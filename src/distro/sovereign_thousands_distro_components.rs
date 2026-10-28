@@ -57,7 +57,7 @@ pub struct SovereignThousandsDistroComponentsEngine {
 
 impl SovereignThousandsDistroComponentsEngine {
     pub fn new() -> Self {
-        let mut components = Vec::with_capacity(26050);
+        let mut components = Vec::with_capacity(28050);
         components.push(DistroComponentItem {
             id: 1,
             name: String::from("Core eBPF Sched_Ext Governor (Linux Generic)"),
@@ -58720,6 +58720,18006 @@ impl SovereignThousandsDistroComponentsEngine {
             enabled: true,
             execution_count: 0,
         });
+        components.push(DistroComponentItem {
+            id: 26001,
+            name: String::from("Kernel Scheduler Capability Variant #150 (Ubuntu v150)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26002,
+            name: String::from("Filesystem & Storage Driver Capability Variant #150 (Debian v150)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26003,
+            name: String::from("Security & Hardening Shield Capability Variant #150 (Fedora v150)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26004,
+            name: String::from("Package Manager & Solver Capability Variant #150 (Arch Linux v150)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26005,
+            name: String::from("Networking & Firewall Router Capability Variant #150 (Gentoo v150)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26006,
+            name: String::from("Init & Service Supervisor Capability Variant #150 (Alpine Linux v150)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26007,
+            name: String::from("Userland Utility Fastpipe Capability Variant #150 (Void Linux v150)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26008,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #150 (NixOS v150)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26009,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #150 (openSUSE v150)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26010,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #150 (FreeBSD v150)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #150"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26011,
+            name: String::from("Kernel Scheduler Capability Variant #151 (OpenBSD v151)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26012,
+            name: String::from("Filesystem & Storage Driver Capability Variant #151 (NetBSD v151)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26013,
+            name: String::from("Security & Hardening Shield Capability Variant #151 (DragonFly BSD v151)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26014,
+            name: String::from("Package Manager & Solver Capability Variant #151 (Solus v151)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26015,
+            name: String::from("Networking & Firewall Router Capability Variant #151 (Slackware v151)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26016,
+            name: String::from("Init & Service Supervisor Capability Variant #151 (Clear Linux v151)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26017,
+            name: String::from("Userland Utility Fastpipe Capability Variant #151 (CachyOS v151)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26018,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #151 (Pop!_OS v151)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26019,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #151 (Manjaro v151)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26020,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #151 (Linux Mint v151)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #151"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26021,
+            name: String::from("Kernel Scheduler Capability Variant #152 (Ubuntu v152)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26022,
+            name: String::from("Filesystem & Storage Driver Capability Variant #152 (Debian v152)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26023,
+            name: String::from("Security & Hardening Shield Capability Variant #152 (Fedora v152)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26024,
+            name: String::from("Package Manager & Solver Capability Variant #152 (Arch Linux v152)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26025,
+            name: String::from("Networking & Firewall Router Capability Variant #152 (Gentoo v152)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26026,
+            name: String::from("Init & Service Supervisor Capability Variant #152 (Alpine Linux v152)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26027,
+            name: String::from("Userland Utility Fastpipe Capability Variant #152 (Void Linux v152)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26028,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #152 (NixOS v152)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26029,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #152 (openSUSE v152)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26030,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #152 (FreeBSD v152)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #152"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26031,
+            name: String::from("Kernel Scheduler Capability Variant #153 (OpenBSD v153)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26032,
+            name: String::from("Filesystem & Storage Driver Capability Variant #153 (NetBSD v153)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26033,
+            name: String::from("Security & Hardening Shield Capability Variant #153 (DragonFly BSD v153)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26034,
+            name: String::from("Package Manager & Solver Capability Variant #153 (Solus v153)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26035,
+            name: String::from("Networking & Firewall Router Capability Variant #153 (Slackware v153)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26036,
+            name: String::from("Init & Service Supervisor Capability Variant #153 (Clear Linux v153)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26037,
+            name: String::from("Userland Utility Fastpipe Capability Variant #153 (CachyOS v153)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26038,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #153 (Pop!_OS v153)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26039,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #153 (Manjaro v153)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26040,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #153 (Linux Mint v153)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #153"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26041,
+            name: String::from("Kernel Scheduler Capability Variant #154 (Ubuntu v154)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26042,
+            name: String::from("Filesystem & Storage Driver Capability Variant #154 (Debian v154)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26043,
+            name: String::from("Security & Hardening Shield Capability Variant #154 (Fedora v154)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26044,
+            name: String::from("Package Manager & Solver Capability Variant #154 (Arch Linux v154)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26045,
+            name: String::from("Networking & Firewall Router Capability Variant #154 (Gentoo v154)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26046,
+            name: String::from("Init & Service Supervisor Capability Variant #154 (Alpine Linux v154)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26047,
+            name: String::from("Userland Utility Fastpipe Capability Variant #154 (Void Linux v154)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26048,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #154 (NixOS v154)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26049,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #154 (openSUSE v154)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26050,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #154 (FreeBSD v154)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #154"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26051,
+            name: String::from("Kernel Scheduler Capability Variant #155 (OpenBSD v155)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26052,
+            name: String::from("Filesystem & Storage Driver Capability Variant #155 (NetBSD v155)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26053,
+            name: String::from("Security & Hardening Shield Capability Variant #155 (DragonFly BSD v155)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26054,
+            name: String::from("Package Manager & Solver Capability Variant #155 (Solus v155)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26055,
+            name: String::from("Networking & Firewall Router Capability Variant #155 (Slackware v155)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26056,
+            name: String::from("Init & Service Supervisor Capability Variant #155 (Clear Linux v155)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26057,
+            name: String::from("Userland Utility Fastpipe Capability Variant #155 (CachyOS v155)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26058,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #155 (Pop!_OS v155)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26059,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #155 (Manjaro v155)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26060,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #155 (Linux Mint v155)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #155"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26061,
+            name: String::from("Kernel Scheduler Capability Variant #156 (Ubuntu v156)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26062,
+            name: String::from("Filesystem & Storage Driver Capability Variant #156 (Debian v156)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26063,
+            name: String::from("Security & Hardening Shield Capability Variant #156 (Fedora v156)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26064,
+            name: String::from("Package Manager & Solver Capability Variant #156 (Arch Linux v156)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26065,
+            name: String::from("Networking & Firewall Router Capability Variant #156 (Gentoo v156)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26066,
+            name: String::from("Init & Service Supervisor Capability Variant #156 (Alpine Linux v156)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26067,
+            name: String::from("Userland Utility Fastpipe Capability Variant #156 (Void Linux v156)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26068,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #156 (NixOS v156)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26069,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #156 (openSUSE v156)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26070,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #156 (FreeBSD v156)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #156"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26071,
+            name: String::from("Kernel Scheduler Capability Variant #157 (OpenBSD v157)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26072,
+            name: String::from("Filesystem & Storage Driver Capability Variant #157 (NetBSD v157)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26073,
+            name: String::from("Security & Hardening Shield Capability Variant #157 (DragonFly BSD v157)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26074,
+            name: String::from("Package Manager & Solver Capability Variant #157 (Solus v157)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26075,
+            name: String::from("Networking & Firewall Router Capability Variant #157 (Slackware v157)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26076,
+            name: String::from("Init & Service Supervisor Capability Variant #157 (Clear Linux v157)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26077,
+            name: String::from("Userland Utility Fastpipe Capability Variant #157 (CachyOS v157)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26078,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #157 (Pop!_OS v157)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26079,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #157 (Manjaro v157)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26080,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #157 (Linux Mint v157)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #157"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26081,
+            name: String::from("Kernel Scheduler Capability Variant #158 (Ubuntu v158)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26082,
+            name: String::from("Filesystem & Storage Driver Capability Variant #158 (Debian v158)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26083,
+            name: String::from("Security & Hardening Shield Capability Variant #158 (Fedora v158)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26084,
+            name: String::from("Package Manager & Solver Capability Variant #158 (Arch Linux v158)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26085,
+            name: String::from("Networking & Firewall Router Capability Variant #158 (Gentoo v158)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26086,
+            name: String::from("Init & Service Supervisor Capability Variant #158 (Alpine Linux v158)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26087,
+            name: String::from("Userland Utility Fastpipe Capability Variant #158 (Void Linux v158)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26088,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #158 (NixOS v158)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26089,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #158 (openSUSE v158)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26090,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #158 (FreeBSD v158)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #158"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26091,
+            name: String::from("Kernel Scheduler Capability Variant #159 (OpenBSD v159)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26092,
+            name: String::from("Filesystem & Storage Driver Capability Variant #159 (NetBSD v159)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26093,
+            name: String::from("Security & Hardening Shield Capability Variant #159 (DragonFly BSD v159)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26094,
+            name: String::from("Package Manager & Solver Capability Variant #159 (Solus v159)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26095,
+            name: String::from("Networking & Firewall Router Capability Variant #159 (Slackware v159)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26096,
+            name: String::from("Init & Service Supervisor Capability Variant #159 (Clear Linux v159)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26097,
+            name: String::from("Userland Utility Fastpipe Capability Variant #159 (CachyOS v159)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26098,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #159 (Pop!_OS v159)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26099,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #159 (Manjaro v159)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26100,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #159 (Linux Mint v159)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #159"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26101,
+            name: String::from("Kernel Scheduler Capability Variant #160 (Ubuntu v160)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26102,
+            name: String::from("Filesystem & Storage Driver Capability Variant #160 (Debian v160)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26103,
+            name: String::from("Security & Hardening Shield Capability Variant #160 (Fedora v160)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26104,
+            name: String::from("Package Manager & Solver Capability Variant #160 (Arch Linux v160)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26105,
+            name: String::from("Networking & Firewall Router Capability Variant #160 (Gentoo v160)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26106,
+            name: String::from("Init & Service Supervisor Capability Variant #160 (Alpine Linux v160)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26107,
+            name: String::from("Userland Utility Fastpipe Capability Variant #160 (Void Linux v160)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26108,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #160 (NixOS v160)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26109,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #160 (openSUSE v160)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26110,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #160 (FreeBSD v160)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #160"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26111,
+            name: String::from("Kernel Scheduler Capability Variant #161 (OpenBSD v161)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26112,
+            name: String::from("Filesystem & Storage Driver Capability Variant #161 (NetBSD v161)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26113,
+            name: String::from("Security & Hardening Shield Capability Variant #161 (DragonFly BSD v161)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26114,
+            name: String::from("Package Manager & Solver Capability Variant #161 (Solus v161)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26115,
+            name: String::from("Networking & Firewall Router Capability Variant #161 (Slackware v161)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26116,
+            name: String::from("Init & Service Supervisor Capability Variant #161 (Clear Linux v161)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26117,
+            name: String::from("Userland Utility Fastpipe Capability Variant #161 (CachyOS v161)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26118,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #161 (Pop!_OS v161)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26119,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #161 (Manjaro v161)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26120,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #161 (Linux Mint v161)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #161"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26121,
+            name: String::from("Kernel Scheduler Capability Variant #162 (Ubuntu v162)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26122,
+            name: String::from("Filesystem & Storage Driver Capability Variant #162 (Debian v162)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26123,
+            name: String::from("Security & Hardening Shield Capability Variant #162 (Fedora v162)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26124,
+            name: String::from("Package Manager & Solver Capability Variant #162 (Arch Linux v162)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26125,
+            name: String::from("Networking & Firewall Router Capability Variant #162 (Gentoo v162)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26126,
+            name: String::from("Init & Service Supervisor Capability Variant #162 (Alpine Linux v162)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26127,
+            name: String::from("Userland Utility Fastpipe Capability Variant #162 (Void Linux v162)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26128,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #162 (NixOS v162)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26129,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #162 (openSUSE v162)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26130,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #162 (FreeBSD v162)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #162"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26131,
+            name: String::from("Kernel Scheduler Capability Variant #163 (OpenBSD v163)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26132,
+            name: String::from("Filesystem & Storage Driver Capability Variant #163 (NetBSD v163)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26133,
+            name: String::from("Security & Hardening Shield Capability Variant #163 (DragonFly BSD v163)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26134,
+            name: String::from("Package Manager & Solver Capability Variant #163 (Solus v163)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26135,
+            name: String::from("Networking & Firewall Router Capability Variant #163 (Slackware v163)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26136,
+            name: String::from("Init & Service Supervisor Capability Variant #163 (Clear Linux v163)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26137,
+            name: String::from("Userland Utility Fastpipe Capability Variant #163 (CachyOS v163)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26138,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #163 (Pop!_OS v163)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26139,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #163 (Manjaro v163)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26140,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #163 (Linux Mint v163)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #163"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26141,
+            name: String::from("Kernel Scheduler Capability Variant #164 (Ubuntu v164)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26142,
+            name: String::from("Filesystem & Storage Driver Capability Variant #164 (Debian v164)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26143,
+            name: String::from("Security & Hardening Shield Capability Variant #164 (Fedora v164)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26144,
+            name: String::from("Package Manager & Solver Capability Variant #164 (Arch Linux v164)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26145,
+            name: String::from("Networking & Firewall Router Capability Variant #164 (Gentoo v164)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26146,
+            name: String::from("Init & Service Supervisor Capability Variant #164 (Alpine Linux v164)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26147,
+            name: String::from("Userland Utility Fastpipe Capability Variant #164 (Void Linux v164)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26148,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #164 (NixOS v164)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26149,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #164 (openSUSE v164)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26150,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #164 (FreeBSD v164)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #164"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26151,
+            name: String::from("Kernel Scheduler Capability Variant #165 (OpenBSD v165)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26152,
+            name: String::from("Filesystem & Storage Driver Capability Variant #165 (NetBSD v165)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26153,
+            name: String::from("Security & Hardening Shield Capability Variant #165 (DragonFly BSD v165)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26154,
+            name: String::from("Package Manager & Solver Capability Variant #165 (Solus v165)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26155,
+            name: String::from("Networking & Firewall Router Capability Variant #165 (Slackware v165)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26156,
+            name: String::from("Init & Service Supervisor Capability Variant #165 (Clear Linux v165)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26157,
+            name: String::from("Userland Utility Fastpipe Capability Variant #165 (CachyOS v165)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26158,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #165 (Pop!_OS v165)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26159,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #165 (Manjaro v165)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26160,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #165 (Linux Mint v165)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #165"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26161,
+            name: String::from("Kernel Scheduler Capability Variant #166 (Ubuntu v166)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26162,
+            name: String::from("Filesystem & Storage Driver Capability Variant #166 (Debian v166)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26163,
+            name: String::from("Security & Hardening Shield Capability Variant #166 (Fedora v166)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26164,
+            name: String::from("Package Manager & Solver Capability Variant #166 (Arch Linux v166)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26165,
+            name: String::from("Networking & Firewall Router Capability Variant #166 (Gentoo v166)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26166,
+            name: String::from("Init & Service Supervisor Capability Variant #166 (Alpine Linux v166)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26167,
+            name: String::from("Userland Utility Fastpipe Capability Variant #166 (Void Linux v166)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26168,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #166 (NixOS v166)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26169,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #166 (openSUSE v166)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26170,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #166 (FreeBSD v166)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #166"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26171,
+            name: String::from("Kernel Scheduler Capability Variant #167 (OpenBSD v167)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26172,
+            name: String::from("Filesystem & Storage Driver Capability Variant #167 (NetBSD v167)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26173,
+            name: String::from("Security & Hardening Shield Capability Variant #167 (DragonFly BSD v167)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26174,
+            name: String::from("Package Manager & Solver Capability Variant #167 (Solus v167)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26175,
+            name: String::from("Networking & Firewall Router Capability Variant #167 (Slackware v167)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26176,
+            name: String::from("Init & Service Supervisor Capability Variant #167 (Clear Linux v167)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26177,
+            name: String::from("Userland Utility Fastpipe Capability Variant #167 (CachyOS v167)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26178,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #167 (Pop!_OS v167)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26179,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #167 (Manjaro v167)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26180,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #167 (Linux Mint v167)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #167"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26181,
+            name: String::from("Kernel Scheduler Capability Variant #168 (Ubuntu v168)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26182,
+            name: String::from("Filesystem & Storage Driver Capability Variant #168 (Debian v168)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26183,
+            name: String::from("Security & Hardening Shield Capability Variant #168 (Fedora v168)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26184,
+            name: String::from("Package Manager & Solver Capability Variant #168 (Arch Linux v168)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26185,
+            name: String::from("Networking & Firewall Router Capability Variant #168 (Gentoo v168)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26186,
+            name: String::from("Init & Service Supervisor Capability Variant #168 (Alpine Linux v168)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26187,
+            name: String::from("Userland Utility Fastpipe Capability Variant #168 (Void Linux v168)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26188,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #168 (NixOS v168)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26189,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #168 (openSUSE v168)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26190,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #168 (FreeBSD v168)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #168"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26191,
+            name: String::from("Kernel Scheduler Capability Variant #169 (OpenBSD v169)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26192,
+            name: String::from("Filesystem & Storage Driver Capability Variant #169 (NetBSD v169)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26193,
+            name: String::from("Security & Hardening Shield Capability Variant #169 (DragonFly BSD v169)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26194,
+            name: String::from("Package Manager & Solver Capability Variant #169 (Solus v169)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26195,
+            name: String::from("Networking & Firewall Router Capability Variant #169 (Slackware v169)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26196,
+            name: String::from("Init & Service Supervisor Capability Variant #169 (Clear Linux v169)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26197,
+            name: String::from("Userland Utility Fastpipe Capability Variant #169 (CachyOS v169)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26198,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #169 (Pop!_OS v169)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26199,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #169 (Manjaro v169)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26200,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #169 (Linux Mint v169)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #169"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26201,
+            name: String::from("Kernel Scheduler Capability Variant #170 (Ubuntu v170)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26202,
+            name: String::from("Filesystem & Storage Driver Capability Variant #170 (Debian v170)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26203,
+            name: String::from("Security & Hardening Shield Capability Variant #170 (Fedora v170)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26204,
+            name: String::from("Package Manager & Solver Capability Variant #170 (Arch Linux v170)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26205,
+            name: String::from("Networking & Firewall Router Capability Variant #170 (Gentoo v170)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26206,
+            name: String::from("Init & Service Supervisor Capability Variant #170 (Alpine Linux v170)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26207,
+            name: String::from("Userland Utility Fastpipe Capability Variant #170 (Void Linux v170)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26208,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #170 (NixOS v170)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26209,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #170 (openSUSE v170)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26210,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #170 (FreeBSD v170)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #170"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26211,
+            name: String::from("Kernel Scheduler Capability Variant #171 (OpenBSD v171)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26212,
+            name: String::from("Filesystem & Storage Driver Capability Variant #171 (NetBSD v171)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26213,
+            name: String::from("Security & Hardening Shield Capability Variant #171 (DragonFly BSD v171)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26214,
+            name: String::from("Package Manager & Solver Capability Variant #171 (Solus v171)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26215,
+            name: String::from("Networking & Firewall Router Capability Variant #171 (Slackware v171)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26216,
+            name: String::from("Init & Service Supervisor Capability Variant #171 (Clear Linux v171)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26217,
+            name: String::from("Userland Utility Fastpipe Capability Variant #171 (CachyOS v171)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26218,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #171 (Pop!_OS v171)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26219,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #171 (Manjaro v171)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26220,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #171 (Linux Mint v171)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #171"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26221,
+            name: String::from("Kernel Scheduler Capability Variant #172 (Ubuntu v172)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26222,
+            name: String::from("Filesystem & Storage Driver Capability Variant #172 (Debian v172)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26223,
+            name: String::from("Security & Hardening Shield Capability Variant #172 (Fedora v172)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26224,
+            name: String::from("Package Manager & Solver Capability Variant #172 (Arch Linux v172)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26225,
+            name: String::from("Networking & Firewall Router Capability Variant #172 (Gentoo v172)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26226,
+            name: String::from("Init & Service Supervisor Capability Variant #172 (Alpine Linux v172)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26227,
+            name: String::from("Userland Utility Fastpipe Capability Variant #172 (Void Linux v172)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26228,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #172 (NixOS v172)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26229,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #172 (openSUSE v172)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26230,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #172 (FreeBSD v172)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #172"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26231,
+            name: String::from("Kernel Scheduler Capability Variant #173 (OpenBSD v173)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26232,
+            name: String::from("Filesystem & Storage Driver Capability Variant #173 (NetBSD v173)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26233,
+            name: String::from("Security & Hardening Shield Capability Variant #173 (DragonFly BSD v173)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26234,
+            name: String::from("Package Manager & Solver Capability Variant #173 (Solus v173)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26235,
+            name: String::from("Networking & Firewall Router Capability Variant #173 (Slackware v173)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26236,
+            name: String::from("Init & Service Supervisor Capability Variant #173 (Clear Linux v173)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26237,
+            name: String::from("Userland Utility Fastpipe Capability Variant #173 (CachyOS v173)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26238,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #173 (Pop!_OS v173)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26239,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #173 (Manjaro v173)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26240,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #173 (Linux Mint v173)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #173"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26241,
+            name: String::from("Kernel Scheduler Capability Variant #174 (Ubuntu v174)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26242,
+            name: String::from("Filesystem & Storage Driver Capability Variant #174 (Debian v174)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26243,
+            name: String::from("Security & Hardening Shield Capability Variant #174 (Fedora v174)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26244,
+            name: String::from("Package Manager & Solver Capability Variant #174 (Arch Linux v174)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26245,
+            name: String::from("Networking & Firewall Router Capability Variant #174 (Gentoo v174)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26246,
+            name: String::from("Init & Service Supervisor Capability Variant #174 (Alpine Linux v174)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26247,
+            name: String::from("Userland Utility Fastpipe Capability Variant #174 (Void Linux v174)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26248,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #174 (NixOS v174)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26249,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #174 (openSUSE v174)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26250,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #174 (FreeBSD v174)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #174"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26251,
+            name: String::from("Kernel Scheduler Capability Variant #175 (OpenBSD v175)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26252,
+            name: String::from("Filesystem & Storage Driver Capability Variant #175 (NetBSD v175)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26253,
+            name: String::from("Security & Hardening Shield Capability Variant #175 (DragonFly BSD v175)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26254,
+            name: String::from("Package Manager & Solver Capability Variant #175 (Solus v175)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26255,
+            name: String::from("Networking & Firewall Router Capability Variant #175 (Slackware v175)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26256,
+            name: String::from("Init & Service Supervisor Capability Variant #175 (Clear Linux v175)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26257,
+            name: String::from("Userland Utility Fastpipe Capability Variant #175 (CachyOS v175)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26258,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #175 (Pop!_OS v175)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26259,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #175 (Manjaro v175)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26260,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #175 (Linux Mint v175)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #175"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26261,
+            name: String::from("Kernel Scheduler Capability Variant #176 (Ubuntu v176)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26262,
+            name: String::from("Filesystem & Storage Driver Capability Variant #176 (Debian v176)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26263,
+            name: String::from("Security & Hardening Shield Capability Variant #176 (Fedora v176)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26264,
+            name: String::from("Package Manager & Solver Capability Variant #176 (Arch Linux v176)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26265,
+            name: String::from("Networking & Firewall Router Capability Variant #176 (Gentoo v176)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26266,
+            name: String::from("Init & Service Supervisor Capability Variant #176 (Alpine Linux v176)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26267,
+            name: String::from("Userland Utility Fastpipe Capability Variant #176 (Void Linux v176)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26268,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #176 (NixOS v176)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26269,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #176 (openSUSE v176)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26270,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #176 (FreeBSD v176)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #176"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26271,
+            name: String::from("Kernel Scheduler Capability Variant #177 (OpenBSD v177)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26272,
+            name: String::from("Filesystem & Storage Driver Capability Variant #177 (NetBSD v177)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26273,
+            name: String::from("Security & Hardening Shield Capability Variant #177 (DragonFly BSD v177)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26274,
+            name: String::from("Package Manager & Solver Capability Variant #177 (Solus v177)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26275,
+            name: String::from("Networking & Firewall Router Capability Variant #177 (Slackware v177)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26276,
+            name: String::from("Init & Service Supervisor Capability Variant #177 (Clear Linux v177)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26277,
+            name: String::from("Userland Utility Fastpipe Capability Variant #177 (CachyOS v177)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26278,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #177 (Pop!_OS v177)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26279,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #177 (Manjaro v177)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26280,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #177 (Linux Mint v177)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #177"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26281,
+            name: String::from("Kernel Scheduler Capability Variant #178 (Ubuntu v178)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26282,
+            name: String::from("Filesystem & Storage Driver Capability Variant #178 (Debian v178)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26283,
+            name: String::from("Security & Hardening Shield Capability Variant #178 (Fedora v178)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26284,
+            name: String::from("Package Manager & Solver Capability Variant #178 (Arch Linux v178)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26285,
+            name: String::from("Networking & Firewall Router Capability Variant #178 (Gentoo v178)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26286,
+            name: String::from("Init & Service Supervisor Capability Variant #178 (Alpine Linux v178)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26287,
+            name: String::from("Userland Utility Fastpipe Capability Variant #178 (Void Linux v178)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26288,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #178 (NixOS v178)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26289,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #178 (openSUSE v178)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26290,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #178 (FreeBSD v178)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #178"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26291,
+            name: String::from("Kernel Scheduler Capability Variant #179 (OpenBSD v179)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26292,
+            name: String::from("Filesystem & Storage Driver Capability Variant #179 (NetBSD v179)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26293,
+            name: String::from("Security & Hardening Shield Capability Variant #179 (DragonFly BSD v179)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26294,
+            name: String::from("Package Manager & Solver Capability Variant #179 (Solus v179)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26295,
+            name: String::from("Networking & Firewall Router Capability Variant #179 (Slackware v179)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26296,
+            name: String::from("Init & Service Supervisor Capability Variant #179 (Clear Linux v179)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26297,
+            name: String::from("Userland Utility Fastpipe Capability Variant #179 (CachyOS v179)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26298,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #179 (Pop!_OS v179)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26299,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #179 (Manjaro v179)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26300,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #179 (Linux Mint v179)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #179"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26301,
+            name: String::from("Kernel Scheduler Capability Variant #180 (Ubuntu v180)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26302,
+            name: String::from("Filesystem & Storage Driver Capability Variant #180 (Debian v180)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26303,
+            name: String::from("Security & Hardening Shield Capability Variant #180 (Fedora v180)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26304,
+            name: String::from("Package Manager & Solver Capability Variant #180 (Arch Linux v180)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26305,
+            name: String::from("Networking & Firewall Router Capability Variant #180 (Gentoo v180)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26306,
+            name: String::from("Init & Service Supervisor Capability Variant #180 (Alpine Linux v180)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26307,
+            name: String::from("Userland Utility Fastpipe Capability Variant #180 (Void Linux v180)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26308,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #180 (NixOS v180)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26309,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #180 (openSUSE v180)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26310,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #180 (FreeBSD v180)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #180"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26311,
+            name: String::from("Kernel Scheduler Capability Variant #181 (OpenBSD v181)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26312,
+            name: String::from("Filesystem & Storage Driver Capability Variant #181 (NetBSD v181)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26313,
+            name: String::from("Security & Hardening Shield Capability Variant #181 (DragonFly BSD v181)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26314,
+            name: String::from("Package Manager & Solver Capability Variant #181 (Solus v181)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26315,
+            name: String::from("Networking & Firewall Router Capability Variant #181 (Slackware v181)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26316,
+            name: String::from("Init & Service Supervisor Capability Variant #181 (Clear Linux v181)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26317,
+            name: String::from("Userland Utility Fastpipe Capability Variant #181 (CachyOS v181)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26318,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #181 (Pop!_OS v181)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26319,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #181 (Manjaro v181)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26320,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #181 (Linux Mint v181)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #181"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26321,
+            name: String::from("Kernel Scheduler Capability Variant #182 (Ubuntu v182)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26322,
+            name: String::from("Filesystem & Storage Driver Capability Variant #182 (Debian v182)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26323,
+            name: String::from("Security & Hardening Shield Capability Variant #182 (Fedora v182)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26324,
+            name: String::from("Package Manager & Solver Capability Variant #182 (Arch Linux v182)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26325,
+            name: String::from("Networking & Firewall Router Capability Variant #182 (Gentoo v182)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26326,
+            name: String::from("Init & Service Supervisor Capability Variant #182 (Alpine Linux v182)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26327,
+            name: String::from("Userland Utility Fastpipe Capability Variant #182 (Void Linux v182)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26328,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #182 (NixOS v182)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26329,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #182 (openSUSE v182)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26330,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #182 (FreeBSD v182)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #182"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26331,
+            name: String::from("Kernel Scheduler Capability Variant #183 (OpenBSD v183)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26332,
+            name: String::from("Filesystem & Storage Driver Capability Variant #183 (NetBSD v183)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26333,
+            name: String::from("Security & Hardening Shield Capability Variant #183 (DragonFly BSD v183)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26334,
+            name: String::from("Package Manager & Solver Capability Variant #183 (Solus v183)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26335,
+            name: String::from("Networking & Firewall Router Capability Variant #183 (Slackware v183)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26336,
+            name: String::from("Init & Service Supervisor Capability Variant #183 (Clear Linux v183)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26337,
+            name: String::from("Userland Utility Fastpipe Capability Variant #183 (CachyOS v183)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26338,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #183 (Pop!_OS v183)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26339,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #183 (Manjaro v183)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26340,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #183 (Linux Mint v183)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #183"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26341,
+            name: String::from("Kernel Scheduler Capability Variant #184 (Ubuntu v184)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26342,
+            name: String::from("Filesystem & Storage Driver Capability Variant #184 (Debian v184)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26343,
+            name: String::from("Security & Hardening Shield Capability Variant #184 (Fedora v184)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26344,
+            name: String::from("Package Manager & Solver Capability Variant #184 (Arch Linux v184)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26345,
+            name: String::from("Networking & Firewall Router Capability Variant #184 (Gentoo v184)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26346,
+            name: String::from("Init & Service Supervisor Capability Variant #184 (Alpine Linux v184)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26347,
+            name: String::from("Userland Utility Fastpipe Capability Variant #184 (Void Linux v184)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26348,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #184 (NixOS v184)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26349,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #184 (openSUSE v184)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26350,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #184 (FreeBSD v184)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #184"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26351,
+            name: String::from("Kernel Scheduler Capability Variant #185 (OpenBSD v185)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26352,
+            name: String::from("Filesystem & Storage Driver Capability Variant #185 (NetBSD v185)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26353,
+            name: String::from("Security & Hardening Shield Capability Variant #185 (DragonFly BSD v185)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26354,
+            name: String::from("Package Manager & Solver Capability Variant #185 (Solus v185)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26355,
+            name: String::from("Networking & Firewall Router Capability Variant #185 (Slackware v185)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26356,
+            name: String::from("Init & Service Supervisor Capability Variant #185 (Clear Linux v185)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26357,
+            name: String::from("Userland Utility Fastpipe Capability Variant #185 (CachyOS v185)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26358,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #185 (Pop!_OS v185)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26359,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #185 (Manjaro v185)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26360,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #185 (Linux Mint v185)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #185"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26361,
+            name: String::from("Kernel Scheduler Capability Variant #186 (Ubuntu v186)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26362,
+            name: String::from("Filesystem & Storage Driver Capability Variant #186 (Debian v186)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26363,
+            name: String::from("Security & Hardening Shield Capability Variant #186 (Fedora v186)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26364,
+            name: String::from("Package Manager & Solver Capability Variant #186 (Arch Linux v186)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26365,
+            name: String::from("Networking & Firewall Router Capability Variant #186 (Gentoo v186)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26366,
+            name: String::from("Init & Service Supervisor Capability Variant #186 (Alpine Linux v186)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26367,
+            name: String::from("Userland Utility Fastpipe Capability Variant #186 (Void Linux v186)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26368,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #186 (NixOS v186)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26369,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #186 (openSUSE v186)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26370,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #186 (FreeBSD v186)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #186"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26371,
+            name: String::from("Kernel Scheduler Capability Variant #187 (OpenBSD v187)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26372,
+            name: String::from("Filesystem & Storage Driver Capability Variant #187 (NetBSD v187)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26373,
+            name: String::from("Security & Hardening Shield Capability Variant #187 (DragonFly BSD v187)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26374,
+            name: String::from("Package Manager & Solver Capability Variant #187 (Solus v187)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26375,
+            name: String::from("Networking & Firewall Router Capability Variant #187 (Slackware v187)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26376,
+            name: String::from("Init & Service Supervisor Capability Variant #187 (Clear Linux v187)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26377,
+            name: String::from("Userland Utility Fastpipe Capability Variant #187 (CachyOS v187)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26378,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #187 (Pop!_OS v187)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26379,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #187 (Manjaro v187)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26380,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #187 (Linux Mint v187)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #187"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26381,
+            name: String::from("Kernel Scheduler Capability Variant #188 (Ubuntu v188)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26382,
+            name: String::from("Filesystem & Storage Driver Capability Variant #188 (Debian v188)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26383,
+            name: String::from("Security & Hardening Shield Capability Variant #188 (Fedora v188)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26384,
+            name: String::from("Package Manager & Solver Capability Variant #188 (Arch Linux v188)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26385,
+            name: String::from("Networking & Firewall Router Capability Variant #188 (Gentoo v188)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26386,
+            name: String::from("Init & Service Supervisor Capability Variant #188 (Alpine Linux v188)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26387,
+            name: String::from("Userland Utility Fastpipe Capability Variant #188 (Void Linux v188)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26388,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #188 (NixOS v188)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26389,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #188 (openSUSE v188)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26390,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #188 (FreeBSD v188)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #188"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26391,
+            name: String::from("Kernel Scheduler Capability Variant #189 (OpenBSD v189)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26392,
+            name: String::from("Filesystem & Storage Driver Capability Variant #189 (NetBSD v189)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26393,
+            name: String::from("Security & Hardening Shield Capability Variant #189 (DragonFly BSD v189)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26394,
+            name: String::from("Package Manager & Solver Capability Variant #189 (Solus v189)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26395,
+            name: String::from("Networking & Firewall Router Capability Variant #189 (Slackware v189)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26396,
+            name: String::from("Init & Service Supervisor Capability Variant #189 (Clear Linux v189)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26397,
+            name: String::from("Userland Utility Fastpipe Capability Variant #189 (CachyOS v189)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26398,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #189 (Pop!_OS v189)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26399,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #189 (Manjaro v189)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26400,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #189 (Linux Mint v189)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #189"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26401,
+            name: String::from("Kernel Scheduler Capability Variant #190 (Ubuntu v190)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26402,
+            name: String::from("Filesystem & Storage Driver Capability Variant #190 (Debian v190)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26403,
+            name: String::from("Security & Hardening Shield Capability Variant #190 (Fedora v190)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26404,
+            name: String::from("Package Manager & Solver Capability Variant #190 (Arch Linux v190)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26405,
+            name: String::from("Networking & Firewall Router Capability Variant #190 (Gentoo v190)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26406,
+            name: String::from("Init & Service Supervisor Capability Variant #190 (Alpine Linux v190)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26407,
+            name: String::from("Userland Utility Fastpipe Capability Variant #190 (Void Linux v190)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26408,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #190 (NixOS v190)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26409,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #190 (openSUSE v190)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26410,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #190 (FreeBSD v190)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #190"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26411,
+            name: String::from("Kernel Scheduler Capability Variant #191 (OpenBSD v191)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26412,
+            name: String::from("Filesystem & Storage Driver Capability Variant #191 (NetBSD v191)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26413,
+            name: String::from("Security & Hardening Shield Capability Variant #191 (DragonFly BSD v191)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26414,
+            name: String::from("Package Manager & Solver Capability Variant #191 (Solus v191)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26415,
+            name: String::from("Networking & Firewall Router Capability Variant #191 (Slackware v191)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26416,
+            name: String::from("Init & Service Supervisor Capability Variant #191 (Clear Linux v191)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26417,
+            name: String::from("Userland Utility Fastpipe Capability Variant #191 (CachyOS v191)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26418,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #191 (Pop!_OS v191)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26419,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #191 (Manjaro v191)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26420,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #191 (Linux Mint v191)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #191"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26421,
+            name: String::from("Kernel Scheduler Capability Variant #192 (Ubuntu v192)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26422,
+            name: String::from("Filesystem & Storage Driver Capability Variant #192 (Debian v192)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26423,
+            name: String::from("Security & Hardening Shield Capability Variant #192 (Fedora v192)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26424,
+            name: String::from("Package Manager & Solver Capability Variant #192 (Arch Linux v192)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26425,
+            name: String::from("Networking & Firewall Router Capability Variant #192 (Gentoo v192)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26426,
+            name: String::from("Init & Service Supervisor Capability Variant #192 (Alpine Linux v192)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26427,
+            name: String::from("Userland Utility Fastpipe Capability Variant #192 (Void Linux v192)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26428,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #192 (NixOS v192)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26429,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #192 (openSUSE v192)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26430,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #192 (FreeBSD v192)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #192"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26431,
+            name: String::from("Kernel Scheduler Capability Variant #193 (OpenBSD v193)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26432,
+            name: String::from("Filesystem & Storage Driver Capability Variant #193 (NetBSD v193)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26433,
+            name: String::from("Security & Hardening Shield Capability Variant #193 (DragonFly BSD v193)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26434,
+            name: String::from("Package Manager & Solver Capability Variant #193 (Solus v193)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26435,
+            name: String::from("Networking & Firewall Router Capability Variant #193 (Slackware v193)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26436,
+            name: String::from("Init & Service Supervisor Capability Variant #193 (Clear Linux v193)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26437,
+            name: String::from("Userland Utility Fastpipe Capability Variant #193 (CachyOS v193)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26438,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #193 (Pop!_OS v193)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26439,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #193 (Manjaro v193)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26440,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #193 (Linux Mint v193)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #193"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26441,
+            name: String::from("Kernel Scheduler Capability Variant #194 (Ubuntu v194)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26442,
+            name: String::from("Filesystem & Storage Driver Capability Variant #194 (Debian v194)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26443,
+            name: String::from("Security & Hardening Shield Capability Variant #194 (Fedora v194)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26444,
+            name: String::from("Package Manager & Solver Capability Variant #194 (Arch Linux v194)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26445,
+            name: String::from("Networking & Firewall Router Capability Variant #194 (Gentoo v194)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26446,
+            name: String::from("Init & Service Supervisor Capability Variant #194 (Alpine Linux v194)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26447,
+            name: String::from("Userland Utility Fastpipe Capability Variant #194 (Void Linux v194)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26448,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #194 (NixOS v194)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26449,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #194 (openSUSE v194)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26450,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #194 (FreeBSD v194)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #194"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26451,
+            name: String::from("Kernel Scheduler Capability Variant #195 (OpenBSD v195)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26452,
+            name: String::from("Filesystem & Storage Driver Capability Variant #195 (NetBSD v195)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26453,
+            name: String::from("Security & Hardening Shield Capability Variant #195 (DragonFly BSD v195)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26454,
+            name: String::from("Package Manager & Solver Capability Variant #195 (Solus v195)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26455,
+            name: String::from("Networking & Firewall Router Capability Variant #195 (Slackware v195)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26456,
+            name: String::from("Init & Service Supervisor Capability Variant #195 (Clear Linux v195)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26457,
+            name: String::from("Userland Utility Fastpipe Capability Variant #195 (CachyOS v195)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26458,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #195 (Pop!_OS v195)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26459,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #195 (Manjaro v195)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26460,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #195 (Linux Mint v195)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #195"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26461,
+            name: String::from("Kernel Scheduler Capability Variant #196 (Ubuntu v196)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26462,
+            name: String::from("Filesystem & Storage Driver Capability Variant #196 (Debian v196)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26463,
+            name: String::from("Security & Hardening Shield Capability Variant #196 (Fedora v196)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26464,
+            name: String::from("Package Manager & Solver Capability Variant #196 (Arch Linux v196)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26465,
+            name: String::from("Networking & Firewall Router Capability Variant #196 (Gentoo v196)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26466,
+            name: String::from("Init & Service Supervisor Capability Variant #196 (Alpine Linux v196)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26467,
+            name: String::from("Userland Utility Fastpipe Capability Variant #196 (Void Linux v196)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26468,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #196 (NixOS v196)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26469,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #196 (openSUSE v196)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26470,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #196 (FreeBSD v196)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #196"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26471,
+            name: String::from("Kernel Scheduler Capability Variant #197 (OpenBSD v197)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26472,
+            name: String::from("Filesystem & Storage Driver Capability Variant #197 (NetBSD v197)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26473,
+            name: String::from("Security & Hardening Shield Capability Variant #197 (DragonFly BSD v197)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26474,
+            name: String::from("Package Manager & Solver Capability Variant #197 (Solus v197)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26475,
+            name: String::from("Networking & Firewall Router Capability Variant #197 (Slackware v197)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26476,
+            name: String::from("Init & Service Supervisor Capability Variant #197 (Clear Linux v197)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26477,
+            name: String::from("Userland Utility Fastpipe Capability Variant #197 (CachyOS v197)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26478,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #197 (Pop!_OS v197)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26479,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #197 (Manjaro v197)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26480,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #197 (Linux Mint v197)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #197"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26481,
+            name: String::from("Kernel Scheduler Capability Variant #198 (Ubuntu v198)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26482,
+            name: String::from("Filesystem & Storage Driver Capability Variant #198 (Debian v198)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26483,
+            name: String::from("Security & Hardening Shield Capability Variant #198 (Fedora v198)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26484,
+            name: String::from("Package Manager & Solver Capability Variant #198 (Arch Linux v198)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26485,
+            name: String::from("Networking & Firewall Router Capability Variant #198 (Gentoo v198)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26486,
+            name: String::from("Init & Service Supervisor Capability Variant #198 (Alpine Linux v198)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26487,
+            name: String::from("Userland Utility Fastpipe Capability Variant #198 (Void Linux v198)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26488,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #198 (NixOS v198)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26489,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #198 (openSUSE v198)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26490,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #198 (FreeBSD v198)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #198"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26491,
+            name: String::from("Kernel Scheduler Capability Variant #199 (OpenBSD v199)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26492,
+            name: String::from("Filesystem & Storage Driver Capability Variant #199 (NetBSD v199)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26493,
+            name: String::from("Security & Hardening Shield Capability Variant #199 (DragonFly BSD v199)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26494,
+            name: String::from("Package Manager & Solver Capability Variant #199 (Solus v199)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26495,
+            name: String::from("Networking & Firewall Router Capability Variant #199 (Slackware v199)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26496,
+            name: String::from("Init & Service Supervisor Capability Variant #199 (Clear Linux v199)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26497,
+            name: String::from("Userland Utility Fastpipe Capability Variant #199 (CachyOS v199)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26498,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #199 (Pop!_OS v199)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26499,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #199 (Manjaro v199)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26500,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #199 (Linux Mint v199)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #199"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26501,
+            name: String::from("Kernel Scheduler Capability Variant #200 (Ubuntu v200)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26502,
+            name: String::from("Filesystem & Storage Driver Capability Variant #200 (Debian v200)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26503,
+            name: String::from("Security & Hardening Shield Capability Variant #200 (Fedora v200)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26504,
+            name: String::from("Package Manager & Solver Capability Variant #200 (Arch Linux v200)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26505,
+            name: String::from("Networking & Firewall Router Capability Variant #200 (Gentoo v200)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26506,
+            name: String::from("Init & Service Supervisor Capability Variant #200 (Alpine Linux v200)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26507,
+            name: String::from("Userland Utility Fastpipe Capability Variant #200 (Void Linux v200)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26508,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #200 (NixOS v200)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26509,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #200 (openSUSE v200)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26510,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #200 (FreeBSD v200)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #200"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26511,
+            name: String::from("Kernel Scheduler Capability Variant #201 (OpenBSD v201)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26512,
+            name: String::from("Filesystem & Storage Driver Capability Variant #201 (NetBSD v201)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26513,
+            name: String::from("Security & Hardening Shield Capability Variant #201 (DragonFly BSD v201)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26514,
+            name: String::from("Package Manager & Solver Capability Variant #201 (Solus v201)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26515,
+            name: String::from("Networking & Firewall Router Capability Variant #201 (Slackware v201)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26516,
+            name: String::from("Init & Service Supervisor Capability Variant #201 (Clear Linux v201)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26517,
+            name: String::from("Userland Utility Fastpipe Capability Variant #201 (CachyOS v201)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26518,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #201 (Pop!_OS v201)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26519,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #201 (Manjaro v201)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26520,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #201 (Linux Mint v201)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #201"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26521,
+            name: String::from("Kernel Scheduler Capability Variant #202 (Ubuntu v202)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26522,
+            name: String::from("Filesystem & Storage Driver Capability Variant #202 (Debian v202)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26523,
+            name: String::from("Security & Hardening Shield Capability Variant #202 (Fedora v202)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26524,
+            name: String::from("Package Manager & Solver Capability Variant #202 (Arch Linux v202)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26525,
+            name: String::from("Networking & Firewall Router Capability Variant #202 (Gentoo v202)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26526,
+            name: String::from("Init & Service Supervisor Capability Variant #202 (Alpine Linux v202)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26527,
+            name: String::from("Userland Utility Fastpipe Capability Variant #202 (Void Linux v202)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26528,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #202 (NixOS v202)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26529,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #202 (openSUSE v202)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26530,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #202 (FreeBSD v202)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #202"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26531,
+            name: String::from("Kernel Scheduler Capability Variant #203 (OpenBSD v203)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26532,
+            name: String::from("Filesystem & Storage Driver Capability Variant #203 (NetBSD v203)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26533,
+            name: String::from("Security & Hardening Shield Capability Variant #203 (DragonFly BSD v203)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26534,
+            name: String::from("Package Manager & Solver Capability Variant #203 (Solus v203)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26535,
+            name: String::from("Networking & Firewall Router Capability Variant #203 (Slackware v203)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26536,
+            name: String::from("Init & Service Supervisor Capability Variant #203 (Clear Linux v203)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26537,
+            name: String::from("Userland Utility Fastpipe Capability Variant #203 (CachyOS v203)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26538,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #203 (Pop!_OS v203)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26539,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #203 (Manjaro v203)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26540,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #203 (Linux Mint v203)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #203"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26541,
+            name: String::from("Kernel Scheduler Capability Variant #204 (Ubuntu v204)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26542,
+            name: String::from("Filesystem & Storage Driver Capability Variant #204 (Debian v204)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26543,
+            name: String::from("Security & Hardening Shield Capability Variant #204 (Fedora v204)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26544,
+            name: String::from("Package Manager & Solver Capability Variant #204 (Arch Linux v204)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26545,
+            name: String::from("Networking & Firewall Router Capability Variant #204 (Gentoo v204)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26546,
+            name: String::from("Init & Service Supervisor Capability Variant #204 (Alpine Linux v204)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26547,
+            name: String::from("Userland Utility Fastpipe Capability Variant #204 (Void Linux v204)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26548,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #204 (NixOS v204)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26549,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #204 (openSUSE v204)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26550,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #204 (FreeBSD v204)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #204"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26551,
+            name: String::from("Kernel Scheduler Capability Variant #205 (OpenBSD v205)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26552,
+            name: String::from("Filesystem & Storage Driver Capability Variant #205 (NetBSD v205)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26553,
+            name: String::from("Security & Hardening Shield Capability Variant #205 (DragonFly BSD v205)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26554,
+            name: String::from("Package Manager & Solver Capability Variant #205 (Solus v205)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26555,
+            name: String::from("Networking & Firewall Router Capability Variant #205 (Slackware v205)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26556,
+            name: String::from("Init & Service Supervisor Capability Variant #205 (Clear Linux v205)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26557,
+            name: String::from("Userland Utility Fastpipe Capability Variant #205 (CachyOS v205)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26558,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #205 (Pop!_OS v205)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26559,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #205 (Manjaro v205)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26560,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #205 (Linux Mint v205)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #205"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26561,
+            name: String::from("Kernel Scheduler Capability Variant #206 (Ubuntu v206)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26562,
+            name: String::from("Filesystem & Storage Driver Capability Variant #206 (Debian v206)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26563,
+            name: String::from("Security & Hardening Shield Capability Variant #206 (Fedora v206)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26564,
+            name: String::from("Package Manager & Solver Capability Variant #206 (Arch Linux v206)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26565,
+            name: String::from("Networking & Firewall Router Capability Variant #206 (Gentoo v206)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26566,
+            name: String::from("Init & Service Supervisor Capability Variant #206 (Alpine Linux v206)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26567,
+            name: String::from("Userland Utility Fastpipe Capability Variant #206 (Void Linux v206)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26568,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #206 (NixOS v206)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26569,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #206 (openSUSE v206)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26570,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #206 (FreeBSD v206)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #206"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26571,
+            name: String::from("Kernel Scheduler Capability Variant #207 (OpenBSD v207)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26572,
+            name: String::from("Filesystem & Storage Driver Capability Variant #207 (NetBSD v207)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26573,
+            name: String::from("Security & Hardening Shield Capability Variant #207 (DragonFly BSD v207)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26574,
+            name: String::from("Package Manager & Solver Capability Variant #207 (Solus v207)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26575,
+            name: String::from("Networking & Firewall Router Capability Variant #207 (Slackware v207)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26576,
+            name: String::from("Init & Service Supervisor Capability Variant #207 (Clear Linux v207)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26577,
+            name: String::from("Userland Utility Fastpipe Capability Variant #207 (CachyOS v207)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26578,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #207 (Pop!_OS v207)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26579,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #207 (Manjaro v207)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26580,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #207 (Linux Mint v207)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #207"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26581,
+            name: String::from("Kernel Scheduler Capability Variant #208 (Ubuntu v208)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26582,
+            name: String::from("Filesystem & Storage Driver Capability Variant #208 (Debian v208)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26583,
+            name: String::from("Security & Hardening Shield Capability Variant #208 (Fedora v208)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26584,
+            name: String::from("Package Manager & Solver Capability Variant #208 (Arch Linux v208)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26585,
+            name: String::from("Networking & Firewall Router Capability Variant #208 (Gentoo v208)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26586,
+            name: String::from("Init & Service Supervisor Capability Variant #208 (Alpine Linux v208)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26587,
+            name: String::from("Userland Utility Fastpipe Capability Variant #208 (Void Linux v208)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26588,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #208 (NixOS v208)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26589,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #208 (openSUSE v208)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26590,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #208 (FreeBSD v208)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #208"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26591,
+            name: String::from("Kernel Scheduler Capability Variant #209 (OpenBSD v209)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26592,
+            name: String::from("Filesystem & Storage Driver Capability Variant #209 (NetBSD v209)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26593,
+            name: String::from("Security & Hardening Shield Capability Variant #209 (DragonFly BSD v209)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26594,
+            name: String::from("Package Manager & Solver Capability Variant #209 (Solus v209)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26595,
+            name: String::from("Networking & Firewall Router Capability Variant #209 (Slackware v209)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26596,
+            name: String::from("Init & Service Supervisor Capability Variant #209 (Clear Linux v209)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26597,
+            name: String::from("Userland Utility Fastpipe Capability Variant #209 (CachyOS v209)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26598,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #209 (Pop!_OS v209)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26599,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #209 (Manjaro v209)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26600,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #209 (Linux Mint v209)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #209"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26601,
+            name: String::from("Kernel Scheduler Capability Variant #210 (Ubuntu v210)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26602,
+            name: String::from("Filesystem & Storage Driver Capability Variant #210 (Debian v210)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26603,
+            name: String::from("Security & Hardening Shield Capability Variant #210 (Fedora v210)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26604,
+            name: String::from("Package Manager & Solver Capability Variant #210 (Arch Linux v210)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26605,
+            name: String::from("Networking & Firewall Router Capability Variant #210 (Gentoo v210)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26606,
+            name: String::from("Init & Service Supervisor Capability Variant #210 (Alpine Linux v210)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26607,
+            name: String::from("Userland Utility Fastpipe Capability Variant #210 (Void Linux v210)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26608,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #210 (NixOS v210)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26609,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #210 (openSUSE v210)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26610,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #210 (FreeBSD v210)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #210"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26611,
+            name: String::from("Kernel Scheduler Capability Variant #211 (OpenBSD v211)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26612,
+            name: String::from("Filesystem & Storage Driver Capability Variant #211 (NetBSD v211)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26613,
+            name: String::from("Security & Hardening Shield Capability Variant #211 (DragonFly BSD v211)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26614,
+            name: String::from("Package Manager & Solver Capability Variant #211 (Solus v211)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26615,
+            name: String::from("Networking & Firewall Router Capability Variant #211 (Slackware v211)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26616,
+            name: String::from("Init & Service Supervisor Capability Variant #211 (Clear Linux v211)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26617,
+            name: String::from("Userland Utility Fastpipe Capability Variant #211 (CachyOS v211)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26618,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #211 (Pop!_OS v211)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26619,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #211 (Manjaro v211)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26620,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #211 (Linux Mint v211)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #211"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26621,
+            name: String::from("Kernel Scheduler Capability Variant #212 (Ubuntu v212)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26622,
+            name: String::from("Filesystem & Storage Driver Capability Variant #212 (Debian v212)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26623,
+            name: String::from("Security & Hardening Shield Capability Variant #212 (Fedora v212)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26624,
+            name: String::from("Package Manager & Solver Capability Variant #212 (Arch Linux v212)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26625,
+            name: String::from("Networking & Firewall Router Capability Variant #212 (Gentoo v212)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26626,
+            name: String::from("Init & Service Supervisor Capability Variant #212 (Alpine Linux v212)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26627,
+            name: String::from("Userland Utility Fastpipe Capability Variant #212 (Void Linux v212)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26628,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #212 (NixOS v212)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26629,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #212 (openSUSE v212)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26630,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #212 (FreeBSD v212)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #212"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26631,
+            name: String::from("Kernel Scheduler Capability Variant #213 (OpenBSD v213)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26632,
+            name: String::from("Filesystem & Storage Driver Capability Variant #213 (NetBSD v213)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26633,
+            name: String::from("Security & Hardening Shield Capability Variant #213 (DragonFly BSD v213)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26634,
+            name: String::from("Package Manager & Solver Capability Variant #213 (Solus v213)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26635,
+            name: String::from("Networking & Firewall Router Capability Variant #213 (Slackware v213)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26636,
+            name: String::from("Init & Service Supervisor Capability Variant #213 (Clear Linux v213)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26637,
+            name: String::from("Userland Utility Fastpipe Capability Variant #213 (CachyOS v213)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26638,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #213 (Pop!_OS v213)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26639,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #213 (Manjaro v213)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26640,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #213 (Linux Mint v213)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #213"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26641,
+            name: String::from("Kernel Scheduler Capability Variant #214 (Ubuntu v214)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26642,
+            name: String::from("Filesystem & Storage Driver Capability Variant #214 (Debian v214)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26643,
+            name: String::from("Security & Hardening Shield Capability Variant #214 (Fedora v214)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26644,
+            name: String::from("Package Manager & Solver Capability Variant #214 (Arch Linux v214)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26645,
+            name: String::from("Networking & Firewall Router Capability Variant #214 (Gentoo v214)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26646,
+            name: String::from("Init & Service Supervisor Capability Variant #214 (Alpine Linux v214)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26647,
+            name: String::from("Userland Utility Fastpipe Capability Variant #214 (Void Linux v214)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26648,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #214 (NixOS v214)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26649,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #214 (openSUSE v214)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26650,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #214 (FreeBSD v214)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #214"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26651,
+            name: String::from("Kernel Scheduler Capability Variant #215 (OpenBSD v215)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26652,
+            name: String::from("Filesystem & Storage Driver Capability Variant #215 (NetBSD v215)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26653,
+            name: String::from("Security & Hardening Shield Capability Variant #215 (DragonFly BSD v215)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26654,
+            name: String::from("Package Manager & Solver Capability Variant #215 (Solus v215)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26655,
+            name: String::from("Networking & Firewall Router Capability Variant #215 (Slackware v215)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26656,
+            name: String::from("Init & Service Supervisor Capability Variant #215 (Clear Linux v215)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26657,
+            name: String::from("Userland Utility Fastpipe Capability Variant #215 (CachyOS v215)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26658,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #215 (Pop!_OS v215)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26659,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #215 (Manjaro v215)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26660,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #215 (Linux Mint v215)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #215"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26661,
+            name: String::from("Kernel Scheduler Capability Variant #216 (Ubuntu v216)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26662,
+            name: String::from("Filesystem & Storage Driver Capability Variant #216 (Debian v216)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26663,
+            name: String::from("Security & Hardening Shield Capability Variant #216 (Fedora v216)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26664,
+            name: String::from("Package Manager & Solver Capability Variant #216 (Arch Linux v216)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26665,
+            name: String::from("Networking & Firewall Router Capability Variant #216 (Gentoo v216)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26666,
+            name: String::from("Init & Service Supervisor Capability Variant #216 (Alpine Linux v216)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26667,
+            name: String::from("Userland Utility Fastpipe Capability Variant #216 (Void Linux v216)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26668,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #216 (NixOS v216)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26669,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #216 (openSUSE v216)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26670,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #216 (FreeBSD v216)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #216"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26671,
+            name: String::from("Kernel Scheduler Capability Variant #217 (OpenBSD v217)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26672,
+            name: String::from("Filesystem & Storage Driver Capability Variant #217 (NetBSD v217)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26673,
+            name: String::from("Security & Hardening Shield Capability Variant #217 (DragonFly BSD v217)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26674,
+            name: String::from("Package Manager & Solver Capability Variant #217 (Solus v217)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26675,
+            name: String::from("Networking & Firewall Router Capability Variant #217 (Slackware v217)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26676,
+            name: String::from("Init & Service Supervisor Capability Variant #217 (Clear Linux v217)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26677,
+            name: String::from("Userland Utility Fastpipe Capability Variant #217 (CachyOS v217)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26678,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #217 (Pop!_OS v217)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26679,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #217 (Manjaro v217)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26680,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #217 (Linux Mint v217)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #217"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26681,
+            name: String::from("Kernel Scheduler Capability Variant #218 (Ubuntu v218)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26682,
+            name: String::from("Filesystem & Storage Driver Capability Variant #218 (Debian v218)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26683,
+            name: String::from("Security & Hardening Shield Capability Variant #218 (Fedora v218)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26684,
+            name: String::from("Package Manager & Solver Capability Variant #218 (Arch Linux v218)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26685,
+            name: String::from("Networking & Firewall Router Capability Variant #218 (Gentoo v218)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26686,
+            name: String::from("Init & Service Supervisor Capability Variant #218 (Alpine Linux v218)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26687,
+            name: String::from("Userland Utility Fastpipe Capability Variant #218 (Void Linux v218)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26688,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #218 (NixOS v218)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26689,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #218 (openSUSE v218)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26690,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #218 (FreeBSD v218)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #218"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26691,
+            name: String::from("Kernel Scheduler Capability Variant #219 (OpenBSD v219)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26692,
+            name: String::from("Filesystem & Storage Driver Capability Variant #219 (NetBSD v219)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26693,
+            name: String::from("Security & Hardening Shield Capability Variant #219 (DragonFly BSD v219)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26694,
+            name: String::from("Package Manager & Solver Capability Variant #219 (Solus v219)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26695,
+            name: String::from("Networking & Firewall Router Capability Variant #219 (Slackware v219)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26696,
+            name: String::from("Init & Service Supervisor Capability Variant #219 (Clear Linux v219)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26697,
+            name: String::from("Userland Utility Fastpipe Capability Variant #219 (CachyOS v219)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26698,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #219 (Pop!_OS v219)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26699,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #219 (Manjaro v219)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26700,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #219 (Linux Mint v219)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #219"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26701,
+            name: String::from("Kernel Scheduler Capability Variant #220 (Ubuntu v220)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26702,
+            name: String::from("Filesystem & Storage Driver Capability Variant #220 (Debian v220)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26703,
+            name: String::from("Security & Hardening Shield Capability Variant #220 (Fedora v220)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26704,
+            name: String::from("Package Manager & Solver Capability Variant #220 (Arch Linux v220)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26705,
+            name: String::from("Networking & Firewall Router Capability Variant #220 (Gentoo v220)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26706,
+            name: String::from("Init & Service Supervisor Capability Variant #220 (Alpine Linux v220)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26707,
+            name: String::from("Userland Utility Fastpipe Capability Variant #220 (Void Linux v220)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26708,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #220 (NixOS v220)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26709,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #220 (openSUSE v220)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26710,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #220 (FreeBSD v220)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #220"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26711,
+            name: String::from("Kernel Scheduler Capability Variant #221 (OpenBSD v221)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26712,
+            name: String::from("Filesystem & Storage Driver Capability Variant #221 (NetBSD v221)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26713,
+            name: String::from("Security & Hardening Shield Capability Variant #221 (DragonFly BSD v221)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26714,
+            name: String::from("Package Manager & Solver Capability Variant #221 (Solus v221)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26715,
+            name: String::from("Networking & Firewall Router Capability Variant #221 (Slackware v221)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26716,
+            name: String::from("Init & Service Supervisor Capability Variant #221 (Clear Linux v221)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26717,
+            name: String::from("Userland Utility Fastpipe Capability Variant #221 (CachyOS v221)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26718,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #221 (Pop!_OS v221)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26719,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #221 (Manjaro v221)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26720,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #221 (Linux Mint v221)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #221"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26721,
+            name: String::from("Kernel Scheduler Capability Variant #222 (Ubuntu v222)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26722,
+            name: String::from("Filesystem & Storage Driver Capability Variant #222 (Debian v222)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26723,
+            name: String::from("Security & Hardening Shield Capability Variant #222 (Fedora v222)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26724,
+            name: String::from("Package Manager & Solver Capability Variant #222 (Arch Linux v222)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26725,
+            name: String::from("Networking & Firewall Router Capability Variant #222 (Gentoo v222)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26726,
+            name: String::from("Init & Service Supervisor Capability Variant #222 (Alpine Linux v222)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26727,
+            name: String::from("Userland Utility Fastpipe Capability Variant #222 (Void Linux v222)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26728,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #222 (NixOS v222)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26729,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #222 (openSUSE v222)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26730,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #222 (FreeBSD v222)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #222"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26731,
+            name: String::from("Kernel Scheduler Capability Variant #223 (OpenBSD v223)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26732,
+            name: String::from("Filesystem & Storage Driver Capability Variant #223 (NetBSD v223)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26733,
+            name: String::from("Security & Hardening Shield Capability Variant #223 (DragonFly BSD v223)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26734,
+            name: String::from("Package Manager & Solver Capability Variant #223 (Solus v223)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26735,
+            name: String::from("Networking & Firewall Router Capability Variant #223 (Slackware v223)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26736,
+            name: String::from("Init & Service Supervisor Capability Variant #223 (Clear Linux v223)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26737,
+            name: String::from("Userland Utility Fastpipe Capability Variant #223 (CachyOS v223)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26738,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #223 (Pop!_OS v223)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26739,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #223 (Manjaro v223)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26740,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #223 (Linux Mint v223)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #223"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26741,
+            name: String::from("Kernel Scheduler Capability Variant #224 (Ubuntu v224)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26742,
+            name: String::from("Filesystem & Storage Driver Capability Variant #224 (Debian v224)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26743,
+            name: String::from("Security & Hardening Shield Capability Variant #224 (Fedora v224)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26744,
+            name: String::from("Package Manager & Solver Capability Variant #224 (Arch Linux v224)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26745,
+            name: String::from("Networking & Firewall Router Capability Variant #224 (Gentoo v224)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26746,
+            name: String::from("Init & Service Supervisor Capability Variant #224 (Alpine Linux v224)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26747,
+            name: String::from("Userland Utility Fastpipe Capability Variant #224 (Void Linux v224)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26748,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #224 (NixOS v224)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26749,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #224 (openSUSE v224)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26750,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #224 (FreeBSD v224)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #224"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26751,
+            name: String::from("Kernel Scheduler Capability Variant #225 (OpenBSD v225)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26752,
+            name: String::from("Filesystem & Storage Driver Capability Variant #225 (NetBSD v225)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26753,
+            name: String::from("Security & Hardening Shield Capability Variant #225 (DragonFly BSD v225)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26754,
+            name: String::from("Package Manager & Solver Capability Variant #225 (Solus v225)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26755,
+            name: String::from("Networking & Firewall Router Capability Variant #225 (Slackware v225)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26756,
+            name: String::from("Init & Service Supervisor Capability Variant #225 (Clear Linux v225)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26757,
+            name: String::from("Userland Utility Fastpipe Capability Variant #225 (CachyOS v225)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26758,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #225 (Pop!_OS v225)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26759,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #225 (Manjaro v225)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26760,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #225 (Linux Mint v225)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #225"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26761,
+            name: String::from("Kernel Scheduler Capability Variant #226 (Ubuntu v226)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26762,
+            name: String::from("Filesystem & Storage Driver Capability Variant #226 (Debian v226)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26763,
+            name: String::from("Security & Hardening Shield Capability Variant #226 (Fedora v226)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26764,
+            name: String::from("Package Manager & Solver Capability Variant #226 (Arch Linux v226)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26765,
+            name: String::from("Networking & Firewall Router Capability Variant #226 (Gentoo v226)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26766,
+            name: String::from("Init & Service Supervisor Capability Variant #226 (Alpine Linux v226)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26767,
+            name: String::from("Userland Utility Fastpipe Capability Variant #226 (Void Linux v226)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26768,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #226 (NixOS v226)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26769,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #226 (openSUSE v226)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26770,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #226 (FreeBSD v226)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #226"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26771,
+            name: String::from("Kernel Scheduler Capability Variant #227 (OpenBSD v227)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26772,
+            name: String::from("Filesystem & Storage Driver Capability Variant #227 (NetBSD v227)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26773,
+            name: String::from("Security & Hardening Shield Capability Variant #227 (DragonFly BSD v227)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26774,
+            name: String::from("Package Manager & Solver Capability Variant #227 (Solus v227)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26775,
+            name: String::from("Networking & Firewall Router Capability Variant #227 (Slackware v227)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26776,
+            name: String::from("Init & Service Supervisor Capability Variant #227 (Clear Linux v227)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26777,
+            name: String::from("Userland Utility Fastpipe Capability Variant #227 (CachyOS v227)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26778,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #227 (Pop!_OS v227)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26779,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #227 (Manjaro v227)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26780,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #227 (Linux Mint v227)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #227"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26781,
+            name: String::from("Kernel Scheduler Capability Variant #228 (Ubuntu v228)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26782,
+            name: String::from("Filesystem & Storage Driver Capability Variant #228 (Debian v228)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26783,
+            name: String::from("Security & Hardening Shield Capability Variant #228 (Fedora v228)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26784,
+            name: String::from("Package Manager & Solver Capability Variant #228 (Arch Linux v228)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26785,
+            name: String::from("Networking & Firewall Router Capability Variant #228 (Gentoo v228)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26786,
+            name: String::from("Init & Service Supervisor Capability Variant #228 (Alpine Linux v228)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26787,
+            name: String::from("Userland Utility Fastpipe Capability Variant #228 (Void Linux v228)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26788,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #228 (NixOS v228)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26789,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #228 (openSUSE v228)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26790,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #228 (FreeBSD v228)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #228"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26791,
+            name: String::from("Kernel Scheduler Capability Variant #229 (OpenBSD v229)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26792,
+            name: String::from("Filesystem & Storage Driver Capability Variant #229 (NetBSD v229)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26793,
+            name: String::from("Security & Hardening Shield Capability Variant #229 (DragonFly BSD v229)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26794,
+            name: String::from("Package Manager & Solver Capability Variant #229 (Solus v229)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26795,
+            name: String::from("Networking & Firewall Router Capability Variant #229 (Slackware v229)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26796,
+            name: String::from("Init & Service Supervisor Capability Variant #229 (Clear Linux v229)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26797,
+            name: String::from("Userland Utility Fastpipe Capability Variant #229 (CachyOS v229)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26798,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #229 (Pop!_OS v229)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26799,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #229 (Manjaro v229)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26800,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #229 (Linux Mint v229)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #229"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26801,
+            name: String::from("Kernel Scheduler Capability Variant #230 (Ubuntu v230)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26802,
+            name: String::from("Filesystem & Storage Driver Capability Variant #230 (Debian v230)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26803,
+            name: String::from("Security & Hardening Shield Capability Variant #230 (Fedora v230)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26804,
+            name: String::from("Package Manager & Solver Capability Variant #230 (Arch Linux v230)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26805,
+            name: String::from("Networking & Firewall Router Capability Variant #230 (Gentoo v230)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26806,
+            name: String::from("Init & Service Supervisor Capability Variant #230 (Alpine Linux v230)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26807,
+            name: String::from("Userland Utility Fastpipe Capability Variant #230 (Void Linux v230)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26808,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #230 (NixOS v230)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26809,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #230 (openSUSE v230)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26810,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #230 (FreeBSD v230)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #230"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26811,
+            name: String::from("Kernel Scheduler Capability Variant #231 (OpenBSD v231)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26812,
+            name: String::from("Filesystem & Storage Driver Capability Variant #231 (NetBSD v231)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26813,
+            name: String::from("Security & Hardening Shield Capability Variant #231 (DragonFly BSD v231)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26814,
+            name: String::from("Package Manager & Solver Capability Variant #231 (Solus v231)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26815,
+            name: String::from("Networking & Firewall Router Capability Variant #231 (Slackware v231)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26816,
+            name: String::from("Init & Service Supervisor Capability Variant #231 (Clear Linux v231)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26817,
+            name: String::from("Userland Utility Fastpipe Capability Variant #231 (CachyOS v231)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26818,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #231 (Pop!_OS v231)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26819,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #231 (Manjaro v231)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26820,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #231 (Linux Mint v231)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #231"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26821,
+            name: String::from("Kernel Scheduler Capability Variant #232 (Ubuntu v232)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26822,
+            name: String::from("Filesystem & Storage Driver Capability Variant #232 (Debian v232)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26823,
+            name: String::from("Security & Hardening Shield Capability Variant #232 (Fedora v232)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26824,
+            name: String::from("Package Manager & Solver Capability Variant #232 (Arch Linux v232)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26825,
+            name: String::from("Networking & Firewall Router Capability Variant #232 (Gentoo v232)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26826,
+            name: String::from("Init & Service Supervisor Capability Variant #232 (Alpine Linux v232)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26827,
+            name: String::from("Userland Utility Fastpipe Capability Variant #232 (Void Linux v232)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26828,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #232 (NixOS v232)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26829,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #232 (openSUSE v232)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26830,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #232 (FreeBSD v232)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #232"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26831,
+            name: String::from("Kernel Scheduler Capability Variant #233 (OpenBSD v233)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26832,
+            name: String::from("Filesystem & Storage Driver Capability Variant #233 (NetBSD v233)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26833,
+            name: String::from("Security & Hardening Shield Capability Variant #233 (DragonFly BSD v233)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26834,
+            name: String::from("Package Manager & Solver Capability Variant #233 (Solus v233)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26835,
+            name: String::from("Networking & Firewall Router Capability Variant #233 (Slackware v233)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26836,
+            name: String::from("Init & Service Supervisor Capability Variant #233 (Clear Linux v233)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26837,
+            name: String::from("Userland Utility Fastpipe Capability Variant #233 (CachyOS v233)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26838,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #233 (Pop!_OS v233)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26839,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #233 (Manjaro v233)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26840,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #233 (Linux Mint v233)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #233"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26841,
+            name: String::from("Kernel Scheduler Capability Variant #234 (Ubuntu v234)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26842,
+            name: String::from("Filesystem & Storage Driver Capability Variant #234 (Debian v234)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26843,
+            name: String::from("Security & Hardening Shield Capability Variant #234 (Fedora v234)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26844,
+            name: String::from("Package Manager & Solver Capability Variant #234 (Arch Linux v234)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26845,
+            name: String::from("Networking & Firewall Router Capability Variant #234 (Gentoo v234)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26846,
+            name: String::from("Init & Service Supervisor Capability Variant #234 (Alpine Linux v234)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26847,
+            name: String::from("Userland Utility Fastpipe Capability Variant #234 (Void Linux v234)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26848,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #234 (NixOS v234)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26849,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #234 (openSUSE v234)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26850,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #234 (FreeBSD v234)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #234"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26851,
+            name: String::from("Kernel Scheduler Capability Variant #235 (OpenBSD v235)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26852,
+            name: String::from("Filesystem & Storage Driver Capability Variant #235 (NetBSD v235)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26853,
+            name: String::from("Security & Hardening Shield Capability Variant #235 (DragonFly BSD v235)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26854,
+            name: String::from("Package Manager & Solver Capability Variant #235 (Solus v235)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26855,
+            name: String::from("Networking & Firewall Router Capability Variant #235 (Slackware v235)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26856,
+            name: String::from("Init & Service Supervisor Capability Variant #235 (Clear Linux v235)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26857,
+            name: String::from("Userland Utility Fastpipe Capability Variant #235 (CachyOS v235)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26858,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #235 (Pop!_OS v235)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26859,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #235 (Manjaro v235)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26860,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #235 (Linux Mint v235)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #235"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26861,
+            name: String::from("Kernel Scheduler Capability Variant #236 (Ubuntu v236)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26862,
+            name: String::from("Filesystem & Storage Driver Capability Variant #236 (Debian v236)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26863,
+            name: String::from("Security & Hardening Shield Capability Variant #236 (Fedora v236)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26864,
+            name: String::from("Package Manager & Solver Capability Variant #236 (Arch Linux v236)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26865,
+            name: String::from("Networking & Firewall Router Capability Variant #236 (Gentoo v236)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26866,
+            name: String::from("Init & Service Supervisor Capability Variant #236 (Alpine Linux v236)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26867,
+            name: String::from("Userland Utility Fastpipe Capability Variant #236 (Void Linux v236)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26868,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #236 (NixOS v236)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26869,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #236 (openSUSE v236)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26870,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #236 (FreeBSD v236)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #236"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26871,
+            name: String::from("Kernel Scheduler Capability Variant #237 (OpenBSD v237)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26872,
+            name: String::from("Filesystem & Storage Driver Capability Variant #237 (NetBSD v237)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26873,
+            name: String::from("Security & Hardening Shield Capability Variant #237 (DragonFly BSD v237)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26874,
+            name: String::from("Package Manager & Solver Capability Variant #237 (Solus v237)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26875,
+            name: String::from("Networking & Firewall Router Capability Variant #237 (Slackware v237)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26876,
+            name: String::from("Init & Service Supervisor Capability Variant #237 (Clear Linux v237)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26877,
+            name: String::from("Userland Utility Fastpipe Capability Variant #237 (CachyOS v237)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26878,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #237 (Pop!_OS v237)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26879,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #237 (Manjaro v237)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26880,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #237 (Linux Mint v237)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #237"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26881,
+            name: String::from("Kernel Scheduler Capability Variant #238 (Ubuntu v238)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26882,
+            name: String::from("Filesystem & Storage Driver Capability Variant #238 (Debian v238)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26883,
+            name: String::from("Security & Hardening Shield Capability Variant #238 (Fedora v238)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26884,
+            name: String::from("Package Manager & Solver Capability Variant #238 (Arch Linux v238)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26885,
+            name: String::from("Networking & Firewall Router Capability Variant #238 (Gentoo v238)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26886,
+            name: String::from("Init & Service Supervisor Capability Variant #238 (Alpine Linux v238)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26887,
+            name: String::from("Userland Utility Fastpipe Capability Variant #238 (Void Linux v238)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26888,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #238 (NixOS v238)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26889,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #238 (openSUSE v238)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26890,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #238 (FreeBSD v238)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #238"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26891,
+            name: String::from("Kernel Scheduler Capability Variant #239 (OpenBSD v239)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26892,
+            name: String::from("Filesystem & Storage Driver Capability Variant #239 (NetBSD v239)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26893,
+            name: String::from("Security & Hardening Shield Capability Variant #239 (DragonFly BSD v239)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26894,
+            name: String::from("Package Manager & Solver Capability Variant #239 (Solus v239)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26895,
+            name: String::from("Networking & Firewall Router Capability Variant #239 (Slackware v239)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26896,
+            name: String::from("Init & Service Supervisor Capability Variant #239 (Clear Linux v239)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26897,
+            name: String::from("Userland Utility Fastpipe Capability Variant #239 (CachyOS v239)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26898,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #239 (Pop!_OS v239)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26899,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #239 (Manjaro v239)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26900,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #239 (Linux Mint v239)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #239"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26901,
+            name: String::from("Kernel Scheduler Capability Variant #240 (Ubuntu v240)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26902,
+            name: String::from("Filesystem & Storage Driver Capability Variant #240 (Debian v240)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26903,
+            name: String::from("Security & Hardening Shield Capability Variant #240 (Fedora v240)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26904,
+            name: String::from("Package Manager & Solver Capability Variant #240 (Arch Linux v240)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26905,
+            name: String::from("Networking & Firewall Router Capability Variant #240 (Gentoo v240)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26906,
+            name: String::from("Init & Service Supervisor Capability Variant #240 (Alpine Linux v240)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26907,
+            name: String::from("Userland Utility Fastpipe Capability Variant #240 (Void Linux v240)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26908,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #240 (NixOS v240)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26909,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #240 (openSUSE v240)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26910,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #240 (FreeBSD v240)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #240"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26911,
+            name: String::from("Kernel Scheduler Capability Variant #241 (OpenBSD v241)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26912,
+            name: String::from("Filesystem & Storage Driver Capability Variant #241 (NetBSD v241)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26913,
+            name: String::from("Security & Hardening Shield Capability Variant #241 (DragonFly BSD v241)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26914,
+            name: String::from("Package Manager & Solver Capability Variant #241 (Solus v241)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26915,
+            name: String::from("Networking & Firewall Router Capability Variant #241 (Slackware v241)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26916,
+            name: String::from("Init & Service Supervisor Capability Variant #241 (Clear Linux v241)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26917,
+            name: String::from("Userland Utility Fastpipe Capability Variant #241 (CachyOS v241)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26918,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #241 (Pop!_OS v241)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26919,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #241 (Manjaro v241)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26920,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #241 (Linux Mint v241)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #241"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26921,
+            name: String::from("Kernel Scheduler Capability Variant #242 (Ubuntu v242)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26922,
+            name: String::from("Filesystem & Storage Driver Capability Variant #242 (Debian v242)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26923,
+            name: String::from("Security & Hardening Shield Capability Variant #242 (Fedora v242)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26924,
+            name: String::from("Package Manager & Solver Capability Variant #242 (Arch Linux v242)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26925,
+            name: String::from("Networking & Firewall Router Capability Variant #242 (Gentoo v242)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26926,
+            name: String::from("Init & Service Supervisor Capability Variant #242 (Alpine Linux v242)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26927,
+            name: String::from("Userland Utility Fastpipe Capability Variant #242 (Void Linux v242)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26928,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #242 (NixOS v242)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26929,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #242 (openSUSE v242)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26930,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #242 (FreeBSD v242)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #242"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26931,
+            name: String::from("Kernel Scheduler Capability Variant #243 (OpenBSD v243)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26932,
+            name: String::from("Filesystem & Storage Driver Capability Variant #243 (NetBSD v243)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26933,
+            name: String::from("Security & Hardening Shield Capability Variant #243 (DragonFly BSD v243)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26934,
+            name: String::from("Package Manager & Solver Capability Variant #243 (Solus v243)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26935,
+            name: String::from("Networking & Firewall Router Capability Variant #243 (Slackware v243)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26936,
+            name: String::from("Init & Service Supervisor Capability Variant #243 (Clear Linux v243)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26937,
+            name: String::from("Userland Utility Fastpipe Capability Variant #243 (CachyOS v243)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26938,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #243 (Pop!_OS v243)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26939,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #243 (Manjaro v243)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26940,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #243 (Linux Mint v243)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #243"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26941,
+            name: String::from("Kernel Scheduler Capability Variant #244 (Ubuntu v244)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26942,
+            name: String::from("Filesystem & Storage Driver Capability Variant #244 (Debian v244)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26943,
+            name: String::from("Security & Hardening Shield Capability Variant #244 (Fedora v244)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26944,
+            name: String::from("Package Manager & Solver Capability Variant #244 (Arch Linux v244)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26945,
+            name: String::from("Networking & Firewall Router Capability Variant #244 (Gentoo v244)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26946,
+            name: String::from("Init & Service Supervisor Capability Variant #244 (Alpine Linux v244)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26947,
+            name: String::from("Userland Utility Fastpipe Capability Variant #244 (Void Linux v244)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26948,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #244 (NixOS v244)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26949,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #244 (openSUSE v244)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26950,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #244 (FreeBSD v244)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #244"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26951,
+            name: String::from("Kernel Scheduler Capability Variant #245 (OpenBSD v245)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26952,
+            name: String::from("Filesystem & Storage Driver Capability Variant #245 (NetBSD v245)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26953,
+            name: String::from("Security & Hardening Shield Capability Variant #245 (DragonFly BSD v245)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26954,
+            name: String::from("Package Manager & Solver Capability Variant #245 (Solus v245)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26955,
+            name: String::from("Networking & Firewall Router Capability Variant #245 (Slackware v245)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26956,
+            name: String::from("Init & Service Supervisor Capability Variant #245 (Clear Linux v245)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26957,
+            name: String::from("Userland Utility Fastpipe Capability Variant #245 (CachyOS v245)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26958,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #245 (Pop!_OS v245)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26959,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #245 (Manjaro v245)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26960,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #245 (Linux Mint v245)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #245"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26961,
+            name: String::from("Kernel Scheduler Capability Variant #246 (Ubuntu v246)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26962,
+            name: String::from("Filesystem & Storage Driver Capability Variant #246 (Debian v246)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26963,
+            name: String::from("Security & Hardening Shield Capability Variant #246 (Fedora v246)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26964,
+            name: String::from("Package Manager & Solver Capability Variant #246 (Arch Linux v246)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26965,
+            name: String::from("Networking & Firewall Router Capability Variant #246 (Gentoo v246)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26966,
+            name: String::from("Init & Service Supervisor Capability Variant #246 (Alpine Linux v246)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26967,
+            name: String::from("Userland Utility Fastpipe Capability Variant #246 (Void Linux v246)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26968,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #246 (NixOS v246)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26969,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #246 (openSUSE v246)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26970,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #246 (FreeBSD v246)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #246"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26971,
+            name: String::from("Kernel Scheduler Capability Variant #247 (OpenBSD v247)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26972,
+            name: String::from("Filesystem & Storage Driver Capability Variant #247 (NetBSD v247)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26973,
+            name: String::from("Security & Hardening Shield Capability Variant #247 (DragonFly BSD v247)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26974,
+            name: String::from("Package Manager & Solver Capability Variant #247 (Solus v247)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26975,
+            name: String::from("Networking & Firewall Router Capability Variant #247 (Slackware v247)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26976,
+            name: String::from("Init & Service Supervisor Capability Variant #247 (Clear Linux v247)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26977,
+            name: String::from("Userland Utility Fastpipe Capability Variant #247 (CachyOS v247)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26978,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #247 (Pop!_OS v247)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26979,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #247 (Manjaro v247)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26980,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #247 (Linux Mint v247)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #247"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26981,
+            name: String::from("Kernel Scheduler Capability Variant #248 (Ubuntu v248)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26982,
+            name: String::from("Filesystem & Storage Driver Capability Variant #248 (Debian v248)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26983,
+            name: String::from("Security & Hardening Shield Capability Variant #248 (Fedora v248)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26984,
+            name: String::from("Package Manager & Solver Capability Variant #248 (Arch Linux v248)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26985,
+            name: String::from("Networking & Firewall Router Capability Variant #248 (Gentoo v248)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26986,
+            name: String::from("Init & Service Supervisor Capability Variant #248 (Alpine Linux v248)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26987,
+            name: String::from("Userland Utility Fastpipe Capability Variant #248 (Void Linux v248)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26988,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #248 (NixOS v248)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26989,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #248 (openSUSE v248)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26990,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #248 (FreeBSD v248)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #248"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26991,
+            name: String::from("Kernel Scheduler Capability Variant #249 (OpenBSD v249)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26992,
+            name: String::from("Filesystem & Storage Driver Capability Variant #249 (NetBSD v249)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26993,
+            name: String::from("Security & Hardening Shield Capability Variant #249 (DragonFly BSD v249)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26994,
+            name: String::from("Package Manager & Solver Capability Variant #249 (Solus v249)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26995,
+            name: String::from("Networking & Firewall Router Capability Variant #249 (Slackware v249)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26996,
+            name: String::from("Init & Service Supervisor Capability Variant #249 (Clear Linux v249)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26997,
+            name: String::from("Userland Utility Fastpipe Capability Variant #249 (CachyOS v249)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26998,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #249 (Pop!_OS v249)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 26999,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #249 (Manjaro v249)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27000,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #249 (Linux Mint v249)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #249"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27001,
+            name: String::from("Kernel Scheduler Capability Variant #250 (Ubuntu v250)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27002,
+            name: String::from("Filesystem & Storage Driver Capability Variant #250 (Debian v250)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27003,
+            name: String::from("Security & Hardening Shield Capability Variant #250 (Fedora v250)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27004,
+            name: String::from("Package Manager & Solver Capability Variant #250 (Arch Linux v250)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27005,
+            name: String::from("Networking & Firewall Router Capability Variant #250 (Gentoo v250)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27006,
+            name: String::from("Init & Service Supervisor Capability Variant #250 (Alpine Linux v250)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27007,
+            name: String::from("Userland Utility Fastpipe Capability Variant #250 (Void Linux v250)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27008,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #250 (NixOS v250)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27009,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #250 (openSUSE v250)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27010,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #250 (FreeBSD v250)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #250"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27011,
+            name: String::from("Kernel Scheduler Capability Variant #251 (OpenBSD v251)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27012,
+            name: String::from("Filesystem & Storage Driver Capability Variant #251 (NetBSD v251)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27013,
+            name: String::from("Security & Hardening Shield Capability Variant #251 (DragonFly BSD v251)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27014,
+            name: String::from("Package Manager & Solver Capability Variant #251 (Solus v251)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27015,
+            name: String::from("Networking & Firewall Router Capability Variant #251 (Slackware v251)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27016,
+            name: String::from("Init & Service Supervisor Capability Variant #251 (Clear Linux v251)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27017,
+            name: String::from("Userland Utility Fastpipe Capability Variant #251 (CachyOS v251)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27018,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #251 (Pop!_OS v251)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27019,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #251 (Manjaro v251)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27020,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #251 (Linux Mint v251)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #251"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27021,
+            name: String::from("Kernel Scheduler Capability Variant #252 (Ubuntu v252)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27022,
+            name: String::from("Filesystem & Storage Driver Capability Variant #252 (Debian v252)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27023,
+            name: String::from("Security & Hardening Shield Capability Variant #252 (Fedora v252)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27024,
+            name: String::from("Package Manager & Solver Capability Variant #252 (Arch Linux v252)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27025,
+            name: String::from("Networking & Firewall Router Capability Variant #252 (Gentoo v252)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27026,
+            name: String::from("Init & Service Supervisor Capability Variant #252 (Alpine Linux v252)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27027,
+            name: String::from("Userland Utility Fastpipe Capability Variant #252 (Void Linux v252)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27028,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #252 (NixOS v252)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27029,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #252 (openSUSE v252)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27030,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #252 (FreeBSD v252)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #252"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27031,
+            name: String::from("Kernel Scheduler Capability Variant #253 (OpenBSD v253)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27032,
+            name: String::from("Filesystem & Storage Driver Capability Variant #253 (NetBSD v253)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27033,
+            name: String::from("Security & Hardening Shield Capability Variant #253 (DragonFly BSD v253)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27034,
+            name: String::from("Package Manager & Solver Capability Variant #253 (Solus v253)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27035,
+            name: String::from("Networking & Firewall Router Capability Variant #253 (Slackware v253)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27036,
+            name: String::from("Init & Service Supervisor Capability Variant #253 (Clear Linux v253)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27037,
+            name: String::from("Userland Utility Fastpipe Capability Variant #253 (CachyOS v253)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27038,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #253 (Pop!_OS v253)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27039,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #253 (Manjaro v253)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27040,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #253 (Linux Mint v253)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #253"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27041,
+            name: String::from("Kernel Scheduler Capability Variant #254 (Ubuntu v254)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27042,
+            name: String::from("Filesystem & Storage Driver Capability Variant #254 (Debian v254)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27043,
+            name: String::from("Security & Hardening Shield Capability Variant #254 (Fedora v254)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27044,
+            name: String::from("Package Manager & Solver Capability Variant #254 (Arch Linux v254)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27045,
+            name: String::from("Networking & Firewall Router Capability Variant #254 (Gentoo v254)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27046,
+            name: String::from("Init & Service Supervisor Capability Variant #254 (Alpine Linux v254)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27047,
+            name: String::from("Userland Utility Fastpipe Capability Variant #254 (Void Linux v254)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27048,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #254 (NixOS v254)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27049,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #254 (openSUSE v254)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27050,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #254 (FreeBSD v254)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #254"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27051,
+            name: String::from("Kernel Scheduler Capability Variant #255 (OpenBSD v255)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27052,
+            name: String::from("Filesystem & Storage Driver Capability Variant #255 (NetBSD v255)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27053,
+            name: String::from("Security & Hardening Shield Capability Variant #255 (DragonFly BSD v255)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27054,
+            name: String::from("Package Manager & Solver Capability Variant #255 (Solus v255)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27055,
+            name: String::from("Networking & Firewall Router Capability Variant #255 (Slackware v255)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27056,
+            name: String::from("Init & Service Supervisor Capability Variant #255 (Clear Linux v255)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27057,
+            name: String::from("Userland Utility Fastpipe Capability Variant #255 (CachyOS v255)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27058,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #255 (Pop!_OS v255)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27059,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #255 (Manjaro v255)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27060,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #255 (Linux Mint v255)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #255"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27061,
+            name: String::from("Kernel Scheduler Capability Variant #256 (Ubuntu v256)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27062,
+            name: String::from("Filesystem & Storage Driver Capability Variant #256 (Debian v256)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27063,
+            name: String::from("Security & Hardening Shield Capability Variant #256 (Fedora v256)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27064,
+            name: String::from("Package Manager & Solver Capability Variant #256 (Arch Linux v256)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27065,
+            name: String::from("Networking & Firewall Router Capability Variant #256 (Gentoo v256)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27066,
+            name: String::from("Init & Service Supervisor Capability Variant #256 (Alpine Linux v256)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27067,
+            name: String::from("Userland Utility Fastpipe Capability Variant #256 (Void Linux v256)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27068,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #256 (NixOS v256)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27069,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #256 (openSUSE v256)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27070,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #256 (FreeBSD v256)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #256"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27071,
+            name: String::from("Kernel Scheduler Capability Variant #257 (OpenBSD v257)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27072,
+            name: String::from("Filesystem & Storage Driver Capability Variant #257 (NetBSD v257)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27073,
+            name: String::from("Security & Hardening Shield Capability Variant #257 (DragonFly BSD v257)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27074,
+            name: String::from("Package Manager & Solver Capability Variant #257 (Solus v257)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27075,
+            name: String::from("Networking & Firewall Router Capability Variant #257 (Slackware v257)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27076,
+            name: String::from("Init & Service Supervisor Capability Variant #257 (Clear Linux v257)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27077,
+            name: String::from("Userland Utility Fastpipe Capability Variant #257 (CachyOS v257)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27078,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #257 (Pop!_OS v257)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27079,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #257 (Manjaro v257)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27080,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #257 (Linux Mint v257)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #257"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27081,
+            name: String::from("Kernel Scheduler Capability Variant #258 (Ubuntu v258)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27082,
+            name: String::from("Filesystem & Storage Driver Capability Variant #258 (Debian v258)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27083,
+            name: String::from("Security & Hardening Shield Capability Variant #258 (Fedora v258)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27084,
+            name: String::from("Package Manager & Solver Capability Variant #258 (Arch Linux v258)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27085,
+            name: String::from("Networking & Firewall Router Capability Variant #258 (Gentoo v258)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27086,
+            name: String::from("Init & Service Supervisor Capability Variant #258 (Alpine Linux v258)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27087,
+            name: String::from("Userland Utility Fastpipe Capability Variant #258 (Void Linux v258)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27088,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #258 (NixOS v258)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27089,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #258 (openSUSE v258)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27090,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #258 (FreeBSD v258)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #258"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27091,
+            name: String::from("Kernel Scheduler Capability Variant #259 (OpenBSD v259)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27092,
+            name: String::from("Filesystem & Storage Driver Capability Variant #259 (NetBSD v259)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27093,
+            name: String::from("Security & Hardening Shield Capability Variant #259 (DragonFly BSD v259)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27094,
+            name: String::from("Package Manager & Solver Capability Variant #259 (Solus v259)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27095,
+            name: String::from("Networking & Firewall Router Capability Variant #259 (Slackware v259)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27096,
+            name: String::from("Init & Service Supervisor Capability Variant #259 (Clear Linux v259)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27097,
+            name: String::from("Userland Utility Fastpipe Capability Variant #259 (CachyOS v259)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27098,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #259 (Pop!_OS v259)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27099,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #259 (Manjaro v259)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27100,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #259 (Linux Mint v259)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #259"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27101,
+            name: String::from("Kernel Scheduler Capability Variant #260 (Ubuntu v260)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27102,
+            name: String::from("Filesystem & Storage Driver Capability Variant #260 (Debian v260)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27103,
+            name: String::from("Security & Hardening Shield Capability Variant #260 (Fedora v260)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27104,
+            name: String::from("Package Manager & Solver Capability Variant #260 (Arch Linux v260)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27105,
+            name: String::from("Networking & Firewall Router Capability Variant #260 (Gentoo v260)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27106,
+            name: String::from("Init & Service Supervisor Capability Variant #260 (Alpine Linux v260)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27107,
+            name: String::from("Userland Utility Fastpipe Capability Variant #260 (Void Linux v260)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27108,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #260 (NixOS v260)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27109,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #260 (openSUSE v260)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27110,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #260 (FreeBSD v260)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #260"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27111,
+            name: String::from("Kernel Scheduler Capability Variant #261 (OpenBSD v261)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27112,
+            name: String::from("Filesystem & Storage Driver Capability Variant #261 (NetBSD v261)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27113,
+            name: String::from("Security & Hardening Shield Capability Variant #261 (DragonFly BSD v261)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27114,
+            name: String::from("Package Manager & Solver Capability Variant #261 (Solus v261)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27115,
+            name: String::from("Networking & Firewall Router Capability Variant #261 (Slackware v261)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27116,
+            name: String::from("Init & Service Supervisor Capability Variant #261 (Clear Linux v261)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27117,
+            name: String::from("Userland Utility Fastpipe Capability Variant #261 (CachyOS v261)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27118,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #261 (Pop!_OS v261)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27119,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #261 (Manjaro v261)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27120,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #261 (Linux Mint v261)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #261"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27121,
+            name: String::from("Kernel Scheduler Capability Variant #262 (Ubuntu v262)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27122,
+            name: String::from("Filesystem & Storage Driver Capability Variant #262 (Debian v262)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27123,
+            name: String::from("Security & Hardening Shield Capability Variant #262 (Fedora v262)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27124,
+            name: String::from("Package Manager & Solver Capability Variant #262 (Arch Linux v262)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27125,
+            name: String::from("Networking & Firewall Router Capability Variant #262 (Gentoo v262)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27126,
+            name: String::from("Init & Service Supervisor Capability Variant #262 (Alpine Linux v262)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27127,
+            name: String::from("Userland Utility Fastpipe Capability Variant #262 (Void Linux v262)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27128,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #262 (NixOS v262)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27129,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #262 (openSUSE v262)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27130,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #262 (FreeBSD v262)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #262"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27131,
+            name: String::from("Kernel Scheduler Capability Variant #263 (OpenBSD v263)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27132,
+            name: String::from("Filesystem & Storage Driver Capability Variant #263 (NetBSD v263)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27133,
+            name: String::from("Security & Hardening Shield Capability Variant #263 (DragonFly BSD v263)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27134,
+            name: String::from("Package Manager & Solver Capability Variant #263 (Solus v263)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27135,
+            name: String::from("Networking & Firewall Router Capability Variant #263 (Slackware v263)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27136,
+            name: String::from("Init & Service Supervisor Capability Variant #263 (Clear Linux v263)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27137,
+            name: String::from("Userland Utility Fastpipe Capability Variant #263 (CachyOS v263)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27138,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #263 (Pop!_OS v263)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27139,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #263 (Manjaro v263)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27140,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #263 (Linux Mint v263)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #263"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27141,
+            name: String::from("Kernel Scheduler Capability Variant #264 (Ubuntu v264)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27142,
+            name: String::from("Filesystem & Storage Driver Capability Variant #264 (Debian v264)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27143,
+            name: String::from("Security & Hardening Shield Capability Variant #264 (Fedora v264)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27144,
+            name: String::from("Package Manager & Solver Capability Variant #264 (Arch Linux v264)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27145,
+            name: String::from("Networking & Firewall Router Capability Variant #264 (Gentoo v264)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27146,
+            name: String::from("Init & Service Supervisor Capability Variant #264 (Alpine Linux v264)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27147,
+            name: String::from("Userland Utility Fastpipe Capability Variant #264 (Void Linux v264)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27148,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #264 (NixOS v264)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27149,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #264 (openSUSE v264)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27150,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #264 (FreeBSD v264)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #264"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27151,
+            name: String::from("Kernel Scheduler Capability Variant #265 (OpenBSD v265)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27152,
+            name: String::from("Filesystem & Storage Driver Capability Variant #265 (NetBSD v265)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27153,
+            name: String::from("Security & Hardening Shield Capability Variant #265 (DragonFly BSD v265)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27154,
+            name: String::from("Package Manager & Solver Capability Variant #265 (Solus v265)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27155,
+            name: String::from("Networking & Firewall Router Capability Variant #265 (Slackware v265)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27156,
+            name: String::from("Init & Service Supervisor Capability Variant #265 (Clear Linux v265)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27157,
+            name: String::from("Userland Utility Fastpipe Capability Variant #265 (CachyOS v265)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27158,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #265 (Pop!_OS v265)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27159,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #265 (Manjaro v265)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27160,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #265 (Linux Mint v265)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #265"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27161,
+            name: String::from("Kernel Scheduler Capability Variant #266 (Ubuntu v266)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27162,
+            name: String::from("Filesystem & Storage Driver Capability Variant #266 (Debian v266)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27163,
+            name: String::from("Security & Hardening Shield Capability Variant #266 (Fedora v266)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27164,
+            name: String::from("Package Manager & Solver Capability Variant #266 (Arch Linux v266)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27165,
+            name: String::from("Networking & Firewall Router Capability Variant #266 (Gentoo v266)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27166,
+            name: String::from("Init & Service Supervisor Capability Variant #266 (Alpine Linux v266)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27167,
+            name: String::from("Userland Utility Fastpipe Capability Variant #266 (Void Linux v266)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27168,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #266 (NixOS v266)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27169,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #266 (openSUSE v266)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27170,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #266 (FreeBSD v266)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #266"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27171,
+            name: String::from("Kernel Scheduler Capability Variant #267 (OpenBSD v267)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27172,
+            name: String::from("Filesystem & Storage Driver Capability Variant #267 (NetBSD v267)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27173,
+            name: String::from("Security & Hardening Shield Capability Variant #267 (DragonFly BSD v267)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27174,
+            name: String::from("Package Manager & Solver Capability Variant #267 (Solus v267)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27175,
+            name: String::from("Networking & Firewall Router Capability Variant #267 (Slackware v267)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27176,
+            name: String::from("Init & Service Supervisor Capability Variant #267 (Clear Linux v267)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27177,
+            name: String::from("Userland Utility Fastpipe Capability Variant #267 (CachyOS v267)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27178,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #267 (Pop!_OS v267)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27179,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #267 (Manjaro v267)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27180,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #267 (Linux Mint v267)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #267"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27181,
+            name: String::from("Kernel Scheduler Capability Variant #268 (Ubuntu v268)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27182,
+            name: String::from("Filesystem & Storage Driver Capability Variant #268 (Debian v268)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27183,
+            name: String::from("Security & Hardening Shield Capability Variant #268 (Fedora v268)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27184,
+            name: String::from("Package Manager & Solver Capability Variant #268 (Arch Linux v268)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27185,
+            name: String::from("Networking & Firewall Router Capability Variant #268 (Gentoo v268)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27186,
+            name: String::from("Init & Service Supervisor Capability Variant #268 (Alpine Linux v268)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27187,
+            name: String::from("Userland Utility Fastpipe Capability Variant #268 (Void Linux v268)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27188,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #268 (NixOS v268)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27189,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #268 (openSUSE v268)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27190,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #268 (FreeBSD v268)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #268"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27191,
+            name: String::from("Kernel Scheduler Capability Variant #269 (OpenBSD v269)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27192,
+            name: String::from("Filesystem & Storage Driver Capability Variant #269 (NetBSD v269)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27193,
+            name: String::from("Security & Hardening Shield Capability Variant #269 (DragonFly BSD v269)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27194,
+            name: String::from("Package Manager & Solver Capability Variant #269 (Solus v269)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27195,
+            name: String::from("Networking & Firewall Router Capability Variant #269 (Slackware v269)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27196,
+            name: String::from("Init & Service Supervisor Capability Variant #269 (Clear Linux v269)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27197,
+            name: String::from("Userland Utility Fastpipe Capability Variant #269 (CachyOS v269)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27198,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #269 (Pop!_OS v269)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27199,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #269 (Manjaro v269)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27200,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #269 (Linux Mint v269)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #269"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27201,
+            name: String::from("Kernel Scheduler Capability Variant #270 (Ubuntu v270)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27202,
+            name: String::from("Filesystem & Storage Driver Capability Variant #270 (Debian v270)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27203,
+            name: String::from("Security & Hardening Shield Capability Variant #270 (Fedora v270)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27204,
+            name: String::from("Package Manager & Solver Capability Variant #270 (Arch Linux v270)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27205,
+            name: String::from("Networking & Firewall Router Capability Variant #270 (Gentoo v270)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27206,
+            name: String::from("Init & Service Supervisor Capability Variant #270 (Alpine Linux v270)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27207,
+            name: String::from("Userland Utility Fastpipe Capability Variant #270 (Void Linux v270)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27208,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #270 (NixOS v270)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27209,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #270 (openSUSE v270)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27210,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #270 (FreeBSD v270)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #270"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27211,
+            name: String::from("Kernel Scheduler Capability Variant #271 (OpenBSD v271)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27212,
+            name: String::from("Filesystem & Storage Driver Capability Variant #271 (NetBSD v271)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27213,
+            name: String::from("Security & Hardening Shield Capability Variant #271 (DragonFly BSD v271)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27214,
+            name: String::from("Package Manager & Solver Capability Variant #271 (Solus v271)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27215,
+            name: String::from("Networking & Firewall Router Capability Variant #271 (Slackware v271)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27216,
+            name: String::from("Init & Service Supervisor Capability Variant #271 (Clear Linux v271)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27217,
+            name: String::from("Userland Utility Fastpipe Capability Variant #271 (CachyOS v271)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27218,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #271 (Pop!_OS v271)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27219,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #271 (Manjaro v271)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27220,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #271 (Linux Mint v271)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #271"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27221,
+            name: String::from("Kernel Scheduler Capability Variant #272 (Ubuntu v272)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27222,
+            name: String::from("Filesystem & Storage Driver Capability Variant #272 (Debian v272)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27223,
+            name: String::from("Security & Hardening Shield Capability Variant #272 (Fedora v272)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27224,
+            name: String::from("Package Manager & Solver Capability Variant #272 (Arch Linux v272)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27225,
+            name: String::from("Networking & Firewall Router Capability Variant #272 (Gentoo v272)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27226,
+            name: String::from("Init & Service Supervisor Capability Variant #272 (Alpine Linux v272)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27227,
+            name: String::from("Userland Utility Fastpipe Capability Variant #272 (Void Linux v272)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27228,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #272 (NixOS v272)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27229,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #272 (openSUSE v272)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27230,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #272 (FreeBSD v272)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #272"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27231,
+            name: String::from("Kernel Scheduler Capability Variant #273 (OpenBSD v273)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27232,
+            name: String::from("Filesystem & Storage Driver Capability Variant #273 (NetBSD v273)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27233,
+            name: String::from("Security & Hardening Shield Capability Variant #273 (DragonFly BSD v273)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27234,
+            name: String::from("Package Manager & Solver Capability Variant #273 (Solus v273)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27235,
+            name: String::from("Networking & Firewall Router Capability Variant #273 (Slackware v273)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27236,
+            name: String::from("Init & Service Supervisor Capability Variant #273 (Clear Linux v273)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27237,
+            name: String::from("Userland Utility Fastpipe Capability Variant #273 (CachyOS v273)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27238,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #273 (Pop!_OS v273)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27239,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #273 (Manjaro v273)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27240,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #273 (Linux Mint v273)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #273"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27241,
+            name: String::from("Kernel Scheduler Capability Variant #274 (Ubuntu v274)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27242,
+            name: String::from("Filesystem & Storage Driver Capability Variant #274 (Debian v274)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27243,
+            name: String::from("Security & Hardening Shield Capability Variant #274 (Fedora v274)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27244,
+            name: String::from("Package Manager & Solver Capability Variant #274 (Arch Linux v274)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27245,
+            name: String::from("Networking & Firewall Router Capability Variant #274 (Gentoo v274)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27246,
+            name: String::from("Init & Service Supervisor Capability Variant #274 (Alpine Linux v274)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27247,
+            name: String::from("Userland Utility Fastpipe Capability Variant #274 (Void Linux v274)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27248,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #274 (NixOS v274)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27249,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #274 (openSUSE v274)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27250,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #274 (FreeBSD v274)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #274"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27251,
+            name: String::from("Kernel Scheduler Capability Variant #275 (OpenBSD v275)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27252,
+            name: String::from("Filesystem & Storage Driver Capability Variant #275 (NetBSD v275)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27253,
+            name: String::from("Security & Hardening Shield Capability Variant #275 (DragonFly BSD v275)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27254,
+            name: String::from("Package Manager & Solver Capability Variant #275 (Solus v275)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27255,
+            name: String::from("Networking & Firewall Router Capability Variant #275 (Slackware v275)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27256,
+            name: String::from("Init & Service Supervisor Capability Variant #275 (Clear Linux v275)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27257,
+            name: String::from("Userland Utility Fastpipe Capability Variant #275 (CachyOS v275)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27258,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #275 (Pop!_OS v275)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27259,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #275 (Manjaro v275)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27260,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #275 (Linux Mint v275)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #275"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27261,
+            name: String::from("Kernel Scheduler Capability Variant #276 (Ubuntu v276)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27262,
+            name: String::from("Filesystem & Storage Driver Capability Variant #276 (Debian v276)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27263,
+            name: String::from("Security & Hardening Shield Capability Variant #276 (Fedora v276)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27264,
+            name: String::from("Package Manager & Solver Capability Variant #276 (Arch Linux v276)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27265,
+            name: String::from("Networking & Firewall Router Capability Variant #276 (Gentoo v276)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27266,
+            name: String::from("Init & Service Supervisor Capability Variant #276 (Alpine Linux v276)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27267,
+            name: String::from("Userland Utility Fastpipe Capability Variant #276 (Void Linux v276)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27268,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #276 (NixOS v276)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27269,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #276 (openSUSE v276)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27270,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #276 (FreeBSD v276)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #276"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27271,
+            name: String::from("Kernel Scheduler Capability Variant #277 (OpenBSD v277)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27272,
+            name: String::from("Filesystem & Storage Driver Capability Variant #277 (NetBSD v277)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27273,
+            name: String::from("Security & Hardening Shield Capability Variant #277 (DragonFly BSD v277)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27274,
+            name: String::from("Package Manager & Solver Capability Variant #277 (Solus v277)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27275,
+            name: String::from("Networking & Firewall Router Capability Variant #277 (Slackware v277)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27276,
+            name: String::from("Init & Service Supervisor Capability Variant #277 (Clear Linux v277)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27277,
+            name: String::from("Userland Utility Fastpipe Capability Variant #277 (CachyOS v277)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27278,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #277 (Pop!_OS v277)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27279,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #277 (Manjaro v277)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27280,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #277 (Linux Mint v277)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #277"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27281,
+            name: String::from("Kernel Scheduler Capability Variant #278 (Ubuntu v278)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27282,
+            name: String::from("Filesystem & Storage Driver Capability Variant #278 (Debian v278)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27283,
+            name: String::from("Security & Hardening Shield Capability Variant #278 (Fedora v278)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27284,
+            name: String::from("Package Manager & Solver Capability Variant #278 (Arch Linux v278)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27285,
+            name: String::from("Networking & Firewall Router Capability Variant #278 (Gentoo v278)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27286,
+            name: String::from("Init & Service Supervisor Capability Variant #278 (Alpine Linux v278)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27287,
+            name: String::from("Userland Utility Fastpipe Capability Variant #278 (Void Linux v278)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27288,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #278 (NixOS v278)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27289,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #278 (openSUSE v278)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27290,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #278 (FreeBSD v278)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #278"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27291,
+            name: String::from("Kernel Scheduler Capability Variant #279 (OpenBSD v279)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27292,
+            name: String::from("Filesystem & Storage Driver Capability Variant #279 (NetBSD v279)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27293,
+            name: String::from("Security & Hardening Shield Capability Variant #279 (DragonFly BSD v279)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27294,
+            name: String::from("Package Manager & Solver Capability Variant #279 (Solus v279)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27295,
+            name: String::from("Networking & Firewall Router Capability Variant #279 (Slackware v279)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27296,
+            name: String::from("Init & Service Supervisor Capability Variant #279 (Clear Linux v279)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27297,
+            name: String::from("Userland Utility Fastpipe Capability Variant #279 (CachyOS v279)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27298,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #279 (Pop!_OS v279)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27299,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #279 (Manjaro v279)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27300,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #279 (Linux Mint v279)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #279"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27301,
+            name: String::from("Kernel Scheduler Capability Variant #280 (Ubuntu v280)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27302,
+            name: String::from("Filesystem & Storage Driver Capability Variant #280 (Debian v280)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27303,
+            name: String::from("Security & Hardening Shield Capability Variant #280 (Fedora v280)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27304,
+            name: String::from("Package Manager & Solver Capability Variant #280 (Arch Linux v280)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27305,
+            name: String::from("Networking & Firewall Router Capability Variant #280 (Gentoo v280)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27306,
+            name: String::from("Init & Service Supervisor Capability Variant #280 (Alpine Linux v280)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27307,
+            name: String::from("Userland Utility Fastpipe Capability Variant #280 (Void Linux v280)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27308,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #280 (NixOS v280)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27309,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #280 (openSUSE v280)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27310,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #280 (FreeBSD v280)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #280"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27311,
+            name: String::from("Kernel Scheduler Capability Variant #281 (OpenBSD v281)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27312,
+            name: String::from("Filesystem & Storage Driver Capability Variant #281 (NetBSD v281)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27313,
+            name: String::from("Security & Hardening Shield Capability Variant #281 (DragonFly BSD v281)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27314,
+            name: String::from("Package Manager & Solver Capability Variant #281 (Solus v281)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27315,
+            name: String::from("Networking & Firewall Router Capability Variant #281 (Slackware v281)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27316,
+            name: String::from("Init & Service Supervisor Capability Variant #281 (Clear Linux v281)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27317,
+            name: String::from("Userland Utility Fastpipe Capability Variant #281 (CachyOS v281)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27318,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #281 (Pop!_OS v281)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27319,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #281 (Manjaro v281)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27320,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #281 (Linux Mint v281)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #281"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27321,
+            name: String::from("Kernel Scheduler Capability Variant #282 (Ubuntu v282)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27322,
+            name: String::from("Filesystem & Storage Driver Capability Variant #282 (Debian v282)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27323,
+            name: String::from("Security & Hardening Shield Capability Variant #282 (Fedora v282)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27324,
+            name: String::from("Package Manager & Solver Capability Variant #282 (Arch Linux v282)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27325,
+            name: String::from("Networking & Firewall Router Capability Variant #282 (Gentoo v282)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27326,
+            name: String::from("Init & Service Supervisor Capability Variant #282 (Alpine Linux v282)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27327,
+            name: String::from("Userland Utility Fastpipe Capability Variant #282 (Void Linux v282)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27328,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #282 (NixOS v282)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27329,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #282 (openSUSE v282)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27330,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #282 (FreeBSD v282)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #282"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27331,
+            name: String::from("Kernel Scheduler Capability Variant #283 (OpenBSD v283)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27332,
+            name: String::from("Filesystem & Storage Driver Capability Variant #283 (NetBSD v283)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27333,
+            name: String::from("Security & Hardening Shield Capability Variant #283 (DragonFly BSD v283)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27334,
+            name: String::from("Package Manager & Solver Capability Variant #283 (Solus v283)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27335,
+            name: String::from("Networking & Firewall Router Capability Variant #283 (Slackware v283)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27336,
+            name: String::from("Init & Service Supervisor Capability Variant #283 (Clear Linux v283)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27337,
+            name: String::from("Userland Utility Fastpipe Capability Variant #283 (CachyOS v283)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27338,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #283 (Pop!_OS v283)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27339,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #283 (Manjaro v283)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27340,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #283 (Linux Mint v283)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #283"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27341,
+            name: String::from("Kernel Scheduler Capability Variant #284 (Ubuntu v284)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27342,
+            name: String::from("Filesystem & Storage Driver Capability Variant #284 (Debian v284)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27343,
+            name: String::from("Security & Hardening Shield Capability Variant #284 (Fedora v284)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27344,
+            name: String::from("Package Manager & Solver Capability Variant #284 (Arch Linux v284)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27345,
+            name: String::from("Networking & Firewall Router Capability Variant #284 (Gentoo v284)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27346,
+            name: String::from("Init & Service Supervisor Capability Variant #284 (Alpine Linux v284)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27347,
+            name: String::from("Userland Utility Fastpipe Capability Variant #284 (Void Linux v284)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27348,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #284 (NixOS v284)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27349,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #284 (openSUSE v284)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27350,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #284 (FreeBSD v284)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #284"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27351,
+            name: String::from("Kernel Scheduler Capability Variant #285 (OpenBSD v285)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27352,
+            name: String::from("Filesystem & Storage Driver Capability Variant #285 (NetBSD v285)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27353,
+            name: String::from("Security & Hardening Shield Capability Variant #285 (DragonFly BSD v285)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27354,
+            name: String::from("Package Manager & Solver Capability Variant #285 (Solus v285)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27355,
+            name: String::from("Networking & Firewall Router Capability Variant #285 (Slackware v285)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27356,
+            name: String::from("Init & Service Supervisor Capability Variant #285 (Clear Linux v285)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27357,
+            name: String::from("Userland Utility Fastpipe Capability Variant #285 (CachyOS v285)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27358,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #285 (Pop!_OS v285)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27359,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #285 (Manjaro v285)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27360,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #285 (Linux Mint v285)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #285"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27361,
+            name: String::from("Kernel Scheduler Capability Variant #286 (Ubuntu v286)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27362,
+            name: String::from("Filesystem & Storage Driver Capability Variant #286 (Debian v286)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27363,
+            name: String::from("Security & Hardening Shield Capability Variant #286 (Fedora v286)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27364,
+            name: String::from("Package Manager & Solver Capability Variant #286 (Arch Linux v286)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27365,
+            name: String::from("Networking & Firewall Router Capability Variant #286 (Gentoo v286)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27366,
+            name: String::from("Init & Service Supervisor Capability Variant #286 (Alpine Linux v286)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27367,
+            name: String::from("Userland Utility Fastpipe Capability Variant #286 (Void Linux v286)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27368,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #286 (NixOS v286)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27369,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #286 (openSUSE v286)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27370,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #286 (FreeBSD v286)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #286"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27371,
+            name: String::from("Kernel Scheduler Capability Variant #287 (OpenBSD v287)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27372,
+            name: String::from("Filesystem & Storage Driver Capability Variant #287 (NetBSD v287)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27373,
+            name: String::from("Security & Hardening Shield Capability Variant #287 (DragonFly BSD v287)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27374,
+            name: String::from("Package Manager & Solver Capability Variant #287 (Solus v287)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27375,
+            name: String::from("Networking & Firewall Router Capability Variant #287 (Slackware v287)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27376,
+            name: String::from("Init & Service Supervisor Capability Variant #287 (Clear Linux v287)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27377,
+            name: String::from("Userland Utility Fastpipe Capability Variant #287 (CachyOS v287)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27378,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #287 (Pop!_OS v287)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27379,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #287 (Manjaro v287)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27380,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #287 (Linux Mint v287)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #287"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27381,
+            name: String::from("Kernel Scheduler Capability Variant #288 (Ubuntu v288)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27382,
+            name: String::from("Filesystem & Storage Driver Capability Variant #288 (Debian v288)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27383,
+            name: String::from("Security & Hardening Shield Capability Variant #288 (Fedora v288)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27384,
+            name: String::from("Package Manager & Solver Capability Variant #288 (Arch Linux v288)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27385,
+            name: String::from("Networking & Firewall Router Capability Variant #288 (Gentoo v288)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27386,
+            name: String::from("Init & Service Supervisor Capability Variant #288 (Alpine Linux v288)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27387,
+            name: String::from("Userland Utility Fastpipe Capability Variant #288 (Void Linux v288)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27388,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #288 (NixOS v288)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27389,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #288 (openSUSE v288)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27390,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #288 (FreeBSD v288)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #288"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27391,
+            name: String::from("Kernel Scheduler Capability Variant #289 (OpenBSD v289)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27392,
+            name: String::from("Filesystem & Storage Driver Capability Variant #289 (NetBSD v289)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27393,
+            name: String::from("Security & Hardening Shield Capability Variant #289 (DragonFly BSD v289)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27394,
+            name: String::from("Package Manager & Solver Capability Variant #289 (Solus v289)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27395,
+            name: String::from("Networking & Firewall Router Capability Variant #289 (Slackware v289)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27396,
+            name: String::from("Init & Service Supervisor Capability Variant #289 (Clear Linux v289)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27397,
+            name: String::from("Userland Utility Fastpipe Capability Variant #289 (CachyOS v289)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27398,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #289 (Pop!_OS v289)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27399,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #289 (Manjaro v289)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27400,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #289 (Linux Mint v289)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #289"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27401,
+            name: String::from("Kernel Scheduler Capability Variant #290 (Ubuntu v290)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27402,
+            name: String::from("Filesystem & Storage Driver Capability Variant #290 (Debian v290)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27403,
+            name: String::from("Security & Hardening Shield Capability Variant #290 (Fedora v290)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27404,
+            name: String::from("Package Manager & Solver Capability Variant #290 (Arch Linux v290)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27405,
+            name: String::from("Networking & Firewall Router Capability Variant #290 (Gentoo v290)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27406,
+            name: String::from("Init & Service Supervisor Capability Variant #290 (Alpine Linux v290)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27407,
+            name: String::from("Userland Utility Fastpipe Capability Variant #290 (Void Linux v290)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27408,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #290 (NixOS v290)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27409,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #290 (openSUSE v290)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27410,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #290 (FreeBSD v290)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #290"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27411,
+            name: String::from("Kernel Scheduler Capability Variant #291 (OpenBSD v291)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27412,
+            name: String::from("Filesystem & Storage Driver Capability Variant #291 (NetBSD v291)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27413,
+            name: String::from("Security & Hardening Shield Capability Variant #291 (DragonFly BSD v291)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27414,
+            name: String::from("Package Manager & Solver Capability Variant #291 (Solus v291)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27415,
+            name: String::from("Networking & Firewall Router Capability Variant #291 (Slackware v291)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27416,
+            name: String::from("Init & Service Supervisor Capability Variant #291 (Clear Linux v291)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27417,
+            name: String::from("Userland Utility Fastpipe Capability Variant #291 (CachyOS v291)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27418,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #291 (Pop!_OS v291)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27419,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #291 (Manjaro v291)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27420,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #291 (Linux Mint v291)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #291"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27421,
+            name: String::from("Kernel Scheduler Capability Variant #292 (Ubuntu v292)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27422,
+            name: String::from("Filesystem & Storage Driver Capability Variant #292 (Debian v292)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27423,
+            name: String::from("Security & Hardening Shield Capability Variant #292 (Fedora v292)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27424,
+            name: String::from("Package Manager & Solver Capability Variant #292 (Arch Linux v292)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27425,
+            name: String::from("Networking & Firewall Router Capability Variant #292 (Gentoo v292)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27426,
+            name: String::from("Init & Service Supervisor Capability Variant #292 (Alpine Linux v292)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27427,
+            name: String::from("Userland Utility Fastpipe Capability Variant #292 (Void Linux v292)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27428,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #292 (NixOS v292)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27429,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #292 (openSUSE v292)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27430,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #292 (FreeBSD v292)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #292"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27431,
+            name: String::from("Kernel Scheduler Capability Variant #293 (OpenBSD v293)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27432,
+            name: String::from("Filesystem & Storage Driver Capability Variant #293 (NetBSD v293)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27433,
+            name: String::from("Security & Hardening Shield Capability Variant #293 (DragonFly BSD v293)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27434,
+            name: String::from("Package Manager & Solver Capability Variant #293 (Solus v293)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27435,
+            name: String::from("Networking & Firewall Router Capability Variant #293 (Slackware v293)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27436,
+            name: String::from("Init & Service Supervisor Capability Variant #293 (Clear Linux v293)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27437,
+            name: String::from("Userland Utility Fastpipe Capability Variant #293 (CachyOS v293)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27438,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #293 (Pop!_OS v293)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27439,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #293 (Manjaro v293)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27440,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #293 (Linux Mint v293)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #293"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27441,
+            name: String::from("Kernel Scheduler Capability Variant #294 (Ubuntu v294)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27442,
+            name: String::from("Filesystem & Storage Driver Capability Variant #294 (Debian v294)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27443,
+            name: String::from("Security & Hardening Shield Capability Variant #294 (Fedora v294)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27444,
+            name: String::from("Package Manager & Solver Capability Variant #294 (Arch Linux v294)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27445,
+            name: String::from("Networking & Firewall Router Capability Variant #294 (Gentoo v294)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27446,
+            name: String::from("Init & Service Supervisor Capability Variant #294 (Alpine Linux v294)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27447,
+            name: String::from("Userland Utility Fastpipe Capability Variant #294 (Void Linux v294)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27448,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #294 (NixOS v294)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27449,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #294 (openSUSE v294)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27450,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #294 (FreeBSD v294)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #294"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27451,
+            name: String::from("Kernel Scheduler Capability Variant #295 (OpenBSD v295)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27452,
+            name: String::from("Filesystem & Storage Driver Capability Variant #295 (NetBSD v295)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27453,
+            name: String::from("Security & Hardening Shield Capability Variant #295 (DragonFly BSD v295)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27454,
+            name: String::from("Package Manager & Solver Capability Variant #295 (Solus v295)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27455,
+            name: String::from("Networking & Firewall Router Capability Variant #295 (Slackware v295)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27456,
+            name: String::from("Init & Service Supervisor Capability Variant #295 (Clear Linux v295)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27457,
+            name: String::from("Userland Utility Fastpipe Capability Variant #295 (CachyOS v295)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27458,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #295 (Pop!_OS v295)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27459,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #295 (Manjaro v295)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27460,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #295 (Linux Mint v295)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #295"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27461,
+            name: String::from("Kernel Scheduler Capability Variant #296 (Ubuntu v296)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27462,
+            name: String::from("Filesystem & Storage Driver Capability Variant #296 (Debian v296)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27463,
+            name: String::from("Security & Hardening Shield Capability Variant #296 (Fedora v296)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27464,
+            name: String::from("Package Manager & Solver Capability Variant #296 (Arch Linux v296)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27465,
+            name: String::from("Networking & Firewall Router Capability Variant #296 (Gentoo v296)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27466,
+            name: String::from("Init & Service Supervisor Capability Variant #296 (Alpine Linux v296)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27467,
+            name: String::from("Userland Utility Fastpipe Capability Variant #296 (Void Linux v296)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27468,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #296 (NixOS v296)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27469,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #296 (openSUSE v296)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27470,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #296 (FreeBSD v296)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #296"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27471,
+            name: String::from("Kernel Scheduler Capability Variant #297 (OpenBSD v297)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27472,
+            name: String::from("Filesystem & Storage Driver Capability Variant #297 (NetBSD v297)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27473,
+            name: String::from("Security & Hardening Shield Capability Variant #297 (DragonFly BSD v297)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27474,
+            name: String::from("Package Manager & Solver Capability Variant #297 (Solus v297)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27475,
+            name: String::from("Networking & Firewall Router Capability Variant #297 (Slackware v297)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27476,
+            name: String::from("Init & Service Supervisor Capability Variant #297 (Clear Linux v297)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27477,
+            name: String::from("Userland Utility Fastpipe Capability Variant #297 (CachyOS v297)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27478,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #297 (Pop!_OS v297)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27479,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #297 (Manjaro v297)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27480,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #297 (Linux Mint v297)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #297"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27481,
+            name: String::from("Kernel Scheduler Capability Variant #298 (Ubuntu v298)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27482,
+            name: String::from("Filesystem & Storage Driver Capability Variant #298 (Debian v298)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27483,
+            name: String::from("Security & Hardening Shield Capability Variant #298 (Fedora v298)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27484,
+            name: String::from("Package Manager & Solver Capability Variant #298 (Arch Linux v298)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27485,
+            name: String::from("Networking & Firewall Router Capability Variant #298 (Gentoo v298)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27486,
+            name: String::from("Init & Service Supervisor Capability Variant #298 (Alpine Linux v298)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27487,
+            name: String::from("Userland Utility Fastpipe Capability Variant #298 (Void Linux v298)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27488,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #298 (NixOS v298)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27489,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #298 (openSUSE v298)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27490,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #298 (FreeBSD v298)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #298"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27491,
+            name: String::from("Kernel Scheduler Capability Variant #299 (OpenBSD v299)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27492,
+            name: String::from("Filesystem & Storage Driver Capability Variant #299 (NetBSD v299)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27493,
+            name: String::from("Security & Hardening Shield Capability Variant #299 (DragonFly BSD v299)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27494,
+            name: String::from("Package Manager & Solver Capability Variant #299 (Solus v299)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27495,
+            name: String::from("Networking & Firewall Router Capability Variant #299 (Slackware v299)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27496,
+            name: String::from("Init & Service Supervisor Capability Variant #299 (Clear Linux v299)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27497,
+            name: String::from("Userland Utility Fastpipe Capability Variant #299 (CachyOS v299)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27498,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #299 (Pop!_OS v299)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27499,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #299 (Manjaro v299)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27500,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #299 (Linux Mint v299)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #299"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27501,
+            name: String::from("Kernel Scheduler Capability Variant #300 (Ubuntu v300)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27502,
+            name: String::from("Filesystem & Storage Driver Capability Variant #300 (Debian v300)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27503,
+            name: String::from("Security & Hardening Shield Capability Variant #300 (Fedora v300)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27504,
+            name: String::from("Package Manager & Solver Capability Variant #300 (Arch Linux v300)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27505,
+            name: String::from("Networking & Firewall Router Capability Variant #300 (Gentoo v300)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27506,
+            name: String::from("Init & Service Supervisor Capability Variant #300 (Alpine Linux v300)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27507,
+            name: String::from("Userland Utility Fastpipe Capability Variant #300 (Void Linux v300)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27508,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #300 (NixOS v300)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27509,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #300 (openSUSE v300)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27510,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #300 (FreeBSD v300)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #300"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27511,
+            name: String::from("Kernel Scheduler Capability Variant #301 (OpenBSD v301)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27512,
+            name: String::from("Filesystem & Storage Driver Capability Variant #301 (NetBSD v301)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27513,
+            name: String::from("Security & Hardening Shield Capability Variant #301 (DragonFly BSD v301)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27514,
+            name: String::from("Package Manager & Solver Capability Variant #301 (Solus v301)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27515,
+            name: String::from("Networking & Firewall Router Capability Variant #301 (Slackware v301)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27516,
+            name: String::from("Init & Service Supervisor Capability Variant #301 (Clear Linux v301)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27517,
+            name: String::from("Userland Utility Fastpipe Capability Variant #301 (CachyOS v301)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27518,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #301 (Pop!_OS v301)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27519,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #301 (Manjaro v301)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27520,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #301 (Linux Mint v301)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #301"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27521,
+            name: String::from("Kernel Scheduler Capability Variant #302 (Ubuntu v302)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27522,
+            name: String::from("Filesystem & Storage Driver Capability Variant #302 (Debian v302)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27523,
+            name: String::from("Security & Hardening Shield Capability Variant #302 (Fedora v302)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27524,
+            name: String::from("Package Manager & Solver Capability Variant #302 (Arch Linux v302)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27525,
+            name: String::from("Networking & Firewall Router Capability Variant #302 (Gentoo v302)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27526,
+            name: String::from("Init & Service Supervisor Capability Variant #302 (Alpine Linux v302)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27527,
+            name: String::from("Userland Utility Fastpipe Capability Variant #302 (Void Linux v302)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27528,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #302 (NixOS v302)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27529,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #302 (openSUSE v302)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27530,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #302 (FreeBSD v302)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #302"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27531,
+            name: String::from("Kernel Scheduler Capability Variant #303 (OpenBSD v303)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27532,
+            name: String::from("Filesystem & Storage Driver Capability Variant #303 (NetBSD v303)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27533,
+            name: String::from("Security & Hardening Shield Capability Variant #303 (DragonFly BSD v303)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27534,
+            name: String::from("Package Manager & Solver Capability Variant #303 (Solus v303)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27535,
+            name: String::from("Networking & Firewall Router Capability Variant #303 (Slackware v303)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27536,
+            name: String::from("Init & Service Supervisor Capability Variant #303 (Clear Linux v303)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27537,
+            name: String::from("Userland Utility Fastpipe Capability Variant #303 (CachyOS v303)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27538,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #303 (Pop!_OS v303)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27539,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #303 (Manjaro v303)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27540,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #303 (Linux Mint v303)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #303"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27541,
+            name: String::from("Kernel Scheduler Capability Variant #304 (Ubuntu v304)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27542,
+            name: String::from("Filesystem & Storage Driver Capability Variant #304 (Debian v304)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27543,
+            name: String::from("Security & Hardening Shield Capability Variant #304 (Fedora v304)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27544,
+            name: String::from("Package Manager & Solver Capability Variant #304 (Arch Linux v304)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27545,
+            name: String::from("Networking & Firewall Router Capability Variant #304 (Gentoo v304)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27546,
+            name: String::from("Init & Service Supervisor Capability Variant #304 (Alpine Linux v304)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27547,
+            name: String::from("Userland Utility Fastpipe Capability Variant #304 (Void Linux v304)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27548,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #304 (NixOS v304)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27549,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #304 (openSUSE v304)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27550,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #304 (FreeBSD v304)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #304"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27551,
+            name: String::from("Kernel Scheduler Capability Variant #305 (OpenBSD v305)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27552,
+            name: String::from("Filesystem & Storage Driver Capability Variant #305 (NetBSD v305)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27553,
+            name: String::from("Security & Hardening Shield Capability Variant #305 (DragonFly BSD v305)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27554,
+            name: String::from("Package Manager & Solver Capability Variant #305 (Solus v305)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27555,
+            name: String::from("Networking & Firewall Router Capability Variant #305 (Slackware v305)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27556,
+            name: String::from("Init & Service Supervisor Capability Variant #305 (Clear Linux v305)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27557,
+            name: String::from("Userland Utility Fastpipe Capability Variant #305 (CachyOS v305)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27558,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #305 (Pop!_OS v305)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27559,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #305 (Manjaro v305)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27560,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #305 (Linux Mint v305)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #305"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27561,
+            name: String::from("Kernel Scheduler Capability Variant #306 (Ubuntu v306)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27562,
+            name: String::from("Filesystem & Storage Driver Capability Variant #306 (Debian v306)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27563,
+            name: String::from("Security & Hardening Shield Capability Variant #306 (Fedora v306)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27564,
+            name: String::from("Package Manager & Solver Capability Variant #306 (Arch Linux v306)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27565,
+            name: String::from("Networking & Firewall Router Capability Variant #306 (Gentoo v306)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27566,
+            name: String::from("Init & Service Supervisor Capability Variant #306 (Alpine Linux v306)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27567,
+            name: String::from("Userland Utility Fastpipe Capability Variant #306 (Void Linux v306)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27568,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #306 (NixOS v306)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27569,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #306 (openSUSE v306)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27570,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #306 (FreeBSD v306)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #306"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27571,
+            name: String::from("Kernel Scheduler Capability Variant #307 (OpenBSD v307)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27572,
+            name: String::from("Filesystem & Storage Driver Capability Variant #307 (NetBSD v307)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27573,
+            name: String::from("Security & Hardening Shield Capability Variant #307 (DragonFly BSD v307)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27574,
+            name: String::from("Package Manager & Solver Capability Variant #307 (Solus v307)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27575,
+            name: String::from("Networking & Firewall Router Capability Variant #307 (Slackware v307)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27576,
+            name: String::from("Init & Service Supervisor Capability Variant #307 (Clear Linux v307)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27577,
+            name: String::from("Userland Utility Fastpipe Capability Variant #307 (CachyOS v307)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27578,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #307 (Pop!_OS v307)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27579,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #307 (Manjaro v307)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27580,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #307 (Linux Mint v307)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #307"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27581,
+            name: String::from("Kernel Scheduler Capability Variant #308 (Ubuntu v308)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27582,
+            name: String::from("Filesystem & Storage Driver Capability Variant #308 (Debian v308)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27583,
+            name: String::from("Security & Hardening Shield Capability Variant #308 (Fedora v308)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27584,
+            name: String::from("Package Manager & Solver Capability Variant #308 (Arch Linux v308)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27585,
+            name: String::from("Networking & Firewall Router Capability Variant #308 (Gentoo v308)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27586,
+            name: String::from("Init & Service Supervisor Capability Variant #308 (Alpine Linux v308)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27587,
+            name: String::from("Userland Utility Fastpipe Capability Variant #308 (Void Linux v308)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27588,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #308 (NixOS v308)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27589,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #308 (openSUSE v308)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27590,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #308 (FreeBSD v308)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #308"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27591,
+            name: String::from("Kernel Scheduler Capability Variant #309 (OpenBSD v309)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27592,
+            name: String::from("Filesystem & Storage Driver Capability Variant #309 (NetBSD v309)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27593,
+            name: String::from("Security & Hardening Shield Capability Variant #309 (DragonFly BSD v309)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27594,
+            name: String::from("Package Manager & Solver Capability Variant #309 (Solus v309)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27595,
+            name: String::from("Networking & Firewall Router Capability Variant #309 (Slackware v309)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27596,
+            name: String::from("Init & Service Supervisor Capability Variant #309 (Clear Linux v309)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27597,
+            name: String::from("Userland Utility Fastpipe Capability Variant #309 (CachyOS v309)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27598,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #309 (Pop!_OS v309)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27599,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #309 (Manjaro v309)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27600,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #309 (Linux Mint v309)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #309"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27601,
+            name: String::from("Kernel Scheduler Capability Variant #310 (Ubuntu v310)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27602,
+            name: String::from("Filesystem & Storage Driver Capability Variant #310 (Debian v310)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27603,
+            name: String::from("Security & Hardening Shield Capability Variant #310 (Fedora v310)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27604,
+            name: String::from("Package Manager & Solver Capability Variant #310 (Arch Linux v310)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27605,
+            name: String::from("Networking & Firewall Router Capability Variant #310 (Gentoo v310)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27606,
+            name: String::from("Init & Service Supervisor Capability Variant #310 (Alpine Linux v310)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27607,
+            name: String::from("Userland Utility Fastpipe Capability Variant #310 (Void Linux v310)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27608,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #310 (NixOS v310)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27609,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #310 (openSUSE v310)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27610,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #310 (FreeBSD v310)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #310"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27611,
+            name: String::from("Kernel Scheduler Capability Variant #311 (OpenBSD v311)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27612,
+            name: String::from("Filesystem & Storage Driver Capability Variant #311 (NetBSD v311)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27613,
+            name: String::from("Security & Hardening Shield Capability Variant #311 (DragonFly BSD v311)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27614,
+            name: String::from("Package Manager & Solver Capability Variant #311 (Solus v311)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27615,
+            name: String::from("Networking & Firewall Router Capability Variant #311 (Slackware v311)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27616,
+            name: String::from("Init & Service Supervisor Capability Variant #311 (Clear Linux v311)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27617,
+            name: String::from("Userland Utility Fastpipe Capability Variant #311 (CachyOS v311)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27618,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #311 (Pop!_OS v311)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27619,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #311 (Manjaro v311)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27620,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #311 (Linux Mint v311)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #311"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27621,
+            name: String::from("Kernel Scheduler Capability Variant #312 (Ubuntu v312)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27622,
+            name: String::from("Filesystem & Storage Driver Capability Variant #312 (Debian v312)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27623,
+            name: String::from("Security & Hardening Shield Capability Variant #312 (Fedora v312)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27624,
+            name: String::from("Package Manager & Solver Capability Variant #312 (Arch Linux v312)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27625,
+            name: String::from("Networking & Firewall Router Capability Variant #312 (Gentoo v312)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27626,
+            name: String::from("Init & Service Supervisor Capability Variant #312 (Alpine Linux v312)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27627,
+            name: String::from("Userland Utility Fastpipe Capability Variant #312 (Void Linux v312)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27628,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #312 (NixOS v312)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27629,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #312 (openSUSE v312)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27630,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #312 (FreeBSD v312)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #312"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27631,
+            name: String::from("Kernel Scheduler Capability Variant #313 (OpenBSD v313)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27632,
+            name: String::from("Filesystem & Storage Driver Capability Variant #313 (NetBSD v313)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27633,
+            name: String::from("Security & Hardening Shield Capability Variant #313 (DragonFly BSD v313)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27634,
+            name: String::from("Package Manager & Solver Capability Variant #313 (Solus v313)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27635,
+            name: String::from("Networking & Firewall Router Capability Variant #313 (Slackware v313)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27636,
+            name: String::from("Init & Service Supervisor Capability Variant #313 (Clear Linux v313)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27637,
+            name: String::from("Userland Utility Fastpipe Capability Variant #313 (CachyOS v313)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27638,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #313 (Pop!_OS v313)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27639,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #313 (Manjaro v313)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27640,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #313 (Linux Mint v313)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #313"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27641,
+            name: String::from("Kernel Scheduler Capability Variant #314 (Ubuntu v314)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27642,
+            name: String::from("Filesystem & Storage Driver Capability Variant #314 (Debian v314)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27643,
+            name: String::from("Security & Hardening Shield Capability Variant #314 (Fedora v314)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27644,
+            name: String::from("Package Manager & Solver Capability Variant #314 (Arch Linux v314)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27645,
+            name: String::from("Networking & Firewall Router Capability Variant #314 (Gentoo v314)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27646,
+            name: String::from("Init & Service Supervisor Capability Variant #314 (Alpine Linux v314)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27647,
+            name: String::from("Userland Utility Fastpipe Capability Variant #314 (Void Linux v314)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27648,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #314 (NixOS v314)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27649,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #314 (openSUSE v314)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27650,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #314 (FreeBSD v314)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #314"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27651,
+            name: String::from("Kernel Scheduler Capability Variant #315 (OpenBSD v315)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27652,
+            name: String::from("Filesystem & Storage Driver Capability Variant #315 (NetBSD v315)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27653,
+            name: String::from("Security & Hardening Shield Capability Variant #315 (DragonFly BSD v315)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27654,
+            name: String::from("Package Manager & Solver Capability Variant #315 (Solus v315)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27655,
+            name: String::from("Networking & Firewall Router Capability Variant #315 (Slackware v315)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27656,
+            name: String::from("Init & Service Supervisor Capability Variant #315 (Clear Linux v315)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27657,
+            name: String::from("Userland Utility Fastpipe Capability Variant #315 (CachyOS v315)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27658,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #315 (Pop!_OS v315)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27659,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #315 (Manjaro v315)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27660,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #315 (Linux Mint v315)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #315"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27661,
+            name: String::from("Kernel Scheduler Capability Variant #316 (Ubuntu v316)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27662,
+            name: String::from("Filesystem & Storage Driver Capability Variant #316 (Debian v316)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27663,
+            name: String::from("Security & Hardening Shield Capability Variant #316 (Fedora v316)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27664,
+            name: String::from("Package Manager & Solver Capability Variant #316 (Arch Linux v316)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27665,
+            name: String::from("Networking & Firewall Router Capability Variant #316 (Gentoo v316)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27666,
+            name: String::from("Init & Service Supervisor Capability Variant #316 (Alpine Linux v316)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27667,
+            name: String::from("Userland Utility Fastpipe Capability Variant #316 (Void Linux v316)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27668,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #316 (NixOS v316)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27669,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #316 (openSUSE v316)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27670,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #316 (FreeBSD v316)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #316"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27671,
+            name: String::from("Kernel Scheduler Capability Variant #317 (OpenBSD v317)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27672,
+            name: String::from("Filesystem & Storage Driver Capability Variant #317 (NetBSD v317)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27673,
+            name: String::from("Security & Hardening Shield Capability Variant #317 (DragonFly BSD v317)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27674,
+            name: String::from("Package Manager & Solver Capability Variant #317 (Solus v317)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27675,
+            name: String::from("Networking & Firewall Router Capability Variant #317 (Slackware v317)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27676,
+            name: String::from("Init & Service Supervisor Capability Variant #317 (Clear Linux v317)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27677,
+            name: String::from("Userland Utility Fastpipe Capability Variant #317 (CachyOS v317)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27678,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #317 (Pop!_OS v317)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27679,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #317 (Manjaro v317)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27680,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #317 (Linux Mint v317)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #317"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27681,
+            name: String::from("Kernel Scheduler Capability Variant #318 (Ubuntu v318)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27682,
+            name: String::from("Filesystem & Storage Driver Capability Variant #318 (Debian v318)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27683,
+            name: String::from("Security & Hardening Shield Capability Variant #318 (Fedora v318)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27684,
+            name: String::from("Package Manager & Solver Capability Variant #318 (Arch Linux v318)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27685,
+            name: String::from("Networking & Firewall Router Capability Variant #318 (Gentoo v318)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27686,
+            name: String::from("Init & Service Supervisor Capability Variant #318 (Alpine Linux v318)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27687,
+            name: String::from("Userland Utility Fastpipe Capability Variant #318 (Void Linux v318)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27688,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #318 (NixOS v318)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27689,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #318 (openSUSE v318)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27690,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #318 (FreeBSD v318)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #318"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27691,
+            name: String::from("Kernel Scheduler Capability Variant #319 (OpenBSD v319)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27692,
+            name: String::from("Filesystem & Storage Driver Capability Variant #319 (NetBSD v319)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27693,
+            name: String::from("Security & Hardening Shield Capability Variant #319 (DragonFly BSD v319)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27694,
+            name: String::from("Package Manager & Solver Capability Variant #319 (Solus v319)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27695,
+            name: String::from("Networking & Firewall Router Capability Variant #319 (Slackware v319)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27696,
+            name: String::from("Init & Service Supervisor Capability Variant #319 (Clear Linux v319)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27697,
+            name: String::from("Userland Utility Fastpipe Capability Variant #319 (CachyOS v319)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27698,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #319 (Pop!_OS v319)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27699,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #319 (Manjaro v319)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27700,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #319 (Linux Mint v319)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #319"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27701,
+            name: String::from("Kernel Scheduler Capability Variant #320 (Ubuntu v320)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27702,
+            name: String::from("Filesystem & Storage Driver Capability Variant #320 (Debian v320)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27703,
+            name: String::from("Security & Hardening Shield Capability Variant #320 (Fedora v320)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27704,
+            name: String::from("Package Manager & Solver Capability Variant #320 (Arch Linux v320)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27705,
+            name: String::from("Networking & Firewall Router Capability Variant #320 (Gentoo v320)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27706,
+            name: String::from("Init & Service Supervisor Capability Variant #320 (Alpine Linux v320)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27707,
+            name: String::from("Userland Utility Fastpipe Capability Variant #320 (Void Linux v320)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27708,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #320 (NixOS v320)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27709,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #320 (openSUSE v320)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27710,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #320 (FreeBSD v320)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #320"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27711,
+            name: String::from("Kernel Scheduler Capability Variant #321 (OpenBSD v321)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27712,
+            name: String::from("Filesystem & Storage Driver Capability Variant #321 (NetBSD v321)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27713,
+            name: String::from("Security & Hardening Shield Capability Variant #321 (DragonFly BSD v321)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27714,
+            name: String::from("Package Manager & Solver Capability Variant #321 (Solus v321)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27715,
+            name: String::from("Networking & Firewall Router Capability Variant #321 (Slackware v321)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27716,
+            name: String::from("Init & Service Supervisor Capability Variant #321 (Clear Linux v321)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27717,
+            name: String::from("Userland Utility Fastpipe Capability Variant #321 (CachyOS v321)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27718,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #321 (Pop!_OS v321)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27719,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #321 (Manjaro v321)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27720,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #321 (Linux Mint v321)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #321"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27721,
+            name: String::from("Kernel Scheduler Capability Variant #322 (Ubuntu v322)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27722,
+            name: String::from("Filesystem & Storage Driver Capability Variant #322 (Debian v322)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27723,
+            name: String::from("Security & Hardening Shield Capability Variant #322 (Fedora v322)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27724,
+            name: String::from("Package Manager & Solver Capability Variant #322 (Arch Linux v322)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27725,
+            name: String::from("Networking & Firewall Router Capability Variant #322 (Gentoo v322)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27726,
+            name: String::from("Init & Service Supervisor Capability Variant #322 (Alpine Linux v322)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27727,
+            name: String::from("Userland Utility Fastpipe Capability Variant #322 (Void Linux v322)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27728,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #322 (NixOS v322)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27729,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #322 (openSUSE v322)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27730,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #322 (FreeBSD v322)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #322"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27731,
+            name: String::from("Kernel Scheduler Capability Variant #323 (OpenBSD v323)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27732,
+            name: String::from("Filesystem & Storage Driver Capability Variant #323 (NetBSD v323)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27733,
+            name: String::from("Security & Hardening Shield Capability Variant #323 (DragonFly BSD v323)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27734,
+            name: String::from("Package Manager & Solver Capability Variant #323 (Solus v323)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27735,
+            name: String::from("Networking & Firewall Router Capability Variant #323 (Slackware v323)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27736,
+            name: String::from("Init & Service Supervisor Capability Variant #323 (Clear Linux v323)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27737,
+            name: String::from("Userland Utility Fastpipe Capability Variant #323 (CachyOS v323)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27738,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #323 (Pop!_OS v323)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27739,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #323 (Manjaro v323)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27740,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #323 (Linux Mint v323)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #323"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27741,
+            name: String::from("Kernel Scheduler Capability Variant #324 (Ubuntu v324)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27742,
+            name: String::from("Filesystem & Storage Driver Capability Variant #324 (Debian v324)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27743,
+            name: String::from("Security & Hardening Shield Capability Variant #324 (Fedora v324)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27744,
+            name: String::from("Package Manager & Solver Capability Variant #324 (Arch Linux v324)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27745,
+            name: String::from("Networking & Firewall Router Capability Variant #324 (Gentoo v324)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27746,
+            name: String::from("Init & Service Supervisor Capability Variant #324 (Alpine Linux v324)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27747,
+            name: String::from("Userland Utility Fastpipe Capability Variant #324 (Void Linux v324)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27748,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #324 (NixOS v324)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27749,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #324 (openSUSE v324)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27750,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #324 (FreeBSD v324)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #324"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27751,
+            name: String::from("Kernel Scheduler Capability Variant #325 (OpenBSD v325)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27752,
+            name: String::from("Filesystem & Storage Driver Capability Variant #325 (NetBSD v325)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27753,
+            name: String::from("Security & Hardening Shield Capability Variant #325 (DragonFly BSD v325)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27754,
+            name: String::from("Package Manager & Solver Capability Variant #325 (Solus v325)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27755,
+            name: String::from("Networking & Firewall Router Capability Variant #325 (Slackware v325)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27756,
+            name: String::from("Init & Service Supervisor Capability Variant #325 (Clear Linux v325)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27757,
+            name: String::from("Userland Utility Fastpipe Capability Variant #325 (CachyOS v325)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27758,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #325 (Pop!_OS v325)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27759,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #325 (Manjaro v325)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27760,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #325 (Linux Mint v325)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #325"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27761,
+            name: String::from("Kernel Scheduler Capability Variant #326 (Ubuntu v326)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27762,
+            name: String::from("Filesystem & Storage Driver Capability Variant #326 (Debian v326)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27763,
+            name: String::from("Security & Hardening Shield Capability Variant #326 (Fedora v326)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27764,
+            name: String::from("Package Manager & Solver Capability Variant #326 (Arch Linux v326)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27765,
+            name: String::from("Networking & Firewall Router Capability Variant #326 (Gentoo v326)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27766,
+            name: String::from("Init & Service Supervisor Capability Variant #326 (Alpine Linux v326)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27767,
+            name: String::from("Userland Utility Fastpipe Capability Variant #326 (Void Linux v326)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27768,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #326 (NixOS v326)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27769,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #326 (openSUSE v326)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27770,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #326 (FreeBSD v326)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #326"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27771,
+            name: String::from("Kernel Scheduler Capability Variant #327 (OpenBSD v327)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27772,
+            name: String::from("Filesystem & Storage Driver Capability Variant #327 (NetBSD v327)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27773,
+            name: String::from("Security & Hardening Shield Capability Variant #327 (DragonFly BSD v327)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27774,
+            name: String::from("Package Manager & Solver Capability Variant #327 (Solus v327)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27775,
+            name: String::from("Networking & Firewall Router Capability Variant #327 (Slackware v327)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27776,
+            name: String::from("Init & Service Supervisor Capability Variant #327 (Clear Linux v327)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27777,
+            name: String::from("Userland Utility Fastpipe Capability Variant #327 (CachyOS v327)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27778,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #327 (Pop!_OS v327)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27779,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #327 (Manjaro v327)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27780,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #327 (Linux Mint v327)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #327"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27781,
+            name: String::from("Kernel Scheduler Capability Variant #328 (Ubuntu v328)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27782,
+            name: String::from("Filesystem & Storage Driver Capability Variant #328 (Debian v328)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27783,
+            name: String::from("Security & Hardening Shield Capability Variant #328 (Fedora v328)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27784,
+            name: String::from("Package Manager & Solver Capability Variant #328 (Arch Linux v328)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27785,
+            name: String::from("Networking & Firewall Router Capability Variant #328 (Gentoo v328)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27786,
+            name: String::from("Init & Service Supervisor Capability Variant #328 (Alpine Linux v328)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27787,
+            name: String::from("Userland Utility Fastpipe Capability Variant #328 (Void Linux v328)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27788,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #328 (NixOS v328)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27789,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #328 (openSUSE v328)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27790,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #328 (FreeBSD v328)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #328"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27791,
+            name: String::from("Kernel Scheduler Capability Variant #329 (OpenBSD v329)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27792,
+            name: String::from("Filesystem & Storage Driver Capability Variant #329 (NetBSD v329)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27793,
+            name: String::from("Security & Hardening Shield Capability Variant #329 (DragonFly BSD v329)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27794,
+            name: String::from("Package Manager & Solver Capability Variant #329 (Solus v329)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27795,
+            name: String::from("Networking & Firewall Router Capability Variant #329 (Slackware v329)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27796,
+            name: String::from("Init & Service Supervisor Capability Variant #329 (Clear Linux v329)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27797,
+            name: String::from("Userland Utility Fastpipe Capability Variant #329 (CachyOS v329)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27798,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #329 (Pop!_OS v329)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27799,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #329 (Manjaro v329)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27800,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #329 (Linux Mint v329)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #329"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27801,
+            name: String::from("Kernel Scheduler Capability Variant #330 (Ubuntu v330)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27802,
+            name: String::from("Filesystem & Storage Driver Capability Variant #330 (Debian v330)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27803,
+            name: String::from("Security & Hardening Shield Capability Variant #330 (Fedora v330)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27804,
+            name: String::from("Package Manager & Solver Capability Variant #330 (Arch Linux v330)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27805,
+            name: String::from("Networking & Firewall Router Capability Variant #330 (Gentoo v330)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27806,
+            name: String::from("Init & Service Supervisor Capability Variant #330 (Alpine Linux v330)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27807,
+            name: String::from("Userland Utility Fastpipe Capability Variant #330 (Void Linux v330)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27808,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #330 (NixOS v330)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27809,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #330 (openSUSE v330)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27810,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #330 (FreeBSD v330)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #330"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27811,
+            name: String::from("Kernel Scheduler Capability Variant #331 (OpenBSD v331)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27812,
+            name: String::from("Filesystem & Storage Driver Capability Variant #331 (NetBSD v331)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27813,
+            name: String::from("Security & Hardening Shield Capability Variant #331 (DragonFly BSD v331)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27814,
+            name: String::from("Package Manager & Solver Capability Variant #331 (Solus v331)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27815,
+            name: String::from("Networking & Firewall Router Capability Variant #331 (Slackware v331)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27816,
+            name: String::from("Init & Service Supervisor Capability Variant #331 (Clear Linux v331)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27817,
+            name: String::from("Userland Utility Fastpipe Capability Variant #331 (CachyOS v331)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27818,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #331 (Pop!_OS v331)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27819,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #331 (Manjaro v331)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27820,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #331 (Linux Mint v331)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #331"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27821,
+            name: String::from("Kernel Scheduler Capability Variant #332 (Ubuntu v332)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27822,
+            name: String::from("Filesystem & Storage Driver Capability Variant #332 (Debian v332)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27823,
+            name: String::from("Security & Hardening Shield Capability Variant #332 (Fedora v332)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27824,
+            name: String::from("Package Manager & Solver Capability Variant #332 (Arch Linux v332)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27825,
+            name: String::from("Networking & Firewall Router Capability Variant #332 (Gentoo v332)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27826,
+            name: String::from("Init & Service Supervisor Capability Variant #332 (Alpine Linux v332)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27827,
+            name: String::from("Userland Utility Fastpipe Capability Variant #332 (Void Linux v332)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27828,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #332 (NixOS v332)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27829,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #332 (openSUSE v332)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27830,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #332 (FreeBSD v332)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #332"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27831,
+            name: String::from("Kernel Scheduler Capability Variant #333 (OpenBSD v333)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27832,
+            name: String::from("Filesystem & Storage Driver Capability Variant #333 (NetBSD v333)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27833,
+            name: String::from("Security & Hardening Shield Capability Variant #333 (DragonFly BSD v333)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27834,
+            name: String::from("Package Manager & Solver Capability Variant #333 (Solus v333)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27835,
+            name: String::from("Networking & Firewall Router Capability Variant #333 (Slackware v333)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27836,
+            name: String::from("Init & Service Supervisor Capability Variant #333 (Clear Linux v333)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27837,
+            name: String::from("Userland Utility Fastpipe Capability Variant #333 (CachyOS v333)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27838,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #333 (Pop!_OS v333)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27839,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #333 (Manjaro v333)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27840,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #333 (Linux Mint v333)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #333"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27841,
+            name: String::from("Kernel Scheduler Capability Variant #334 (Ubuntu v334)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27842,
+            name: String::from("Filesystem & Storage Driver Capability Variant #334 (Debian v334)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27843,
+            name: String::from("Security & Hardening Shield Capability Variant #334 (Fedora v334)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27844,
+            name: String::from("Package Manager & Solver Capability Variant #334 (Arch Linux v334)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27845,
+            name: String::from("Networking & Firewall Router Capability Variant #334 (Gentoo v334)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27846,
+            name: String::from("Init & Service Supervisor Capability Variant #334 (Alpine Linux v334)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27847,
+            name: String::from("Userland Utility Fastpipe Capability Variant #334 (Void Linux v334)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27848,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #334 (NixOS v334)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27849,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #334 (openSUSE v334)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27850,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #334 (FreeBSD v334)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #334"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27851,
+            name: String::from("Kernel Scheduler Capability Variant #335 (OpenBSD v335)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27852,
+            name: String::from("Filesystem & Storage Driver Capability Variant #335 (NetBSD v335)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27853,
+            name: String::from("Security & Hardening Shield Capability Variant #335 (DragonFly BSD v335)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27854,
+            name: String::from("Package Manager & Solver Capability Variant #335 (Solus v335)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27855,
+            name: String::from("Networking & Firewall Router Capability Variant #335 (Slackware v335)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27856,
+            name: String::from("Init & Service Supervisor Capability Variant #335 (Clear Linux v335)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27857,
+            name: String::from("Userland Utility Fastpipe Capability Variant #335 (CachyOS v335)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27858,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #335 (Pop!_OS v335)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27859,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #335 (Manjaro v335)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27860,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #335 (Linux Mint v335)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #335"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27861,
+            name: String::from("Kernel Scheduler Capability Variant #336 (Ubuntu v336)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27862,
+            name: String::from("Filesystem & Storage Driver Capability Variant #336 (Debian v336)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27863,
+            name: String::from("Security & Hardening Shield Capability Variant #336 (Fedora v336)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27864,
+            name: String::from("Package Manager & Solver Capability Variant #336 (Arch Linux v336)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27865,
+            name: String::from("Networking & Firewall Router Capability Variant #336 (Gentoo v336)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27866,
+            name: String::from("Init & Service Supervisor Capability Variant #336 (Alpine Linux v336)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27867,
+            name: String::from("Userland Utility Fastpipe Capability Variant #336 (Void Linux v336)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27868,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #336 (NixOS v336)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27869,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #336 (openSUSE v336)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27870,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #336 (FreeBSD v336)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #336"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27871,
+            name: String::from("Kernel Scheduler Capability Variant #337 (OpenBSD v337)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27872,
+            name: String::from("Filesystem & Storage Driver Capability Variant #337 (NetBSD v337)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27873,
+            name: String::from("Security & Hardening Shield Capability Variant #337 (DragonFly BSD v337)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27874,
+            name: String::from("Package Manager & Solver Capability Variant #337 (Solus v337)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27875,
+            name: String::from("Networking & Firewall Router Capability Variant #337 (Slackware v337)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27876,
+            name: String::from("Init & Service Supervisor Capability Variant #337 (Clear Linux v337)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27877,
+            name: String::from("Userland Utility Fastpipe Capability Variant #337 (CachyOS v337)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27878,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #337 (Pop!_OS v337)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27879,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #337 (Manjaro v337)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27880,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #337 (Linux Mint v337)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #337"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27881,
+            name: String::from("Kernel Scheduler Capability Variant #338 (Ubuntu v338)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27882,
+            name: String::from("Filesystem & Storage Driver Capability Variant #338 (Debian v338)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27883,
+            name: String::from("Security & Hardening Shield Capability Variant #338 (Fedora v338)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27884,
+            name: String::from("Package Manager & Solver Capability Variant #338 (Arch Linux v338)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27885,
+            name: String::from("Networking & Firewall Router Capability Variant #338 (Gentoo v338)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27886,
+            name: String::from("Init & Service Supervisor Capability Variant #338 (Alpine Linux v338)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27887,
+            name: String::from("Userland Utility Fastpipe Capability Variant #338 (Void Linux v338)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27888,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #338 (NixOS v338)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27889,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #338 (openSUSE v338)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27890,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #338 (FreeBSD v338)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #338"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27891,
+            name: String::from("Kernel Scheduler Capability Variant #339 (OpenBSD v339)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27892,
+            name: String::from("Filesystem & Storage Driver Capability Variant #339 (NetBSD v339)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27893,
+            name: String::from("Security & Hardening Shield Capability Variant #339 (DragonFly BSD v339)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27894,
+            name: String::from("Package Manager & Solver Capability Variant #339 (Solus v339)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27895,
+            name: String::from("Networking & Firewall Router Capability Variant #339 (Slackware v339)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27896,
+            name: String::from("Init & Service Supervisor Capability Variant #339 (Clear Linux v339)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27897,
+            name: String::from("Userland Utility Fastpipe Capability Variant #339 (CachyOS v339)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27898,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #339 (Pop!_OS v339)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27899,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #339 (Manjaro v339)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27900,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #339 (Linux Mint v339)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #339"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27901,
+            name: String::from("Kernel Scheduler Capability Variant #340 (Ubuntu v340)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27902,
+            name: String::from("Filesystem & Storage Driver Capability Variant #340 (Debian v340)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27903,
+            name: String::from("Security & Hardening Shield Capability Variant #340 (Fedora v340)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27904,
+            name: String::from("Package Manager & Solver Capability Variant #340 (Arch Linux v340)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27905,
+            name: String::from("Networking & Firewall Router Capability Variant #340 (Gentoo v340)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27906,
+            name: String::from("Init & Service Supervisor Capability Variant #340 (Alpine Linux v340)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27907,
+            name: String::from("Userland Utility Fastpipe Capability Variant #340 (Void Linux v340)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27908,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #340 (NixOS v340)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27909,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #340 (openSUSE v340)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27910,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #340 (FreeBSD v340)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #340"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27911,
+            name: String::from("Kernel Scheduler Capability Variant #341 (OpenBSD v341)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27912,
+            name: String::from("Filesystem & Storage Driver Capability Variant #341 (NetBSD v341)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27913,
+            name: String::from("Security & Hardening Shield Capability Variant #341 (DragonFly BSD v341)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27914,
+            name: String::from("Package Manager & Solver Capability Variant #341 (Solus v341)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27915,
+            name: String::from("Networking & Firewall Router Capability Variant #341 (Slackware v341)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27916,
+            name: String::from("Init & Service Supervisor Capability Variant #341 (Clear Linux v341)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27917,
+            name: String::from("Userland Utility Fastpipe Capability Variant #341 (CachyOS v341)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27918,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #341 (Pop!_OS v341)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27919,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #341 (Manjaro v341)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27920,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #341 (Linux Mint v341)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #341"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27921,
+            name: String::from("Kernel Scheduler Capability Variant #342 (Ubuntu v342)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27922,
+            name: String::from("Filesystem & Storage Driver Capability Variant #342 (Debian v342)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27923,
+            name: String::from("Security & Hardening Shield Capability Variant #342 (Fedora v342)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27924,
+            name: String::from("Package Manager & Solver Capability Variant #342 (Arch Linux v342)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27925,
+            name: String::from("Networking & Firewall Router Capability Variant #342 (Gentoo v342)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27926,
+            name: String::from("Init & Service Supervisor Capability Variant #342 (Alpine Linux v342)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27927,
+            name: String::from("Userland Utility Fastpipe Capability Variant #342 (Void Linux v342)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27928,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #342 (NixOS v342)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27929,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #342 (openSUSE v342)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27930,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #342 (FreeBSD v342)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #342"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27931,
+            name: String::from("Kernel Scheduler Capability Variant #343 (OpenBSD v343)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27932,
+            name: String::from("Filesystem & Storage Driver Capability Variant #343 (NetBSD v343)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27933,
+            name: String::from("Security & Hardening Shield Capability Variant #343 (DragonFly BSD v343)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27934,
+            name: String::from("Package Manager & Solver Capability Variant #343 (Solus v343)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27935,
+            name: String::from("Networking & Firewall Router Capability Variant #343 (Slackware v343)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27936,
+            name: String::from("Init & Service Supervisor Capability Variant #343 (Clear Linux v343)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27937,
+            name: String::from("Userland Utility Fastpipe Capability Variant #343 (CachyOS v343)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27938,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #343 (Pop!_OS v343)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27939,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #343 (Manjaro v343)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27940,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #343 (Linux Mint v343)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #343"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27941,
+            name: String::from("Kernel Scheduler Capability Variant #344 (Ubuntu v344)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27942,
+            name: String::from("Filesystem & Storage Driver Capability Variant #344 (Debian v344)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27943,
+            name: String::from("Security & Hardening Shield Capability Variant #344 (Fedora v344)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27944,
+            name: String::from("Package Manager & Solver Capability Variant #344 (Arch Linux v344)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27945,
+            name: String::from("Networking & Firewall Router Capability Variant #344 (Gentoo v344)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27946,
+            name: String::from("Init & Service Supervisor Capability Variant #344 (Alpine Linux v344)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27947,
+            name: String::from("Userland Utility Fastpipe Capability Variant #344 (Void Linux v344)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27948,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #344 (NixOS v344)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27949,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #344 (openSUSE v344)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27950,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #344 (FreeBSD v344)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #344"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27951,
+            name: String::from("Kernel Scheduler Capability Variant #345 (OpenBSD v345)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27952,
+            name: String::from("Filesystem & Storage Driver Capability Variant #345 (NetBSD v345)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27953,
+            name: String::from("Security & Hardening Shield Capability Variant #345 (DragonFly BSD v345)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27954,
+            name: String::from("Package Manager & Solver Capability Variant #345 (Solus v345)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27955,
+            name: String::from("Networking & Firewall Router Capability Variant #345 (Slackware v345)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27956,
+            name: String::from("Init & Service Supervisor Capability Variant #345 (Clear Linux v345)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27957,
+            name: String::from("Userland Utility Fastpipe Capability Variant #345 (CachyOS v345)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27958,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #345 (Pop!_OS v345)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27959,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #345 (Manjaro v345)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27960,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #345 (Linux Mint v345)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #345"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27961,
+            name: String::from("Kernel Scheduler Capability Variant #346 (Ubuntu v346)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27962,
+            name: String::from("Filesystem & Storage Driver Capability Variant #346 (Debian v346)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27963,
+            name: String::from("Security & Hardening Shield Capability Variant #346 (Fedora v346)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27964,
+            name: String::from("Package Manager & Solver Capability Variant #346 (Arch Linux v346)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27965,
+            name: String::from("Networking & Firewall Router Capability Variant #346 (Gentoo v346)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27966,
+            name: String::from("Init & Service Supervisor Capability Variant #346 (Alpine Linux v346)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27967,
+            name: String::from("Userland Utility Fastpipe Capability Variant #346 (Void Linux v346)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27968,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #346 (NixOS v346)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27969,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #346 (openSUSE v346)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27970,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #346 (FreeBSD v346)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #346"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27971,
+            name: String::from("Kernel Scheduler Capability Variant #347 (OpenBSD v347)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27972,
+            name: String::from("Filesystem & Storage Driver Capability Variant #347 (NetBSD v347)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27973,
+            name: String::from("Security & Hardening Shield Capability Variant #347 (DragonFly BSD v347)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27974,
+            name: String::from("Package Manager & Solver Capability Variant #347 (Solus v347)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27975,
+            name: String::from("Networking & Firewall Router Capability Variant #347 (Slackware v347)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27976,
+            name: String::from("Init & Service Supervisor Capability Variant #347 (Clear Linux v347)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27977,
+            name: String::from("Userland Utility Fastpipe Capability Variant #347 (CachyOS v347)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27978,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #347 (Pop!_OS v347)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27979,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #347 (Manjaro v347)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27980,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #347 (Linux Mint v347)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #347"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27981,
+            name: String::from("Kernel Scheduler Capability Variant #348 (Ubuntu v348)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("Ubuntu"),
+            description: String::from("Ubuntu-inspired Kernel Scheduler Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27982,
+            name: String::from("Filesystem & Storage Driver Capability Variant #348 (Debian v348)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("Debian"),
+            description: String::from("Debian-inspired Filesystem & Storage Driver Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27983,
+            name: String::from("Security & Hardening Shield Capability Variant #348 (Fedora v348)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("Fedora"),
+            description: String::from("Fedora-inspired Security & Hardening Shield Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27984,
+            name: String::from("Package Manager & Solver Capability Variant #348 (Arch Linux v348)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Arch Linux"),
+            description: String::from("Arch Linux-inspired Package Manager & Solver Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27985,
+            name: String::from("Networking & Firewall Router Capability Variant #348 (Gentoo v348)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Gentoo"),
+            description: String::from("Gentoo-inspired Networking & Firewall Router Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27986,
+            name: String::from("Init & Service Supervisor Capability Variant #348 (Alpine Linux v348)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Alpine Linux"),
+            description: String::from("Alpine Linux-inspired Init & Service Supervisor Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27987,
+            name: String::from("Userland Utility Fastpipe Capability Variant #348 (Void Linux v348)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("Void Linux"),
+            description: String::from("Void Linux-inspired Userland Utility Fastpipe Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27988,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #348 (NixOS v348)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("NixOS"),
+            description: String::from("NixOS-inspired Desktop Compositor & Media Graph Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27989,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #348 (openSUSE v348)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("openSUSE"),
+            description: String::from("openSUSE-inspired Hardware Driver & Firmware Allocator Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27990,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #348 (FreeBSD v348)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("FreeBSD"),
+            description: String::from("FreeBSD-inspired Virtualization & MicroVM Isolation Capability variant #348"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27991,
+            name: String::from("Kernel Scheduler Capability Variant #349 (OpenBSD v349)"),
+            category: DistroComponentCategory::KernelScheduler,
+            origin_distro: String::from("OpenBSD"),
+            description: String::from("OpenBSD-inspired Kernel Scheduler Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27992,
+            name: String::from("Filesystem & Storage Driver Capability Variant #349 (NetBSD v349)"),
+            category: DistroComponentCategory::FilesystemsStorage,
+            origin_distro: String::from("NetBSD"),
+            description: String::from("NetBSD-inspired Filesystem & Storage Driver Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27993,
+            name: String::from("Security & Hardening Shield Capability Variant #349 (DragonFly BSD v349)"),
+            category: DistroComponentCategory::SecurityHardening,
+            origin_distro: String::from("DragonFly BSD"),
+            description: String::from("DragonFly BSD-inspired Security & Hardening Shield Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27994,
+            name: String::from("Package Manager & Solver Capability Variant #349 (Solus v349)"),
+            category: DistroComponentCategory::PackageManagement,
+            origin_distro: String::from("Solus"),
+            description: String::from("Solus-inspired Package Manager & Solver Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27995,
+            name: String::from("Networking & Firewall Router Capability Variant #349 (Slackware v349)"),
+            category: DistroComponentCategory::NetworkingFirewall,
+            origin_distro: String::from("Slackware"),
+            description: String::from("Slackware-inspired Networking & Firewall Router Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27996,
+            name: String::from("Init & Service Supervisor Capability Variant #349 (Clear Linux v349)"),
+            category: DistroComponentCategory::InitAndSupervisor,
+            origin_distro: String::from("Clear Linux"),
+            description: String::from("Clear Linux-inspired Init & Service Supervisor Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27997,
+            name: String::from("Userland Utility Fastpipe Capability Variant #349 (CachyOS v349)"),
+            category: DistroComponentCategory::UserlandUtilities,
+            origin_distro: String::from("CachyOS"),
+            description: String::from("CachyOS-inspired Userland Utility Fastpipe Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27998,
+            name: String::from("Desktop Compositor & Media Graph Capability Variant #349 (Pop!_OS v349)"),
+            category: DistroComponentCategory::DesktopAndMedia,
+            origin_distro: String::from("Pop!_OS"),
+            description: String::from("Pop!_OS-inspired Desktop Compositor & Media Graph Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 27999,
+            name: String::from("Hardware Driver & Firmware Allocator Capability Variant #349 (Manjaro v349)"),
+            category: DistroComponentCategory::DriversHardware,
+            origin_distro: String::from("Manjaro"),
+            description: String::from("Manjaro-inspired Hardware Driver & Firmware Allocator Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
+        components.push(DistroComponentItem {
+            id: 28000,
+            name: String::from("Virtualization & MicroVM Isolation Capability Variant #349 (Linux Mint v349)"),
+            category: DistroComponentCategory::VirtualizationContainers,
+            origin_distro: String::from("Linux Mint"),
+            description: String::from("Linux Mint-inspired Virtualization & MicroVM Isolation Capability variant #349"),
+            enabled: true,
+            execution_count: 0,
+        });
         Self { components }
     }
 
@@ -58787,7 +76787,7 @@ impl SovereignThousandsDistroComponentsEngine {
     }
 
     pub fn verify_catalog(&mut self) -> bool {
-        if self.components.len() < 25000 {
+        if self.components.len() < 27000 {
             return false;
         }
         let cat_items = self.filter_by_category(DistroComponentCategory::KernelScheduler);
@@ -58814,8 +76814,8 @@ mod tests {
     fn test_thousands_components_catalog_count() {
         let engine = SovereignThousandsDistroComponentsEngine::new();
         assert!(
-            engine.total_components() >= 26000,
-            "Engine catalog must contain at least 25000 components, got {}",
+            engine.total_components() >= 28000,
+            "Engine catalog must contain at least 27000 components, got {}",
             engine.total_components()
         );
     }
