@@ -3030,10 +3030,10 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v77_pr.rs" ]; then
     ./build/test_open_source_os_v77_pr
 fi
 
-if [ -f "tests/test_open_source_os_and_cachy_linux_v79_pr.rs" ]; then
-    echo "Running Open Source OS & Cachy Linux Missing Components V79 PR test suite..."
+if [ -f "tests/test_open_source_os_debian_unimplemented_ideas_v78_pr.rs" ]; then
+    echo "Running Open Source OS & Debian Unimplemented Ideas V78 PR test suite..."
     mkdir -p build
-    rustc --test tests/test_open_source_os_and_cachy_linux_v79_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v79_pr
-    ./build/test_open_source_os_v79_pr
+    rustc --test tests/test_open_source_os_debian_unimplemented_ideas_v78_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v78_pr
+    ./build/test_open_source_os_v78_pr
 fi
 echo "All SigmaOS test suites completed."
