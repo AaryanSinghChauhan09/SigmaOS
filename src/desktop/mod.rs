@@ -655,5 +655,6 @@ pub mod sovereign_de_wm_advancements_v68_pr;
 pub use sovereign_de_wm_advancements_v68_pr::*;
 pub mod sovereign_de_wm_advancements_v74_pr;
 pub use sovereign_de_wm_advancements_v74_pr::*;
-pub mod sovereign_de_wm_advancements_v80_pr;
-pub use sovereign_de_wm_advancements_v80_pr::*;
+
+pub mod elementary_os_missing_components_v78;
+pub use elementary_os_missing_components_v78::*;

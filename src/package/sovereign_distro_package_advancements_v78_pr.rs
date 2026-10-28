@@ -10,33 +10,30 @@
 
 extern crate alloc;
 
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(feature = "standalone_test"))]
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
-
-#[cfg(feature = "standalone_test")]
 #[path = "universal.rs"]
 pub mod universal;
 
-#[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+pub use universal::{PackageFormat, PackageState, UnifiedPackage};
 
 /// Pull Request Proposal Manifest V78
 #[derive(Debug, Clone, PartialEq, Eq)]

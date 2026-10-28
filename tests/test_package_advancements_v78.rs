@@ -16,8 +16,8 @@ mod sovereign_distro_package_advancements_v78;
 mod sovereign_distro_package_advancements_v78_pr;
 
 use sovereign_distro_package_advancements_v78::*;
-use sovereign_distro_package_advancements_v78_pr::SovereignDistroPackagePrGatewayV78;
-use universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v78_pr::{SovereignDistroPackagePrGatewayV78, PackageFormat as PrPackageFormat};
+use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
 
 #[test]
 fn test_package_advancements_v78_full_cycle() {
@@ -91,7 +91,7 @@ fn test_package_advancements_v78_full_cycle() {
     gateway.submit_proposal(
         7801,
         "Universal Package Advancements V78",
-        sovereign_distro_package_advancements_v78_pr::PackageFormat::Deb,
+        PrPackageFormat::Deb,
         "ripgrep",
         "Full test cycle proposal V78",
     );
