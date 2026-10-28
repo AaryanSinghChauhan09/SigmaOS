@@ -541,7 +541,7 @@ impl SosreportSanitizerEngineV15 {
             let mut l = line.to_string();
             let mut redacted_in_line = false;
 
-            // Password key-value redaction (mock test helper)
+            // Password key-value redaction
             let pwd_pattern = concat!("pass", "word=");
             if let Some(pos) = l.find(pwd_pattern) {
                 let start = pos + pwd_pattern.len();
