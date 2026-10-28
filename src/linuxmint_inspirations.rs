@@ -325,9 +325,9 @@ impl WebappManager {
             name: name.to_string(),
             url: url.to_string(),
             engine,
-            isolated: name.to_lowercase().contains("drive")
-                || name.to_lowercase().contains("mail")
-                || name.to_lowercase().contains("office"),
+            isolated: contains_ignore_case(name, "drive")
+                || contains_ignore_case(name, "mail")
+                || contains_ignore_case(name, "office"),
             desktop_shortcut: true,
             pinned: false,
         });
@@ -2409,16 +2409,10 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
         return false;
     }
     if haystack.is_ascii() && needle.is_ascii() {
-        let needle_bytes = needle.as_bytes();
         haystack
             .as_bytes()
-            .windows(needle_bytes.len())
-            .any(|window| {
-                window
-                    .iter()
-                    .zip(needle_bytes.iter())
-                    .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2.to_ascii_lowercase())
-            })
+            .windows(needle.len())
+            .any(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
     } else {
         haystack.to_lowercase().contains(&needle.to_lowercase())
     }
