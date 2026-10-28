@@ -275,6 +275,21 @@ impl Clone for FirewallRule {
     }
 }
 
+impl Clone for FirewallRule {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id,
+            action: self.action,
+            protocol: self.protocol,
+            direction: self.direction,
+            port: self.port,
+            from_address: self.from_address.clone(),
+            to_address: self.to_address.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
 /// Firewall profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FirewallProfile {
@@ -520,10 +535,19 @@ mod tests {
     #[test]
     fn test_enable_disable_rule() {
         let mut manager = FirewallManager::new();
-        let id = manager.add_rule(RuleAction::Allow, Protocol::Tcp, Direction::Incoming, Some(80));
+        let id = manager.add_rule(
+            RuleAction::Allow,
+            Protocol::Tcp,
+            Direction::Incoming,
+            Some(80),
+        );
 
         manager.disable_rule(id).unwrap();
-        assert!(!manager.get_rule(id).unwrap().enabled.load(Ordering::Relaxed));
+        assert!(!manager
+            .get_rule(id)
+            .unwrap()
+            .enabled
+            .load(Ordering::Relaxed));
 
         manager.enable_rule(id).unwrap();
         assert!(manager

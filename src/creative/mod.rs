@@ -129,8 +129,6 @@ pub mod wordcraft_missing_components_parity_pr;
 pub use anicraft_advancements_pr::*;
 pub use anicraft_advancements_v69_pr::*;
 pub use anicraft_artcraft_parity_pr::*;
-pub use artcraft_advancements_pr::*;
-pub use artcraft_advancements_v75_pr::*;
 pub use anicraft_missing_components_parity_pr::*;
 pub use artcraft_advancements_v75_pr::*;
 pub use cadcraft_artcraft_missing_components_v65_pr::*;

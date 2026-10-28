@@ -336,8 +336,16 @@ pub use cleanup::{
     SystemCleanupManager,
 };
 pub use firewall::{
-    FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
-    init_firewall, get_firewall,
+    get_firewall, init_firewall, Direction, FirewallManager, FirewallProfile, FirewallRule,
+    Protocol, RuleAction,
+};
+pub use logrotate::{
+    get_log_rotate, init_log_rotate, CompressionType, LogFileConfig, LogRotateManager,
+    RotationSchedule,
+};
+pub use restore::{
+    get_system_restore, init_system_restore, RestorePoint, SnapshotStatus, SnapshotType,
+    SystemRestoreManager, SystemSnapshot,
 };
 
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
@@ -495,7 +503,7 @@ pub use sigmafilm::{
 };
 pub use sigmafirewall::{
     create_rule, get_sigmafirewall, get_sigmafirewall_mut, init_sigmafirewall, FirewallAction,
-    FirewallChain, FirewallProtocol, FirewallRule as SigmaEngineFirewallRule, RuleState, SigmaFirewall,
+    FirewallChain, FirewallProtocol, FirewallRule as SigmaFirewallRule, RuleState, SigmaFirewall,
 };
 pub use sigmaflatpak::{
     add_flatpak, get_sigmaflatpak, init_sigmaflatpak, install_flatpak, Flatpak, FlatpakRemote,
@@ -554,7 +562,7 @@ pub use sigmalight::{
 };
 pub use sigmalogrotate::{
     get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod,
-    LogFileConfig as SigmaEngineLogFileConfig, SigmaLogRotate,
+    LogFileConfig as SigmaLogFileConfig, SigmaLogRotate,
 };
 pub use sigmalvm::{
     create_volume_group, get_sigmalvm, init_sigmalvm, LVState, LogicalVolume, PVState,

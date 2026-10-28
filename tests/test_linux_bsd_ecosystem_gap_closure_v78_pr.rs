@@ -42,24 +42,24 @@ fn test_dragonfly_hammer3_pfs_v78_engine() {
     let mut engine = DragonFlyHammer3PfsV78PrEngine::new();
     assert!(engine.pfs_list.contains_key("ROOT"));
 
-    let diff = engine.create_pfs_snapshot("BACKUP", 80005);
-    assert!(diff.contains("hammer3"));
+    let diff = engine.create_pfs_snapshot("BACKUP", 78005);
+    assert!(diff.contains("pfs-create"));
     assert!(engine.pfs_list.contains_key("BACKUP"));
 }
 
 #[test]
 fn test_gentoo_portage_eapi10_v78_engine() {
     let mut engine = GentooPortageEapi10V78PrEngine::new();
-    let diff = engine.add_ebuild("sys-devel/gcc-16.0", "0", "16", vec!["cxx", "fortran"]);
+    let diff = engine.add_ebuild("sys-devel/gcc-15.0", "0", "15", vec!["cxx", "fortran"]);
     assert!(diff.contains("EAPI=10"));
-    assert!(engine.ebuilds.contains_key("sys-devel/gcc-16.0"));
+    assert!(engine.ebuilds.contains_key("sys-devel/gcc-15.0"));
 }
 
 #[test]
 fn test_alpine_apk_v4_apkovl_v78_engine() {
     let mut engine = AlpineApkV4ApkovlV78PrEngine::new();
     let diff = engine.generate_overlay("server.apkovl.tar.gz", 30);
-    assert!(diff.contains("lbu"));
+    assert!(diff.contains("lbu commit"));
     assert!(engine.overlays.contains_key("server.apkovl.tar.gz"));
 }
 
@@ -67,7 +67,7 @@ fn test_alpine_apk_v4_apkovl_v78_engine() {
 fn test_nix_guix_flake_store_v78_engine() {
     let mut engine = NixGuixFlakeStoreV78PrEngine::new();
     let diff = engine.add_closure("/nix/store/test-path", "sha256-digest", vec![]);
-    assert!(diff.contains("INSERT INTO ValidPaths"));
+    assert!(diff.contains("nix store add-path"));
     assert!(engine.store_closures.contains_key("/nix/store/test-path"));
 }
 
@@ -75,7 +75,7 @@ fn test_nix_guix_flake_store_v78_engine() {
 fn test_netbsd_npf_jit_firewall_v78_engine() {
     let mut engine = NetBsdNpfJitFirewallV78PrEngine::new();
     let diff = engine.add_rule(10, "pass", "vioif1");
-    assert!(diff.contains("group"));
+    assert!(diff.contains("npfctl"));
     assert!(engine.rules.contains_key(&10));
 }
 

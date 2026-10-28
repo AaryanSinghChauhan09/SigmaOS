@@ -258,7 +258,10 @@ mod tests {
         manager.complete_snapshot(id, 1_000_000_000).unwrap();
         manager.restore_snapshot(id).unwrap();
 
-        assert_eq!(manager.get_snapshot(id).unwrap().status, SnapshotStatus::Restored);
+        assert_eq!(
+            manager.get_snapshot(id).unwrap().status,
+            SnapshotStatus::Restored
+        );
         assert_eq!(manager.restore_history.len(), 1);
     }
 
@@ -278,9 +281,21 @@ mod tests {
     #[test]
     fn test_get_snapshots_by_type() {
         let mut manager = SystemRestoreManager::new();
-        manager.create_snapshot("Manual1".to_string(), SnapshotType::Manual, "Manual".to_string());
-        manager.create_snapshot("Manual2".to_string(), SnapshotType::Manual, "Manual".to_string());
-        manager.create_snapshot("Scheduled1".to_string(), SnapshotType::Scheduled, "Scheduled".to_string());
+        manager.create_snapshot(
+            "Manual1".to_string(),
+            SnapshotType::Manual,
+            "Manual".to_string(),
+        );
+        manager.create_snapshot(
+            "Manual2".to_string(),
+            SnapshotType::Manual,
+            "Manual".to_string(),
+        );
+        manager.create_snapshot(
+            "Scheduled1".to_string(),
+            SnapshotType::Scheduled,
+            "Scheduled".to_string(),
+        );
 
         let manual = manager.get_snapshots_by_type(SnapshotType::Manual);
         assert_eq!(manual.len(), 2);
