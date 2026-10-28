@@ -3,6 +3,7 @@
 // Creative applications framework inspired by GIMP, Krita, Inkscape, Blender, etc.
 
 pub mod anicraft;
+pub mod anicraft_advancements_pr;
 pub mod anicraft_advancements_v69_pr;
 pub mod anicraft_artcraft_parity_pr;
 pub mod anicraft_missing_components_parity_pr;
@@ -13,15 +14,18 @@ pub mod cadcraft;
 pub mod cadcraft_artcraft_missing_components_v65_pr;
 pub mod cadcraft_artcraft_missing_components_v67_pr;
 pub mod cadcraft_artcraft_missing_components_v68_pr;
+pub mod cadcraft_artcraft_missing_components_v69_pr;
 pub mod cadcraft_artcraft_parity_pr;
 pub mod cadcraft_missing_components_parity_pr;
 pub mod craftlibs_artcraft_missing_components_v69_pr;
+pub mod craftlibs_artcraft_missing_components_v70_pr;
 pub mod craftlibs_artcraft_parity_pr;
 pub mod craftlibs_missing_components_parity_pr;
 pub mod deckcraft;
 pub mod deckcraft_artcraft_missing_components_v65_pr;
 pub mod deckcraft_artcraft_missing_components_v67_pr;
 pub mod deckcraft_artcraft_missing_components_v68_pr;
+pub mod deckcraft_artcraft_missing_components_v69_pr;
 pub mod deckcraft_artcraft_parity_pr;
 pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
@@ -39,6 +43,7 @@ pub mod effectcraft_missing_components_parity_pr;
 pub mod figcraft;
 pub mod figcraft_artcraft_missing_components_v65_pr;
 pub mod figcraft_artcraft_missing_components_v66_pr;
+pub mod figcraft_artcraft_missing_components_v67_pr;
 pub mod figcraft_artcraft_parity_pr;
 pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
@@ -51,6 +56,7 @@ pub mod filmcraft_artcraft_missing_components_v67_pr;
 // pub mod filmcraft_missing_components_parity_pr;
 pub mod fontcraft;
 pub mod fontcraft_advancements_v77_pr;
+pub mod fontcraft_advancements_v78_pr;
 pub mod fontcraft_artcraft_missing_components_v66_pr;
 pub mod fontcraft_artcraft_parity_pr;
 pub mod fontcraft_missing_components_parity_pr;
@@ -63,13 +69,15 @@ pub mod gridcraft_artcraft_parity_pr;
 pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod lightcraft_artcraft_missing_components_v67_pr;
+pub mod lightcraft_artcraft_missing_components_v68_pr;
 pub mod lightcraft_artcraft_parity_pr;
 pub mod lightcraft_missing_components_parity_pr;
 pub mod mediacraft;
 pub mod model3d;
 pub mod pdfcraft;
 pub mod pdfcraft_artcraft_parity_pr;
-// pub mod pdfcraft_missing_components_parity_pr;
+pub mod pdfcraft_missing_components_parity_pr;
+pub mod pdfcraft_artcraft_missing_components_v68_pr;
 pub mod photocraft;
 pub mod photocraft_artcraft_missing_components_v65_pr;
 pub mod photocraft_artcraft_parity_pr;
@@ -80,12 +88,14 @@ pub mod soundcraft;
 pub mod soundcraft_artcraft_missing_components_v65_pr;
 pub mod soundcraft_artcraft_missing_components_v66_pr;
 pub mod soundcraft_artcraft_missing_components_v67_pr;
+pub mod soundcraft_artcraft_missing_components_v68_pr;
 pub mod soundcraft_artcraft_parity_pr;
 pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod sovereign_artcraft_creative_suite_master_pr;
 pub use sovereign_artcraft_creative_suite_master_pr::*;
 pub mod threedcraft_advancements_v74_pr;
+pub mod threedcraft_advancements_v78_pr;
 pub mod threedcraft_artcraft_parity_pr;
 pub mod threedcraft_missing_components_parity_pr;
 pub mod threedcraft_spatial_computing_pr;
@@ -98,15 +108,18 @@ pub mod voicecraft_artcraft_parity_pr;
 pub mod voicecraft_missing_components_parity_pr;
 pub mod voicecraft_neural_dsp_advancements_v68_pr;
 
+pub use voicecraft::*;
 pub use voicecraft_advancements_v73_pr::*;
 pub use voicecraft_advancements_v76_pr::*;
 pub mod wordcraft;
 pub mod wordcraft_artcraft_missing_components_v65_pr;
 pub mod wordcraft_artcraft_missing_components_v66_pr;
 pub mod wordcraft_artcraft_missing_components_v67_pr;
+pub mod wordcraft_artcraft_missing_components_v68_pr;
 pub mod wordcraft_artcraft_parity_pr;
 pub mod wordcraft_missing_components_parity_pr;
 
+pub use anicraft_advancements_pr::*;
 pub use anicraft_advancements_v69_pr::*;
 pub use anicraft_artcraft_parity_pr::*;
 pub use artcraft_advancements_v75_pr::*;
@@ -114,9 +127,11 @@ pub use anicraft_missing_components_parity_pr::*;
 pub use cadcraft_artcraft_missing_components_v65_pr::*;
 pub use cadcraft_artcraft_missing_components_v67_pr::*;
 pub use cadcraft_artcraft_missing_components_v68_pr::*;
+pub use cadcraft_artcraft_missing_components_v69_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
 pub use craftlibs_artcraft_missing_components_v69_pr::*;
+pub use craftlibs_artcraft_missing_components_v70_pr::*;
 pub use craftlibs_missing_components_parity_pr::*;
 pub use craftlibs_artcraft_parity_pr::{
     CraftlibsArtcraftParityPrSuite, CraftlibsEmbreeBvhRaytracingKernelPrEngine,
@@ -138,6 +153,7 @@ pub use deckcraft::{
 pub use deckcraft_artcraft_missing_components_v65_pr::*;
 pub use deckcraft_artcraft_missing_components_v67_pr::*;
 pub use deckcraft_artcraft_missing_components_v68_pr::*;
+pub use deckcraft_artcraft_missing_components_v69_pr::*;
 pub use designcraft::{
     get_designcraft, init_designcraft, Artboard, Canvas, Color, ColorModel, Component,
     DesignBlendMode, DesignEditor, Element, ElementType, ExportFormat as DesignExportFormat,
@@ -163,6 +179,7 @@ pub use effectcraft_artcraft_parity_pr::*;
 pub use effectcraft_missing_components_parity_pr::*;
 pub use figcraft_artcraft_missing_components_v65_pr::*;
 pub use figcraft_artcraft_missing_components_v66_pr::*;
+pub use figcraft_artcraft_missing_components_v67_pr::*;
 pub use figcraft_artcraft_parity_pr::*;
 pub use figcraft_missing_components_parity_pr::*;
 pub use filmcraft_artcraft_missing_components_v65_pr::*;
@@ -171,6 +188,7 @@ pub use filmcraft_artcraft_parity_pr::*;
 pub use filmcraft_lightcraft_mediacraft_artcraft_parity_pr::*;
 pub use filmcraft_artcraft_missing_components_v67_pr::*;
 pub use fontcraft_advancements_v77_pr::*;
+pub use fontcraft_advancements_v78_pr::*;
 pub use fontcraft_artcraft_missing_components_v66_pr::*;
 pub use gridcraft::{
     get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
@@ -192,6 +210,7 @@ pub use lightcraft::{
     ToneCurve, ToneCurvePoint,
 };
 pub use lightcraft_artcraft_missing_components_v67_pr::*;
+pub use lightcraft_artcraft_missing_components_v68_pr::*;
 pub use lightcraft_artcraft_parity_pr::*;
 pub use lightcraft_missing_components_parity_pr::*;
 pub use mediacraft::{
@@ -212,6 +231,8 @@ pub use pdfcraft::{
     SecuritySettings, ShapeObject, ShapeType, TextAlignment as PdfTextAlignment, TextObject,
 };
 pub use pdfcraft_artcraft_parity_pr::*;
+pub use pdfcraft_missing_components_parity_pr::*;
+pub use pdfcraft_artcraft_missing_components_v68_pr::*;
 pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
@@ -229,9 +250,11 @@ pub use soundcraft::{
 pub use soundcraft_artcraft_missing_components_v65_pr::*;
 pub use soundcraft_artcraft_missing_components_v66_pr::*;
 pub use soundcraft_artcraft_missing_components_v67_pr::*;
+pub use soundcraft_artcraft_missing_components_v68_pr::*;
 pub use soundcraft_artcraft_parity_pr::*;
 pub use soundcraft_missing_components_parity_pr::*;
 pub use threedcraft_advancements_v74_pr::*;
+pub use threedcraft_advancements_v78_pr::*;
 pub use threedcraft_artcraft_parity_pr::*;
 pub use threedcraft_missing_components_parity_pr::*;
 pub use threedcraft_spatial_computing_pr::*;
@@ -258,3 +281,4 @@ pub use wordcraft::{
 pub use wordcraft_artcraft_missing_components_v65_pr::*;
 pub use wordcraft_artcraft_missing_components_v66_pr::*;
 pub use wordcraft_artcraft_missing_components_v67_pr::*;
+pub use wordcraft_artcraft_missing_components_v68_pr::*;

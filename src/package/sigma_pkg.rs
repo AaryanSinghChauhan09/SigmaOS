@@ -3050,4 +3050,37 @@ mod tests {
             Some(UniversalPackageFormat::SolusEopkg)
         );
     }
+
+    #[test]
+    fn test_additional_universal_distro_cli_operations() {
+        let mut pkg_mgr = SigmaPkg {
+            config: PkgConfig::default(),
+            repositories: vec![],
+            local_packages: HashMap::new(),
+            cache_dir: PathBuf::from("/tmp/sigma_cache_add_test"),
+            database_dir: PathBuf::from("/tmp/sigma_db_add_test"),
+        };
+
+        // Flatpak & Snap CLI simulation
+        let flatpak_res = pkg_mgr
+            .execute_universal_cli_command("flatpak install flathub org.gimp.GIMP")
+            .unwrap();
+        assert!(flatpak_res.contains("org.gimp.GIMP"));
+
+        let snap_res = pkg_mgr
+            .execute_universal_cli_command("snap install vlc")
+            .unwrap();
+        assert!(snap_res.contains("vlc"));
+
+        // Micro-distro / HPC package managers
+        let spack_res = pkg_mgr
+            .execute_universal_cli_command("spack install openmpi")
+            .unwrap();
+        assert!(spack_res.contains("openmpi"));
+
+        let conan_res = pkg_mgr
+            .execute_universal_cli_command("conan install boost/1.81.0")
+            .unwrap();
+        assert!(conan_res.contains("boost/1.81.0"));
+    }
 }

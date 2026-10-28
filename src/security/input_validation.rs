@@ -142,27 +142,32 @@ pub fn validate_email(email: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::TooLong);
     }
 
-    for &b in email {
+    // Zero-allocation single-pass scan combining NUL-byte injection checks,
+    // ASCII control character rejection, and single '@' delimiter index tracking.
+    // Eliminates heap allocations (`Vec<usize>`) to prevent memory allocation DoS (CWE-400)
+    // and improves validation throughput in no-std / kernel contexts.
+    let mut at_pos: Option<usize> = None;
+
+    for (idx, &b) in email.iter().enumerate() {
         if b == 0 {
             return Err(ValidationError::NullByte);
         }
         if b < 32 || b == 127 {
             return Err(ValidationError::InvalidChars);
         }
+        if b == b'@' {
+            if at_pos.is_some() {
+                // Reject multiple '@' delimiters immediately
+                return Err(ValidationError::InvalidChars);
+            }
+            at_pos = Some(idx);
+        }
     }
 
-    // Find the `@` separator. Ensure there is exactly one `@` character.
-    let at_indices: Vec<usize> = email
-        .iter()
-        .enumerate()
-        .filter_map(|(idx, &b)| if b == b'@' { Some(idx) } else { None })
-        .collect();
-
-    if at_indices.len() != 1 {
-        return Err(ValidationError::InvalidChars);
-    }
-
-    let at_pos = at_indices[0];
+    let at_pos = match at_pos {
+        Some(pos) => pos,
+        None => return Err(ValidationError::InvalidChars),
+    };
     let local = &email[..at_pos];
     let domain = &email[at_pos + 1..];
 

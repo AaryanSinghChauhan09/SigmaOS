@@ -217,7 +217,6 @@ pub use sigmastallmanager::{
     SoftwareItem as InstallManagerItem,
 };
 pub use sigmataskscheduler::{
-    pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
 };
@@ -303,7 +302,6 @@ pub mod user_manager;
 
 pub mod abi;
 pub mod automation;
-pub mod cleanup;
 pub mod config;
 pub mod cron;
 pub mod declarative_state;
@@ -343,7 +341,7 @@ pub use cleanup::{
     init_system_cleanup, get_system_cleanup,
 };
 pub use logrotate::{
-    LogRotateManager, LogFileConfig, RotationSchedule, CompressionType,
+    LogRotateManager, SysLogFileConfig, RotationSchedule, CompressionType,
     init_log_rotate, get_log_rotate,
 };
 pub use restore::{
@@ -353,7 +351,7 @@ pub use restore::{
 pub use firewall::{
     FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
     init_firewall, get_firewall,
-}
+};
 
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
@@ -510,7 +508,7 @@ pub use sigmafilm::{
 };
 pub use sigmafirewall::{
     create_rule, get_sigmafirewall, get_sigmafirewall_mut, init_sigmafirewall, FirewallAction,
-    FirewallChain, FirewallProtocol, FirewallRule, RuleState, SigmaFirewall,
+    FirewallChain, FirewallProtocol, FirewallRule as OtherFirewallRule, RuleState, SigmaFirewall,
 };
 pub use sigmaflatpak::{
     add_flatpak, get_sigmaflatpak, init_sigmaflatpak, install_flatpak, Flatpak, FlatpakRemote,
@@ -568,7 +566,7 @@ pub use sigmalight::{
     LightType, LightingScene, SigmaLight,
 };
 pub use sigmalogrotate::{
-    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig,
+    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, SigmaLogFileConfig,
     SigmaLogRotate,
 };
 pub use sigmalvm::{
@@ -948,6 +946,9 @@ pub use sovereign_init_and_supervisor_advancements_v76_pr::*;
 
 pub mod sovereign_init_and_supervisor_advancements_v77_pr;
 pub use sovereign_init_and_supervisor_advancements_v77_pr::*;
+
+pub mod sovereign_init_and_supervisor_advancements_v78_pr;
+pub use sovereign_init_and_supervisor_advancements_v78_pr::*;
 
 pub use mint_tools::{
     get_system_tools, init_system_tools, BackupConfig, BackupJob as MintBackupJob,

@@ -38,7 +38,7 @@ pub enum Direction {
 }
 
 /// Firewall rule
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FirewallRule {
     pub id: u32,
     pub action: RuleAction,

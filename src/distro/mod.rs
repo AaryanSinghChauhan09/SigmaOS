@@ -481,6 +481,8 @@ pub mod tech_media_component_advancements_v73_pr;
 pub use tech_media_component_advancements_v73_pr::*;
 pub mod tech_media_component_advancements_v74_pr;
 pub use tech_media_component_advancements_v74_pr::*;
+pub mod tech_media_component_advancements_v75_pr;
+pub use tech_media_component_advancements_v75_pr::*;
 
 pub mod sovereign_open_source_os_gap_closure_pr;
 pub use sovereign_open_source_os_gap_closure_pr::*;
@@ -522,6 +524,8 @@ pub mod openbsd_missing_components_v66_pr;
 pub use openbsd_missing_components_v66_pr::*;
 pub mod openbsd_missing_components_v67_pr;
 pub use openbsd_missing_components_v67_pr::*;
+pub mod openbsd_missing_components_v68_pr;
+pub use openbsd_missing_components_v68_pr::*;
 pub mod openbsd_missing_components_v59_pr;
 pub use openbsd_missing_components_v59_pr::*;
 
@@ -797,6 +801,8 @@ pub use open_source_os_missing_components_v54_pr::*;
 
 pub mod open_source_os_missing_components_v57_pr;
 pub use open_source_os_missing_components_v57_pr::*;
+pub mod open_source_os_missing_components_v79_pr;
+pub use open_source_os_missing_components_v79_pr::*;
 
 pub mod open_source_os_missing_components_v58_pr;
 pub use open_source_os_missing_components_v58_pr::*;
@@ -942,6 +948,10 @@ pub mod open_source_os_missing_components_v76_pr;
 pub use open_source_os_missing_components_v76_pr::*;
 pub mod open_source_os_missing_components_v77_pr;
 pub use open_source_os_missing_components_v77_pr::*;
+pub mod open_source_os_missing_components_v78_pr;
+pub use open_source_os_missing_components_v78_pr::*;
+pub mod open_source_os_missing_components_v80_pr;
+pub use open_source_os_missing_components_v80_pr::*;
 pub mod sovereign_independent_complete_os_engine;
 pub use sovereign_independent_complete_os_engine::*;
 pub mod sovereign_universal_linux_bsd_subsystem_interop_pr;

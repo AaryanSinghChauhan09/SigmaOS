@@ -365,6 +365,16 @@ if [ -f "src/creative/anicraft_advancements_v69_pr.rs" ]; then
     ./build/test_anicraft_v69
 fi
 
+if [ -f "src/creative/anicraft_advancements_pr.rs" ]; then
+    echo "Running Sovereign AniCraft Advancements PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/anicraft_advancements_pr.rs --edition=2021 -o build/test_anicraft_advancements
+    ./build/test_anicraft_advancements
+
+    rustc --test tests/test_anicraft_advancements_pr.rs --edition=2021 -o build/test_anicraft_advancements_integration
+    ./build/test_anicraft_advancements_integration
+fi
+
 if [ -f "src/creative/deckcraft.rs" ]; then
     echo "Running Sovereign DeckCraft Presentation Slide PR test suite..."
     mkdir -p build
@@ -405,6 +415,13 @@ if [ -f "src/creative/deckcraft_artcraft_missing_components_v68_pr.rs" ]; then
     mkdir -p build
     TMPDIR=$(pwd)/build rustc --test src/creative/deckcraft_artcraft_missing_components_v68_pr.rs --edition=2021 -o build/test_deckcraft_v68
     ./build/test_deckcraft_v68
+fi
+
+if [ -f "src/creative/deckcraft_artcraft_missing_components_v69_pr.rs" ]; then
+    echo "Running Deckcraft & ArtCraft Missing Components Parity PR Gateway V69 test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test src/creative/deckcraft_artcraft_missing_components_v69_pr.rs --edition=2021 -o build/test_deckcraft_v69
+    ./build/test_deckcraft_v69
 fi
 
 if [ -f "src/creative/effectcraft.rs" ]; then
@@ -459,6 +476,12 @@ if [ -f "src/creative/soundcraft_artcraft_missing_components_v67_pr.rs" ]; then
     echo "Running SoundCraft V67 PR Suite tests..."
     rustc --test src/creative/soundcraft_artcraft_missing_components_v67_pr.rs --edition=2021 -o build/test_soundcraft_v67
     ./build/test_soundcraft_v67
+fi
+
+if [ -f "src/creative/soundcraft_artcraft_missing_components_v68_pr.rs" ]; then
+    echo "Running SoundCraft V68 PR Suite tests..."
+    rustc --test src/creative/soundcraft_artcraft_missing_components_v68_pr.rs --edition=2021 -o build/test_soundcraft_v68
+    ./build/test_soundcraft_v68
 fi
 
 
@@ -559,6 +582,12 @@ if [ -f "src/creative/wordcraft_artcraft_missing_components_v67_pr.rs" ]; then
     ./build/test_wordcraft_v67
 fi
 
+if [ -f "src/creative/wordcraft_artcraft_missing_components_v68_pr.rs" ]; then
+    echo "Running Sovereign WordCraft & ArtCraft Missing Components Parity PR Gateway V68 test suite..."
+    TMPDIR=$(pwd)/build rustc --test src/creative/wordcraft_artcraft_missing_components_v68_pr.rs --edition=2021 -o build/test_wordcraft_v68
+    ./build/test_wordcraft_v68
+fi
+
 if [ -f "src/creative/figcraft.rs" ]; then
     echo "Running Sovereign FigCraft UI/UX Vector Canvas PR test suite..."
     mkdir -p build
@@ -591,6 +620,12 @@ if [ -f "src/creative/figcraft_artcraft_missing_components_v66_pr.rs" ]; then
     echo "Testing Figcraft ArtCraft Missing Components V66 PR Gateway..."
     TMPDIR=$(pwd)/build rustc --test src/creative/figcraft_artcraft_missing_components_v66_pr.rs --edition=2021 -o build/test_figcraft_v66
     ./build/test_figcraft_v66
+fi
+
+if [ -f "src/creative/figcraft_artcraft_missing_components_v67_pr.rs" ]; then
+    echo "Testing Figcraft ArtCraft Missing Components V67 PR Gateway..."
+    TMPDIR=$(pwd)/build rustc --test src/creative/figcraft_artcraft_missing_components_v67_pr.rs --edition=2021 -o build/test_figcraft_v67
+    ./build/test_figcraft_v67
 fi
 
 if [ -f "src/creative/cadcraft.rs" ]; then
@@ -635,6 +670,13 @@ if [ -f "src/creative/cadcraft_artcraft_missing_components_v68_pr.rs" ]; then
     ./build/test_cadcraft_v68
 fi
 
+if [ -f "src/creative/cadcraft_artcraft_missing_components_v69_pr.rs" ]; then
+    echo "Running Sovereign CadCraft & ArtCraft Missing Components Parity PR Gateway V69 test suite..."
+    mkdir -p build
+    rustc --test src/creative/cadcraft_artcraft_missing_components_v69_pr.rs --edition=2021 -o build/test_cadcraft_v69
+    ./build/test_cadcraft_v69
+fi
+
 if [ -f "src/creative/fontcraft.rs" ]; then
     echo "Running Sovereign FontCraft Typography Engine test suite..."
     mkdir -p build
@@ -668,6 +710,13 @@ if [ -f "src/creative/fontcraft_advancements_v77_pr.rs" ]; then
     mkdir -p build
     rustc --test src/creative/fontcraft_advancements_v77_pr.rs --edition=2021 -o build/test_fontcraft_v77
     ./build/test_fontcraft_v77
+fi
+
+if [ -f "src/creative/fontcraft_advancements_v78_pr.rs" ]; then
+    echo "Running Sovereign FontCraft Advancements V78 PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/fontcraft_advancements_v78_pr.rs --edition=2021 -o build/test_fontcraft_v78
+    ./build/test_fontcraft_v78
 fi
 
 if [ -f "src/creative/voicecraft.rs" ]; then
@@ -1309,6 +1358,27 @@ if [ -f "src/package/sovereign_distro_package_advancements_v70_pr.rs" ]; then
     ./build/sovereign_advancements_v70_pr_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v78.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V78 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v78.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v78_test
+    ./build/sovereign_advancements_v78_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v78_pr.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V78 PR test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v78_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v78_pr_test
+    ./build/sovereign_advancements_v78_pr_test
+fi
+
+if [ -f "tests/test_package_advancements_v78.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V78 Integration test suite..."
+    mkdir -p build
+    rustc --test tests/test_package_advancements_v78.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v78
+    ./build/test_package_advancements_v78
+fi
+
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
     mkdir -p build
@@ -1460,6 +1530,12 @@ if [ -f "src/distro/tech_media_component_advancements_v74_pr.rs" ]; then
     echo "Running Sovereign Tech Media Component Advancements V74 test suite..."
     rustc --test src/distro/tech_media_component_advancements_v74_pr.rs --edition=2021 -o build/tech_media_v74_test
     ./build/tech_media_v74_test
+fi
+
+if [ -f "src/distro/tech_media_component_advancements_v75_pr.rs" ]; then
+    echo "Running Sovereign Tech Media Component Advancements V75 test suite..."
+    rustc --test src/distro/tech_media_component_advancements_v75_pr.rs --edition=2021 -o build/tech_media_v75_test
+    ./build/tech_media_v75_test
 fi
 
 if [ -f "src/open_source_os_gap_closure.rs" ]; then
@@ -2094,6 +2170,23 @@ if [ -f "src/distro/open_source_os_missing_components_v78_pr.rs" ]; then
 
     rustc --test tests/test_open_source_os_missing_components_v78_pr.rs --edition=2021 -o build/test_open_source_v78_pr_integration
     ./build/test_open_source_v78_pr_integration
+
+    echo "Running Open Source OS Missing Components V79 PR Suite tests..."
+    rustc --test src/distro/open_source_os_missing_components_v79_pr.rs --edition=2021 -o build/test_open_source_v79_pr
+    ./build/test_open_source_v79_pr
+
+    rustc --test tests/test_open_source_os_missing_components_v79_pr.rs --edition=2021 -o build/test_open_source_v79_pr_integration
+    ./build/test_open_source_v79_pr_integration
+fi
+
+if [ -f "src/distro/open_source_os_missing_components_v80_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V80 PR Suite tests..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_missing_components_v80_pr.rs --edition=2021 -o build/test_open_source_v80_pr
+    ./build/test_open_source_v80_pr
+
+    rustc --test tests/test_open_source_os_missing_components_v80_pr.rs --edition=2021 -o build/test_open_source_v80_pr_integration
+    ./build/test_open_source_v80_pr_integration
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
@@ -2400,10 +2493,10 @@ if [ -f "src/desktop/sovereign_gui_development_and_pr_suite.rs" ]; then
     ./build/test_gui_pr_suite
 fi
 
-if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; then
+if [ -f "src/driver/sovereign_device_driver_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign Device Driver Development and PR Gateway Suite..."
     mkdir -p build
-    rustc --test src/drivers/sovereign_device_driver_development_and_pr_suite.rs --edition=2021 -o build/test_device_driver_pr_suite
+    rustc --test src/driver/sovereign_device_driver_development_and_pr_suite.rs --edition=2021 -o build/test_device_driver_pr_suite
     ./build/test_device_driver_pr_suite
 fi
 
@@ -2426,6 +2519,13 @@ if [ -f "src/userland/system_utilities.rs" ]; then
     mkdir -p build
     rustc --test src/userland/system_utilities.rs --edition=2021 -o build/test_system_utilities
     ./build/test_system_utilities
+fi
+
+if [ -f "tests/test_system_utilities_plan_verification.rs" ]; then
+    echo "Running System Utilities Plan Verification test suite..."
+    mkdir -p build
+    rustc --test tests/test_system_utilities_plan_verification.rs --edition=2021 -o build/test_sys_utils_plan
+    ./build/test_sys_utils_plan
 fi
 
 if [ -f "src/productivity/sovereign_application_replacements_pr_suite.rs" ]; then
@@ -2476,6 +2576,13 @@ if [ -f "src/syscall/sovereign_syscall_development_and_pr_suite.rs" ]; then
     mkdir -p build
     rustc --test src/syscall/sovereign_syscall_development_and_pr_suite.rs --edition=2021 -o build/test_syscall_pr_suite
     ./build/test_syscall_pr_suite
+fi
+
+if [ -f "tests/test_syscall_development_plan.rs" ]; then
+    echo "Running Sovereign Syscall Development Plan Integration Suite..."
+    mkdir -p build
+    rustc --test tests/test_syscall_development_plan.rs --edition=2021 -o build/test_syscall_development_plan
+    ./build/test_syscall_development_plan
 fi
 
 if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
@@ -2593,6 +2700,12 @@ if [ -f "tests/process/test_process_synchronization_plan.rs" ]; then
     rustc --test tests/process/test_process_synchronization_plan.rs --edition=2021 -o build/test_proc_sync && ./build/test_proc_sync
 fi
 
+if [ -f "tests/dispatch/test_dispatcher_plan.rs" ]; then
+    echo "Running Dispatcher Plan test suite..."
+    mkdir -p build
+    rustc --test tests/dispatch/test_dispatcher_plan.rs --edition=2021 -o build/test_dispatcher_plan && ./build/test_dispatcher_plan
+fi
+
 if [ -f "tests/shell.rs" ]; then
     echo "Running Shell Conformance and Lifecycle test suites..."
     mkdir -p build
@@ -2647,6 +2760,13 @@ if [ -f "src/creative/craftlibs_artcraft_missing_components_v69_pr.rs" ]; then
     mkdir -p build
     rustc --test src/creative/craftlibs_artcraft_missing_components_v69_pr.rs --edition=2021 -o build/test_craftlibs_v69
     ./build/test_craftlibs_v69
+fi
+
+if [ -f "src/creative/craftlibs_artcraft_missing_components_v70_pr.rs" ]; then
+    echo "Running Sovereign CraftLibs & ArtCraft Missing Components Parity PR Gateway V70 test suite..."
+    mkdir -p build
+    rustc --test src/creative/craftlibs_artcraft_missing_components_v70_pr.rs --edition=2021 -o build/test_craftlibs_v70
+    ./build/test_craftlibs_v70
 fi
 
 if [ -f "src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs" ]; then
@@ -2708,6 +2828,12 @@ if [ -f "src/creative/threedcraft_advancements_v74_pr.rs" ]; then
     echo "Running Sovereign 3DCraft Advancements V74 PR test suite..."
     rustc --test src/creative/threedcraft_advancements_v74_pr.rs --edition=2021 -o build/threedcraft_v74_test
     ./build/threedcraft_v74_test
+fi
+
+if [ -f "src/creative/threedcraft_advancements_v78_pr.rs" ]; then
+    echo "Running Sovereign 3DCraft Advancements V78 PR test suite..."
+    rustc --test src/creative/threedcraft_advancements_v78_pr.rs --edition=2021 -o build/threedcraft_v78_test
+    ./build/threedcraft_v78_test
 fi
 
 if [ -f "src/creative/artcraft_advancements_v75_pr.rs" ]; then

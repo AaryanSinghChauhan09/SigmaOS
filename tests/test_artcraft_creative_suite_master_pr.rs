@@ -23,6 +23,7 @@ fn test_sovereign_artcraft_creative_suite_master_gateway_integration() {
     assert!(md.contains("FilmCraft"));
     assert!(md.contains("PdfCraft"));
     assert!(md.contains("ArtCraft V75 Core"));
+    assert!(md.contains("ArtCraft Core"));
 }
 
 #[test]
