@@ -278,5 +278,7 @@ pub mod sovereign_security_and_hardening_advancements_v76_pr;
 pub use sovereign_security_and_hardening_advancements_v76_pr::*;
 pub mod sovereign_security_and_hardening_advancements_v77_pr;
 pub use sovereign_security_and_hardening_advancements_v77_pr::*;
+pub mod sovereign_security_and_hardening_advancements_v80_pr;
+pub use sovereign_security_and_hardening_advancements_v80_pr::*;
 pub mod sovereign_security_management_plan;
 pub use sovereign_security_management_plan::*;
