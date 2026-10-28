@@ -289,6 +289,10 @@ pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v72_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v76_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v77_pr::*;
+pub use distro::open_source_os_unimplemented_ideas_v78_pr::*;
+pub use distro::debian_github_repo_missing_components_v78_pr::*;
+pub use distro::open_source_os_debian_unimplemented_ideas_v78_pr::*;
+pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 // Module-path re-exports so `crate::<module>` resolves under cfg(test)/standalone_test
 pub use distro::debian_github_repo_missing_components_v71_pr;
 pub use distro::dragonflybsd_missing_components_v61_pr::*;

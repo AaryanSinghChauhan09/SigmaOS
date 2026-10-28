@@ -47,18 +47,18 @@ pub struct DebianGithubV78PrSpec {
 }
 
 // 1. DPKG TRIGGERS ORDERING ENGINE V78
-pub struct DebianDpkgTriggersDeferredExecutionV78PrEngine {
+pub struct DebianDpkgTriggersOrderingEngineV78Pr {
     pub pending_triggers: Vec<String>,
     pub processed_triggers: u32,
 }
 
-impl Default for DebianDpkgTriggersDeferredExecutionV78PrEngine {
+impl Default for DebianDpkgTriggersOrderingEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianDpkgTriggersDeferredExecutionV78PrEngine {
+impl DebianDpkgTriggersOrderingEngineV78Pr {
     pub fn new() -> Self {
         Self {
             pending_triggers: vec![
@@ -115,15 +115,15 @@ impl DebianDpkgTriggersDeferredExecutionV78PrEngine {
 }
 
 // 2. SECURE APT PQC DILITHIUM INRELEASE ENGINE V78
-pub struct DebianSecureAptPqcDilithiumInReleaseV78PrEngine;
+pub struct DebianSecureAptPqcDilithiumInReleaseEngineV78Pr;
 
-impl Default for DebianSecureAptPqcDilithiumInReleaseV78PrEngine {
+impl Default for DebianSecureAptPqcDilithiumInReleaseEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianSecureAptPqcDilithiumInReleaseV78PrEngine {
+impl DebianSecureAptPqcDilithiumInReleaseEngineV78Pr {
     pub fn new() -> Self {
         Self
     }
@@ -152,17 +152,17 @@ impl DebianSecureAptPqcDilithiumInReleaseV78PrEngine {
 }
 
 // 3. DEBCONF DATABASE STATE ENGINE V78
-pub struct DebianDebconfDatabaseStateV78PrEngine {
+pub struct DebianDebconfStateDatabaseEngineV78Pr {
     pub answers: BTreeMap<String, String>,
 }
 
-impl Default for DebianDebconfDatabaseStateV78PrEngine {
+impl Default for DebianDebconfStateDatabaseEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianDebconfDatabaseStateV78PrEngine {
+impl DebianDebconfStateDatabaseEngineV78Pr {
     pub fn new() -> Self {
         let mut answers = BTreeMap::new();
         answers.insert("tzdata/zones".to_string(), "UTC".to_string());
@@ -195,15 +195,15 @@ impl DebianDebconfDatabaseStateV78PrEngine {
 }
 
 // 4. LINTIAN STATIC POLICY CHECKER ENGINE V78
-pub struct DebianLintianStaticAnalysisV78PrEngine;
+pub struct DebianLintianStaticPolicyCheckerEngineV78Pr;
 
-impl Default for DebianLintianStaticAnalysisV78PrEngine {
+impl Default for DebianLintianStaticPolicyCheckerEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianLintianStaticAnalysisV78PrEngine {
+impl DebianLintianStaticPolicyCheckerEngineV78Pr {
     pub fn new() -> Self {
         Self
     }
@@ -235,15 +235,15 @@ impl DebianLintianStaticAnalysisV78PrEngine {
 }
 
 // 5. BUILDD CLEANROOM SBUILD CHROOT ENGINE V78
-pub struct DebianBuilddCleanroomSbuildV78PrEngine;
+pub struct DebianBuilddCleanroomSbuildChrootEngineV78Pr;
 
-impl Default for DebianBuilddCleanroomSbuildV78PrEngine {
+impl Default for DebianBuilddCleanroomSbuildChrootEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianBuilddCleanroomSbuildV78PrEngine {
+impl DebianBuilddCleanroomSbuildChrootEngineV78Pr {
     pub fn new() -> Self {
         Self
     }
@@ -267,15 +267,15 @@ impl DebianBuilddCleanroomSbuildV78PrEngine {
 }
 
 // 6. DEBSUMS INTEGRITY TAMPER DETECTOR ENGINE V78
-pub struct DebianDebsumsIntegrityAuditorV78PrEngine;
+pub struct DebianDebsumsIntegrityTamperDetectorEngineV78Pr;
 
-impl Default for DebianDebsumsIntegrityAuditorV78PrEngine {
+impl Default for DebianDebsumsIntegrityTamperDetectorEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianDebsumsIntegrityAuditorV78PrEngine {
+impl DebianDebsumsIntegrityTamperDetectorEngineV78Pr {
     pub fn new() -> Self {
         Self
     }
@@ -299,15 +299,15 @@ impl DebianDebsumsIntegrityAuditorV78PrEngine {
 }
 
 // 7. POPCON USAGE TELEMETRY ENGINE V78
-pub struct DebianPopconTelemetryAnalyzerV78PrEngine;
+pub struct DebianPopconUsageTelemetryEngineV78Pr;
 
-impl Default for DebianPopconTelemetryAnalyzerV78PrEngine {
+impl Default for DebianPopconUsageTelemetryEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianPopconTelemetryAnalyzerV78PrEngine {
+impl DebianPopconUsageTelemetryEngineV78Pr {
     pub fn new() -> Self {
         Self
     }
@@ -331,15 +331,15 @@ impl DebianPopconTelemetryAnalyzerV78PrEngine {
 }
 
 // 8. PIUPARTS LIFECYCLE SANITY ENGINE V78
-pub struct DebianPiupartsPackageSanitySuiteV78PrEngine;
+pub struct DebianPiupartsLifecycleSanityEngineV78Pr;
 
-impl Default for DebianPiupartsPackageSanitySuiteV78PrEngine {
+impl Default for DebianPiupartsLifecycleSanityEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianPiupartsPackageSanitySuiteV78PrEngine {
+impl DebianPiupartsLifecycleSanityEngineV78Pr {
     pub fn new() -> Self {
         Self
     }
@@ -367,15 +367,15 @@ impl DebianPiupartsPackageSanitySuiteV78PrEngine {
 }
 
 // 9. SUBIQUITY INSTALLER AUTOINSTALL ENGINE V78
-pub struct DebianSubiquityInstallerAutoinstallV78PrEngine;
+pub struct DebianSubiquityInstallerAutoinstallEngineV78Pr;
 
-impl Default for DebianSubiquityInstallerAutoinstallV78PrEngine {
+impl Default for DebianSubiquityInstallerAutoinstallEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianSubiquityInstallerAutoinstallV78PrEngine {
+impl DebianSubiquityInstallerAutoinstallEngineV78Pr {
     pub fn new() -> Self {
         Self
     }
@@ -399,15 +399,15 @@ impl DebianSubiquityInstallerAutoinstallV78PrEngine {
 }
 
 // 10. MULTIARCH APT RESOLVER ENGINE V78
-pub struct DebianMultiarchAptResolverV78PrEngine;
+pub struct DebianMultiarchAptResolverEngineV78Pr;
 
-impl Default for DebianMultiarchAptResolverV78PrEngine {
+impl Default for DebianMultiarchAptResolverEngineV78Pr {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DebianMultiarchAptResolverV78PrEngine {
+impl DebianMultiarchAptResolverEngineV78Pr {
     pub fn new() -> Self {
         Self
     }
@@ -432,16 +432,16 @@ impl DebianMultiarchAptResolverV78PrEngine {
 
 // MASTER SUITE AGGREGATOR V78
 pub struct DebianGithubRepoMissingComponentsV78PrSuite {
-    pub dpkg_triggers: DebianDpkgTriggersDeferredExecutionV78PrEngine,
-    pub apt_pqc: DebianSecureAptPqcDilithiumInReleaseV78PrEngine,
-    pub debconf: DebianDebconfDatabaseStateV78PrEngine,
-    pub lintian: DebianLintianStaticAnalysisV78PrEngine,
-    pub sbuild: DebianBuilddCleanroomSbuildV78PrEngine,
-    pub debsums: DebianDebsumsIntegrityAuditorV78PrEngine,
-    pub popcon: DebianPopconTelemetryAnalyzerV78PrEngine,
-    pub piuparts: DebianPiupartsPackageSanitySuiteV78PrEngine,
-    pub subiquity: DebianSubiquityInstallerAutoinstallV78PrEngine,
-    pub multiarch: DebianMultiarchAptResolverV78PrEngine,
+    pub dpkg_triggers: DebianDpkgTriggersOrderingEngineV78Pr,
+    pub apt_pqc: DebianSecureAptPqcDilithiumInReleaseEngineV78Pr,
+    pub debconf: DebianDebconfStateDatabaseEngineV78Pr,
+    pub lintian: DebianLintianStaticPolicyCheckerEngineV78Pr,
+    pub sbuild: DebianBuilddCleanroomSbuildChrootEngineV78Pr,
+    pub debsums: DebianDebsumsIntegrityTamperDetectorEngineV78Pr,
+    pub popcon: DebianPopconUsageTelemetryEngineV78Pr,
+    pub piuparts: DebianPiupartsLifecycleSanityEngineV78Pr,
+    pub subiquity: DebianSubiquityInstallerAutoinstallEngineV78Pr,
+    pub multiarch: DebianMultiarchAptResolverEngineV78Pr,
 }
 
 impl Default for DebianGithubRepoMissingComponentsV78PrSuite {
@@ -453,16 +453,16 @@ impl Default for DebianGithubRepoMissingComponentsV78PrSuite {
 impl DebianGithubRepoMissingComponentsV78PrSuite {
     pub fn new() -> Self {
         Self {
-            dpkg_triggers: DebianDpkgTriggersDeferredExecutionV78PrEngine::new(),
-            apt_pqc: DebianSecureAptPqcDilithiumInReleaseV78PrEngine::new(),
-            debconf: DebianDebconfDatabaseStateV78PrEngine::new(),
-            lintian: DebianLintianStaticAnalysisV78PrEngine::new(),
-            sbuild: DebianBuilddCleanroomSbuildV78PrEngine::new(),
-            debsums: DebianDebsumsIntegrityAuditorV78PrEngine::new(),
-            popcon: DebianPopconTelemetryAnalyzerV78PrEngine::new(),
-            piuparts: DebianPiupartsPackageSanitySuiteV78PrEngine::new(),
-            subiquity: DebianSubiquityInstallerAutoinstallV78PrEngine::new(),
-            multiarch: DebianMultiarchAptResolverV78PrEngine::new(),
+            dpkg_triggers: DebianDpkgTriggersOrderingEngineV78Pr::new(),
+            apt_pqc: DebianSecureAptPqcDilithiumInReleaseEngineV78Pr::new(),
+            debconf: DebianDebconfStateDatabaseEngineV78Pr::new(),
+            lintian: DebianLintianStaticPolicyCheckerEngineV78Pr::new(),
+            sbuild: DebianBuilddCleanroomSbuildChrootEngineV78Pr::new(),
+            debsums: DebianDebsumsIntegrityTamperDetectorEngineV78Pr::new(),
+            popcon: DebianPopconUsageTelemetryEngineV78Pr::new(),
+            piuparts: DebianPiupartsLifecycleSanityEngineV78Pr::new(),
+            subiquity: DebianSubiquityInstallerAutoinstallEngineV78Pr::new(),
+            multiarch: DebianMultiarchAptResolverEngineV78Pr::new(),
         }
     }
 
