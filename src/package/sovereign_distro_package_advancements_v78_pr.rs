@@ -27,17 +27,8 @@ use std::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::sovereign_distro_package_advancements_v78::PackageFormat;
 
-#[cfg(all(feature = "standalone_test", feature = "standalone_pr_only"))]
-#[path = "universal.rs"]
-pub mod universal;
-
-#[cfg(all(feature = "standalone_test", feature = "standalone_pr_only"))]
-pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
-
-#[cfg(all(feature = "standalone_test", not(feature = "standalone_pr_only")))]
-use super::sovereign_distro_package_advancements_v78::universal::{
-    PackageError, PackageFormat, PackageState, UnifiedPackage,
-};
+#[cfg(feature = "standalone_test")]
+use crate::package::sovereign_distro_package_advancements_v78::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 
 /// Pull Request Proposal Manifest V78
 #[derive(Debug, Clone, PartialEq, Eq)]
