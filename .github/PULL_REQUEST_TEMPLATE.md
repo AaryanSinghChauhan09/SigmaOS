@@ -1,118 +1,76 @@
 ## Summary
 
-<!-- What file-management behavior changed and why? -->
+<!-- What component does this PR improve or add? -->
 
-## Component
+## Related issue
 
 Closes #<issue-id>
 
-## File component
+## Upstream study
 
-- [ ] File descriptor manager
-- [ ] fd / handle / file
-- [ ] Inode and directory manager
-- [ ] Permission manager
-- [ ] Lock manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
 
-## Recurring task
+## What SigmaOS adopts
 
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly file audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+<!-- State the design principle or mechanism adopted. -->
 
-## Reference behavior
+## What SigmaOS changes or rejects
 
-<!-- Required for lifecycle, ABI, or file changes -->
+<!-- State simplifications, deviations, and rejected ideas. -->
 
-- POSIX section:
-- Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
+## Component impact
+
+- Component:
+- Maturity before:
+- Maturity after:
+- Runtime path affected:
 
 ## Changes
 
--
-
-## Motivation
-
-<!-- Link the issue, roadmap item, or gap-analysis entry. Upstream study / Reference study / What SigmaOS adopts. -->
-
-## Implementation notes
-
-<!-- Design decisions, data structures, locking, error handling. -->
-
-## Tests
-
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Concurrency/stress tests added/updated
-- [ ] Fuzz tests added/updated
-- [ ] Boot smoke test performed, if kernel-facing
-- [ ] No regression in existing tests
-
-## File safety review
-
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-unlink prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
 
 ## Verification
 
 ```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
+make check
+make test
+make format
 ```
 
-Paste relevant output below.
+## Runtime evidence
 
-## Capability status
-
-- Previous status:
-- New status:
-- Evidence:
-
-## Integration impact
-
-- [ ] No runtime integration yet
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
 
 ## Safety and rollback
 
-- [ ] Safety guarantees and rollback steps documented
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
 
 ## Reviewer checklist
 
 - [ ] Scope is narrow
-- [ ] Public API documented
-- [ ] `unsafe` justified
-- [ ] Lock ordering documented
-- [ ] Error paths tested
-- [ ] Feature status updated
-- [ ] No unsupported compatibility claim
+- [ ] Tests cover the change
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported parity claims
