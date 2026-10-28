@@ -221,7 +221,7 @@ pub use kernel::{
     SovereignKernelOpenSourceOsDistroAdvancementsV65PrGateway,
     SovereignKernelOpenSourceOsDistroAdvancementsV68PrGateway,
     SovereignKernelOpenSourceOsDistroAdvancementsV75PrGateway,
-    SovereignKernelOpenSourceOsDistroAdvancementsV80PrGateway,
+    SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
     SovereignKernelOpenSourceOsDistroInnovationsV72PrGateway,
     SovereignLinuxBsdKernelInnovationsPrGateway,
 };
@@ -334,9 +334,6 @@ pub use distro::open_source_os_missing_components_v74_pr::*;
 pub use distro::open_source_os_missing_components_v75_pr::*;
 pub use distro::open_source_os_missing_components_v76_pr::*;
 pub use distro::open_source_os_missing_components_v77_pr::*;
-pub use distro::open_source_os_missing_components_v78_pr::*;
-pub use package::sovereign_distro_package_advancements_v73::*;
-pub use package::sovereign_distro_package_advancements_v74::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v71_pr;
@@ -350,7 +347,7 @@ pub use distro::openbsd_missing_components_v64_pr::*;
 pub use distro::openbsd_missing_components_v65_pr::*;
 pub use distro::openbsd_missing_components_v66_pr::*;
 pub use distro::openbsd_missing_components_v67_pr::*;
-pub use distro::openbsd_missing_components_v68_pr::*;
+pub use distro::reactos_missing_components_parity_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
@@ -390,6 +387,8 @@ pub use open_source_obsoletion::open_source_os_gap_closure::*;
 pub use open_source_obsoletion::open_source_os_pinnacle_gap_closure::*;
 pub use package::sovereign_distro_package_advancements_v73::*;
 pub use package::sovereign_distro_package_advancements_v74::*;
+pub use package::sovereign_distro_package_advancements_v75::*;
+pub use package::sovereign_distro_package_advancements_v75_pr::*;
 pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
@@ -795,11 +794,8 @@ pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v55::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v70::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
-pub use crate::distro::arch_linux_missing_components_v73_pr::*;
-pub use crate::distro::arch_linux_missing_components_v74_pr::*;
-pub use crate::distro::open_source_os_missing_components_v76_pr::*;
-pub use crate::distro::open_source_os_missing_components_v77_pr::*;
-pub use crate::distro::open_source_os_missing_components_v78_pr::*;
+pub use crate::graphics::sovereign_graphics_display_v72_pr::*;
+pub use crate::graphics::sovereign_graphics_display_v74_pr::*;
 
 pub mod screen;
 pub mod software_manager;

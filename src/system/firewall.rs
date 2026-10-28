@@ -230,6 +230,21 @@ impl Clone for FirewallRule {
     }
 }
 
+impl Clone for FirewallRule {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id,
+            action: self.action.clone(),
+            protocol: self.protocol.clone(),
+            direction: self.direction.clone(),
+            port: self.port,
+            from_address: self.from_address.clone(),
+            to_address: self.to_address.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
 /// Firewall profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FirewallProfile {
