@@ -32,6 +32,10 @@ use std::vec::Vec;
 use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
 
 #[cfg(feature = "standalone_test")]
+#[path = "sovereign_distro_package_advancements_v78.rs"]
+pub mod sovereign_distro_package_advancements_v78;
+
+#[cfg(feature = "standalone_test")]
 use crate::sovereign_distro_package_advancements_v78::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 
 /// Pull Request Proposal Manifest V78
