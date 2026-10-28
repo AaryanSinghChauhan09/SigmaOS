@@ -2549,11 +2549,11 @@ if [ -f "src/signal/sovereign_signal_development_and_pr_suite.rs" ]; then
     ./build/test_signal_pr_suite
 fi
 
-if [ -f "src/io/sovereign_io_management_and_pr_suite.rs" ]; then
-    echo "Running Sovereign Subsystem I/O Lifecycle Management & Gateway Suite..."
+if [ -f "tests/test_signal_development_plan.rs" ]; then
+    echo "Running Sovereign Signal Development Plan Integration Suite..."
     mkdir -p build
-    rustc --test src/io/sovereign_io_management_and_pr_suite.rs --edition=2021 -o build/test_sovereign_io_management
-    ./build/test_sovereign_io_management
+    rustc --test tests/test_signal_development_plan.rs --edition=2021 -o build/test_signal_development_plan
+    ./build/test_signal_development_plan
 fi
 
 if [ -f "src/kernel/sovereign_kernel_signal_interruption_suite.rs" ]; then
