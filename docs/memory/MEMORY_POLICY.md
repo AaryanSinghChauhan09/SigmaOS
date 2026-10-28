@@ -1,99 +1,65 @@
-# SigmaOS Memory Subsystem Policy
+# SigmaOS Main Memory Management Policy
 
-## Memory-Management Objective
+## 1. Overview & Core Directive
 
-> **Maintain SigmaOS memory management as a safe, observable, testable subsystem: allocate, map, protect, swap, limit, reclaim, and release memory without leaks, races, corruption, or undefined behavior.**
+SigmaOS manages main memory as an authoritative lifecycle subsystem. Memory management encompasses physical allocation, paging, virtual address space mapping, swapping, reclaim, OOM handling, and observability. All memory operations must proceed without leaks, races, corruption, or undefined behavior.
 
-SigmaOS connects memory models directly to a validated boot-to-shell runtime path, turning experimental memory structures into an evidence-backed, maintainable kernel subsystem.
+## 2. Authoritative Lifecycle Contract
 
----
-
-## Authoritative Memory Management Contract
-
-SigmaOS memory management enforces one single authoritative lifecycle:
+The SigmaOS main memory subsystem strictly enforces the following 11-stage lifecycle:
 
 ```text
 boot -> physical allocator init -> paging init -> virtual memory init ->
 allocation -> mapping -> protection -> swap -> reclaim -> free -> cleanup
 ```
 
-### Stage Behaviors and Requirements
+### Stage Requirements & Behaviors
 
-| Stage | Required Behavior | Invariants & Guarantees |
-|---|---|---|
-| **Boot** | Memory map discovered from hardware/firmware, reserved regions excluded | E820 / EFI memory map parsed; kernel/firmware regions marked unallocatable. |
-| **Physical Allocation** | Frames allocated/freed with bounded capacity | Lock-free or race-free frame allocation; double-free protection; typed exhaustion errors. |
-| **Paging** | Page tables initialized, mappings race-safe | 4-level x86_64 paging structure; page-table entries protected against lost-updates. |
-| **Virtual Memory** | User/kernel mappings isolated | User and kernel address space boundaries strictly enforced; virtual region limits defined. |
-| **Protection** | Permissions enforced on every mapping | Read, Write, Execute, User/Supervisor permissions enforced; W^X (Write XOR Execute) policy. |
-| **Swap** | Swap-out / swap-in failure-safe | Bounded swap slot bitmap; race-free disk enqueue; priority queue processing; zero lost swaps. |
-| **Reclaim** | Defined reclaim policy under memory pressure | LRU/mGLRU page compaction; background kswapd flushing; loss-less frame reclamation. |
-| **Free** | Frames and accounting released exactly once | Double-free prevention via reference counting and bitmap sanity checks; zero leaks. |
+| Stage | Required Behavior |
+|---|---|
+| Boot | Discovers physical memory map from firmware (ACPI/e820/EFI) and excludes reserved hardware/firmware regions. |
+| Physical Allocation Init | Initializes bounded buddy/bitmap frame allocators; tracks frame metadata race-free. |
+| Paging Init | Constructs initial 4-level x86_64 page tables with kernel address space identity/higher-half mappings. |
+| Virtual Memory Init | Sets up Virtual Memory Areas (VMAs) and user/kernel isolated address space boundaries. |
+| Allocation | Allocates physical frame or virtual region with bounded memory tracking and typed error handling on exhaustion. |
+| Mapping | Safe page-table insertion with TLB invalidation and race-free page attribute modification. |
+| Protection | Enforces W^X (Write XOR Execute) and User/Supervisor permission bits on every page table entry. |
+| Swap | Swaps cold/dirty pages to swap devices safely without lost writes or race conditions under memory pressure. |
+| Reclaim | LRU/MGLRU page scanning and proactive slab/page-cache eviction before OOM invocation. |
+| Free | Returns physical frames and virtual mappings back to pools exactly once without double-free errors. |
+| Cleanup | Reaps address space contexts, unwinds page table hierarchies, and clears residual tracking structures. |
 
----
-
-## Memory Policies
+## 3. Subsystem Policies
 
 ### Physical Allocator Class
-- **Hybrid Buddy + Slab Allocator**: Bounded buddy allocator for contiguous physical frame allocation backed by slab cache pools for fine-grained kernel object allocations.
-- **Frame Allocator Policy**: Bitmap-tracked physical memory manager (`src/memory/physical.rs`, `src/memory/frame.rs`) with O(1) free-list search and bounded capacity checks.
-- **Paging Policy**: 4-level page table management (`src/mm/paging.rs`, `src/mm/page_table.rs`) with canonical address validation, TLB shootdown hooks, and race-free page table mutation.
-- **Virtual Memory Policy**: VMA tracking (`src/mm/virtual.rs`) supporting demand paging, copy-on-write (COW), kernel/user isolation, and W^X memory protection.
-- **Swap Policy**: Priority-queued swap slots (`src/swap/core.rs`, `src/swap/enqueue.rs`) supporting bounded slot allocation, zram/zswap compression stages, and deterministic disk persistence.
-- **Reclaim Policy**: Multi-generational LRU aging, active/inactive page list scanning, and page compaction (`src/memory/kswapd.rs`, `src/memory/compaction.rs`).
-- **OOM Policy**: Explicit OOM score evaluation and typed error handling (`src/memory/oom_killer.rs`). OOM is a designed state returning `Err(MemoryError::OutOfMemory)`, preventing accidental kernel panics.
-- **NUMA & Hotplug Behavior**: ACPI SLIT/SRAT awareness (`src/memory/acpi_slit.rs`) and physical frame hotplug registration with NUMA node affinity binding.
+- **Buddy Allocator**: Primary physical frame allocator (`src/memory/buddy_allocator.rs`, `src/memory/sigma_buddy.rs`) for power-of-two page order allocations.
+- **Slab Allocator**: Kernel object cache allocator (`src/memory/slab_allocator.rs`) operating on buddy-allocated physical pages for fixed-size object caching.
 
----
+### Frame Allocator Policy
+- Frame allocation must be race-free and thread-safe.
+- Reserved regions (e.g., lower 1MB, ACPI tables, kernel text/data) are protected from allocation.
+- Frame exhaustion returns `PhysicalMemoryError::Exhausted` rather than panicking.
+- Double-free protection via explicit frame state bitmasks and reference counts.
 
-## Periodic Task Calendar
+### Paging Policy
+- 4-level page table architecture (`PML4 -> PDPT -> PD -> PT`).
+- Explicit CR3 register manipulation with ASID/PCID support for fast context switches.
+- Strict canonical address enforcement (`0x0000_0000_0000_0000` to `0x000F_FFFF_FFFF_FFFF` for user, `0xFFFF_8000_0000_0000` to `0xFFFF_FFFF_FFFF_FFFF` for kernel).
 
-| Frequency | Memory Task | Output | Required PR |
-|---|---|---|---|
-| **Every PR** | Build, lint, unit, and integration tests | CI result | `feat`, `fix`, `test`, `docs`, or `chore` PR |
-| **Daily** | CI/nightly triage | Root cause + fix | `fix(memory)` or `fix(ci)` PR |
-| **Weekly** | Memory subsystem review | Gap list + status | `docs(memory)` PR |
-| **Weekly** | Linux/BSD memory study | Study note | `docs(studies)` PR |
-| **Biweekly** | Allocator audit | Leak/OOM findings | `fix(memory)` / `test(memory)` PR |
-| **Biweekly** | Paging and protection audit | Mapping findings | `fix(paging)` PR |
-| **Monthly** | Boot-to-shell memory validation | Boot log + smoke report | `test(memory)` PR |
-| **Monthly** | Memory stress/fuzz triage | Crash reports + fixes | `fix(memory)` PR |
-| **Monthly** | Swap rehearsal | Swap enforcement report | `test(swap)` PR |
-| **Quarterly** | Memory architecture review | ADR + roadmap | `docs(adr)` PR |
-| **Quarterly** | Security review | Threat-model update | `security(memory)` PR |
-| **Quarterly** | Release readiness review | Release checklist | `docs(release)` PR |
+### Virtual Memory Policy
+- Address spaces isolated between user and kernel processes.
+- Memory protection enforced via page flags (`PRESENT`, `WRITABLE`, `USER_ACCESSIBLE`, `NO_EXECUTE`).
+- W^X policy: Memory regions cannot be simultaneously writable and executable.
 
----
+### Swap & Reclaim Policy
+- Bounded swap slot bitmap and priority queues (`src/swap/core.rs`, `src/swap/enqueue.rs`).
+- Background reclaim daemon (`kswapd`) triggered when free memory drops below low watermark.
+- Page aging via Multi-Generational LRU (MGLRU).
 
-## First 12 Memory PR Roadmap
+### OOM Behavior
+- OOM killer (`src/memory/oom_killer.rs`) selects task based on OOM score (`memory_usage + badness_adj`).
+- Designed state: Returns typed allocation errors or safely terminates chosen process without kernel panic.
 
-| # | PR | Purpose |
-|---:|---|---|
-| 1 | `docs(memory): add lifecycle state machine` | Establish authoritative memory states |
-| 2 | `docs(memory): add frame and page-table policy` | Define allocation, reuse, and limits |
-| 3 | `feat(memory): add bounded physical manager` | Prevent unbounded kernel growth |
-| 4 | `feat(memory): add race-free frame allocator` | Ensure safe frame lifecycle |
-| 5 | `test(memory): add paging/protection conformance tests` | Validate core lifecycle |
-| 6 | `feat(memory): define reclaim and OOM policy` | Eliminate corruption leaks |
-| 7 | `feat(memory): add page-table contract and integrity metric` | Make paging observable |
-| 8 | `test(mm): add preemption and starvation tests` | Validate scheduling behavior |
-| 9 | `feat(swap): define swap-out/swap-in policy` | Make signals deterministic |
-| 10 | `test(swap): add CPU, memory, fd, and process-limit tests` | Enforce resource limits |
-| 11 | `test(namespaces): add address-space isolation tests` | Validate isolation boundaries |
-| 12 | `test(boot): add boot-to-shell memory smoke test` | Connect memory management to runtime |
-
----
-
-## Memory Health Metrics
-
-| Metric | Target | Verification Method |
-|---|---|---|
-| **Memory CI pass rate** | 100% | GitHub Actions CI |
-| **Boot-to-shell pass rate** | 100% | QEMU smoke test runner |
-| **Orphan frames after stress test** | 0 | Physical manager audit |
-| **Double-free incidents** | 0 | Frame tracking sanity assertions |
-| **Frame reuse races** | 0 | Concurrency unit tests |
-| **Memory corruption incidents** | 0 | Page table & protection tests |
-| **Declared limits with enforcement tests** | 100% | VMA/Swap limit test suite |
-| **Memory claims linked to evidence** | 100% | PR evidence checklist audit |
-| **Security-sensitive PRs reviewed** | 100% | Security gate evaluation |
+### NUMA & Hotplug
+- NUMA awareness via ACPI SLIT/SRAT tables (`src/memory/acpi_slit.rs`).
+- Memory hotplug handling safely adjusts node frame boundaries dynamically.

@@ -1,45 +1,22 @@
-# ADR 0002: Safe, Observable, and Testable Memory Subsystem Architecture
+# Memory Architecture Decision Record (ADR)
 
-## Context and Problem Statement
+## ADR-001: SigmaOS Main Memory Subsystem Architecture
 
-SigmaOS requires a deterministic, safe, observable, and testable memory subsystem. Historically, OS kernels suffer from memory leaks, race conditions during physical frame allocation, unvalidated page table mutations, and unexpected panics caused by unbounded kernel allocations under memory exhaustion.
+### Status
+Accepted
 
-SigmaOS explicitly requires that unit-tested models connect to a validated boot-to-shell path, turning model abstractions into an evidence-backed kernel memory subsystem.
+### Context
+SigmaOS requires a safe, deterministic, observable, and high-performance memory management subsystem. Previous designs relied on fragmented memory experiments. A unified, production-grade memory subsystem contract is required to support multi-tasking, page-table isolation, virtual memory areas, and swap management.
 
-## Decision Drivers
+### Decision
+1. **Authoritative Memory Lifecycle**: Implement and enforce an 11-stage linear memory lifecycle state machine:
+   `boot -> physical allocator init -> paging init -> virtual memory init -> allocation -> mapping -> protection -> swap -> reclaim -> free -> cleanup`.
+2. **Physical Allocator Architecture**: Combine a Buddy Frame Allocator for page-granularity physical frame allocation with a Slab Cache Allocator for kernel object instances.
+3. **Paging & Address Space Isolation**: Enforce 4-level x86_64 paging with PCID/ASID context tags, strict canonical address validation, and explicit User/Supervisor space separation.
+4. **Virtual Memory Area (VMA) Governance**: Enforce Write-XOR-Execute (W^X) permissions on all VMAs and track allocations via bounded data structures.
+5. **Swap & OOM Handling**: Treat OOM as a designed error state managed by `kswapd` page reclaim and bounded swap slots.
 
-- **Memory Safety**: Eliminate physical frame leaks, double-frees, frame reuse races, and undefined behavior.
-- **Strict Isolation**: Enforce kernel vs. user address space separation and W^X (Write XOR Execute) page protection policies.
-- **Observable OOM**: Treat Out-Of-Memory (OOM) as a designed error state returning typed errors (`Err(MemoryError::OutOfMemory)`) rather than triggering kernel panics.
-- **Fail-Safe Swap Subsystem**: Provide race-free swap-out/swap-in queuing with bounded metadata overhead.
-- **Evidence-Based Maintenance**: Require unit tests, integration tests, and boot-to-shell validation for all memory-affecting changes.
-
-## Architectural Design
-
-### 1. Authoritative 11-Stage Memory Lifecycle
-SigmaOS establishes one single canonical lifecycle contract across all memory components:
-
-```text
-boot -> physical allocator init -> paging init -> virtual memory init ->
-allocation -> mapping -> protection -> swap -> reclaim -> free -> cleanup
-```
-
-### 2. Component Boundaries
-- **Physical Memory Manager (`src/memory/physical.rs`, `src/memory/frame.rs`)**:
-  Manages physical memory discovery, region reservation, bounded frame allocation bitmap, double-free validation, and frame reuse.
-- **Paging & Page Tables (`src/mm/paging.rs`, `src/mm/page_table.rs`)**:
-  Manages 4-level x86_64 page table translation, canonical address enforcement, mapping capacity bounds, and TLB invalidation hooks.
-- **Virtual Memory Manager (`src/mm/virtual.rs`)**:
-  Manages Virtual Memory Areas (VMAs), permissions enforcement (Read, Write, Execute, W^X policy), and user/kernel address space isolation.
-- **Swap Manager (`src/swap/core.rs`, `src/swap/enqueue.rs`)**:
-  Manages priority-queued swap slots, zram/zswap compression stages, and failure-safe swap enqueueing.
-
-## Concurrency & Locking Discipline
-
-- **Physical Allocator**: Mutex-protected or lock-free bitmap search.
-- **Page Tables**: Locking hierarchy ensures Page Directory / Page Table locks precede VMA locks.
-- **Swap Queue**: Thread-safe mutex queue with lost-wakeup prevention via atomic state flags.
-
-## Status
-
-**Accepted** - Implemented and validated across unit and integration test suites.
+### Consequences
+- **Safety**: Double-free errors, lost updates, and frame exhaustion races are prevented by explicit state locks and typed errors.
+- **Observability**: Allocation, mapping, protection, and swap events expose structured telemetry for kernel diagnostics.
+- **Reliability**: Eliminates unbounded recursive allocation panics across all physical and virtual memory operations.

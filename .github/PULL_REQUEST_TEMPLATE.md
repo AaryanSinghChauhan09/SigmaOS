@@ -2,7 +2,7 @@
 
 <!-- What memory-management behavior changed and why? -->
 
-## Memory component
+## Component
 
 - [ ] Memory policy
 - [ ] Physical memory manager
@@ -17,6 +17,7 @@
 - [ ] OOM
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
+- [ ] Shell / CLI / UI
 - [ ] Documentation
 - [ ] CI / tooling
 
@@ -58,6 +59,10 @@
 - [ ] Double-free prevented
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
+
+## Kernel safety review
+
+- [ ] Safety constraints verified
 
 ## Evidence
 

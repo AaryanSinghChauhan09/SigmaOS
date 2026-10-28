@@ -1,32 +1,12 @@
-# SigmaOS Physical Memory Management Policy
+# Physical Memory Allocation Policy
 
-## Overview
+## 1. Frame Allocator Policy
 
-The physical memory manager (`src/memory/physical.rs`, `src/memory/frame.rs`) is responsible for managing physical memory frame discovery, region reservations, allocation, and deallocation across SigmaOS.
+SigmaOS physical memory allocation (`src/memory/physical.rs`, `src/memory/frame.rs`) adheres to the following strict operational rules:
 
----
-
-## Core Guarantees & Invariants
-
-1. **Race-Free Frame Allocation**: Physical frame allocations and free operations are atomic or synchronized via internal mutex structures.
-2. **Defined Frame Reuse Policy**: Freed physical frames are returned to the free pool / bitmap and can be safely reallocated to subsequent callers without dangling references.
-3. **Typed Exhaustion Errors**: Physical frame exhaustion does not panic or trigger undefined behavior; it returns a explicit typed error (`MemoryError::OutOfMemory` or `FrameAllocationError::Exhausted`).
-4. **Reserved Region Protection**: Physical memory regions marked as reserved (e.g., BIOS/UEFI firmware areas, ACPI tables, kernel executable text/data) are strictly protected and excluded from allocation pools.
-5. **Double-Free Protection**: Freeing an already freed physical frame or an unallocated frame is detected and rejected via reference counting / bitmap assertions, returning a typed error (`FrameAllocationError::DoubleFree`).
-6. **Lost-Wakeup Prevention**: Wait queues associated with frame reclamation notify blocked allocators atomically upon frame release.
-
----
-
-## Implementation Specifications
-
-- **Source Implementation**: `src/memory/physical.rs`, `src/memory/frame.rs`
-- **Unit & Concurrency Tests**: `tests/memory/physical.rs`
-- **Page Frame Size**: 4096 bytes (4 KiB) standard page size.
-- **Physical Memory Map Parsing**: E820 / EFI memory descriptors map reserved and usable physical regions during kernel boot.
-
----
-
-## Enforcement & Verification
-
-- `cargo check --lib`
-- `rustc --test --edition=2021 tests/memory/physical.rs -o build/test_phys && ./build/test_phys`
+1. **Race-Free Frame Allocation**: All physical frame allocation and deallocation operations use atomic state bitmasks or spinlock synchronization to guarantee thread-safe frame acquisition.
+2. **Defined Frame Reuse Policy**: Freed physical frames are returned to the buddy allocator freelist at their appropriate block order, making them immediately eligible for reallocation without fragmentation leaks.
+3. **Typed Exhaustion Handling**: When no physical frames are available, the physical manager returns `PhysicalMemoryError::Exhausted` rather than panicking or looping infinitely.
+4. **Reserved Region Protection**: Firmware, ACPI, kernel image, and I/O mapped memory regions are marked as reserved during boot discovery and are permanently excluded from physical frame allocation.
+5. **Double-Free Protection**: Each frame tracks its allocation state (`Allocated` vs `Free`). Attempting to free an unallocated frame returns `PhysicalMemoryError::DoubleFree`.
+6. **Lost-Wakeup Prevention**: Wait queues associated with memory reclaim (`kswapd` / reclaim threads) use atomic sequence counter updates to ensure no wakeup signal is lost during memory pressure recovery.
