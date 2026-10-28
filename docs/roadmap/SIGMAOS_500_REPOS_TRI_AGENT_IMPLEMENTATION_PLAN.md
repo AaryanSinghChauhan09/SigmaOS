@@ -1,93 +1,156 @@
-# Implementation Roadmap: 500+ Open-Source Repositories Absorption & Tri-Agent Framework
+# SigmaOS 500+ GitHub Repositories Tri-Agent Implementation Plan
 
-> **Target Repository:** https://github.com/AaryanSinghChauhan09/SigmaOS
-> **Specification Version:** V1.0
-> **Status:** Active Implementation Roadmap
-
----
-
-## Executive Summary
-
-This implementation plan details the phased execution strategy for absorbing features, algorithms, architectures, design patterns, UI/UX components, and security controls from 500+ open-source GitHub repositories into native SigmaOS Rust submodules. Execution is governed by the Tri-Agent Engine (**Bolt ⚡**, **Palette 🎨**, **Sentinel 🛡️**).
+Target Repository: `https://github.com/AaryanSinghChauhan09/SigmaOS`
+Framework Version: 10.0-SOVEREIGN
+Document Type: IMPLEMENTATION ROADMAP & EXECUTION PLAN
 
 ---
 
-## 10 Execution Phases
+## Overview & Implementation Strategy
 
-### Phase 1: Core Kernel Parity & Hardware Support
-- **Source Repos:** `torvalds/linux`, `gregkh/linux`, `raspberrypi/linux`, `analogdevicesinc/linux`, `rt-linux/rt-linux`, `xenomai/xenomai`, `preempt-rt/preempt-rt`.
-- **Target Submodules:** `src/kernel/`, `src/hardware/`, `src/sched/`.
-- **Key Objectives:**
-  - Implement Linux 6.13+ EEVDF and BORE `sched_ext` scheduler abstractions.
-  - Integrate `io_uring` SQPOLL zero-syscall rings.
-  - Implement PREEMPT_RT real-time latency primitives.
+This Implementation Plan establishes a structured, 10-Phase execution roadmap to systematically analyze, extract, synthesize, and implement features, algorithms, design patterns, UI/UX elements, and security primitives from **500+ open-source GitHub repositories** into SigmaOS native Rust, QML, C, and shell implementations.
 
-### Phase 2: Microkernel & Alternative OS Innovations
-- **Source Repos:** `seL4/seL4`, `genode/genode`, `haiku/haiku`, `plan9foundation/plan9`, `reactos/reactos`, `rumpkernel/rumpkernel`.
-- **Target Submodules:** `src/microkernel/`, `src/compat/`.
-- **Key Objectives:**
-  - Formally verifiable capability-based IPC endpoints.
-  - 9P2000 remote filesystem protocol translation.
-  - Haiku BFS extended attribute indexing engine.
-
-### Phase 3: Package Manager Adaptation & Subsystem Cohesion
-- **Source Repos:** `pacman/pacman`, `dpkg/dpkg`, `rpm-software-management/rpm`, `nixos/nixpkgs`, `guix/guix`, `void-linux/void-packages`, `alpinelinux/aports`, `flatpak/flatpak`, `snapcore/snapd`.
-- **Target Submodules:** `src/package/`, `src/sigpkg/`.
-- **Key Objectives:**
-  - Universal package format classification across 250+ package types.
-  - Multi-clause SAT DPLL dependency solver with canonical `sovereign-*` remapping.
-  - OSTree zero-copy Content Addressable Store (CAS) delta deduplication.
-
-### Phase 4: Init Systems & Service Management
-- **Source Repos:** `systemd/systemd`, `openrc/openrc`, `runit/runit`, `s6/s6`, `upstart/upstart`, `smf/smf`.
-- **Target Submodules:** `src/system/`, `src/init/`.
-- **Key Objectives:**
-  - Parallel socket-activated init engine with cgroup v2 tracking.
-  - Supervision state machine with transactional restart policies.
-
-### Phase 5: Storage, Filesystems & Memory Governors
-- **Source Repos:** `zfs/zfs`, `btrfs/btrfs-progs`, `bcachefs/bcachefs-tools`, `ceph/ceph`, `gluster/glusterfs`, `e2fsprogs/e2fsprogs`, `f2fs-tools/f2fs-tools`.
-- **Target Submodules:** `src/storage/`, `src/memory/`.
-- **Key Objectives:**
-  - Transparent Zstd block compression and RAID-Z parity engines.
-  - Modern THP khugepaged defragmentation and compaction daemons.
-
-### Phase 6: Networking, Security & Hardening
-- **Source Repos:** `wireguard/wireguard-linux`, `openvpn/openvpn`, `openssh/openssh-portable`, `selinuxProject/selinux`, `iptables/iptables`, `nftables/nftables`, `fail2ban/fail2ban`, `clamav/clamav`.
-- **Target Submodules:** `src/security/`, `src/net/`.
-- **Key Objectives:**
-  - Kernel-level WireGuard Noise protocol handshakes.
-  - Landlock & Capsicum sandboxing capability enforcement.
-  - eBPF/XDP fast-path packet filtering.
-
-### Phase 7: Container Runtimes & Hypervisors
-- **Source Repos:** `docker/docker-ce`, `containerd/containerd`, `podman/podman`, `opencontainers/runc`, `qemu/qemu`, `kvm/kvm`, `firecracker-microvm/firecracker`, `lxc/lxc`.
-- **Target Submodules:** `src/container/`, `src/virt/`.
-- **Key Objectives:**
-  - Rootless OCI runtime container lifecycle.
-  - KVM microVM minimal boot loader.
-
-### Phase 8: Desktop Environments & Windowing Systems
-- **Source Repos:** `GNOME/gnome-shell`, `KDE/plasma-desktop`, `swaywm/sway`, `i3/i3`, `awesomeWM/awesome`, `hyprwm/Hyprland`.
-- **Target Submodules:** `src/desktop/`, `src/wayland/`.
-- **Key Objectives:**
-  - Wayland sub-surface compositor with HDR & VRR passthrough.
-  - Tiling layout algorithms (master-stack, spiral, binary space partitioning).
-
-### Phase 9: Shells, Terminals & Userland Utilities
-- **Source Repos:** `bash/bash`, `zsh-users/zsh`, `fish-shell/fish-shell`, `nushell/nushell`, `alacritty/alacritty`, `kitty/kitty`, `htop-dev/htop`, `tmux/tmux`.
-- **Target Submodules:** `src/shell/`, `src/userland/`.
-- **Key Objectives:**
-  - Structured data pipelines in native shell environment.
-  - GPU-accelerated terminal render buffer with Kitty image protocol.
-
-### Phase 10: HPC, Scientific & Utility Ecosystem
-- **Source Repos:** `slurm/slurm`, `openmpi/ompi`, `spack/spack`, `petsc/petsc`, `paraview/paraview`, `gromacs/gromacs`.
-- **Target Submodules:** `src/hpc/`, `src/scientific/`.
-- **Key Objectives:**
-  - Slurm job allocation and MPI zero-copy message passing.
-  - Parallel data pipeline synchronization.
+Each Phase is executed under the collaborative governance of the **Tri-Agent Framework**:
+- **Bolt ⚡** (Performance fastpaths, lock-free datastructures, zero-copy I/O)
+- **Palette 🎨** (UX polish, keyboard accessibility, ARIA compliance, desktop visuals)
+- **Sentinel 🛡️** (Input sanitization, sandboxing, capability security, CVE mitigation)
 
 ---
 
-*End of Implementation Roadmap.*
+## 10-Phase Implementation Roadmap
+
+### Phase 1: Core Kernel, Scheduler & Hardware Parity
+- **Target Repositories:** `torvalds/linux`, `gregkh/linux`, `raspberrypi/linux`, `rt-linux/rt-linux`, `preempt-rt/preempt-rt`, `xenomai/xenomai`
+- **Modules Touched:** `src/kernel/`, `boot/`, `src/memory/`
+- **Key Deliverables:**
+  - `sched_ext` eBPF BORE & EEVDF dynamic task schedulers.
+  - Transparent Huge Page (THP) defrag daemon & memory compaction fastpath.
+  - PREEMPT_RT real-time latency optimization for low-jitter IPC.
+  - ARM64 SBC device tree parsing & VirtIO driver support.
+- **Agent Roles:**
+  - ⚡ **Bolt:** Implement zero-copy buffer pools and lock-free thread queues.
+  - 🎨 **Palette:** Expose kernel scheduler telemetry in Zenith Desktop widget.
+  - 🛡️ **Sentinel:** W^X paging checks & kernel boundary syscall validation.
+
+### Phase 2: Microkernel & Alternative OS Primitive Synthesis
+- **Target Repositories:** `seL4/seL4`, `genode/genode`, `haiku/haiku`, `reactos/reactos`, `plan9foundation/plan9`, `unikernel-org/unikernel`, `rumpkernel/rumpkernel`
+- **Modules Touched:** `src/microkernel/`, `src/kernel/`
+- **Key Deliverables:**
+  - seL4-style formally verified capability spaces and IPC endpoint tokens.
+  - Plan 9 9P2000 virtual file protocol adapter for distributed resource sharing.
+  - NetBSD Rump Kernel hypercall translation layer for driver isolation.
+  - Genode RPC capability pass-through governor.
+- **Agent Roles:**
+  - ⚡ **Bolt:** Micro-benchmark IPC latency (< 100ns context switches).
+  - 🎨 **Palette:** Clean status logs for subsystem capabilities.
+  - 🛡️ **Sentinel:** Capabilities validation & secure token revocation.
+
+### Phase 3: Universal Package Management & Distro Adapter Suite
+- **Target Repositories:** `rpm-software-management/rpm`, `dpkg/dpkg`, `pacman/pacman`, `flatpak/flatpak`, `snapcore/snapd`, `void-linux/void-packages`, `nixos/nixpkgs`, `alpinelinux/aports`, `gentoo/portage`, `chimera-linux/chimera`, `serpent-os/core`
+- **Modules Touched:** `src/package/sovereign_distro_package_advancements_v74.rs`, `src/sigpkg/`
+- **Key Deliverables:**
+  - Universal format classifier & zero-copy parser for 220+ package types.
+  - SAT DPLL constraint solver with canonical `sovereign-*` system package mapping.
+  - Post-quantum cryptography (Dilithium5) & Signify signature attestation.
+  - Foreign PM CLI command router (`pacman`, `apt`, `dnf`, `apk`, `xbps`, `nix`).
+- **Agent Roles:**
+  - ⚡ **Bolt:** DPLL solver optimization using BitVec decision heuristics.
+  - 🎨 **Palette:** Progress spinners & informative CLI error formatting.
+  - 🛡️ **Sentinel:** Sandboxed scriptlet hook execution via Landlock/SECCOMP.
+
+### Phase 4: Init Systems, Service Supervision & System Utilities
+- **Target Repositories:** `systemd/systemd`, `busybox/busybox`, `util-linux/util-linux`, `coreutils/coreutils`, `openrc/openrc`, `runit/runit`, `s6/s6`, `monit/monit`, `supervisord/supervisor`
+- **Modules Touched:** `src/userland/`, `src/system/`
+- **Key Deliverables:**
+  - Parallel dependency service launcher with cgroup v2 resource limits.
+  - Single-binary core utilities replacement for minimal memory footprint.
+  - Process supervision daemon with restart policies and health checks.
+- **Agent Roles:**
+  - ⚡ **Bolt:** Async service socket activation with epoll/io_uring.
+  - 🎨 **Palette:** Interactive CLI service tree viewer (`sigmaservice status`).
+  - 🛡️ **Sentinel:** Restrict service unit capabilities and filesystem access.
+
+### Phase 5: Hardened Networking, VPN & Intrusion Prevention
+- **Target Repositories:** `openvpn/openvpn`, `wireguard/wireguard-linux`, `iptables/iptables`, `nftables/nftables`, `openssh/openssh-portable`, `fail2ban/fail2ban`, `suricata/suricata`, `nmap/nmap`, `snort/snort`
+- **Modules Touched:** `src/network/`, `src/security/`
+- **Key Deliverables:**
+  - Native WireGuard protocol integration in kernel network stack.
+  - eBPF XDP high-speed packet filtering and DDoS mitigation firewall.
+  - Automated threat detection and automated ban trigger system.
+- **Agent Roles:**
+  - ⚡ **Bolt:** eBPF XDP zero-copy packet drop path for 10Gbps line rates.
+  - 🎨 **Palette:** Firewall status tray widget and visual connection indicator.
+  - 🛡️ **Sentinel:** PQC SSH key generation and strict cipher suite enforcement.
+
+### Phase 6: Filesystems, Storage & Snapshot Management
+- **Target Repositories:** `xfs/xfsprogs`, `f2fs-tools/f2fs-tools`, `btrfs/btrfs-progs`, `zfs/zfs`, `bcachefs/bcachefs-tools`, `overlayfs/overlayfs-tools`, `squashfs-tools/squashfs-tools`, `timeshift/timeshift`, `borgbackup/borg`
+- **Modules Touched:** `src/fs/`, `src/storage/`, `src/backup/`
+- **Key Deliverables:**
+  - Bcachefs flash-optimized storage engine with multi-device tiering.
+  - Timeshift-compatible boot environment snapshot governor.
+  - Deduplicated content-addressable storage (CAS) delta engine.
+- **Agent Roles:**
+  - ⚡ **Bolt:** Zero-copy CAS chunk hashing with SIMD-accelerated BLAKE3.
+  - 🎨 **Palette:** Visual disk usage graphs & snapshot rollback wizard.
+  - 🛡️ **Sentinel:** Encrypted backup payloads and read-only snapshot protection.
+
+### Phase 7: Desktop Environments, Shells & Window Managers
+- **Target Repositories:** `GNOME/gnome-shell`, `KDE/plasma-desktop`, `xfce/xfce4-panel`, `swaywm/sway`, `i3/i3`, `alacritty/alacritty`, `kitty/kitty`, `fish-shell/fish-shell`, `nushell/nushell`
+- **Modules Touched:** `shell/`, `zenith_desktop/`, `web_ui/`
+- **Key Deliverables:**
+  - Wayland compositor with Hyprland master-stack tiling layouts.
+  - Zenith Desktop control center, top bar, and dock widgets.
+  - Structured data pipelines in native `sigmashell`.
+- **Agent Roles:**
+  - ⚡ **Bolt:** GPU-accelerated QML/WebGL frame rendering at 144Hz.
+  - 🎨 **Palette:** ARIA labels, focus visible navigation, theme switching animations.
+  - 🛡️ **Sentinel:** Sandboxed Wayland surface protocol access & clipboard isolation.
+
+### Phase 8: Container Runtimes & MicroVM Virtualization
+- **Target Repositories:** `docker/docker-ce`, `moby/moby`, `containerd/containerd`, `podman/podman`, `lxc/lxc`, `firecracker-microvm/firecracker`, `qemu/qemu`, `kvm/kvm`
+- **Modules Touched:** `src/virtualization/`, `src/container/`
+- **Key Deliverables:**
+  - OCI specification compliant daemonless container executor.
+  - MicroVM isolation engine booting in under 10 milliseconds.
+  - VirtIO PCI device passthrough and tap networking bridge.
+- **Agent Roles:**
+  - ⚡ **Bolt:** Fast-path container namespace creation (< 5ms startup).
+  - 🎨 **Palette:** Terminal container dashboard with resource gauges.
+  - 🛡️ **Sentinel:** SECCOMP syscall profile enforcement & rootless execution.
+
+### Phase 9: Diagnostics, Observability & Performance Tracing
+- **Target Repositories:** `htop-dev/htop`, `glances/glances`, `sysstat/sysstat`, `perf/perf`, `prometheus/prometheus`, `grafana/grafana`, `bpftrace/bpftrace`, `strace/strace`
+- **Modules Touched:** `src/diagnostics/`, `tools/`
+- **Key Deliverables:**
+  - Interactive process monitoring suite (`sigma-top`).
+  - Kernel eBPF probe generator for zero-overhead system tracing.
+  - Prometheus-compatible metrics endpoint generator.
+- **Agent Roles:**
+  - ⚡ **Bolt:** Ring-buffer log collection with minimal allocation overhead.
+  - 🎨 **Palette:** Color-coded CPU core activity maps & memory pressure indicators.
+  - 🛡️ **Sentinel:** Redact sensitive environment variables in process listings.
+
+### Phase 10: Creative Suites, Editors & Scientific Workloads
+- **Target Repositories:** `slurm/slurm`, `openmpi/ompi`, `helix-editor/helix`, `neovim/neovim`, `micro-editor/micro`, `paraview/paraview`, `openfoam/openfoam`
+- **Modules Touched:** `src/creative/`, `src/tools/`
+- **Key Deliverables:**
+  - Sovereign Artcraft creative suite (CAD, Vector, Film, 3D, Audio).
+  - Modal text editor component with Tree-Sitter syntax highlighting.
+  - HPC Slurm-compatible job allocation and MPI messaging stub.
+- **Agent Roles:**
+  - ⚡ **Bolt:** Vectorized audio DSP & multi-threaded mesh rendering.
+  - 🎨 **Palette:** Smooth modal keybinding overlay and status bar themes.
+  - 🛡️ **Sentinel:** WASI plugin execution sandboxing for third-party extensions.
+
+---
+
+## Verification & Execution Criteria
+
+1. **Automated Suite Execution:**
+   - Command: `./run_sigma_tests.sh`
+   - Mandatory Result: 100% test pass rate across all Rust crates, JS/QML tests, and shell scripts.
+2. **Pre-Commit Inspection:**
+   - Run `pre_commit_instructions` before submitting PRs.
+   - Verify code formatting (`cargo fmt -- --check`), linter output, and documentation sync.
+3. **Branch & Commit Policy:**
+   - Commit changes cleanly with short, descriptive commit titles and detailed descriptions.

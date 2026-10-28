@@ -1,40 +1,58 @@
-# SigmaOS Technical Improvement Plan & Domain Audits
+# SigmaOS System Improvement Plan
 
-> **Target Repository:** https://github.com/AaryanSinghChauhan09/SigmaOS
-> **Direct Execution Branch:** `main`
+Target Repository: `https://github.com/AaryanSinghChauhan09/SigmaOS`
+Status: ACTIVE TECHNICAL IMPROVEMENT PLAN
 
 ---
 
-## Technical Audits across 8 Architectural Domains
+## Executive Overview
+
+This System Improvement Plan details concrete technical enhancements across 8 core system domains in SigmaOS, designed to maximize system performance, improve user experience, enforce security hardening, and streamline developer workflows.
+
+---
+
+## 1. System Domains & Architectural Audit
 
 ### 1. Code Quality & Testing
-- **Status:** Excellent unit test suite with standalone test scripts in `run_sigma_tests.sh`.
-- **Target:** Expand cargo integration tests to cover real-time hardware timers and memory paging limits.
+- **Current State:** Comprehensive unit test coverage across 100+ native modules (`tests/`).
+- **Improvement Goal:** Implement continuous fuzzing with `cargo-fuzz` for IPC syscall handlers and package format deserialization.
 
 ### 2. Performance & Optimization
-- **Status:** High performance Rust routines across kernel, packaging, and wayland sub-components.
-- **Target:** Integrate Bolt ⚡ zero-copy buffer pools and SIMD bit manipulation for SAT DPLL dependency solver.
+- **Current State:** Lock-free event queues and zero-copy CAS store in place.
+- **Improvement Goal:** Expand SIMD vectorization (AVX2 / NEON) for packet parsing in `src/network/` and crypto verification in `src/security/`.
 
 ### 3. Security & Compliance
-- **Status:** Hardened Landlock, Capsicum capabilities, and PQC Dilithium5 signature verification.
-- **Target:** Integrate Sentinel 🛡️ automatic memory sanitization for temporary secret storage buffers.
+- **Current State:** Landlock sandboxing, eBPF XDP firewall, and PQC Dilithium signatures.
+- **Improvement Goal:** Mandate SECCOMP syscall filters across all userland services and container execution runtimes.
 
 ### 4. Documentation & Workflow
-- **Status:** Synchronized Wiki mirrors and exhaustive roadmap specifications in `docs/` and `wiki/`.
-- **Target:** Maintain active Markdown tracking directly on main branch without pull request friction.
+- **Current State:** Comprehensive master plans in `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md` and `docs/`.
+- **Improvement Goal:** Maintain synchronized mirrors across `docs/` and `docs/roadmap/` with zero missing references.
 
-### 5. Repo Governance
-- **Status:** Explicit `.gitignore` negate rules for tracking all core roadmap and plan files.
-- **Target:** Strict enforcement of zero ignored build artifact leaks.
+### 5. Repository Governance
+- **Current State:** Tri-Agent Framework (Bolt ⚡, Palette 🎨, Sentinel 🛡️) establishing clear boundaries and daily processes.
+- **Improvement Goal:** Enforce automated pre-commit instructions checking formatting, linting, and test execution.
 
 ### 6. Community & Collaboration
-- **Status:** Structured GitHub issues and pull request template checklists.
-- **Target:** Transparent Tri-Agent contribution workflows.
+- **Current State:** Clear GitHub issue and pull request templates in `.github/`.
+- **Improvement Goal:** Provide comprehensive API documentation and developer setup guides.
 
 ### 7. Tools & Utilities
-- **Status:** Single-binary shell utilities and test execution scripts.
-- **Target:** Fast path execution scripts in `tools/`.
+- **Current State:** Extensive suite of compatibility binaries (`sigma_pacman_compat`, `sigma_cron_compat`, `sigma_systemd_analyze_compat`).
+- **Improvement Goal:** Standardize single-binary CLI argument parsing across all `tools/` utilities.
 
-### 8. Object-Oriented & Architectural Principles
-- **Status:** Clean polyglot OOP design patterns (Factory, Strategy, Command, Observer, Memento, Facade).
-- **Target:** Strict encapsulation and interface abstraction across all submodules.
+### 8. OOP & Software Architecture
+- **Current State:** Polyglot OOP design patterns (Factory, Strategy, Command with Undo, Observer, Memento, Chain of Responsibility, Facade, Decorator, Flyweight, Template Method).
+- **Improvement Goal:** Ensure abstract interfaces and trait objects enforce clear decoupling between subsystem modules.
+
+---
+
+## Priority Action Matrix
+
+| Priority | Domain | Action Item | Target File/Module |
+| :--- | :--- | :--- | :--- |
+| **P0** | Performance | SIMD acceleration for BLAKE3 chunk hashing | `src/package/cas.rs` |
+| **P0** | Security | Landlock sandbox enforcement for maintainer scripts | `src/package/sandbox.rs` |
+| **P1** | UX/UI | Keyboard shortcut visual overlay for Zenith Desktop | `zenith_desktop/` |
+| **P1** | Testing | Fuzz targets for package format deserializer | `fuzz/fuzz_targets/` |
+| **P2** | Architecture | Unify CLI subcommand parsing across compatibility tools | `tools/` |
