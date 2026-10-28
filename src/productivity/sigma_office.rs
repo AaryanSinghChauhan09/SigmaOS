@@ -1044,6 +1044,12 @@ impl SigmaOffice {
     pub fn load_document(&mut self, _path: &str) -> Result<SigmaDocument> {
         Err("Not implemented")
     }
+
+    /// Execute V8 Enterprise Productivity Suite audit gateway
+    pub fn audit_v8_productivity_suite(&self) -> crate::productivity::sovereign_office_suite_innovations_v8::ProductivitySuiteV8AuditManifest {
+        let gateway = crate::productivity::sovereign_office_suite_innovations_v8::SovereignEnterpriseProductivitySuiteV8PrGatewayEngine::new();
+        gateway.audit_suite_v8()
+    }
 }
 
 /// Microsoft-style Collaborative Co-authoring Session & Real-time Paragraph Locks
