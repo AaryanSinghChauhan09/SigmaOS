@@ -120,7 +120,11 @@ impl DualQuaternionTransform {
         dual: [0.0, 0.0, 0.0, 0.0],
     };
 
-    pub fn from_rotation_translation(angle_rad: f32, axis: (f32, f32, f32), trans: (f32, f32, f32)) -> Self {
+    pub fn from_rotation_translation(
+        angle_rad: f32,
+        axis: (f32, f32, f32),
+        trans: (f32, f32, f32),
+    ) -> Self {
         let half_angle = angle_rad * 0.5;
         let sin_h = half_angle.sin();
         let cos_h = half_angle.cos();
@@ -151,14 +155,20 @@ impl AnicraftMultiBoneDqsSkinningPrEngine {
     }
 
     /// Blend weighted dual quaternions for a vertex skinning point
-    pub fn blend_dual_quaternions(&self, dqs: &[DualQuaternionTransform], weights: &[f32]) -> DualQuaternionTransform {
+    pub fn blend_dual_quaternions(
+        &self,
+        dqs: &[DualQuaternionTransform],
+        weights: &[f32],
+    ) -> DualQuaternionTransform {
         let mut blended_real = [0.0f32; 4];
         let mut blended_dual = [0.0f32; 4];
 
         for (dq, &w) in dqs.iter().zip(weights.iter()) {
             if w > 0.0 {
-                let dot = dq.real[0] * blended_real[0] + dq.real[1] * blended_real[1]
-                    + dq.real[2] * blended_real[2] + dq.real[3] * blended_real[3];
+                let dot = dq.real[0] * blended_real[0]
+                    + dq.real[1] * blended_real[1]
+                    + dq.real[2] * blended_real[2]
+                    + dq.real[3] * blended_real[3];
                 let sign = if dot < 0.0 { -1.0 } else { 1.0 };
 
                 for i in 0..4 {
@@ -168,8 +178,11 @@ impl AnicraftMultiBoneDqsSkinningPrEngine {
             }
         }
 
-        let norm = (blended_real[0] * blended_real[0] + blended_real[1] * blended_real[1]
-            + blended_real[2] * blended_real[2] + blended_real[3] * blended_real[3]).sqrt();
+        let norm = (blended_real[0] * blended_real[0]
+            + blended_real[1] * blended_real[1]
+            + blended_real[2] * blended_real[2]
+            + blended_real[3] * blended_real[3])
+            .sqrt();
 
         if norm > 1e-6 {
             let inv_norm = 1.0 / norm;
@@ -314,7 +327,11 @@ impl AnicraftNlaTrackCrossfadeCurvePrEngine {
     }
 
     /// Compute S-curve ease-in/ease-out blend weights for track crossfading
-    pub fn compute_crossfade_weights(&self, current_frame: u32, transition_start: u32) -> (f32, f32) {
+    pub fn compute_crossfade_weights(
+        &self,
+        current_frame: u32,
+        transition_start: u32,
+    ) -> (f32, f32) {
         if current_frame < transition_start {
             return (1.0, 0.0);
         }
@@ -408,7 +425,11 @@ impl AnicraftMultiLayerOnionSkinningDepthPrEngine {
     /// Sort layers by Z-depth for depth-ordered ghost rendering
     pub fn compute_depth_sorted_layers(&self) -> Vec<OnionSkinDepthLayerSpec> {
         let mut sorted = self.layers.clone();
-        sorted.sort_by(|a, b| a.z_depth.partial_cmp(&b.z_depth).unwrap_or(core::cmp::Ordering::Equal));
+        sorted.sort_by(|a, b| {
+            a.z_depth
+                .partial_cmp(&b.z_depth)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
         sorted
     }
 
@@ -569,7 +590,11 @@ mod tests {
     fn test_dual_quaternion_skinning() {
         let engine = AnicraftMultiBoneDqsSkinningPrEngine::new();
         let dq1 = DualQuaternionTransform::IDENTITY;
-        let dq2 = DualQuaternionTransform::from_rotation_translation(0.5, (0.0, 0.0, 1.0), (1.0, 0.0, 0.0));
+        let dq2 = DualQuaternionTransform::from_rotation_translation(
+            0.5,
+            (0.0, 0.0, 1.0),
+            (1.0, 0.0, 0.0),
+        );
         let blended = engine.blend_dual_quaternions(&[dq1, dq2], &[0.5, 0.5]);
         assert!(blended.real[0] > 0.0);
     }

@@ -58,7 +58,10 @@ impl ItsFossTerminalOptimizationEngineV75 {
     }
 
     pub fn render_prompt(&self, user: &str, host: &str, path: &str) -> String {
-        format!("\x1b[38;2;137;180;250m{}@{}\x1b[0m:\x1b[38;2;166;227;161m{}\x1b[0m [{}] $ ", user, host, path, self.active_theme)
+        format!(
+            "\x1b[38;2;137;180;250m{}@{}\x1b[0m:\x1b[38;2;166;227;161m{}\x1b[0m [{}] $ ",
+            user, host, path, self.active_theme
+        )
     }
 
     pub fn parse_cli_args(&self, args: &[&str]) -> Vec<String> {
@@ -93,7 +96,10 @@ impl NineToFiveLinuxKernelRtEngineV75 {
     }
 
     pub fn is_lts_rt_active(&self) -> bool {
-        (self.kernel_version.contains("6.14") || self.kernel_version.contains("6.13") || self.kernel_version.contains("6.12")) && self.preempt_rt_enabled
+        (self.kernel_version.contains("6.14")
+            || self.kernel_version.contains("6.13")
+            || self.kernel_version.contains("6.12"))
+            && self.preempt_rt_enabled
     }
 
     pub fn estimate_worst_case_latency_us(&self, sched_priority: u32) -> u32 {
@@ -332,7 +338,9 @@ impl ITDailyHybridCloudSlaGovernorEngineV75 {
     }
 
     pub fn verify_sla(&self) -> bool {
-        self.target_uptime_percentage >= 99.99 && self.auto_failover_enabled && self.max_rto_seconds <= 10
+        self.target_uptime_percentage >= 99.99
+            && self.auto_failover_enabled
+            && self.max_rto_seconds <= 10
     }
 
     pub fn calculate_allowed_downtime_seconds(&self) -> f32 {
@@ -340,7 +348,10 @@ impl ITDailyHybridCloudSlaGovernorEngineV75 {
         year_seconds * (1.0 - (self.target_uptime_percentage / 100.0))
     }
 
-    pub fn select_failover_cluster<'a>(&self, cluster_load: &'a [(&'a str, f32)]) -> Option<&'a str> {
+    pub fn select_failover_cluster<'a>(
+        &self,
+        cluster_load: &'a [(&'a str, f32)],
+    ) -> Option<&'a str> {
         cluster_load
             .iter()
             .min_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(core::cmp::Ordering::Equal))
@@ -385,7 +396,10 @@ impl HowToGeekCommandTranslationEngineV75 {
 
     pub fn explain_translation(&self, legacy_cmd: &str) -> String {
         let modern = self.translate(legacy_cmd);
-        format!("Legacy command '{}' is replaced by modern, high-performance tool '{}'", legacy_cmd, modern)
+        format!(
+            "Legacy command '{}' is replaced by modern, high-performance tool '{}'",
+            legacy_cmd, modern
+        )
     }
 }
 
@@ -490,7 +504,13 @@ impl LinuxFoundationSbomLicenseAuditEngineV75 {
     pub fn is_valid_spdx_id(&self, license_id: &str) -> bool {
         matches!(
             license_id,
-            "MIT" | "Apache-2.0" | "GPL-3.0-only" | "GPL-2.0-only" | "BSD-3-Clause" | "MPL-2.0" | "AGPL-3.0-only"
+            "MIT"
+                | "Apache-2.0"
+                | "GPL-3.0-only"
+                | "GPL-2.0-only"
+                | "BSD-3-Clause"
+                | "MPL-2.0"
+                | "AGPL-3.0-only"
         )
     }
 }
@@ -650,7 +670,12 @@ impl WindowsLatestWslPathInteropEngineV75 {
         if win_path.len() >= 3 && &win_path[1..3] == ":\\" {
             let drive = win_path.chars().next().unwrap().to_lowercase().to_string();
             let rest = win_path[3..].replace('\\', "/");
-            format!("{}/{}/{}", self.mount_point.trim_end_matches("/c"), drive, rest)
+            format!(
+                "{}/{}/{}",
+                self.mount_point.trim_end_matches("/c"),
+                drive,
+                rest
+            )
         } else {
             win_path.replace('\\', "/")
         }
@@ -658,7 +683,12 @@ impl WindowsLatestWslPathInteropEngineV75 {
 
     pub fn posix_to_win(&self, posix_path: &str) -> String {
         if posix_path.starts_with("/mnt/") && posix_path.len() >= 7 {
-            let drive = posix_path.chars().nth(5).unwrap().to_uppercase().to_string();
+            let drive = posix_path
+                .chars()
+                .nth(5)
+                .unwrap()
+                .to_uppercase()
+                .to_string();
             let rest = posix_path[7..].replace('/', "\\");
             format!("{}:\\{}", drive, rest)
         } else {
@@ -699,7 +729,11 @@ impl TechSpotFramePacingDirectStorageEngineV75 {
             return 0.0;
         }
         let mean: f32 = frame_times.iter().sum::<f32>() / frame_times.len() as f32;
-        let var: f32 = frame_times.iter().map(|&x| (x - mean) * (x - mean)).sum::<f32>() / frame_times.len() as f32;
+        let var: f32 = frame_times
+            .iter()
+            .map(|&x| (x - mean) * (x - mean))
+            .sum::<f32>()
+            / frame_times.len() as f32;
         var.sqrt()
     }
 }
@@ -731,7 +765,13 @@ impl TheNewStackEbpfMeshWasmEngineV75 {
         self.ebpf_jit_compiler && self.zero_overhead_tracing
     }
 
-    pub fn check_wasm_sandbox_bounds(&self, base_addr: u64, offset: u64, length: u64, max_memory: u64) -> bool {
+    pub fn check_wasm_sandbox_bounds(
+        &self,
+        base_addr: u64,
+        offset: u64,
+        length: u64,
+        max_memory: u64,
+    ) -> bool {
         base_addr + offset + length <= max_memory
     }
 }
@@ -1057,7 +1097,10 @@ impl LinuxTeckFirewallSysadminEngineV75 {
     }
 
     pub fn generate_nftables_rate_limit_rule(&self, port: u16, limit_per_min: u32) -> String {
-        format!("tcp dport {} meter ip_limit {{ ip saddr limit rate {}/minute }} accept", port, limit_per_min)
+        format!(
+            "tcp dport {} meter ip_limit {{ ip saddr limit rate {}/minute }} accept",
+            port, limit_per_min
+        )
     }
 }
 
@@ -1092,7 +1135,10 @@ impl AppualsAutomatedPackageResolverEngineV75 {
                 self.orphan_packages_removed += 1;
                 format!("Error 127 resolved: Missing shared object dependency fixed via dynamic link matrix.")
             }
-            code => format!("Error code {} resolved: Automated heuristic repair applied successfully.", code),
+            code => format!(
+                "Error code {} resolved: Automated heuristic repair applied successfully.",
+                code
+            ),
         }
     }
 }
@@ -1145,7 +1191,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("ItsFOSS"),
             title: String::from("Zero-Dependency Terminal Tooling & AppCenter Parity V75"),
             category: String::from("Desktop & CLI Optimization"),
-            action_recommendation: String::from("Deploy zero-dependency Rust CLI prompts & PWYW monetized store"),
+            action_recommendation: String::from(
+                "Deploy zero-dependency Rust CLI prompts & PWYW monetized store",
+            ),
             impact_score: 97,
             article_url: String::from("https://itsfoss.com/zero-dependency-cli-pwyw-monetization/"),
             publication_domain: String::from("itsfoss.com"),
@@ -1167,7 +1215,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("Geeky-Gadgets"),
             title: String::from("SBC Telemetry & RISC-V Hardware Acceleration V75"),
             category: String::from("Hardware & Embedded"),
-            action_recommendation: String::from("Integrate RISC-V 64-bit board support & thermal throttling GPIO telemetry"),
+            action_recommendation: String::from(
+                "Integrate RISC-V 64-bit board support & thermal throttling GPIO telemetry",
+            ),
             impact_score: 94,
             article_url: String::from("https://geeky-gadgets.com/riscv64-sbc-gpio-telemetry/"),
             publication_domain: String::from("geeky-gadgets.com"),
@@ -1178,9 +1228,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("Linux.com"),
             title: String::from("Enterprise Security with Pledge/Unveil & WireGuard Mesh V75"),
             category: String::from("Security & Networking"),
-            action_recommendation: String::from("Deploy strict Pledge/Unveil process sandboxing and automated WireGuard VPN mesh"),
+            action_recommendation: String::from(
+                "Deploy strict Pledge/Unveil process sandboxing and automated WireGuard VPN mesh",
+            ),
             impact_score: 100,
-            article_url: String::from("https://linux.com/pledge-unveil-wireguard-enterprise-hardening/"),
+            article_url: String::from(
+                "https://linux.com/pledge-unveil-wireguard-enterprise-hardening/",
+            ),
             publication_domain: String::from("linux.com"),
             pr_branch_name: String::from("pr/linuxcom-pledge-unveil-wireguard-v75"),
         });
@@ -1200,9 +1254,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("HWBusters"),
             title: String::from("ATX 3.1 PCIe 5.1 Power Excursion & Ripple Filtering V75"),
             category: String::from("Power & Hardware"),
-            action_recommendation: String::from("Enforce sub-20mV ripple guardrails and ATX 3.1 transient power spike protection"),
+            action_recommendation: String::from(
+                "Enforce sub-20mV ripple guardrails and ATX 3.1 transient power spike protection",
+            ),
             impact_score: 96,
-            article_url: String::from("https://hwbusters.com/atx31-pcie51-transient-ripple-testing/"),
+            article_url: String::from(
+                "https://hwbusters.com/atx31-pcie51-transient-ripple-testing/",
+            ),
             publication_domain: String::from("hwbusters.com"),
             pr_branch_name: String::from("pr/hwbusters-atx31-power-ripple-guard-v75"),
         });
@@ -1222,9 +1280,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("HowToGeek"),
             title: String::from("Modern CLI Command Replacements Translation Matrix V75"),
             category: String::from("CLI & Tooling"),
-            action_recommendation: String::from("Map legacy netstat/ifconfig/grep commands to ss/ip/rg modern Rust tools"),
+            action_recommendation: String::from(
+                "Map legacy netstat/ifconfig/grep commands to ss/ip/rg modern Rust tools",
+            ),
             impact_score: 93,
-            article_url: String::from("https://howtogeek.com/modern-linux-cli-command-replacements/"),
+            article_url: String::from(
+                "https://howtogeek.com/modern-linux-cli-command-replacements/",
+            ),
             publication_domain: String::from("howtogeek.com"),
             pr_branch_name: String::from("pr/howtogeek-modern-cli-translation-v75"),
         });
@@ -1233,7 +1295,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("Linux.org"),
             title: String::from("Linux Kernel Sysctl Tuning & BBRv3 Congestion Control V75"),
             category: String::from("Kernel & Network Performance"),
-            action_recommendation: String::from("Apply low-latency swappiness and BBRv3 TCP congestion control profiles"),
+            action_recommendation: String::from(
+                "Apply low-latency swappiness and BBRv3 TCP congestion control profiles",
+            ),
             impact_score: 97,
             article_url: String::from("https://linux.org/sysctl-bbrv3-kernel-optimization/"),
             publication_domain: String::from("linux.org"),
@@ -1244,9 +1308,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("InfoWorld"),
             title: String::from("Zero-Trust Microservices & SPIFFE mTLS Verification V75"),
             category: String::from("Enterprise Security"),
-            action_recommendation: String::from("Enforce strict mTLS mutual authentication and SPIFFE identity tokens"),
+            action_recommendation: String::from(
+                "Enforce strict mTLS mutual authentication and SPIFFE identity tokens",
+            ),
             impact_score: 98,
-            article_url: String::from("https://infoworld.com/zero-trust-microservices-spiffe-mtls/"),
+            article_url: String::from(
+                "https://infoworld.com/zero-trust-microservices-spiffe-mtls/",
+            ),
             publication_domain: String::from("infoworld.com"),
             pr_branch_name: String::from("pr/infoworld-zero-trust-spiffe-mtls-v75"),
         });
@@ -1255,7 +1323,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("LinuxFoundation"),
             title: String::from("SPDX License Compliance & CycloneDX SBOM Auditing V75"),
             category: String::from("Open Source Compliance"),
-            action_recommendation: String::from("Automate CycloneDX-1.6 SBOM generation and SPDX license validation"),
+            action_recommendation: String::from(
+                "Automate CycloneDX-1.6 SBOM generation and SPDX license validation",
+            ),
             impact_score: 99,
             article_url: String::from("https://linuxfoundation.org/spdx-cyclonedx-sbom-audit/"),
             publication_domain: String::from("linuxfoundation.org"),
@@ -1266,9 +1336,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("MakeUseOf"),
             title: String::from("Low-RAM Desktop Environment Memory Profiling V75"),
             category: String::from("Desktop Performance"),
-            action_recommendation: String::from("Provide ultra-light desktop profile using under 110MB idle RAM"),
+            action_recommendation: String::from(
+                "Provide ultra-light desktop profile using under 110MB idle RAM",
+            ),
             impact_score: 92,
-            article_url: String::from("https://makeuseof.com/low-ram-linux-desktop-environment-profiling/"),
+            article_url: String::from(
+                "https://makeuseof.com/low-ram-linux-desktop-environment-profiling/",
+            ),
             publication_domain: String::from("makeuseof.com"),
             pr_branch_name: String::from("pr/makeuseof-low-ram-de-profiler-v75"),
         });
@@ -1277,7 +1351,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("PCWorld"),
             title: String::from("Laptop Battery Charge Limit Governor V75"),
             category: String::from("Power Management"),
-            action_recommendation: String::from("Implement 80% charge threshold limiting to extend battery lifespan 3.0x"),
+            action_recommendation: String::from(
+                "Implement 80% charge threshold limiting to extend battery lifespan 3.0x",
+            ),
             impact_score: 94,
             article_url: String::from("https://pcworld.com/laptop-battery-health-charge-governor/"),
             publication_domain: String::from("pcworld.com"),
@@ -1288,9 +1364,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("MarkTechPost"),
             title: String::from("SLM Quantized Vector Inference & Memory Estimation V75"),
             category: String::from("AI & Machine Learning"),
-            action_recommendation: String::from("Deploy INT4 Q4_K_M SLM quantization and KV-cache memory estimation"),
+            action_recommendation: String::from(
+                "Deploy INT4 Q4_K_M SLM quantization and KV-cache memory estimation",
+            ),
             impact_score: 96,
-            article_url: String::from("https://marktechpost.com/slm-quantized-vector-inference-q4km/"),
+            article_url: String::from(
+                "https://marktechpost.com/slm-quantized-vector-inference-q4km/",
+            ),
             publication_domain: String::from("marktechpost.com"),
             pr_branch_name: String::from("pr/marktechpost-slm-quantized-vector-v75"),
         });
@@ -1299,9 +1379,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("WindowsLatest"),
             title: String::from("WSL2 / WSLg Interoperability Path Transpiler V75"),
             category: String::from("Cross-Platform Interop"),
-            action_recommendation: String::from("Transpile bi-directional POSIX and Windows drive path mappings seamlessly"),
+            action_recommendation: String::from(
+                "Transpile bi-directional POSIX and Windows drive path mappings seamlessly",
+            ),
             impact_score: 93,
-            article_url: String::from("https://windowslatest.com/wsl2-wslg-path-interop-transpiler/"),
+            article_url: String::from(
+                "https://windowslatest.com/wsl2-wslg-path-interop-transpiler/",
+            ),
             publication_domain: String::from("windowslatest.com"),
             pr_branch_name: String::from("pr/windowslatest-wsl-path-interop-v75"),
         });
@@ -1310,7 +1394,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("TechSpot"),
             title: String::from("DirectStorage Zero-Copy & GPU Frame Pacing V75"),
             category: String::from("Graphics & Game Performance"),
-            action_recommendation: String::from("Bypass CPU overhead using direct GPU NVMe transfers and low frame variance"),
+            action_recommendation: String::from(
+                "Bypass CPU overhead using direct GPU NVMe transfers and low frame variance",
+            ),
             impact_score: 97,
             article_url: String::from("https://techspot.com/directstorage-zero-copy-frame-pacing/"),
             publication_domain: String::from("techspot.com"),
@@ -1321,7 +1407,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("TheNewStack"),
             title: String::from("eBPF Service Mesh & WASI-v2 Edge Runtime V75"),
             category: String::from("Cloud Native"),
-            action_recommendation: String::from("Implement kernel JIT eBPF tracing and WASI-v2 memory bounds verification"),
+            action_recommendation: String::from(
+                "Implement kernel JIT eBPF tracing and WASI-v2 memory bounds verification",
+            ),
             impact_score: 98,
             article_url: String::from("https://thenewstack.io/ebpf-service-mesh-wasi-v2-edge/"),
             publication_domain: String::from("thenewstack.io"),
@@ -1332,9 +1420,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("TechPowerUp / WindowsCentral"),
             title: String::from("GPU Junction Thermal Protection & Cross-Device Bridge V75"),
             category: String::from("Hardware & Device Link"),
-            action_recommendation: String::from("Monitor GPU junction thermals and enable cross-device low-latency sync"),
+            action_recommendation: String::from(
+                "Monitor GPU junction thermals and enable cross-device low-latency sync",
+            ),
             impact_score: 95,
-            article_url: String::from("https://techpowerup.techpwindowscentral.com/gpu-thermal-device-bridge/"),
+            article_url: String::from(
+                "https://techpowerup.techpwindowscentral.com/gpu-thermal-device-bridge/",
+            ),
             publication_domain: String::from("techpowerup.techpwindowscentral.com"),
             pr_branch_name: String::from("pr/techpowerup-windowscentral-device-bridge-v75"),
         });
@@ -1343,9 +1435,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("Phoronix"),
             title: String::from("Automated Benchmark Suite & Geometric Mean Metrics V75"),
             category: String::from("Benchmarking"),
-            action_recommendation: String::from("Automate 150+ Phoronix performance tests with geometric mean aggregation"),
+            action_recommendation: String::from(
+                "Automate 150+ Phoronix performance tests with geometric mean aggregation",
+            ),
             impact_score: 99,
-            article_url: String::from("https://phoronix.com/automated-benchmark-suite-geometric-mean/"),
+            article_url: String::from(
+                "https://phoronix.com/automated-benchmark-suite-geometric-mean/",
+            ),
             publication_domain: String::from("phoronix.com"),
             pr_branch_name: String::from("pr/phoronix-automated-benchmark-suite-v75"),
         });
@@ -1354,9 +1450,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("TechCrunch"),
             title: String::from("Open Source Project Health & Bus Factor Metrics V75"),
             category: String::from("Governance"),
-            action_recommendation: String::from("Track project maintainer velocity and bus factor risk levels"),
+            action_recommendation: String::from(
+                "Track project maintainer velocity and bus factor risk levels",
+            ),
             impact_score: 92,
-            article_url: String::from("https://techcrunch.com/open-source-health-bus-factor-governance/"),
+            article_url: String::from(
+                "https://techcrunch.com/open-source-health-bus-factor-governance/",
+            ),
             publication_domain: String::from("techcrunch.com"),
             pr_branch_name: String::from("pr/techcrunch-opensource-health-metrics-v75"),
         });
@@ -1365,9 +1465,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("XDA-Developers"),
             title: String::from("Android Wireless Mirroring & Dynamic Bitrate Scaling V75"),
             category: String::from("Mobile & Desktop Integration"),
-            action_recommendation: String::from("Enable 120 FPS Scrcpy wireless mirroring with adaptive Wi-Fi bitrate scaling"),
+            action_recommendation: String::from(
+                "Enable 120 FPS Scrcpy wireless mirroring with adaptive Wi-Fi bitrate scaling",
+            ),
             impact_score: 96,
-            article_url: String::from("https://xda-developers.com/android-scrcpy-wireless-bitrate-scaling/"),
+            article_url: String::from(
+                "https://xda-developers.com/android-scrcpy-wireless-bitrate-scaling/",
+            ),
             publication_domain: String::from("xda-developers.com"),
             pr_branch_name: String::from("pr/xda-android-scrcpy-mirroring-v75"),
         });
@@ -1376,9 +1480,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("ZDNet"),
             title: String::from("Enterprise Security Auditing & Fail2ban Escalation V75"),
             category: String::from("Security"),
-            action_recommendation: String::from("Enforce progressive fail2ban IP ban escalation and auditd event monitoring"),
+            action_recommendation: String::from(
+                "Enforce progressive fail2ban IP ban escalation and auditd event monitoring",
+            ),
             impact_score: 97,
-            article_url: String::from("https://zdnet.com/enterprise-security-auditing-fail2ban-escalation/"),
+            article_url: String::from(
+                "https://zdnet.com/enterprise-security-auditing-fail2ban-escalation/",
+            ),
             publication_domain: String::from("zdnet.com"),
             pr_branch_name: String::from("pr/zdnet-enterprise-hardening-auditor-v75"),
         });
@@ -1387,9 +1495,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("OpenSourceForU"),
             title: String::from("Modular Kernel Drivers & Dual-Guard MAC System V75"),
             category: String::from("Kernel & MAC Security"),
-            action_recommendation: String::from("Combine SELinux AVC parsing and AppArmor profile enforcement"),
+            action_recommendation: String::from(
+                "Combine SELinux AVC parsing and AppArmor profile enforcement",
+            ),
             impact_score: 94,
-            article_url: String::from("https://opensourceforu.com/modular-kernel-dualguard-mac-security/"),
+            article_url: String::from(
+                "https://opensourceforu.com/modular-kernel-dualguard-mac-security/",
+            ),
             publication_domain: String::from("opensourceforu.com"),
             pr_branch_name: String::from("pr/opensourceforu-modular-mac-kernel-v75"),
         });
@@ -1398,9 +1510,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("PCMag"),
             title: String::from("Endpoint Heuristic Binary Entropy & Anti-Malware V75"),
             category: String::from("Antivirus Security"),
-            action_recommendation: String::from("Calculate Shannon binary entropy for 99.9% zero-day threat detection"),
+            action_recommendation: String::from(
+                "Calculate Shannon binary entropy for 99.9% zero-day threat detection",
+            ),
             impact_score: 98,
-            article_url: String::from("https://pcmag.com/endpoint-heuristic-binary-entropy-security/"),
+            article_url: String::from(
+                "https://pcmag.com/endpoint-heuristic-binary-entropy-security/",
+            ),
             publication_domain: String::from("pcmag.com"),
             pr_branch_name: String::from("pr/pcmag-endpoint-heuristic-security-v75"),
         });
@@ -1409,9 +1525,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("LinuxTeck"),
             title: String::from("nftables Rate-Limiting & Sysadmin Firewall Rules V75"),
             category: String::from("Sysadmin & Firewall"),
-            action_recommendation: String::from("Generate dynamic nftables connection meters and default DROP rules"),
+            action_recommendation: String::from(
+                "Generate dynamic nftables connection meters and default DROP rules",
+            ),
             impact_score: 95,
-            article_url: String::from("https://linuxteck.com/nftables-rate-limiting-sysadmin-rules/"),
+            article_url: String::from(
+                "https://linuxteck.com/nftables-rate-limiting-sysadmin-rules/",
+            ),
             publication_domain: String::from("linuxteck.com"),
             pr_branch_name: String::from("pr/linuxteck-nftables-sysadmin-firewall-v75"),
         });
@@ -1420,7 +1540,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("Appuals"),
             title: String::from("Automated Package Resolver & Dynamic Fix Gateway V75"),
             category: String::from("Package Management"),
-            action_recommendation: String::from("Automatically resolve broken dependency mirrors and missing dynamic libraries"),
+            action_recommendation: String::from(
+                "Automatically resolve broken dependency mirrors and missing dynamic libraries",
+            ),
             impact_score: 93,
             article_url: String::from("https://appuals.com/automated-package-dependency-resolver/"),
             publication_domain: String::from("appuals.com"),
@@ -1431,7 +1553,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             publication: String::from("DistroWatch"),
             title: String::from("DistroWatch Top Rank #1 Metric Verification V75"),
             category: String::from("Distro Ranking"),
-            action_recommendation: String::from("Maintain SigmaOS #1 position with 18,000+ daily page hit tracking"),
+            action_recommendation: String::from(
+                "Maintain SigmaOS #1 position with 18,000+ daily page hit tracking",
+            ),
             impact_score: 100,
             article_url: String::from("https://distrowatch.com/table.php?distribution=sigmaos"),
             publication_domain: String::from("distrowatch.com"),
@@ -1453,7 +1577,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
             .iter()
             .filter(|i| {
                 let domain = i.publication_domain.to_lowercase();
-                domain == clean_query || domain.contains(&clean_query) || clean_query.contains(&domain)
+                domain == clean_query
+                    || domain.contains(&clean_query)
+                    || clean_query.contains(&domain)
             })
             .cloned()
             .collect()
@@ -1480,7 +1606,9 @@ impl SovereignTechMediaArticleInsightSynthesisEngineV75 {
     }
 
     pub fn generate_master_pr_manifest(&self) -> String {
-        let mut manifest = String::from("## Sovereign SigmaOS Tech Media Component Advancements (V75 PR Suite)\n\n");
+        let mut manifest = String::from(
+            "## Sovereign SigmaOS Tech Media Component Advancements (V75 PR Suite)\n\n",
+        );
         for insight in &self.insights {
             manifest.push_str(&self.format_as_pr_proposal(insight));
             manifest.push_str("\n---\n\n");
@@ -1614,11 +1742,14 @@ mod tests {
         assert_eq!(itsfoss_results.len(), 1);
         assert_eq!(itsfoss_results[0].publication, "ItsFOSS");
 
-        let flexible_query = synthesis.query_insights_by_domain("techpowerup.techpwindowscentral.com");
+        let flexible_query =
+            synthesis.query_insights_by_domain("techpowerup.techpwindowscentral.com");
         assert_eq!(flexible_query.len(), 1);
 
         let manifest = synthesis.generate_master_pr_manifest();
-        assert!(manifest.contains("Sovereign SigmaOS Tech Media Component Advancements (V75 PR Suite)"));
+        assert!(
+            manifest.contains("Sovereign SigmaOS Tech Media Component Advancements (V75 PR Suite)")
+        );
         assert!(manifest.contains("itsfoss.com"));
     }
 
@@ -1626,8 +1757,13 @@ mod tests {
     fn test_v75_individual_component_engines() {
         let itsfoss = ItsFossTerminalOptimizationEngineV75::new();
         assert!(itsfoss.verify_tooling());
-        assert!(itsfoss.render_prompt("alice", "sigma", "/home").contains("alice@sigma"));
-        assert_eq!(itsfoss.parse_cli_args(&["--verbose", "input.txt"]), vec!["verbose"]);
+        assert!(itsfoss
+            .render_prompt("alice", "sigma", "/home")
+            .contains("alice@sigma"));
+        assert_eq!(
+            itsfoss.parse_cli_args(&["--verbose", "input.txt"]),
+            vec!["verbose"]
+        );
 
         let ninetofive = NineToFiveLinuxKernelRtEngineV75::new();
         assert!(ninetofive.is_lts_rt_active());
@@ -1676,7 +1812,10 @@ mod tests {
 
         let muo = MakeUseOfLowRamDeProfileEngineV75::new();
         assert_eq!(muo.recommend_de(512), "Zenith-Minimal-Tiling");
-        assert_eq!(muo.estimate_de_memory_footprint_mb("Zenith-Minimal-Tiling"), 110);
+        assert_eq!(
+            muo.estimate_de_memory_footprint_mb("Zenith-Minimal-Tiling"),
+            110
+        );
 
         let pcw = PCWorldBatteryHealthGovernorEngineV75::new();
         assert!(pcw.should_charge(75));
@@ -1733,7 +1872,9 @@ mod tests {
 
         let lteck = LinuxTeckFirewallSysadminEngineV75::new();
         assert!(lteck.is_sysadmin_hardened());
-        assert!(lteck.generate_nftables_rate_limit_rule(22, 10).contains("22"));
+        assert!(lteck
+            .generate_nftables_rate_limit_rule(22, 10)
+            .contains("22"));
 
         let mut appuals = AppualsAutomatedPackageResolverEngineV75::new();
         assert!(appuals.auto_repair(404).contains("404"));

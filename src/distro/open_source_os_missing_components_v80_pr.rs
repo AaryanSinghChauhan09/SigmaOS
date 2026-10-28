@@ -102,15 +102,20 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-00-MATRIX".to_string(),
-            title: "feat(matrix): SigmaOS vs Open Source Operating Systems Complete Parity Matrix V80".to_string(),
+            title:
+                "feat(matrix): SigmaOS vs Open Source Operating Systems Complete Parity Matrix V80"
+                    .to_string(),
             component_name: "sigmaos-v80-comparison-matrix-engine".to_string(),
             os_origin: "Global Open Source OS Ecosystem V80".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
                 UniversalSubsystemCategory::SystemAudit.as_str().to_string(),
-                UniversalSubsystemCategory::ObservabilityDiagnostics.as_str().to_string(),
+                UniversalSubsystemCategory::ObservabilityDiagnostics
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/distro/v80_matrix.rs b/sys/distro/v80_matrix.rs".to_string(),
+            patch_diff: "diff --git a/sys/distro/v80_matrix.rs b/sys/distro/v80_matrix.rs"
+                .to_string(),
         }
     }
 }
@@ -160,16 +165,24 @@ impl Linux634SchedExtAiPredictivePowerGovernorEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-01-LINUX-634".to_string(),
-            title: "feat(kernel): Linux 6.34+ AI-Predictive SchedExt & EEVDF Power Governor".to_string(),
+            title: "feat(kernel): Linux 6.34+ AI-Predictive SchedExt & EEVDF Power Governor"
+                .to_string(),
             component_name: "sigmaos-linux634-schedext-governor-v80".to_string(),
             os_origin: "Linux Kernel 6.34+".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::KernelScheduling.as_str().to_string(),
-                UniversalSubsystemCategory::HardwarePower.as_str().to_string(),
-                UniversalSubsystemCategory::MemoryVirtualization.as_str().to_string(),
+                UniversalSubsystemCategory::KernelScheduling
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::HardwarePower
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::MemoryVirtualization
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/kernel/sched_ext_v80.rs b/sys/kernel/sched_ext_v80.rs".to_string(),
+            patch_diff: "diff --git a/sys/kernel/sched_ext_v80.rs b/sys/kernel/sched_ext_v80.rs"
+                .to_string(),
         }
     }
 }
@@ -256,16 +269,25 @@ impl OpenBsd93FineIbtPinsyscallPteGuardEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-03-OPENBSD-93".to_string(),
-            title: "feat(openbsd): OpenBSD 9.3+ FineIBT Pinsyscall & Shadow Stack PTE Guard".to_string(),
+            title: "feat(openbsd): OpenBSD 9.3+ FineIBT Pinsyscall & Shadow Stack PTE Guard"
+                .to_string(),
             component_name: "sigmaos-openbsd93-fineibt-pte-v80".to_string(),
             os_origin: "OpenBSD 9.3+".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::SecuritySandboxing.as_str().to_string(),
-                UniversalSubsystemCategory::KernelScheduling.as_str().to_string(),
-                UniversalSubsystemCategory::MemoryVirtualization.as_str().to_string(),
+                UniversalSubsystemCategory::SecuritySandboxing
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::KernelScheduling
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::MemoryVirtualization
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/openbsd/fineibt_pte_v80.rs b/sys/openbsd/fineibt_pte_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/openbsd/fineibt_pte_v80.rs b/sys/openbsd/fineibt_pte_v80.rs"
+                    .to_string(),
         }
     }
 }
@@ -313,16 +335,25 @@ impl DragonFly82Hammer3DirectIoErasureEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-04-DRAGONFLY-82".to_string(),
-            title: "feat(dfbsd): DragonFly BSD 8.2+ HAMMER3 Direct-IO & Erasure Coding Engine".to_string(),
+            title: "feat(dfbsd): DragonFly BSD 8.2+ HAMMER3 Direct-IO & Erasure Coding Engine"
+                .to_string(),
             component_name: "sigmaos-dragonfly82-hammer3-erasure-v80".to_string(),
             os_origin: "DragonFly BSD 8.2+".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
-                UniversalSubsystemCategory::StorageDrive.as_str().to_string(),
-                UniversalSubsystemCategory::RecoveryBackup.as_str().to_string(),
+                UniversalSubsystemCategory::FilesystemStorage
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::StorageDrive
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::RecoveryBackup
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/dfbsd/hammer3_erasure_v80.rs b/sys/dfbsd/hammer3_erasure_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/dfbsd/hammer3_erasure_v80.rs b/sys/dfbsd/hammer3_erasure_v80.rs"
+                    .to_string(),
         }
     }
 }
@@ -360,16 +391,23 @@ impl NetBsd129RumpUserlandAudioPciRouterEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-05-NETBSD-129".to_string(),
-            title: "feat(netbsd): NetBSD 12.9 Rump Kernel Userland Audio PCI Router Engine".to_string(),
+            title: "feat(netbsd): NetBSD 12.9 Rump Kernel Userland Audio PCI Router Engine"
+                .to_string(),
             component_name: "sigmaos-netbsd129-rump-audio-v80".to_string(),
             os_origin: "NetBSD 12.9".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
                 UniversalSubsystemCategory::AudioSound.as_str().to_string(),
-                UniversalSubsystemCategory::DriversHardware.as_str().to_string(),
-                UniversalSubsystemCategory::VirtualizationHypervisor.as_str().to_string(),
+                UniversalSubsystemCategory::DriversHardware
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::VirtualizationHypervisor
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/netbsd/rump_audio_pci_v80.rs b/sys/netbsd/rump_audio_pci_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/netbsd/rump_audio_pci_v80.rs b/sys/netbsd/rump_audio_pci_v80.rs"
+                    .to_string(),
         }
     }
 }
@@ -455,16 +493,23 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-07-PLAN9".to_string(),
-            title: "feat(plan9): Plan 9 Synthetic 9P2000 VFS & Rfork Namespace Multiplexer".to_string(),
+            title: "feat(plan9): Plan 9 Synthetic 9P2000 VFS & Rfork Namespace Multiplexer"
+                .to_string(),
             component_name: "sigmaos-plan9-9p2000-rfork-v80".to_string(),
             os_origin: "Plan 9".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
-                UniversalSubsystemCategory::ProcessActivity.as_str().to_string(),
+                UniversalSubsystemCategory::FilesystemStorage
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::ProcessActivity
+                    .as_str()
+                    .to_string(),
                 UniversalSubsystemCategory::IpcMemory.as_str().to_string(),
             ],
-            patch_diff: "diff --git a/sys/plan9/vfs_9p2000_rfork_v80.rs b/sys/plan9/vfs_9p2000_rfork_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/plan9/vfs_9p2000_rfork_v80.rs b/sys/plan9/vfs_9p2000_rfork_v80.rs"
+                    .to_string(),
         }
     }
 }
@@ -500,16 +545,25 @@ impl NixGuixHermeticCasMerkleClosureEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-08-NIX-GUIX".to_string(),
-            title: "feat(nixguix): NixOS / Guix Hermetic CAS Store & Merkle Closure Tree Engine".to_string(),
+            title: "feat(nixguix): NixOS / Guix Hermetic CAS Store & Merkle Closure Tree Engine"
+                .to_string(),
             component_name: "sigmaos-nixguix-cas-merkle-v80".to_string(),
             os_origin: "NixOS / GNU Guix".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::PackageManagement.as_str().to_string(),
-                UniversalSubsystemCategory::AutomationProvisioning.as_str().to_string(),
-                UniversalSubsystemCategory::CompilerToolchain.as_str().to_string(),
+                UniversalSubsystemCategory::PackageManagement
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::AutomationProvisioning
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::CompilerToolchain
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/nixguix/cas_merkle_v80.rs b/sys/nixguix/cas_merkle_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/nixguix/cas_merkle_v80.rs b/sys/nixguix/cas_merkle_v80.rs"
+                    .to_string(),
         }
     }
 }
@@ -594,15 +648,22 @@ impl OmarchyWallustThemeChordNavigatorEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-10-OMARCHY".to_string(),
-            title: "feat(omarchy): Omarchy Wallust Theme Engine & Hyprland Chord Navigator".to_string(),
+            title: "feat(omarchy): Omarchy Wallust Theme Engine & Hyprland Chord Navigator"
+                .to_string(),
             component_name: "sigmaos-omarchy-wallust-chord-v80".to_string(),
             os_origin: "Omarchy Linux".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::DesktopCompositor.as_str().to_string(),
-                UniversalSubsystemCategory::ShellTerminal.as_str().to_string(),
+                UniversalSubsystemCategory::DesktopCompositor
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::ShellTerminal
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/omarchy/wallust_chord_v80.rs b/sys/omarchy/wallust_chord_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/omarchy/wallust_chord_v80.rs b/sys/omarchy/wallust_chord_v80.rs"
+                    .to_string(),
         }
     }
 }
@@ -643,15 +704,22 @@ impl GlobalTechMedia36PortalUnimplementedIdeasEngineV80 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV80 {
         OpenSourceOsPrProposalV80 {
             pr_id: "PR-SIGMA-V80-11-MEDIA".to_string(),
-            title: "feat(media): Global Tech Media 36 Portals Unimplemented Ideas Synthesizer V80".to_string(),
+            title: "feat(media): Global Tech Media 36 Portals Unimplemented Ideas Synthesizer V80"
+                .to_string(),
             component_name: "sigmaos-global-tech-media-v80".to_string(),
             os_origin: "36 Global Tech Media Portals".to_string(),
             status: OsPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::AiWorkflowAgent.as_str().to_string(),
-                UniversalSubsystemCategory::ObservabilityDiagnostics.as_str().to_string(),
+                UniversalSubsystemCategory::AiWorkflowAgent
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::ObservabilityDiagnostics
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/media/tech_media_36_v80.rs b/sys/media/tech_media_36_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/media/tech_media_36_v80.rs b/sys/media/tech_media_36_v80.rs"
+                    .to_string(),
         }
     }
 }

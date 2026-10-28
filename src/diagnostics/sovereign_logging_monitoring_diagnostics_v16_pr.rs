@@ -180,7 +180,13 @@ impl SyslogNgSinkEngineV16 {
         flushed
     }
 
-    pub fn substitute_macros(&self, template: &str, host: &str, prog: &str, iso_date: &str) -> String {
+    pub fn substitute_macros(
+        &self,
+        template: &str,
+        host: &str,
+        prog: &str,
+        iso_date: &str,
+    ) -> String {
         template
             .replace("$HOST", host)
             .replace("$PROGRAM", prog)
@@ -222,13 +228,18 @@ pub struct SovereignJournaldSyslogSuiteV16 {
 impl SovereignJournaldSyslogSuiteV16 {
     pub fn default_suite() -> Self {
         Self {
-            gateway_endpoints: vec![
-                JournaldGatewayRestApiEndpointV16::new("/entries", JournalGatewayFormatV16::ServerSentEvents, 500)
-                    .with_filter("_SYSTEMD_UNIT", "sshd.service"),
-            ],
-            relp_frames: vec![
-                RsyslogRelpFrameV16::new_syslog(1001, "<13>1 2025-02-23T10:00:00Z web01 nginx - - - Restarting worker", true, true),
-            ],
+            gateway_endpoints: vec![JournaldGatewayRestApiEndpointV16::new(
+                "/entries",
+                JournalGatewayFormatV16::ServerSentEvents,
+                500,
+            )
+            .with_filter("_SYSTEMD_UNIT", "sshd.service")],
+            relp_frames: vec![RsyslogRelpFrameV16::new_syslog(
+                1001,
+                "<13>1 2025-02-23T10:00:00Z web01 nginx - - - Restarting worker",
+                true,
+                true,
+            )],
             syslog_ng_sinks: vec![
                 SyslogNgSinkEngineV16::new("clickhouse", "http://ch.internal:8123/logs", 100),
                 SyslogNgSinkEngineV16::new("otlp", "grpc://otel.internal:4317", 50),
@@ -247,17 +258,15 @@ impl SovereignJournaldSyslogSuiteV16 {
                     is_pipe: false,
                 },
             ],
-            logrotate_states: vec![
-                LogrotateStateEntryV16 {
-                    log_path: "/var/log/nginx/access.log".to_string(),
-                    last_rotated_iso: "2025-02-23T00:00:00Z".to_string(),
-                    rotation_count: 7,
-                    max_size_bytes: 104857600,
-                    compress: true,
-                    copytruncate: true,
-                    missingok: true,
-                },
-            ],
+            logrotate_states: vec![LogrotateStateEntryV16 {
+                log_path: "/var/log/nginx/access.log".to_string(),
+                last_rotated_iso: "2025-02-23T00:00:00Z".to_string(),
+                rotation_count: 7,
+                max_size_bytes: 104857600,
+                compress: true,
+                copytruncate: true,
+                missingok: true,
+            }],
         }
     }
 }
@@ -291,10 +300,16 @@ impl DmesgLogEntryV16 {
         let color = match self.level.as_str() {
             "emerg" | "alert" | "crit" | "err" => "\x1b[31m", // Red
             "warning" => "\x1b[33m",                          // Yellow
-            "notice" | "info" => "\x1b[32m",                   // Green
-            _ => "\x1b[37m",                                   // White
+            "notice" | "info" => "\x1b[32m",                  // Green
+            _ => "\x1b[37m",                                  // White
         };
-        format!("[{}] {}[{}]\x1b[0m {}", self.iso8601_time, color, self.level.to_uppercase(), self.message)
+        format!(
+            "[{}] {}[{}]\x1b[0m {}",
+            self.iso8601_time,
+            color,
+            self.level.to_uppercase(),
+            self.message
+        )
     }
 }
 
@@ -356,11 +371,31 @@ impl SovereignDmesgKdumpSuiteV16 {
     pub fn default_suite() -> Self {
         Self {
             dmesg_entries: vec![
-                DmesgLogEntryV16::new("kern", "info", 0.0, "2025-02-23T00:00:00Z", "Linux version 6.12.0-sigmaos (gcc 14.2) #1 SMP PREEMPT_DYNAMIC"),
-                DmesgLogEntryV16::new("kern", "warning", 1.25, "2025-02-23T00:00:01Z", "e1000e 0000:00:1f.6: Interrupt Throttling Rate set to 3"),
-                DmesgLogEntryV16::new("kern", "err", 5.80, "2025-02-23T00:00:05Z", "ext4_lookup: deleted inode referenced: 1048580"),
+                DmesgLogEntryV16::new(
+                    "kern",
+                    "info",
+                    0.0,
+                    "2025-02-23T00:00:00Z",
+                    "Linux version 6.12.0-sigmaos (gcc 14.2) #1 SMP PREEMPT_DYNAMIC",
+                ),
+                DmesgLogEntryV16::new(
+                    "kern",
+                    "warning",
+                    1.25,
+                    "2025-02-23T00:00:01Z",
+                    "e1000e 0000:00:1f.6: Interrupt Throttling Rate set to 3",
+                ),
+                DmesgLogEntryV16::new(
+                    "kern",
+                    "err",
+                    5.80,
+                    "2025-02-23T00:00:05Z",
+                    "ext4_lookup: deleted inode referenced: 1048580",
+                ),
             ],
-            vmcore_header: Some(KdumpVmcoreHeaderV16::parse_mock_vmcore("Kernel panic - not syncing: Fatal exception in interrupt")),
+            vmcore_header: Some(KdumpVmcoreHeaderV16::parse_mock_vmcore(
+                "Kernel panic - not syncing: Fatal exception in interrupt",
+            )),
             ebpf_rules: vec![
                 EbpfTraceFilterRuleV16 {
                     tracepoint_category: "sched".to_string(),
@@ -484,27 +519,23 @@ impl SovereignSystemMetricsSuiteV16 {
                 interrupts_per_sec: 4200,
                 context_switches_per_sec: 9800,
             },
-            iostat_devices: vec![
-                IostatDeviceLatencyV16 {
-                    device_name: "nvme0n1".to_string(),
-                    r_ops_sec: 1450.0,
-                    w_ops_sec: 820.0,
-                    r_await_ms: 0.15,
-                    w_await_ms: 0.28,
-                    avg_queue_size_aqu_sz: 0.35,
-                    util_percent: 18.4,
-                    service_time_svctm_ms: 0.08,
-                },
-            ],
-            sar_records: vec![
-                SarTimeSeriesEntryV16 {
-                    timestamp_iso: "2025-02-23T10:00:00Z".to_string(),
-                    cpu_total_idle: 64.85,
-                    mem_pct_used: 42.1,
-                    net_rx_kb_sec: 1250.4,
-                    net_tx_kb_sec: 480.2,
-                },
-            ],
+            iostat_devices: vec![IostatDeviceLatencyV16 {
+                device_name: "nvme0n1".to_string(),
+                r_ops_sec: 1450.0,
+                w_ops_sec: 820.0,
+                r_await_ms: 0.15,
+                w_await_ms: 0.28,
+                avg_queue_size_aqu_sz: 0.35,
+                util_percent: 18.4,
+                service_time_svctm_ms: 0.08,
+            }],
+            sar_records: vec![SarTimeSeriesEntryV16 {
+                timestamp_iso: "2025-02-23T10:00:00Z".to_string(),
+                cpu_total_idle: 64.85,
+                mem_pct_used: 42.1,
+                net_rx_kb_sec: 1250.4,
+                net_tx_kb_sec: 480.2,
+            }],
         }
     }
 }
@@ -528,7 +559,7 @@ pub struct LsofOpenHandleV16 {
 /// Lspci PCIe BAR & ReBAR Descriptor V16
 #[derive(Debug, Clone)]
 pub struct LspciDeviceDescriptorV16 {
-    pub slot_address: String, // 0000:01:00.0
+    pub slot_address: String,     // 0000:01:00.0
     pub vendor_device_id: String, // 10de:2684
     pub class_name: String,
     pub bar0_address_size: String,
@@ -539,7 +570,7 @@ pub struct LspciDeviceDescriptorV16 {
 /// Lsusb Endpoint Descriptor V16
 #[derive(Debug, Clone)]
 pub struct LsusbEndpointV16 {
-    pub bus_dev_id: String, // 001:002
+    pub bus_dev_id: String,     // 001:002
     pub vendor_product: String, // 1b1c:0c10
     pub speed_mbps: u32,
     pub num_endpoints: u8,
@@ -585,7 +616,10 @@ impl SosreportSanitizerEngineV16 {
             // Password key-value redaction
             if let Some(pos) = l.find("password=") {
                 let start = pos + "password=".len();
-                let end = l[start..].find(|c: char| c.is_whitespace() || c == '&' || c == ';').map(|idx| start + idx).unwrap_or(l.len());
+                let end = l[start..]
+                    .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
+                    .map(|idx| start + idx)
+                    .unwrap_or(l.len());
                 l.replace_range(start..end, "[REDACTED]");
                 redacted_in_line = true;
             }
@@ -593,7 +627,10 @@ impl SosreportSanitizerEngineV16 {
             // Bearer token redaction
             if let Some(pos) = l.find("Bearer ") {
                 let start = pos + "Bearer ".len();
-                let end = l[start..].find(|c: char| c.is_whitespace() || c == ';' || c == ',').map(|idx| start + idx).unwrap_or(l.len());
+                let end = l[start..]
+                    .find(|c: char| c.is_whitespace() || c == ';' || c == ',')
+                    .map(|idx| start + idx)
+                    .unwrap_or(l.len());
                 l.replace_range(start..end, "[REDACTED]");
                 redacted_in_line = true;
             }
@@ -601,7 +638,10 @@ impl SosreportSanitizerEngineV16 {
             // API key redaction
             if let Some(pos) = l.find("api_key=") {
                 let start = pos + "api_key=".len();
-                let end = l[start..].find(|c: char| c.is_whitespace() || c == '&' || c == ';').map(|idx| start + idx).unwrap_or(l.len());
+                let end = l[start..]
+                    .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
+                    .map(|idx| start + idx)
+                    .unwrap_or(l.len());
                 l.replace_range(start..end, "[REDACTED]");
                 redacted_in_line = true;
             }
@@ -635,7 +675,10 @@ impl SovereignHardwareDiagnosticsSuiteV16 {
         smbios0.insert("Version".to_string(), "v1.6.0".to_string());
 
         let mut smbios1 = BTreeMap::new();
-        smbios1.insert("Manufacturer".to_string(), "Sovereign Systems Inc.".to_string());
+        smbios1.insert(
+            "Manufacturer".to_string(),
+            "Sovereign Systems Inc.".to_string(),
+        );
         smbios1.insert("Product Name".to_string(), "SigmaServer V16".to_string());
 
         let mut sos = SosreportSanitizerEngineV16::new("/var/log/sosreport-sigmaos-2025.tar.xz");
@@ -664,25 +707,21 @@ impl SovereignHardwareDiagnosticsSuiteV16 {
                     lock_type: "None".to_string(),
                 },
             ],
-            pcie_devices: vec![
-                LspciDeviceDescriptorV16 {
-                    slot_address: "0000:01:00.0".to_string(),
-                    vendor_device_id: "10de:2684".to_string(),
-                    class_name: "VGA compatible controller: NVIDIA Corporation AD102".to_string(),
-                    bar0_address_size: "0x3800000000 [64-bit, pref]".to_string(),
-                    rebar_capable: true,
-                    msix_table_size: 64,
-                },
-            ],
-            usb_devices: vec![
-                LsusbEndpointV16 {
-                    bus_dev_id: "001:002".to_string(),
-                    vendor_product: "1d6b:0003".to_string(),
-                    speed_mbps: 10000,
-                    num_endpoints: 1,
-                    is_hub: true,
-                },
-            ],
+            pcie_devices: vec![LspciDeviceDescriptorV16 {
+                slot_address: "0000:01:00.0".to_string(),
+                vendor_device_id: "10de:2684".to_string(),
+                class_name: "VGA compatible controller: NVIDIA Corporation AD102".to_string(),
+                bar0_address_size: "0x3800000000 [64-bit, pref]".to_string(),
+                rebar_capable: true,
+                msix_table_size: 64,
+            }],
+            usb_devices: vec![LsusbEndpointV16 {
+                bus_dev_id: "001:002".to_string(),
+                vendor_product: "1d6b:0003".to_string(),
+                speed_mbps: 10000,
+                num_endpoints: 1,
+                is_hub: true,
+            }],
             smbios_entries: vec![
                 DmidecodeSmbiosEntryV16 {
                     handle: 0x0000,
@@ -719,7 +758,15 @@ pub struct PrometheusNodeExporterV16 {
 }
 
 impl PrometheusNodeExporterV16 {
-    pub fn new(host: &str, uptime: f64, mem_tot: u64, mem_avail: u64, l1: f32, l5: f32, l15: f32) -> Self {
+    pub fn new(
+        host: &str,
+        uptime: f64,
+        mem_tot: u64,
+        mem_avail: u64,
+        l1: f32,
+        l5: f32,
+        l15: f32,
+    ) -> Self {
         Self {
             hostname: host.to_string(),
             uptime_seconds: uptime,
@@ -735,19 +782,31 @@ impl PrometheusNodeExporterV16 {
         let mut out = String::new();
         out.push_str("# HELP node_uptime_seconds System uptime in seconds.\n");
         out.push_str("# TYPE node_uptime_seconds gauge\n");
-        out.push_str(&format!("node_uptime_seconds{{instance=\"{}\"}} {:.2}\n", self.hostname, self.uptime_seconds));
+        out.push_str(&format!(
+            "node_uptime_seconds{{instance=\"{}\"}} {:.2}\n",
+            self.hostname, self.uptime_seconds
+        ));
 
         out.push_str("# HELP node_memory_MemTotal_bytes Memory total in bytes.\n");
         out.push_str("# TYPE node_memory_MemTotal_bytes gauge\n");
-        out.push_str(&format!("node_memory_MemTotal_bytes{{instance=\"{}\"}} {}\n", self.hostname, self.memory_total_bytes));
+        out.push_str(&format!(
+            "node_memory_MemTotal_bytes{{instance=\"{}\"}} {}\n",
+            self.hostname, self.memory_total_bytes
+        ));
 
         out.push_str("# HELP node_memory_MemAvailable_bytes Memory available in bytes.\n");
         out.push_str("# TYPE node_memory_MemAvailable_bytes gauge\n");
-        out.push_str(&format!("node_memory_MemAvailable_bytes{{instance=\"{}\"}} {}\n", self.hostname, self.memory_avail_bytes));
+        out.push_str(&format!(
+            "node_memory_MemAvailable_bytes{{instance=\"{}\"}} {}\n",
+            self.hostname, self.memory_avail_bytes
+        ));
 
         out.push_str("# HELP node_load1 1m load average.\n");
         out.push_str("# TYPE node_load1 gauge\n");
-        out.push_str(&format!("node_load1{{instance=\"{}\"}} {:.2}\n", self.hostname, self.load1));
+        out.push_str(&format!(
+            "node_load1{{instance=\"{}\"}} {:.2}\n",
+            self.hostname, self.load1
+        ));
 
         out
     }
@@ -768,7 +827,9 @@ pub struct SovereignLoggingDiagnosticsV16PrGatewayEngine {
 impl SovereignLoggingDiagnosticsV16PrGatewayEngine {
     pub fn new() -> Self {
         Self {
-            pr_title: "feat(diagnostics): V16 Linux & BSD Logging, Telemetry & Hardware Diagnostics Suite".to_string(),
+            pr_title:
+                "feat(diagnostics): V16 Linux & BSD Logging, Telemetry & Hardware Diagnostics Suite"
+                    .to_string(),
             target_branch: "main".to_string(),
             journal_syslog_suite: SovereignJournaldSyslogSuiteV16::default_suite(),
             dmesg_kdump_suite: SovereignDmesgKdumpSuiteV16::default_suite(),
@@ -810,18 +871,64 @@ impl SovereignLoggingDiagnosticsV16PrGatewayEngine {
 
     pub fn audit_system_diagnostics(&self) -> BTreeMap<String, bool> {
         let mut report = BTreeMap::new();
-        report.insert("journald_rest_sse_ok".to_string(), !self.journal_syslog_suite.gateway_endpoints.is_empty());
-        report.insert("journald_fss_sealing_ok".to_string(), self.journal_syslog_suite.gateway_endpoints.iter().all(|e| e.fss_sealing.verified_intact));
-        report.insert("relp_disk_spool_ok".to_string(), self.journal_syslog_suite.relp_frames.iter().any(|f| f.disk_spool_fallback));
-        report.insert("dmesg_iso8601_ok".to_string(), !self.dmesg_kdump_suite.dmesg_entries.is_empty());
-        report.insert("kdump_vmcore_elf_ok".to_string(), self.dmesg_kdump_suite.vmcore_header.is_some());
-        report.insert("ebpf_tracepoints_ok".to_string(), !self.dmesg_kdump_suite.ebpf_rules.is_empty());
-        report.insert("htop_eevdf_bore_ok".to_string(), !self.system_metrics_suite.cpu_cores.is_empty());
-        report.insert("iostat_await_latency_ok".to_string(), !self.system_metrics_suite.iostat_devices.is_empty());
-        report.insert("lsof_open_handles_ok".to_string(), !self.hardware_suite.open_handles.is_empty());
-        report.insert("lspci_rebar_msix_ok".to_string(), !self.hardware_suite.pcie_devices.is_empty());
-        report.insert("sosreport_secret_sanitizer_ok".to_string(), !self.hardware_suite.sosreport.collected_subsystems.is_empty());
-        report.insert("prometheus_exporter_ok".to_string(), !self.prometheus_node_exporter.hostname.is_empty());
+        report.insert(
+            "journald_rest_sse_ok".to_string(),
+            !self.journal_syslog_suite.gateway_endpoints.is_empty(),
+        );
+        report.insert(
+            "journald_fss_sealing_ok".to_string(),
+            self.journal_syslog_suite
+                .gateway_endpoints
+                .iter()
+                .all(|e| e.fss_sealing.verified_intact),
+        );
+        report.insert(
+            "relp_disk_spool_ok".to_string(),
+            self.journal_syslog_suite
+                .relp_frames
+                .iter()
+                .any(|f| f.disk_spool_fallback),
+        );
+        report.insert(
+            "dmesg_iso8601_ok".to_string(),
+            !self.dmesg_kdump_suite.dmesg_entries.is_empty(),
+        );
+        report.insert(
+            "kdump_vmcore_elf_ok".to_string(),
+            self.dmesg_kdump_suite.vmcore_header.is_some(),
+        );
+        report.insert(
+            "ebpf_tracepoints_ok".to_string(),
+            !self.dmesg_kdump_suite.ebpf_rules.is_empty(),
+        );
+        report.insert(
+            "htop_eevdf_bore_ok".to_string(),
+            !self.system_metrics_suite.cpu_cores.is_empty(),
+        );
+        report.insert(
+            "iostat_await_latency_ok".to_string(),
+            !self.system_metrics_suite.iostat_devices.is_empty(),
+        );
+        report.insert(
+            "lsof_open_handles_ok".to_string(),
+            !self.hardware_suite.open_handles.is_empty(),
+        );
+        report.insert(
+            "lspci_rebar_msix_ok".to_string(),
+            !self.hardware_suite.pcie_devices.is_empty(),
+        );
+        report.insert(
+            "sosreport_secret_sanitizer_ok".to_string(),
+            !self
+                .hardware_suite
+                .sosreport
+                .collected_subsystems
+                .is_empty(),
+        );
+        report.insert(
+            "prometheus_exporter_ok".to_string(),
+            !self.prometheus_node_exporter.hostname.is_empty(),
+        );
         report
     }
 }
@@ -868,7 +975,12 @@ mod tests {
         assert!(sink.ingest("msg2"));
         assert_eq!(sink.flush(), 2);
 
-        let subbed = sink.substitute_macros("[$ISODATE] $HOST $PROGRAM: test", "web01", "nginx", "2025-02-23T10:00:00Z");
+        let subbed = sink.substitute_macros(
+            "[$ISODATE] $HOST $PROGRAM: test",
+            "web01",
+            "nginx",
+            "2025-02-23T10:00:00Z",
+        );
         assert_eq!(subbed, "[2025-02-23T10:00:00Z] web01 nginx: test");
     }
 
@@ -911,7 +1023,9 @@ mod tests {
         assert_eq!(suite.pcie_devices[0].rebar_capable, true);
         assert_eq!(suite.usb_devices[0].speed_mbps, 10000);
 
-        let redacted = suite.sosreport.sanitize_content("connect with password=secret123 and Bearer tokenxyz and api_key=key999");
+        let redacted = suite.sosreport.sanitize_content(
+            "connect with password=secret123 and Bearer tokenxyz and api_key=key999",
+        );
         assert!(redacted.contains("password=[REDACTED]"));
         assert!(!redacted.contains("secret123"));
         assert!(redacted.contains("Bearer [REDACTED]"));

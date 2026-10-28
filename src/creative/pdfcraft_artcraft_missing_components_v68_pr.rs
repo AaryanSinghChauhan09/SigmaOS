@@ -48,7 +48,10 @@ impl PdfcraftAiNeuralOcrLayoutAnalysisV68PrEngine {
         if image_bytes.is_empty() {
             (String::new(), 0)
         } else {
-            ("Recognized document text with embedded layout".to_string(), 1)
+            (
+                "Recognized document text with embedded layout".to_string(),
+                1,
+            )
         }
     }
 
@@ -398,7 +401,10 @@ impl PdfcraftInteractiveAcroFormsXfaV68PrEngine {
     pub fn export_xfdf_data(&self) -> String {
         let mut xfdf = String::from("<?xml version=\"1.0\"?><xfdf><fields>");
         for (k, v) in &self.form_fields {
-            xfdf.push_str(&format!("<field name=\"{}\"><value>{}</value></field>", k, v));
+            xfdf.push_str(&format!(
+                "<field name=\"{}\"><value>{}</value></field>",
+                k, v
+            ));
         }
         xfdf.push_str("</fields></xfdf>");
         xfdf
@@ -407,7 +413,9 @@ impl PdfcraftInteractiveAcroFormsXfaV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PdfcraftV68PrProposalManifest {
         PdfcraftV68PrProposalManifest {
             pr_id: 6808,
-            pr_title: "feat(pdfcraft): Interactive AcroForms & Dynamic XFA Form Validation Engine V68".to_string(),
+            pr_title:
+                "feat(pdfcraft): Interactive AcroForms & Dynamic XFA Form Validation Engine V68"
+                    .to_string(),
             target_subsystem: "Pdfcraft Interactive Forms Subsystem".to_string(),
             original_suite: "ArtCraft PdfCraft Studio".to_string(),
             components_added: vec![
@@ -506,7 +514,8 @@ impl Pdfcraft3dMeshU3d3PdfViewerV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PdfcraftV68PrProposalManifest {
         PdfcraftV68PrProposalManifest {
             pr_id: 6810,
-            pr_title: "feat(pdfcraft): Embedded 3D Mesh (U3D/PRC) & Spatial Annotations Engine V68".to_string(),
+            pr_title: "feat(pdfcraft): Embedded 3D Mesh (U3D/PRC) & Spatial Annotations Engine V68"
+                .to_string(),
             target_subsystem: "Pdfcraft 3D Graphics Subsystem".to_string(),
             original_suite: "ArtCraft PdfCraft Studio".to_string(),
             components_added: vec![
@@ -572,7 +581,10 @@ impl SovereignPdfcraftArtcraftMissingComponentsV68PrGateway {
             return false;
         }
 
-        if !self.pqc_signature_engine.verify_document_pqc_signature(&[1], &[2]) {
+        if !self
+            .pqc_signature_engine
+            .verify_document_pqc_signature(&[1], &[2])
+        {
             return false;
         }
 
@@ -580,7 +592,9 @@ impl SovereignPdfcraftArtcraftMissingComponentsV68PrGateway {
             return false;
         }
 
-        let (_c, _m, _y, _k, density) = self.cmyk_preflight_engine.analyze_cmyk_ink_density(255, 0, 0);
+        let (_c, _m, _y, _k, density) = self
+            .cmyk_preflight_engine
+            .analyze_cmyk_ink_density(255, 0, 0);
         if density < 0.0 {
             return false;
         }
@@ -590,7 +604,9 @@ impl SovereignPdfcraftArtcraftMissingComponentsV68PrGateway {
             return false;
         }
 
-        let sheets = self.imposition_engine.calculate_imposition_sheet_count(16, 4);
+        let sheets = self
+            .imposition_engine
+            .calculate_imposition_sheet_count(16, 4);
         if sheets != 4 {
             return false;
         }

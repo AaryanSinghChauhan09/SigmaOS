@@ -1859,10 +1859,27 @@ pub enum VirtioGpuFormat {
 /// VirtIO GPU Command Request
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum VirtioGpuCommand {
-    Create2dResource { resource_id: u32, width: u32, height: u32, format: VirtioGpuFormat },
-    AttachBacking { resource_id: u32, buffer_addr: u64, size: u32 },
-    TransferToHost2d { resource_id: u32, x: u32, y: u32, w: u32, h: u32 },
-    FlushResource { resource_id: u32 },
+    Create2dResource {
+        resource_id: u32,
+        width: u32,
+        height: u32,
+        format: VirtioGpuFormat,
+    },
+    AttachBacking {
+        resource_id: u32,
+        buffer_addr: u64,
+        size: u32,
+    },
+    TransferToHost2d {
+        resource_id: u32,
+        x: u32,
+        y: u32,
+        w: u32,
+        h: u32,
+    },
+    FlushResource {
+        resource_id: u32,
+    },
 }
 
 /// VirtIO GPU Command Pipeline Engine
@@ -1917,13 +1934,20 @@ pub struct AmlInterpreterEngine {
 impl AmlInterpreterEngine {
     pub fn new() -> Self {
         let mut engine = Self::default();
-        engine.symbol_table.push(("_PIC".to_string(), AmlValue::Integer(1))); // APIC mode
-        engine.symbol_table.push(("_OS_".to_string(), AmlValue::String("SigmaOS".to_string())));
+        engine
+            .symbol_table
+            .push(("_PIC".to_string(), AmlValue::Integer(1))); // APIC mode
+        engine
+            .symbol_table
+            .push(("_OS_".to_string(), AmlValue::String("SigmaOS".to_string())));
         engine
     }
 
     pub fn evaluate_symbol(&self, name: &str) -> Option<AmlValue> {
-        self.symbol_table.iter().find(|(n, _)| n == name).map(|(_, v)| v.clone())
+        self.symbol_table
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| v.clone())
     }
 
     pub fn register_symbol(&mut self, name: String, val: AmlValue) {
@@ -1957,7 +1981,10 @@ impl UefiProtocolDatabaseEngine {
     pub fn new() -> Self {
         let mut db = Self::default();
         // GOP GUID: 9042a9de-23dc-4a38-96fb-7adc08c0b5d3
-        let gop_guid = UefiGuid([0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0x4a, 0x96, 0xfb, 0x7a, 0xdc, 0x08, 0xc0, 0xb5, 0xd3]);
+        let gop_guid = UefiGuid([
+            0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0x4a, 0x96, 0xfb, 0x7a, 0xdc, 0x08, 0xc0,
+            0xb5, 0xd3,
+        ]);
         db.protocols.push(UefiProtocolInstance {
             handle_id: 1,
             guid: gop_guid,
@@ -2084,7 +2111,9 @@ pub struct KeyboardLayoutMapperEngine {
 
 impl KeyboardLayoutMapperEngine {
     pub fn new(layout: KeyboardLayoutType) -> Self {
-        Self { active_layout: layout }
+        Self {
+            active_layout: layout,
+        }
     }
 
     pub fn map_scancode_to_char(&self, scancode: u8, shift_pressed: bool) -> Option<char> {
@@ -2464,8 +2493,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5121,
-            title: "feat(arch_x86_64): Implement 5-Level Paging (LA57) Page Table Translation Engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement 5-Level Paging (LA57) Page Table Translation Engine"
+                    .to_string(),
             target_subsystem: "Memory Management & 5-Level Paging".to_string(),
             rust_osdev_crate_inspiration: "x86_64".to_string(),
             components_added: vec![
@@ -2477,8 +2507,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5122,
-            title: "feat(arch_x86_64): Implement VirtIO GPU 2D/3D Command Submission Pipeline Engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement VirtIO GPU 2D/3D Command Submission Pipeline Engine"
+                    .to_string(),
             target_subsystem: "Graphics & Display Drivers".to_string(),
             rust_osdev_crate_inspiration: "virtio-drivers".to_string(),
             components_added: vec![
@@ -2490,8 +2521,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5123,
-            title: "feat(arch_x86_64): Implement ACPI AML Bytecode Parser & Symbol Evaluator Engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement ACPI AML Bytecode Parser & Symbol Evaluator Engine"
+                    .to_string(),
             target_subsystem: "Firmware & ACPI Interpretation".to_string(),
             rust_osdev_crate_inspiration: "aml".to_string(),
             components_added: vec![
@@ -2516,8 +2548,7 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5125,
-            title: "feat(arch_x86_64): Implement Multi-Core GDB Target Switcher Engine"
-                .to_string(),
+            title: "feat(arch_x86_64): Implement Multi-Core GDB Target Switcher Engine".to_string(),
             target_subsystem: "Kernel Multi-Core Debugging".to_string(),
             rust_osdev_crate_inspiration: "gdbstub".to_string(),
             components_added: vec![
@@ -2542,8 +2573,7 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5127,
-            title: "feat(arch_x86_64): Implement Dynamic Keyboard Layout Mapper Engine"
-                .to_string(),
+            title: "feat(arch_x86_64): Implement Dynamic Keyboard Layout Mapper Engine".to_string(),
             target_subsystem: "Input Subsystem".to_string(),
             rust_osdev_crate_inspiration: "pc-keyboard".to_string(),
             components_added: vec![
@@ -2861,7 +2891,10 @@ mod tests {
     #[test]
     fn test_uefi_protocol_database() {
         let db = UefiProtocolDatabaseEngine::new();
-        let gop_guid = UefiGuid([0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0x4a, 0x96, 0xfb, 0x7a, 0xdc, 0x08, 0xc0, 0xb5, 0xd3]);
+        let gop_guid = UefiGuid([
+            0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0x4a, 0x96, 0xfb, 0x7a, 0xdc, 0x08, 0xc0,
+            0xb5, 0xd3,
+        ]);
         let proto = db.locate_protocol(&gop_guid).expect("GOP protocol found");
         assert_eq!(proto.interface_ptr, 0xE000_0000);
     }

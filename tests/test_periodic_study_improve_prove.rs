@@ -269,7 +269,9 @@ fn test_periodic_pr_gateway_and_proposal_formatting() {
     assert!(formatted_desc.contains("Rule 3: Runtime evidence gated status promotion"));
 
     let diff = gateway.generate_patch_diff();
-    assert!(diff.contains("PR Title: feat(governance): Adopt Periodic Study-Improve-Prove Operating Program"));
+    assert!(diff.contains(
+        "PR Title: feat(governance): Adopt Periodic Study-Improve-Prove Operating Program"
+    ));
     assert!(diff.contains("Staged PR Proposals Count: 6"));
 
     let summary_report = gateway.generate_pr_gateway_summary();

@@ -217,12 +217,16 @@ impl LightcraftOpticalLensDistortionAberrationV68PrEngine {
                     let dx = x as f32 - center_x;
                     let dy = y as f32 - center_y;
                     let norm_r = (dx * dx + dy * dy).sqrt() / max_dist;
-                    let geom_scale = 1.0 + self.radial_k1 * norm_r * norm_r + self.radial_k2 * norm_r.powi(4);
+                    let geom_scale =
+                        1.0 + self.radial_k1 * norm_r * norm_r + self.radial_k2 * norm_r.powi(4);
                     let vig_scale = 1.0 + self.vignetting_falloff * norm_r * norm_r;
 
-                    let r = (input_rgb[idx] as f32 * geom_scale * self.chromatic_r * vig_scale).clamp(0.0, 255.0) as u8;
-                    let g = (input_rgb[idx + 1] as f32 * geom_scale * vig_scale).clamp(0.0, 255.0) as u8;
-                    let b = (input_rgb[idx + 2] as f32 * geom_scale / self.chromatic_r * vig_scale).clamp(0.0, 255.0) as u8;
+                    let r = (input_rgb[idx] as f32 * geom_scale * self.chromatic_r * vig_scale)
+                        .clamp(0.0, 255.0) as u8;
+                    let g = (input_rgb[idx + 1] as f32 * geom_scale * vig_scale).clamp(0.0, 255.0)
+                        as u8;
+                    let b = (input_rgb[idx + 2] as f32 * geom_scale / self.chromatic_r * vig_scale)
+                        .clamp(0.0, 255.0) as u8;
 
                     output.extend_from_slice(&[r, g, b]);
                 }
@@ -288,9 +292,21 @@ impl LightcraftCmykIccColorProofingV68PrEngine {
                 let b = chunk[2] as f32 / 255.0;
 
                 let k = 1.0 - r.max(g).max(b);
-                let c = if k < 1.0 { (1.0 - r - k) / (1.0 - k) } else { 0.0 };
-                let m = if k < 1.0 { (1.0 - g - k) / (1.0 - k) } else { 0.0 };
-                let y = if k < 1.0 { (1.0 - b - k) / (1.0 - k) } else { 0.0 };
+                let c = if k < 1.0 {
+                    (1.0 - r - k) / (1.0 - k)
+                } else {
+                    0.0
+                };
+                let m = if k < 1.0 {
+                    (1.0 - g - k) / (1.0 - k)
+                } else {
+                    0.0
+                };
+                let y = if k < 1.0 {
+                    (1.0 - b - k) / (1.0 - k)
+                } else {
+                    0.0
+                };
 
                 cmyk.push((c * 255.0).clamp(0.0, 255.0) as u8);
                 cmyk.push((m * 255.0).clamp(0.0, 255.0) as u8);
@@ -304,7 +320,8 @@ impl LightcraftCmykIccColorProofingV68PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV68PrProposalManifest {
         LightcraftV68PrProposalManifest {
             pr_id: 6804,
-            pr_title: "feat(lightcraft): CMYK ICC Soft Proofing & Out-of-Gamut Warning Engine V68".to_string(),
+            pr_title: "feat(lightcraft): CMYK ICC Soft Proofing & Out-of-Gamut Warning Engine V68"
+                .to_string(),
             target_subsystem: "LightCraft Color Management Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -514,8 +531,14 @@ pub struct LightcraftXmpSidecarPresetHistoryV68PrEngine {
 impl LightcraftXmpSidecarPresetHistoryV68PrEngine {
     pub fn new() -> Self {
         let mut presets = BTreeMap::new();
-        presets.insert("VividHDR_V68".to_string(), "hdr:+2.0,vibrance:+20,contrast:+15".to_string());
-        presets.insert("B&W_Film_V68".to_string(), "saturation:-100,grain:+15,contrast:+30".to_string());
+        presets.insert(
+            "VividHDR_V68".to_string(),
+            "hdr:+2.0,vibrance:+20,contrast:+15".to_string(),
+        );
+        presets.insert(
+            "B&W_Film_V68".to_string(),
+            "saturation:-100,grain:+15,contrast:+30".to_string(),
+        );
         Self {
             presets,
             history_tree: Vec::new(),
@@ -524,7 +547,8 @@ impl LightcraftXmpSidecarPresetHistoryV68PrEngine {
 
     pub fn apply_xmp_preset(&mut self, preset_name: &str) -> Option<&String> {
         if let Some(val) = self.presets.get(preset_name) {
-            self.history_tree.push(format!("Applied preset: {}", preset_name));
+            self.history_tree
+                .push(format!("Applied preset: {}", preset_name));
             Some(val)
         } else {
             None
@@ -534,7 +558,9 @@ impl LightcraftXmpSidecarPresetHistoryV68PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV68PrProposalManifest {
         LightcraftV68PrProposalManifest {
             pr_id: 6808,
-            pr_title: "feat(lightcraft): XMP Sidecar Non-Destructive Adjustment Stack & History Tree V68".to_string(),
+            pr_title:
+                "feat(lightcraft): XMP Sidecar Non-Destructive Adjustment Stack & History Tree V68"
+                    .to_string(),
             target_subsystem: "LightCraft Preset & History Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -582,7 +608,9 @@ impl LightcraftParallelBatchExportWatermarkV68PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV68PrProposalManifest {
         LightcraftV68PrProposalManifest {
             pr_id: 6809,
-            pr_title: "feat(lightcraft): Parallel Multi-Threaded Batch Export Pipeline & Watermarking V68".to_string(),
+            pr_title:
+                "feat(lightcraft): Parallel Multi-Threaded Batch Export Pipeline & Watermarking V68"
+                    .to_string(),
             target_subsystem: "LightCraft Export & Output Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -625,7 +653,12 @@ impl LightcraftSpatial3dLumaChromaMaskV68PrEngine {
         }
     }
 
-    pub fn generate_spatial_depth_mask(&self, width: u32, height: u32, depth_map: &[f32]) -> Vec<u8> {
+    pub fn generate_spatial_depth_mask(
+        &self,
+        width: u32,
+        height: u32,
+        depth_map: &[f32],
+    ) -> Vec<u8> {
         let pixel_count = (width * height) as usize;
         let mut mask = Vec::with_capacity(pixel_count);
 
@@ -645,7 +678,9 @@ impl LightcraftSpatial3dLumaChromaMaskV68PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV68PrProposalManifest {
         LightcraftV68PrProposalManifest {
             pr_id: 6810,
-            pr_title: "feat(lightcraft): Spatial 3D Luma/Chroma Depth-Aware Precision Masking Engine V68".to_string(),
+            pr_title:
+                "feat(lightcraft): Spatial 3D Luma/Chroma Depth-Aware Precision Masking Engine V68"
+                    .to_string(),
             target_subsystem: "LightCraft Masking Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -708,12 +743,16 @@ impl SovereignLightcraftArtcraftMissingComponentsV68PrGateway {
             return false;
         }
 
-        let (low, mid, high) = self.frequency_separation_engine.decompose_multiband_frequencies(&hdr_fused);
+        let (low, mid, high) = self
+            .frequency_separation_engine
+            .decompose_multiband_frequencies(&hdr_fused);
         if low.is_empty() || mid.is_empty() || high.is_empty() {
             return false;
         }
 
-        let corrected = self.lens_correction_engine.process_lens_correction(&hdr_fused, 4, 4);
+        let corrected = self
+            .lens_correction_engine
+            .process_lens_correction(&hdr_fused, 4, 4);
         if corrected.is_empty() {
             return false;
         }
@@ -733,13 +772,20 @@ impl SovereignLightcraftArtcraftMissingComponentsV68PrGateway {
             return false;
         }
 
-        self.dam_search_engine.index_asset_record(1001, "IMG_001.CR3", 5, &["landscape", "sunset"]);
-        let search_res = self.dam_search_engine.search_smart_collection(5, "landscape");
+        self.dam_search_engine
+            .index_asset_record(1001, "IMG_001.CR3", 5, &["landscape", "sunset"]);
+        let search_res = self
+            .dam_search_engine
+            .search_smart_collection(5, "landscape");
         if search_res.is_empty() {
             return false;
         }
 
-        if self.preset_history_engine.apply_xmp_preset("VividHDR_V68").is_none() {
+        if self
+            .preset_history_engine
+            .apply_xmp_preset("VividHDR_V68")
+            .is_none()
+        {
             return false;
         }
 
@@ -749,7 +795,9 @@ impl SovereignLightcraftArtcraftMissingComponentsV68PrGateway {
         }
 
         let depth_map = vec![1.0f32; 16];
-        let mask = self.spatial_mask_engine.generate_spatial_depth_mask(4, 4, &depth_map);
+        let mask = self
+            .spatial_mask_engine
+            .generate_spatial_depth_mask(4, 4, &depth_map);
         if mask.len() != 16 {
             return false;
         }

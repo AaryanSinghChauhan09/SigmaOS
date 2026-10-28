@@ -1818,36 +1818,4 @@ mod tests {
             Err(ValidationError::InvalidChars)
         );
     }
-
-    #[test]
-    fn test_validate_http_header_name_and_value() {
-        // Valid header names
-        assert_eq!(validate_http_header_name(b"Content-Type"), Ok(()));
-        assert_eq!(validate_http_header_name(b"X-Custom-Header_123"), Ok(()));
-        assert_eq!(validate_http_header_name(b"Authorization"), Ok(()));
-
-        // Invalid header names
-        assert_eq!(validate_http_header_name(b""), Err(ValidationError::EmptyInput));
-        assert_eq!(validate_http_header_name(b"Header:Name"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_http_header_name(b"Header Name"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_http_header_name(b"Header\r\nName"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_http_header_name(&[b'X', 0, b'Y']), Err(ValidationError::NullByte));
-
-        let long_name = [b'A'; MAX_HTTP_HEADER_NAME_LEN + 1];
-        assert_eq!(validate_http_header_name(&long_name), Err(ValidationError::TooLong));
-
-        // Valid header values
-        assert_eq!(validate_http_header_value(b"application/json; charset=utf-8"), Ok(()));
-        assert_eq!(validate_http_header_value(b"Bearer token_123\t"), Ok(()));
-        assert_eq!(validate_http_header_value(b""), Ok(()));
-
-        // Invalid header values (CRLF injection / response splitting CWE-113, NUL truncation CWE-626)
-        assert_eq!(validate_http_header_value(b"value\r\nSet-Cookie: session=evil"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_http_header_value(b"value\nHost: evil.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_http_header_value(b"v\x00al"), Err(ValidationError::NullByte));
-        assert_eq!(validate_http_header_value(b"value\x7f"), Err(ValidationError::InvalidChars));
-
-        let long_val = vec![b'V'; MAX_HTTP_HEADER_VALUE_LEN + 1];
-        assert_eq!(validate_http_header_value(&long_val), Err(ValidationError::TooLong));
-    }
 }

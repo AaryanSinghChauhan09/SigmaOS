@@ -5,8 +5,9 @@
 #[path = "../src/package/sovereign_distro_package_advancements_v78_pr.rs"]
 mod sovereign_distro_package_advancements_v78_pr;
 
-use sovereign_distro_package_advancements_v78::*;
 use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v78::*;
+use sovereign_distro_package_advancements_v78_pr::SovereignDistroPackagePrGatewayV78;
 
 #[test]
 fn test_package_advancements_v78_full_cycle() {
@@ -45,7 +46,10 @@ fn test_package_advancements_v78_full_cycle() {
     let solved = solver
         .solve_dependencies("ripgrep", &raw_deps)
         .expect("SAT solver failed");
-    assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v78"]);
+    assert_eq!(
+        solved,
+        vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v78"]
+    );
 
     // 4. Multi-Sandbox Security Governor V78
     let sandbox_gov = UniversalMultiSandboxGovernorV78::new();
@@ -75,6 +79,16 @@ fn test_package_advancements_v78_full_cycle() {
     assert!(routed.dry_run);
     assert_eq!(routed.package_targets, vec!["neovim".to_string()]);
 
+    // 8. PR Gateway V78
+    let mut gateway = SovereignDistroPackagePrGatewayV78::new();
+    gateway.submit_proposal(
+        7801,
+        "Universal Package Advancements V78",
+        sovereign_distro_package_advancements_v78_pr::PackageFormat::Deb,
+        "ripgrep",
+        "Full test cycle proposal V78",
+    );
+    assert_eq!(gateway.total_proposals(), 1);
 
     // 9. Master Coordinator Suite V78
     let mut master_suite = SovereignDistroPackageAdvancementsSuiteV78::new();

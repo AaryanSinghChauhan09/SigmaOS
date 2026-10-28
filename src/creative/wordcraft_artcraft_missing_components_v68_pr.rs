@@ -126,7 +126,9 @@ impl WordcraftDynamicMathEquationLatexRendererV68Engine {
 
     pub fn render_equation(&self, expression: &str, format: MathFormatV68) -> String {
         match format {
-            MathFormatV68::LaTeX => format!("$$\\begin{{equation}}{}\\end{{equation}}$$", expression),
+            MathFormatV68::LaTeX => {
+                format!("$$\\begin{{equation}}{}\\end{{equation}}$$", expression)
+            }
             MathFormatV68::MathML => format!("<math><mrow>{}</mrow></math>", expression),
             MathFormatV68::AsciiMath => format!("`{}`", expression),
         }
@@ -161,7 +163,9 @@ impl WordcraftRealtimeMultiUserCursorPresenceCrdtV68Engine {
     pub fn generate_proposal(&self) -> WordcraftV68PrProposalManifest {
         WordcraftV68PrProposalManifest {
             pr_id: 6803,
-            pr_title: String::from("Wordcraft Realtime Multi-User Cursor & Presence CRDT V68 Engine"),
+            pr_title: String::from(
+                "Wordcraft Realtime Multi-User Cursor & Presence CRDT V68 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / CRDT Collaboration"),
             original_suite: String::from("ArtCraft Wordcraft CRDT V68"),
             components_added: vec![
@@ -173,7 +177,13 @@ impl WordcraftRealtimeMultiUserCursorPresenceCrdtV68Engine {
         }
     }
 
-    pub fn update_cursor(&mut self, user_id: &str, offset: usize, sel_len: usize, color: (u8, u8, u8)) {
+    pub fn update_cursor(
+        &mut self,
+        user_id: &str,
+        offset: usize,
+        sel_len: usize,
+        color: (u8, u8, u8),
+    ) {
         if let Some(user) = self.active_users.iter_mut().find(|u| u.user_id == user_id) {
             user.cursor_offset = offset;
             user.selection_length = sel_len;
@@ -222,7 +232,9 @@ impl WordcraftVariableFontOpenTypeTypographyV68Engine {
     pub fn generate_proposal(&self) -> WordcraftV68PrProposalManifest {
         WordcraftV68PrProposalManifest {
             pr_id: 6804,
-            pr_title: String::from("Wordcraft Variable Font & OpenType Advanced Typography V68 Engine"),
+            pr_title: String::from(
+                "Wordcraft Variable Font & OpenType Advanced Typography V68 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Advanced Typography"),
             original_suite: String::from("ArtCraft Wordcraft Typography V68"),
             components_added: vec![
@@ -286,7 +298,10 @@ impl WordcraftSmartInfographicDiagramAutoLayoutV68Engine {
     }
 
     pub fn layout_diagram(&self, title: &str, kind: DiagramTypeV68, node_count: usize) -> String {
-        format!("[V68 Diagram {:?}]: '{}' formatted with {} nodes", kind, title, node_count)
+        format!(
+            "[V68 Diagram {:?}]: '{}' formatted with {} nodes",
+            kind, title, node_count
+        )
     }
 }
 
@@ -308,7 +323,9 @@ pub struct WordcraftMultiVolumeBookBinderTocIndexerV68Engine {
 
 impl WordcraftMultiVolumeBookBinderTocIndexerV68Engine {
     pub fn new() -> Self {
-        Self { volumes: Vec::new() }
+        Self {
+            volumes: Vec::new(),
+        }
     }
 
     pub fn generate_proposal(&self) -> WordcraftV68PrProposalManifest {
@@ -340,7 +357,13 @@ impl WordcraftMultiVolumeBookBinderTocIndexerV68Engine {
     pub fn render_master_toc(&self) -> String {
         let mut out = String::from("--- MASTER TABLE OF CONTENTS V68 ---\n");
         for v in &self.volumes {
-            out.push_str(&format!("Vol {}: {} (Pages {}-{})\n", v.volume_id, v.title, v.start_page, v.start_page + v.total_pages - 1));
+            out.push_str(&format!(
+                "Vol {}: {} (Pages {}-{})\n",
+                v.volume_id,
+                v.title,
+                v.start_page,
+                v.start_page + v.total_pages - 1
+            ));
         }
         out
     }
@@ -374,12 +397,19 @@ impl WordcraftZeroKnowledgeDocumentEncryptionV68Engine {
                 String::from("WordcraftZeroKnowledgeDocumentEncryptionV68Engine"),
                 String::from("EncryptedParagraphV68"),
             ],
-            performance_multiplier: String::from("52.4x AES-GCM zero-knowledge hardware encryption"),
+            performance_multiplier: String::from(
+                "52.4x AES-GCM zero-knowledge hardware encryption",
+            ),
             status: String::from("MERGED_PR_STAGE_V68"),
         }
     }
 
-    pub fn encrypt_paragraph(&self, paragraph_id: usize, plaintext: &str, key_hash: u64) -> EncryptedParagraphV68 {
+    pub fn encrypt_paragraph(
+        &self,
+        paragraph_id: usize,
+        plaintext: &str,
+        key_hash: u64,
+    ) -> EncryptedParagraphV68 {
         let mut cipher = String::new();
         for (i, b) in plaintext.bytes().enumerate() {
             let enc_b = b ^ ((key_hash >> (i % 8)) & 0xFF) as u8;
@@ -397,7 +427,7 @@ impl WordcraftZeroKnowledgeDocumentEncryptionV68Engine {
         let hex = &enc.ciphertext_hex;
         for i in (0..hex.len()).step_by(2) {
             if i + 2 <= hex.len() {
-                if let Ok(b) = u8::from_str_radix(&hex[i..i+2], 16) {
+                if let Ok(b) = u8::from_str_radix(&hex[i..i + 2], 16) {
                     let dec_b = b ^ ((key_hash >> ((i / 2) % 8)) & 0xFF) as u8;
                     bytes.push(dec_b);
                 }
@@ -435,7 +465,9 @@ pub struct WordcraftAutomatedCitationBibTeXZoteroV68Engine {
 
 impl WordcraftAutomatedCitationBibTeXZoteroV68Engine {
     pub fn new() -> Self {
-        Self { citations: Vec::new() }
+        Self {
+            citations: Vec::new(),
+        }
     }
 
     pub fn generate_proposal(&self) -> WordcraftV68PrProposalManifest {
@@ -466,7 +498,11 @@ impl WordcraftAutomatedCitationBibTeXZoteroV68Engine {
 
     pub fn format_in_text(&self, key: &str, style: CitationStyleV68) -> String {
         if let Some(entry) = self.citations.iter().find(|c| c.cite_key == key) {
-            let author = entry.authors.first().map(|s| s.as_str()).unwrap_or("Unknown");
+            let author = entry
+                .authors
+                .first()
+                .map(|s| s.as_str())
+                .unwrap_or("Unknown");
             match style {
                 CitationStyleV68::APA7 => format!("({}, {})", author, entry.year),
                 CitationStyleV68::MLA9 => format!("({})", author),
@@ -494,12 +530,14 @@ impl WordcraftSpeechToTextVoiceDictationAnalyticsV68Engine {
     pub fn generate_proposal(&self) -> WordcraftV68PrProposalManifest {
         WordcraftV68PrProposalManifest {
             pr_id: 6809,
-            pr_title: String::from("Wordcraft Speech-to-Text Voice Dictation & Analytics V68 Engine"),
+            pr_title: String::from(
+                "Wordcraft Speech-to-Text Voice Dictation & Analytics V68 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Voice Dictation"),
             original_suite: String::from("ArtCraft Wordcraft Voice V68"),
-            components_added: vec![
-                String::from("WordcraftSpeechToTextVoiceDictationAnalyticsV68Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftSpeechToTextVoiceDictationAnalyticsV68Engine",
+            )],
             performance_multiplier: String::from("17.9x low-latency neural acoustic dictation"),
             status: String::from("MERGED_PR_STAGE_V68"),
         }
@@ -509,7 +547,10 @@ impl WordcraftSpeechToTextVoiceDictationAnalyticsV68Engine {
         if pcm_samples.is_empty() {
             return String::new();
         }
-        format!("[V68 Transcribed]: {} audio samples processed into text.", pcm_samples.len())
+        format!(
+            "[V68 Transcribed]: {} audio samples processed into text.",
+            pcm_samples.len()
+        )
     }
 
     pub fn compute_words_per_minute(&self, word_count: usize, seconds: f32) -> f32 {
@@ -555,7 +596,11 @@ impl WordcraftMultiFormatBatchDocumentExporterV68Engine {
         }
     }
 
-    pub fn export_batch(&self, doc_name: &str, targets: &[ExportTargetV68]) -> Vec<(ExportTargetV68, String)> {
+    pub fn export_batch(
+        &self,
+        doc_name: &str,
+        targets: &[ExportTargetV68],
+    ) -> Vec<(ExportTargetV68, String)> {
         targets
             .iter()
             .map(|t| (*t, format!("{}.{:?}", doc_name, t)))
@@ -604,7 +649,9 @@ impl WordcraftArtcraftMissingComponentsV68PrSuite {
         // Test 1: Neural Tone Rewriter
         let rewriter = WordcraftNeuralToneStyleRewriterV68Engine::new();
         let rewritten = rewriter.rewrite_tone("Submit report", ToneStyleV68::Professional);
-        if !rewritten.contains("Professional Tone") || rewriter.compute_readability_score("Hello world") <= 0.0 {
+        if !rewritten.contains("Professional Tone")
+            || rewriter.compute_readability_score("Hello world") <= 0.0
+        {
             return false;
         }
 
@@ -663,13 +710,16 @@ impl WordcraftArtcraftMissingComponentsV68PrSuite {
         // Test 9: Voice Dictation
         let voice = WordcraftSpeechToTextVoiceDictationAnalyticsV68Engine::new();
         let samples = vec![0i16; 100];
-        if voice.transcribe_audio_chunk(&samples).is_empty() || voice.compute_words_per_minute(150, 60.0) != 150.0 {
+        if voice.transcribe_audio_chunk(&samples).is_empty()
+            || voice.compute_words_per_minute(150, 60.0) != 150.0
+        {
             return false;
         }
 
         // Test 10: Multi-Format Exporter
         let exporter = WordcraftMultiFormatBatchDocumentExporterV68Engine::new();
-        let batch = exporter.export_batch("Document", &[ExportTargetV68::Docx, ExportTargetV68::PdfA]);
+        let batch =
+            exporter.export_batch("Document", &[ExportTargetV68::Docx, ExportTargetV68::PdfA]);
         if batch.len() != 2 {
             return false;
         }
