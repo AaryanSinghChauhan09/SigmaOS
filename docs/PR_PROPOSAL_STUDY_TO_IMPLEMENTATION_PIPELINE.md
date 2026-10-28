@@ -1,23 +1,16 @@
-# PR Proposal: Study-to-Implementation Pipeline Strategy
+# PR Proposal: SigmaOS Study-to-Implementation Pipeline
 
-**PR Title:** `feat(governance): Establish Study-to-Implementation Pipeline Strategy`
-**PR Branch:** `feature/study-to-implementation-pipeline`
-**Status:** Approved / Specification Ready
-**Patch Digest:** `0xa3f891bc471d8032`
+## Overview
 
----
+SigmaOS uses a **study → extract pattern → implement minimal slice → validate at runtime** pipeline. The repository references Linux, Arch, Mint, Redox, xv6, FreeBSD/OpenBSD ideas, and includes agent guides for kernel, memory, filesystem, networking, security, desktop, packaging, drivers, and distro compatibility—but its README is explicit that source presence and unit tests do not establish bootability, installation readiness, or hardware support.
 
-## Executive Summary
-
-SigmaOS operates under a strict **study → extract pattern → implement minimal slice → validate at runtime** pipeline. While SigmaOS references ideas from Linux, Arch, Mint, Redox, xv6, FreeBSD, OpenBSD, Debian, Fedora, NixOS, and OSDev, its documentation explicitly maintains that source presence or passing unit tests alone do not establish bootability, installation readiness, or hardware support.
-
-This specification formalizes the repeatable 10-step study-to-implementation workflow, study curriculum, upstream study requirements, Architecture Decision Record (ADR) templates, 12 mandatory implementation rules, 12-week schedule, definition of done, and first 30 days execution plan.
+Reference projects serve as sources of **design insight**, not feature checklists. Reference-project feature names do not establish SigmaOS feature parity without explicit runtime proof.
 
 ---
 
 ## Study-to-Implementation Pipeline
 
-SigmaOS uses one repeatable cycle for every concept borrowed from an upstream OS project:
+Use one repeatable cycle for every concept borrowed from an upstream OS project:
 
 ```text
 1. SELECT a narrow OS concept
@@ -32,13 +25,11 @@ SigmaOS uses one repeatable cycle for every concept borrowed from an upstream OS
 10. UPDATE capability status with evidence
 ```
 
-A reference project is a source of **design insight**, not a feature checklist. Reference-project feature names do not establish SigmaOS feature parity.
-
 ---
 
-## Upstream Projects to Study
+## Projects to Study
 
-Study upstream projects in a fixed order, producing one study deliverable per project:
+Study these in a fixed order, with one deliverable per project.
 
 | Project | Study focus | SigmaOS application | Study deliverable |
 |---|---|---|---|
@@ -58,37 +49,116 @@ Study upstream projects in a fixed order, producing one study deliverable per pr
 
 ## Study Curriculum
 
-### Phase 1: OS Fundamentals (2 weeks)
-- **Study:** Boot process (firmware, bootloader, kernel entry, initrd, init), CPU modes, privilege rings, interrupts, exceptions, syscalls, physical/virtual memory, paging, address spaces, processes, threads, scheduling, context switching, filesystems, VFS, file descriptors, mount namespaces.
-- **Primary References:** xv6, OSDev tutorials, Linux kernel documentation.
-- **SigmaOS Implementation:** Implement and validate QEMU x86_64 boot path, early serial logging, memory-map parsing, frame allocation, paging, interrupts, timer, scheduler, syscall entry, init, and shell. Produce boot trace showing each stage.
-- **Exit Test:** QEMU x86_64 boots to a shell, executes a basic command, and shuts down cleanly.
+### Phase 1: OS fundamentals — 2 weeks
 
-### Phase 2: Kernel Services (3 weeks)
-- **Study:** Linux scheduler classes and run queues, Linux VFS and mount semantics, Linux syscall ABI and error conventions, FreeBSD jail and OpenBSD `pledge`/`unveil` isolation concepts, IPC (pipes, signals, shared memory, sockets, event queues).
-- **SigmaOS Implementation:** Scheduler with fairness and starvation safeguards, VFS abstraction with path resolution and file operations, process creation, exit, wait, signals, file descriptors, pipes, basic IPC, stable syscall table, initial security boundary model.
-- **Exit Test:** A process can be created, open/read/write files, use pipes, receive a signal, and exit; all operations are covered by integration tests.
+**Study**
+- Boot process: firmware, bootloader, kernel entry, initrd, init.
+- CPU modes, privilege rings, interrupts, exceptions, and system calls.
+- Physical and virtual memory, paging, address spaces.
+- Processes, threads, scheduling, context switching.
+- Filesystems, VFS, file descriptors, and mount namespaces.
 
-### Phase 3: Userspace and Distribution (3 weeks)
-- **Study:** Arch package format and Pacman dependency resolution, Debian package metadata (DEB822 stanzas), repositories, stable-release policy, Fedora atomic update concepts, Mint update/recovery workflows, NixOS declarative configuration.
-- **SigmaOS Implementation:** Minimal userland (shell, core utilities, service manager), RAM-disk/in-memory filesystem before persistent storage, package metadata parser, dependency resolver, dry-run package installation, update manifest, staged activation, rollback, recovery entry.
-- **Exit Test:** A clean QEMU install completes, boots after installation, and a deliberately failed update rolls back to the previous known-good state.
+**Primary references**
+- xv6 for a clean minimal implementation.
+- OSDev tutorials for bootloader and interrupt basics.
+- Linux kernel documentation for production-scale concepts.
 
-### Phase 4: Security and Isolation (3 weeks)
-- **Study:** OpenBSD secure defaults and audit culture, FreeBSD jails and capability-like confinement, Linux namespaces, cgroups, seccomp, Landlock, capabilities, package-script attack surfaces, supply-chain security, signed update channels.
-- **SigmaOS Implementation:** Capability checks for filesystem, process, IPC, device, network, package execution; sandboxed package-script execution; signed update manifests; fuzzing for syscall, filesystem, IPC, package parsers; separate security review process.
-- **Exit Test:** Every protected operation fails without the required capability, and malicious package scripts cannot escape their declared sandbox.
+**SigmaOS implementation**
+- Implement or validate a QEMU x86_64 boot path.
+- Implement early serial logging, memory-map parsing, frame allocation, paging, interrupts, timer, scheduler, syscall entry, init, and shell.
+- Produce a boot trace showing each stage.
 
-### Phase 5: Desktop and Hardware (4 weeks)
-- **Study:** Linux input, DRM/KMS, display-server concepts, USB and PCI device enumeration, network driver and socket-stack layering, FreeBSD/OpenBSD hardware support matrices, Linux Mint hardware onboarding/troubleshooting patterns.
-- **SigmaOS Implementation:** Minimal graphical session (framebuffer, input, window, app launch), VirtIO-blk, VirtIO-net, VGA/framebuffer, keyboard support in QEMU, device support matrix with model/driver/test date/logs. Real-hardware enablement only after QEMU parity.
-- **Exit Test:** QEMU boots to a graphical session, accepts input, launches an application, and records no kernel panic.
+**Exit test**
+QEMU x86_64 boots to a shell, executes a basic command, and shuts down cleanly.
+
+---
+
+### Phase 2: Kernel services — 3 weeks
+
+**Study**
+- Linux scheduler classes and run queues.
+- Linux VFS and mount semantics.
+- Linux syscall ABI and error conventions.
+- FreeBSD jail and OpenBSD `pledge`/`unveil` isolation concepts.
+- IPC: pipes, signals, shared memory, sockets, event queues.
+
+**SigmaOS implementation**
+- Scheduler with fairness and starvation safeguards.
+- VFS abstraction with path resolution and file operations.
+- Process creation, exit, wait, signals, and file descriptors.
+- Pipes, basic IPC, and a stable syscall table.
+- Initial security boundary model.
+
+**Exit test**
+A process can be created, open/read/write files, use pipes, receive a signal, and exit; all operations are covered by integration tests.
+
+---
+
+### Phase 3: Userspace and distribution — 3 weeks
+
+**Study**
+- Arch package format and Pacman dependency resolution.
+- Debian package metadata, repositories, and stable-release policy.
+- Fedora atomic update concepts.
+- Mint update/recovery workflows.
+- NixOS declarative configuration.
+
+**SigmaOS implementation**
+- Minimal userland: shell, core utilities, service manager.
+- RAM-disk or simple filesystem before persistent storage.
+- Package metadata parser and dependency resolver.
+- Dry-run package installation.
+- Update manifest, staged activation, rollback, and recovery entry.
+
+**Exit test**
+A clean QEMU install completes, boots after installation, and a deliberately failed update rolls back to the previous known-good state.
+
+---
+
+### Phase 4: Security and isolation — 3 weeks
+
+**Study**
+- OpenBSD secure defaults and audit culture.
+- FreeBSD jails and capability-like confinement.
+- Linux namespaces, cgroups, seccomp, Landlock, and capabilities.
+- Package-script attack surfaces.
+- Supply-chain security and signed update channels.
+
+**SigmaOS implementation**
+- Capability checks for filesystem, process, IPC, device, network, and package execution.
+- Sandboxed package-script execution.
+- Signed update manifests.
+- Fuzzing for syscall, filesystem, IPC, and package parsers.
+- Security review process separate from ordinary code review.
+
+**Exit test**
+Every protected operation fails without the required capability, and malicious package scripts cannot escape their declared sandbox.
+
+---
+
+### Phase 5: Desktop and hardware — 4 weeks
+
+**Study**
+- Linux input, DRM/KMS, and display-server concepts.
+- USB and PCI device enumeration.
+- Network driver and socket-stack layering.
+- FreeBSD/OpenBSD hardware support matrices.
+- Linux Mint hardware onboarding and troubleshooting patterns.
+
+**SigmaOS implementation**
+- Minimal graphical session: framebuffer, input, window, application launch.
+- Virtio-blk, virtio-net, VGA/framebuffer, and keyboard support in QEMU.
+- Device support matrix with model, driver, test date, and logs.
+- Real-hardware enablement only after QEMU parity.
+
+**Exit test**
+QEMU boots to a graphical session, accepts input, launches an application, and records no kernel panic.
 
 ---
 
 ## Repository Study Artifacts
 
-Study results are stored under `research/`:
+Create a `research/` directory so study results become implementation inputs rather than scattered notes.
 
 ```text
 research/
@@ -129,15 +199,10 @@ research/
     security.md
     packaging.md
     hardware-support.md
-
-  reports/
-    daily/
-    weekly/
-    monthly/
-    quarterly/
 ```
 
-Each upstream study note answers 7 canonical questions:
+Each upstream study note must answer:
+
 1. What problem does the upstream design solve?
 2. What is its core data structure and control flow?
 3. What are its security and failure assumptions?
@@ -148,7 +213,7 @@ Each upstream study note answers 7 canonical questions:
 
 ---
 
-## Design Decision Records (ADRs)
+## Design Decision Records
 
 For every significant borrowed idea, write an Architecture Decision Record:
 
@@ -156,7 +221,7 @@ For every significant borrowed idea, write an Architecture Decision Record:
 # ADR-003: VFS interface
 
 ## Status
-Accepted
+Proposed
 
 ## Context
 SigmaOS needs a filesystem abstraction supporting multiple backends.
@@ -182,20 +247,43 @@ mount points, file descriptors, and standardized error codes.
 
 ---
 
-## 12 Implementation Rules
+## Implementation Rules
 
-1. **Study one concept at a time:** Focus on a single mechanism (scheduler, VFS, package update, capability sandbox) rather than broad OS distributions.
-2. **Extract the invariant, not the code:** Record the underlying rule (e.g., consistency under failure) rather than copying C or foreign code.
-3. **License and attribution first:** Verify dual MIT/GPL-2.0 compatibility and respect upstream attribution requirements before adaptation. Prefer clean-room design notes and original Rust implementations.
-4. **Implement the smallest vertical slice:** Build the minimum connected path: `boot -> memory -> scheduler -> syscall -> VFS -> shell`.
-5. **Runtime validation is mandatory:** A component is complete only when exercised through real boot/runtime execution in QEMU. Unit-tested models do not establish runtime parity alone.
-6. **CI gates merges:** All pull requests must pass `cargo check --lib`, `cargo test --lib`, `./run_sigma_tests.sh`, formatting, and QEMU smoke tests.
-7. **Security changes get separate review:** Capability enforcement, sandboxing, syscalls, memory safety, cryptography, package execution, networking, and updates require a dedicated security review.
-8. **Reproducibility:** Every experiment records commit hash, toolchain, container image, commands, timestamps, exit codes, and artifact hashes.
-9. **Least privilege:** Restrict permissions for processes, scripts, CI jobs, and agents.
-10. **Document adoption boundaries:** Explicitly state what was adopted, modified, simplified, or rejected and why.
-11. **Regression tests are mandatory:** Every fix and feature includes an automated test that fails if behavior regresses.
-12. **Human approval for high-risk work:** Mandatory human sign-off for bootloader, installer, update, security-boundary, package-execution, release, and destructive storage changes.
+### Rule 1: Study one concept at a time
+Do not study “Linux” or “BSD” broadly. Study one mechanism—scheduler, VFS, package update, capability sandbox—at a time.
+
+### Rule 2: Extract the invariant, not the code
+Record the underlying invariant. For example: “A filesystem operation must return a consistent error and leave filesystem state coherent on failure,” rather than copying an implementation.
+
+### Rule 3: License and attribution first
+Before adapting code, verify license compatibility. SigmaOS is dual-licensed MIT/GPL-2.0, so copied code must respect the upstream license and attribution requirements. Prefer clean-room design notes and original implementation unless license compatibility is confirmed.
+
+### Rule 4: Implement the smallest vertical slice
+Do not build a full scheduler, full VFS, and full package manager independently. Build the minimum connected path: boot → memory → scheduler → syscall → VFS → shell.
+
+### Rule 5: Runtime validation is mandatory
+A component is not implemented merely because its unit tests pass. It must be exercised through the actual boot or runtime path. SigmaOS’s README specifically distinguishes unit-tested models from kernel integration and hardware support.
+
+### Rule 6: CI gates merges
+Required checks must include `cargo check --lib`, `cargo test --lib`, `./run_sigma_tests.sh`, formatting, and relevant QEMU smoke tests.
+
+### Rule 7: Security changes get separate review
+Capability enforcement, sandboxing, syscalls, memory safety, cryptography, package execution, networking, and update mechanisms require a dedicated security review.
+
+### Rule 8: Reproducibility
+Every experiment and artifact must record commit hash, toolchain, container image, commands, timestamps, exit codes, and hashes.
+
+### Rule 9: Least privilege
+Agents, CI jobs, packages, and services receive only the permissions required. No broad credentials, unrestricted package-script execution, or force-push access.
+
+### Rule 10: Document adoption boundaries
+Every borrowed design must state what SigmaOS adopted, simplified, changed, rejected, and why.
+
+### Rule 11: Regression tests are mandatory
+Every implemented mechanism needs a test that fails if the behavior regresses.
+
+### Rule 12: Human approval for high-risk work
+Humans approve bootloader, installer, update, security-boundary, package-execution, release, and destructive-storage changes.
 
 ---
 
@@ -218,24 +306,26 @@ mount points, file descriptors, and standardized error codes.
 
 ---
 
-## Definition of Done (10-Point Checklist)
+## Definition of Done
 
-1. Research note explains upstream design and SigmaOS adaptation.
-2. ADR records the design decision.
-3. Implementation has a clear module boundary and owner.
+A studied concept is considered implemented in SigmaOS only when:
+
+1. A research note explains the upstream design and SigmaOS adaptation.
+2. An ADR records the design decision.
+3. The implementation has a clear module boundary and owner.
 4. Unit and integration tests pass.
-5. Feature is exercised through QEMU boot or real runtime path.
-6. Automated regression test exists.
+5. The feature is exercised through QEMU boot or another real runtime path.
+6. A regression test exists.
 7. Security implications are reviewed.
 8. Documentation states limitations and unsupported cases.
-9. `CAPABILITY_MATRIX.toml` or component page is updated with evidence.
-10. Change is reproducible from a clean checkout.
+9. `CAPABILITY_MATRIX.toml` or the relevant component page is updated with evidence.
+10. The change is reproducible from a clean checkout.
 
 ---
 
-## First 30 Days Action Plan
+## First 30 Days Execution Plan
 
-1. Create `research/upstream/`, `research/decisions/`, `research/comparisons/`, and `research/reports/`.
+1. Create `research/upstream/`, `research/decisions/`, and `research/comparisons/`.
 2. Study xv6 boot and OSDev bootloader patterns; write `ADR-001-boot-path.md`.
 3. Implement QEMU x86_64 UEFI boot with serial logging.
 4. Study xv6 memory and Linux paging; write `ADR-002-memory-model.md`.
@@ -244,4 +334,4 @@ mount points, file descriptors, and standardized error codes.
 7. Add boot-to-shell smoke test.
 8. Study Linux VFS and xv6 filesystem; write `ADR-003-vfs-interface.md`.
 9. Implement a RAM-disk VFS and basic file operations.
-10. Publish a weekly "studied → implemented → validated" report.
+10. Publish a weekly “studied → implemented → validated” report.
