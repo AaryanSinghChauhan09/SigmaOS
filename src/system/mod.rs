@@ -332,11 +332,19 @@ pub use automation::{
 
 pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType};
 pub use cleanup::{
-    get_system_cleanup, init_system_cleanup, CleanupCategory, CleanupOption, CleanupStats,
-    SystemCleanupManager,
+    CleanupCategory, CleanupOption, CleanupStats, SystemCleanupManager,
+    init_system_cleanup, get_system_cleanup,
+};
+pub use logrotate::{
+    LogRotateManager, LogFileConfig as LogRotateManagerFileConfig, RotationSchedule, CompressionType,
+    init_log_rotate, get_log_rotate,
+};
+pub use restore::{
+    SystemRestoreManager, SystemSnapshot, SnapshotType, SnapshotStatus, RestorePoint,
+    init_system_restore, get_system_restore,
 };
 pub use firewall::{
-    FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
+    FirewallManager, FirewallRule as FirewallManagerRule, RuleAction, Protocol, Direction, FirewallProfile,
     init_firewall, get_firewall,
 };
 
