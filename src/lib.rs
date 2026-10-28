@@ -751,9 +751,9 @@ pub use crate::io::sovereign_io_management_and_pr_suite::*;
 
 pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;
 pub use crate::desktop::sovereign_de_wm_advancements_v74_pr::*;
-pub use crate::distro::arch_linux_missing_components_v71_pr::*;
-pub use crate::distro::arch_linux_missing_components_v73_pr::*;
-pub use crate::distro::arch_linux_missing_components_v74_pr::*;
+pub use crate::graphics::sovereign_graphics_display_v72_pr::*;
+pub use crate::graphics::sovereign_graphics_display_v74_pr::*;
+pub use crate::graphics::sovereign_graphics_display_v76_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v68_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v69_pr::*;

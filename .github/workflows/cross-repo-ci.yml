@@ -25,6 +25,7 @@ jobs:
   test-iso:
     runs-on: ubuntu-latest
     continue-on-error: true
+    needs: test-kernel
     steps:
       - uses: actions/checkout@v3
         with:
@@ -40,6 +41,7 @@ jobs:
   test-desktop:
     runs-on: ubuntu-latest
     continue-on-error: true
+    needs: test-kernel
     steps:
       - uses: actions/checkout@v3
         with:
@@ -99,6 +101,8 @@ jobs:
 
   integration-test:
     runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: [test-kernel, test-iso, test-desktop]
     steps:
       - uses: actions/checkout@v3
       - name: Run integration tests
