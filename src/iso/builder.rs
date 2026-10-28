@@ -2,8 +2,8 @@
 //! Follows: Layered Design, Separation of Mechanism & Policy, Modularity, KISS.
 //! Principles: Zero-Copy (mmap), Fail-Fast, Least Privilege, Memory Safety.
 
-use std::path::{Path, PathBuf};
 use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 /// ISO build profile variants inspired by real-world distro ISOs.
 #[derive(Debug, Clone, PartialEq)]
@@ -33,10 +33,10 @@ pub enum TargetArch {
 impl TargetArch {
     pub fn as_str(&self) -> &'static str {
         match self {
-            Self::X86_64    => "x86_64",
-            Self::Aarch64   => "aarch64",
-            Self::Riscv64   => "riscv64",
-            Self::Arm32     => "armv7",
+            Self::X86_64 => "x86_64",
+            Self::Aarch64 => "aarch64",
+            Self::Riscv64 => "riscv64",
+            Self::Arm32 => "armv7",
             Self::LoongArch64 => "loongarch64",
         }
     }
@@ -82,10 +82,10 @@ pub struct IsoBuildConfig {
 /// Squashfs compression algorithms (Zero-Copy friendly algorithms first).
 #[derive(Debug, Clone, PartialEq)]
 pub enum SquashfsCompression {
-    Zstd,   // Best speed/ratio balance (recommended for SigmaOS)
-    Lz4,    // Fastest decompression (for Live/Recovery)
-    Xz,     // Highest compression (for Minimal/release builds)
-    Lzo,    // Legacy compatibility
+    Zstd, // Best speed/ratio balance (recommended for SigmaOS)
+    Lz4,  // Fastest decompression (for Live/Recovery)
+    Xz,   // Highest compression (for Minimal/release builds)
+    Lzo,  // Legacy compatibility
 }
 
 impl Default for IsoBuildConfig {
@@ -140,13 +140,17 @@ impl DistroIsoBuilder {
     /// Validate configuration before building (Fail-Fast principle).
     pub fn validate(&self) -> Result<(), IsoError> {
         if self.config.volume_label.len() > 32 {
-            return Err(IsoError::InvalidConfig("Volume label exceeds 32 characters".into()));
+            return Err(IsoError::InvalidConfig(
+                "Volume label exceeds 32 characters".into(),
+            ));
         }
         if self.config.packages.is_empty() {
             return Err(IsoError::InvalidConfig("Package list is empty".into()));
         }
         if self.config.output_name.is_empty() {
-            return Err(IsoError::InvalidConfig("Output name cannot be empty".into()));
+            return Err(IsoError::InvalidConfig(
+                "Output name cannot be empty".into(),
+            ));
         }
         Ok(())
     }
@@ -154,11 +158,11 @@ impl DistroIsoBuilder {
     /// Compute the approximate ISO size in MiB (query — no side effects).
     pub fn estimate_size_mb(&self) -> u32 {
         let base_mb = match self.config.variant {
-            IsoVariant::Minimal    => 512,
-            IsoVariant::Live       => 1024,
-            IsoVariant::Desktop    => 2048,
-            IsoVariant::Developer  => 3072,
-            IsoVariant::Recovery   => 768,
+            IsoVariant::Minimal => 512,
+            IsoVariant::Live => 1024,
+            IsoVariant::Desktop => 2048,
+            IsoVariant::Developer => 3072,
+            IsoVariant::Recovery => 768,
         };
         base_mb + self.config.efi_partition_mb
     }
@@ -166,16 +170,46 @@ impl DistroIsoBuilder {
     /// Return build plan as a structured list (query — no side effects).
     pub fn build_plan(&self) -> Vec<BuildStep> {
         vec![
-            BuildStep { name: "validate-config".into(),     estimated_ms: 10 },
-            BuildStep { name: "prepare-work-dir".into(),    estimated_ms: 50 },
-            BuildStep { name: "install-packages".into(),    estimated_ms: 60_000 },
-            BuildStep { name: "strip-docs".into(),          estimated_ms: 2_000 },
-            BuildStep { name: "build-squashfs".into(),      estimated_ms: 120_000 },
-            BuildStep { name: "install-bootloader".into(),  estimated_ms: 5_000 },
-            BuildStep { name: "create-efi-image".into(),    estimated_ms: 3_000 },
-            BuildStep { name: "pack-iso9660".into(),        estimated_ms: 30_000 },
-            BuildStep { name: "compute-checksums".into(),   estimated_ms: 5_000 },
-            BuildStep { name: "gpg-sign".into(),            estimated_ms: 2_000 },
+            BuildStep {
+                name: "validate-config".into(),
+                estimated_ms: 10,
+            },
+            BuildStep {
+                name: "prepare-work-dir".into(),
+                estimated_ms: 50,
+            },
+            BuildStep {
+                name: "install-packages".into(),
+                estimated_ms: 60_000,
+            },
+            BuildStep {
+                name: "strip-docs".into(),
+                estimated_ms: 2_000,
+            },
+            BuildStep {
+                name: "build-squashfs".into(),
+                estimated_ms: 120_000,
+            },
+            BuildStep {
+                name: "install-bootloader".into(),
+                estimated_ms: 5_000,
+            },
+            BuildStep {
+                name: "create-efi-image".into(),
+                estimated_ms: 3_000,
+            },
+            BuildStep {
+                name: "pack-iso9660".into(),
+                estimated_ms: 30_000,
+            },
+            BuildStep {
+                name: "compute-checksums".into(),
+                estimated_ms: 5_000,
+            },
+            BuildStep {
+                name: "gpg-sign".into(),
+                estimated_ms: 2_000,
+            },
         ]
     }
 
@@ -184,10 +218,15 @@ impl DistroIsoBuilder {
     pub fn build(&mut self) -> Result<PathBuf, IsoError> {
         self.validate()?;
         self.log(format!("Starting ISO build: {}", self.config.output_name));
-        self.log(format!("Arch: {:?}  Variant: {:?}  Bootloader: {:?}",
-            self.config.arch, self.config.variant, self.config.bootloader));
-        self.log(format!("Packages: {} | Compression: {:?}",
-            self.config.packages.len(), self.config.squashfs_comp));
+        self.log(format!(
+            "Arch: {:?}  Variant: {:?}  Bootloader: {:?}",
+            self.config.arch, self.config.variant, self.config.bootloader
+        ));
+        self.log(format!(
+            "Packages: {} | Compression: {:?}",
+            self.config.packages.len(),
+            self.config.squashfs_comp
+        ));
 
         for step in self.build_plan() {
             self.log(format!("  [{}] ~{}ms", step.name, step.estimated_ms));
@@ -226,9 +265,9 @@ impl std::fmt::Display for IsoError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::InvalidConfig(m) => write!(f, "invalid ISO config: {m}"),
-            Self::IoError(m)       => write!(f, "I/O error: {m}"),
-            Self::ToolNotFound(m)  => write!(f, "required tool not found: {m}"),
-            Self::BuildFailed(m)   => write!(f, "build failed: {m}"),
+            Self::IoError(m) => write!(f, "I/O error: {m}"),
+            Self::ToolNotFound(m) => write!(f, "required tool not found: {m}"),
+            Self::BuildFailed(m) => write!(f, "build failed: {m}"),
         }
     }
 }
