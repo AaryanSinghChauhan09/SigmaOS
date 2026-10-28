@@ -56,7 +56,7 @@ fn test_individual_v81_engines_integration() {
     let parity = dragonfly_engine.compute_erasure_parity(&[&stripe_a, &stripe_b]);
     assert_eq!(parity, vec![1 ^ 5, 2 ^ 6, 3 ^ 7, 4 ^ 8]);
 
-    let netbsd_engine = NetBsd130RumpUserlandAudioPciRouterEngineV81::new();
+    let netbsd_engine = NetBsd1210RumpUserlandAudioPciRouterEngineV81::new();
     assert!(netbsd_engine.route_pci_hypercall(10));
 
     let haiku_engine = HaikuBfsRelationalLiveQueryMetadataEngineV81::new();

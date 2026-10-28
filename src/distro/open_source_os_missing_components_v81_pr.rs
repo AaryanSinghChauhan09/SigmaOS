@@ -4,7 +4,7 @@
 //
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.35+ BPF SchedExt,
 // FreeBSD 16.5+ OpenZFS ARC & Capsicum, OpenBSD 9.4+ Pinsyscall FineIBT, DragonFly BSD 8.3+ HAMMER3,
-// NetBSD 13.0 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
+// NetBSD 12.10 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
 // Global Tech Media 37 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
 // Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines across all 44 core subsystems.
 
@@ -71,14 +71,14 @@ pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV81 {
 impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV81 {
     pub fn new() -> Self {
         Self {
-            total_features_evaluated: 2048,
+            total_features_evaluated: 1080,
             parity_percentage: 100.0,
             os_sources: vec![
                 "Linux 6.35+".to_string(),
                 "FreeBSD 16.5+".to_string(),
                 "OpenBSD 9.4+".to_string(),
                 "DragonFly BSD 8.3+".to_string(),
-                "NetBSD 13.0".to_string(),
+                "NetBSD 12.10".to_string(),
                 "Haiku OS".to_string(),
                 "Plan 9".to_string(),
                 "NixOS / Guix".to_string(),
@@ -149,7 +149,7 @@ impl Linux635SchedExtAiPredictivePowerGovernorEngineV81 {
         }
         let avg_load: f64 = workload_history.iter().sum::<f64>() / workload_history.len() as f64;
         if avg_load > 0.8 {
-            5500
+            5200
         } else if avg_load > 0.4 {
             4000
         } else {
@@ -334,17 +334,17 @@ impl Default for DragonFly83Hammer3DirectIoErasureEngineV81 {
 }
 
 // ============================================================================
-// 6. NetBSD 13.0 Rump Userland Audio PCI Router Engine V81
+// 6. NetBSD 12.10 Rump Userland Audio PCI Router Engine V81
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct NetBsd130RumpUserlandAudioPciRouterEngineV81 {
+pub struct NetBsd1210RumpUserlandAudioPciRouterEngineV81 {
     pub rump_hypercall_active: bool,
     pub pci_passthrough_enabled: bool,
     pub audio_router_channel_count: u32,
 }
 
-impl NetBsd130RumpUserlandAudioPciRouterEngineV81 {
+impl NetBsd1210RumpUserlandAudioPciRouterEngineV81 {
     pub fn new() -> Self {
         Self {
             rump_hypercall_active: true,
@@ -359,10 +359,10 @@ impl NetBsd130RumpUserlandAudioPciRouterEngineV81 {
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV81 {
         OpenSourceOsPrProposalV81 {
-            pr_id: "PR-SIGMA-V81-05-NETBSD-130".to_string(),
-            title: "feat(netbsd): NetBSD 13.0 Rump Kernel Userland Audio PCI Router Engine".to_string(),
-            component_name: "sigmaos-netbsd130-rump-audio-v81".to_string(),
-            os_origin: "NetBSD 13.0".to_string(),
+            pr_id: "PR-SIGMA-V81-05-NETBSD-1210".to_string(),
+            title: "feat(netbsd): NetBSD 12.10 Rump Kernel Userland Audio PCI Router Engine".to_string(),
+            component_name: "sigmaos-netbsd1210-rump-audio-v81".to_string(),
+            os_origin: "NetBSD 12.10".to_string(),
             status: OsPrStatusV81::Validated,
             impacted_subsystems: vec![
                 UniversalSubsystemCategory::AudioSound.as_str().to_string(),
@@ -374,7 +374,7 @@ impl NetBsd130RumpUserlandAudioPciRouterEngineV81 {
     }
 }
 
-impl Default for NetBsd130RumpUserlandAudioPciRouterEngineV81 {
+impl Default for NetBsd1210RumpUserlandAudioPciRouterEngineV81 {
     fn default() -> Self {
         Self::new()
     }
@@ -627,14 +627,14 @@ impl GlobalTechMedia37PortalUnimplementedIdeasEngineV81 {
     pub fn new() -> Self {
         Self {
             active_portals_count: 37,
-            crawled_ideas_count: 4096,
+            crawled_ideas_count: 2304,
         }
     }
 
     pub fn generate_wiki_documentation_page(&self, title: &str) -> String {
         format!(
             "# Wiki Documentation: {}\n\n\
-            Harvester active across {} Tech Media Portals (including 9to5Linux, Phoronix, TechCrunch, TomsHardware, ArsTechnica, LWN, Slashdot).\n\
+            Harvester active across {} Tech Media Portals (including 9to5Linux, Phoronix, TechCrunch, TomsHardware, ArsTechnica, LWN, Slashdot, AnandTech, OSNews).\n\
             Crawled ideas count: {}.",
             title, self.active_portals_count, self.crawled_ideas_count
         )
@@ -749,7 +749,7 @@ pub struct SovereignOpenSourceOsMissingComponentsV81PrSuite {
     pub freebsd_capsicum: FreeBsd165CapsicumCasperNetlinkMeshVnetEngineV81,
     pub openbsd_security: OpenBsd94FineIbtPinsyscallPteGuardEngineV81,
     pub dragonfly_hammer: DragonFly83Hammer3DirectIoErasureEngineV81,
-    pub netbsd_rump: NetBsd130RumpUserlandAudioPciRouterEngineV81,
+    pub netbsd_rump: NetBsd1210RumpUserlandAudioPciRouterEngineV81,
     pub haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV81,
     pub plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV81,
     pub nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV81,
@@ -767,7 +767,7 @@ impl SovereignOpenSourceOsMissingComponentsV81PrSuite {
             freebsd_capsicum: FreeBsd165CapsicumCasperNetlinkMeshVnetEngineV81::new(),
             openbsd_security: OpenBsd94FineIbtPinsyscallPteGuardEngineV81::new(),
             dragonfly_hammer: DragonFly83Hammer3DirectIoErasureEngineV81::new(),
-            netbsd_rump: NetBsd130RumpUserlandAudioPciRouterEngineV81::new(),
+            netbsd_rump: NetBsd1210RumpUserlandAudioPciRouterEngineV81::new(),
             haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV81::new(),
             plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV81::new(),
             nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV81::new(),
@@ -835,7 +835,7 @@ mod tests {
         assert!(report.contains("Feature Parity Matrix V81"));
 
         let sched = Linux635SchedExtAiPredictivePowerGovernorEngineV81::new();
-        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5500);
+        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5200);
 
         let freebsd = FreeBsd165CapsicumCasperNetlinkMeshVnetEngineV81::new();
         assert!(freebsd.verify_jail_vnet_isolation(10));
@@ -847,7 +847,7 @@ mod tests {
         let parity = dfbsd.compute_erasure_parity(&[&[1, 2], &[3, 4]]);
         assert_eq!(parity, vec![1 ^ 3, 2 ^ 4]);
 
-        let netbsd = NetBsd130RumpUserlandAudioPciRouterEngineV81::new();
+        let netbsd = NetBsd1210RumpUserlandAudioPciRouterEngineV81::new();
         assert!(netbsd.route_pci_hypercall(1));
 
         let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV81::new();
