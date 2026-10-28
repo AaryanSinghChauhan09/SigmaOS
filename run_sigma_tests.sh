@@ -457,7 +457,7 @@ if [ -f "src/creative/effectcraft_artcraft_missing_components_v68_pr.rs" ]; then
 fi
 
 if [ -f "src/creative/effectcraft_artcraft_missing_components_v69_pr.rs" ]; then
-    echo -e "\n${YELLOW}Running EffectCraft & ArtCraft Missing Components V69 PR Suite...${NC}"
+    echo "Running EffectCraft & ArtCraft Missing Components V69 PR Suite..."
     rustc --test src/creative/effectcraft_artcraft_missing_components_v69_pr.rs --edition=2021 -o build/test_effectcraft_v69
     ./build/test_effectcraft_v69
 fi
