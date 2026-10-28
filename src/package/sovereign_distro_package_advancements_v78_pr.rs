@@ -38,7 +38,7 @@ pub mod universal;
 pub mod sovereign_distro_package_advancements_v78;
 
 #[cfg(feature = "standalone_test")]
-pub use sovereign_distro_package_advancements_v78::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+use crate::sovereign_distro_package_advancements_v78::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 
 /// Pull Request Proposal Manifest V78
 #[derive(Debug, Clone, PartialEq, Eq)]
