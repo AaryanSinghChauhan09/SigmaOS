@@ -951,6 +951,8 @@ pub mod cachy_linux_missing_components_v72_pr;
 pub use cachy_linux_missing_components_v72_pr::*;
 pub mod cachy_linux_missing_components_v76_pr;
 pub use cachy_linux_missing_components_v76_pr::*;
+pub mod cachy_linux_missing_components_v78_pr;
+pub use cachy_linux_missing_components_v78_pr::*;
 pub mod open_source_os_missing_components_v71_pr;
 pub use open_source_os_missing_components_v71_pr::*;
 pub mod open_source_os_missing_components_v72_pr;
