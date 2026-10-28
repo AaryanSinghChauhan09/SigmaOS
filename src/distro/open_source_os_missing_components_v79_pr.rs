@@ -71,7 +71,7 @@ pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV79 {
 impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV79 {
     pub fn new() -> Self {
         Self {
-            total_features_evaluated: 1080,
+            total_features_evaluated: 1024,
             parity_percentage: 100.0,
             os_sources: vec![
                 "Linux 6.33+".to_string(),
@@ -137,23 +137,23 @@ impl Linux633SchedExtAiPredictivePowerGovernorEngineV79 {
     pub fn new() -> Self {
         Self {
             sched_ext_active: true,
-            eevdf_latency_target_us: 140,
+            eevdf_latency_target_us: 150,
             energy_model_enabled: true,
-            active_cpu_cores: 128,
+            active_cpu_cores: 64,
         }
     }
 
     pub fn predict_optimal_cpu_frequency(&self, workload_history: &[f64]) -> u32 {
         if workload_history.is_empty() {
-            return 2500;
+            return 2400;
         }
         let avg_load: f64 = workload_history.iter().sum::<f64>() / workload_history.len() as f64;
         if avg_load > 0.8 {
-            5000
+            4800
         } else if avg_load > 0.4 {
-            3800
+            3600
         } else {
-            1900
+            1800
         }
     }
 
@@ -198,7 +198,7 @@ impl FreeBsd163CapsicumCasperNetlinkMeshVnetEngineV79 {
             capsicum_active: true,
             casper_service_running: true,
             netlink_vnet_mesh_active: true,
-            total_jails_active: 256,
+            total_jails_active: 128,
         }
     }
 
@@ -292,7 +292,7 @@ impl DragonFly81Hammer3DirectIoErasureEngineV79 {
         Self {
             hammer3_pfs_active: true,
             erasure_coding_enabled: true,
-            stripe_width: 16,
+            stripe_width: 8,
         }
     }
 
@@ -349,7 +349,7 @@ impl NetBsd128RumpUserlandAudioPciRouterEngineV79 {
         Self {
             rump_hypercall_active: true,
             pci_passthrough_enabled: true,
-            audio_router_channel_count: 64,
+            audio_router_channel_count: 32,
         }
     }
 
@@ -394,7 +394,7 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV79 {
     pub fn new() -> Self {
         Self {
             bfs_live_query_active: true,
-            btree_indexed_attributes: 1024,
+            btree_indexed_attributes: 512,
         }
     }
 
@@ -402,7 +402,7 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV79 {
         if !self.bfs_live_query_active {
             return Vec::new();
         }
-        vec![format!("META_V79:{}", attr_name)]
+        vec![format!("META:{}", attr_name)]
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV79 {
@@ -441,7 +441,7 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV79 {
     pub fn new() -> Self {
         Self {
             vfs_9p_active: true,
-            rfork_namespaces_count: 1024,
+            rfork_namespaces_count: 512,
         }
     }
 
@@ -489,7 +489,7 @@ impl NixGuixHermeticCasMerkleClosureEngineV79 {
     pub fn new() -> Self {
         Self {
             cas_store_active: true,
-            merkle_closure_tree_depth: 64,
+            merkle_closure_tree_depth: 32,
         }
     }
 
@@ -540,7 +540,7 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV79 {
 
     pub fn probe_vnic_latency(&self, vnic_id: u32) -> u64 {
         if self.crossbow_vnic_active && self.dtrace_ebpf_bridge_enabled {
-            vnic_id as u64 + 2
+            vnic_id as u64 + 3
         } else {
             100
         }
@@ -627,14 +627,14 @@ impl GlobalTechMedia35PortalUnimplementedIdeasEngineV79 {
     pub fn new() -> Self {
         Self {
             active_portals_count: 35,
-            crawled_ideas_count: 2048,
+            crawled_ideas_count: 1024,
         }
     }
 
     pub fn generate_wiki_documentation_page(&self, title: &str) -> String {
         format!(
             "# Wiki Documentation: {}\n\n\
-            Harvester active across {} Tech Media Portals (including 9to5Linux, Phoronix, TechCrunch, TomsHardware, ArsTechnica, LWN).\n\
+            Harvester active across {} Tech Media Portals (including 9to5Linux, Phoronix, TechCrunch, TomsHardware, ArsTechnica).\n\
             Crawled ideas count: {}.",
             title, self.active_portals_count, self.crawled_ideas_count
         )
@@ -835,7 +835,7 @@ mod tests {
         assert!(report.contains("Feature Parity Matrix V79"));
 
         let sched = Linux633SchedExtAiPredictivePowerGovernorEngineV79::new();
-        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5000);
+        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 4800);
 
         let freebsd = FreeBsd163CapsicumCasperNetlinkMeshVnetEngineV79::new();
         assert!(freebsd.verify_jail_vnet_isolation(10));
@@ -851,16 +851,16 @@ mod tests {
         assert!(netbsd.route_pci_hypercall(1));
 
         let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV79::new();
-        assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META_V79:ARTIST"]);
+        assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
         let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV79::new();
-        assert_eq!(plan9.rfork_namespace(1), 1025);
+        assert_eq!(plan9.rfork_namespace(1), 513);
 
         let nix = NixGuixHermeticCasMerkleClosureEngineV79::new();
         assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
 
         let illumos = IllumosCrossbowVnicDtraceSwitchMeshEngineV79::new();
-        assert_eq!(illumos.probe_vnic_latency(5), 7);
+        assert_eq!(illumos.probe_vnic_latency(5), 8);
 
         let mut omarchy = OmarchyWallustThemeChordNavigatorEngineV79::new();
         assert!(omarchy.reload_theme("Dark-V79"));
