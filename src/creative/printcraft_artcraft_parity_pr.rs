@@ -55,11 +55,14 @@ impl PrintcraftDriverlessIppEverywherePrEngine {
             "ipp://printer.local/ipp/print".to_string(),
             "Epson-SureColor-P900,color-supported,duplex,cmyk".to_string(),
         );
-        Self { discovered_printers: printers }
+        Self {
+            discovered_printers: printers,
+        }
     }
 
     pub fn discover_printers(&mut self, uri: &str, capabilities: &str) {
-        self.discovered_printers.insert(uri.to_string(), capabilities.to_string());
+        self.discovered_printers
+            .insert(uri.to_string(), capabilities.to_string());
     }
 
     pub fn query_capabilities(&self, uri: &str) -> Option<&String> {
@@ -96,10 +99,10 @@ impl Default for PrintcraftDriverlessIppEverywherePrEngine {
 /// CMYK Color struct with Under Color Removal (UCR) & Gray Component Replacement (GCR).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PrintcraftCmykSpotColor {
-    pub c: f32, // Cyan [0.0, 1.0]
-    pub m: f32, // Magenta [0.0, 1.0]
-    pub y: f32, // Yellow [0.0, 1.0]
-    pub k: f32, // Key / Black [0.0, 1.0]
+    pub c: f32,                // Cyan [0.0, 1.0]
+    pub m: f32,                // Magenta [0.0, 1.0]
+    pub y: f32,                // Yellow [0.0, 1.0]
+    pub k: f32,                // Key / Black [0.0, 1.0]
     pub spot_ink: Option<u16>, // Spot color ID / Pantone index
 }
 
@@ -209,12 +212,7 @@ impl PrintcraftMultiThreadedRipHalftoningPrEngine {
     }
 
     pub fn process_ordered_dither_cmyk(&self, cmyk_pixels: &[PrintcraftCmykSpotColor]) -> Vec<u8> {
-        let bayer_matrix: [u8; 16] = [
-             0,  8,  2, 10,
-            12,  4, 14,  6,
-             3, 11,  1,  9,
-            15,  7, 13,  5,
-        ];
+        let bayer_matrix: [u8; 16] = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
         let mut dithered_output = Vec::with_capacity(cmyk_pixels.len() * 4);
         for (i, px) in cmyk_pixels.iter().enumerate() {
@@ -294,7 +292,8 @@ impl PrintcraftIccColorProfileSoftProofingPrEngine {
     pub fn generate_proposal(&self) -> PrintcraftArtcraftPrProposalManifest {
         PrintcraftArtcraftPrProposalManifest {
             pr_id: 204,
-            pr_title: "feat(printcraft): ICC Profile Color Management & Soft-Proofing Simulator".to_string(),
+            pr_title: "feat(printcraft): ICC Profile Color Management & Soft-Proofing Simulator"
+                .to_string(),
             target_subsystem: "PrintCraft ICC Soft-Proofing Subsystem".to_string(),
             original_suite: "ArtCraft PrintCraft Studio".to_string(),
             components_added: vec![
@@ -321,7 +320,7 @@ impl Default for PrintcraftIccColorProfileSoftProofingPrEngine {
 /// Page Imposition Layout & Booklet Binding PR Engine.
 #[derive(Debug, Clone)]
 pub struct PrintcraftPageImpositionBookletBindingPrEngine {
-    pub n_up_mode: u8,         // 2-up, 4-up, 8-up, 16-up
+    pub n_up_mode: u8, // 2-up, 4-up, 8-up, 16-up
     pub creep_compensation_mm: f32,
     pub bind_direction: String, // "Left", "Right", "Saddle-Stitch"
 }
@@ -398,7 +397,11 @@ impl PrintcraftPdfXPreflightCompliancePrEngine {
         }
     }
 
-    pub fn validate_and_repair_document(&self, embedded_fonts: bool, has_transparency: bool) -> (bool, Vec<String>) {
+    pub fn validate_and_repair_document(
+        &self,
+        embedded_fonts: bool,
+        has_transparency: bool,
+    ) -> (bool, Vec<String>) {
         let mut fixes = Vec::new();
         let mut valid = true;
 
@@ -407,7 +410,9 @@ impl PrintcraftPdfXPreflightCompliancePrEngine {
         }
 
         if has_transparency && self.standard_level == "PDF/X-1a:2001" {
-            fixes.push("Flattened PDF vector transparency layers for PDF/X-1a compliance".to_string());
+            fixes.push(
+                "Flattened PDF vector transparency layers for PDF/X-1a compliance".to_string(),
+            );
         } else if has_transparency {
             fixes.push("Retained live transparency with PDF/X-4 output intent".to_string());
         }
@@ -422,7 +427,9 @@ impl PrintcraftPdfXPreflightCompliancePrEngine {
     pub fn generate_proposal(&self) -> PrintcraftArtcraftPrProposalManifest {
         PrintcraftArtcraftPrProposalManifest {
             pr_id: 206,
-            pr_title: "feat(printcraft): PDF/X Print Preflight Compliance Validator & Auto-Repair Engine".to_string(),
+            pr_title:
+                "feat(printcraft): PDF/X Print Preflight Compliance Validator & Auto-Repair Engine"
+                    .to_string(),
             target_subsystem: "PrintCraft PDF Preflight Subsystem".to_string(),
             original_suite: "ArtCraft PrintCraft Studio".to_string(),
             components_added: vec![
@@ -455,11 +462,19 @@ pub struct PrintcraftVariableDataPrintingVdpPrEngine {
 impl PrintcraftVariableDataPrintingVdpPrEngine {
     pub fn new() -> Self {
         Self {
-            template_fields: vec!["FirstName".to_string(), "LastName".to_string(), "BarCode".to_string()],
+            template_fields: vec![
+                "FirstName".to_string(),
+                "LastName".to_string(),
+                "BarCode".to_string(),
+            ],
         }
     }
 
-    pub fn render_vdp_records(&self, template_str: &str, records: &[BTreeMap<String, String>]) -> Vec<String> {
+    pub fn render_vdp_records(
+        &self,
+        template_str: &str,
+        records: &[BTreeMap<String, String>],
+    ) -> Vec<String> {
         let mut output_pages = Vec::with_capacity(records.len());
         for record in records {
             let mut rendered = template_str.to_string();
@@ -502,9 +517,9 @@ impl Default for PrintcraftVariableDataPrintingVdpPrEngine {
 /// Substrate Paper Media Profiling, Dot Gain & Ink Absorption Calibrator PR Engine.
 #[derive(Debug, Clone)]
 pub struct PrintcraftSubstrateMediaCalibratorPrEngine {
-    pub media_type: String,       // Glossy, Matte, Canvas, Newsprint
-    pub dot_gain_percent: f32,    // e.g. 15.0%
-    pub ink_limit_percent: f32,   // e.g. 280.0%
+    pub media_type: String,     // Glossy, Matte, Canvas, Newsprint
+    pub dot_gain_percent: f32,  // e.g. 15.0%
+    pub ink_limit_percent: f32, // e.g. 280.0%
 }
 
 impl PrintcraftSubstrateMediaCalibratorPrEngine {
@@ -524,7 +539,9 @@ impl PrintcraftSubstrateMediaCalibratorPrEngine {
     pub fn generate_proposal(&self) -> PrintcraftArtcraftPrProposalManifest {
         PrintcraftArtcraftPrProposalManifest {
             pr_id: 208,
-            pr_title: "feat(printcraft): Substrate Media Profiling, Dot Gain & Ink Absorption Calibrator".to_string(),
+            pr_title:
+                "feat(printcraft): Substrate Media Profiling, Dot Gain & Ink Absorption Calibrator"
+                    .to_string(),
             target_subsystem: "PrintCraft Substrate Calibration Subsystem".to_string(),
             original_suite: "ArtCraft PrintCraft Studio".to_string(),
             components_added: vec![
@@ -637,7 +654,7 @@ impl PrintcraftPostScriptPdfRasterizerPrEngine {
         for (i, cmd) in commands.iter().enumerate() {
             if cmd.contains("fill") {
                 let idx = (i * 4) % (raster_buffer.len() - 4);
-                raster_buffer[idx] = 0;     // R
+                raster_buffer[idx] = 0; // R
                 raster_buffer[idx + 1] = 0; // G
                 raster_buffer[idx + 2] = 0; // B
                 raster_buffer[idx + 3] = 255; // A
@@ -649,7 +666,9 @@ impl PrintcraftPostScriptPdfRasterizerPrEngine {
     pub fn generate_proposal(&self) -> PrintcraftArtcraftPrProposalManifest {
         PrintcraftArtcraftPrProposalManifest {
             pr_id: 210,
-            pr_title: "feat(printcraft): Vector PostScript / PDF Page Rasterizer & Transparency Flattener".to_string(),
+            pr_title:
+                "feat(printcraft): Vector PostScript / PDF Page Rasterizer & Transparency Flattener"
+                    .to_string(),
             target_subsystem: "PrintCraft PostScript/PDF Engine".to_string(),
             original_suite: "ArtCraft PrintCraft Studio".to_string(),
             components_added: vec![
@@ -705,12 +724,20 @@ impl SovereignPrintcraftArtcraftParityPrGateway {
     }
 
     pub fn evaluate_printcraft_parity(&mut self) -> bool {
-        if self.driverless_ipp_engine.query_capabilities("ipp://printer.local/ipp/print").is_none() {
+        if self
+            .driverless_ipp_engine
+            .query_capabilities("ipp://printer.local/ipp/print")
+            .is_none()
+        {
             return false;
         }
 
-        let cmyk = self.cmyk_separation_engine.convert_rgb_to_cmyk_gcr(128, 64, 200);
-        let dithered = self.rip_halftoning_engine.process_ordered_dither_cmyk(&[cmyk]);
+        let cmyk = self
+            .cmyk_separation_engine
+            .convert_rgb_to_cmyk_gcr(128, 64, 200);
+        let dithered = self
+            .rip_halftoning_engine
+            .process_ordered_dither_cmyk(&[cmyk]);
         if dithered.is_empty() {
             return false;
         }
@@ -725,14 +752,18 @@ impl SovereignPrintcraftArtcraftParityPrGateway {
             return false;
         }
 
-        let (_valid, fixes) = self.preflight_engine.validate_and_repair_document(false, true);
+        let (_valid, fixes) = self
+            .preflight_engine
+            .validate_and_repair_document(false, true);
         if fixes.is_empty() {
             return false;
         }
 
         let mut rec = BTreeMap::new();
         rec.insert("FirstName".to_string(), "Alice".to_string());
-        let pages = self.vdp_engine.render_vdp_records("Hello {{FirstName}}", &[rec]);
+        let pages = self
+            .vdp_engine
+            .render_vdp_records("Hello {{FirstName}}", &[rec]);
         if pages.len() != 1 {
             return false;
         }
@@ -747,7 +778,9 @@ impl SovereignPrintcraftArtcraftParityPrGateway {
             return false;
         }
 
-        let raster = self.rasterizer_engine.rasterize_vector_command_buffer(&["fill rect"]);
+        let raster = self
+            .rasterizer_engine
+            .rasterize_vector_command_buffer(&["fill rect"]);
         if raster.is_empty() {
             return false;
         }

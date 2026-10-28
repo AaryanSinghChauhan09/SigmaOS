@@ -83,7 +83,11 @@ impl ReactOsNtObjectDirectoryPrEngine {
         }
     }
 
-    pub fn create_directory_object(&mut self, path: &str, object_type: &str) -> Result<u64, String> {
+    pub fn create_directory_object(
+        &mut self,
+        path: &str,
+        object_type: &str,
+    ) -> Result<u64, String> {
         let handle = self.next_handle_id;
         self.next_handle_id += 4; // NT handles increment by 4
         let node = NtObjectDirectoryNode {
@@ -149,10 +153,19 @@ impl ReactOsWin32kGdiUserPrEngine {
             style,
         };
         self.registered_classes.insert(name.to_string(), win_class);
-        Ok(format!("Registered win32k class '{}' with style 0x{:X}", name, style))
+        Ok(format!(
+            "Registered win32k class '{}' with style 0x{:X}",
+            name, style
+        ))
     }
 
-    pub fn post_user_message(&mut self, hwnd: u64, msg_id: u32, w_param: u64, l_param: u64) -> usize {
+    pub fn post_user_message(
+        &mut self,
+        hwnd: u64,
+        msg_id: u32,
+        w_param: u64,
+        l_param: u64,
+    ) -> usize {
         self.message_queue.push(Win32kMessage {
             hwnd,
             msg_id,
@@ -197,7 +210,12 @@ impl ReactOsNtRegistryHivePrEngine {
         }
     }
 
-    pub fn set_registry_value(&mut self, hive_path: &str, value_name: &str, data: &[u8]) -> Result<String, String> {
+    pub fn set_registry_value(
+        &mut self,
+        hive_path: &str,
+        value_name: &str,
+        data: &[u8],
+    ) -> Result<String, String> {
         if let Some(key) = self.hives.get_mut(hive_path) {
             key.values.insert(value_name.to_string(), data.to_vec());
             let log = format!("REG_SET: {} -> {}", hive_path, value_name);
@@ -335,7 +353,9 @@ impl ReactOsPeLoaderRelocPrEngine {
                 imported_dlls: vec!["hal.dll".to_string(), "kdcom.dll".to_string()],
             },
         );
-        Self { loaded_images: loaded }
+        Self {
+            loaded_images: loaded,
+        }
     }
 
     pub fn load_pe_binary(&mut self, name: &str, preferred_base: u64) -> Result<u64, String> {
@@ -387,21 +407,40 @@ impl SovereignReactOsMissingComponentsParityPrGateway {
     }
 
     pub fn execute_reactos_parity_eval(&mut self) -> bool {
-        let handle = self.object_dir.create_directory_object("\\KnownDlls", "Directory").unwrap_or(0);
+        let handle = self
+            .object_dir
+            .create_directory_object("\\KnownDlls", "Directory")
+            .unwrap_or(0);
         let _win_class = self.win32k.register_window_class("BUTTON", 0x0002).is_ok();
         let _msg = self.win32k.post_user_message(0x1000, 0x0010, 0, 0) > 0;
-        let _reg = self.registry.set_registry_value("\\REGISTRY\\MACHINE\\SYSTEM", "Select", &[0x01, 0x00, 0x00, 0x00]).is_ok();
-        let irp_id = self.io_manager.allocate_irp(0x03, "\\Device\\Harddisk0\\Partition1");
+        let _reg = self
+            .registry
+            .set_registry_value(
+                "\\REGISTRY\\MACHINE\\SYSTEM",
+                "Select",
+                &[0x01, 0x00, 0x00, 0x00],
+            )
+            .is_ok();
+        let irp_id = self
+            .io_manager
+            .allocate_irp(0x03, "\\Device\\Harddisk0\\Partition1");
         let _irp_disp = self.io_manager.dispatch_irp_stack(irp_id).is_ok();
         let vad_addr = self.vm_manager.allocate_vad_region(8192, 0x04);
-        let pe_entry = self.pe_loader.load_pe_binary("explorer.exe", 0x00400000).unwrap_or(0);
-        let _reloc = self.pe_loader.apply_base_relocations("explorer.exe", 0x10000).is_ok();
+        let pe_entry = self
+            .pe_loader
+            .load_pe_binary("explorer.exe", 0x00400000)
+            .unwrap_or(0);
+        let _reloc = self
+            .pe_loader
+            .apply_base_relocations("explorer.exe", 0x10000)
+            .is_ok();
 
         handle > 0 && vad_addr >= 0x00400000 && pe_entry > 0
     }
 }
 
-pub type SovereignReactOsMissingComponentsParityPrSuite = SovereignReactOsMissingComponentsParityPrGateway;
+pub type SovereignReactOsMissingComponentsParityPrSuite =
+    SovereignReactOsMissingComponentsParityPrGateway;
 
 #[cfg(test)]
 mod tests {
@@ -410,7 +449,9 @@ mod tests {
     #[test]
     fn test_reactos_nt_object_directory_engine() {
         let mut engine = ReactOsNtObjectDirectoryPrEngine::new();
-        let handle = engine.create_directory_object("\\KernelObjects\\Device1", "Device").unwrap();
+        let handle = engine
+            .create_directory_object("\\KernelObjects\\Device1", "Device")
+            .unwrap();
         assert_eq!(handle, 0x1000);
         let node = engine.lookup_object("\\KernelObjects\\Device1").unwrap();
         assert_eq!(node.object_type, "Device");
@@ -428,9 +469,15 @@ mod tests {
     #[test]
     fn test_reactos_nt_registry_hive_engine() {
         let mut engine = ReactOsNtRegistryHivePrEngine::new();
-        let set_res = engine.set_registry_value("\\REGISTRY\\MACHINE\\SYSTEM", "SetupType", &[0x00, 0x00, 0x00, 0x00]);
+        let set_res = engine.set_registry_value(
+            "\\REGISTRY\\MACHINE\\SYSTEM",
+            "SetupType",
+            &[0x00, 0x00, 0x00, 0x00],
+        );
         assert!(set_res.is_ok());
-        let val = engine.query_registry_value("\\REGISTRY\\MACHINE\\SYSTEM", "SetupType").unwrap();
+        let val = engine
+            .query_registry_value("\\REGISTRY\\MACHINE\\SYSTEM", "SetupType")
+            .unwrap();
         assert_eq!(&val, &[0x00, 0x00, 0x00, 0x00]);
     }
 
@@ -474,7 +521,10 @@ mod tests {
         assert!(gateway.win32k.registered_classes.contains_key("BUTTON"));
 
         // Test Registry
-        let val = gateway.registry.query_registry_value("\\REGISTRY\\MACHINE\\SYSTEM", "SystemStartOptions").unwrap();
+        let val = gateway
+            .registry
+            .query_registry_value("\\REGISTRY\\MACHINE\\SYSTEM", "SystemStartOptions")
+            .unwrap();
         assert_eq!(&val, b"NOEXEC=OPTIN NOPAE");
 
         // Test I/O Manager IRP

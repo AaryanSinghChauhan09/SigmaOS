@@ -45,11 +45,15 @@ impl ArchPacmanParallelDownloadConnectionPoolPrEngine {
         Self {
             max_parallel_streams: 32,
             enable_http3_quic: true,
-            total_downloads_completed: 10240,        }
+            total_downloads_completed: 10240,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        self.max_parallel_streams > 0 && self.enable_http3_quic && self.total_downloads_completed > 0    }
+        self.max_parallel_streams > 0
+            && self.enable_http3_quic
+            && self.total_downloads_completed > 0
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -65,7 +69,8 @@ impl ArchPacmanParallelDownloadConnectionPoolPrEngine {
     }
 }
 
-impl Default for ArchPacmanParallelDownloadConnectionPoolPrEngine {    fn default() -> Self {
+impl Default for ArchPacmanParallelDownloadConnectionPoolPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -82,11 +87,13 @@ impl ArchAurHelperYayDependencyResolverPrEngine {
         Self {
             sat_solver_rules: 256,
             ast_parser_enabled: true,
-            resolved_packages_count: 5000,        }
+            resolved_packages_count: 5000,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        self.sat_solver_rules > 0 && self.ast_parser_enabled && self.resolved_packages_count > 0    }
+        self.sat_solver_rules > 0 && self.ast_parser_enabled && self.resolved_packages_count > 0
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -103,7 +110,8 @@ impl ArchAurHelperYayDependencyResolverPrEngine {
     }
 }
 
-impl Default for ArchAurHelperYayDependencyResolverPrEngine {    fn default() -> Self {
+impl Default for ArchAurHelperYayDependencyResolverPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -120,11 +128,13 @@ impl ArchMkinitcpioSystemdUkiStubEnginePrEngine {
         Self {
             uki_stub_path: "/boot/EFI/Linux/systemd-uki.efi".to_string(),
             tpm2_pcr_measurer: true,
-            secureboot_keys_count: 4,        }
+            secureboot_keys_count: 4,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        !self.uki_stub_path.is_empty() && self.tpm2_pcr_measurer && self.secureboot_keys_count > 0    }
+        !self.uki_stub_path.is_empty() && self.tpm2_pcr_measurer && self.secureboot_keys_count > 0
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -140,7 +150,8 @@ impl ArchMkinitcpioSystemdUkiStubEnginePrEngine {
     }
 }
 
-impl Default for ArchMkinitcpioSystemdUkiStubEnginePrEngine {    fn default() -> Self {
+impl Default for ArchMkinitcpioSystemdUkiStubEnginePrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -157,11 +168,13 @@ impl ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine {
         Self {
             eevdf_latency_ns: 2000000,
             bore_burst_score_max: 64,
-            fps_pacing_target_hz: 240,        }
+            fps_pacing_target_hz: 240,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        self.eevdf_latency_ns > 0 && self.bore_burst_score_max > 0 && self.fps_pacing_target_hz > 0    }
+        self.eevdf_latency_ns > 0 && self.bore_burst_score_max > 0 && self.fps_pacing_target_hz > 0
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -177,7 +190,8 @@ impl ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine {
     }
 }
 
-impl Default for ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine {    fn default() -> Self {
+impl Default for ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -194,11 +208,13 @@ impl ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine {
         Self {
             subvolumes_count: 6,
             compression_level: "zstd:3".to_string(),
-            snapper_integration: true,        }
+            snapper_integration: true,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        self.subvolumes_count > 0 && !self.compression_level.is_empty() && self.snapper_integration    }
+        self.subvolumes_count > 0 && !self.compression_level.is_empty() && self.snapper_integration
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -214,7 +230,8 @@ impl ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine {
     }
 }
 
-impl Default for ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine {    fn default() -> Self {
+impl Default for ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -231,11 +248,15 @@ impl ArchPacmanConfigRepositoryCustomDbPrEngine {
         Self {
             repo_name: "sigma-core".to_string(),
             pqc_signature_algo: "Dilithium3".to_string(),
-            packages_indexed: 1200,        }
+            packages_indexed: 1200,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        !self.repo_name.is_empty() && !self.pqc_signature_algo.is_empty() && self.packages_indexed > 0    }
+        !self.repo_name.is_empty()
+            && !self.pqc_signature_algo.is_empty()
+            && self.packages_indexed > 0
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -252,7 +273,8 @@ impl ArchPacmanConfigRepositoryCustomDbPrEngine {
     }
 }
 
-impl Default for ArchPacmanConfigRepositoryCustomDbPrEngine {    fn default() -> Self {
+impl Default for ArchPacmanConfigRepositoryCustomDbPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -269,11 +291,13 @@ impl ArchArchisoSquashfsZstdBootstrapPrEngine {
         Self {
             zstd_compression_level: 19,
             live_overlay_ram_mb: 4096,
-            uefi_iso_bootable: true,        }
+            uefi_iso_bootable: true,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        self.zstd_compression_level > 0 && self.live_overlay_ram_mb > 0 && self.uefi_iso_bootable    }
+        self.zstd_compression_level > 0 && self.live_overlay_ram_mb > 0 && self.uefi_iso_bootable
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -289,7 +313,8 @@ impl ArchArchisoSquashfsZstdBootstrapPrEngine {
     }
 }
 
-impl Default for ArchArchisoSquashfsZstdBootstrapPrEngine {    fn default() -> Self {
+impl Default for ArchArchisoSquashfsZstdBootstrapPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -306,11 +331,15 @@ impl ArchPacmanCachePaccacheRetentionPrEngine {
         Self {
             keep_last_versions: 2,
             freed_disk_space_mb: 15360,
-            uninstalled_packages_cleaned: 850,        }
+            uninstalled_packages_cleaned: 850,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        self.keep_last_versions > 0 && self.freed_disk_space_mb > 0 && self.uninstalled_packages_cleaned > 0    }
+        self.keep_last_versions > 0
+            && self.freed_disk_space_mb > 0
+            && self.uninstalled_packages_cleaned > 0
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -326,7 +355,8 @@ impl ArchPacmanCachePaccacheRetentionPrEngine {
     }
 }
 
-impl Default for ArchPacmanCachePaccacheRetentionPrEngine {    fn default() -> Self {
+impl Default for ArchPacmanCachePaccacheRetentionPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -343,11 +373,15 @@ impl ArchArchNewsSystemNotificationPrEngine {
         Self {
             rss_feed_url: "https://archlinux.org/feeds/news/".to_string(),
             high_priority_advisories: 12,
-            auto_hold_upgrades: true,        }
+            auto_hold_upgrades: true,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        !self.rss_feed_url.is_empty() && self.high_priority_advisories > 0 && self.auto_hold_upgrades    }
+        !self.rss_feed_url.is_empty()
+            && self.high_priority_advisories > 0
+            && self.auto_hold_upgrades
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -363,7 +397,8 @@ impl ArchArchNewsSystemNotificationPrEngine {
     }
 }
 
-impl Default for ArchArchNewsSystemNotificationPrEngine {    fn default() -> Self {
+impl Default for ArchArchNewsSystemNotificationPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -380,11 +415,15 @@ impl ArchKeyringWebOfTrustAutoRefreshPrEngine {
         Self {
             wkd_sync_interval_hours: 24,
             keys_rotated_count: 512,
-            pqc_dilithium_verified: true,        }
+            pqc_dilithium_verified: true,
+        }
     }
 
     pub fn verify(&self) -> bool {
-        self.wkd_sync_interval_hours > 0 && self.keys_rotated_count > 0 && self.pqc_dilithium_verified    }
+        self.wkd_sync_interval_hours > 0
+            && self.keys_rotated_count > 0
+            && self.pqc_dilithium_verified
+    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -400,7 +439,8 @@ impl ArchKeyringWebOfTrustAutoRefreshPrEngine {
     }
 }
 
-impl Default for ArchKeyringWebOfTrustAutoRefreshPrEngine {    fn default() -> Self {
+impl Default for ArchKeyringWebOfTrustAutoRefreshPrEngine {
+    fn default() -> Self {
         Self::new()
     }
 }
@@ -416,7 +456,8 @@ pub struct ArchLinuxMissingComponentsV71PrSuite {
     pub archiso: ArchArchisoSquashfsZstdBootstrapPrEngine,
     pub paccache: ArchPacmanCachePaccacheRetentionPrEngine,
     pub archnews: ArchArchNewsSystemNotificationPrEngine,
-    pub keyring: ArchKeyringWebOfTrustAutoRefreshPrEngine,}
+    pub keyring: ArchKeyringWebOfTrustAutoRefreshPrEngine,
+}
 
 impl ArchLinuxMissingComponentsV71PrSuite {
     pub fn new() -> Self {
@@ -430,7 +471,8 @@ impl ArchLinuxMissingComponentsV71PrSuite {
             archiso: ArchArchisoSquashfsZstdBootstrapPrEngine::new(),
             paccache: ArchPacmanCachePaccacheRetentionPrEngine::new(),
             archnews: ArchArchNewsSystemNotificationPrEngine::new(),
-            keyring: ArchKeyringWebOfTrustAutoRefreshPrEngine::new(),        }
+            keyring: ArchKeyringWebOfTrustAutoRefreshPrEngine::new(),
+        }
     }
 
     pub fn run_all_prs(&self) -> Vec<ArchLinuxV71PrSpec> {
@@ -444,7 +486,8 @@ impl ArchLinuxMissingComponentsV71PrSuite {
             self.archiso.generate_pr(),
             self.paccache.generate_pr(),
             self.archnews.generate_pr(),
-            self.keyring.generate_pr(),        ]
+            self.keyring.generate_pr(),
+        ]
     }
 
     pub fn compute_gap_closure_score(&self) -> u32 {
@@ -476,7 +519,8 @@ impl ArchLinuxMissingComponentsV71PrSuite {
         if self.archnews.verify() {
             score += 10;
         }
-        if self.keyring.verify() {            score += 10;
+        if self.keyring.verify() {
+            score += 10;
         }
         score
     }

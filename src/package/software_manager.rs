@@ -33,7 +33,8 @@ impl AppPackageStatus {
     pub fn from_str(s: &str) -> Option<Self> {
         if s.eq_ignore_ascii_case("installed") {
             Some(AppPackageStatus::Installed)
-        } else if s.eq_ignore_ascii_case("notinstalled") || s.eq_ignore_ascii_case("not_installed") {
+        } else if s.eq_ignore_ascii_case("notinstalled") || s.eq_ignore_ascii_case("not_installed")
+        {
             Some(AppPackageStatus::NotInstalled)
         } else if s.eq_ignore_ascii_case("updateavailable")
             || s.eq_ignore_ascii_case("update_available")

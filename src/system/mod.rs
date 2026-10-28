@@ -217,7 +217,6 @@ pub use sigmastallmanager::{
     SoftwareItem as InstallManagerItem,
 };
 pub use sigmataskscheduler::{
-    pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
 };
@@ -298,16 +297,13 @@ pub mod task_scheduler;
 pub mod update_manager;
 pub mod user_manager;
 
-// SigmaOS System Utilities Module
-// System-level utilities and tools
-
 pub mod abi;
 pub mod automation;
-pub mod cleanup;
 pub mod config;
 pub mod cron;
 pub mod declarative_state;
 pub mod defrag;
+pub mod dmesg;
 pub mod duplicate;
 pub mod generation_manager;
 pub mod memory;
@@ -320,40 +316,9 @@ pub mod snapshot;
 pub mod snapshot_schedule;
 pub mod sovereign_init_supervisor;
 pub mod startup;
-
-pub use sovereign_init_supervisor::*;
-pub mod dmesg;
 pub mod state;
 pub mod syslog;
 pub mod user;
-
-pub use dmesg::{DmesgRingBuffer, KernelLogLevel, KernelLogRecord};
-
-pub use abi::{
-    AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,
-};
-
-pub use automation::{
-    AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus as OtherTaskStatus,
-};
-
-pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType};
-pub use cleanup::{
-    CleanupCategory, CleanupOption, CleanupStats, SystemCleanupManager,
-    init_system_cleanup, get_system_cleanup,
-};
-pub use logrotate::{
-    LogRotateManager, LogFileConfig, RotationSchedule, CompressionType,
-    init_log_rotate, get_log_rotate,
-};
-pub use restore::{
-    SystemRestoreManager, SystemSnapshot, SnapshotType, SnapshotStatus, RestorePoint,
-    init_system_restore, get_system_restore,
-};
-pub use firewall::{
-    FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
-    init_firewall, get_firewall,
-}
 
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
@@ -903,7 +868,6 @@ pub use task_scheduler::{
     get_task_scheduler, init_task_scheduler, ScheduleFrequency as SchedFrequency,
     ScheduledTask as SchedTask, TaskScheduler, TaskStatus as SchedTaskStatus,
 };
-
 
 pub mod sovereign_init_and_supervisor_inspirations_pr;
 pub use sovereign_init_and_supervisor_inspirations_pr::*;
