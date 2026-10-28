@@ -780,6 +780,8 @@ pub use crate::distro::open_source_os_missing_components_v76_pr::*;
 pub use crate::distro::open_source_os_missing_components_v77_pr::*;
 pub use crate::distro::open_source_os_missing_components_v78_pr::*;
 pub use crate::distro::open_source_os_missing_components_v80_pr::*;
+pub use crate::distro::open_source_os_missing_components_v81_pr::*;
+pub use crate::distro::open_source_os_unimplemented_ideas_v81_pr::*;
 
 pub mod screen;
 pub mod software_manager;
