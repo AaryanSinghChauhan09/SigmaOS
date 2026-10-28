@@ -140,7 +140,10 @@ impl FreeBsd161OpenZfsCapsicumParityEngineV77 {
 
     pub fn trim_openzfs_arc_pressure(&mut self, free_mb: u64) -> String {
         self.openzfs_direct_io_arc_trim_active = true;
-        format!("FreeBSD 16.1+ OpenZFS: Direct-IO ARC memory pressure trimmed by {} MB; GEOM depth: {}", free_mb, self.geom_async_vdev_queue_depth)
+        format!(
+            "FreeBSD 16.1+ OpenZFS: Direct-IO ARC memory pressure trimmed by {} MB; GEOM depth: {}",
+            free_mb, self.geom_async_vdev_queue_depth
+        )
     }
 
     pub fn verify_capsicum_casper_v3(&self) -> bool {
@@ -244,7 +247,10 @@ impl DragonFlyBsdHAMMER3ReplicationEngineV77 {
     }
 
     pub fn sync_replica_node(&mut self, node_id: u32) -> String {
-        format!("DragonFly BSD 7.8+: HAMMER3 multi-master CoW snapshot synced to node #{} (depth {})", node_id, self.lockless_cow_btree_depth)
+        format!(
+            "DragonFly BSD 7.8+: HAMMER3 multi-master CoW snapshot synced to node #{} (depth {})",
+            node_id, self.lockless_cow_btree_depth
+        )
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV77 {
@@ -569,7 +575,10 @@ impl SovereignUnimplementedIdeasSuiteV77 {
         let mut summary = BTreeMap::new();
         summary.insert("suite_version".to_string(), "v77.0".to_string());
         summary.insert("total_proposals".to_string(), "9".to_string());
-        summary.insert("pqc_signature_algorithm".to_string(), "Dilithium-5".to_string());
+        summary.insert(
+            "pqc_signature_algorithm".to_string(),
+            "Dilithium-5".to_string(),
+        );
         summary.insert("interoperability_score".to_string(), "100.0%".to_string());
         summary.insert("linux631_status".to_string(), "Active".to_string());
         summary.insert("freebsd161_status".to_string(), "Active".to_string());
@@ -602,7 +611,10 @@ mod tests {
 
         let summary = suite.generate_suite_summary();
         assert_eq!(summary.get("total_proposals").unwrap(), "9");
-        assert_eq!(summary.get("pqc_signature_algorithm").unwrap(), "Dilithium-5");
+        assert_eq!(
+            summary.get("pqc_signature_algorithm").unwrap(),
+            "Dilithium-5"
+        );
     }
 
     #[test]
@@ -630,7 +642,8 @@ mod tests {
         assert!(veriexec_msg.contains("Veriexec V6"));
 
         let illumos_engine = IllumosOpenZfsDTraceEBPFEngineV77::new();
-        let dtrace_msg = illumos_engine.translate_dtrace_script("sysinfo:::syscall-entry { @[probefunc] = count(); }");
+        let dtrace_msg = illumos_engine
+            .translate_dtrace_script("sysinfo:::syscall-entry { @[probefunc] = count(); }");
         assert!(dtrace_msg.contains("eBPF bytecode"));
 
         let microkernel_engine = HaikuPlan9RedoxMicrokernelSchemeEngineV77::new();

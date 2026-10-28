@@ -50,7 +50,9 @@ impl ArchPacmanMultiThreadedAlpmDatabaseSyncPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.parallel_sync_threads > 0 && self.binary_delta_tree_enabled && self.mmap_cache_size_mb > 0
+        self.parallel_sync_threads > 0
+            && self.binary_delta_tree_enabled
+            && self.mmap_cache_size_mb > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV72PrSpec {
@@ -92,7 +94,9 @@ impl ArchAurwebOidcChrootIsolatedBuilderPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.landlock_seccomp_enabled && !self.oidc_token_issuer.is_empty() && self.isolated_build_sandboxes > 0
+        self.landlock_seccomp_enabled
+            && !self.oidc_token_issuer.is_empty()
+            && self.isolated_build_sandboxes > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV72PrSpec {
@@ -176,7 +180,9 @@ impl ArchCachyOsScxLavenderEnergyEfficiencySchedulerPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.energy_perf_preference.is_empty() && self.dynamic_core_parking && self.sub_milliwatt_saving_pct > 0
+        !self.energy_perf_preference.is_empty()
+            && self.dynamic_core_parking
+            && self.sub_milliwatt_saving_pct > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV72PrSpec {
@@ -218,7 +224,9 @@ impl ArchArchinstallSubvolumeSnapshotRollbackEnginePrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.btrfs_snapshots_retained > 0 && self.systemd_boot_sync && self.rollback_timeout_secs > 0
+        self.btrfs_snapshots_retained > 0
+            && self.systemd_boot_sync
+            && self.rollback_timeout_secs > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV72PrSpec {
@@ -260,7 +268,9 @@ impl ArchReflectorGeoIpLatencyAwareMirrorSelectorPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.rtt_sample_count > 0 && self.dilithium_verified_mirrors > 0 && self.max_mirror_age_hours > 0
+        self.rtt_sample_count > 0
+            && self.dilithium_verified_mirrors > 0
+            && self.max_mirror_age_hours > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV72PrSpec {
@@ -386,7 +396,9 @@ impl ArchSecurityTrackerCveMitigationAutomatorPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.cve_advisories_scanned > 0 && self.kernel_mitigation_overrides > 0 && self.auto_hotfix_applied
+        self.cve_advisories_scanned > 0
+            && self.kernel_mitigation_overrides > 0
+            && self.auto_hotfix_applied
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV72PrSpec {
@@ -428,7 +440,9 @@ impl ArchKeyringWebKeyDirectoryDilithium3RotationPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.wkd_endpoint.is_empty() && self.dilithium3_keys_rotated > 0 && self.revoke_compromised_keys
+        !self.wkd_endpoint.is_empty()
+            && self.dilithium3_keys_rotated > 0
+            && self.revoke_compromised_keys
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV72PrSpec {
