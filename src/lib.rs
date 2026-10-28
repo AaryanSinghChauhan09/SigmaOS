@@ -82,6 +82,7 @@ pub use creative::lightcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::pdfcraft_artcraft_parity_pr::*;
 pub use creative::pdfcraft_missing_components_parity_pr::*;
 pub use creative::pdfcraft_artcraft_missing_components_v68_pr::*;
+pub use creative::pdfcraft_artcraft_missing_components_v69_pr::*;
 pub use creative::photocraft_artcraft_missing_components_v65_pr::*;
 pub use creative::photocraft_artcraft_parity_pr::*;
 pub use creative::sovereign_artcraft_creative_suite_master_pr::*;
