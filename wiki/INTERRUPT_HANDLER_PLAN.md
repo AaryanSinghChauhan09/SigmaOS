@@ -1,74 +1,10 @@
 # SigmaOS Interrupt Handling Master Architecture & Support Matrix Plan
 
-## Overview & Executive Summary
+SigmaOS lists x86_64 GDT/IDT and interrupt stubs, an APIC with EOI and timer/IPI support, plus AArch64 GICv3 and RISC-V PLIC components. But the repository’s own inventory rates x86_64 interrupt work as structural and needing QEMU boot validation; AArch64 and RISC-V are compile-only pending QEMU boots. The immediate work is therefore to connect **vector entry → generic dispatch → controller flow → registered handler → safe return**, then prove it with booted tests before claiming hardware support.
 
-The **SigmaOS Interrupt Handling Subsystem** provides a unified, architecture-decoupled framework for managing CPU exceptions, hardware device interrupts (IRQs), and deferred work dispatch. While initial implementations exist for x86_64 GDT/IDT stubs and Local APIC, AArch64 GICv3, and RISC-V PLIC controllers, this plan establishes a rigorous sequence of engineering milestones to transition interrupt handling from structural prototypes to proven runtime execution.
+This plan distinguishes **exceptions** (CPU-detected faults/traps), **device interrupts** (APIC/GIC/PLIC-delivered IRQs), and **deferred work** (work run later in a schedulable context). Linux’s generic IRQ design separates driver registration, interrupt-flow handling, and controller-specific operations; FreeBSD’s filter/threaded-handler model provides a complementary BSD reference.
 
-The fundamental core requirement is connecting **vector entry → generic dispatch → controller flow → registered handler → safe return**, validated via booted QEMU integration before hardware support is claimed.
-
-## Core Decoupled Pipeline (5 Stages)
-
-To avoid monolithic handling, SigmaOS enforces strict architectural separation across 5 distinct pipeline stages:
-
-1. **Vector Entry (Architecture Layer):** CPU context save (registers, error codes, stack alignment) via architecture entry stubs into standard interrupt frames.
-2. **Generic Dispatch (Core Kernel Layer):** Hardware vector / IRQ translation to logical IRQ descriptors via hardware domain mapping (`irq_domain`).
-3. **Controller Flow (Hardware Operations Layer):** Flow control handlers managing edge, level, fast-EOI, or per-CPU interrupt semantics.
-4. **Handler Invocation (Subsystem / Driver Layer):** Safe execution of registered top-half hard-IRQ callbacks or exception dispatch handlers.
-5. **Return & Deferred Work (System Scheduler Boundary):** Execution of pending bottom-half / softirq / workqueue deferred tasks and safe register/stack restore.
-
-```
-+-----------------------------------------------------------------------------+
-| Stage 1: Vector Entry (CPU / IDT / Exception Vectors)                       |
-+-----------------------------------------------------------------------------+
-                                      |
-                                      v
-+-----------------------------------------------------------------------------+
-| Stage 2: Generic Dispatch (Hardware IRQ -> Logical IRQ Descriptor Mapping)  |
-+-----------------------------------------------------------------------------+
-                                      |
-                                      v
-+-----------------------------------------------------------------------------+
-| Stage 3: Controller Flow (Edge / Level / Fast-EOI / Per-CPU Flow Control)    |
-+-----------------------------------------------------------------------------+
-                                      |
-                                      v
-+-----------------------------------------------------------------------------+
-| Stage 4: Handler Invocation (Hard-IRQ Top-Half Callbacks / Exception Routes)|
-+-----------------------------------------------------------------------------+
-                                      |
-                                      v
-+-----------------------------------------------------------------------------+
-| Stage 5: Deferred Work & Return (SoftIRQ / WorkQueue / Preempt Return)      |
-+-----------------------------------------------------------------------------+
-```
-
-## Architecture Audit & Support Matrix
-
-| Architecture | Controller | Entry Mechanism | State / Evidence | Target Validation Milestone |
-|--------------|------------|-----------------|------------------|-----------------------------|
-| **x86_64**   | Local APIC & IOAPIC | IDT stubs (`src/arch/x86_64/interrupts.rs`) | Structural — IDT stubs and APIC initialized | QEMU x86_64 system boot & APIC timer IRQ dispatch |
-| **AArch64**  | GICv3 (Distributor & Redistributor) | Exception Vectors (`src/arch/aarch64/`) | Compile-only — Pending QEMU boot validation | QEMU `virt` machine GICv3 timer/UART dispatch |
-| **RISC-V 64**| PLIC & CLINT/CLIC | Trap Handler (`src/arch/riscv64/`) | Compile-only — Pending QEMU boot validation | QEMU `virt` machine PLIC external IRQ dispatch |
-
-## Context Contracts & Execution Restrictions
-
-1. **Hard-IRQ Context:**
-   - Initiated directly by CPU interrupt lines.
-   - Non-blocking: strict prohibition against sleeping, allocation, or waiting on locks.
-   - Execution time bounded to minimal top-half work (ack hardware, capture status, trigger deferred work).
-2. **Threaded / Deferred Context (SoftIRQ / Workqueue):**
-   - Executed in schedulable kernel thread context or deferred worker queue.
-   - Blocking allowed (mutexes, page allocations, disk/network I/O).
-3. **Exception Context:**
-   - Synchronous CPU-detected faults/traps (Page Fault, General Protection Fault, Breakpoint).
-   - May panic kernel on unrecoverable faults or deliver process signals (SIGSEGV, SIGFPE, SIGTRAP).
-4. **NMI / Critical Interrupt Context:**
-   - Non-maskable hardware interrupts (hardware failure, watchdog timer).
-   - Isolated stack frame; minimal inspection without acquiring standard kernel spinlocks.
-5. **Process Context:**
-   - Standard user/kernel thread execution context; safe target for reschedule requests upon IRQ exit.
-
-## Architecture Rules and Invariants
+## Rules and invariants
 
 - **Separate architecture entry, IRQ flow, and controller operations.** Architecture code enters the generic layer; flow policy handles edge/level/per-CPU behavior; controller code supplies mask, acknowledge, EOI, and affinity operations. Do not combine these in one monolithic handler.
 - **Keep hard-interrupt work bounded.** A hard-IRQ handler should identify and acknowledge the source, capture minimal state, and defer work that can block or take significant time. Linux and FreeBSD both distinguish quick interrupt-context work from threaded/deferred handling.
@@ -80,9 +16,9 @@ To avoid monolithic handling, SigmaOS enforces strict architectural separation a
 - **SMP requires synchronization.** Specify whether a handler may run concurrently on multiple CPUs, how shared device state is protected, and what affinity means. Linux supports IRQ affinity and CPU-offline migration, but devices/queues must be quiesced when interrupts are disabled or moved.
 - **Test by evidence tier.** Unit/model tests validate state machines; QEMU tests validate real vector entry/controller behavior; hardware tests validate actual devices. SigmaOS explicitly warns that module tests do not establish bootability or hardware support.
 
-## 17-PR Sequence Roadmap
+## Proposed PR sequence
 
-| PR | Proposed Title | Scope | Acceptance Criteria |
+| PR | Proposed title | Scope | Acceptance criteria |
 |---|---|---|---|
 | 1 | `docs(irq): audit interrupt paths and define support matrix` | Audit x86_64 IDT/APIC, AArch64 exception vectors/GICv3, RISC-V traps/PLIC, timer/IPI code, device handlers, and deferred work. Document implemented paths and test evidence. | Each architecture and IRQ source has a status, source links, controller type, test level, and known limitations; compile-only paths are clearly labeled. |
 | 2 | `docs(irq): define handler context and lifecycle contracts` | Define hard-IRQ, threaded/deferred, exception, NMI/critical, and process contexts; registration, masking, synchronization, removal, shared IRQ, and error semantics. | Every API states blocking/locking restrictions, ownership, ordering, and teardown requirements; unsupported contexts are rejected in debug builds. |
@@ -102,24 +38,26 @@ To avoid monolithic handling, SigmaOS enforces strict architectural separation a
 | 16 | `feat(irq): add interrupt statistics and trace interface` | Expose per-controller/per-CPU counts, unhandled counts, handler duration, deferred-work delay, and affinity through a read-only versioned interface. | Counters are bounded, concurrency-safe, and do not allocate in hard-IRQ context; trace output is rate-limited and excludes sensitive data. |
 | 17 | `docs(irq): publish driver guide and architecture support matrix` | Document handler API, context restrictions, IRQ flow, driver registration, deferred work, diagnostics, and architecture/device support. | Every supported claim links to booted tests and exact QEMU/hardware configuration; unsupported MSI/MSI-X, hotplug, NMI, or affinity features are explicit. |
 
-*Priority focus:* Complete PRs **1–8** plus the APIC timer path in PR 11 before broad driver adoption.
+**Priority order:** complete PRs **1–8** plus the QEMU timer path in PR 11 before broad driver adoption. SigmaOS’s inventory already identifies APIC/GIC/PLIC components but lacks booted validation for all architectures; integration and proof are more urgent than adding additional IRQ types.
 
-## Periodic Maintenance PR Cadence
+## Periodic maintenance PR cadence
 
-| Cadence | Task | Required Evidence |
-|---------|------|-------------------|
-| **Every PR** | `ci(irq): run architecture entry and flow checks` | Build, frame-layout tests, generic flow tests, and affected QEMU test; skipped architecture tests explained. |
-| **Weekly** | `maint(irq): triage unhandled vectors and interrupt regressions` | Reproducer, vector/source, architecture/controller, owner, impact, and fix or tracked issue. |
-| **Weekly** | `test(irq): review storm and deferred-work failures` | Queue depth, handler duration, unhandled count, dropped/coalesced work, and recovery behavior from fixed test workloads. |
-| **Monthly** | `audit(irq): review handler registration and teardown safety` | In-flight synchronization, ownership tokens, shared handlers, device removal, worker drain, and lifetime rules reviewed. |
-| **Monthly** | `test(irq): run timer, device, and spurious-IRQ matrix` | QEMU test results for timer, one device IRQ, unknown vector, no handler, repeated level/edge, and EOI correctness. |
-| **Monthly** | `security(irq): review privilege and interrupt-storm attack surface` | User-triggerable device paths, interrupt-rate abuse, untrusted descriptors, logging bounds, and denial-of-service controls. |
-| **Quarterly** | `test(irq): validate SMP affinity and CPU-offline behavior` | Run only when SMP/CPU hotplug exists; validate affinity, migration, quiesce, and online/offline recovery. |
-| **Quarterly** | `docs(irq): review architecture and controller assumptions` | Recheck IDT/vector mapping, GIC/PLIC/APIC behavior, interrupt-context rules, and unsupported trigger modes. |
-| **Release Candidate** | `release(irq): certify interrupt support claims` | Exact architecture, QEMU machine/controller, IRQ test results, known limitations, and recovery behavior. |
-| **Post-Incident** | `fix(irq): prevent recurrence of <issue>` | Minimal reproducer, root cause, regression test, affected hardware/configuration, and backport decision. |
+| Cadence | Proposed recurring PR/task | Required evidence |
+|---|---|---|
+| Every PR | `ci(irq): run architecture entry and flow checks` | Build, frame-layout tests, generic flow tests, and affected QEMU test; skipped architecture tests explained. |
+| Weekly | `maint(irq): triage unhandled vectors and interrupt regressions` | Reproducer, vector/source, architecture/controller, owner, impact, and fix or tracked issue. |
+| Weekly | `test(irq): review storm and deferred-work failures` | Queue depth, handler duration, unhandled count, dropped/coalesced work, and recovery behavior from fixed test workloads. |
+| Monthly | `audit(irq): review handler registration and teardown safety` | In-flight synchronization, ownership tokens, shared handlers, device removal, worker drain, and lifetime rules reviewed. |
+| Monthly | `test(irq): run timer, device, and spurious-IRQ matrix` | QEMU test results for timer, one device IRQ, unknown vector, no handler, repeated level/edge, and EOI correctness. |
+| Monthly | `security(irq): review privilege and interrupt-storm attack surface` | User-triggerable device paths, interrupt-rate abuse, untrusted descriptors, logging bounds, and denial-of-service controls. |
+| Quarterly | `test(irq): validate SMP affinity and CPU-offline behavior` | Run only when SMP/CPU hotplug exists; validate affinity, migration, quiesce, and online/offline recovery. |
+| Quarterly | `docs(irq): review architecture and controller assumptions` | Recheck IDT/vector mapping, GIC/PLIC/APIC behavior, interrupt-context rules, and unsupported trigger modes. |
+| Each release candidate | `release(irq): certify interrupt support claims` | Exact architecture, QEMU machine/controller, IRQ test results, known limitations, and recovery behavior. |
+| After each incident | `fix(irq): prevent recurrence of <lost IRQ, storm, or teardown race>` | Minimal reproducer, root cause, regression test, affected hardware/configuration, and backport decision. |
 
-## Component-Specific Rules
+These are review tasks or candidate PRs, not auto-merges. Linux’s KUnit and kselftest split is a useful test-design reference: unit-level flow tests and booted userspace/system tests establish different kinds of evidence.
+
+## Component-specific rules
 
 - **Architecture entry stubs:** Save exactly the state required by the ABI and exception type; use distinct handling for CPU-pushed error codes; validate stack alignment and privilege transition; never assume all vectors have identical frames.
 - **Interrupt descriptor table/vectors:** Reserve exception vectors separately from device vectors; validate installation and privilege levels; reject duplicate or conflicting assignments.
@@ -133,7 +71,7 @@ To avoid monolithic handling, SigmaOS enforces strict architectural separation a
 - **Diagnostics:** Provide bounded per-vector counters and rate-limited logs; avoid printing or allocating from hard-IRQ context.
 - **Status reporting:** Use Prototype for models/structural tests, Integrated for actual QEMU dispatch, and Supported only for repeatable tests on documented configurations.
 
-## PR Template and Merge Gates
+## PR template and merge gates
 
 ```text
 ## Summary
@@ -172,8 +110,12 @@ Link feature inventory, architecture matrix, driver guide, and test evidence.
 - [ ] Required CI and QEMU checks pass; review discussions resolved
 ```
 
-## Status Definitions & Completion Criteria
+Require one maintainer review for isolated tests/docs and two qualified reviews for architecture entry assembly, controller backends, SMP affinity, or driver teardown. Protect the default branch with required PR reviews and passing checks; GitHub branch protection supports these merge gates.
 
-- **Prototype:** Interrupt layouts, controllers, or flow logic are modeled/unit-tested, but no booted IRQ is proven.
-- **Integrated:** A documented QEMU target receives a real timer and device interrupt, dispatches it to a registered handler, acknowledges/EOIs correctly, and returns safely.
-- **Supported:** Repeatable tests cover all claimed architectures, trigger modes, handler lifecycle, spurious/storm behavior, deferred work, and SMP affinity if advertised.
+## Completion criteria
+
+- **Prototype:** interrupt layouts, controllers, or flow logic are modeled/unit-tested, but no booted IRQ is proven.
+- **Integrated:** a documented QEMU target receives a real timer and device interrupt, dispatches it to a registered handler, acknowledges/EOIs correctly, and returns safely.
+- **Supported:** repeatable tests cover all claimed architectures, trigger modes, handler lifecycle, spurious/storm behavior, deferred work, and SMP affinity if advertised.
+
+The immediate gate is **x86_64 QEMU validation of IDT/APIC entry and timer dispatch**, followed by a small device IRQ path. Do not mark AArch64 GICv3 or RISC-V PLIC as supported until each boots and passes its own runtime matrix; the feature inventory currently says those paths still need QEMU validation.
