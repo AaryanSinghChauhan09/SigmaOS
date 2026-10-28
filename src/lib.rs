@@ -140,6 +140,7 @@ pub use system::sovereign_init_and_supervisor_advancements_v75_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v76_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v77_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v78_pr::*;
+pub use system::sovereign_init_and_supervisor_advancements_v82_pr::*;
 pub use system::*;
 pub mod driver;
 pub mod drivers;
