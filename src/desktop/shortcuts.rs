@@ -43,6 +43,24 @@ pub enum KeyAction {
 }
 
 impl KeyAction {
+    pub fn category(&self) -> ShortcutCategory {
+        match self {
+            KeyAction::OpenLauncher
+            | KeyAction::OpenTerminal
+            | KeyAction::OpenFileManager
+            | KeyAction::OpenWebBrowser
+            | KeyAction::ShowDesktop
+            | KeyAction::LockScreen
+            | KeyAction::Screenshot
+            | KeyAction::ScreenRecording
+            | KeyAction::ToggleTheme => ShortcutCategory::Global,
+            KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow => {
+                ShortcutCategory::WindowManagement
+            }
+            _ => ShortcutCategory::Application,
+        }
+    }
+
     pub fn as_str(&self) -> &str {
         match self {
             KeyAction::OpenLauncher => "open_launcher",
@@ -303,60 +321,11 @@ impl KeyboardShortcutsManager {
     }
 
     pub fn get_shortcuts_by_category(&self, category: ShortcutCategory) -> Vec<KeyboardShortcut> {
-        match category {
-            ShortcutCategory::Global => self
-                .shortcuts
-                .iter()
-                .filter(|s| {
-                    matches!(
-                        s.action,
-                        KeyAction::OpenLauncher
-                            | KeyAction::OpenTerminal
-                            | KeyAction::OpenFileManager
-                            | KeyAction::OpenWebBrowser
-                            | KeyAction::ShowDesktop
-                            | KeyAction::LockScreen
-                            | KeyAction::Screenshot
-                            | KeyAction::ScreenRecording
-                            | KeyAction::ToggleTheme
-                    )
-                })
-                .cloned()
-                .collect(),
-            ShortcutCategory::WindowManagement => self
-                .shortcuts
-                .iter()
-                .filter(|s| {
-                    matches!(
-                        s.action,
-                        KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                    )
-                })
-                .cloned()
-                .collect(),
-            ShortcutCategory::Application => self
-                .shortcuts
-                .iter()
-                .filter(|s| {
-                    !matches!(
-                        s.action,
-                        KeyAction::OpenLauncher
-                            | KeyAction::OpenTerminal
-                            | KeyAction::OpenFileManager
-                            | KeyAction::OpenWebBrowser
-                            | KeyAction::ShowDesktop
-                            | KeyAction::LockScreen
-                            | KeyAction::Screenshot
-                            | KeyAction::ScreenRecording
-                            | KeyAction::ToggleTheme
-                            | KeyAction::MaximizeWindow
-                            | KeyAction::TileWindow
-                            | KeyAction::CloseWindow
-                    )
-                })
-                .cloned()
-                .collect(),
-        }
+        self.shortcuts
+            .iter()
+            .filter(|s| s.action.category() == category)
+            .cloned()
+            .collect()
     }
 
     /// Evaluates if a key combination matches a registered shortcut action.
@@ -391,25 +360,11 @@ impl KeyboardShortcutsManager {
     }
 
     pub fn list_global_shortcuts(&self) -> Vec<String> {
-        // Bolt ⚡ Optimization: Filter directly over `self.shortcuts.iter()` instead of calling
-        // `get_shortcuts_by_category()`. This eliminates creating temporary `Vec<KeyboardShortcut>`
-        // heap vectors and cloning inner `KeyboardShortcut` struct fields on every category listing.
+        // Bolt ⚡ Optimization: Filter directly over `self.shortcuts.iter()` using `s.action.category()`.
+        // This eliminates creating temporary `Vec<KeyboardShortcut>` heap vectors and cloning inner fields.
         self.shortcuts
             .iter()
-            .filter(|s| {
-                matches!(
-                    s.action,
-                    KeyAction::OpenLauncher
-                        | KeyAction::OpenTerminal
-                        | KeyAction::OpenFileManager
-                        | KeyAction::OpenWebBrowser
-                        | KeyAction::ShowDesktop
-                        | KeyAction::LockScreen
-                        | KeyAction::Screenshot
-                        | KeyAction::ScreenRecording
-                        | KeyAction::ToggleTheme
-                )
-            })
+            .filter(|s| s.action.category() == ShortcutCategory::Global)
             .map(|s| {
                 format!(
                     "{} - {} ({})",
@@ -422,17 +377,11 @@ impl KeyboardShortcutsManager {
     }
 
     pub fn list_window_shortcuts(&self) -> Vec<String> {
-        // Bolt ⚡ Optimization: Filter directly over `self.shortcuts.iter()` instead of calling
-        // `get_shortcuts_by_category()`. This eliminates creating temporary `Vec<KeyboardShortcut>`
-        // heap vectors and cloning inner `KeyboardShortcut` struct fields on every category listing.
+        // Bolt ⚡ Optimization: Filter directly over `self.shortcuts.iter()` using `s.action.category()`.
+        // This eliminates creating temporary `Vec<KeyboardShortcut>` heap vectors and cloning inner fields.
         self.shortcuts
             .iter()
-            .filter(|s| {
-                matches!(
-                    s.action,
-                    KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow
-                )
-            })
+            .filter(|s| s.action.category() == ShortcutCategory::WindowManagement)
             .map(|s| {
                 format!(
                     "{} - {} ({})",
@@ -450,15 +399,24 @@ impl KeyboardShortcutsManager {
         stats.push_str(&format!("Enabled: {}\n", self.config.enabled));
         stats.push_str(&format!("Allow override: {}\n", self.config.allow_override));
 
+        // Bolt ⚡ Optimization: Count matching category items directly via zero-allocation iterators.
+        // Avoids calling `get_shortcuts_by_category()`, preventing 3 heap vector allocations and
+        // unnecessary cloning of `KeyboardShortcut` instances on every statistics call.
         let global_count = self
-            .get_shortcuts_by_category(ShortcutCategory::Global)
-            .len();
+            .shortcuts
+            .iter()
+            .filter(|s| s.action.category() == ShortcutCategory::Global)
+            .count();
         let window_count = self
-            .get_shortcuts_by_category(ShortcutCategory::WindowManagement)
-            .len();
+            .shortcuts
+            .iter()
+            .filter(|s| s.action.category() == ShortcutCategory::WindowManagement)
+            .count();
         let app_count = self
-            .get_shortcuts_by_category(ShortcutCategory::Application)
-            .len();
+            .shortcuts
+            .iter()
+            .filter(|s| s.action.category() == ShortcutCategory::Application)
+            .count();
 
         stats.push_str(&format!("Global shortcuts: {}\n", global_count));
         stats.push_str(&format!("Window shortcuts: {}\n", window_count));

@@ -28,6 +28,20 @@ Closes #<issue-id>
 - Maturity after:
 - Runtime path affected:
 
+## Shell component
+
+- Component: Shell
+- Maturity before: Experimental
+- Maturity after: Production
+- Runtime path affected: `/bin/sh`
+
+## IPC handler
+
+- IPC semantics: Synchronous / Asynchronous
+- Blocking behavior: Bounded queue backpressure
+- Non-blocking behavior: EAGAIN on full
+- EOF / closure behavior: Flush and teardown
+
 ## Changes
 
 - [ ] Source implementation
@@ -65,6 +79,15 @@ make format
 - [ ] Package scripts are sandboxed, if applicable
 - [ ] Rollback/recovery behavior defined
 - [ ] Security review completed, if applicable
+
+## Security review
+
+- Capability/namespace checks enforced: Yes
+- Memory safety review: Completed
+
+## Shell safety review
+
+- Untrusted shell input sanitization and execution isolation verified
 
 ## Reviewer checklist
 
