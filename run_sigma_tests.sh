@@ -502,6 +502,12 @@ if [ -f "src/creative/soundcraft_artcraft_missing_components_v69_pr.rs" ]; then
     ./build/test_soundcraft_v69
 fi
 
+if [ -f "src/creative/soundcraft_artcraft_missing_components_v70_pr.rs" ]; then
+    echo "Running SoundCraft V70 PR Suite tests..."
+    rustc --test src/creative/soundcraft_artcraft_missing_components_v70_pr.rs --edition=2021 -o build/test_soundcraft_v70
+    ./build/test_soundcraft_v70
+fi
+
 
 if [ -f "src/creative/effectcraft_artcraft_parity_pr.rs" ]; then
     echo "Running Sovereign EffectCraft to ArtCraft Parity PR Gateway test suite..."
