@@ -27,10 +27,10 @@ use std::vec::Vec;
 #[path = "debian_github_repo_missing_components_v81_pr.rs"]
 pub mod debian_github_repo_missing_components_v81_pr;
 #[path = "open_source_os_unimplemented_ideas_v81_pr.rs"]
-pub mod open_source_os_unimplemented_ideas_v81_pr;
+pub mod open_source_os_unimplemented_ideas_v81_pr_mod;
 
 use debian_github_repo_missing_components_v81_pr::*;
-use open_source_os_unimplemented_ideas_v81_pr::*;
+use open_source_os_unimplemented_ideas_v81_pr_mod::*;
 
 #[derive(Debug, Clone)]
 pub struct UnifiedOsDebianV81PrProposal {
