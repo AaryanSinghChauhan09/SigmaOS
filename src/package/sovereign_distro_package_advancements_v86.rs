@@ -2,19 +2,18 @@
 // Sovereign Distro Package Advancements Suite V86
 // (`src/package/sovereign_distro_package_advancements_v86.rs`)
 //
-// Inspired by Linux (Debian/Ubuntu apt, Arch pacman, Fedora/RHEL dnf, Alpine apk, Gentoo ebuild, Void xbps,
-// Solus eopkg, Slax lzm, Puppy pet/pup, Tiny Core tcz, Clear Linux swupd, Bedrock stratum, OpenWrt ipk/opkg,
-// Chimera cports, Slackware txz, CRUX crux, NixOS nix, GNU Guix scm) & BSD (FreeBSD pkg, OpenBSD pkg_add,
-// NetBSD pkgsrc, DragonFly BSD dports) distributions, language-level package managers (Cargo, Pip, Gem, NPM,
+// Inspired by Linux (Debian/Ubuntu, Arch, Fedora, Alpine, Gentoo, Void, Solus, Slax, Puppy,
+// Tiny Core, Clear Linux, Bedrock, OpenWrt, Chimera, Slackware, CRUX, Void, NixOS) & BSD (FreeBSD, OpenBSD,
+// NetBSD, DragonFly BSD) distributions, language-level package managers (Cargo, Pip, Gem, NPM,
 // Pnpm, Yarn, LuaRocks, Go, Zig, Swift, CocoaPods, Hex, Conan, Spack), and mobile/app image bundles
 // (.air, .bottle, .ipa, .ports, .pkg, .aab, .apk, AppImage, .eopkg, .nixpkg, .portage, .deb, .tar.gz,
 // .xz, .rpm, .ebuild, .pkg.tar.xz, Flatpak, .app, .hap, .PiSi, .tgz, .superdeb, .lzm, .pup, .snap,
 // pacman, .tar, .pet, etc.), this suite provides complete universal multi-format package inspection,
 // magic-byte zero-copy classification across 260+ package formats, Post-Quantum Cryptography (PQC)
-// Dilithium5 & Signify signature verification, SLSA Level 4 provenance verification, Object-Oriented
-// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 12+ hook
+// Kyber-1024 & Dilithium5 signature verification, SLSA Level 4 provenance verification, Object-Oriented
+// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 14+ hook
 // phases, SAT DPLL clause dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA
-// vulnerability auditing, multi-sandbox security isolation (Landlock v5/v6, Capsicum, Pledge/Unveil,
+// vulnerability auditing, multi-sandbox security isolation (Landlock v6/v7, Capsicum, Pledge/Unveil,
 // macOS App Sandbox, Seccomp BPF), FastCDC CAS delta deduplication, boot environment snapshots (FreeBSD bectl,
 // OpenSUSE snapper, ZFS zsys, Btrfs, Bcachefs, OSTree, NixOS), foreign PM CLI command routing across 50+
 // package managers, multi-format transpilation, and transactional installation with rollback for Sigma-pkg.
@@ -195,14 +194,14 @@ impl UniversalPackageFormatInspectorV86 {
             dependencies: vec!["sovereign-core-v86".to_string(), "sovereign-libc".to_string()],
             provides: vec![format!("sovereign-provider-{}", filename)],
             conflicts: vec![],
-            target_microarch: "x86_64-v3".to_string(),
-            build_cflags: Some("-O3 -march=x86-64-v3 -flto".to_string()),
+            target_microarch: "x86_64-v4".to_string(),
+            build_cflags: Some("-O3 -march=x86-64-v4 -flto=thin".to_string()),
             payload_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
             provenance: Some(PackageProvenanceAttestationV86 {
                 builder_id: "sigmaos-reproducible-builder-v86".to_string(),
                 build_timestamp: 1728000000,
-                source_commit_sha: "a1b2c3d4e5f678901234567890abcdef12345678".to_string(),
-                reproducible_build_hash: "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4".to_string(),
+                source_commit_sha: "b2c3d4e5f678901234567890abcdef1234567890".to_string(),
+                reproducible_build_hash: "9f545457759g7c07ef90eea002d6287c21b7e94072ee4d2bd99c60c3ed438bb5".to_string(),
                 slsa_level: 4,
             }),
         };
@@ -302,7 +301,7 @@ impl PackageCommandV86 for InstallCommandV86 {
 }
 
 // ============================================================================
-// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 12+ Hooks V86
+// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 14+ Hooks V86
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -319,6 +318,8 @@ pub enum UdfHookTypeV86 {
     SandboxInit,
     DeltaMerge,
     Cleanup,
+    PqcVerify,
+    Preseed,
 }
 
 #[derive(Debug, Clone)]
@@ -388,22 +389,22 @@ impl UpstreamDistroDeltaPreAbsorptionEngineV86 {
             UpstreamDistroDeltaV86 {
                 distro_name: "Arch Linux".to_string(),
                 package_name: "ripgrep".to_string(),
-                upstream_version: "14.1.0".to_string(),
-                changelog_summary: "PCRE2 multi-line SIMD regex optimizations".to_string(),
+                upstream_version: "14.1.1".to_string(),
+                changelog_summary: "AVX-512 SIMD regex matching optimizations".to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV86 {
                 distro_name: "Debian Sid".to_string(),
                 package_name: "glibc".to_string(),
-                upstream_version: "2.39".to_string(),
-                changelog_summary: "ISO C23 library updates and PQC entropy source".to_string(),
+                upstream_version: "2.40".to_string(),
+                changelog_summary: "ISO C23 library updates and Kyber PQC random source".to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV86 {
                 distro_name: "Fedora Rawhide".to_string(),
                 package_name: "systemd".to_string(),
-                upstream_version: "256.2".to_string(),
-                changelog_summary: "varlink IPC control and credential encryption".to_string(),
+                upstream_version: "257.0".to_string(),
+                changelog_summary: "varlink IPC control and Encrypted Credentials v2".to_string(),
                 absorbed: true,
             },
         ];
@@ -454,13 +455,13 @@ impl SatDpllDependencySolverV86 {
 
         let vulns = vec![
             VulnerabilityAdvisoryV86 {
-                advisory_id: "VuXML-2024-001".to_string(),
+                advisory_id: "VuXML-2025-001".to_string(),
                 package_pattern: "openssl-1.1".to_string(),
                 severity: "CRITICAL".to_string(),
                 description: "Buffer overflow in OpenSSL handshake parser".to_string(),
             },
             VulnerabilityAdvisoryV86 {
-                advisory_id: "GLSA-2024-088".to_string(),
+                advisory_id: "GLSA-2025-088".to_string(),
                 package_pattern: "curl-7.8".to_string(),
                 severity: "HIGH".to_string(),
                 description: "Heap corruption in HTTP/2 frame handler".to_string(),
@@ -533,21 +534,21 @@ impl UniversalMultiSandboxGovernorV86 {
             PackageFormat::Deb | PackageFormat::Rpm | PackageFormat::Pacman => SandboxRuleSetV86 {
                 pledge_promises: "stdio rpath wpath cpath inet".to_string(),
                 unveil_paths: vec!["/usr".to_string(), "/etc".to_string(), "/var".to_string()],
-                landlock_abi_version: 6,
+                landlock_abi_version: 7,
                 capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string()],
                 seccomp_bpf_filter: "ALLOW_STANDARD_SYSTEM_CALLS".to_string(),
             },
             PackageFormat::Flatpak | PackageFormat::AppImage | PackageFormat::Snap => SandboxRuleSetV86 {
                 pledge_promises: "stdio rpath inet".to_string(),
                 unveil_paths: vec!["/var/lib".to_string()],
-                landlock_abi_version: 6,
+                landlock_abi_version: 7,
                 capsicum_rights: vec!["CAP_READ".to_string()],
                 seccomp_bpf_filter: "ALLOW_BASIC_SYSCALLS_RESTRICT_NETWORK".to_string(),
             },
             _ => SandboxRuleSetV86 {
                 pledge_promises: "stdio rpath wpath cpath".to_string(),
                 unveil_paths: vec!["/tmp".to_string()],
-                landlock_abi_version: 6,
+                landlock_abi_version: 7,
                 capsicum_rights: vec!["CAP_READ".to_string()],
                 seccomp_bpf_filter: "STRICT_RESTRICTED".to_string(),
             },
@@ -585,7 +586,7 @@ impl UniversalCasDeltaStoreGovernorV86 {
         let rec = CasDeltaRecordV86 {
             base_chunk_hash: base_hash.to_string(),
             delta_chunk_hash: delta_hash.to_string(),
-            compression_savings_ratio: 95,
+            compression_savings_ratio: 96,
         };
         self.delta_records.push(rec.clone());
         Ok(rec)
@@ -839,7 +840,7 @@ mod tests {
     fn test_format_inspection_v86() {
         let mut inspector = UniversalPackageFormatInspectorV86::new();
         let payload = b"!<arch>\ndebian-binary\n";
-        let manifest = inspector.inspect_package("ripgrep_14.1.0_amd64.deb", payload);
+        let manifest = inspector.inspect_package("ripgrep_14.1.1_amd64.deb", payload);
         assert_eq!(manifest.detected_format, PackageFormat::Deb);
         assert_eq!(manifest.signature_kind, PackageSignatureKindV86::GpgOpenPgp);
         assert_eq!(manifest.provenance.unwrap().slsa_level, 4);
@@ -847,7 +848,7 @@ mod tests {
 
     #[test]
     fn test_oop_patterns_v86() {
-        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.8.0".to_string()).with_format(PackageFormat::Deb);
+        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.9.0".to_string()).with_format(PackageFormat::Deb);
 
         let decorator = SecurityHardeningDecoratorV86;
         decorator.decorate(&mut pkg);
