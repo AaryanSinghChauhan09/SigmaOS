@@ -430,6 +430,12 @@ if [ -f "src/creative/deckcraft_artcraft_missing_components_v69_pr.rs" ]; then
     ./build/test_deckcraft_v69
 fi
 
+if [ -f "src/creative/deckcraft_artcraft_missing_components_v70_pr.rs" ]; then
+    echo "Running Deckcraft & ArtCraft Missing Components Parity PR Gateway V70 Tests..."
+    TMPDIR=$(pwd)/build rustc --test src/creative/deckcraft_artcraft_missing_components_v70_pr.rs --edition=2021 -o build/test_deckcraft_v70
+    ./build/test_deckcraft_v70
+fi
+
 if [ -f "src/creative/effectcraft.rs" ]; then
     echo "Running Sovereign EffectCraft Visual Effects PR test suite..."
     mkdir -p build
