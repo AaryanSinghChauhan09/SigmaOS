@@ -2342,6 +2342,16 @@ if [ -f "src/distro/open_source_os_missing_components_v81_pr.rs" ]; then
     ./build/test_open_source_v81_pr_integration
 fi
 
+if [ -f "src/distro/reactos_linux_distro_innovations_v82_pr.rs" ]; then
+    echo "Running Sovereign ReactOS & Linux Distro Innovations V82 PR Suite tests..."
+    mkdir -p build
+    rustc --test src/distro/reactos_linux_distro_innovations_v82_pr.rs --edition=2021 -o build/test_reactos_v82_pr
+    ./build/test_reactos_v82_pr
+
+    rustc --test tests/test_reactos_linux_distro_innovations_v82_pr.rs --edition=2021 -o build/test_reactos_v82_pr_integration
+    ./build/test_reactos_v82_pr_integration
+fi
+
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
     mkdir -p build

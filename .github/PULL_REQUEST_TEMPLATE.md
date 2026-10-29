@@ -116,5 +116,33 @@
 
 ## Risks and rollback
 
-- Risk:
-- Rollback:
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
+
+## Shell component
+
+<!-- Details on shell or userland component improvements -->
+
+## Shell safety review
+
+<!-- Shell safety review details -->
+
+## Safety and rollback
+
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Tests cover the change
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported parity claims
