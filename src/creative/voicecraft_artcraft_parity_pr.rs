@@ -21,11 +21,13 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-use super::voicecraft;
-use super::voicecraft::Phoneme;
-use super::voicecraft::PhonemeType;
-use super::voicecraft::VoiceActivityDetector;
-use super::voicecraft::SAMPLE_RATE;
+#[path = "voicecraft.rs"]
+pub mod voicecraft;
+
+use voicecraft::Phoneme;
+use voicecraft::PhonemeType;
+use voicecraft::VoiceActivityDetector;
+use voicecraft::SAMPLE_RATE;
 
 /// Structured PR proposal manifest for VoiceCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]

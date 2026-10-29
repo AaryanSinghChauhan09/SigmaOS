@@ -21,6 +21,10 @@ Closes #<issue-id>
 
 <!-- State simplifications, deviations, and rejected ideas. -->
 
+## Shell component
+
+<!-- Shell component name, if applicable -->
+
 ## Component impact
 
 - Component:
@@ -71,6 +75,10 @@ make format
 - [ ] Package dry-run report
 - [ ] Hardware test log, if applicable
 - [ ] Artifact hash
+
+## Shell safety review
+
+<!-- Shell safety review details -->
 
 ## Safety and rollback
 

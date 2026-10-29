@@ -767,7 +767,7 @@ fi
 if [ -f "src/creative/voicecraft_artcraft_parity_pr.rs" ]; then
     echo "Running Sovereign VoiceCraft to ArtCraft Parity PR Gateway test suite..."
     mkdir -p build
-    rustc --test src/creative/mod.rs --edition=2021 -o build/test_voicecraft_artcraft_parity
+    rustc --test src/creative/voicecraft_artcraft_parity_pr.rs --edition=2021 -o build/test_voicecraft_artcraft_parity
     ./build/test_voicecraft_artcraft_parity
 fi
 
