@@ -844,5 +844,9 @@ pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use crate::graphics::sovereign_graphics_display_v72_pr::*;
 pub use crate::graphics::sovereign_graphics_display_v74_pr::*;
 
+pub use crate::distro::cachy_linux_missing_components_v83_pr::*;
+pub use crate::distro::open_source_os_and_cachy_linux_v83_pr::*;
+pub use crate::distro::open_source_os_unimplemented_ideas_v83_pr::*;
+
 pub mod screen;
 pub mod software_manager;
