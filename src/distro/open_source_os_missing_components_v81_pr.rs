@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Sovereign Open Source OS Universal Parity Synthesis V81 PR Engine
+// Enhanced Arch Linux distro inspiration parity PR suite V81
 // (`src/distro/open_source_os_missing_components_v81_pr.rs`)
 //
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.35+ BPF SchedExt,
