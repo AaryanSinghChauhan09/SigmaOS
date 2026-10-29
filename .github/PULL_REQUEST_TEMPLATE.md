@@ -58,6 +58,14 @@ make format
 - [ ] Hardware test log, if applicable
 - [ ] Artifact hash
 
+## Shell component
+
+<!-- Details on shell or userland component improvements -->
+
+## Shell safety review
+
+<!-- Shell safety review details -->
+
 ## Safety and rollback
 
 - [ ] No broad credentials or host access introduced
