@@ -60,17 +60,24 @@ impl OpenBsdPinsyscallStaticCodePinningV68PrEngine {
         self.pinned_regions.push(region);
     }
 
-    pub fn verify_syscall(&mut self, pid: u32, syscall_num: u32, callsite_addr: usize) -> PinsyscallVerificationResult {
+    pub fn verify_syscall(
+        &mut self,
+        pid: u32,
+        syscall_num: u32,
+        callsite_addr: usize,
+    ) -> PinsyscallVerificationResult {
         self.total_verified_syscalls += 1;
-        let is_valid = if let Some(region) = self.pinned_regions.iter().find(|r| r.process_id == pid) {
-            if region.is_pinned {
-                callsite_addr >= region.text_segment_start && callsite_addr <= region.text_segment_end
+        let is_valid =
+            if let Some(region) = self.pinned_regions.iter().find(|r| r.process_id == pid) {
+                if region.is_pinned {
+                    callsite_addr >= region.text_segment_start
+                        && callsite_addr <= region.text_segment_end
+                } else {
+                    true
+                }
             } else {
                 true
-            }
-        } else {
-            true
-        };
+            };
 
         if !is_valid {
             self.total_violations_blocked += 1;
@@ -81,12 +88,22 @@ impl OpenBsdPinsyscallStaticCodePinningV68PrEngine {
             syscall_number: syscall_num,
             callsite_address: callsite_addr,
             is_valid,
-            enforcement_action: String::from(if is_valid { "PERMIT" } else { "SIGABRT_TERMINATE" }),
+            enforcement_action: String::from(if is_valid {
+                "PERMIT"
+            } else {
+                "SIGABRT_TERMINATE"
+            }),
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} pinned regions registered, {} verified, {} violations blocked", self.engine_name, self.pinned_regions.len(), self.total_verified_syscalls, self.total_violations_blocked)
+        format!(
+            "{}: {} pinned regions registered, {} verified, {} violations blocked",
+            self.engine_name,
+            self.pinned_regions.len(),
+            self.total_verified_syscalls,
+            self.total_violations_blocked
+        )
     }
 }
 
@@ -112,28 +129,48 @@ impl OpenBsdUnveilDynamicPathInheritanceV68PrEngine {
         }
     }
 
-    pub fn propagate_unveil(&mut self, parent_pid: u32, child_pid: u32, paths: Vec<String>) -> Result<(), String> {
-        if self.active_inheritance_rules.iter().any(|r| r.child_process_id == child_pid && r.is_locked) {
-            return Err(String::from("EPERM: Child process unveil inheritance table is permanently locked"));
+    pub fn propagate_unveil(
+        &mut self,
+        parent_pid: u32,
+        child_pid: u32,
+        paths: Vec<String>,
+    ) -> Result<(), String> {
+        if self
+            .active_inheritance_rules
+            .iter()
+            .any(|r| r.child_process_id == child_pid && r.is_locked)
+        {
+            return Err(String::from(
+                "EPERM: Child process unveil inheritance table is permanently locked",
+            ));
         }
 
-        self.active_inheritance_rules.push(DynamicUnveilInheritanceRule {
-            parent_process_id: parent_pid,
-            child_process_id: child_pid,
-            inherited_paths: paths,
-            is_locked: false,
-        });
+        self.active_inheritance_rules
+            .push(DynamicUnveilInheritanceRule {
+                parent_process_id: parent_pid,
+                child_process_id: child_pid,
+                inherited_paths: paths,
+                is_locked: false,
+            });
         Ok(())
     }
 
     pub fn lock_child_unveil(&mut self, child_pid: u32) {
-        if let Some(rule) = self.active_inheritance_rules.iter_mut().find(|r| r.child_process_id == child_pid) {
+        if let Some(rule) = self
+            .active_inheritance_rules
+            .iter_mut()
+            .find(|r| r.child_process_id == child_pid)
+        {
             rule.is_locked = true;
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} dynamic unveil inheritance rules active", self.engine_name, self.active_inheritance_rules.len())
+        format!(
+            "{}: {} dynamic unveil inheritance rules active",
+            self.engine_name,
+            self.active_inheritance_rules.len()
+        )
     }
 }
 
@@ -200,7 +237,11 @@ impl OpenBsdPledgeSyscallCategoryEnforcerV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} processes with pledge category enforcement active", self.engine_name, self.active_pledges.len())
+        format!(
+            "{}: {} processes with pledge category enforcement active",
+            self.engine_name,
+            self.active_pledges.len()
+        )
     }
 }
 
@@ -243,7 +284,11 @@ impl OpenBsdSoftraidKryptexPqcMasterKeyringV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} PQC softraid keyrings managed", self.engine_name, self.keyrings.len())
+        format!(
+            "{}: {} PQC softraid keyrings managed",
+            self.engine_name,
+            self.keyrings.len()
+        )
     }
 }
 
@@ -288,7 +333,12 @@ impl OpenBsdPfHardwareOffloadFlowTableV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} flows tracked, {} packets hardware-offloaded", self.engine_name, self.flow_table.len(), self.offloaded_packets_count)
+        format!(
+            "{}: {} flows tracked, {} packets hardware-offloaded",
+            self.engine_name,
+            self.flow_table.len(),
+            self.offloaded_packets_count
+        )
     }
 }
 
@@ -315,7 +365,10 @@ impl OpenBsdVmdVirtioGpu3dPassthroughV68PrEngine {
         }
     }
 
-    pub fn configure_gpu_passthrough(&mut self, config: VmdVirtioGpu3dConfig) -> Result<(), String> {
+    pub fn configure_gpu_passthrough(
+        &mut self,
+        config: VmdVirtioGpu3dConfig,
+    ) -> Result<(), String> {
         if config.vram_mb < 128 {
             return Err(String::from("Virtio 3D GPU requires at least 128MB VRAM"));
         }
@@ -324,7 +377,11 @@ impl OpenBsdVmdVirtioGpu3dPassthroughV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} VMD Virtio-GPU 3D instances active", self.engine_name, self.active_vm_gpus.len())
+        format!(
+            "{}: {} VMD Virtio-GPU 3D instances active",
+            self.engine_name,
+            self.active_vm_gpus.len()
+        )
     }
 }
 
@@ -352,12 +409,20 @@ impl OpenBsdSmtpdSpamTrapDkimSignerV68PrEngine {
         }
     }
 
-    pub fn process_outgoing_mail(&self, msg_id: &str, recipient: &str, sender_domain: &str) -> SmtpdDkimSignResult {
+    pub fn process_outgoing_mail(
+        &self,
+        msg_id: &str,
+        recipient: &str,
+        sender_domain: &str,
+    ) -> SmtpdDkimSignResult {
         let is_trap = self.spam_traps.iter().any(|t| t == recipient);
         let sig = if is_trap {
             String::from("v=1; a=rsa-sha256; c=relaxed/relaxed; d=invalid; s=trap;")
         } else {
-            format!("v=1; a=rsa-sha256; c=relaxed/relaxed; d={}; s={};", sender_domain, self.dkim_selector)
+            format!(
+                "v=1; a=rsa-sha256; c=relaxed/relaxed; d={}; s={};",
+                sender_domain, self.dkim_selector
+            )
         };
 
         SmtpdDkimSignResult {
@@ -369,7 +434,12 @@ impl OpenBsdSmtpdSpamTrapDkimSignerV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} spam traps registered, selector: {}", self.engine_name, self.spam_traps.len(), self.dkim_selector)
+        format!(
+            "{}: {} spam traps registered, selector: {}",
+            self.engine_name,
+            self.spam_traps.len(),
+            self.dkim_selector
+        )
     }
 }
 
@@ -395,7 +465,12 @@ impl OpenBsdSignifyPqcDilithium3VerifierV68PrEngine {
         }
     }
 
-    pub fn verify_file_signature(&self, path: &str, signature_blob: &str, key_id: &str) -> SignifyDilithium3Verification {
+    pub fn verify_file_signature(
+        &self,
+        path: &str,
+        signature_blob: &str,
+        key_id: &str,
+    ) -> SignifyDilithium3Verification {
         let key_trusted = self.trusted_keys.iter().any(|k| k == key_id);
         let valid = key_trusted && !signature_blob.is_empty();
 
@@ -408,7 +483,11 @@ impl OpenBsdSignifyPqcDilithium3VerifierV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} trusted Dilithium3 keys loaded", self.engine_name, self.trusted_keys.len())
+        format!(
+            "{}: {} trusted Dilithium3 keys loaded",
+            self.engine_name,
+            self.trusted_keys.len()
+        )
     }
 }
 
@@ -440,7 +519,11 @@ impl OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine {
     }
 
     pub fn dispatch_grpc_stream(&mut self, backend_id: u32) -> bool {
-        if let Some(b) = self.backends.iter_mut().find(|b| b.backend_id == backend_id) {
+        if let Some(b) = self
+            .backends
+            .iter_mut()
+            .find(|b| b.backend_id == backend_id)
+        {
             b.grpc_active_streams += 1;
             true
         } else {
@@ -449,7 +532,11 @@ impl OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} gRPC HTTP/2 backends configured", self.engine_name, self.backends.len())
+        format!(
+            "{}: {} gRPC HTTP/2 backends configured",
+            self.engine_name,
+            self.backends.len()
+        )
     }
 }
 
@@ -485,7 +572,11 @@ impl OpenBsdUnwindDnssecDoHResolverV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} DoH endpoints configured", self.engine_name, self.doh_endpoints.len())
+        format!(
+            "{}: {} DoH endpoints configured",
+            self.engine_name,
+            self.doh_endpoints.len()
+        )
     }
 }
 
@@ -507,7 +598,9 @@ pub struct OpenBsdMissingComponentsV68PrSuite {
 impl OpenBsdMissingComponentsV68PrSuite {
     pub fn new() -> Self {
         Self {
-            suite_name: String::from("SigmaOS OpenBSD Missing Components V68 Master PR Gateway Suite"),
+            suite_name: String::from(
+                "SigmaOS OpenBSD Missing Components V68 Master PR Gateway Suite",
+            ),
             pinsyscall_engine: OpenBsdPinsyscallStaticCodePinningV68PrEngine::new(),
             unveil_engine: OpenBsdUnveilDynamicPathInheritanceV68PrEngine::new(),
             pledge_engine: OpenBsdPledgeSyscallCategoryEnforcerV68PrEngine::new(),
@@ -638,7 +731,11 @@ mod tests {
     #[test]
     fn test_signify_pqc_dilithium3_v68() {
         let engine = OpenBsdSignifyPqcDilithium3VerifierV68PrEngine::new();
-        let verification = engine.verify_file_signature("/etc/firmware.bin", "sig_blob_dilithium3", "openbsd-v68-dilithium3.pub");
+        let verification = engine.verify_file_signature(
+            "/etc/firmware.bin",
+            "sig_blob_dilithium3",
+            "openbsd-v68-dilithium3.pub",
+        );
         assert!(verification.signature_valid);
         assert_eq!(verification.pqc_scheme, "CRYSTALS-Dilithium3");
     }

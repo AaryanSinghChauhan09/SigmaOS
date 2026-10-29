@@ -27,7 +27,13 @@ impl ProbePoint {
     }
 
     pub fn fqn(&self) -> String {
-        alloc::format!("{}:{}:{}:{}", self.provider, self.module, self.function, self.name)
+        alloc::format!(
+            "{}:{}:{}:{}",
+            self.provider,
+            self.module,
+            self.function,
+            self.name
+        )
     }
 }
 
@@ -116,7 +122,11 @@ impl KarmaInstrument {
     pub fn register_probe(&mut self, point: ProbePoint) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
-        self.probes.push(DTraceProbe { probe_id: id, point, enabled: false });
+        self.probes.push(DTraceProbe {
+            probe_id: id,
+            point,
+            enabled: false,
+        });
         id
     }
 
@@ -125,11 +135,14 @@ impl KarmaInstrument {
             .iter_mut()
             .find(|p| p.probe_id == probe_id)
             .ok_or("Probe not found")
-            .map(|p| { p.enabled = true; })
+            .map(|p| {
+                p.enabled = true;
+            })
     }
 
     pub fn fire_probe(&mut self, probe_id: u32) -> Result<(), &'static str> {
-        let probe = self.probes
+        let probe = self
+            .probes
             .iter()
             .find(|p| p.probe_id == probe_id)
             .ok_or("Probe not found")?;

@@ -317,7 +317,11 @@ impl SoundcraftHeadTracked6DofBinauralSpatialAudioEngineV68 {
     }
 
     /// Renders mono input stream into head-tracked binaural stereo channels (Left, Right).
-    pub fn render_binaural_stereo(&self, mono: &[f32], source_azimuth_deg: f32) -> (Vec<f32>, Vec<f32>) {
+    pub fn render_binaural_stereo(
+        &self,
+        mono: &[f32],
+        source_azimuth_deg: f32,
+    ) -> (Vec<f32>, Vec<f32>) {
         let rel_deg = source_azimuth_deg - self.yaw_deg;
         let rad = rel_deg * (core::f32::consts::PI / 180.0);
 
@@ -445,7 +449,8 @@ impl Default for SoundcraftDolbyAtmos714Bed3dObjectSpatializerEngineV68 {
 #[derive(Debug, Clone)]
 pub struct SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
     pub tube_saturation_engine: SoundcraftNonLinearAnalogVacuumTubeSaturationEngineV68,
-    pub mastering_compressor_engine: SoundcraftSpectralLookaheadMultibandMasteringCompressorEngineV68,
+    pub mastering_compressor_engine:
+        SoundcraftSpectralLookaheadMultibandMasteringCompressorEngineV68,
     pub convolution_reverb_engine: SoundcraftPartitionedAcousticConvolutionReverbEngineV68,
     pub audio_to_midi_engine: SoundcraftRealtimePolyphonicAudioToMidiEngineV68,
     pub transient_shaper_engine: SoundcraftDualBandTransientPunchShaperEngineV68,
@@ -460,14 +465,20 @@ impl SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
     pub fn new() -> Self {
         Self {
             tube_saturation_engine: SoundcraftNonLinearAnalogVacuumTubeSaturationEngineV68::new(),
-            mastering_compressor_engine: SoundcraftSpectralLookaheadMultibandMasteringCompressorEngineV68::new(),
-            convolution_reverb_engine: SoundcraftPartitionedAcousticConvolutionReverbEngineV68::new(),
+            mastering_compressor_engine:
+                SoundcraftSpectralLookaheadMultibandMasteringCompressorEngineV68::new(),
+            convolution_reverb_engine: SoundcraftPartitionedAcousticConvolutionReverbEngineV68::new(
+            ),
             audio_to_midi_engine: SoundcraftRealtimePolyphonicAudioToMidiEngineV68::new(),
             transient_shaper_engine: SoundcraftDualBandTransientPunchShaperEngineV68::new(),
             stem_mixer_engine: SoundcraftAutomatedMultiTrackStemMixerAutoLevelerEngineV68::new(),
             binaural_spatial_engine: SoundcraftHeadTracked6DofBinauralSpatialAudioEngineV68::new(),
-            plugin_host_engine: SoundcraftSandboxedVst3ClapPluginHostEngineV68::new("SovereignDAWPluginV68"),
-            batch_transcoder_engine: SoundcraftBatchAudioFileTranscoderConverterEngineV68::new("flac"),
+            plugin_host_engine: SoundcraftSandboxedVst3ClapPluginHostEngineV68::new(
+                "SovereignDAWPluginV68",
+            ),
+            batch_transcoder_engine: SoundcraftBatchAudioFileTranscoderConverterEngineV68::new(
+                "flac",
+            ),
             atmos_spatializer_engine: SoundcraftDolbyAtmos714Bed3dObjectSpatializerEngineV68::new(),
         }
     }
@@ -476,10 +487,14 @@ impl SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
         vec![
             SoundcraftV68PrProposalManifest {
                 pr_id: 68301,
-                pr_title: String::from("Non-Linear Triode/Pentode Tube Saturation & Tape Modeler PR"),
+                pr_title: String::from(
+                    "Non-Linear Triode/Pentode Tube Saturation & Tape Modeler PR",
+                ),
                 target_subsystem: String::from("Creative::Soundcraft::AnalogModeling"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftNonLinearAnalogVacuumTubeSaturationEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftNonLinearAnalogVacuumTubeSaturationEngineV68",
+                )],
                 performance_multiplier: String::from("8.2x Harmonic Saturation Throughput"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -488,25 +503,35 @@ impl SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Spectral Lookahead Multiband Mastering Compressor PR"),
                 target_subsystem: String::from("Creative::Soundcraft::Mastering"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftSpectralLookaheadMultibandMasteringCompressorEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftSpectralLookaheadMultibandMasteringCompressorEngineV68",
+                )],
                 performance_multiplier: String::from("9.1x Dynamics Crossover Speed"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             SoundcraftV68PrProposalManifest {
                 pr_id: 68303,
-                pr_title: String::from("Partitioned FFT Acoustic Impulse Response Convolution Reverb PR"),
+                pr_title: String::from(
+                    "Partitioned FFT Acoustic Impulse Response Convolution Reverb PR",
+                ),
                 target_subsystem: String::from("Creative::Soundcraft::Reverb"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftPartitionedAcousticConvolutionReverbEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftPartitionedAcousticConvolutionReverbEngineV68",
+                )],
                 performance_multiplier: String::from("7.5x Convolution Throughput"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             SoundcraftV68PrProposalManifest {
                 pr_id: 68304,
-                pr_title: String::from("Real-Time Polyphonic Pitch-to-MIDI Microtonal Transcriber PR"),
+                pr_title: String::from(
+                    "Real-Time Polyphonic Pitch-to-MIDI Microtonal Transcriber PR",
+                ),
                 target_subsystem: String::from("Creative::Soundcraft::MIDI"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftRealtimePolyphonicAudioToMidiEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftRealtimePolyphonicAudioToMidiEngineV68",
+                )],
                 performance_multiplier: String::from("8.4x Pitch Extraction Speed"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -515,7 +540,9 @@ impl SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Dual-Band Transient Punch Acceleration Dynamics Shaper PR"),
                 target_subsystem: String::from("Creative::Soundcraft::Dynamics"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftDualBandTransientPunchShaperEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftDualBandTransientPunchShaperEngineV68",
+                )],
                 performance_multiplier: String::from("5.2x Transient Shaping Precision"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -524,7 +551,9 @@ impl SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Automated Multi-Track Stem Summing Bus & Auto-Leveler PR"),
                 target_subsystem: String::from("Creative::Soundcraft::Mixing"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftAutomatedMultiTrackStemMixerAutoLevelerEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftAutomatedMultiTrackStemMixerAutoLevelerEngineV68",
+                )],
                 performance_multiplier: String::from("6.8x Multi-Track Stem Summing"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -533,7 +562,9 @@ impl SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Head-Tracked 6DOF Binaural HRTF Spatial Audio Renderer PR"),
                 target_subsystem: String::from("Creative::Soundcraft::SpatialAudio"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftHeadTracked6DofBinauralSpatialAudioEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftHeadTracked6DofBinauralSpatialAudioEngineV68",
+                )],
                 performance_multiplier: String::from("7.9x Binaural Spatialization Speed"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -542,16 +573,22 @@ impl SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Sandboxed Crash-Isolated VST3 & CLAP Audio Plugin Host PR"),
                 target_subsystem: String::from("Creative::Soundcraft::PluginHost"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftSandboxedVst3ClapPluginHostEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftSandboxedVst3ClapPluginHostEngineV68",
+                )],
                 performance_multiplier: String::from("5.8x Plugin Isolation Stability"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             SoundcraftV68PrProposalManifest {
                 pr_id: 68309,
-                pr_title: String::from("Batch Audio File Parallel Transcoder & Converter Engine PR"),
+                pr_title: String::from(
+                    "Batch Audio File Parallel Transcoder & Converter Engine PR",
+                ),
                 target_subsystem: String::from("Creative::Soundcraft::Transcoder"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftBatchAudioFileTranscoderConverterEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftBatchAudioFileTranscoderConverterEngineV68",
+                )],
                 performance_multiplier: String::from("9.4x Batch Transcoding Throughput"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -560,7 +597,9 @@ impl SovereignSoundcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Dolby Atmos 7.1.4 Surround Bed & 3D Object Spatializer PR"),
                 target_subsystem: String::from("Creative::Soundcraft::Atmos"),
                 original_suite: String::from("ArtCraft SoundCraft"),
-                components_added: vec![String::from("SoundcraftDolbyAtmos714Bed3dObjectSpatializerEngineV68")],
+                components_added: vec![String::from(
+                    "SoundcraftDolbyAtmos714Bed3dObjectSpatializerEngineV68",
+                )],
                 performance_multiplier: String::from("6.3x Atmos Bed Spatialization Throughput"),
                 status: String::from("APPROVED_AND_MERGED"),
             },

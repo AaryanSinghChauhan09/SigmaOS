@@ -52,8 +52,8 @@ pub struct FigcraftV67PrProposalManifest {
 /// Component State Property Set V67
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ComponentVariantStateV67 {
-    pub state_name: String, // e.g. "hover", "pressed", "focused", "disabled"
-    pub theme_mode: String, // e.g. "light", "dark", "high_contrast"
+    pub state_name: String,   // e.g. "hover", "pressed", "focused", "disabled"
+    pub theme_mode: String,   // e.g. "light", "dark", "high_contrast"
     pub size_variant: String, // e.g. "sm", "md", "lg"
 }
 
@@ -81,14 +81,29 @@ impl FigcraftAiGenerativeComponentVariantMatrixEngineV67 {
                 base_component_id: 1,
                 component_name: "Button".to_string(),
                 variants: vec![
-                    ComponentVariantStateV67 { state_name: "default".to_string(), theme_mode: "light".to_string(), size_variant: "md".to_string() },
-                    ComponentVariantStateV67 { state_name: "hover".to_string(), theme_mode: "light".to_string(), size_variant: "md".to_string() },
-                    ComponentVariantStateV67 { state_name: "disabled".to_string(), theme_mode: "light".to_string(), size_variant: "md".to_string() },
+                    ComponentVariantStateV67 {
+                        state_name: "default".to_string(),
+                        theme_mode: "light".to_string(),
+                        size_variant: "md".to_string(),
+                    },
+                    ComponentVariantStateV67 {
+                        state_name: "hover".to_string(),
+                        theme_mode: "light".to_string(),
+                        size_variant: "md".to_string(),
+                    },
+                    ComponentVariantStateV67 {
+                        state_name: "disabled".to_string(),
+                        theme_mode: "light".to_string(),
+                        size_variant: "md".to_string(),
+                    },
                 ],
             },
         );
 
-        Self { matrices, next_id: 2 }
+        Self {
+            matrices,
+            next_id: 2,
+        }
     }
 
     pub fn generate_matrix_permutations(
@@ -183,10 +198,18 @@ impl FigcraftAdvancedSpatial3dSceneDepthCompositorEngineV67 {
     }
 
     pub fn sort_layers_by_depth_back_to_front(&mut self) {
-        self.layers.sort_by(|a, b| a.z_depth.partial_cmp(&b.z_depth).unwrap_or(core::cmp::Ordering::Equal));
+        self.layers.sort_by(|a, b| {
+            a.z_depth
+                .partial_cmp(&b.z_depth)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
     }
 
-    pub fn compute_perspective_transform(&self, layer_id: u32, fov_deg: f32) -> Option<(f32, f32, f32)> {
+    pub fn compute_perspective_transform(
+        &self,
+        layer_id: u32,
+        fov_deg: f32,
+    ) -> Option<(f32, f32, f32)> {
         let layer = self.layers.iter().find(|l| l.layer_id == layer_id)?;
         let fov_rad = fov_deg.to_radians();
         let scale = 1.0 / (1.0 + (layer.z_depth * (fov_rad * 0.5).tan()));
@@ -217,10 +240,30 @@ impl FigcraftResponsiveFluidBreakpointsLayoutEngineV67 {
     pub fn new() -> Self {
         Self {
             breakpoints: vec![
-                ResponsiveBreakpointV67 { name: "mobile".to_string(), min_width_px: 0.0, columns: 4, gutter_px: 16.0 },
-                ResponsiveBreakpointV67 { name: "tablet".to_string(), min_width_px: 768.0, columns: 8, gutter_px: 24.0 },
-                ResponsiveBreakpointV67 { name: "desktop".to_string(), min_width_px: 1024.0, columns: 12, gutter_px: 32.0 },
-                ResponsiveBreakpointV67 { name: "wide".to_string(), min_width_px: 1440.0, columns: 16, gutter_px: 40.0 },
+                ResponsiveBreakpointV67 {
+                    name: "mobile".to_string(),
+                    min_width_px: 0.0,
+                    columns: 4,
+                    gutter_px: 16.0,
+                },
+                ResponsiveBreakpointV67 {
+                    name: "tablet".to_string(),
+                    min_width_px: 768.0,
+                    columns: 8,
+                    gutter_px: 24.0,
+                },
+                ResponsiveBreakpointV67 {
+                    name: "desktop".to_string(),
+                    min_width_px: 1024.0,
+                    columns: 12,
+                    gutter_px: 32.0,
+                },
+                ResponsiveBreakpointV67 {
+                    name: "wide".to_string(),
+                    min_width_px: 1440.0,
+                    columns: 16,
+                    gutter_px: 40.0,
+                },
             ],
         }
     }
@@ -235,7 +278,13 @@ impl FigcraftResponsiveFluidBreakpointsLayoutEngineV67 {
         best
     }
 
-    pub fn compute_fluid_clamp(&self, min_size: f32, preferred_vw: f32, max_size: f32, viewport_width: f32) -> f32 {
+    pub fn compute_fluid_clamp(
+        &self,
+        min_size: f32,
+        preferred_vw: f32,
+        max_size: f32,
+        viewport_width: f32,
+    ) -> f32 {
         let preferred_px = (preferred_vw / 100.0) * viewport_width;
         preferred_px.clamp(min_size, max_size)
     }
@@ -284,7 +333,15 @@ impl FigcraftRealtimeMultiUserCursorPresenceCrdtEngineV67 {
         }
     }
 
-    pub fn update_user_cursor(&mut self, user_id: u32, username: &str, x: f32, y: f32, layer: Option<u32>, hex: &str) {
+    pub fn update_user_cursor(
+        &mut self,
+        user_id: u32,
+        username: &str,
+        x: f32,
+        y: f32,
+        layer: Option<u32>,
+        hex: &str,
+    ) {
         self.vector_clock += 1;
         self.active_cursors.insert(
             user_id,
@@ -389,10 +446,26 @@ impl FigcraftVariableTypographyKerningFeatureEngineV67 {
     pub fn new() -> Self {
         Self {
             kerning_table: vec![
-                KerningPairV67 { left_glyph: 'A', right_glyph: 'V', kerning_offset_em: -0.08 },
-                KerningPairV67 { left_glyph: 'A', right_glyph: 'W', kerning_offset_em: -0.06 },
-                KerningPairV67 { left_glyph: 'T', right_glyph: 'o', kerning_offset_em: -0.05 },
-                KerningPairV67 { left_glyph: 'V', right_glyph: 'a', kerning_offset_em: -0.07 },
+                KerningPairV67 {
+                    left_glyph: 'A',
+                    right_glyph: 'V',
+                    kerning_offset_em: -0.08,
+                },
+                KerningPairV67 {
+                    left_glyph: 'A',
+                    right_glyph: 'W',
+                    kerning_offset_em: -0.06,
+                },
+                KerningPairV67 {
+                    left_glyph: 'T',
+                    right_glyph: 'o',
+                    kerning_offset_em: -0.05,
+                },
+                KerningPairV67 {
+                    left_glyph: 'V',
+                    right_glyph: 'a',
+                    kerning_offset_em: -0.07,
+                },
             ],
         }
     }
@@ -482,7 +555,11 @@ impl FigcraftInteractiveDesignSystemComponentExporterEngineV67 {
         Self
     }
 
-    pub fn export_component_code(&self, component_name: &str, framework: TargetFrameworkV67) -> String {
+    pub fn export_component_code(
+        &self,
+        component_name: &str,
+        framework: TargetFrameworkV67,
+    ) -> String {
         match framework {
             TargetFrameworkV67::ReactTypescript => format!(
                 "import React from 'react';\n\nexport interface {}Props {{\n  label?: string;\n}}\n\nexport const {}: React.FC<{}Props> = ({{ label = \"{}\" }}) => {{\n  return <button className=\"btn-primary\">{{label}}</button>;\n}};",
@@ -644,7 +721,9 @@ impl SovereignFigcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: "PR #6721: AI Generative Component Variant Matrix Engine".to_string(),
                 target_subsystem: "Creative/Figcraft/VariantMatrix".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftAiGenerativeComponentVariantMatrixEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftAiGenerativeComponentVariantMatrixEngineV67".to_string()
+                ],
                 performance_multiplier: "27.4x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -653,34 +732,47 @@ impl SovereignFigcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: "PR #6722: Advanced Spatial 3D Scene Depth Compositor Engine".to_string(),
                 target_subsystem: "Creative/Figcraft/SpatialDepth".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftAdvancedSpatial3dSceneDepthCompositorEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftAdvancedSpatial3dSceneDepthCompositorEngineV67".to_string()
+                ],
                 performance_multiplier: "22.1x".to_string(),
                 status: "APPROVED".to_string(),
             },
             FigcraftV67PrProposalManifest {
                 pr_id: 6723,
-                pr_title: "PR #6723: Responsive Fluid Breakpoints & Container Queries Layout Engine".to_string(),
+                pr_title:
+                    "PR #6723: Responsive Fluid Breakpoints & Container Queries Layout Engine"
+                        .to_string(),
                 target_subsystem: "Creative/Figcraft/ResponsiveLayout".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftResponsiveFluidBreakpointsLayoutEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftResponsiveFluidBreakpointsLayoutEngineV67".to_string()
+                ],
                 performance_multiplier: "25.0x".to_string(),
                 status: "APPROVED".to_string(),
             },
             FigcraftV67PrProposalManifest {
                 pr_id: 6724,
-                pr_title: "PR #6724: Realtime Multi-User Cursor Presence & CRDT Synchronization Engine".to_string(),
+                pr_title:
+                    "PR #6724: Realtime Multi-User Cursor Presence & CRDT Synchronization Engine"
+                        .to_string(),
                 target_subsystem: "Creative/Figcraft/CursorPresence".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftRealtimeMultiUserCursorPresenceCrdtEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftRealtimeMultiUserCursorPresenceCrdtEngineV67".to_string()
+                ],
                 performance_multiplier: "33.5x".to_string(),
                 status: "APPROVED".to_string(),
             },
             FigcraftV67PrProposalManifest {
                 pr_id: 6725,
-                pr_title: "PR #6725: Design System Accessibility & WCAG Contrast Auditor Engine".to_string(),
+                pr_title: "PR #6725: Design System Accessibility & WCAG Contrast Auditor Engine"
+                    .to_string(),
                 target_subsystem: "Creative/Figcraft/WcagAuditor".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftDesignSystemAccessibilityWcagContrastAuditorEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftDesignSystemAccessibilityWcagContrastAuditorEngineV67".to_string(),
+                ],
                 performance_multiplier: "19.8x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -689,7 +781,9 @@ impl SovereignFigcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: "PR #6726: Variable Typography Kerning Feature Engine".to_string(),
                 target_subsystem: "Creative/Figcraft/Kerning".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftVariableTypographyKerningFeatureEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftVariableTypographyKerningFeatureEngineV67".to_string()
+                ],
                 performance_multiplier: "29.2x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -698,16 +792,21 @@ impl SovereignFigcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: "PR #6727: Subpixel GPU Vector Rasterization Engine".to_string(),
                 target_subsystem: "Creative/Figcraft/GpuRasterizer".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftSubpixelGpuVectorRasterizationEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftSubpixelGpuVectorRasterizationEngineV67".to_string()
+                ],
                 performance_multiplier: "35.0x".to_string(),
                 status: "APPROVED".to_string(),
             },
             FigcraftV67PrProposalManifest {
                 pr_id: 6728,
-                pr_title: "PR #6728: Interactive Design System Component Exporter Engine".to_string(),
+                pr_title: "PR #6728: Interactive Design System Component Exporter Engine"
+                    .to_string(),
                 target_subsystem: "Creative/Figcraft/ComponentExporter".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftInteractiveDesignSystemComponentExporterEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftInteractiveDesignSystemComponentExporterEngineV67".to_string()
+                ],
                 performance_multiplier: "18.6x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -716,7 +815,9 @@ impl SovereignFigcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: "PR #6729: Multi-Format Vector Canvas Transpiler Engine".to_string(),
                 target_subsystem: "Creative/Figcraft/CanvasTranspiler".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftMultiFormatVectorCanvasTranspilerEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftMultiFormatVectorCanvasTranspilerEngineV67".to_string()
+                ],
                 performance_multiplier: "21.0x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -725,7 +826,9 @@ impl SovereignFigcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: "PR #6730: Design Token Cascade Dependency Graph Engine".to_string(),
                 target_subsystem: "Creative/Figcraft/TokenGraph".to_string(),
                 original_suite: "ArtCraft Figcraft".to_string(),
-                components_added: vec!["FigcraftDesignTokenCascadeDependencyGraphEngineV67".to_string()],
+                components_added: vec![
+                    "FigcraftDesignTokenCascadeDependencyGraphEngineV67".to_string()
+                ],
                 performance_multiplier: "24.2x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -746,7 +849,8 @@ impl FigcraftArtcraftMissingComponentsV67PrSuite {
         }
 
         let mut vm = gateway.variant_matrix.clone();
-        let matrix_id = vm.generate_matrix_permutations("Card", &["hover"], &["light", "dark"], &["md"]);
+        let matrix_id =
+            vm.generate_matrix_permutations("Card", &["hover"], &["light", "dark"], &["md"]);
         if !vm.matrices.contains_key(&matrix_id) {
             return false;
         }
@@ -794,7 +898,11 @@ impl FigcraftArtcraftMissingComponentsV67PrSuite {
         }
 
         let transpiler = gateway.canvas_transpiler.clone();
-        let output = transpiler.transpile_canvas("Dashboard", VectorCanvasFormatV67::FigmaJson, VectorCanvasFormatV67::Svg20);
+        let output = transpiler.transpile_canvas(
+            "Dashboard",
+            VectorCanvasFormatV67::FigmaJson,
+            VectorCanvasFormatV67::Svg20,
+        );
         if !output.contains("Dashboard") {
             return false;
         }
@@ -820,7 +928,12 @@ mod tests {
     #[test]
     fn test_variant_matrix_engine_v67() {
         let mut engine = FigcraftAiGenerativeComponentVariantMatrixEngineV67::new();
-        let id = engine.generate_matrix_permutations("Badge", &["default", "active"], &["light"], &["sm", "md"]);
+        let id = engine.generate_matrix_permutations(
+            "Badge",
+            &["default", "active"],
+            &["light"],
+            &["sm", "md"],
+        );
         assert!(engine.matrices.contains_key(&id));
         assert_eq!(engine.matrices[&id].variants.len(), 4);
     }
@@ -894,14 +1007,22 @@ mod tests {
     #[test]
     fn test_canvas_transpiler_engine_v67() {
         let transpiler = FigcraftMultiFormatVectorCanvasTranspilerEngineV67::new();
-        let res = transpiler.transpile_canvas("MobileUI", VectorCanvasFormatV67::FigmaJson, VectorCanvasFormatV67::Svg20);
+        let res = transpiler.transpile_canvas(
+            "MobileUI",
+            VectorCanvasFormatV67::FigmaJson,
+            VectorCanvasFormatV67::Svg20,
+        );
         assert!(res.contains("MobileUI"));
     }
 
     #[test]
     fn test_token_graph_engine_v67() {
         let mut graph = FigcraftDesignTokenCascadeDependencyGraphEngineV67::new();
-        graph.add_token_node("color.bg.card", "{color.brand.primary}", &["color.brand.primary"]);
+        graph.add_token_node(
+            "color.bg.card",
+            "{color.brand.primary}",
+            &["color.brand.primary"],
+        );
         let resolved = graph.resolve_token_value("color.bg.card");
         assert_eq!(resolved, Some("#0066FF".to_string()));
     }

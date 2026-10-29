@@ -277,7 +277,11 @@ impl SovereignDrmKmsV72Engine {
         }
     }
 
-    pub fn alloc_gem_export_prime(&mut self, width: u32, height: u32) -> Result<(u32, i32), &'static str> {
+    pub fn alloc_gem_export_prime(
+        &mut self,
+        width: u32,
+        height: u32,
+    ) -> Result<(u32, i32), &'static str> {
         let size = (width * height * 4) as u64;
         let handle = self.native_kms.gem_create(size)?;
         let prime_fd = (handle as i32) + 15;
@@ -1002,7 +1006,10 @@ impl SovereignGraphicsDisplayV72MasterSuiteEngine {
         let mut audit = BTreeMap::new();
 
         // 1. PR Gateway
-        audit.insert("V72 PR Gateway Seeding (20 Categories)", self.pr_gateway.prs.len() == 20);
+        audit.insert(
+            "V72 PR Gateway Seeding (20 Categories)",
+            self.pr_gateway.prs.len() == 20,
+        );
 
         // 2. X11
         let lease = self.x11.lease_randr_output_for_vr(1);
@@ -1011,7 +1018,10 @@ impl SovereignGraphicsDisplayV72MasterSuiteEngine {
         // 3. Wayland
         let surf = self.wayland.create_surface();
         self.wayland.set_color_space_v4(surf, "DCI-P3");
-        audit.insert("Wayland Color Management v4 Functional", self.wayland.color_spaces.contains_key(&surf));
+        audit.insert(
+            "Wayland Color Management v4 Functional",
+            self.wayland.color_spaces.contains_key(&surf),
+        );
 
         // 4. Mesa
         let aco = self.mesa.compile_nir_shader("main()");
@@ -1020,7 +1030,10 @@ impl SovereignGraphicsDisplayV72MasterSuiteEngine {
         // 5. DRM/KMS
         let gem = self.drm.alloc_gem_export_prime(1920, 1080);
         let vrr = self.drm.compute_vrr_timing_ns(144);
-        audit.insert("DRM/KMS PRIME Export & VRR Functional", gem.is_ok() && vrr < 10_000_000);
+        audit.insert(
+            "DRM/KMS PRIME Export & VRR Functional",
+            gem.is_ok() && vrr < 10_000_000,
+        );
 
         // 6. libdrm
         let dumb = self.libdrm.create_dumb_buffer(1920, 1080);
@@ -1036,7 +1049,10 @@ impl SovereignGraphicsDisplayV72MasterSuiteEngine {
 
         // 9. Weston
         self.weston.schedule_repaint();
-        audit.insert("Weston Repaint Scheduler Functional", self.weston.repaint_pending);
+        audit.insert(
+            "Weston Repaint Scheduler Functional",
+            self.weston.repaint_pending,
+        );
 
         // 10. Sway
         let split = self.sway.split_container(1, true);
@@ -1044,7 +1060,10 @@ impl SovereignGraphicsDisplayV72MasterSuiteEngine {
 
         // 11. wlroots
         self.wlroots.add_damage(0, 0, 100, 100);
-        audit.insert("wlroots Damage Ring Functional", !self.wlroots.damage_rects.is_empty());
+        audit.insert(
+            "wlroots Damage Ring Functional",
+            !self.wlroots.damage_rects.is_empty(),
+        );
 
         // 12. Mutter
         let px = self.mutter.scale_geometry(100.0);
@@ -1052,11 +1071,17 @@ impl SovereignGraphicsDisplayV72MasterSuiteEngine {
 
         // 13. KWin
         let (kw_w, kw_h) = self.kwin.compute_decorated_extents(800, 600);
-        audit.insert("KWin Decorated Window Geometry Functional", kw_w == 832 && kw_h == 660);
+        audit.insert(
+            "KWin Decorated Window Geometry Functional",
+            kw_w == 832 && kw_h == 660,
+        );
 
         // 14. Compiz
         self.compiz.rotate_cube(0.5);
-        audit.insert("Compiz 3D Cube Rotation Functional", self.compiz.cube_angle_rad > 0.0);
+        audit.insert(
+            "Compiz 3D Cube Rotation Functional",
+            self.compiz.cube_angle_rad > 0.0,
+        );
 
         // 15. Picom
         let corner = self.picom.is_inside_rounded_corner(50, 50, 100, 100);
@@ -1064,11 +1089,17 @@ impl SovereignGraphicsDisplayV72MasterSuiteEngine {
 
         // 16. Xwayland
         self.xwayland.set_clipboard("Wayland Paste");
-        audit.insert("Xwayland Clipboard Selection Bridge Functional", self.xwayland.clipboard_text == "Wayland Paste");
+        audit.insert(
+            "Xwayland Clipboard Selection Bridge Functional",
+            self.xwayland.clipboard_text == "Wayland Paste",
+        );
 
         // 17. evdev
         self.evdev.update_slot_position(0, 100, 200);
-        audit.insert("evdev Multitouch Slot Tracker Functional", self.evdev.slots[0] == (100, 200));
+        audit.insert(
+            "evdev Multitouch Slot Tracker Functional",
+            self.evdev.slots[0] == (100, 200),
+        );
 
         // 18. libinput
         let palm = self.libinput.is_palm_touch(10, 1000);
@@ -1076,7 +1107,10 @@ impl SovereignGraphicsDisplayV72MasterSuiteEngine {
 
         // 19. Framebuffer
         self.fbdev.draw_pixel(10, 10, 0xFF00FF00);
-        audit.insert("Console Framebuffer ARGB Pixel Drawing Functional", self.fbdev.buffer[10 * 1920 + 10] == 0xFF00FF00);
+        audit.insert(
+            "Console Framebuffer ARGB Pixel Drawing Functional",
+            self.fbdev.buffer[10 * 1920 + 10] == 0xFF00FF00,
+        );
 
         // 20. Virtual Terminal
         let vt_ok = self.vt.switch_vt(3);

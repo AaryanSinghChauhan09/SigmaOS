@@ -56,7 +56,8 @@ impl CadcraftAiGenerativeTopologyOptimizationV69Engine {
     ) -> (f64, f64, f64) {
         let reduction = target_mass_reduction_pct.clamp(10.0, 90.0);
         let final_mass_mm3 = domain_volume_mm3 * (1.0 - reduction / 100.0);
-        let max_von_mises_stress_mpa = (applied_load_kn * 1000.0) / (final_mass_mm3.powf(0.666) + 1.0);
+        let max_von_mises_stress_mpa =
+            (applied_load_kn * 1000.0) / (final_mass_mm3.powf(0.666) + 1.0);
         let convergence_score = (100.0 - reduction * 0.2).min(99.8);
 
         (final_mass_mm3, max_von_mises_stress_mpa, convergence_score)
@@ -195,11 +196,18 @@ impl CadcraftSheetMetalBendingHemingSpringbackV69Engine {
         k_factor: f64,
     ) -> (f64, f64, f64) {
         let k = k_factor.clamp(0.2, 0.5);
-        let bend_allowance_mm = (3.141592653589793 / 180.0) * bend_angle_deg * (bend_radius_mm + k * sheet_thickness_mm);
-        let springback_angle_deg = bend_angle_deg * 0.025 * (bend_radius_mm / sheet_thickness_mm.max(0.1));
+        let bend_allowance_mm = (3.141592653589793 / 180.0)
+            * bend_angle_deg
+            * (bend_radius_mm + k * sheet_thickness_mm);
+        let springback_angle_deg =
+            bend_angle_deg * 0.025 * (bend_radius_mm / sheet_thickness_mm.max(0.1));
         let overbend_required_deg = bend_angle_deg + springback_angle_deg;
 
-        (bend_allowance_mm, springback_angle_deg, overbend_required_deg)
+        (
+            bend_allowance_mm,
+            springback_angle_deg,
+            overbend_required_deg,
+        )
     }
 }
 
@@ -268,7 +276,11 @@ impl CadcraftMultiBodyKinematicRigidBodyDynamicsV69Engine {
         let angular_velocity = angular_acceleration * simulation_step_sec * 100.0;
         let contact_collision_passed = drive_torque_nm < 5000.0;
 
-        (angular_acceleration, angular_velocity, contact_collision_passed)
+        (
+            angular_acceleration,
+            angular_velocity,
+            contact_collision_passed,
+        )
     }
 }
 
@@ -301,7 +313,8 @@ impl CadcraftEcadMcad3dCoDesignThermalIntegratorV69Engine {
         let thermal_resistance_c_w = 15.0 / (enclosure_airflow_cfm.max(1.0)).sqrt();
         let junction_temp_c = 25.0 + total_power_dissipation_w * thermal_resistance_c_w;
         let clearance_ok = component_count > 0 && junction_temp_c < 105.0;
-        let max_heat_flux_w_cm2 = total_power_dissipation_w / (component_count as f64 * 0.5).max(1.0);
+        let max_heat_flux_w_cm2 =
+            total_power_dissipation_w / (component_count as f64 * 0.5).max(1.0);
 
         (junction_temp_c, max_heat_flux_w_cm2, clearance_ok)
     }
@@ -334,7 +347,8 @@ impl CadcraftGenerativePipingHarnessAutolayoutV69Engine {
         obstacle_count: usize,
     ) -> (usize, f64, bool) {
         let bends_count = obstacle_count * 2 + 2;
-        let total_routed_length_mm = path_distance_mm * (1.0 + 0.05 * bends_count as f64) + min_bend_radius_mm * 0.5;
+        let total_routed_length_mm =
+            path_distance_mm * (1.0 + 0.05 * bends_count as f64) + min_bend_radius_mm * 0.5;
         let routing_success = bends_count < 20;
 
         (bends_count, total_routed_length_mm, routing_success)
@@ -371,7 +385,11 @@ impl CadcraftPointcloud3dMeshToBRepReconstructionV69Engine {
         let mean_surface_deviation_mm = fitting_tolerance_mm * 0.42;
         let brep_feature_completeness_pct = 98.6;
 
-        (brep_faces_reconstructed, mean_surface_deviation_mm, brep_feature_completeness_pct)
+        (
+            brep_faces_reconstructed,
+            mean_surface_deviation_mm,
+            brep_feature_completeness_pct,
+        )
     }
 }
 
@@ -406,7 +424,8 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
             ai_topology_engine: CadcraftAiGenerativeTopologyOptimizationV69Engine::new(),
             class_a_nurbs_engine: CadcraftClassANurbsSurfaceG3BlendingV69Engine::new(),
             lmd_cam_engine: CadcraftMultiAxisLaserMetalDepositionCamV69Engine::new(),
-            multiphysics_cae_engine: CadcraftElectromagneticThermalFluidMultiPhysicsCaeV69Engine::new(),
+            multiphysics_cae_engine:
+                CadcraftElectromagneticThermalFluidMultiPhysicsCaeV69Engine::new(),
             sheet_metal_engine: CadcraftSheetMetalBendingHemingSpringbackV69Engine::new(),
             acoustic_nvh_engine: CadcraftAcousticModalNvhVibrationCaeV69Engine::new(),
             rigid_body_dynamics_engine: CadcraftMultiBodyKinematicRigidBodyDynamicsV69Engine::new(),
@@ -420,10 +439,14 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
         vec![
             CadcraftV69PrProposalManifest {
                 pr_id: 6901,
-                pr_title: String::from("AI Deep Learning Generative Topology Optimization Engine PR"),
+                pr_title: String::from(
+                    "AI Deep Learning Generative Topology Optimization Engine PR",
+                ),
                 target_subsystem: String::from("Creative::Cadcraft::GenerativeAI"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftAiGenerativeTopologyOptimizationV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftAiGenerativeTopologyOptimizationV69Engine",
+                )],
                 performance_multiplier: String::from("28.4x neural density field solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -432,7 +455,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("Class-A NURBS Surface G3 Curvature Blending Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::ClassASurfacing"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftClassANurbsSurfaceG3BlendingV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftClassANurbsSurfaceG3BlendingV69Engine",
+                )],
                 performance_multiplier: String::from("32.1x G3 continuous fillet solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -441,7 +466,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("5-Axis Laser Metal Deposition Additive CAM Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::LaserMetalCAM"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftMultiAxisLaserMetalDepositionCamV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftMultiAxisLaserMetalDepositionCamV69Engine",
+                )],
                 performance_multiplier: String::from("21.8x multi-axis cladding planner"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -450,7 +477,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("Electromagnetic-Thermal-Fluid Multi-Physics CAE Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::MultiPhysicsCAE"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftElectromagneticThermalFluidMultiPhysicsCaeV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftElectromagneticThermalFluidMultiPhysicsCaeV69Engine",
+                )],
                 performance_multiplier: String::from("26.0x coupled Joule heating FEA solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -459,7 +488,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("Sheet Metal Bending, Heming & Springback Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::SheetMetal"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftSheetMetalBendingHemingSpringbackV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftSheetMetalBendingHemingSpringbackV69Engine",
+                )],
                 performance_multiplier: String::from("19.5x K-factor bend allowance predictor"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -468,7 +499,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("Acoustic Modal NVH Vibration CAE Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::NVHAcoustics"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftAcousticModalNvhVibrationCaeV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftAcousticModalNvhVibrationCaeV69Engine",
+                )],
                 performance_multiplier: String::from("24.7x acoustic modal frequency solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -477,7 +510,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("Multi-Body Kinematic Rigid Body Dynamics Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::MechanismDynamics"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftMultiBodyKinematicRigidBodyDynamicsV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftMultiBodyKinematicRigidBodyDynamicsV69Engine",
+                )],
                 performance_multiplier: String::from("35.2x joint reaction collision solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -486,7 +521,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("ECAD/MCAD 3D Co-Design Thermal Integrator Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::ECADMCAD"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftEcadMcad3dCoDesignThermalIntegratorV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftEcadMcad3dCoDesignThermalIntegratorV69Engine",
+                )],
                 performance_multiplier: String::from("22.9x IPC-2581 PCB thermal solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -495,7 +532,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("Generative Piping & Harness Autolayout Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::RoutingAutolayout"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftGenerativePipingHarnessAutolayoutV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftGenerativePipingHarnessAutolayoutV69Engine",
+                )],
                 performance_multiplier: String::from("30.1x obstacle bend route optimizer"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -504,7 +543,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV69PrGateway {
                 pr_title: String::from("Pointcloud 3D Mesh to B-Rep Surface Reconstruction PR"),
                 target_subsystem: String::from("Creative::Cadcraft::ScanToCAD"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftPointcloud3dMeshToBRepReconstructionV69Engine")],
+                components_added: vec![String::from(
+                    "CadcraftPointcloud3dMeshToBRepReconstructionV69Engine",
+                )],
                 performance_multiplier: String::from("40.5x LiDAR point cloud B-Rep fitter"),
                 status: String::from("APPROVED_AND_MERGED"),
             },

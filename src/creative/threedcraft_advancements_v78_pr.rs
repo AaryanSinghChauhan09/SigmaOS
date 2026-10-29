@@ -49,10 +49,10 @@ pub struct ThreeDCraftV78PrProposalManifest {
 /// Material optical properties for BSSRDF diffusion profile calculation.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct SubsurfaceMaterialProfile {
-    pub scattering_coeff: [f32; 3],  // RGB scattering coefficient Sigma_s
-    pub absorption_coeff: [f32; 3],  // RGB absorption coefficient Sigma_a
-    pub mean_free_path_mm: f32,       // Average mean free path in mm
-    pub refractive_index: f32,        // Relative index of refraction (e.g., 1.3 to 1.5)
+    pub scattering_coeff: [f32; 3], // RGB scattering coefficient Sigma_s
+    pub absorption_coeff: [f32; 3], // RGB absorption coefficient Sigma_a
+    pub mean_free_path_mm: f32,     // Average mean free path in mm
+    pub refractive_index: f32,      // Relative index of refraction (e.g., 1.3 to 1.5)
 }
 
 /// BSSRDF Subsurface Scattering & Light Diffusion PR Engine V78.
@@ -93,7 +93,8 @@ impl ThreeDCraftSubsurfaceScatteringDiffusionPrEngineV78 {
 
             // Dipole diffusion approximation formula
             let c1 = l_mfp * (sigma_tr + 1.0 / d_pos) * (-sigma_tr * d_pos).exp() / (d_pos * d_pos);
-            let c2 = 3.0 * l_mfp * (sigma_tr + 1.0 / d_neg) * (-sigma_tr * d_neg).exp() / (d_neg * d_neg);
+            let c2 = 3.0 * l_mfp * (sigma_tr + 1.0 / d_neg) * (-sigma_tr * d_neg).exp()
+                / (d_neg * d_neg);
 
             result[i] = ((c1 + c2) / (4.0 * PI)).clamp(0.0, 10.0);
         }
@@ -181,12 +182,7 @@ impl ThreeDCraftSdfRigidBodyPhysicsCollisionPrEngineV78 {
     }
 
     /// Compute normal gradient vector of SDF at point via finite differences
-    pub fn compute_sdf_gradient(
-        &self,
-        point: [f32; 3],
-        center: [f32; 3],
-        radius: f32,
-    ) -> [f32; 3] {
+    pub fn compute_sdf_gradient(&self, point: [f32; 3], center: [f32; 3], radius: f32) -> [f32; 3] {
         let eps = 1e-3;
         let dx = self.evaluate_sphere_sdf([point[0] + eps, point[1], point[2]], center, radius)
             - self.evaluate_sphere_sdf([point[0] - eps, point[1], point[2]], center, radius);
@@ -220,10 +216,18 @@ impl ThreeDCraftSdfRigidBodyPhysicsCollisionPrEngineV78 {
         body.position[2] += body.velocity[2] * dt;
 
         // Check SDF collision against obstacle
-        let sdf_val = self.evaluate_sphere_sdf(body.position, collider_center, collider_radius + body.bounding_radius);
+        let sdf_val = self.evaluate_sphere_sdf(
+            body.position,
+            collider_center,
+            collider_radius + body.bounding_radius,
+        );
 
         if sdf_val < self.collision_margin {
-            let normal = self.compute_sdf_gradient(body.position, collider_center, collider_radius + body.bounding_radius);
+            let normal = self.compute_sdf_gradient(
+                body.position,
+                collider_center,
+                collider_radius + body.bounding_radius,
+            );
 
             // Separate penetrating body
             let penetration = self.collision_margin - sdf_val;
@@ -232,7 +236,9 @@ impl ThreeDCraftSdfRigidBodyPhysicsCollisionPrEngineV78 {
             body.position[2] += normal[2] * penetration;
 
             // Reflect normal velocity with restitution
-            let v_dot_n = body.velocity[0] * normal[0] + body.velocity[1] * normal[1] + body.velocity[2] * normal[2];
+            let v_dot_n = body.velocity[0] * normal[0]
+                + body.velocity[1] * normal[1]
+                + body.velocity[2] * normal[2];
             if v_dot_n < 0.0 {
                 let impulse = -(1.0 + body.restitution) * v_dot_n;
                 body.velocity[0] += normal[0] * impulse;
@@ -312,8 +318,16 @@ impl ThreeDCraftVoxelConeTracingGlobalIlluminationPrEngineV78 {
         let mut accumulated_opacity = 0.0f32;
         let mut t = 0.5f32; // Initial offset from surface
 
-        let dir_len = (direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]).sqrt().max(1e-5);
-        let norm_dir = [direction[0] / dir_len, direction[1] / dir_len, direction[2] / dir_len];
+        let dir_len = (direction[0] * direction[0]
+            + direction[1] * direction[1]
+            + direction[2] * direction[2])
+            .sqrt()
+            .max(1e-5);
+        let norm_dir = [
+            direction[0] / dir_len,
+            direction[1] / dir_len,
+            direction[2] / dir_len,
+        ];
 
         while t < self.max_trace_distance && accumulated_opacity < 0.95 {
             let cone_radius = t * (self.cone_angle_rad * 0.5).tan();
@@ -414,7 +428,9 @@ impl ThreeDCraftSkeletalInverseKinematicsRagdollPrEngineV78 {
         let dx = target_pos[0] - root_pos[0];
         let dy = target_pos[1] - root_pos[1];
         let dz = target_pos[2] - root_pos[2];
-        let d = (dx * dx + dy * dy + dz * dz).sqrt().clamp(0.01, l1 + l2 - 1e-4);
+        let d = (dx * dx + dy * dy + dz * dz)
+            .sqrt()
+            .clamp(0.01, l1 + l2 - 1e-4);
 
         // Law of cosines for interior joint angle theta
         let cos_theta = ((l1 * l1 + d * d - l2 * l2) / (2.0 * l1 * d)).clamp(-1.0, 1.0);
@@ -428,7 +444,9 @@ impl ThreeDCraftSkeletalInverseKinematicsRagdollPrEngineV78 {
         let perp_x = dir[1] * bend_up[2] - dir[2] * bend_up[1];
         let perp_y = dir[2] * bend_up[0] - dir[0] * bend_up[2];
         let perp_z = dir[0] * bend_up[1] - dir[1] * bend_up[0];
-        let perp_len = (perp_x * perp_x + perp_y * perp_y + perp_z * perp_z).sqrt().max(1e-4);
+        let perp_len = (perp_x * perp_x + perp_y * perp_y + perp_z * perp_z)
+            .sqrt()
+            .max(1e-4);
 
         let perp = [perp_x / perp_len, perp_y / perp_len, perp_z / perp_len];
 
@@ -527,21 +545,35 @@ impl ThreeDCraftWaylandXrHandTrackingGesturePrEngineV78 {
         let dx_thumb_index = thumb_tip[0] - index_tip[0];
         let dy_thumb_index = thumb_tip[1] - index_tip[1];
         let dz_thumb_index = thumb_tip[2] - index_tip[2];
-        let dist_thumb_index = (dx_thumb_index * dx_thumb_index + dy_thumb_index * dy_thumb_index + dz_thumb_index * dz_thumb_index).sqrt();
+        let dist_thumb_index = (dx_thumb_index * dx_thumb_index
+            + dy_thumb_index * dy_thumb_index
+            + dz_thumb_index * dz_thumb_index)
+            .sqrt();
 
         let dx_thumb_middle = thumb_tip[0] - middle_tip[0];
         let dy_thumb_middle = thumb_tip[1] - middle_tip[1];
         let dz_thumb_middle = thumb_tip[2] - middle_tip[2];
-        let dist_thumb_middle = (dx_thumb_middle * dx_thumb_middle + dy_thumb_middle * dy_thumb_middle + dz_thumb_middle * dz_thumb_middle).sqrt();
+        let dist_thumb_middle = (dx_thumb_middle * dx_thumb_middle
+            + dy_thumb_middle * dy_thumb_middle
+            + dz_thumb_middle * dz_thumb_middle)
+            .sqrt();
 
         if dist_thumb_index < self.pinch_threshold_m {
             SpatialGestureType::Pinch
-        } else if dist_thumb_index < self.grab_threshold_m && dist_thumb_middle < self.grab_threshold_m {
+        } else if dist_thumb_index < self.grab_threshold_m
+            && dist_thumb_middle < self.grab_threshold_m
+        {
             SpatialGestureType::Grab
         } else {
             // Check if index finger is extended away from wrist while other fingers are curled
-            let dist_index_wrist = ((index_tip[0] - wrist[0]).powi(2) + (index_tip[1] - wrist[1]).powi(2) + (index_tip[2] - wrist[2]).powi(2)).sqrt();
-            let dist_middle_wrist = ((middle_tip[0] - wrist[0]).powi(2) + (middle_tip[1] - wrist[1]).powi(2) + (middle_tip[2] - wrist[2]).powi(2)).sqrt();
+            let dist_index_wrist = ((index_tip[0] - wrist[0]).powi(2)
+                + (index_tip[1] - wrist[1]).powi(2)
+                + (index_tip[2] - wrist[2]).powi(2))
+            .sqrt();
+            let dist_middle_wrist = ((middle_tip[0] - wrist[0]).powi(2)
+                + (middle_tip[1] - wrist[1]).powi(2)
+                + (middle_tip[2] - wrist[2]).powi(2))
+            .sqrt();
 
             if dist_index_wrist > dist_middle_wrist + 0.04 {
                 SpatialGestureType::Point
@@ -623,13 +655,17 @@ impl SovereignThreeDCraftAdvancementsV78MasterSuite {
         if manifests.is_empty() {
             0.0
         } else {
-            let ready = manifests.iter().filter(|m| m.status == "Ready for Merge").count();
+            let ready = manifests
+                .iter()
+                .filter(|m| m.status == "Ready for Merge")
+                .count();
             (ready as f64 / manifests.len() as f64) * 100.0
         }
     }
 
     pub fn export_pr_manifest_markdown(&self) -> String {
-        let mut md = String::from("# 3DCraft Spatial Computing & Advanced 3D Rendering V78 PR Manifest\n\n");
+        let mut md =
+            String::from("# 3DCraft Spatial Computing & Advanced 3D Rendering V78 PR Manifest\n\n");
         for manifest in self.collect_all_pr_manifests() {
             let digest = fnv1a_threedcraft_v78_pr_digest(manifest.pr_id, &manifest.pr_title);
             md.push_str(&format!(
@@ -721,7 +757,13 @@ mod tests {
             bounding_radius: 0.1,
             restitution: 0.5,
         };
-        let hit = engine.step_sdf_physics_collision(&mut body, [0.0, 0.0, 0.0], 1.0, [0.0, -9.81, 0.0], 0.016);
+        let hit = engine.step_sdf_physics_collision(
+            &mut body,
+            [0.0, 0.0, 0.0],
+            1.0,
+            [0.0, -9.81, 0.0],
+            0.016,
+        );
         assert!(hit);
         assert!(body.velocity[1] > 0.0);
     }
@@ -731,12 +773,21 @@ mod tests {
         let engine = ThreeDCraftVoxelConeTracingGlobalIlluminationPrEngineV78::new();
         let grid_dim = 4;
         let mut voxels = vec![
-            VoxelCell3D { radiance_rgb: [0.0, 0.0, 0.0], opacity: 0.0, normal_dir: [0.0, 1.0, 0.0] };
+            VoxelCell3D {
+                radiance_rgb: [0.0, 0.0, 0.0],
+                opacity: 0.0,
+                normal_dir: [0.0, 1.0, 0.0]
+            };
             grid_dim * grid_dim * grid_dim
         ];
-        voxels[5] = VoxelCell3D { radiance_rgb: [1.0, 0.8, 0.6], opacity: 0.8, normal_dir: [0.0, 1.0, 0.0] };
+        voxels[5] = VoxelCell3D {
+            radiance_rgb: [1.0, 0.8, 0.6],
+            opacity: 0.8,
+            normal_dir: [0.0, 1.0, 0.0],
+        };
 
-        let (color, opacity) = engine.trace_voxel_cone([0.0, 0.0, 0.0], [1.0, 1.0, 1.0], &voxels, grid_dim);
+        let (color, opacity) =
+            engine.trace_voxel_cone([0.0, 0.0, 0.0], [1.0, 1.0, 1.0], &voxels, grid_dim);
         assert!(color[0] >= 0.0);
         assert!(opacity >= 0.0);
 
@@ -747,7 +798,8 @@ mod tests {
     #[test]
     fn test_analytical_ik_ragdoll_engine() {
         let engine = ThreeDCraftSkeletalInverseKinematicsRagdollPrEngineV78::new();
-        let (mid, end) = engine.solve_two_bone_analytical_ik([0.0, 0.0, 0.0], [0.0, 2.0, 0.0], 1.2, 1.2);
+        let (mid, end) =
+            engine.solve_two_bone_analytical_ik([0.0, 0.0, 0.0], [0.0, 2.0, 0.0], 1.2, 1.2);
         assert_eq!(end, [0.0, 2.0, 0.0]);
         assert!(mid[0].abs() > 0.0 || mid[1].abs() > 0.0 || mid[2].abs() > 0.0);
 

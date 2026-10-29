@@ -244,9 +244,12 @@ impl SyscallAbiPolicyGovernor {
         self.published_numbers.insert(10, "mprotect".to_string());
         self.published_numbers.insert(11, "munmap".to_string());
         self.published_numbers.insert(12, "brk".to_string());
-        self.published_numbers.insert(13, "rt_sigaction".to_string());
-        self.published_numbers.insert(14, "rt_sigprocmask".to_string());
-        self.published_numbers.insert(15, "rt_sigreturn".to_string());
+        self.published_numbers
+            .insert(13, "rt_sigaction".to_string());
+        self.published_numbers
+            .insert(14, "rt_sigprocmask".to_string());
+        self.published_numbers
+            .insert(15, "rt_sigreturn".to_string());
         self.published_numbers.insert(16, "ioctl".to_string());
         self.published_numbers.insert(39, "getpid".to_string());
         self.published_numbers.insert(57, "fork".to_string());
@@ -261,10 +264,16 @@ impl SyscallAbiPolicyGovernor {
         self.published_numbers.insert(293, "pipe2".to_string());
     }
 
-    pub fn validate_number_uniqueness(&self, number: usize, proposed_name: &str) -> Result<(), &'static str> {
+    pub fn validate_number_uniqueness(
+        &self,
+        number: usize,
+        proposed_name: &str,
+    ) -> Result<(), &'static str> {
         if let Some(existing_name) = self.published_numbers.get(&number) {
             if existing_name != proposed_name {
-                return Err("ABI Violation: Attempted to reassign an already published syscall number");
+                return Err(
+                    "ABI Violation: Attempted to reassign an already published syscall number",
+                );
             }
         }
         Ok(())
@@ -277,7 +286,11 @@ impl SyscallAbiPolicyGovernor {
         Ok(())
     }
 
-    pub fn validate_versioned_struct_size(user_size: usize, min_expected: usize, max_expected: usize) -> Result<(), &'static str> {
+    pub fn validate_versioned_struct_size(
+        user_size: usize,
+        min_expected: usize,
+        max_expected: usize,
+    ) -> Result<(), &'static str> {
         if user_size < min_expected {
             return Err("EINVAL: User argument struct size smaller than minimum required header");
         }
@@ -321,14 +334,20 @@ impl UserMemoryAccessValidationPrimitive {
         if ptr >= self.user_space_limit {
             return Err("EFAULT: User pointer points to kernel address space");
         }
-        let end = ptr.checked_add(size).ok_or("EFAULT: Pointer size overflow")?;
+        let end = ptr
+            .checked_add(size)
+            .ok_or("EFAULT: Pointer size overflow")?;
         if end > self.user_space_limit {
             return Err("EFAULT: Buffer range crosses user/kernel boundary");
         }
         Ok(())
     }
 
-    pub fn copy_from_user(&self, dest: &mut [u8], src_user_ptr: usize) -> Result<usize, &'static str> {
+    pub fn copy_from_user(
+        &self,
+        dest: &mut [u8],
+        src_user_ptr: usize,
+    ) -> Result<usize, &'static str> {
         self.validate_user_pointer(src_user_ptr, dest.len())?;
         // Simulated fault-safe memory copy from user space
         dest.fill(0);
@@ -384,15 +403,17 @@ impl SyscallDispatchAndUnknownCallHandler {
             return Err("ENOSYS: Syscall number out of dispatch table bounds");
         }
         if self.disabled_syscall_mask[sys_num] {
-            return Err("ENOSYS: Syscall explicitly disabled or not implemented on this architecture");
+            return Err(
+                "ENOSYS: Syscall explicitly disabled or not implemented on this architecture",
+            );
         }
 
         // Mock dispatch behavior for standard calls
         match sys_num {
-            0 => Ok(0), // read -> 0 bytes
-            1 => Ok(10), // write -> 10 bytes written
+            0 => Ok(0),     // read -> 0 bytes
+            1 => Ok(10),    // write -> 10 bytes written
             39 => Ok(1001), // getpid -> PID 1001
-            60 => Ok(0), // exit -> return code 0
+            60 => Ok(0),    // exit -> return code 0
             _ => Err("ENOSYS: Unassigned system call entry point"),
         }
     }
@@ -404,15 +425,15 @@ impl SyscallDispatchAndUnknownCallHandler {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct X86_64SyscallRegisterFrame {
-    pub rax: u64, // Syscall number / return value
-    pub rdi: u64, // Arg 1
-    pub rsi: u64, // Arg 2
-    pub rdx: u64, // Arg 3
-    pub r10: u64, // Arg 4
-    pub r8: u64,  // Arg 5
-    pub r9: u64,  // Arg 6
-    pub rip: u64, // User return instruction pointer
-    pub rsp: u64, // User stack pointer
+    pub rax: u64,    // Syscall number / return value
+    pub rdi: u64,    // Arg 1
+    pub rsi: u64,    // Arg 2
+    pub rdx: u64,    // Arg 3
+    pub r10: u64,    // Arg 4
+    pub r8: u64,     // Arg 5
+    pub r9: u64,     // Arg 6
+    pub rip: u64,    // User return instruction pointer
+    pub rsp: u64,    // User stack pointer
     pub rflags: u64, // Saved user flags
 }
 
@@ -502,10 +523,18 @@ impl SovereignSyscallDevelopmentAndPrMasterSuite {
         }
 
         // Step 2: Verify ABI policy governor number uniqueness
-        if self.abi_governor.validate_number_uniqueness(60, "exit").is_err() {
+        if self
+            .abi_governor
+            .validate_number_uniqueness(60, "exit")
+            .is_err()
+        {
             return false;
         }
-        if self.abi_governor.validate_number_uniqueness(60, "invalid_reuse").is_ok() {
+        if self
+            .abi_governor
+            .validate_number_uniqueness(60, "invalid_reuse")
+            .is_ok()
+        {
             return false;
         }
 
@@ -519,11 +548,19 @@ impl SovereignSyscallDevelopmentAndPrMasterSuite {
 
         // Step 4: Verify user memory validation
         let user_ptr = 0x0000_7FFF_1000_0000;
-        if self.memory_validator.validate_user_pointer(user_ptr, 64).is_err() {
+        if self
+            .memory_validator
+            .validate_user_pointer(user_ptr, 64)
+            .is_err()
+        {
             return false;
         }
         let kernel_ptr = 0xFFFF_8000_0000_0000;
-        if self.memory_validator.validate_user_pointer(kernel_ptr, 64).is_ok() {
+        if self
+            .memory_validator
+            .validate_user_pointer(kernel_ptr, 64)
+            .is_ok()
+        {
             return false;
         }
 
@@ -548,7 +585,9 @@ impl SovereignSyscallDevelopmentAndPrMasterSuite {
             rsp: 0x0000_7FFF_7FFF_0000,
             rflags: 0x202,
         };
-        if X86_64SyscallEntryStateAndReturnPathValidator::validate_entry_frame(&valid_frame).is_err() {
+        if X86_64SyscallEntryStateAndReturnPathValidator::validate_entry_frame(&valid_frame)
+            .is_err()
+        {
             return false;
         }
 
@@ -602,7 +641,9 @@ mod tests {
         let mem = UserMemoryAccessValidationPrimitive::new();
         assert!(mem.validate_user_pointer(0x10000, 100).is_ok());
         assert!(mem.validate_user_pointer(0, 100).is_err());
-        assert!(mem.validate_user_pointer(0xFFFF_8000_0000_0000, 100).is_err());
+        assert!(mem
+            .validate_user_pointer(0xFFFF_8000_0000_0000, 100)
+            .is_err());
 
         let mut buf = [0u8; 16];
         assert!(mem.copy_from_user(&mut buf, 0x20000).is_ok());
@@ -635,17 +676,29 @@ mod tests {
             rsp: 0x7FFF0000,
             rflags: 0x202,
         };
-        assert!(X86_64SyscallEntryStateAndReturnPathValidator::validate_entry_frame(&frame).is_ok());
+        assert!(
+            X86_64SyscallEntryStateAndReturnPathValidator::validate_entry_frame(&frame).is_ok()
+        );
 
-        let ret_frame = X86_64SyscallEntryStateAndReturnPathValidator::prepare_sysret_frame(frame, 5);
+        let ret_frame =
+            X86_64SyscallEntryStateAndReturnPathValidator::prepare_sysret_frame(frame, 5);
         assert_eq!(ret_frame.rax, 5);
     }
 
     #[test]
     fn test_uapi_error_conventions() {
-        assert_eq!(SyscallUapiTypeAndErrorConventionGovernor::map_kernel_error_to_errno("EFAULT"), -14);
-        assert_eq!(SyscallUapiTypeAndErrorConventionGovernor::map_kernel_error_to_errno("ENOSYS"), -38);
-        assert_eq!(SyscallUapiTypeAndErrorConventionGovernor::map_kernel_error_to_errno("EINVAL"), -22);
+        assert_eq!(
+            SyscallUapiTypeAndErrorConventionGovernor::map_kernel_error_to_errno("EFAULT"),
+            -14
+        );
+        assert_eq!(
+            SyscallUapiTypeAndErrorConventionGovernor::map_kernel_error_to_errno("ENOSYS"),
+            -38
+        );
+        assert_eq!(
+            SyscallUapiTypeAndErrorConventionGovernor::map_kernel_error_to_errno("EINVAL"),
+            -22
+        );
     }
 
     #[test]

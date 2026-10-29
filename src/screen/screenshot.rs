@@ -24,7 +24,7 @@ pub enum ImageFormat {
 impl ImageFormat {
     pub fn extension(&self) -> &'static str {
         match self {
-            Self::Png  => "png",
+            Self::Png => "png",
             Self::Jpeg => "jpg",
             Self::Webp => "webp",
             Self::Avif => "avif",
@@ -64,7 +64,10 @@ pub struct ScreenshotTool {
 
 impl ScreenshotTool {
     pub fn new(config: ScreenshotConfig) -> Self {
-        Self { config, shot_count: 0 }
+        Self {
+            config,
+            shot_count: 0,
+        }
     }
 
     /// Generate an auto-filename for this screenshot (query — no side effects).
@@ -84,7 +87,9 @@ impl ScreenshotTool {
         Ok(full_path)
     }
 
-    pub fn shot_count(&self) -> u32 { self.shot_count }
+    pub fn shot_count(&self) -> u32 {
+        self.shot_count
+    }
 }
 
 #[cfg(test)]

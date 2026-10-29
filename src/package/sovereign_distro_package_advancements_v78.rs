@@ -108,79 +108,179 @@ impl UniversalPackageFormatInspectorV78 {
     }
 
     /// Detects package format based on header magic bytes or file extension V78
-    pub fn detect_format_by_magic_bytes(&self, raw_payload: &[u8], filename: &str) -> (PackageFormat, PackageSignatureKindV78, &'static str) {
+    pub fn detect_format_by_magic_bytes(
+        &self,
+        raw_payload: &[u8],
+        filename: &str,
+    ) -> (PackageFormat, PackageSignatureKindV78, &'static str) {
         if raw_payload.len() >= 8 && &raw_payload[0..7] == b"!<arch>" {
-            return (PackageFormat::Deb, PackageSignatureKindV78::GpgOpenPgp, "ar/tar");
+            return (
+                PackageFormat::Deb,
+                PackageSignatureKindV78::GpgOpenPgp,
+                "ar/tar",
+            );
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0xed, 0xab, 0xee, 0xdb] {
-            return (PackageFormat::Rpm, PackageSignatureKindV78::GpgOpenPgp, "rpm-lead");
+            return (
+                PackageFormat::Rpm,
+                PackageSignatureKindV78::GpgOpenPgp,
+                "rpm-lead",
+            );
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x28, 0xb5, 0x2f, 0xfd] {
-            return (PackageFormat::Pacman, PackageSignatureKindV78::GpgOpenPgp, "zstd");
+            return (
+                PackageFormat::Pacman,
+                PackageSignatureKindV78::GpgOpenPgp,
+                "zstd",
+            );
         }
         if raw_payload.len() >= 4 && &raw_payload[0..4] == b"hsqs" {
-            return (PackageFormat::AppImage, PackageSignatureKindV78::Minisign, "squashfs");
+            return (
+                PackageFormat::AppImage,
+                PackageSignatureKindV78::Minisign,
+                "squashfs",
+            );
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x50, 0x4b, 0x03, 0x04] {
             if filename.ends_with(".apk") {
-                return (PackageFormat::Apk, PackageSignatureKindV78::ApkV2V3Signature, "zip/apk");
+                return (
+                    PackageFormat::Apk,
+                    PackageSignatureKindV78::ApkV2V3Signature,
+                    "zip/apk",
+                );
             }
             if filename.ends_with(".whl") {
-                return (PackageFormat::Wheel, PackageSignatureKindV78::CosignSigstore, "zip/wheel");
+                return (
+                    PackageFormat::Wheel,
+                    PackageSignatureKindV78::CosignSigstore,
+                    "zip/wheel",
+                );
             }
             if filename.ends_with(".crate") || filename.ends_with(".nupkg") {
-                return (PackageFormat::Crate, PackageSignatureKindV78::CosignSigstore, "zip/crate");
+                return (
+                    PackageFormat::Crate,
+                    PackageSignatureKindV78::CosignSigstore,
+                    "zip/crate",
+                );
             }
             if filename.ends_with(".air") {
-                return (PackageFormat::Air, PackageSignatureKindV78::X509Certificate, "zip/air");
+                return (
+                    PackageFormat::Air,
+                    PackageSignatureKindV78::X509Certificate,
+                    "zip/air",
+                );
             }
             if filename.ends_with(".ipa") {
-                return (PackageFormat::Ipa, PackageSignatureKindV78::X509Certificate, "zip/ipa");
+                return (
+                    PackageFormat::Ipa,
+                    PackageSignatureKindV78::X509Certificate,
+                    "zip/ipa",
+                );
             }
             if filename.ends_with(".aab") {
-                return (PackageFormat::Aab, PackageSignatureKindV78::ApkV2V3Signature, "zip/aab");
+                return (
+                    PackageFormat::Aab,
+                    PackageSignatureKindV78::ApkV2V3Signature,
+                    "zip/aab",
+                );
             }
             if filename.ends_with(".hap") {
-                return (PackageFormat::Hap, PackageSignatureKindV78::X509Certificate, "zip/hap");
+                return (
+                    PackageFormat::Hap,
+                    PackageSignatureKindV78::X509Certificate,
+                    "zip/hap",
+                );
             }
-            return (PackageFormat::Flatpak, PackageSignatureKindV78::CosignSigstore, "zip/ostree");
+            return (
+                PackageFormat::Flatpak,
+                PackageSignatureKindV78::CosignSigstore,
+                "zip/ostree",
+            );
         }
         if filename.ends_with(".xbps") {
-            return (PackageFormat::Xbps, PackageSignatureKindV78::OpenBsdSignify, "xbps/zstd");
+            return (
+                PackageFormat::Xbps,
+                PackageSignatureKindV78::OpenBsdSignify,
+                "xbps/zstd",
+            );
         }
         if filename.ends_with(".ebuild") || filename.ends_with(".portage") {
-            return (PackageFormat::Ebuild, PackageSignatureKindV78::GpgOpenPgp, "gentoo-portage");
+            return (
+                PackageFormat::Ebuild,
+                PackageSignatureKindV78::GpgOpenPgp,
+                "gentoo-portage",
+            );
         }
         if filename.ends_with(".pkg") || filename.ends_with(".ports") {
-            return (PackageFormat::Pkg, PackageSignatureKindV78::OpenBsdSignify, "bsd-pkg");
+            return (
+                PackageFormat::Pkg,
+                PackageSignatureKindV78::OpenBsdSignify,
+                "bsd-pkg",
+            );
         }
         if filename.ends_with(".bottle") {
-            return (PackageFormat::Bottle, PackageSignatureKindV78::CosignSigstore, "tar.gz/bottle");
+            return (
+                PackageFormat::Bottle,
+                PackageSignatureKindV78::CosignSigstore,
+                "tar.gz/bottle",
+            );
         }
         if filename.ends_with(".eopkg") || filename.ends_with(".PiSi") {
-            return (PackageFormat::Eopkg, PackageSignatureKindV78::GpgOpenPgp, "zip/xml");
+            return (
+                PackageFormat::Eopkg,
+                PackageSignatureKindV78::GpgOpenPgp,
+                "zip/xml",
+            );
         }
         if filename.ends_with(".nixpkg") {
-            return (PackageFormat::Nixpkg, PackageSignatureKindV78::CosignSigstore, "nix-store");
+            return (
+                PackageFormat::Nixpkg,
+                PackageSignatureKindV78::CosignSigstore,
+                "nix-store",
+            );
         }
         if filename.ends_with(".superdeb") {
-            return (PackageFormat::Superdeb, PackageSignatureKindV78::GpgOpenPgp, "ar/tar/superdeb");
+            return (
+                PackageFormat::Superdeb,
+                PackageSignatureKindV78::GpgOpenPgp,
+                "ar/tar/superdeb",
+            );
         }
         if filename.ends_with(".lzm") {
-            return (PackageFormat::Lzm, PackageSignatureKindV78::Unsigned, "squashfs/slax");
+            return (
+                PackageFormat::Lzm,
+                PackageSignatureKindV78::Unsigned,
+                "squashfs/slax",
+            );
         }
         if filename.ends_with(".pup") || filename.ends_with(".pet") {
-            return (PackageFormat::Pup, PackageSignatureKindV78::Unsigned, "tar.gz/puppy");
+            return (
+                PackageFormat::Pup,
+                PackageSignatureKindV78::Unsigned,
+                "tar.gz/puppy",
+            );
         }
         if filename.ends_with(".snap") {
-            return (PackageFormat::Snap, PackageSignatureKindV78::CosignSigstore, "squashfs/snap");
+            return (
+                PackageFormat::Snap,
+                PackageSignatureKindV78::CosignSigstore,
+                "squashfs/snap",
+            );
         }
 
-        (PackageFormat::SigmaPkg, PackageSignatureKindV78::PqcKyberDilithium5, "sigpkg-native")
+        (
+            PackageFormat::SigmaPkg,
+            PackageSignatureKindV78::PqcKyberDilithium5,
+            "sigpkg-native",
+        )
     }
 
     /// Performs zero-copy inspection to parse metadata V78
-    pub fn inspect_package(&mut self, filename: &str, raw_payload: &[u8]) -> InspectedPackageManifestV78 {
+    pub fn inspect_package(
+        &mut self,
+        filename: &str,
+        raw_payload: &[u8],
+    ) -> InspectedPackageManifestV78 {
         let (fmt, sig_kind, comp) = self.detect_format_by_magic_bytes(raw_payload, filename);
         let base_name = filename.split('.').next().unwrap_or(filename);
         let pkg_name = base_name.split('-').next().unwrap_or(base_name).to_string();
@@ -191,22 +291,28 @@ impl UniversalPackageFormatInspectorV78 {
             detected_format: fmt,
             signature_kind: sig_kind,
             compression_type: comp.to_string(),
-            dependencies: vec!["sovereign-core-v78".to_string(), "sovereign-libc".to_string()],
+            dependencies: vec![
+                "sovereign-core-v78".to_string(),
+                "sovereign-libc".to_string(),
+            ],
             provides: vec![format!("sovereign-provider-{}", filename)],
             conflicts: vec![],
             target_microarch: "x86_64-v3".to_string(),
             build_cflags: Some("-O3 -march=x86-64-v3 -flto".to_string()),
-            payload_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            payload_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                .to_string(),
             provenance: Some(PackageProvenanceAttestationV78 {
                 builder_id: "sigmaos-reproducible-builder-v78".to_string(),
                 build_timestamp: 1728000000,
                 source_commit_sha: "a1b2c3d4e5f678901234567890abcdef12345678".to_string(),
-                reproducible_build_hash: "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4".to_string(),
+                reproducible_build_hash:
+                    "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4".to_string(),
                 slsa_level: 4,
             }),
         };
 
-        self.inspection_cache.insert(filename.to_string(), manifest.clone());
+        self.inspection_cache
+            .insert(filename.to_string(), manifest.clone());
         manifest
     }
 }
@@ -239,7 +345,10 @@ pub trait PackageInstallationStrategyV78 {
 pub struct TransactionalInstallStrategyV78;
 impl PackageInstallationStrategyV78 for TransactionalInstallStrategyV78 {
     fn install(&self, pkg: &UnifiedPackage) -> Result<String, PackageError> {
-        Ok(format!("Installed {} via V78 transactional strategy", pkg.name))
+        Ok(format!(
+            "Installed {} via V78 transactional strategy",
+            pkg.name
+        ))
     }
 }
 
@@ -338,7 +447,11 @@ impl UdfScriptletEngineV78 {
         self.registered_hooks.push(ctx);
     }
 
-    pub fn execute_hooks_for_phase(&mut self, pkg_name: &str, hook_type: UdfHookTypeV78) -> Result<usize, PackageError> {
+    pub fn execute_hooks_for_phase(
+        &mut self,
+        pkg_name: &str,
+        hook_type: UdfHookTypeV78,
+    ) -> Result<usize, PackageError> {
         let mut executed = 0;
         for hook in &self.registered_hooks {
             if hook.package_name == pkg_name && hook.hook_type == hook_type {
@@ -419,7 +532,11 @@ impl SatDpllDependencySolverV78 {
         }
     }
 
-    pub fn solve_dependencies(&self, _target_pkg: &str, foreign_deps: &[String]) -> Result<Vec<String>, PackageError> {
+    pub fn solve_dependencies(
+        &self,
+        _target_pkg: &str,
+        foreign_deps: &[String],
+    ) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
         for dep in foreign_deps {
             let remapped = self.remap_to_canonical(dep);
@@ -473,13 +590,15 @@ impl UniversalMultiSandboxGovernorV78 {
                 capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string()],
                 seccomp_bpf_filter: "ALLOW_STANDARD_SYSTEM_CALLS".to_string(),
             },
-            PackageFormat::Flatpak | PackageFormat::AppImage | PackageFormat::Snap => SandboxRuleSetV78 {
-                pledge_promises: "stdio rpath inet".to_string(),
-                unveil_paths: vec!["/var/lib".to_string()],
-                landlock_abi_version: 6,
-                capsicum_rights: vec!["CAP_READ".to_string()],
-                seccomp_bpf_filter: "ALLOW_BASIC_SYSCALLS_RESTRICT_NETWORK".to_string(),
-            },
+            PackageFormat::Flatpak | PackageFormat::AppImage | PackageFormat::Snap => {
+                SandboxRuleSetV78 {
+                    pledge_promises: "stdio rpath inet".to_string(),
+                    unveil_paths: vec!["/var/lib".to_string()],
+                    landlock_abi_version: 6,
+                    capsicum_rights: vec!["CAP_READ".to_string()],
+                    seccomp_bpf_filter: "ALLOW_BASIC_SYSCALLS_RESTRICT_NETWORK".to_string(),
+                }
+            }
             _ => SandboxRuleSetV78 {
                 pledge_promises: "stdio rpath wpath cpath".to_string(),
                 unveil_paths: vec!["/tmp".to_string()],
@@ -514,10 +633,16 @@ pub struct UniversalCasDeltaStoreGovernorV78 {
 
 impl UniversalCasDeltaStoreGovernorV78 {
     pub fn new() -> Self {
-        Self { delta_records: vec![] }
+        Self {
+            delta_records: vec![],
+        }
     }
 
-    pub fn apply_delta_patch(&mut self, base_hash: &str, delta_hash: &str) -> Result<CasDeltaRecordV78, PackageError> {
+    pub fn apply_delta_patch(
+        &mut self,
+        base_hash: &str,
+        delta_hash: &str,
+    ) -> Result<CasDeltaRecordV78, PackageError> {
         let rec = CasDeltaRecordV78 {
             base_chunk_hash: base_hash.to_string(),
             delta_chunk_hash: delta_hash.to_string(),
@@ -588,9 +713,15 @@ impl UniversalBootEnvSnapshotGovernorV78 {
     pub fn rollback(&mut self, snapshot_id: u64) -> Result<String, PackageError> {
         if let Some(snap) = self.snapshots.get_mut(&snapshot_id) {
             snap.active = true;
-            Ok(format!("Rolled back boot environment to snapshot #{}: {}", snapshot_id, snap.description))
+            Ok(format!(
+                "Rolled back boot environment to snapshot #{}: {}",
+                snapshot_id, snap.description
+            ))
         } else {
-            Err(PackageError::ValidationError(format!("Snapshot {} not found", snapshot_id)))
+            Err(PackageError::ValidationError(format!(
+                "Snapshot {} not found",
+                snapshot_id
+            )))
         }
     }
 }
@@ -630,10 +761,15 @@ impl UniversalPmCliRouterV78 {
         Self
     }
 
-    pub fn route_command(&self, raw_cli_input: &str) -> Result<TranslatedPmCommandV78, PackageError> {
+    pub fn route_command(
+        &self,
+        raw_cli_input: &str,
+    ) -> Result<TranslatedPmCommandV78, PackageError> {
         let parts: Vec<&str> = raw_cli_input.split_whitespace().collect();
         if parts.is_empty() {
-            return Err(PackageError::ValidationError("Empty PM command".to_string()));
+            return Err(PackageError::ValidationError(
+                "Empty PM command".to_string(),
+            ));
         }
 
         let pm = parts[0];
@@ -691,9 +827,15 @@ impl SovereignPackageFacadeV78 {
         }
     }
 
-    pub fn quick_install(&mut self, filename: &str, raw_payload: &[u8]) -> Result<String, PackageError> {
+    pub fn quick_install(
+        &mut self,
+        filename: &str,
+        raw_payload: &[u8],
+    ) -> Result<String, PackageError> {
         let manifest = self.inspector.inspect_package(filename, raw_payload);
-        let _resolved = self.solver.solve_dependencies(&manifest.name, &manifest.dependencies)?;
+        let _resolved = self
+            .solver
+            .solve_dependencies(&manifest.name, &manifest.dependencies)?;
         Ok(format!("Quick installed package {}", manifest.name))
     }
 }
@@ -733,9 +875,15 @@ impl SovereignDistroPackageAdvancementsSuiteV78 {
         }
     }
 
-    pub fn process_and_install(&mut self, filename: &str, raw_payload: &[u8]) -> Result<UnifiedPackage, PackageError> {
+    pub fn process_and_install(
+        &mut self,
+        filename: &str,
+        raw_payload: &[u8],
+    ) -> Result<UnifiedPackage, PackageError> {
         let manifest = self.inspector.inspect_package(filename, raw_payload);
-        let resolved_deps = self.solver.solve_dependencies(&manifest.name, &manifest.dependencies)?;
+        let resolved_deps = self
+            .solver
+            .solve_dependencies(&manifest.name, &manifest.dependencies)?;
 
         self.udf_engine.register_hook(UdfExecutionContextV78 {
             hook_type: UdfHookTypeV78::PreInstall,
@@ -743,14 +891,16 @@ impl SovereignDistroPackageAdvancementsSuiteV78 {
             scriptlet_code: "echo Installing V78 package".to_string(),
             environment_vars: BTreeMap::new(),
         });
-        self.udf_engine.execute_hooks_for_phase(&manifest.name, UdfHookTypeV78::PreInstall)?;
+        self.udf_engine
+            .execute_hooks_for_phase(&manifest.name, UdfHookTypeV78::PreInstall)?;
 
         let mut sigpkg = UnifiedPackage::new(manifest.name.clone(), manifest.version)
             .with_format(manifest.detected_format);
         sigpkg.state = PackageState::Installed;
         sigpkg.dependencies = resolved_deps;
 
-        self.installed_packages.push(format!("sigpkg-v78-{}", manifest.name));
+        self.installed_packages
+            .push(format!("sigpkg-v78-{}", manifest.name));
         Ok(sigpkg)
     }
 }
@@ -781,7 +931,8 @@ mod tests {
 
     #[test]
     fn test_oop_patterns_v78() {
-        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.5.0".to_string()).with_format(PackageFormat::Deb);
+        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.5.0".to_string())
+            .with_format(PackageFormat::Deb);
 
         let decorator = SecurityHardeningDecoratorV78;
         decorator.decorate(&mut pkg);

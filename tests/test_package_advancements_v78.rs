@@ -8,9 +8,9 @@ mod sovereign_distro_package_advancements_v78;
 #[path = "../src/package/sovereign_distro_package_advancements_v78_pr.rs"]
 mod sovereign_distro_package_advancements_v78_pr;
 
+use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
 use sovereign_distro_package_advancements_v78::*;
 use sovereign_distro_package_advancements_v78_pr::SovereignDistroPackagePrGatewayV78;
-use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
 
 #[test]
 fn test_package_advancements_v78_full_cycle() {
@@ -49,7 +49,10 @@ fn test_package_advancements_v78_full_cycle() {
     let solved = solver
         .solve_dependencies("ripgrep", &raw_deps)
         .expect("SAT solver failed");
-    assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v78"]);
+    assert_eq!(
+        solved,
+        vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v78"]
+    );
 
     // 4. Multi-Sandbox Security Governor V78
     let sandbox_gov = UniversalMultiSandboxGovernorV78::new();

@@ -1728,7 +1728,7 @@ impl X2ApicTimerHpetClockEngine {
     pub fn new() -> Self {
         Self {
             x2apic_id: 0x0000_0000,
-            hpet_frequency_hz: 14_318_180, // 14.31818 MHz HPET
+            hpet_frequency_hz: 14_318_180,   // 14.31818 MHz HPET
             tsc_ticks_per_microsecond: 3800, // 3.8 GHz TSC clock
         }
     }
@@ -1859,10 +1859,27 @@ pub enum VirtioGpuFormat {
 /// VirtIO GPU Command Request
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum VirtioGpuCommand {
-    Create2dResource { resource_id: u32, width: u32, height: u32, format: VirtioGpuFormat },
-    AttachBacking { resource_id: u32, buffer_addr: u64, size: u32 },
-    TransferToHost2d { resource_id: u32, x: u32, y: u32, w: u32, h: u32 },
-    FlushResource { resource_id: u32 },
+    Create2dResource {
+        resource_id: u32,
+        width: u32,
+        height: u32,
+        format: VirtioGpuFormat,
+    },
+    AttachBacking {
+        resource_id: u32,
+        buffer_addr: u64,
+        size: u32,
+    },
+    TransferToHost2d {
+        resource_id: u32,
+        x: u32,
+        y: u32,
+        w: u32,
+        h: u32,
+    },
+    FlushResource {
+        resource_id: u32,
+    },
 }
 
 /// VirtIO GPU Command Pipeline Engine
@@ -1917,13 +1934,20 @@ pub struct AmlInterpreterEngine {
 impl AmlInterpreterEngine {
     pub fn new() -> Self {
         let mut engine = Self::default();
-        engine.symbol_table.push(("_PIC".to_string(), AmlValue::Integer(1))); // APIC mode
-        engine.symbol_table.push(("_OS_".to_string(), AmlValue::String("SigmaOS".to_string())));
+        engine
+            .symbol_table
+            .push(("_PIC".to_string(), AmlValue::Integer(1))); // APIC mode
+        engine
+            .symbol_table
+            .push(("_OS_".to_string(), AmlValue::String("SigmaOS".to_string())));
         engine
     }
 
     pub fn evaluate_symbol(&self, name: &str) -> Option<AmlValue> {
-        self.symbol_table.iter().find(|(n, _)| n == name).map(|(_, v)| v.clone())
+        self.symbol_table
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| v.clone())
     }
 
     pub fn register_symbol(&mut self, name: String, val: AmlValue) {
@@ -1957,7 +1981,10 @@ impl UefiProtocolDatabaseEngine {
     pub fn new() -> Self {
         let mut db = Self::default();
         // GOP GUID: 9042a9de-23dc-4a38-96fb-7adc08c0b5d3
-        let gop_guid = UefiGuid([0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0x4a, 0x96, 0xfb, 0x7a, 0xdc, 0x08, 0xc0, 0xb5, 0xd3]);
+        let gop_guid = UefiGuid([
+            0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0x4a, 0x96, 0xfb, 0x7a, 0xdc, 0x08, 0xc0,
+            0xb5, 0xd3,
+        ]);
         db.protocols.push(UefiProtocolInstance {
             handle_id: 1,
             guid: gop_guid,
@@ -2084,7 +2111,9 @@ pub struct KeyboardLayoutMapperEngine {
 
 impl KeyboardLayoutMapperEngine {
     pub fn new(layout: KeyboardLayoutType) -> Self {
-        Self { active_layout: layout }
+        Self {
+            active_layout: layout,
+        }
     }
 
     pub fn map_scancode_to_char(&self, scancode: u8, shift_pressed: bool) -> Option<char> {
@@ -2358,8 +2387,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5113,
-            title: "feat(arch_x86_64): Implement virtio-drivers VirtIO Blk, Net, GPU & Console drivers"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement virtio-drivers VirtIO Blk, Net, GPU & Console drivers"
+                    .to_string(),
             target_subsystem: "Bare-Metal VirtIO Acceleration".to_string(),
             rust_osdev_crate_inspiration: "virtio-drivers".to_string(),
             components_added: vec![
@@ -2436,8 +2466,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5119,
-            title: "feat(arch_x86_64): Implement bootloader_api / limine Modern Boot Protocol Engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement bootloader_api / limine Modern Boot Protocol Engine"
+                    .to_string(),
             target_subsystem: "Modern Boot Protocol Interop".to_string(),
             rust_osdev_crate_inspiration: "bootloader_api / limine".to_string(),
             components_added: vec![
@@ -2462,8 +2493,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5121,
-            title: "feat(arch_x86_64): Implement 5-Level Paging (LA57) Page Table Translation Engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement 5-Level Paging (LA57) Page Table Translation Engine"
+                    .to_string(),
             target_subsystem: "Memory Management & 5-Level Paging".to_string(),
             rust_osdev_crate_inspiration: "x86_64".to_string(),
             components_added: vec![
@@ -2475,8 +2507,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5122,
-            title: "feat(arch_x86_64): Implement VirtIO GPU 2D/3D Command Submission Pipeline Engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement VirtIO GPU 2D/3D Command Submission Pipeline Engine"
+                    .to_string(),
             target_subsystem: "Graphics & Display Drivers".to_string(),
             rust_osdev_crate_inspiration: "virtio-drivers".to_string(),
             components_added: vec![
@@ -2488,8 +2521,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5123,
-            title: "feat(arch_x86_64): Implement ACPI AML Bytecode Parser & Symbol Evaluator Engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement ACPI AML Bytecode Parser & Symbol Evaluator Engine"
+                    .to_string(),
             target_subsystem: "Firmware & ACPI Interpretation".to_string(),
             rust_osdev_crate_inspiration: "aml".to_string(),
             components_added: vec![
@@ -2514,8 +2548,7 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5125,
-            title: "feat(arch_x86_64): Implement Multi-Core GDB Target Switcher Engine"
-                .to_string(),
+            title: "feat(arch_x86_64): Implement Multi-Core GDB Target Switcher Engine".to_string(),
             target_subsystem: "Kernel Multi-Core Debugging".to_string(),
             rust_osdev_crate_inspiration: "gdbstub".to_string(),
             components_added: vec![
@@ -2540,8 +2573,7 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5127,
-            title: "feat(arch_x86_64): Implement Dynamic Keyboard Layout Mapper Engine"
-                .to_string(),
+            title: "feat(arch_x86_64): Implement Dynamic Keyboard Layout Mapper Engine".to_string(),
             target_subsystem: "Input Subsystem".to_string(),
             rust_osdev_crate_inspiration: "pc-keyboard".to_string(),
             components_added: vec![
@@ -2786,7 +2818,10 @@ mod tests {
 
     #[test]
     fn test_smoltcp_network_engine() {
-        let mut net = SmoltcpBareMetalNetworkEngine::new([0x52, 0x54, 0x00, 0x12, 0x34, 0x56], [192, 168, 1, 100]);
+        let mut net = SmoltcpBareMetalNetworkEngine::new(
+            [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
+            [192, 168, 1, 100],
+        );
         let sock_id = net.create_socket(BareMetalSocketType::Udp, 8080);
         assert_eq!(sock_id, 1);
         assert_eq!(net.send_packet(1, b"Hello Network"), Ok(13));
@@ -2809,7 +2844,10 @@ mod tests {
     #[test]
     fn test_bootloader_api_protocol() {
         let api = BootloaderApiProtocolEngine::new();
-        let resp = api.process_request(BootloaderApiRequest { request_id: 1, revision: 3 });
+        let resp = api.process_request(BootloaderApiRequest {
+            request_id: 1,
+            revision: 3,
+        });
         assert_eq!(resp.kernel_address, 0x0010_0000);
     }
 
@@ -2853,7 +2891,10 @@ mod tests {
     #[test]
     fn test_uefi_protocol_database() {
         let db = UefiProtocolDatabaseEngine::new();
-        let gop_guid = UefiGuid([0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0x4a, 0x96, 0xfb, 0x7a, 0xdc, 0x08, 0xc0, 0xb5, 0xd3]);
+        let gop_guid = UefiGuid([
+            0xde, 0xa9, 0x42, 0x90, 0xdc, 0x23, 0x38, 0x4a, 0x96, 0xfb, 0x7a, 0xdc, 0x08, 0xc0,
+            0xb5, 0xd3,
+        ]);
         let proto = db.locate_protocol(&gop_guid).expect("GOP protocol found");
         assert_eq!(proto.interface_ptr, 0xE000_0000);
     }
