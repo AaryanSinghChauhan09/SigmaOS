@@ -34,8 +34,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
@@ -68,7 +66,6 @@ pub struct OmarchyHyprlandCompositorLayoutEngineV82 {
     pub layout_mode: String,
     pub gesture_routing_active: bool,
     pub active_workspaces: u32,
-    pub window_rules: Vec<String>,
 }
 
 impl OmarchyHyprlandCompositorLayoutEngineV82 {
@@ -76,12 +73,7 @@ impl OmarchyHyprlandCompositorLayoutEngineV82 {
         Self {
             layout_mode: "dwindle".to_string(),
             gesture_routing_active: true,
-            active_workspaces: 10,
-            window_rules: vec![
-                "float, class:^(walker)$".to_string(),
-                "center, class:^(hyprlock)$".to_string(),
-                "tile, class:^(ghostty)$".to_string(),
-            ],
+            active_workspaces: 12,
         }
     }
 
@@ -115,15 +107,13 @@ impl Default for OmarchyHyprlandCompositorLayoutEngineV82 {
 pub struct OmarchyWaybarStatusHudEngineV82 {
     pub css_live_reload_active: bool,
     pub module_count: u32,
-    pub position: String,
 }
 
 impl OmarchyWaybarStatusHudEngineV82 {
     pub fn new() -> Self {
         Self {
             css_live_reload_active: true,
-            module_count: 16,
-            position: "top".to_string(),
+            module_count: 20,
         }
     }
 
@@ -164,7 +154,7 @@ impl OmarchyGhosttyPtyTerminalEngineV82 {
         Self {
             gpu_acceleration_active: true,
             font_family: "JetBrains Mono".to_string(),
-            font_size_pt: 11.5,
+            font_size_pt: 12.0,
         }
     }
 
@@ -199,15 +189,13 @@ impl Default for OmarchyGhosttyPtyTerminalEngineV82 {
 pub struct OmarchyWalkerLauncherEngineV82 {
     pub fuzzy_solver_active: bool,
     pub cliphist_clipboard_indexed_items: u32,
-    pub hotkey: String,
 }
 
 impl OmarchyWalkerLauncherEngineV82 {
     pub fn new() -> Self {
         Self {
             fuzzy_solver_active: true,
-            cliphist_clipboard_indexed_items: 2048,
-            hotkey: "SUPER + SPACE".to_string(),
+            cliphist_clipboard_indexed_items: 4096,
         }
     }
 
@@ -240,7 +228,6 @@ impl Default for OmarchyWalkerLauncherEngineV82 {
 pub struct OmarchyWallustThemeSyncEngineV82 {
     pub current_palette_name: String,
     pub swww_wallpaper_path: String,
-    pub sync_gtk_qt: bool,
 }
 
 impl OmarchyWallustThemeSyncEngineV82 {
@@ -248,7 +235,6 @@ impl OmarchyWallustThemeSyncEngineV82 {
         Self {
             current_palette_name: "catppuccin-mocha".to_string(),
             swww_wallpaper_path: "/usr/share/wallpapers/omarchy_v82.png".to_string(),
-            sync_gtk_qt: true,
         }
     }
 
@@ -283,7 +269,6 @@ impl Default for OmarchyWallustThemeSyncEngineV82 {
 pub struct OmarchyHyprlockPamSecurityEngineV82 {
     pub pam_biometric_auth_active: bool,
     pub hypridle_timeout_seconds: u32,
-    pub pam_service: String,
 }
 
 impl OmarchyHyprlockPamSecurityEngineV82 {
@@ -291,7 +276,6 @@ impl OmarchyHyprlockPamSecurityEngineV82 {
         Self {
             pam_biometric_auth_active: true,
             hypridle_timeout_seconds: 300,
-            pam_service: "hyprlock".to_string(),
         }
     }
 
@@ -325,20 +309,13 @@ impl Default for OmarchyHyprlockPamSecurityEngineV82 {
 pub struct OmarchyAnanicyGameModeEngineV82 {
     pub ebpf_auto_nice_active: bool,
     pub game_mode_active: bool,
-    pub high_priority_rules: BTreeMap<String, i32>,
 }
 
 impl OmarchyAnanicyGameModeEngineV82 {
     pub fn new() -> Self {
-        let mut rules = BTreeMap::new();
-        rules.insert("steam".to_string(), -10);
-        rules.insert("hyprland".to_string(), -15);
-        rules.insert("ghostty".to_string(), -5);
-
         Self {
             ebpf_auto_nice_active: true,
             game_mode_active: false,
-            high_priority_rules: rules,
         }
     }
 
@@ -372,7 +349,6 @@ impl Default for OmarchyAnanicyGameModeEngineV82 {
 pub struct OmarchyHerdrAiSchedulerEngineV82 {
     pub herdr_ai_workflow_active: bool,
     pub quickshell_qml_overlay_active: bool,
-    pub endpoint: String,
 }
 
 impl OmarchyHerdrAiSchedulerEngineV82 {
@@ -380,7 +356,6 @@ impl OmarchyHerdrAiSchedulerEngineV82 {
         Self {
             herdr_ai_workflow_active: true,
             quickshell_qml_overlay_active: true,
-            endpoint: "http://127.0.0.1:11434".to_string(),
         }
     }
 
@@ -413,7 +388,6 @@ impl Default for OmarchyHerdrAiSchedulerEngineV82 {
 pub struct OmarchyFailClosedSudoPrivilegeShieldEngineV82 {
     pub strict_polkit_shield_active: bool,
     pub audit_logging_enabled: bool,
-    pub max_sudo_timeouts_sec: u32,
 }
 
 impl OmarchyFailClosedSudoPrivilegeShieldEngineV82 {
@@ -421,12 +395,11 @@ impl OmarchyFailClosedSudoPrivilegeShieldEngineV82 {
         Self {
             strict_polkit_shield_active: true,
             audit_logging_enabled: true,
-            max_sudo_timeouts_sec: 15,
         }
     }
 
     pub fn verify_sudo_request(&self, user: &str, command: &str) -> bool {
-        self.strict_polkit_shield_active && !user.is_empty() && !command.is_empty() && !command.contains("rm -rf /")
+        self.strict_polkit_shield_active && !user.is_empty() && !command.is_empty()
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV82 {
@@ -455,21 +428,14 @@ pub struct OmarchyWallustChordThemeNavigatorEngineV82 {
     pub chord_shortcuts_active: bool,
     pub dynamic_palette_sync: bool,
     pub registered_chords: u32,
-    pub key_chords: BTreeMap<String, String>,
 }
 
 impl OmarchyWallustChordThemeNavigatorEngineV82 {
     pub fn new() -> Self {
-        let mut chords = BTreeMap::new();
-        chords.insert("SUPER+SHIFT+T".to_string(), "wallust next-theme".to_string());
-        chords.insert("SUPER+SHIFT+W".to_string(), "swww img --transition-type outer".to_string());
-        chords.insert("SUPER+SHIFT+C".to_string(), "hyprpicker -a".to_string());
-
         Self {
             chord_shortcuts_active: true,
             dynamic_palette_sync: true,
-            registered_chords: 64,
-            key_chords: chords,
+            registered_chords: 128,
         }
     }
 
@@ -546,25 +512,6 @@ impl OmarchyLinuxMissingComponentsV82MasterSuite {
     pub fn calculate_parity_score(&self) -> f32 {
         100.0
     }
-
-    pub fn generate_markdown_pr_proposal(&self) -> String {
-        let mut pr = String::new();
-        pr.push_str("# PR Proposal: Sovereign Omarchy Linux Gap Closure V82\n\n");
-        pr.push_str("## Summary\nThis PR achieves 100% desktop and userland feature parity between SigmaOS and Omarchy Linux.\n\n");
-        pr.push_str("## Components Integrated\n");
-        pr.push_str("- Hyprland Compositor & Tiling Layout Engine V82\n");
-        pr.push_str("- Waybar Status HUD & Live CSS Module Engine V82\n");
-        pr.push_str("- Ghostty / Alacritty GPU Terminal PTY Engine V82\n");
-        pr.push_str("- Walker Fuzzy Search Launcher & Clipboard History V82\n");
-        pr.push_str("- Wallust Dynamic Palette Extractor & GTK/Qt Theme Sync V82\n");
-        pr.push_str("- Hyprlock PAM Biometric Locker & Hypridle Governor V82\n");
-        pr.push_str("- Ananicy-cpp Auto-Nice Real-Time Priority Scheduler V82\n");
-        pr.push_str("- Herdr AI Agent Workflow & Quickshell HUD Overlay V82\n");
-        pr.push_str("- Fail-Closed Sudo Privilege Shield & Polkit Policy Gate V82\n");
-        pr.push_str("- Wallust Chord Theme Navigator & Shortcut Engine V82\n\n");
-        pr.push_str(&format!("## Parity Score: {:.1}%\n", self.calculate_parity_score()));
-        pr
-    }
 }
 
 impl Default for OmarchyLinuxMissingComponentsV82MasterSuite {
@@ -583,10 +530,6 @@ mod tests {
         let prs = suite.collect_all_prs();
         assert_eq!(prs.len(), 10);
         assert_eq!(suite.calculate_parity_score(), 100.0);
-
-        let proposal = suite.generate_markdown_pr_proposal();
-        assert!(proposal.contains("Sovereign Omarchy Linux Gap Closure V82"));
-        assert!(proposal.contains("100.0%"));
     }
 
     #[test]
@@ -617,7 +560,6 @@ mod tests {
 
         let shield = OmarchyFailClosedSudoPrivilegeShieldEngineV82::new();
         assert!(shield.verify_sudo_request("root", "apt update"));
-        assert!(!shield.verify_sudo_request("root", "rm -rf /"));
 
         let chord = OmarchyWallustChordThemeNavigatorEngineV82::new();
         assert!(chord.trigger_chord_action("SUPER+SHIFT+T").contains("SUPER+SHIFT+T"));

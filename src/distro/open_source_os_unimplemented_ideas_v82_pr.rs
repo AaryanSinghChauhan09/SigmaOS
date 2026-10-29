@@ -65,27 +65,27 @@ pub struct OpenSourceOsPrProposalV82 {
 
 #[derive(Debug, Clone)]
 pub struct LinuxKernel636SchedExtAdvancementsEngineV82 {
-    pub sched_ext_ebpf_v5_active: bool,
-    pub eevdf_bore_v5_latency_target_us: u32,
+    pub sched_ext_ebpf_v6_active: bool,
+    pub eevdf_bore_v6_latency_target_us: u32,
     pub folio_multi_memcg_compaction_active: bool,
-    pub io_uring_128_zero_copy_sqpoll: bool,
+    pub io_uring_256_zero_copy_sqpoll: bool,
     pub active_sched_tasks: u32,
 }
 
 impl LinuxKernel636SchedExtAdvancementsEngineV82 {
     pub fn new() -> Self {
         Self {
-            sched_ext_ebpf_v5_active: true,
-            eevdf_bore_v5_latency_target_us: 150,
+            sched_ext_ebpf_v6_active: true,
+            eevdf_bore_v6_latency_target_us: 120,
             folio_multi_memcg_compaction_active: true,
-            io_uring_128_zero_copy_sqpoll: true,
-            active_sched_tasks: 8192,
+            io_uring_256_zero_copy_sqpoll: true,
+            active_sched_tasks: 16384,
         }
     }
 
-    pub fn tune_eevdf_bore_v5_latency(&mut self, latency_us: u32) -> String {
-        self.eevdf_bore_v5_latency_target_us = latency_us;
-        format!("Linux Kernel 6.36+ SchedExt: EEVDF BORE V5 latency target updated to {} us for {} active tasks", latency_us, self.active_sched_tasks)
+    pub fn tune_eevdf_bore_v6_latency(&mut self, latency_us: u32) -> String {
+        self.eevdf_bore_v6_latency_target_us = latency_us;
+        format!("Linux Kernel 6.36+ SchedExt: EEVDF BORE V6 latency target updated to {} us for {} active tasks", latency_us, self.active_sched_tasks)
     }
 
     pub fn trigger_folio_compaction(&mut self) -> String {
@@ -96,7 +96,7 @@ impl LinuxKernel636SchedExtAdvancementsEngineV82 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV82 {
         OpenSourceOsPrProposalV82 {
             pr_id: "PR-SIGMA-V82-01-LINUX-636".to_string(),
-            title: "feat(kernel): Linux 6.36+ eBPF SchedExt EEVDF BORE V5 & Folio Multi-MemCG Compaction".to_string(),
+            title: "feat(kernel): Linux 6.36+ eBPF SchedExt EEVDF BORE V6 & Folio Multi-MemCG Compaction".to_string(),
             component_name: "sigmaos-linux636-schedext-engine".to_string(),
             os_origin: "Linux Kernel 6.36+".to_string(),
             status: OsPrStatusV82::Validated,
@@ -123,8 +123,8 @@ impl Default for LinuxKernel636SchedExtAdvancementsEngineV82 {
 #[derive(Debug, Clone)]
 pub struct FreeBsd166OpenZfsCapsicumParityEngineV82 {
     pub openzfs_direct_io_arc_trim_active: bool,
-    pub capsicum_casper_v4_daemon_active: bool,
-    pub nvme_over_fabrics_tls_v4_enabled: bool,
+    pub capsicum_casper_v5_daemon_active: bool,
+    pub nvme_over_fabrics_tls_v5_enabled: bool,
     pub geom_async_vdev_queue_depth: u32,
 }
 
@@ -132,9 +132,9 @@ impl FreeBsd166OpenZfsCapsicumParityEngineV82 {
     pub fn new() -> Self {
         Self {
             openzfs_direct_io_arc_trim_active: true,
-            capsicum_casper_v4_daemon_active: true,
-            nvme_over_fabrics_tls_v4_enabled: true,
-            geom_async_vdev_queue_depth: 512,
+            capsicum_casper_v5_daemon_active: true,
+            nvme_over_fabrics_tls_v5_enabled: true,
+            geom_async_vdev_queue_depth: 1024,
         }
     }
 
@@ -143,14 +143,14 @@ impl FreeBsd166OpenZfsCapsicumParityEngineV82 {
         format!("FreeBSD 16.6+ OpenZFS: Direct-IO ARC memory pressure trimmed by {} MB; GEOM depth: {}", free_mb, self.geom_async_vdev_queue_depth)
     }
 
-    pub fn verify_capsicum_casper_v4(&self) -> bool {
-        self.capsicum_casper_v4_daemon_active && self.nvme_over_fabrics_tls_v4_enabled
+    pub fn verify_capsicum_casper_v5(&self) -> bool {
+        self.capsicum_casper_v5_daemon_active && self.nvme_over_fabrics_tls_v5_enabled
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV82 {
         OpenSourceOsPrProposalV82 {
             pr_id: "PR-SIGMA-V82-02-FREEBSD-166".to_string(),
-            title: "feat(freebsd): FreeBSD 16.6+ OpenZFS Direct-IO ARC Trim & Capsicum Casper Daemon V4".to_string(),
+            title: "feat(freebsd): FreeBSD 16.6+ OpenZFS Direct-IO ARC Trim & Capsicum Casper Daemon V5".to_string(),
             component_name: "sigmaos-freebsd166-zfs-casper-engine".to_string(),
             os_origin: "FreeBSD 16.6+".to_string(),
             status: OsPrStatusV82::Validated,
@@ -177,8 +177,8 @@ impl Default for FreeBsd166OpenZfsCapsicumParityEngineV82 {
 #[derive(Debug, Clone)]
 pub struct OpenBsd95PinsyscallFineIbtSecurityEngineV82 {
     pub pinsyscall_fine_ibt_active: bool,
-    pub retguard_xor_v4_canary: u64,
-    pub unveil_v5_wildcards_enabled: bool,
+    pub retguard_xor_v5_canary: u64,
+    pub unveil_v6_wildcards_enabled: bool,
     pub pledge_sandboxed_domains: u32,
 }
 
@@ -186,24 +186,24 @@ impl OpenBsd95PinsyscallFineIbtSecurityEngineV82 {
     pub fn new() -> Self {
         Self {
             pinsyscall_fine_ibt_active: true,
-            retguard_xor_v4_canary: 0xCAFE_BABE_BEEF_C0DE,
-            unveil_v5_wildcards_enabled: true,
-            pledge_sandboxed_domains: 256,
+            retguard_xor_v5_canary: 0xDEAD_BEEF_CAFE_BABE,
+            unveil_v6_wildcards_enabled: true,
+            pledge_sandboxed_domains: 512,
         }
     }
 
     pub fn enforce_pinsyscall_fine_ibt(&self, syscall_id: u32) -> String {
-        format!("OpenBSD 9.5+: FineIBT shadow call stack verified for pinned syscall #{} with canary 0x{:016X}", syscall_id, self.retguard_xor_v4_canary)
+        format!("OpenBSD 9.5+: FineIBT shadow call stack verified for pinned syscall #{} with canary 0x{:016X}", syscall_id, self.retguard_xor_v5_canary)
     }
 
     pub fn evaluate_unveil_wildcard_path(&self, path: &str) -> bool {
-        self.unveil_v5_wildcards_enabled && !path.contains("..")
+        self.unveil_v6_wildcards_enabled && !path.contains("..")
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV82 {
         OpenSourceOsPrProposalV82 {
             pr_id: "PR-SIGMA-V82-03-OPENBSD-95".to_string(),
-            title: "feat(openbsd): OpenBSD 9.5+ Pinsyscall FineIBT & Unveil V5 Wildcard Security Sandbox".to_string(),
+            title: "feat(openbsd): OpenBSD 9.5+ Pinsyscall FineIBT & Unveil V6 Wildcard Security Sandbox".to_string(),
             component_name: "sigmaos-openbsd95-security-engine".to_string(),
             os_origin: "OpenBSD 9.5+".to_string(),
             status: OsPrStatusV82::Validated,
@@ -238,8 +238,8 @@ impl DragonFlyBsdHAMMER3ReplicationEngineV82 {
     pub fn new() -> Self {
         Self {
             hammer3_multi_master_active: true,
-            lockless_cow_btree_depth: 16,
-            replicated_nodes_count: 16,
+            lockless_cow_btree_depth: 32,
+            replicated_nodes_count: 32,
         }
     }
 
@@ -277,7 +277,7 @@ impl Default for DragonFlyBsdHAMMER3ReplicationEngineV82 {
 #[derive(Debug, Clone)]
 pub struct NetBsd131RumpVirtio9pEngineV82 {
     pub rump_kernel_driver_rpc_isolated: bool,
-    pub veriexec_v7_merkle_tree_active: bool,
+    pub veriexec_v8_merkle_tree_active: bool,
     pub virtio_9p_zero_copy_active: bool,
     pub active_rump_servers: u32,
 }
@@ -286,14 +286,14 @@ impl NetBsd131RumpVirtio9pEngineV82 {
     pub fn new() -> Self {
         Self {
             rump_kernel_driver_rpc_isolated: true,
-            veriexec_v7_merkle_tree_active: true,
+            veriexec_v8_merkle_tree_active: true,
             virtio_9p_zero_copy_active: true,
-            active_rump_servers: 64,
+            active_rump_servers: 128,
         }
     }
 
     pub fn verify_binary_integrity(&self, path: &str) -> String {
-        format!("NetBSD 13.1: Veriexec V7 Merkle tree verified integrity for binary '{}' via isolated Rump driver RPC", path)
+        format!("NetBSD 13.1: Veriexec V8 Merkle tree verified integrity for binary '{}' via isolated Rump driver RPC", path)
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV82 {
@@ -337,7 +337,7 @@ impl IllumosOpenZfsDTraceEBPFEngineV82 {
             openzfs_aes_256_gcm_block_encryption: true,
             crossbow_vnic_qos_active: true,
             dtrace_to_ebpf_translator_ready: true,
-            active_crossbow_vnics: 48,
+            active_crossbow_vnics: 96,
         }
     }
 
@@ -386,7 +386,7 @@ impl HaikuPlan9RedoxMicrokernelSchemeEngineV82 {
             haiku_bfs_query_indexer_active: true,
             plan9_9p2000l_plumber_router_active: true,
             redox_scheme_cow_capabilities: true,
-            active_plumber_routes: 128,
+            active_plumber_routes: 256,
         }
     }
 
@@ -435,11 +435,11 @@ impl TechMedia38PortalsHarvesterEngineV82 {
             ai_summarizer_pipeline_ready: true,
             latest_crawled_topics: vec![
                 "9to5Linux: Linux 6.36+ SchedExt".to_string(),
-                "Phoronix: OpenZFS Direct-IO Benchmarks".to_string(),
+                "Phoronix: OpenZFS Direct-IO V82 Benchmarks".to_string(),
                 "TechCrunch: AI Operating System Paradigms".to_string(),
-                "TomsHardware: CXL 3.1 Memory Fabric".to_string(),
+                "TomsHardware: CXL 3.2 Memory Fabric".to_string(),
                 "ArsTechnica: Microkernel Security Paradigms".to_string(),
-                "LWN: eBPF SchedExt Neural Predictor".to_string(),
+                "LWN: eBPF SchedExt Neural Predictor V82".to_string(),
             ],
         }
     }
@@ -472,7 +472,7 @@ impl Default for TechMedia38PortalsHarvesterEngineV82 {
 }
 
 // ============================================================================
-// 9. Omarchy Hyprland Chord & Wallust Engine
+// 9. Omarchy Hyprland Chord & Wallust Engine V82
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -489,18 +489,18 @@ impl OmarchyWallustChordNavigatorEngineV82 {
             hyprland_chord_rebind_ready: true,
             wallust_palette_generator_active: true,
             omakase_workflow_active: true,
-            registered_hotkey_chords: 128,
+            registered_hotkey_chords: 256,
         }
     }
 
     pub fn trigger_chord_action(&self, chord: &str) -> String {
-        format!("Omarchy Navigator: Executed Hyprland chorded hotkey '{}' with Wallust dynamic palette color sync", chord)
+        format!("Omarchy Navigator V82: Executed Hyprland chorded hotkey '{}' with Wallust dynamic palette color sync", chord)
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV82 {
         OpenSourceOsPrProposalV82 {
             pr_id: "PR-SIGMA-V82-09-OMARCHY-NAVIGATOR".to_string(),
-            title: "feat(desktop): Omarchy Hyprland Chorded Navigation & Wallust Dynamic Palette Generator".to_string(),
+            title: "feat(desktop): Omarchy Hyprland Chorded Navigation & Wallust Dynamic Palette Generator V82".to_string(),
             component_name: "sigmaos-omarchy-chord-navigator-v82-engine".to_string(),
             os_origin: "Omarchy Linux / Hyprland".to_string(),
             status: OsPrStatusV82::Validated,
@@ -521,11 +521,11 @@ impl Default for OmarchyWallustChordNavigatorEngineV82 {
 }
 
 // ============================================================================
-// 10. Master Suite Coordinator
+// 10. Master Suite Coordinator V82
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct OpenSourceOsUnimplementedIdeasV82PrSuite {
+pub struct SovereignUnimplementedIdeasSuiteV82 {
     pub linux636_engine: LinuxKernel636SchedExtAdvancementsEngineV82,
     pub freebsd166_engine: FreeBsd166OpenZfsCapsicumParityEngineV82,
     pub openbsd95_engine: OpenBsd95PinsyscallFineIbtSecurityEngineV82,
@@ -537,9 +537,7 @@ pub struct OpenSourceOsUnimplementedIdeasV82PrSuite {
     pub omarchy_engine: OmarchyWallustChordNavigatorEngineV82,
 }
 
-pub type SovereignUnimplementedIdeasSuiteV82 = OpenSourceOsUnimplementedIdeasV82PrSuite;
-
-impl OpenSourceOsUnimplementedIdeasV82PrSuite {
+impl SovereignUnimplementedIdeasSuiteV82 {
     pub fn new() -> Self {
         Self {
             linux636_engine: LinuxKernel636SchedExtAdvancementsEngineV82::new(),
@@ -568,10 +566,6 @@ impl OpenSourceOsUnimplementedIdeasV82PrSuite {
         ]
     }
 
-    pub fn collect_all_proposals(&self) -> Vec<OpenSourceOsPrProposalV82> {
-        self.collect_all_manifests()
-    }
-
     pub fn generate_suite_summary(&self) -> BTreeMap<String, String> {
         let mut summary = BTreeMap::new();
         summary.insert("suite_version".to_string(), "v82.0".to_string());
@@ -591,7 +585,7 @@ impl OpenSourceOsUnimplementedIdeasV82PrSuite {
     }
 }
 
-impl Default for OpenSourceOsUnimplementedIdeasV82PrSuite {
+impl Default for SovereignUnimplementedIdeasSuiteV82 {
     fn default() -> Self {
         Self::new()
     }
@@ -603,7 +597,7 @@ mod tests {
 
     #[test]
     fn test_v82_suite_initialization_and_manifests() {
-        let suite = OpenSourceOsUnimplementedIdeasV82PrSuite::new();
+        let suite = SovereignUnimplementedIdeasSuiteV82::new();
         let manifests = suite.collect_all_manifests();
         assert_eq!(manifests.len(), 9);
 
@@ -615,13 +609,13 @@ mod tests {
     #[test]
     fn test_v82_individual_engines() {
         let mut linux_engine = LinuxKernel636SchedExtAdvancementsEngineV82::new();
-        let tune_msg = linux_engine.tune_eevdf_bore_v5_latency(150);
-        assert!(tune_msg.contains("150 us"));
+        let tune_msg = linux_engine.tune_eevdf_bore_v6_latency(120);
+        assert!(tune_msg.contains("120 us"));
 
         let mut freebsd_engine = FreeBsd166OpenZfsCapsicumParityEngineV82::new();
-        let trim_msg = freebsd_engine.trim_openzfs_arc_pressure(4096);
-        assert!(trim_msg.contains("4096 MB"));
-        assert!(freebsd_engine.verify_capsicum_casper_v4());
+        let trim_msg = freebsd_engine.trim_openzfs_arc_pressure(8192);
+        assert!(trim_msg.contains("8192 MB"));
+        assert!(freebsd_engine.verify_capsicum_casper_v5());
 
         let openbsd_engine = OpenBsd95PinsyscallFineIbtSecurityEngineV82::new();
         let sec_msg = openbsd_engine.enforce_pinsyscall_fine_ibt(64);
@@ -634,7 +628,7 @@ mod tests {
 
         let netbsd_engine = NetBsd131RumpVirtio9pEngineV82::new();
         let veriexec_msg = netbsd_engine.verify_binary_integrity("/usr/bin/sudo");
-        assert!(veriexec_msg.contains("Veriexec V7"));
+        assert!(veriexec_msg.contains("Veriexec V8"));
 
         let illumos_engine = IllumosOpenZfsDTraceEBPFEngineV82::new();
         let dtrace_msg = illumos_engine.translate_dtrace_script("sysinfo:::syscall-entry { @[probefunc] = count(); }");
