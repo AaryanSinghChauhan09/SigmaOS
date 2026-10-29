@@ -9,6 +9,7 @@ use std::string::String;
 use std::vec::Vec;
 
 /// Recurring frequency for shell maintenance tasks
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ShellTaskCadence {
     EveryPr,
@@ -21,6 +22,7 @@ pub enum ShellTaskCadence {
 }
 
 impl ShellTaskCadence {
+    #[allow(dead_code)]
     pub fn name(&self) -> &'static str {
         match self {
             Self::EveryPr => "Every PR",
@@ -45,6 +47,7 @@ pub struct ShellTaskDefinition {
 }
 
 /// Component scope areas of the shell
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ShellComponent {
     Lexer,
@@ -59,6 +62,7 @@ pub enum ShellComponent {
 }
 
 impl ShellComponent {
+    #[allow(dead_code)]
     pub fn name(&self) -> &'static str {
         match self {
             Self::Lexer => "Lexer",
@@ -75,6 +79,7 @@ impl ShellComponent {
 }
 
 /// Shell Issue Triage Classification Areas
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ShellIssueArea {
     ParserCorrectness,
@@ -107,6 +112,7 @@ impl ShellIssueArea {
 }
 
 /// Shell Acceptance Gates G0 through G8
+#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum ShellAcceptanceGate {
     G0CodeQuality = 0,
@@ -121,6 +127,7 @@ pub enum ShellAcceptanceGate {
 }
 
 impl ShellAcceptanceGate {
+    #[allow(dead_code)]
     pub fn code(&self) -> &'static str {
         match self {
             Self::G0CodeQuality => "G0",
@@ -135,6 +142,7 @@ impl ShellAcceptanceGate {
         }
     }
 
+    #[allow(dead_code)]
     pub fn description(&self) -> &'static str {
         match self {
             Self::G0CodeQuality => "cargo check --lib, formatting, and unit tests pass",
