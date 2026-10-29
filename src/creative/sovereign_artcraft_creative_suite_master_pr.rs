@@ -156,7 +156,6 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
             && craft_ok
             && artcraftlibs_ok
             && v75_ok
-            && advancements_ok
     }
 
     /// Collects all master PR proposals across all 18+ creative applications.
