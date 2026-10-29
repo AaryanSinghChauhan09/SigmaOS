@@ -1,92 +1,87 @@
 ## Summary
 
-<!-- One paragraph: what component does this PR improve or add, and why? -->
+<!-- What I/O-management behavior changed and why? -->
 
-## Component
+## I/O component
 
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
+- [ ] I/O policy
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] Submit / complete
+- [ ] Callback
+- [ ] Interrupt
+- [ ] DMA
+- [ ] Buffer
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
 
-## Upstream study
+## Recurring task
 
-- Reference study:
-- What SigmaOS adopts:
-- What SigmaOS changes or rejects:
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly I/O audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or I/O changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
 -
+-
 
-## Motivation
+## I/O safety review
 
-<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
-## Implementation notes
+## Evidence
 
-<!-- Design decisions, data structures, locking, error handling. -->
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] I/O benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
 
-## Tests
+## Status updates
 
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Concurrency/stress tests added/updated
-- [ ] Fuzz tests added/updated
-- [ ] Boot smoke test performed, if kernel-facing
-- [ ] No regression in existing tests
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] I/O documentation
+- [ ] Boot matrix, if applicable
 
-## Verification
+## Risks and rollback
 
-```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
-
-Paste relevant verification output below.
-
-## Capability status
-
-- Previous status:
-- New status:
-- Evidence:
-
-## Integration impact
-
-- [ ] No runtime integration yet
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
-
-## Shell safety review
-
-<!-- Shell safety review details -->
-
-## Safety and rollback
-
-- [ ] Risks and rollback behavior defined
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Security review completed, if applicable
-
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] Public API documented
-- [ ] `unsafe` justified with safety comments
-- [ ] Lock ordering documented
-- [ ] Error paths tested
-- [ ] Feature status updated in FEATURE_STATUS.toml
-- [ ] No unsupported compatibility claims
+- Risk:
+- Rollback:

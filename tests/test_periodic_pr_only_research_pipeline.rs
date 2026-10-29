@@ -111,6 +111,7 @@ fn test_github_templates_exist() {
             || pr_template.contains("IPC handler")
             || pr_template.contains("Component")
             || pr_template.contains("Memory component")
+            || pr_template.contains("I/O component")
     );
     assert!(
         pr_template.contains("Reference study")
@@ -125,6 +126,7 @@ fn test_github_templates_exist() {
         pr_template.contains("Kernel safety review")
             || pr_template.contains("Reviewer checklist")
             || pr_template.contains("Memory safety review")
+            || pr_template.contains("I/O safety review")
     );
 
     // Check Study Issue Template
