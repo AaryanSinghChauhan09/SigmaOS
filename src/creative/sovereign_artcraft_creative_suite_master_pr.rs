@@ -18,6 +18,7 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+use super::anicraft_advancements_v75_pr::SovereignAnicraftAdvancementsV75MasterSuite;
 use super::anicraft_artcraft_parity_pr::SovereignAnicraftArtcraftParityPrGateway;
 use super::artcraft::ArtcraftAdvancementsMasterSuite;
 use super::artcraft_advancements_v75_pr::SovereignArtcraftAdvancementsV75MasterSuite;
@@ -67,6 +68,7 @@ pub struct SovereignArtcraftCreativeSuiteMasterPrGateway {
     pub cadcraft_gateway: SovereignCadcraftArtcraftParityPrGateway,
     pub threedcraft_gateway: SovereignThreeDCraftArtcraftParityPrGateway,
     pub anicraft_gateway: SovereignAnicraftArtcraftParityPrGateway,
+    pub anicraft_v75_gateway: SovereignAnicraftAdvancementsV75MasterSuite,
     pub voicecraft_gateway: SovereignVoicecraftArtcraftParityPrGateway,
     pub figcraft_gateway: SovereignFigcraftArtcraftParityPrGateway,
     pub deckcraft_gateway: SovereignDeckcraftArtcraftParityPrGateway,
@@ -92,6 +94,7 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
             cadcraft_gateway: SovereignCadcraftArtcraftParityPrGateway::new(),
             threedcraft_gateway: SovereignThreeDCraftArtcraftParityPrGateway::new(),
             anicraft_gateway: SovereignAnicraftArtcraftParityPrGateway::new(),
+            anicraft_v75_gateway: SovereignAnicraftAdvancementsV75MasterSuite::new(),
             voicecraft_gateway: SovereignVoicecraftArtcraftParityPrGateway::new(),
             figcraft_gateway: SovereignFigcraftArtcraftParityPrGateway::new(),
             deckcraft_gateway: SovereignDeckcraftArtcraftParityPrGateway::new(),
@@ -126,6 +129,7 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
         let cad_ok = self.cadcraft_gateway.evaluate_cadcraft_parity();
         let threed_ok = self.threedcraft_gateway.evaluate_3dcraft_parity();
         let ani_ok = self.anicraft_gateway.evaluate_anicraft_parity();
+        let ani_v75_ok = self.anicraft_v75_gateway.evaluate_v75_anicraft_parity();
         let voice_ok = self
             .voicecraft_gateway
             .evaluate_voicecraft_artcraft_parity();
@@ -150,13 +154,13 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
             && cad_ok
             && threed_ok
             && ani_ok
+            && ani_v75_ok
             && voice_ok
             && fig_ok
             && deck_ok
             && craft_ok
             && artcraftlibs_ok
             && v75_ok
-            && advancements_ok
     }
 
     /// Collects all master PR proposals across all 18+ creative applications.
@@ -170,6 +174,18 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
                 pr_id: id_counter,
                 pr_title: p.pr_title,
                 creative_app: "PhotoCraft".to_string(),
+                target_subsystem: p.target_subsystem,
+                components_added_count: p.components_added.len(),
+                status: p.status,
+            });
+        }
+
+        for p in self.anicraft_v75_gateway.collect_all_pr_manifests() {
+            id_counter += 1;
+            proposals.push(ArtcraftMasterPrProposal {
+                pr_id: id_counter,
+                pr_title: p.pr_title,
+                creative_app: "AniCraft V75".to_string(),
                 target_subsystem: p.target_subsystem,
                 components_added_count: p.components_added.len(),
                 status: p.status,
