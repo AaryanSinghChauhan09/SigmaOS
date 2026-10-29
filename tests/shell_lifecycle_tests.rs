@@ -37,17 +37,8 @@ fn test_pull_request_template_exists() {
     let path = Path::new(".github/PULL_REQUEST_TEMPLATE.md");
     assert!(path.exists(), ".github/PULL_REQUEST_TEMPLATE.md must exist");
     let content = fs::read_to_string(path).expect("Failed to read PR template");
-    assert!(
-        content.contains("## Shell component")
-            || content.contains("## I/O component")
-            || content.contains("## Component")
-    );
-    assert!(
-        content.contains("## Shell safety review")
-            || content.contains("## I/O safety review")
-            || content.contains("## Safety")
-            || content.contains("Safety review")
-    );
+    assert!(content.contains("Component impact") || content.contains("## Component impact"));
+    assert!(content.contains("Safety and rollback") || content.contains("## Safety and rollback"));
 }
 
 #[test]

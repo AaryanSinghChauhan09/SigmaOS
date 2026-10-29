@@ -406,11 +406,10 @@ impl CommandPalette {
 
         // 2. System Actions: triggered if starts with ":" or matches action triggers
         if trimmed.starts_with(':') {
-            let action_q = trimmed.to_lowercase();
             for act in &self.system_actions {
                 // Performance: zero-allocation matching eliminates transient String heap allocations on every keypress
-                if contains_ignore_case(&act.trigger, &action_q)
-                    || contains_ignore_case(&act.description, &action_q)
+                if contains_ignore_case(&act.trigger, trimmed)
+                    || contains_ignore_case(&act.description, trimmed)
                 {
                     results.push(SearchResultItem {
                         title: act.trigger.clone(),
@@ -427,11 +426,10 @@ impl CommandPalette {
         }
 
         // 3. Window Switcher: search open running windows
-        let q_lower = trimmed.to_lowercase();
         for win in &self.open_windows {
             // Performance: zero-allocation matching avoids lowercasing title and app_class in loops
-            if contains_ignore_case(&win.title, &q_lower)
-                || contains_ignore_case(&win.app_class, &q_lower)
+            if contains_ignore_case(&win.title, trimmed)
+                || contains_ignore_case(&win.app_class, trimmed)
             {
                 results.push(SearchResultItem {
                     title: win.title.clone(),
@@ -453,11 +451,10 @@ impl CommandPalette {
         if trimmed.starts_with("cb ") || trimmed.starts_with("clip ") {
             let cb_q = trimmed
                 .trim_start_matches("cb ")
-                .trim_start_matches("clip ")
-                .to_lowercase();
+                .trim_start_matches("clip ");
             for snippet in &self.clipboard_history {
                 // Performance: zero-allocation matching avoids lowercasing content in loops
-                if contains_ignore_case(&snippet.content, &cb_q) {
+                if contains_ignore_case(&snippet.content, cb_q) {
                     let preview = clipboard_preview(&snippet.content, 60);
                     results.push(SearchResultItem {
                         title: preview,
@@ -478,16 +475,16 @@ impl CommandPalette {
             let mut score: i32 = -1;
 
             // Performance: zero-allocation matching avoids lowercasing app name and keywords in loops
-            if app.name.eq_ignore_ascii_case(&q_lower) {
+            if app.name.eq_ignore_ascii_case(trimmed) {
                 score = 1000;
-            } else if starts_with_ignore_case(&app.name, &q_lower) {
+            } else if starts_with_ignore_case(&app.name, trimmed) {
                 score = 800;
-            } else if contains_ignore_case(&app.name, &q_lower) {
+            } else if contains_ignore_case(&app.name, trimmed) {
                 score = 500;
             } else if app
                 .keywords
                 .iter()
-                .any(|k| contains_ignore_case(k, &q_lower))
+                .any(|k| contains_ignore_case(k, trimmed))
             {
                 score = 300;
             }
@@ -516,24 +513,14 @@ impl CommandPalette {
 
     /// Legacy fuzzy search compatibility wrapper
     pub fn fuzzy_search(&self, query: &str) -> Vec<&LauncherEntry> {
-        let q = query.to_lowercase();
         let mut matched: Vec<(&LauncherEntry, usize)> = self
             .apps
             .iter()
             .filter_map(|e| {
-                if contains_ignore_case(&e.name, &q) {
-                    let pos = e
-                        .name
-                        .as_bytes()
-                        .windows(q.len())
-                        .position(|w| {
-                            w.iter()
-                                .zip(q.as_bytes())
-                                .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2)
-                        })
-                        .unwrap_or(usize::MAX);
+                if contains_ignore_case(&e.name, query) {
+                    let pos = position_ignore_case(&e.name, query).unwrap_or(usize::MAX);
                     Some((e, pos))
-                } else if e.keywords.iter().any(|k| contains_ignore_case(k, &q)) {
+                } else if e.keywords.iter().any(|k| contains_ignore_case(k, query)) {
                     Some((e, 1000))
                 } else {
                     None
@@ -617,13 +604,27 @@ pub fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
 }
 
 /// Perform zero-allocation ASCII case-insensitive prefix match.
-/// `needle_lower` is expected to be lowercased by the caller.
 #[inline]
 pub fn starts_with_ignore_case(haystack: &str, needle_lower: &str) -> bool {
     if needle_lower.len() > haystack.len() {
         return false;
     }
     haystack.as_bytes()[..needle_lower.len()].eq_ignore_ascii_case(needle_lower.as_bytes())
+}
+
+/// Perform zero-allocation ASCII case-insensitive position search.
+#[inline]
+pub fn position_ignore_case(haystack: &str, needle: &str) -> Option<usize> {
+    if needle.is_empty() {
+        return Some(0);
+    }
+    if needle.len() > haystack.len() {
+        return None;
+    }
+    haystack
+        .as_bytes()
+        .windows(needle.len())
+        .position(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
 }
 
 fn clipboard_preview(content: &str, max_bytes: usize) -> String {
