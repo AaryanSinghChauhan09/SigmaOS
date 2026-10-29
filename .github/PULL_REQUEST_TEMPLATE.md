@@ -58,6 +58,15 @@
 - Decision: Adopt / Adapt / Reject
 - Reason:
 
+## Shell component
+
+- Shell component:
+- Grammar/conformance impact:
+
+## Shell safety review
+
+- [ ] Shell safety principles verified
+
 ## Changes
 
 -

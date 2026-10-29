@@ -1,7 +1,7 @@
 # PR Specification: Omarchy Linux & SigmaOS Desktop Gap Closure
 
 ## Abstract
-This proposal specifies the clean-room implementation of 10 core Omarchy Linux desktop and userland subsystems within SigmaOS (`src/distro/omarchy_linux_missing_components_v75_pr.rs`). It bridges the feature gap between SigmaOS and modern Linux desktop distributions by delivering automated tiling, status HUD, GPU terminal, fuzzy launching, theme sync, biometric locking, process auto-niceness, AI task scheduling, fail-closed privilege protection, and chord hotkeys.
+This proposal specifies the clean-room implementation of 10 core Omarchy Linux desktop and userland subsystems within SigmaOS (`src/distro/omarchy_linux_gap_closure_pr_suite.rs`). It bridges the feature gap between SigmaOS and modern Linux desktop distributions by delivering automated tiling, status HUD, GPU terminal, fuzzy launching, theme sync, biometric locking, process auto-niceness, AI task scheduling, fail-closed privilege protection, and chord hotkeys.
 
 ## Detailed Architecture
 
@@ -28,6 +28,6 @@ This proposal specifies the clean-room implementation of 10 core Omarchy Linux d
     - Chord keybinding shortcuts for theme cycling and desktop state management.
 
 ## Verification
-- Unit test suite: `tests/test_omarchy_linux_v75_pr.rs`
+- Unit test suite: `src/distro/omarchy_linux_gap_closure_pr_suite.rs`
 - Master test runner: `./run_sigma_tests.sh`
 - Expected Parity Score: 100%

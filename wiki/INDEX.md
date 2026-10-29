@@ -13,3 +13,5 @@
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
 - [SIGMAOS GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md)
 - [SIGMAOS CLI Development Plan](SIGMAOS_CLI_DEVELOPMENT_PLAN.md)
+- [Omarchy Linux Desktop Parity Roadmap](44-Omarchy-Linux-Desktop-Parity-And-Distro-Gap-Closure-Roadmap.md)
+- [Linux & BSD Kernel Security & Virtualization AI Agent Roadmap](45-Linux-BSD-Kernel-Security-And-Virtualization-AI-Agent-Roadmap.md)
