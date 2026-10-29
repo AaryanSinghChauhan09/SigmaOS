@@ -4,6 +4,7 @@
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft CadCraft
 // 3D CAD/CAM/CAE engineering design ecosystem components in Pull Request proposal format.
+// Integrates AI generative latent space mesh synthesis, IGA NURBS FEA, and 5-axis G-code optimization.
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
