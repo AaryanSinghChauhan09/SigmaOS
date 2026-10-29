@@ -56,6 +56,36 @@ impl SigmaLookerAnalyticsEngine {
         total
     }
 
+    pub fn compute_metric_mean(&self, field_name: &str) -> f64 {
+        let mut total = 0.0;
+        let mut count = 0;
+        for rec in &self.data_records {
+            if let Some(val_str) = rec.get(field_name) {
+                if let Ok(val) = val_str.parse::<f64>() {
+                    total += val;
+                    count += 1;
+                }
+            }
+        }
+        if count > 0 {
+            total / count as f64
+        } else {
+            0.0
+        }
+    }
+
+    pub fn group_by_dimension(&self, dimension_key: &str, metric_key: &str) -> BTreeMap<String, f64> {
+        let mut result = BTreeMap::new();
+        for rec in &self.data_records {
+            if let (Some(dim), Some(val_str)) = (rec.get(dimension_key), rec.get(metric_key)) {
+                if let Ok(val) = val_str.parse::<f64>() {
+                    *result.entry(dim.clone()).or_insert(0.0) += val;
+                }
+            }
+        }
+        result
+    }
+
     pub fn export_dashboard_summary(&self) -> String {
         format!(
             "Dashboard: {} | Widgets: {} | Records Ingested: {}",
@@ -119,6 +149,28 @@ impl SigmaSlidesPresenterEngine {
         } else {
             self.get_current_slide()
         }
+    }
+
+    pub fn previous_slide(&mut self) -> Option<&PresentationSlide> {
+        if self.current_slide_idx > 0 {
+            self.current_slide_idx -= 1;
+            Some(&self.slides[self.current_slide_idx])
+        } else {
+            self.get_current_slide()
+        }
+    }
+
+    pub fn go_to_slide(&mut self, slide_number: u32) -> Option<&PresentationSlide> {
+        if slide_number > 0 && ((slide_number - 1) as usize) < self.slides.len() {
+            self.current_slide_idx = (slide_number - 1) as usize;
+            Some(&self.slides[self.current_slide_idx])
+        } else {
+            None
+        }
+    }
+
+    pub fn total_slides(&self) -> usize {
+        self.slides.len()
     }
 
     pub fn get_current_slide(&self) -> Option<&PresentationSlide> {
@@ -197,6 +249,30 @@ impl SigmaDocsEnterpriseCollaborationEngine {
         }
         false
     }
+
+    pub fn reject_suggestion(&mut self, sug_id: &str) -> bool {
+        if let Some(pos) = self.suggestions.iter().position(|s| s.suggestion_id == sug_id) {
+            self.suggestions.remove(pos);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn get_active_collaborators_count(&self) -> usize {
+        self.cursors.len()
+    }
+
+    pub fn insert_text_at_cursor(&mut self, user_id: &str, text: &str) -> bool {
+        if let Some(cursor) = self.cursors.get_mut(user_id) {
+            let pos = cursor.cursor_position.min(self.content.len());
+            self.content.insert_str(pos, text);
+            cursor.cursor_position += text.len();
+            true
+        } else {
+            false
+        }
+    }
 }
 
 // =========================================================================
@@ -262,6 +338,27 @@ impl SovereignEnterpriseCrmErpEngine {
             total += lead.estimated_value_usd * probability;
         }
         total
+    }
+
+    pub fn get_leads_by_stage(&self, stage: LeadStage) -> Vec<&CrmLead> {
+        self.leads.values().filter(|l| l.stage == stage).collect()
+    }
+
+    pub fn calculate_total_closed_won_revenue(&self) -> f64 {
+        self.leads
+            .values()
+            .filter(|l| l.stage == LeadStage::ClosedWon)
+            .map(|l| l.estimated_value_usd)
+            .sum()
+    }
+
+    pub fn assign_lead_score(&mut self, lead_id: &str, score: u32) -> bool {
+        if let Some(lead) = self.leads.get_mut(lead_id) {
+            lead.score = score;
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -346,6 +443,37 @@ impl SovereignOdooBitrixSuite {
             false
         }
     }
+
+    pub fn mark_invoice_paid(&mut self, invoice_id: &str) -> bool {
+        if let Some(inv) = self.invoices.get_mut(invoice_id) {
+            inv.is_paid = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn calculate_unpaid_invoices_total_cents(&self) -> u64 {
+        self.invoices
+            .values()
+            .filter(|inv| !inv.is_paid)
+            .map(|inv| inv.calculate_total_cents())
+            .sum()
+    }
+
+    pub fn calculate_employee_total_seconds(&self, emp_id: &str) -> u64 {
+        self.attendance_logs
+            .iter()
+            .filter(|l| l.employee_id == emp_id)
+            .map(|l| {
+                if let Some(out) = l.clock_out_sec {
+                    out.saturating_sub(l.clock_in_sec)
+                } else {
+                    0
+                }
+            })
+            .sum()
+    }
 }
 
 impl Default for SovereignOdooBitrixSuite {
@@ -371,14 +499,22 @@ mod tests {
         });
 
         let mut r1 = BTreeMap::new();
+        r1.insert("region".to_string(), "US".to_string());
         r1.insert("amount".to_string(), "1500.50".to_string());
         let mut r2 = BTreeMap::new();
+        r2.insert("region".to_string(), "EU".to_string());
         r2.insert("amount".to_string(), "2499.50".to_string());
 
         engine.ingest_record(r1);
         engine.ingest_record(r2);
 
         assert_eq!(engine.compute_metric_sum("amount"), 4000.0);
+        assert_eq!(engine.compute_metric_mean("amount"), 2000.0);
+
+        let grouped = engine.group_by_dimension("region", "amount");
+        assert_eq!(grouped.get("US"), Some(&1500.50));
+        assert_eq!(grouped.get("EU"), Some(&2499.50));
+
         assert!(engine
             .export_dashboard_summary()
             .contains("Sales Dashboard"));
@@ -396,10 +532,17 @@ mod tests {
             "Key points for slide 2",
         );
 
+        assert_eq!(slides.total_slides(), 2);
         slides.start_presentation();
         assert_eq!(slides.get_current_slide().unwrap().title, "Intro");
 
         slides.next_slide();
+        assert_eq!(slides.get_current_slide().unwrap().title, "Architecture");
+
+        slides.previous_slide();
+        assert_eq!(slides.get_current_slide().unwrap().title, "Intro");
+
+        slides.go_to_slide(2);
         assert_eq!(slides.get_current_slide().unwrap().title, "Architecture");
     }
 
@@ -413,9 +556,16 @@ mod tests {
             selection_length: 0,
         });
 
+        assert_eq!(docs.get_active_collaborators_count(), 1);
+        assert!(docs.insert_text_at_cursor("user-1", " Beautiful"));
+        assert_eq!(docs.content, "Hello Beautiful World");
+
         let sug_id = docs.propose_suggestion("Bob", "World", "SigmaOS");
         assert!(docs.accept_suggestion(&sug_id));
-        assert_eq!(docs.content, "Hello SigmaOS");
+        assert_eq!(docs.content, "Hello Beautiful SigmaOS");
+
+        let sug_id2 = docs.propose_suggestion("Charlie", "SigmaOS", "OS");
+        assert!(docs.reject_suggestion(&sug_id2));
     }
 
     #[test]
@@ -431,9 +581,14 @@ mod tests {
         });
 
         assert_eq!(crm.calculate_pipeline_forecast(), 5000.0);
+        assert_eq!(crm.get_leads_by_stage(LeadStage::Qualified).len(), 1);
+
+        crm.assign_lead_score("lead-101", 95);
+        assert_eq!(crm.leads.get("lead-101").unwrap().score, 95);
 
         crm.update_stage("lead-101", LeadStage::ClosedWon);
         assert_eq!(crm.calculate_pipeline_forecast(), 10000.0);
+        assert_eq!(crm.calculate_total_closed_won_revenue(), 10000.0);
     }
 
     #[test]
@@ -453,8 +608,13 @@ mod tests {
 
         let inv = suite.invoices.get("inv-001").unwrap();
         assert_eq!(inv.calculate_total_cents(), 10000);
+        assert_eq!(suite.calculate_unpaid_invoices_total_cents(), 10000);
+
+        assert!(suite.mark_invoice_paid("inv-001"));
+        assert_eq!(suite.calculate_unpaid_invoices_total_cents(), 0);
 
         suite.clock_in("emp-1", 1000);
         assert!(suite.clock_out("emp-1", 5000));
+        assert_eq!(suite.calculate_employee_total_seconds("emp-1"), 4000);
     }
 }
