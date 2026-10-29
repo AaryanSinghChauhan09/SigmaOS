@@ -56,6 +56,9 @@ pub use sovereign_virtualization_and_containers_v67_pr::*;
 pub mod sovereign_virtualization_and_containers_v68_pr;
 pub use sovereign_virtualization_and_containers_v68_pr::*;
 
+pub mod sovereign_virtualization_and_containers_v81_pr;
+pub use sovereign_virtualization_and_containers_v81_pr::*;
+
 pub mod sovereign_virtualization_and_containers_v74_pr;
 pub use sovereign_virtualization_and_containers_v74_pr::*;
 
