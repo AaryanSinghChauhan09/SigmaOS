@@ -972,6 +972,12 @@ pub use open_source_os_missing_components_v80_pr::*;
 
 pub mod open_source_os_missing_components_v81_pr;
 pub use open_source_os_missing_components_v81_pr::*;
+
+pub mod open_source_os_unimplemented_ideas_v82_pr;
+pub use open_source_os_unimplemented_ideas_v82_pr::*;
+
+pub mod omarchy_linux_missing_components_v82_pr;
+pub use omarchy_linux_missing_components_v82_pr::*;
 pub mod sovereign_independent_complete_os_engine;
 pub use sovereign_independent_complete_os_engine::*;
 pub mod sovereign_universal_linux_bsd_subsystem_interop_pr;
