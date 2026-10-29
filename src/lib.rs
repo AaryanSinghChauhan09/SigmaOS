@@ -199,6 +199,7 @@ pub use runtime::*;
 pub mod security;
 pub mod shell;
 pub use shell::sovereign_shell_repl_advancements_v82_pr::*;
+pub use shell::sovereign_shell_repl_advancements_v86_pr::*;
 pub mod sigpkg;
 pub use filesystem::{
     AutofsMountTrigger, EphemeralTmpfsMountGovernor, FscryptInodeRecord, FscryptPolicy,
@@ -720,6 +721,7 @@ pub use media::sovereign_audio_video_advancements_v80_pr::*;
 pub use media::sovereign_audio_video_advancements_v84_pr::*;
 pub use media::sovereign_audio_video_advancements_v86_pr::*;
 pub use media::sovereign_web_browser_advancements_v82_pr::*;
+pub use media::sovereign_web_browser_advancements_v86_pr::*;
 pub mod microphone;
 pub mod mm;
 pub mod monitor;
