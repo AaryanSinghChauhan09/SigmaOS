@@ -20,6 +20,9 @@ fn test_v82_pr_suite_execution_integration() {
         assert!(!p.patch_diff.is_empty());
         assert!(!p.pr_id.is_empty());
         assert!(!p.title.is_empty());
+        assert!(!p.component_name.is_empty());
+        assert!(!p.os_origin.is_empty());
+        assert!(!p.impacted_subsystems.is_empty());
     }
 
     let wiki_page = suite

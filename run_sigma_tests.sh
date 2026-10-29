@@ -2345,10 +2345,10 @@ fi
 if [ -f "src/distro/open_source_os_missing_components_v82_pr.rs" ]; then
     echo "Running Open Source OS Missing Components V82 PR Suite tests..."
     mkdir -p build
-    rustc --test src/distro/open_source_os_missing_components_v82_pr.rs --edition=2021 -o build/test_open_source_v82_pr
+    TMPDIR=$(pwd)/build rustc --test src/distro/open_source_os_missing_components_v82_pr.rs --edition=2021 -o build/test_open_source_v82_pr
     ./build/test_open_source_v82_pr
 
-    rustc --test tests/test_open_source_os_missing_components_v82_pr.rs --edition=2021 -o build/test_open_source_v82_pr_integration
+    TMPDIR=$(pwd)/build rustc --test tests/test_open_source_os_missing_components_v82_pr.rs --edition=2021 -L build/ -o build/test_open_source_v82_pr_integration
     ./build/test_open_source_v82_pr_integration
 fi
 
