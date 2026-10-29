@@ -1,93 +1,73 @@
 ## Summary
 
-<!-- What component does this PR improve or add? -->
+<!-- One paragraph: what component does this PR improve or add, and why? -->
 
-## Related issue
+## Component
 
-Closes #<issue-id>
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## Upstream study
 
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
-
-## What SigmaOS adopts
-
-<!-- State the design principle or mechanism adopted. -->
-
-## What SigmaOS changes or rejects
-
-<!-- State simplifications, deviations, and rejected ideas. -->
-
-## Shell component
-
-<!-- Shell component name, if applicable -->
-
-## Component impact
-
-- Component:
-- Maturity before:
-- Maturity after:
-- Runtime path affected:
-- Integration impact
-
-## IPC handler
-
-- IPC semantics
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-- Capability status
-
-## Shell component
-
-## Shell safety review
-
-## Shell component
-
-- Component: Shell
-- Maturity before: Experimental
-- Maturity after: Production
-- Runtime path affected: `/bin/sh`
-
-## IPC handler
-
-- IPC semantics: Synchronous / Asynchronous
-- Blocking behavior: Bounded queue backpressure
-- Non-blocking behavior: EAGAIN on full
-- EOF / closure behavior: Flush and teardown
+- Reference study:
+- What SigmaOS adopts:
+- What SigmaOS changes or rejects:
 
 ## Changes
 
-- [ ] Source implementation
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+-
+
+## Motivation
+
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+
+## Implementation notes
+
+<!-- Design decisions, data structures, locking, error handling. -->
+
+## Tests
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
 
 ## Verification
 
 ```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
-make check
-make test
-make format
 ```
 
-## Runtime evidence
+Paste relevant verification output below.
 
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
+## Capability status
+
+- Previous status:
+- New status:
+- Evidence:
+
+## Integration impact
+
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
 
 ## Shell safety review
 
@@ -95,27 +75,18 @@ make format
 
 ## Safety and rollback
 
+- [ ] Risks and rollback behavior defined
 - [ ] No broad credentials or host access introduced
 - [ ] Untrusted input is validated
 - [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review
-- [ ] Capability/namespace checks enforced
-
-## Security review
-
-- Capability/namespace checks enforced: Yes
-- Memory safety review: Completed
-
-## Shell safety review
-
-- Untrusted shell input sanitization and execution isolation verified
+- [ ] Security review completed, if applicable
 
 ## Reviewer checklist
 
 - [ ] Scope is narrow
-- [ ] Tests cover the change
-- [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported parity claims
+- [ ] Public API documented
+- [ ] `unsafe` justified with safety comments
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated in FEATURE_STATUS.toml
+- [ ] No unsupported compatibility claims

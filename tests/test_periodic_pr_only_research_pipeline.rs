@@ -116,6 +116,7 @@ fn test_github_templates_exist() {
         pr_template.contains("Reference study")
             || pr_template.contains("What SigmaOS adopts")
             || pr_template.contains("Reference behavior")
+            || pr_template.contains("Upstream study")
     );
     assert!(
         pr_template.contains("Risks and rollback") || pr_template.contains("Safety and rollback")
