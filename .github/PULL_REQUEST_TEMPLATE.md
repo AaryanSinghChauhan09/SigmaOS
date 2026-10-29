@@ -6,18 +6,46 @@
 
 ### Kernel component
 
-- [ ] Boot / arch init
-- [ ] Interrupts / traps
-- [ ] Memory / paging / swap
-- [ ] Scheduler / processes
-- [ ] VFS / filesystems
-- [ ] Syscalls / ELF
-- [ ] Drivers
-- [ ] Networking / sockets
-- [ ] IPC / signals / timers
-- [ ] Security / capabilities
+## Shell component
+
+- [ ] Lexer
+- [ ] Parser
+- [ ] Expansion
+- [ ] Executor
+- [ ] Pipelines
+- [ ] Redirection
+- [ ] Job control
+- [ ] Signals
+- [ ] Built-ins
+- [ ] Interactive line editor
+- [ ] Script runner
 - [ ] Diagnostics
-- [ ] Build / CI
+- [ ] Security / sandboxing
+- [ ] Documentation
+- [ ] CI / tooling
+
+## IPC handler & IPC semantics
+
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+- Integration impact:
+
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
+
+## Upstream study
 
 ### Shell component
 
@@ -44,6 +72,14 @@
 ## Shell safety review
 
 <!-- Specify shell safety review criteria. -->
+
+## Reference behavior
+
+- POSIX section:
+- Bash/dash/Zsh/BusyBox reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Component impact
 
@@ -107,7 +143,27 @@
 - [ ] Driver/hardware evidence, if driver-affecting
 - [ ] Security review requested, if applicable
 
-## Status updates
+## Shell safety review
+
+- [ ] Expansion order is correct
+- [ ] Quoting behavior is preserved
+- [ ] Redirection failures are handled
+- [ ] Exit codes are explicit
+- [ ] Signal behavior is defined
+- [ ] No unbounded recursion or allocation
+- [ ] Interactive terminal state is restored
+- [ ] Script mode does not execute invalid partial input
+
+## Safety and rollback
+
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
+- [ ] Capability/namespace checks enforced
+
+## Verification
 
 - [ ] Capability status updated in `FEATURE_STATUS.toml` / `CAPABILITY_MATRIX.toml`
 - [ ] Integration impact and component documentation updated
@@ -122,21 +178,13 @@
 - [ ] Hardware test log, if applicable
 - [ ] Artifact hash
 
-## Shell component
+## Status updates
 
-<!-- Details on shell or userland component improvements -->
-
-## Shell safety review
-
-<!-- Shell safety review details -->
-
-## Safety and rollback
-
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- [ ] Capability status
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Shell documentation
+- [ ] Boot matrix, if applicable
 
 ## Reviewer checklist
 
