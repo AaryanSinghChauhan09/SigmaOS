@@ -858,7 +858,7 @@ fi
 if [ -f "src/creative/voicecraft_artcraft_parity_pr.rs" ]; then
     echo "Running Sovereign VoiceCraft to ArtCraft Parity PR Gateway test suite..."
     mkdir -p build
-    rustc --test src/creative/voicecraft_artcraft_parity_pr.rs --edition=2021 -o build/test_voicecraft_artcraft_parity
+    rustc --test src/creative/voicecraft_artcraft_parity_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_voicecraft_artcraft_parity
     ./build/test_voicecraft_artcraft_parity
 fi
 
@@ -3208,6 +3208,15 @@ if [ -f "src/creative/artcraft_advancements_v75_pr.rs" ]; then
     echo "Running Sovereign Artcraft Advancements V75 PR test suite..."
     rustc --test src/creative/artcraft_advancements_v75_pr.rs --edition=2021 -o build/test_artcraft_v75_pr
     ./build/test_artcraft_v75_pr
+fi
+
+if [ -f "src/creative/artcraft_advancements_v80_pr.rs" ]; then
+    echo "Running Sovereign Artcraft Advancements V80 PR test suite..."
+    rustc --test src/creative/artcraft_advancements_v80_pr.rs --edition=2021 -o build/test_artcraft_v80_pr
+    ./build/test_artcraft_v80_pr
+
+    rustc --test tests/test_artcraft_advancements_v80_pr.rs --edition=2021 -o build/test_artcraft_v80_integration
+    ./build/test_artcraft_v80_integration
 fi
 
 if [ -f "src/creative/artcraft_advancements_pr.rs" ]; then
