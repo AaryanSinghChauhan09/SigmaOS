@@ -21,7 +21,7 @@ Closes #<issue-id>
 
 <!-- State simplifications, deviations, and rejected ideas. -->
 
-## Component impact
+## Shell component
 
 - Component:
 - Maturity before:
@@ -57,6 +57,8 @@ make format
 - [ ] Package dry-run report
 - [ ] Hardware test log, if applicable
 - [ ] Artifact hash
+
+## Shell safety review
 
 ## Safety and rollback
 
