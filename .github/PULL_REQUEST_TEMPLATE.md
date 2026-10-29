@@ -1,70 +1,124 @@
 ## Summary
 
-<!-- What component does this PR improve or add? -->
+<!-- What scheduler, kernel, shell, or subsystem behavior changed and why? -->
 
-## Related issue
+## Scheduler component
 
-Closes #<issue-id>
+- [ ] Scheduler core
+- [ ] Run queue / PID allocation
+- [ ] fork / clone
+- [ ] exec
+- [ ] Scheduler / run queue
+- [ ] Context switch
+- [ ] Signals
+- [ ] Wait / zombie / reaping
+- [ ] Process groups / sessions
+- [ ] Resource limits
+- [ ] Namespaces / isolation
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
+- [ ] Documentation
+- [ ] CI / tooling
 
-## Upstream study
+## Shell component
 
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
+- [ ] Parser / Lexer
+- [ ] Expansion / Splitting
+- [ ] Redirection / Pipes
+- [ ] Builtins / Environment
+- [ ] Interactive / Line editing
+- [ ] Diagnostics / Exit codes
 
-## What SigmaOS adopts
+## Subsystem component
 
-<!-- State the design principle or mechanism adopted. -->
+- [ ] Kernel lifecycle
+- [ ] IPC handler
+- [ ] Memory / VFS / Drivers
 
-## What SigmaOS changes or rejects
+## Recurring task
 
-<!-- State simplifications, deviations, and rejected ideas. -->
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly scheduler audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
 
-## Component impact
+## Reference behavior
 
-- Component:
-- Maturity before:
-- Maturity after:
-- Runtime path affected:
+<!-- Required for lifecycle, ABI, or scheduler changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
-- [ ] Source implementation
-- [ ] Unit tests
+-
+-
+
+## Scheduler safety review
+
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-reap prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
+
+## Shell safety review
+
+- [ ] Deterministic script execution
+- [ ] Safe expansion ordering
+- [ ] Quoting integrity maintained
+- [ ] Redirection safety enforced
+- [ ] Signal handling verified
+
+## IPC semantics and safety
+
+- [ ] IPC handler
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+- Capability/namespace checks enforced
+
+## Security review
+
+- [ ] Security review requested, if applicable
+- [ ] Capability/namespace checks enforced
+
+## Evidence / Verification
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
 - [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Scheduler benchmark, if performance-affecting
 
-## Verification
+## Status updates / Capability status
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-make check
-make test
-make format
-```
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Process documentation
+- [ ] Boot matrix, if applicable
+- Integration impact:
 
-## Runtime evidence
+## Risks and rollback
 
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
-
-## Safety and rollback
-
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- Risk:
+- Rollback:
 
 ## Reviewer checklist
 
