@@ -1758,6 +1758,11 @@ if (typeof window !== "undefined") {
   window.initOmniShellTerminal = initOmniShellTerminal;
   window.initFormInputEnterSubmit = initFormInputEnterSubmit;
   window.initFileManagerGrid = initFileManagerGrid;
+  window.neural = window.neural || {
+    setMindfulness: (enabled) => {
+      showToast(enabled ? "🧠 Neural Layout Engine enabled." : "🧠 Neural Layout Engine disabled.");
+    },
+  };
 }
 
 // Minimal dummy index file to export initialization and basic attributes
