@@ -659,6 +659,18 @@ if [ -f "src/creative/wordcraft_artcraft_missing_components_v68_pr.rs" ]; then
     ./build/test_wordcraft_v68
 fi
 
+if [ -f "src/creative/wordcraft_artcraft_missing_components_v69_pr.rs" ]; then
+    echo "Running Sovereign WordCraft & ArtCraft Missing Components Parity PR Gateway V69 test suite..."
+    TMPDIR=$(pwd)/build rustc --test src/creative/wordcraft_artcraft_missing_components_v69_pr.rs --edition=2021 -o build/test_wordcraft_v69
+    ./build/test_wordcraft_v69
+fi
+
+if [ -f "src/creative/wordcraft_artcraft_missing_components_v70_pr.rs" ]; then
+    echo "Running Sovereign WordCraft & ArtCraft Missing Components Parity PR Gateway V70 test suite..."
+    TMPDIR=$(pwd)/build rustc --test src/creative/wordcraft_artcraft_missing_components_v70_pr.rs --edition=2021 -o build/test_wordcraft_v70
+    ./build/test_wordcraft_v70
+fi
+
 if [ -f "src/creative/figcraft.rs" ]; then
     echo "Running Sovereign FigCraft UI/UX Vector Canvas PR test suite..."
     mkdir -p build
