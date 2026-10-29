@@ -46,7 +46,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference behavior
+## Shell component
 
 <!-- Required for lifecycle, ABI, or scheduler changes -->
 
@@ -117,8 +117,21 @@
 
 ## Risks and rollback
 
-- Risk:
-- Rollback:
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
+
+## Shell safety review
+
+## Safety and rollback
+
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
 
 ## Reviewer checklist
 
