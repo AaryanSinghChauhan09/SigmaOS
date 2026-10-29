@@ -96,6 +96,14 @@
 - Maturity after:
 - Runtime path affected:
 
+## Shell component
+
+- Component affected:
+
+## Shell safety review
+
+- Security review status:
+
 ## Changes
 
 -
