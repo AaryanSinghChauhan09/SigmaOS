@@ -83,23 +83,18 @@
 
 ## Component impact
 
-## Reference study
-
-<!-- Required for design-changing PRs -->
-
-- Study document:
-- Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject
-- Reason:
+- Component:
 
 ## Shell component
 
-- Shell component:
-- Grammar/conformance impact:
+<!-- Shell component affected if applicable -->
 
 ## Shell safety review
 
-- [ ] Shell safety principles verified
+<!-- Shell safety review details if applicable -->
+- Maturity before:
+- Maturity after:
+- Runtime path affected:
 
 ## Changes
 

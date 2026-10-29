@@ -180,6 +180,7 @@ pub use designcraft::{
     FontFamily, FontWeight, Grid, Guide, GuideOrientation, Layer, Style, StyleType, TextAlignment,
     TextElement,
 };
+pub use designcraft_artcraft_missing_components_v65_pr::*;
 pub use designcraft_artcraft_missing_components_v66_pr::*;
 pub use designcraft_artcraft_missing_components_v67_pr::*;
 pub use designcraft_artcraft_missing_components_v68_pr::*;
