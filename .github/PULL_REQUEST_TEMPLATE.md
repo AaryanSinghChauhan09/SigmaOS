@@ -24,6 +24,14 @@ Closes #<issue-id>
 ## Component impact
 
 - Component:
+
+## Shell component
+
+<!-- Shell component affected if applicable -->
+
+## Shell safety review
+
+<!-- Shell safety review details if applicable -->
 - Maturity before:
 - Maturity after:
 - Runtime path affected:
