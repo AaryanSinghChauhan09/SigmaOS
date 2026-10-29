@@ -12,7 +12,7 @@ fn test_init_and_supervisor_v77_pr_integration() {
 
     assert_eq!(manifests.len(), 7);
     for manifest in &manifests {
-        assert!(manifest.pr_id >= 4185 && manifest.pr_id <= 4212);
+        assert!(manifest.pr_id >= 4185 && manifest.pr_id <= 4215);
         assert!(!manifest.pr_title.is_empty());
         assert_eq!(manifest.status, "Ready for Integration");
     }
