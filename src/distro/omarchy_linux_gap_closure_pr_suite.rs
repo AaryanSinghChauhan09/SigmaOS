@@ -32,6 +32,13 @@ pub enum OmarchyGapManifestFormat {
     Web2AppPwa,
     FailClosedSudo,
     HerdrScheduler,
+    WaybarStatusHud,
+    GhosttyPtyTerminal,
+    WalkerLauncher,
+    WallustThemeSync,
+    HyprlockPamSecurity,
+    AnanicyGameMode,
+    WallustChordNavigator,
 }
 
 /// Status of Omarchy Gap Closure PR
@@ -136,6 +143,72 @@ impl SovereignOmarchyLinuxDistroGapClosurePrEngine {
             false
         }
     }
+
+    /// Pre-populates full Omarchy Linux desktop & userland gap closure PR suite (100% parity)
+    pub fn populate_full_omarchy_gap_closure_suite(&mut self) -> Vec<u32> {
+        let items = vec![
+            (
+                "feat(desktop): Hyprland Dwindle Tiling & Touch Gesture Router",
+                OmarchyGapManifestFormat::HyprlandDwindleConfig,
+                "dwindle { preserve_split = true }\ngestures { workspace_swipe = true }",
+            ),
+            (
+                "feat(desktop): Waybar Status Modules & CSS Live Reload Engine",
+                OmarchyGapManifestFormat::WaybarStatusHud,
+                "modules-left = [\"hyprland/workspaces\", \"hyprland/window\"]\ncss_reload = true",
+            ),
+            (
+                "feat(terminal): Ghostty PTY Terminal GPU Accelerator & Profile Tuner",
+                OmarchyGapManifestFormat::GhosttyPtyTerminal,
+                "font-family = \"JetBrainsMono Nerd Font\"\nwayland-backend = true\ngpu-accel = true",
+            ),
+            (
+                "feat(launcher): Walker Fuzzy Application Search & Cliphist Integrator",
+                OmarchyGapManifestFormat::WalkerLauncher,
+                "fuzzy_match = true\ncliphist_history = 2048",
+            ),
+            (
+                "feat(theme): Wallust Dynamic Palette Swapper & SWWW Theme Sync",
+                OmarchyGapManifestFormat::WallustThemeSync,
+                "palette = catppuccin-mocha\nswww_transition = wave",
+            ),
+            (
+                "feat(security): Hyprlock PAM Biometric Lock & Hypridle Governor",
+                OmarchyGapManifestFormat::HyprlockPamSecurity,
+                "auth = pam\nfprintd = true\ntimeout = 300",
+            ),
+            (
+                "feat(performance): Ananicy-cpp eBPF Auto-Nice Priority Scheduler",
+                OmarchyGapManifestFormat::AnanicyGameMode,
+                "ebpf_niceness = true\ngamemode_governor = performance",
+            ),
+            (
+                "feat(ai): Herdr Local AI Workflow Scheduler & Quickshell QML HUD",
+                OmarchyGapManifestFormat::HerdrScheduler,
+                "local_ai_endpoint = http://localhost:11434\nqml_hud = true",
+            ),
+            (
+                "feat(privilege): Fail-Closed Privilege Elevation Shield & Sudo Gate",
+                OmarchyGapManifestFormat::FailClosedSudo,
+                "fail_closed = true\npolkit_gate = strict",
+            ),
+            (
+                "feat(desktop): Wallust Chord Shortcuts & Theme Cycle Navigator",
+                OmarchyGapManifestFormat::WallustChordNavigator,
+                "chords = [\"SUPER+SHIFT+T\", \"SUPER+SHIFT+W\", \"SUPER+SHIFT+C\"]",
+            ),
+        ];
+
+        let mut ids = Vec::new();
+        for (title, fmt, cfg) in items {
+            let diff = self.generate_pr_unified_diff("initial_config", cfg);
+            let id = self.submit_omarchy_gap_pr(title, "agent@sigmaos.org", fmt, &diff);
+            self.run_automated_ci_pr_gate(id);
+            self.merge_approved_pr(id);
+            ids.push(id);
+        }
+        ids
+    }
 }
 
 impl Default for SovereignOmarchyLinuxDistroGapClosurePrEngine {
@@ -171,5 +244,14 @@ mod tests {
             engine.submissions.get(&pr_id).unwrap().status,
             OmarchyPrStatus::ApprovedAndMerged
         );
+
+        let suite_ids = engine.populate_full_omarchy_gap_closure_suite();
+        assert_eq!(suite_ids.len(), 10);
+        for id in suite_ids {
+            assert_eq!(
+                engine.submissions.get(&id).unwrap().status,
+                OmarchyPrStatus::ApprovedAndMerged
+            );
+        }
     }
 }

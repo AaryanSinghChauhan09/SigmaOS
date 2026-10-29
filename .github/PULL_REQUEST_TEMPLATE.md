@@ -28,6 +28,15 @@ Closes #<issue-id>
 - Maturity after:
 - Runtime path affected:
 
+## Shell component
+
+- Shell component:
+- Grammar/conformance impact:
+
+## Shell safety review
+
+- [ ] Shell safety principles verified
+
 ## Changes
 
 - [ ] Source implementation

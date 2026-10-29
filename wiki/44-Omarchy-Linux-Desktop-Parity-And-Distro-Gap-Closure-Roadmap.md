@@ -26,4 +26,4 @@ This Wiki roadmap documents the clean-room implementation strategy and PR propos
 - Implement `OmarchyHerdrAiSchedulerEngineV75` for local AI task orchestration and Quickshell overlays.
 
 ## Testing & Verification
-- All phases are verified via `tests/test_omarchy_linux_v75_pr.rs` and `./run_sigma_tests.sh`.
+- All phases are verified via `src/distro/omarchy_linux_gap_closure_pr_suite.rs` and `./run_sigma_tests.sh`.

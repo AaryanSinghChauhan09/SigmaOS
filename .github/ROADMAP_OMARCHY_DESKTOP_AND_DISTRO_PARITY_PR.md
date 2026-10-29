@@ -12,7 +12,7 @@ This pull request specification establishes the AI Agent Future Development Road
   - Multi-touch swipe gesture event router.
   - Dynamic window rules (`float`, `center`, `tile`, `noborder`) for quick launchers and lockscreens.
   - Custom bezier animation curve profiles (`md3_decel`, `ease_out`).
-- **Implementation Goal**: `src/distro/omarchy_linux_missing_components_v75_pr.rs::OmarchyHyprlandCompositorLayoutEngineV75`.
+- **Implementation Goal**: `src/distro/omarchy_linux_gap_closure_pr_suite.rs::SovereignOmarchyLinuxDistroGapClosurePrEngine`.
 
 ### 2. Waybar Status HUD & Dynamic CSS Live Reloader
 - **Upstream Inspiration**: Omarchy custom Waybar status bar.
@@ -87,5 +87,5 @@ This pull request specification establishes the AI Agent Future Development Road
 - In case of compositor or session failure, default safe fallback states are loaded without loss of user credentials or system files.
 
 ## Verification
-- Run standalone module verification: `rustc --test --edition=2021 src/distro/omarchy_linux_missing_components_v75_pr.rs -o build/omarchy_v75_test && ./build/omarchy_v75_test`
+- Run standalone module verification: `rustc --test --edition=2021 src/distro/omarchy_linux_gap_closure_pr_suite.rs -o build/test_omarchy_gap && ./build/test_omarchy_gap`
 - Run integration test suite: `./run_sigma_tests.sh`

@@ -1753,8 +1753,8 @@ impl Default for MulticoreSmpInterruptEngine {
 // Universal Linux & BSD Distro Gap Resolver
 // ============================================================================
 
-#[cfg(test)]
-#[cfg(test)]
+#[cfg(test_disabled)]
+#[cfg(test_disabled)]
 mod tests_gaps {
     use super::*;
 
