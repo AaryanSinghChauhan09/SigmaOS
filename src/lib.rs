@@ -844,6 +844,7 @@ pub use crate::distro::sovereign_open_source_os_apex_inspirations_v70::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use crate::graphics::sovereign_graphics_display_v72_pr::*;
 pub use crate::graphics::sovereign_graphics_display_v74_pr::*;
+pub use crate::graphics::sovereign_graphics_display_v82_pr::*;
 
 pub mod screen;
 pub mod software_manager;
