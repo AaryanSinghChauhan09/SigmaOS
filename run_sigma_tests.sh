@@ -18,6 +18,13 @@ if [ -f "tests/test_periodic_study_improve_prove.rs" ]; then
     ./build/test_periodic
 fi
 
+if [ -f "tests/test_sovereign_periodic_research_program.rs" ]; then
+    echo "Running Sovereign Periodic Research Governance Engine test suite..."
+    mkdir -p build
+    rustc --test tests/test_sovereign_periodic_research_program.rs --edition=2021 -o build/test_sovereign_periodic_research_program
+    ./build/test_sovereign_periodic_research_program
+fi
+
 if [ -f "tests/test_periodic_pr_component_rules.rs" ]; then
     echo "Running Periodic PR-Only Component-Rule Governance Engine test suite..."
     mkdir -p build

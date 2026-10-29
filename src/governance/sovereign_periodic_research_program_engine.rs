@@ -232,6 +232,16 @@ pub struct ProgramMetrics {
     pub avg_time_days_study_to_merge: u8,
 }
 
+/// Pull Request Manifest for Periodic Research Program Staging
+#[derive(Debug, Clone)]
+pub struct PeriodicResearchPrManifest {
+    pub pr_id: u32,
+    pub title: String,
+    pub branch: String,
+    pub status: String,
+    pub target_files: Vec<String>,
+}
+
 /// Sovereign Periodic Research Engine
 #[derive(Debug, Clone)]
 pub struct SovereignPeriodicResearchEngine {
@@ -395,6 +405,86 @@ impl SovereignPeriodicResearchEngine {
         self.adrs.iter().find(|a| a.id == id)
     }
 
+    pub fn generate_weekly_task_toml(&self, id: &str, title: &str, theme: &str, upstream: &[&str]) -> String {
+        let mut toml = String::new();
+        toml.push_str(&format!("id = \"{}\"\n", id));
+        toml.push_str(&format!("title = \"{}\"\n", title));
+        toml.push_str("cycle = \"weekly\"\n");
+        toml.push_str(&format!("theme = \"{}\"\n", theme));
+        toml.push_str("upstream = [");
+        for (i, u) in upstream.iter().enumerate() {
+            if i > 0 {
+                toml.push_str(", ");
+            }
+            toml.push_str(&format!("\"{}\"", u));
+        }
+        toml.push_str("]\n");
+        toml.push_str("deliverables = [\n");
+        let first_upstream = upstream.first().copied().unwrap_or("linux");
+        toml.push_str(&format!("  \"research/upstream/{}/topic.md\",\n", first_upstream));
+        toml.push_str("  \"research/decisions/ADR-xxx.md\",\n");
+        toml.push_str("  \"implementation PR\",\n");
+        toml.push_str("  \"test report\"\n");
+        toml.push_str("]\n\n");
+        toml.push_str("success = [\n");
+        toml.push_str("  \"design note explains upstream model\",\n");
+        toml.push_str("  \"SigmaOS adaptation is defined\",\n");
+        toml.push_str("  \"unit tests pass\",\n");
+        toml.push_str("  \"runtime path is identified\",\n");
+        toml.push_str("  \"capability status updated only with evidence\"\n");
+        toml.push_str("]\n");
+        toml
+    }
+
+    pub fn generate_monthly_task_toml(&self, id: &str, title: &str, priority: &str, owner: &str) -> String {
+        let mut toml = String::new();
+        toml.push_str(&format!("id = \"{}\"\n", id));
+        toml.push_str(&format!("title = \"{}\"\n", title));
+        toml.push_str("cycle = \"monthly\"\n");
+        toml.push_str(&format!("priority = \"{}\"\n", priority));
+        toml.push_str(&format!("owner = \"{}\"\n\n", owner));
+        toml.push_str("required_evidence = [\n");
+        toml.push_str("  \"reports/build/build-manifest.json\",\n");
+        toml.push_str("  \"reports/test/test-report.json\",\n");
+        toml.push_str("  \"reports/boot/qemu-x86_64.log\",\n");
+        toml.push_str("  \"reports/boot/boot-matrix.json\"\n");
+        toml.push_str("]\n\n");
+        toml.push_str("definition_of_done = [\n");
+        toml.push_str("  \"clean build succeeds\",\n");
+        toml.push_str("  \"unit and integration tests pass\",\n");
+        toml.push_str("  \"QEMU reaches shell\",\n");
+        toml.push_str("  \"smoke command succeeds\",\n");
+        toml.push_str("  \"no kernel panic\",\n");
+        toml.push_str("  \"rollback or recovery path documented\"\n");
+        toml.push_str("]\n");
+        toml
+    }
+
+    pub fn generate_adr_template(&self, adr_id: &str, title: &str, upstream_study: &str) -> String {
+        format!(
+            "# {}: {}\n\n## Status\nProposed\n\n## Upstream study\n{}\n\n## SigmaOS decision\nImplement minimal connected slice.\n\n## Validation\n- Unit tests\n- Integration tests\n- QEMU runtime trace\n",
+            adr_id, title, upstream_study
+        )
+    }
+
+    pub fn generate_pr_proposal_manifest(&self) -> PeriodicResearchPrManifest {
+        PeriodicResearchPrManifest {
+            pr_id: 4221,
+            title: "governance: enforce periodic research and implementation program".into(),
+            branch: "feat/governance-periodic-research-program".into(),
+            status: "Ready for Integration".into(),
+            target_files: vec![
+                "PR_PROPOSAL_PERIODIC_RESEARCH_AND_IMPLEMENTATION_PROGRAM.md".into(),
+                "docs/PR_PROPOSAL_PERIODIC_RESEARCH_AND_IMPLEMENTATION_PROGRAM.md".into(),
+                "docs/roadmap/PR_SPEC_PERIODIC_RESEARCH_AND_IMPLEMENTATION_PROGRAM.md".into(),
+                ".agents/runbooks/weekly-study.md".into(),
+                ".agents/runbooks/monthly-capability.md".into(),
+                "src/governance/sovereign_periodic_research_program_engine.rs".into(),
+                "tests/test_sovereign_periodic_research_program.rs".into(),
+            ],
+        }
+    }
+
     pub fn generate_summary_report(&self) -> String {
         let mut report = String::from("# Sovereign Periodic Research Program Status\n\n");
         report.push_str("## Program Metrics\n");
@@ -473,5 +563,25 @@ mod tests {
             WeeklyStudyStage::Day1SelectMechanism.description(),
             "Day 1: Select one narrowly bounded OS mechanism"
         );
+    }
+
+    #[test]
+    fn test_generators() {
+        let engine = SovereignPeriodicResearchEngine::new();
+        let weekly_toml = engine.generate_weekly_task_toml("STUDY-2026-W42", "Study Linux VFS", "filesystem", &["linux", "xv6"]);
+        assert!(weekly_toml.contains("STUDY-2026-W42"));
+        assert!(weekly_toml.contains("filesystem"));
+
+        let monthly_toml = engine.generate_monthly_task_toml("CAP-2026-M10", "Deliver QEMU boot", "P0", "boot-agent");
+        assert!(monthly_toml.contains("CAP-2026-M10"));
+        assert!(monthly_toml.contains("P0"));
+
+        let adr_tmpl = engine.generate_adr_template("ADR-007", "Minimal scheduler model", "xv6 and Linux");
+        assert!(adr_tmpl.contains("ADR-007"));
+        assert!(adr_tmpl.contains("Minimal scheduler model"));
+
+        let manifest = engine.generate_pr_proposal_manifest();
+        assert_eq!(manifest.pr_id, 4221);
+        assert_eq!(manifest.status, "Ready for Integration");
     }
 }

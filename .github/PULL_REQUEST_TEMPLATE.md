@@ -21,6 +21,14 @@ Closes #<issue-id>
 
 <!-- State simplifications, deviations, and rejected ideas. -->
 
+## Shell component
+
+<!-- Specify if this affects shell or userland components. -->
+
+## Shell safety review
+
+<!-- Specify shell safety review criteria. -->
+
 ## Component impact
 
 - Component:
