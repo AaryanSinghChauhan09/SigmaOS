@@ -2907,6 +2907,18 @@ if [ -f "tests/process/test_process_synchronization_plan.rs" ]; then
     rustc --test tests/process/test_process_synchronization_plan.rs --edition=2021 -o build/test_proc_sync && ./build/test_proc_sync
 fi
 
+if [ -f "tests/test_ipc_handler_plan.rs" ]; then
+    echo "Running IPC Handler Subsystem & Plan Verification test suite..."
+    mkdir -p build
+    rustc --test tests/test_ipc_handler_plan.rs --edition=2021 -o build/test_ipc_plan && ./build/test_ipc_plan
+fi
+
+if [ -f "src/ipc/ipc.rs" ]; then
+    echo "Running Canonical IPC Objects test suite..."
+    mkdir -p build
+    rustc --test src/ipc/ipc.rs --edition=2021 -o build/test_ipc && ./build/test_ipc
+fi
+
 if [ -f "tests/dispatch/test_dispatcher_plan.rs" ]; then
     echo "Running Dispatcher Plan test suite..."
     mkdir -p build
