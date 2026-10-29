@@ -1,0 +1,29 @@
+id = "BUILD-SENTINEL-001"
+title = "Execute clean builds and test suite verification"
+agent = "sentinel"
+priority = "P0"
+scope = ["src/", "tests/", "tools/", "Makefile", "run_sigma_tests.sh"]
+repeat = "daily"
+
+steps = [
+  "cargo check --lib",
+  "cargo test --lib",
+  "./run_sigma_tests.sh",
+  "make check",
+  "make test",
+  "write test summary report"
+]
+
+evidence = [
+  "reports/build/latest.json",
+  "reports/test/summary.json"
+]
+
+success = [
+  "cargo check --lib exits 0",
+  "cargo test --lib exits 0",
+  "run_sigma_tests.sh exits 0",
+  "all test manifests recorded"
+]
+
+on_failure = "open repair task or classify flaky test"

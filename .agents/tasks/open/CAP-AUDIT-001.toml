@@ -1,0 +1,27 @@
+id = "CAP-AUDIT-001"
+title = "Audit capability matrix claims against test evidence"
+agent = "capability-auditor"
+priority = "P1"
+scope = ["CAPABILITY_MATRIX.toml", "FEATURE_STATUS.toml", "README.md"]
+repeat = "weekly"
+
+steps = [
+  "read CAPABILITY_MATRIX.toml and FEATURE_STATUS.toml",
+  "verify status claims against test results and boot logs",
+  "flag claims lacking runtime evidence",
+  "generate truth table report",
+  "update verified today dashboard"
+]
+
+evidence = [
+  "reports/capability/truth_table.json",
+  "reports/capability/verified_today.md"
+]
+
+success = [
+  "all claims cross-referenced with passing tests",
+  "unverified claims flagged or moved to model-only / integration-pending",
+  "truth table updated"
+]
+
+on_failure = "create blocked issue for unverified claims"

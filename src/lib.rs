@@ -757,6 +757,7 @@ pub use crate::distro::arch_linux_missing_components_v71_pr::*;
 pub use crate::distro::arch_linux_missing_components_v73_pr::*;
 pub use crate::distro::arch_linux_missing_components_v74_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
+pub use crate::distro::repeatable_agent_operating_loop_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v68_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v69_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v71_pr::*;
