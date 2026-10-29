@@ -16,7 +16,7 @@ fn test_package_advancements_v86_full_cycle() {
     assert_eq!(inspector.total_formats_supported, 260);
 
     let manifest = inspector
-        .inspect_package("ripgrep-14.1.1-amd64.deb", b"!<arch>\ndebian-binary\n")
+        .inspect_package("ripgrep-14.1.0-amd64.deb", b"!<arch>\ndebian-binary\n")
         .clone();
     assert_eq!(manifest.name, "ripgrep");
     assert_eq!(manifest.detected_format, PackageFormat::Deb);
@@ -33,7 +33,7 @@ fn test_package_advancements_v86_full_cycle() {
     let manifest_lzm = inspector.inspect_package("slax.lzm", b"squashfs_lzm");
     assert_eq!(manifest_lzm.detected_format, PackageFormat::Lzm);
 
-    // 2. OOP Design Patterns V86
+    // 2. OOP Design Patterns V86 (Decorator, Observer, Command with Undo, Memento)
     let mut facade = SovereignPackageFacadeV86::new();
     let fac_res = facade
         .quick_install("curl.apk", &[0x50, 0x4b, 0x03, 0x04])
@@ -42,7 +42,7 @@ fn test_package_advancements_v86_full_cycle() {
 
     // 3. Upstream Distro Delta Pre-Absorption Engine V86
     let delta_engine = UpstreamDistroDeltaPreAbsorptionEngineV86::new();
-    assert!(delta_engine.total_deltas_absorbed() >= 3);
+    assert!(delta_engine.total_deltas_absorbed() >= 4);
 
     // 4. SAT Dependency Resolution V86
     let solver = SatDpllDependencySolverV86::new();
@@ -56,7 +56,7 @@ fn test_package_advancements_v86_full_cycle() {
     let sandbox_gov = UniversalMultiSandboxGovernorV86::new();
     let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);
     assert!(rules.pledge_promises.contains("inet"));
-    assert_eq!(rules.landlock_abi_version, 7);
+    assert_eq!(rules.landlock_abi_version, 6);
 
     // 6. CAS Delta Store V86
     let mut cas_store = UniversalCasDeltaStoreGovernorV86::new();

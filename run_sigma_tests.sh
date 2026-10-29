@@ -1549,25 +1549,25 @@ if [ -f "tests/test_package_advancements_v85.rs" ]; then
     ./build/test_package_advancements_v85
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v87.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V87 test suite..."
+if [ -f "src/package/sovereign_distro_package_advancements_v86.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V86 test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v87.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v87_test
-    ./build/sovereign_advancements_v87_test
+    rustc --test src/package/sovereign_distro_package_advancements_v86.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v86_test
+    ./build/sovereign_advancements_v86_test
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v87_pr.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V87 PR test suite..."
+if [ -f "src/package/sovereign_distro_package_advancements_v86_pr.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V86 PR test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v87_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v87_pr_test
-    ./build/sovereign_advancements_v87_pr_test
+    rustc --test src/package/sovereign_distro_package_advancements_v86_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v86_pr_test
+    ./build/sovereign_advancements_v86_pr_test
 fi
 
-if [ -f "tests/test_package_advancements_v87.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V87 Integration test suite..."
+if [ -f "tests/test_package_advancements_v86.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V86 Integration test suite..."
     mkdir -p build
-    rustc --test tests/test_package_advancements_v87.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v87
-    ./build/test_package_advancements_v87
+    rustc --test tests/test_package_advancements_v86.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v86
+    ./build/test_package_advancements_v86
 fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
