@@ -2,80 +2,112 @@
 
 <!-- What changed and why? -->
 
-## Component
+## Subsystem / Component
 
-- [ ] IPC handler
-- [ ] Pipes / FIFOs
-- [ ] UNIX-domain sockets
-- [ ] Shared memory
-- [ ] Message queues
-- [ ] Event wakeups
-- [ ] Signals
-- [ ] Process/thread management
-- [ ] VFS
-- [ ] Security
-- [ ] Documentation
-- [ ] CI / tooling
+### Kernel component
+
+- [ ] Boot / arch init
+- [ ] Interrupts / traps
+- [ ] Memory / paging / swap
+- [ ] Scheduler / processes
+- [ ] VFS / filesystems
+- [ ] Syscalls / ELF
+- [ ] Drivers
+- [ ] Networking / sockets
+- [ ] IPC / signals / timers
+- [ ] Security / capabilities
+- [ ] Diagnostics
+- [ ] Build / CI
+
+### Shell component
+
+- [ ] Lexer / Parser
+- [ ] Expansion & Globbing
+- [ ] Pipelines & Redirection
+- [ ] Built-ins & Exit Codes
+- [ ] Interactive & Prompt
+- [ ] Diagnostics & Errors
+
+### IPC handler & IPC semantics
+
+- [ ] Message Queues / Buffers
+- [ ] Blocking behavior: timeout / wait
+- [ ] Non-blocking behavior: EAGAIN / EWOULDBLOCK
+- [ ] EOF / closure behavior: single close / teardown
+
+## Recurring task
+
+- [ ] PR-level validation
+- [ ] Daily CI triage
+- [ ] Weekly subsystem review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly syscall/ABI review
+- [ ] Biweekly memory/concurrency audit
+- [ ] Monthly boot validation
+- [ ] Monthly driver/hardware audit
+- [ ] Monthly fuzz triage
+- [ ] Monthly diagnostics rehearsal
+- [ ] Quarterly release/architecture/security review
+
+## Reference study
+
+<!-- Required for design-changing PRs -->
+
+- Study document:
+- Linux/BSD/Redox/xv6 reference:
+- Decision: Adopt / Adapt / Reject
+- Reason:
 
 ## Changes
 
 -
+-
 
-## Motivation
+## Safety review
 
-<!-- Link issue, roadmap item, or gap-analysis entry. -->
+### Kernel safety review
 
-## IPC semantics
+- [ ] No unnecessary `unsafe`
+- [ ] Every `unsafe` block documents invariants
+- [ ] Lock ordering documented
+- [ ] Interrupt-context safety considered
+- [ ] Allocation limits defined
+- [ ] OOM behavior defined
+- [ ] Error paths tested
+- [ ] No silent failure introduced
 
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-- Error behavior:
-- Permission model:
-- Resource limits:
-- Backpressure policy:
+### Shell safety review
 
-## Security review
+- [ ] Quote integrity preserved
+- [ ] Safe expansion order enforced
+- [ ] Redirection and signal safety verified
 
-- [ ] User input validated
-- [ ] Descriptor lifecycle checked
+### Security review
+
 - [ ] Capability/namespace checks enforced
-- [ ] No unbounded kernel allocation
-- [ ] `unsafe` justified with SAFETY comments
-- [ ] Threat model updated
-
-## Tests
-
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] Concurrency/stress tests
-- [ ] Timeout tests
-- [ ] Fuzz tests
-- [ ] Resource-exhaustion tests
-- [ ] Regression test for fixed bug
+- [ ] Untrusted input validated
 
 ## Status updates
 
-```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or reason for exemption
+- [ ] QEMU boot evidence, if boot-affecting
+- [ ] Driver/hardware evidence, if driver-affecting
+- [ ] Security review requested, if applicable
 
-Paste output below.
+## Status updates
 
-## Capability status
+- [ ] Capability status updated in `FEATURE_STATUS.toml` / `CAPABILITY_MATRIX.toml`
+- [ ] Integration impact and component documentation updated
+- [ ] Boot matrix, if applicable
+- [ ] Hardware matrix, if applicable
 
-- Previous status:
-- New status:
-- Evidence:
+## Risks and rollback
 
-## Integration impact
-
-- [ ] Unit-tested only
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
+- Risk:
+- Rollback:
