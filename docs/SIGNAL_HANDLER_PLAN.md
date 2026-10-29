@@ -15,34 +15,14 @@ Implementing `sigaction()` alone does not deliver a handler. POSIX.1-2024 specif
 
 ## Required Semantics and Safety Rules
 
-1. **Default to `sigaction` Semantics:**
-   - Make `signal()` a libc compatibility wrapper over `sigaction()`. POSIX recommends `sigaction()` for explicit control of handler behavior (`SA_RESTART`, `SA_NODEFER`, `SA_RESETHAND`, `SA_SIGINFO`).
-
-2. **Distinguish Process- and Thread-Directed Signals:**
-   - Store process dispositions and process-pending signals separately from each thread's blocked signal mask and thread-pending queue. Select an eligible thread only at a safe delivery point.
-
-3. **Protect Handler Execution State:**
-   - On delivery, save the interrupted CPU registers, signal mask, and alternate-stack state in a validated user stack frame (`UserSignalFrame`). Redirect Ring 3 execution to the handler, setting the return address to a kernel-provided or libc signal trampoline.
-   - Restore execution state exclusively through a validated `sys_sigreturn` path.
-
-4. **Enforce Uncatchable Signals in Kernel:**
-   - `SIGKILL` (signal 9) and `SIGSTOP` (signal 19) must not be caught, ignored, or blocked under any circumstances. Kernel checks must reject attempts to modify their disposition or mask.
-
-5. **Respect Masks and Nesting:**
-   - Block the delivered signal during handler execution unless `SA_NODEFER` is set.
-   - Add `sa_mask` signals to the thread mask while the handler runs.
-   - Automatically restore the previous mask on normal return through `sigreturn`.
-   - If `SA_RESETHAND` is set, reset disposition to `SIG_DFL` upon delivery.
-
-6. **Define Syscall Interruption Behavior:**
-   - For every blocking system call (`read`, `write`, `waitpid`, `nanosleep`), specify whether a signal causes partial success, `EINTR`, or automatic syscall restart under `SA_RESTART`.
-
-7. **Minimal and Auditable Handler-Path Behavior:**
-   - Kernel delivery and return paths must not allocate without bounds, sleep in invalid contexts, or trust handler-modified privileged state (e.g., CPU privilege flags or kernel CR3).
-   - User handlers must observe async-signal-safety rules; standard library routines like `printf()` or heap allocators are unsafe inside signal handlers.
-
-8. **No False Status Claims:**
-   - A signal frame model or unit test is Prototype-level evidence, not an Integrated signal handler. Status transitions require real Ring 3 execution and validated return paths on specified targets.
+1. **Default to `sigaction` Semantics:** `signal()` is implemented strictly as a libc compatibility wrapper over `sigaction()`. POSIX.1-2024 recommends `sigaction()` for explicit control over signal masks, flags, and disposition parameters.
+2. **Distinguish Process- and Thread-Directed Signals:** Process dispositions (`sigaction` tables) are stored per-process, while blocked signal masks (`sigprocmask`) and pending signal sets are maintained per-thread. Process-directed signals (e.g., `kill(pid, sig)`) are delivered to any eligible thread whose mask does not block the signal at a safe delivery point; thread-directed signals (e.g., `pthread_kill(tid, sig)` or synchronous CPU exceptions like `SIGSEGV`/`SIGFPE`) are queued in the target thread's pending set and delivered specifically to that thread.
+3. **Protect Handler Execution State:** On signal delivery, the kernel constructs an x86_64 user signal frame containing interrupted CPU registers, instruction pointer (`rip`), stack pointer (`rsp`), saved signal mask, and alternate stack state. Control returns to the kernel strictly through a validated signal-return trampoline (`sigreturn`), which verifies canonical addresses and frame integrity before restoring execution context.
+4. **Enforce Uncatchable Signals in Kernel:** `SIGKILL` (signal 9) and `SIGSTOP` (signal 19) cannot be caught, ignored, or blocked under any circumstances. The kernel rejects attempts to modify their dispositions or include them in blocked signal masks (`sigprocmask` / `pthread_sigmask`).
+5. **Respect Masks and Nesting:** The delivered signal is automatically added to the thread's signal mask during handler execution unless `SA_NODEFER` is set. Additional signals specified in `sa_mask` are also blocked. The saved mask is restored upon return via `sigreturn`.
+6. **Define Syscall Interruption Behavior:** Blocking system calls interrupted by a signal return `EINTR` or restart automatically if `SA_RESTART` is specified in `sa_flags`. The interruption contract is defined per syscall.
+7. **Minimal and Auditable Handler Path:** The kernel signal delivery and return paths operate without dynamic memory allocations, never sleep in invalid contexts, and never trust handler-modified privileged CPU flags or addresses. User handlers must obey async-signal-safety requirements.
+8. **Truth in Status Claims:** No feature is marked "Integrated" or "Supported" based solely on unit tests, struct definitions, or synthetic models. Integration requires real Ring 3 execution, handler entry, trampoline execution, and safe context restoration.
 
 ---
 

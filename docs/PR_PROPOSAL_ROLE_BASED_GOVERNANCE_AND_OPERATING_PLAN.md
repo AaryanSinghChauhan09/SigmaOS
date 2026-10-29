@@ -1,141 +1,164 @@
-# [PR Proposal] Role-Based Governance, Strategic Roadmap, & Recurring AI-Agent Maintenance Plan for SigmaOS
+# PR Proposal: Role-Based Governance, Strategic Wedge & Recurring AI-Agent Operating Plan
 
-## Summary & Overview
-This Pull Request Proposal establishes SigmaOS's comprehensive Role-Based Operating Model, Strategic Focus & Wedge Prioritization Framework, 4-Phase Roadmap, 8-Step Execution Guide, and Recurring AI-Agent Maintenance Plan with 7 Governance Guardrails.
+- **PR Title**: `feat(governance): Role-Based Operating Plan & Strategic Execution Model`
+- **PR Branch**: `feature/role-based-governance-operating-plan`
+- **Status**: Approved / Specification Ready
 
-Grounded in an honest reality check of open-source OS ecosystems, this PR codifies how SigmaOS wins by owning a focused, high-value wedge rather than attempting unrealistic parity across all legacy operating systems. It defines explicit, evidence-linked criteria for feature completion, automated QEMU CI verification gates, a 12-role human/AI maintenance structure, and a weekly operational cadence.
+## Executive Summary
 
----
+SigmaOS requires a grounded, evidence-backed strategy and a structured role-based operating model for human and AI-agent maintainers. Rather than attempting unachievable broad feature dominance over long-standing operating systems, SigmaOS focuses on winning specific key wedges: a memory-safe Rust kernel/userland, default atomic updates with rollback, capability-based security defaults, and automated, agent-driven maintainability with strong verification gates.
 
-## Reality Check & Strategic Rationale
-
-- **Focus Over Universal Parity:** "Defeating every open-source OS in every aspect" is impossible. Linux has tens of thousands of maintainers and decades of hardware support; FreeBSD and OpenBSD possess deep architectural specialties. SigmaOS wins by provably excelling in a focused wedge.
-- **Evidence-Gated Completion:** Synthetic benchmark claims (1.8s boot, 164 MB idle RAM) and mock-validated unit tests do not constitute working features. A feature is only marked "100% complete" when backed by linked CI logs proving runtime execution in QEMU or on bare metal.
-- **Sprawl Reduction:** Overlapping status reports and duplicated encyclopedia entries add maintenance overhead without OS improvements. Consolidation into single sources of truth is mandatory.
+This proposal establishes the phased roadmap, 8-step execution guide, 12-role AI-agent maintenance model, weekly operational calendar, and 7 governance guardrails.
 
 ---
 
-## Part 1: Learning from Reference OS Ecosystems & The Wedge
+## Reality Check & Strategic Direction
 
-### SigmaOS Core Wedge Target
-1. **Memory-Safe Kernel & Userland:** Pure Rust operating system foundation (a unique differentiator among major distributions).
-2. **Atomic Updates & Rollback by Default:** Generation-based, crash-consistent, image- or package-based atomic updates inspired by NixOS and Silverblue.
-3. **Capability-Based Security Default:** Granular principle of least privilege (`pledge`/`unveil`, Capsicum, Landlock, W^X, KARL).
-4. **AI-Agent Safe Maintenance:** Machine-readable status interfaces (`FEATURE_STATUS.toml`, `CAPABILITY_MATRIX.toml`), least-privilege scoping, and strict test gates.
+1. **Focused Wedges Over Broad Dominance**: Competing across every hardware and software domain against mature operating systems with decades of development is unachievable. SigmaOS wins by provably dominating targeted wedge areas.
+2. **Evidence Over Claims**: Features count as complete or working only when backed by linked CI artifacts and serial boot logs from QEMU or real hardware.
+3. **Consolidation of Artifact Sprawl**: Duplicate reports, redundant parity documentation, and synthetic benchmark claims are consolidated into single sources of truth.
 
-### Reference OS Study Matrix
+---
 
-| Subsystem Area | Reference Systems | Takeaway / Focus |
+## Strategic Wedge & Reference OS Study Areas
+
+### Target Wedges
+1. **Memory-Safe Architecture**: Pure Rust kernel and userland with minimal unsafe boundaries.
+2. **Atomic Rollback Updates**: Generation-based image updates and instant rollback (NixOS/Silverblue paradigm).
+3. **Capability-Based Security**: Default-deny sandboxing combining OpenBSD `pledge`/`unveil`, FreeBSD Capsicum, and Linux Landlock principles.
+4. **Agent-Maintainable System**: Machine-readable status feeds (`FEATURE_STATUS.toml`), automated regression ratchets, and strict CI gates.
+
+### Reference OS Study Areas
+
+| Area | Reference Projects | Key Design Takeaways |
 |---|---|---|
-| Kernel Structure & Drivers | Linux (`kernel/`, `drivers/`), FreeBSD, NetBSD | Driver model, DeviceTree parsing, boot flow |
-| Security & Hardening | OpenBSD (`pledge`, `unveil`, W^X, KARL), FreeBSD Capsicum | Minimal privilege defaults, mitigations |
-| Rust in Kernel Space | Redox OS, Linux `rust/`, Theseus, Asterinas | Unsafe boundaries, driver interfaces, ABI |
-| Updates & Rollback | NixOS, Fedora Silverblue/bootc, FreeBSD Boot Environments, openSUSE Snapper | Atomic generations, A/B updates |
-| Packaging & Distribution | Arch (pacman, AUR), Alpine (apk), Void (xbps), Nix | Fast dependency resolver, reproducible builds, PQC signatures |
-| Init & Supervision | systemd, runit, s6, OpenRC | Dependency graph, fast boot, service supervision |
-| Desktop & Graphics | Wayland compositors (wlroots, Sway, Hyprland), GNOME, KDE | Protocol coverage, input latency, accessibility |
-| Installer & First-Run UX | Debian Installer, Calamares, Anaconda, Linux Mint | Hardware detection, first-run wizard |
-| Quality & Verification | Linux (syzkaller, KUnit, kselftest, LTP), OpenBSD review culture | Fuzzing pipelines, regression suites, reproducible builds |
-
-### Rules for Borrowing & Licensing
-- Study architectural designs and read code, but **do not copy GPL code** into non-GPL components. BSD, MIT, and Apache code may be reused with proper attribution.
-- Write a one-page design note for every competitor feature explaining what it does, why it works, and the simplest version for SigmaOS.
-- Maintain a single consolidated gap file with testable acceptance criteria rather than redundant parity documents.
+| **Kernel & Drivers** | Linux (`kernel/`, `drivers/`), FreeBSD, NetBSD | Driver models, device trees, unified boot flows |
+| **Security** | OpenBSD (`pledge`, `unveil`, W^X, KARL), FreeBSD Capsicum | Minimal privilege defaults, runtime mitigations |
+| **Rust in Kernels** | Redox OS, Linux `rust/`, Theseus, Asterinas | Safe/unsafe boundaries, driver shims, C ABI compatibility |
+| **Updates & Rollback** | NixOS, Fedora Silverblue/bootc, FreeBSD boot environments | Atomic generations, A/B root partition swapping |
+| **Packaging** | Arch (`pacman`, `AUR`), Alpine (`apk`), Void (`xbps`), Nix | Fast dependency resolvers, reproducible builds, PQC signing |
+| **Init & Services** | systemd, runit, s6, OpenRC | Dependency graph resolution, fast boot, service supervision |
+| **Desktop** | Wayland compositors (`wlroots`, Sway, Hyprland), GNOME, KDE | Modern protocols, low input latency, WCAG accessibility |
+| **Installer & UX** | Debian installer, Calamares, Fedora Anaconda, Linux Mint | Hardware discovery, first-run OOBE wizard |
+| **Quality Process** | Linux (`syzkaller`, `KUnit`, `kselftest`), OpenBSD review culture | Continuous fuzzing, regression test ratchets, reproducible builds |
 
 ---
 
 ## Phased Roadmap
 
 ### Phase 0: Ground Truth (Weeks 1–4)
-- **CI QEMU Boot Gates:** Implement automated CI workflows booting the kernel in QEMU across `x86_64`, `AArch64`, and `RISC-V`, asserting on serial console output.
-- **Evidence-Linked Status:** Require all entries in `FEATURE_STATUS.toml` to link to verifiable CI execution logs.
-- **Doc Consolidation:** Merge duplicate reports and mirrored docs into a unified source of truth.
+- Automated QEMU boot CI on `x86_64`, `AArch64`, and `RISC-V` asserting on serial log output.
+- Evidence-linked status in `FEATURE_STATUS.toml` backed by test artifacts.
+- Consolidation of duplicate documentation and parity reports into canonical guides.
 
 ### Phase 1: Real Hardware Boot (Months 1–3)
-- **Address Core Gaps:** User-mode transition (MSRs/paging setup), MMIO mapping for NVMe/AHCI, interrupt-driven VirtIO NIC, ACPI AML interpreter, and SLIT parsing.
-- **Dynamic Loader & Linux ABI:** Implement dynamic ELF loader and high-fidelity Linux syscall compatibility.
-- **Hardware Compatibility List:** Test on 3–5 real bare-metal reference machines and publish a public HCL.
+- Address kernel gaps: user-mode transitions (MSRs/page table flags), NVMe/AHCI MMIO mapping, interrupt-driven VirtIO networking, ACPI AML interpreter, and SLIT parsing.
+- Dynamic ELF loader for Linux ABI compatibility.
+- Hardware validation across 3–5 real target machines with a public compatibility list.
 
 ### Phase 2: Usability & Dogfooding (Months 3–6)
-- **Core Desktop & Graphics:** DRM/KMS GPU display path, persistent filesystem with crash-consistency guarantees, working disk installer, and PQC-signed package repositories.
-- **Daily Dogfooding:** Run SigmaOS on developer VMs and reference laptop hardware daily.
+- DRM/KMS GPU display path, persistent crash-consistent filesystem, signed package repositories, and bootable installer.
+- Daily dogfooding on target developer VMs and laptops.
 
-### Phase 3: Win the Wedge (Months 6–12)
-- **Comparative Benchmarks:** Publish monthly comparative benchmarks against Debian, Arch, Alpine, FreeBSD, and OpenBSD (boot time, idle RAM, syscall latency, rollback time, attack surface).
-- **Fuzzing & Security Audits:** Run continuous kernel fuzzing (`syzkaller`/`fuzz/`), maintain reproducible build targets, and conduct third-party security audits.
+### Phase 3: Winning the Wedge (Months 6–12)
+- Comparative public benchmarks against Debian, Arch, Alpine, FreeBSD, and OpenBSD.
+- Continuous kernel/syscall fuzzing pipeline tracking crash minimization.
+- Reproducible build verification and external security audits.
 
-### Public Scoreboard Metrics (Published Monthly)
-- QEMU & Bare-Metal Boot Time (s)
-- Idle RAM Memory Footprint (MB)
-- Supported Real-Hardware Devices (HCL Count)
-- Fuzzing Hours Without Kernel Panic
-- Open Vulnerabilities / CVE Fix Time (Hours)
-- System Update & Rollback Execution Time (s)
-- Reproducible Build Percentage (%)
-- Verified Package Ecosystem Count
-
----
-
-## Part 2: Recurring AI-Agent Maintenance Plan & Role Definitions
-
-### 12 Maintenance Roles
-
-| Role | Mission & Primary Scope | Cadence | Leadership Profile |
-|---|---|---|---|
-| **Maintainer** | Owns subsystem health, code review, backlog grooming, and merge approval | Daily / Weekly | Human-Led, Agent-Assisted |
-| **Updater** | Scans and updates dependencies, Rust toolchain, and upstream advisories | Daily / Weekly | Mostly Agent |
-| **Reviewer** | Audits all incoming changes for correctness, safety, tests, and style | Per PR | Agent First Pass, Human Approval |
-| **Consolidator** | Fights sprawl by removing dead code, duplicate docs, and stale flags | Weekly / Monthly | Mostly Agent |
-| **Researcher** | Studies Linux/BSD upstream designs, writes one-page design notes | Weekly / Monthly | Agent Drafts, Human Decides |
-| **Triager** | Sorts issues, reproduces bugs, deduplicates, and assigns severity | Daily | Mostly Agent |
-| **Tester / Fuzzer** | Executes test suites, continuous fuzzing, and hardware boot checks | Daily / Nightly | Agent Automated, Human Hardware |
-| **Security Officer** | Audits `unsafe` Rust blocks, syscall surfaces, key management, and CVEs | Daily / Monthly | Human-Led |
-| **Release Manager** | Builds ISOs, validates reproducible builds, and publishes releases | Per Release | Human-Led, Agent-Assisted |
-| **Docs Steward** | Keeps documentation and status reports synchronized with CI evidence | Weekly | Agent Drafts, Human Decides |
-| **Benchmarker** | Runs scoreboard benchmarks against Debian, Arch, Alpine, FreeBSD, OpenBSD | Weekly / Monthly | Mostly Agent |
-| **Community Manager**| Manages contributor onboarding, issues, and release communications | Daily / Monthly | Human-Led |
-
----
-
-## 7 Mandatory Governance Guardrails
-
-1. **Human Approval Required:** Human maintainers must approve any changes touching kernel code, cryptography, bootloaders, disk installers, or signing keys.
-2. **Evidence-Gated Success:** No feature or task may be marked complete without a linked CI artifact (QEMU boot log, test run output).
-3. **Sandboxing & Least Privilege:** AI agents operate under scoped access tokens with no direct push privileges to `main` and zero access to release keys.
-4. **Small, Reviewable PRs:** All changes must be delivered in atomic, test-backed pull requests with daily rate caps to ensure review capacity.
-5. **Regression Ratchet:** Every bug fix must include an automated regression test; code coverage and `unsafe` counts cannot degrade without human override.
-6. **Audit Log & Rollback:** Every agent action is logged in machine-readable format, supporting single-command automated rollback.
-7. **Honest Public Claims:** Public READMEs and documentation must strictly reflect features verified on bare-metal or QEMU today.
+### Monthly Scoreboard
+- **Boot Time**: Cold boot to interactive shell (seconds).
+- **Idle Memory**: Idle RAM usage after boot (MB).
+- **Supported Hardware**: Confirmed bootable target devices count.
+- **Fuzzing Reliability**: Fuzzing execution hours without unhandled kernel crash.
+- **CVE Response**: Total vulnerabilities identified and mean time to fix.
+- **Rollback Time**: Time required to revert to a prior system generation.
+- **Reproducibility**: Percentage of package/kernel artifacts with reproducible builds.
+- **Package Availability**: Count of verified packages in the official repository.
 
 ---
 
 ## 8-Step Execution Guide
 
-| Step | Title | Timeframe | Action | Required Output |
-|---|---|---|---|---|
-| **Step 1** | Decide System Target | Week 1 | Define target profile, license model, and core wedge | `VISION.md` |
-| **Step 2** | Ground Truth & Cleanup | Weeks 1–3 | Consolidate docs, enable QEMU boot CI, convert status | `FEATURE_STATUS.toml` |
-| **Step 3** | Assign Study Areas | Week 2 | Assign reference OS study areas and subsystem owners | `GOVERNANCE.md` |
-| **Step 4** | Subsystem Design Notes | Weeks 2–6 | Study upstream systems, write 1-page notes, file backlog | Design Notes & Backlog |
-| **Step 5** | Fix Core Gaps | Months 1–3 | Fix MSRs, paging, MMIO, VirtIO NIC, ACPI, and loader | Hardware Compatibility List |
-| **Step 6** | Day-to-Day Usability | Months 3–6 | Build installer, persistent FS, signed repos, dogfood | Dogfooding Feedback |
-| **Step 7** | Measure & Scoreboard | Months 6–12 | Run comparative benchmarks, continuous fuzzing | Monthly Scoreboard Report |
-| **Step 8** | Community & Release | Ongoing | Maintain CONTRIBUTING.md, quarterly releases | Release Notes & Roadmap |
+1. **Step 1: Decide System Target (Week 1)**
+   - *Action*: Select primary target profile (desktop/server/embedded/security) and core license model.
+   - *Output*: `VISION.md`.
+
+2. **Step 2: Ground Truth & Cleanup (Weeks 1–3)**
+   - *Action*: Merge duplicate docs, establish QEMU boot CI, convert status claims to evidence links, update README.
+   - *Output*: CI boot badge and single source of truth `FEATURE_STATUS.toml`.
+
+3. **Step 3: Assign Study Areas (Week 2)**
+   - *Action*: Assign subsystem research areas and reference projects to human/agent leads.
+   - *Output*: Subsystem ownership assignments in `GOVERNANCE.md` and `CODEOWNERS`.
+
+4. **Step 4: Subsystem Design Notes (Weeks 2–6)**
+   - *Action*: Analyze reference architecture, extract minimal designs, write design notes with acceptance criteria.
+   - *Output*: Subsystem design notes and prioritized backlog issues.
+
+5. **Step 5: Address Kernel & Driver Gaps (Months 1–3)**
+   - *Action*: Implement user-mode transitions, NVMe/AHCI MMIO, VirtIO interrupts, dynamic ELF loader, and ACPI parsing.
+   - *Output*: Public Hardware Compatibility List (HCL) and serial boot logs.
+
+6. **Step 6: Day-to-Day Usability (Months 3–6)**
+   - *Action*: Complete installer, persistent crash-consistent storage, signed repos, and initiate daily dogfooding.
+   - *Output*: Daily dogfooding feedback and bug report sweep.
+
+7. **Step 7: Scoreboard & Fuzzing (Months 6–12)**
+   - *Action*: Execute comparative benchmarks against Linux/BSD distros, continuous fuzzing, and reproducible build audits.
+   - *Output*: Monthly public scoreboard report.
+
+8. **Step 8: Community & Release Cadence (Ongoing)**
+   - *Action*: Maintain `CONTRIBUTING.md`, issue labeling, release notes, and contributor onboarding.
+   - *Output*: Quarterly releases and published roadmap updates.
 
 ---
 
-## Operational Weekly Calendar
+## 12-Role AI-Agent Maintenance Model
 
-- **Monday:** Triage sweep, issue labeling, sprint planning, and upstream advisory digest (*Triager, Updater, Maintainer*).
-- **Tuesday–Wednesday:** Active subsystem development, code review, and researcher design note publication (*Maintainer, Reviewer, Researcher*).
-- **Thursday:** Consolidation sweep, dead code cleanup, doc synchronization, and benchmark run (*Consolidator, Docs Steward, Benchmarker*).
-- **Friday:** Release candidate verification, weekly health report generation, and sprint retrospective (*Release Manager, Tester/Fuzzer, Community Manager*).
+| Role | Mission | Main Cadence | Agent / Human Leadership |
+|---|---|---|---|
+| **Maintainer** | Owns subsystem health, reviews PRs, and manages backlog | Daily / Weekly | Human-led, agent-assisted |
+| **Updater** | Keeps dependencies, toolchain, and upstream knowledge current | Daily / Weekly | Mostly agent |
+| **Reviewer** | Reviews code changes for correctness, security, and tests | Per PR | Agent first-pass, human final signoff |
+| **Consolidator** | Identifies and removes duplicate code, dead features, and stale docs | Weekly / Monthly | Mostly agent |
+| **Researcher** | Studies Linux/BSD reference systems and writes design notes | Weekly / Monthly | Agent drafts, human decides |
+| **Triager** | Labels issues, deduplicates bugs, and creates reproduction steps | Daily | Mostly agent |
+| **Tester / Fuzzer** | Runs test suites, fuzz campaigns, and hardware boot verification | Daily / Nightly | Agent automated, human real hardware |
+| **Security Officer** | Manages security advisories, `unsafe` audits, and key security | Daily / Monthly | Human-led |
+| **Release Manager** | Builds release ISOs, verifies reproducible builds, ships releases | Per Release | Agent builds, human signs off |
+| **Docs Steward** | Maintains documentation accuracy and syncs status with CI evidence | Weekly | Agent drafts, human checks |
+| **Benchmarker** | Measures boot, RAM, latency, and rollback metrics against competitor OSes | Weekly / Monthly | Agent automated |
+| **Community Manager** | Manages contributor onboarding, communication, and release notes | Daily / Monthly | Human-led |
 
 ---
 
-## Verification & Acceptance Criteria
+## Operational Workflows & Weekly Calendar
 
-1. **Documentation Consolidation:** Created `docs/PR_PROPOSAL_ROLE_BASED_GOVERNANCE_AND_OPERATING_PLAN.md` as the unified source of truth for SigmaOS role-based operating model, governance guardrails, roadmap, and maintenance workflows.
-2. **System Module Health:** Corrected syntax errors in `src/system/mod.rs` (removing duplicate `pub use sigmataskscheduler` declaration and adding missing semicolon).
-3. **Governance Engine Compatibility:** Validated `RoleBasedOperatingPlanEngine` structures (`MaintenanceRole`, `RoadmapPhase`, `ExecutionStep`, `OperationalDayFocus`, `GovernanceGuardrail`) against `tests/test_role_based_operating_plan.rs`.
-4. **Runtime Test Verification:** Executing `./run_sigma_tests.sh` completes cleanly with all test suites passing.
+```text
+RESEARCH (Researcher) → DESIGN NOTE & ISSUES
+  → TRIAGE & PRIORITIZE (Triager)
+  → IMPLEMENT (Contributor / Agent)
+  → AUTOMATED & HUMAN REVIEW (Reviewer & Security)
+  → TEST & BENCHMARK VALIDATION (Tester & Benchmarker)
+  → MERGE (Maintainer)
+  → DOCS & CONSOLIDATION (Docs Steward & Consolidator)
+  → RELEASE & ATTESTATION (Release Manager & Security)
+```
+
+### Weekly Calendar
+- **Monday**: Triage sweep, weekly planning, upstream advisory digest.
+- **Tuesday–Wednesday**: Active development, code review, researcher design notes.
+- **Thursday**: Consolidation sweep, documentation sync, benchmark runs.
+- **Friday**: Release candidates (if scheduled), weekly health report, retrospective.
+
+---
+
+## 7 Governance Guardrails
+
+1. **Human Signoff Mandatory**: Any changes touching kernel core, cryptography, bootloader, installer, or signing keys require human approval before merge.
+2. **Evidence-Gated Claims**: No feature may be marked complete without a linked CI log or test execution artifact.
+3. **Least Privilege Sandboxing**: Agents operate with scoped API tokens, restricted directory access, and no direct push access to `main`.
+4. **Small Reviewable PRs**: Agent PRs must be focused, contain unit/integration tests, and be throttled to manageable daily limits.
+5. **Regression Ratchet**: Fixed bugs must add permanent regression tests. Test coverage, `unsafe` counts, and benchmark performance must not degrade.
+6. **Audit Trail & One-Command Rollback**: Every agent action is logged, allowing single-command reversal of agent changes.
+7. **Public Transparency**: Public documentation and READMEs reflect actual verified hardware capabilities without exaggeration.
