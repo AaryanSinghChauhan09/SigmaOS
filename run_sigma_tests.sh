@@ -2673,6 +2673,13 @@ if [ -f "src/desktop/sovereign_gui_development_and_pr_suite.rs" ]; then
     ./build/test_gui_pr_suite
 fi
 
+if [ -f "tests/test_gui_development_plan.rs" ]; then
+    echo "Running Sovereign GUI Development Plan Integration Suite..."
+    mkdir -p build
+    rustc --test tests/test_gui_development_plan.rs --edition=2021 -o build/test_gui_development_plan
+    ./build/test_gui_development_plan
+fi
+
 if [ -f "src/driver/sovereign_device_driver_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign Device Driver Development and PR Gateway Suite..."
     mkdir -p build
