@@ -786,6 +786,7 @@ pub use crate::distro::open_source_os_missing_components_v73_pr::*;
 pub use crate::distro::open_source_os_missing_components_v73_pr::*;
 pub use crate::distro::open_source_os_missing_components_v76_pr::*;
 pub use crate::distro::open_source_os_missing_components_v77_pr::*;
+pub use crate::distro::open_source_os_missing_components_v82_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v69_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v70_pr::*;
