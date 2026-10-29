@@ -110,6 +110,7 @@ pub mod voicecraft;
 pub mod voicecraft_advancements_v73_pr;
 pub mod voicecraft_advancements_v76_pr;
 pub mod voicecraft_advancements_v78_pr;
+pub mod voicecraft_advancements_v80_pr;
 pub mod voicecraft_artcraft_parity_pr;
 pub mod voicecraft_missing_components_parity_pr;
 pub mod voicecraft_neural_dsp_advancements_v68_pr;
@@ -118,6 +119,7 @@ pub use voicecraft::*;
 pub use voicecraft_advancements_v73_pr::*;
 pub use voicecraft_advancements_v76_pr::*;
 pub use voicecraft_advancements_v78_pr::*;
+pub use voicecraft_advancements_v80_pr::*;
 pub mod wordcraft;
 pub mod wordcraft_artcraft_missing_components_v65_pr;
 pub mod wordcraft_artcraft_missing_components_v66_pr;
@@ -166,7 +168,6 @@ pub use designcraft::{
     FontFamily, FontWeight, Grid, Guide, GuideOrientation, Layer, Style, StyleType, TextAlignment,
     TextElement,
 };
-pub mod designcraft_artcraft_missing_components_v67_pr;
 pub use designcraft_artcraft_missing_components_v65_pr::*;
 pub use designcraft_artcraft_missing_components_v66_pr::*;
 pub use designcraft_artcraft_missing_components_v67_pr::*;
