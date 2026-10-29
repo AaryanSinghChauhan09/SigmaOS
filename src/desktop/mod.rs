@@ -627,6 +627,8 @@ pub mod sovereign_desktop_toolkits_and_services_v76_pr;
 pub use sovereign_desktop_toolkits_and_services_v76_pr::*;
 pub mod sovereign_desktop_toolkits_and_services_v82_pr;
 pub use sovereign_desktop_toolkits_and_services_v82_pr::*;
+pub mod sovereign_desktop_toolkits_and_services_v88_pr;
+pub use sovereign_desktop_toolkits_and_services_v88_pr::*;
 pub mod sovereign_de_wm_innovation_engine;
 pub use sovereign_de_wm_innovation_engine::*;
 pub mod elementary_os_missing_components_pr;
