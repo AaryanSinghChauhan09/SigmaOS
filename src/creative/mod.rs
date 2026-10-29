@@ -74,6 +74,7 @@ pub mod gridcraft_artcraft_missing_components_v66_pr;
 pub mod gridcraft_artcraft_missing_components_v67_pr;
 pub mod gridcraft_artcraft_missing_components_v68_pr;
 pub mod gridcraft_artcraft_missing_components_v69_pr;
+pub mod gridcraft_artcraft_missing_components_v70_pr;
 pub mod gridcraft_artcraft_parity_pr;
 pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
@@ -222,6 +223,7 @@ pub use gridcraft_artcraft_missing_components_v66_pr::*;
 pub use gridcraft_artcraft_missing_components_v67_pr::*;
 pub use gridcraft_artcraft_missing_components_v68_pr::*;
 pub use gridcraft_artcraft_missing_components_v69_pr::*;
+pub use gridcraft_artcraft_missing_components_v70_pr::*;
 pub use gridcraft_artcraft_parity_pr::*;
 pub use gridcraft_missing_components_parity_pr::*;
 pub use lightcraft::{
