@@ -1,29 +1,18 @@
-# SigmaOS Security Architecture & Hardening Model
+# SigmaOS Security Architecture & Security Baseline
 
-## Core Security Principles
+This document defines the security architecture, capability model, privilege boundaries, and threat mitigation strategies for the SigmaOS kernel.
 
-SigmaOS enforces defense-in-depth, least-privilege execution, capability-based access control, and memory safety invariants across the kernel and userland.
+## Core Security Directives
 
-1. **Least Privilege by Default:** Every userland process starts with minimal privileges. Capabilities must be explicitly granted and bounded.
-2. **Memory Safety Invariants:** All code written in safe Rust. Any `unsafe` block must document invariant safety guarantees and pass security review.
-3. **Defense in Depth:** Privilege separation across process boundaries, syscall filtering (pledge/seccomp), path unveils, capability tokens, and Ring 0/Ring 3 isolation.
-4. **Fail Closed:** Errors, resource exhaustion, or invalid input parameters immediately reject execution and log security diagnostics.
-5. **No Custom Cryptography:** Standardized, peer-reviewed cryptographic primitives and Post-Quantum Cryptography (PQC) Dilithium/Sphincs implementations only.
+1. **Least Privilege Principle:** Processes run with the minimum necessary capabilities required for their function.
+2. **W^X (Write XOR Execute):** Virtual memory pages cannot be simultaneously writable and executable.
+3. **Capability Tokens:** Access to hardware, IPC ports, and sensitive syscalls requires explicit 64-bit capability tokens.
+4. **Isolated Address Spaces:** User address space (`0x0000_0000_0000_0000` to `0x0000_7FFF_FFFF_FFFF`) is strictly isolated from kernel address space (`0xFFFF_8000_0000_0000` and above).
+5. **No Undocumented Unsafe:** Every `unsafe` block must document memory invariants, alignment bounds, and concurrency assumptions.
 
----
+## Security Controls Overview
 
-## Security Layers & Subsystem Policies
-
-### 1. Capability Access Control
-Defined in `docs/security/CAPABILITY_POLICY.md`. System resources (devices, sockets, files, process creation) require fine-grained bitmask capabilities (`CapabilityToken`) preventing privilege escalation.
-
-### 2. Syscall Sandboxing (Pledge & Unveil)
-Inspired by OpenBSD, processes restrict executable syscall classes via `pledge` and restrict visible filesystem hierarchies via `unveil`. Attempts to invoke unpledged syscalls or access unveiled paths result in immediate SIGABRT / SIGKILL and security log generation.
-
-### 3. Threat Model & Security Policy
-Defined in `docs/security/THREAT_MODEL.md` and `docs/security/SECURITY_TEST_PLAN.md`. System components categorize attack surfaces (untrusted external inputs, network packets, userland IPC, device drivers) and maintain automated fuzz targets (`fuzz/`) and security regression tests.
-
-### 4. Continuous Security Operations
-- **Weekly Advisory Audits:** Dependencies and upstream CVE advisories reviewed continuously.
-- **Automated Security Workflow:** `.github/workflows/security.yml` executes static security analysis, capability validation tests, and dependency auditing.
-- **Security Review Requirement:** Any PR touching syscalls, privilege boundaries, memory management, cryptography, networking, drivers, or updates requires explicit security review.
+- **Syscall Validation:** Bounds checking and pointer alignment checks on all user arguments prior to copy-in.
+- **Seccomp Filters:** System call filtering based on BPF-like state machine checks.
+- **PQC Attestation:** Dilithium-5 / Kyber-1024 cryptographic verification for package and binary signature checking.
+- **Kernel Memory Guard:** Double-free, use-after-free, and stack overflow guard pages.

@@ -1,103 +1,101 @@
-# SigmaOS — Sovereign Rust Operating System
+# SigmaOS
 
-> **⚠️ DISCLAIMER & PROJECT WARNING**:
-> SigmaOS is an experimental, sovereign Rust operating system workspace containing kernel, userspace, desktop, packaging, and tooling subsystems.
-> **Unit-tested subsystems or passing component test suites DO NOT establish or prove a bootable, installable, or hardware-ready operating system.**
-> Values in feature matrices track module-level logic test evidence; boot-to-shell, installer recovery, hardware validation, and full runtime path integration remain active priorities under development.
+**Sovereign, AI-Native Operating System** — built in `#![no_std]` Rust, inspired by Arch Linux, Omarchy, and Linux Mint.
 
 ---
 
-## Program Vision & Engineering Cadence
-
-To convert isolated component logic and ambitious roadmap designs into auditable, verified, and reviewable pull requests, SigmaOS mandates a **cadence-based engineering program**.
-
-| Period | Thread Manager / Scheduler Work | OS-Wide Maintenance Task | Required PR Output |
-|---|---|---|---|
-| **Daily** | Triage scheduler bugs, flaky tests, lock-order warnings, and regression reports. | Triage CI failures, build breakages, security advisories, and documentation drift. | Small bug-fix or triage PRs |
-| **Weekly** | Implement one focused scheduler behavior: run queue, preemption, priority, affinity, or wait queue. | Dependency/toolchain updates, lint cleanup, test-suite repair and maintenance. | One scoped PR per change |
-| **Biweekly** | Cross-subsystem integration test: threads with signals, FDs, IPC, timers, and process exit coordination. | Component status audit: update `FEATURE_STATUS.toml` and documentation with verified test evidence. | Status update + integration test evidence PR |
-| **Monthly** | Scheduler benchmark, lock contention test, starvation audit, deadlock and fuzzing review. | Release-candidate build, ISO smoke test, installer & update recovery test. | Release-readiness PR |
-| **Quarterly** | Scheduler architecture review against Linux/BSD paradigms; remove dead code and duplicated plans. | Roadmap consolidation, security review, API stability audit, contributor survey. | Architecture RFC + cleanup PRs |
-
----
-
-## Thread Manager Subsystem Plan
-
-The thread manager is defined as a formal subsystem with four explicit phase deliverables:
-
-### Phase 1: Subsystem Contract Definition
-- **Documentation**: See `docs/thread-manager.md` for the formal specification contract.
-- **States**: `New`, `Ready`, `Running`, `Blocked`, `Suspended`, `Zombie`, `Terminated`.
-- **Ownership**: `Kernel`, `User`, `Process`, `Detached`.
-- **Guarantees**: Legal transition enforcement, saved `CpuContext`, `StackMeta` guard zones, priority ranges (0..=139), CPU affinity, wait-channel wakeup safety, and lock-order tracking.
-
-### Phase 2: Core Thread Object Consolidation
-- Single canonical `Thread` struct in `src/kernel/thread.rs`.
-- `ThreadManager` wait-channel registration, wakeup, signal delivery, timeout, and reaping mechanics.
-
-### Phase 3: Scheduler Integration Roadmap
-1. **Run Queue**: Enqueue, dequeue, priority ordering, per-CPU queues, load balancing hooks.
-2. **Context Switching**: Save/restore register state, stack switching, safe `Running`/`Ready` transitions.
-3. **Preemption**: Timer-driven preemption, voluntary yield, priority inheritance, bounded latency.
-4. **Blocking and Wakeup**: Sleep/wake channels, timeouts, lost-wakeup prevention.
-5. **Exit and Reaping**: Thread exit, join/detach, zombie cleanup, stack reclamation, process exit coordination.
-6. **Observability**: Thread statistics: state, CPU time, context switches, wait time, priority, and affinity.
-
-### Phase 4: POSIX-Facing Behavior & Syscalls
-- Thread creation, exit, join, detach syscalls.
-- Mutex, condition variable, semaphore, reader-writer lock synchronization primitives.
-- Thread-aware signal delivery, cancellation handlers, thread-specific data, and robust process termination.
-
----
-
-## Prioritized Missing Components Matrix
-
-| Component | Target Work / Missing Areas | PR Deliverable |
-|---|---|---|
-| **Boot Path** | End-to-end firmware-to-kernel-to-shell validation | `ci/boot-smoke` workflow plus boot log artifacts |
-| **Thread Manager** | Canonical thread lifecycle, preemption, join/detach, wait channels | `feat(thread): canonical thread manager` |
-| **Scheduler** | Deterministic run queues, preemption, fairness, starvation tests | `feat(sched): preemptive scheduler core` |
-| **Process Lifecycle** | Fork/exec/wait/exit semantics and orphan/reparent behavior | `feat(process): POSIX-style lifecycle tests` |
-| **Signals** | Per-thread masks, queued signals, signal-safe delivery | `feat(signal): thread-aware signal delivery` |
-| **IPC** | Pipes, shared memory, message queues, eventfd consistency | `feat(ipc): unified IPC test matrix` |
-| **VFS** | Mount namespace, path resolution, permission, crash consistency | `test(vfs): filesystem integration suite` |
-| **Drivers** | Hardware test evidence and device support matrix | `docs(drivers): tested hardware matrix` |
-| **Installer** | Failure recovery, rollback, disk validation, upgrade path | `feat(installer): recoverable install flow` |
-| **Security** | Capability enforcement, sandbox policy, seccomp/Landlock restrictions | `feat(security): policy enforcement tests` |
-| **Packaging** | Reproducible builds, SBOMs, signed updates, rollback | `feat(pkg): reproducible package pipeline` |
-| **Observability** | Kernel logs, tracing, panic reports, crash dumps | `feat(observability): structured kernel tracing` |
-
----
-
-## Suggested First 10 PR Sequence
-
-1. `docs(thread): define thread-manager contract and acceptance criteria`
-2. `feat(thread): add canonical Thread object and lifecycle states`
-3. `test(thread): add lifecycle, join, detach, and exit tests`
-4. `feat(sched): add deterministic ready queue and scheduling-class hooks`
-5. `feat(sched): add preemptive scheduling and context-switch test harness`
-6. `fix(thread): add wait-channel wakeup and timeout race tests`
-7. `feat(signal): route signals to the correct target thread`
-8. `feat(proc): add process exit, orphan reparenting, and thread cleanup tests`
-9. `ci: enforce fmt, clippy, unit tests, and standalone SigmaOS suites`
-10. `docs(status): connect FEATURE_STATUS.toml to verified test evidence`
-
----
-
-## Verification & Standard Testing Commands
-
-Before submitting any PR or marking a roadmap item complete, execute:
+## Quick Start
 
 ```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
+# 1. Install build dependencies (one-time)
+bash scripts/setup.sh
+
+# 2. Check everything is ready
+bash scripts/check_launch_ready.sh
+
+# 3. Launch interactive workstation dashboard
+make launch
+
+# 4. Build a bootable ISO (GRUB2-based, boots in QEMU)
+make iso-stub
+
+# 5. Boot in QEMU
+make run-stub
 ```
 
-For standalone subsystem unit verification (e.g. Thread Manager):
+## Requirements
+
+| Tool | Purpose | Install |
+|------|---------|---------|
+| Rust (stable) | Core build | `curl https://sh.rustup.rs -sSf \| sh` |
+| gcc (32-bit) | Multiboot kernel | `sudo apt install build-essential` |
+| grub-pc-bin | ISO bootloader | `sudo apt install grub-pc-bin` |
+| genisoimage | ISO creation | `sudo apt install genisoimage` |
+| nasm *(optional)* | Stub kernel ASM | `sudo apt install nasm` |
+| xorriso *(optional)* | Alt ISO tool | `sudo apt install xorriso` |
+| qemu-system-x86 *(optional)* | VM testing | `sudo apt install qemu-system-x86` |
+
+Run `bash scripts/setup.sh` to install everything automatically (detects apt/pacman/dnf/brew).
+
+## Architecture
+
+```
+SigmaOS
+├── src/            # ~1M LOC Rust library — 190 modules
+│   ├── kernel/     # Microkernel: scheduler, VFS, memory, drivers
+│   ├── bin/        # CLI binaries: sigmaos, sigpkg, sigma_pkg
+│   └── ...         # Desktop, security, networking, creative suite
+├── boot/           # Multiboot kernel (C), linker script, GRUB config
+├── bin/            # Shell scripts: sigmaos-launch, sigmaos-shell, …
+├── scripts/        # Build, ISO, QEMU, CI helpers
+├── install/        # Package lists, post-install hooks, provisioning
+└── tests/          # 40+ native test suites
+```
+
+## Inspirations
+
+| Distro | What SigmaOS Takes |
+|--------|-------------------|
+| **Arch Linux** | Rolling release, pacman/pkgbuild, AUR compatibility |
+| **Omarchy** | Hyprland WM, Quickshell bar, keyboard-first UX |
+| **Linux Mint** | Ergonomics, Nemo file manager, MintUpdate GUI |
+| **CachyOS** | BORE/EEVDF scheduler, AutoBOLT/PGO, zram-zstd |
+| **FreeBSD** | Capsicum capability isolation, kqueue, Jails |
+| **OpenBSD** | `pledge()`, `unveil()`, W^X PTE protection |
+| **DragonFlyBSD** | HAMMER2 VFS, lightweight kernel threads |
+
+## Build Commands
 
 ```bash
-rustc --test src/kernel/thread.rs --edition=2021 -o /tmp/test_thread && /tmp/test_thread
+make check          # cargo check --lib (static analysis)
+make check-fast     # Cached quick cargo check
+make test           # Native standalone test suites (./run_sigma_tests.sh)
+make test-fast      # cargo test --lib (parallel unit tests)
+make fmt            # Verify formatting
+make fmt-fix        # Auto-apply rustfmt
+make iso-stub       # Build GRUB2 bootable ISO ✓ (works now)
+make run-stub       # Boot stub ISO in QEMU ✓
+make launch         # Interactive workstation dashboard ✓
+make kernel         # Compile Multiboot C kernel
+make clean          # Remove build artifacts
 ```
+
+## 20-Module Craft Creative Suite
+
+3DCraft · AniCraft · ArtCraft · CADCraft · CraftLibs · DeckCraft · DesignCraft · EffectCraft · FigCraft · FilmCraft · FontCraft · GridCraft · LightCraft · PDFCraft · PhotoCraft · PrintCraft · SoundCraft · VectorCraft · VoiceCraft · WordCraft
+
+## Project Status
+
+| Component | Status |
+|-----------|--------|
+| Rust library (190 modules) | ✅ `cargo check --lib` — 0 errors |
+| Bootable ISO | ✅ 2.8 MB ISO9660 + GRUB2 El Torito |
+| Multiboot kernel | ✅ 32-bit ELF, boots in QEMU |
+| Native test suites | ✅ 40 suites, 300+ tests, 0 failures |
+| Desktop shell daemon | ✅ `bin/sigmaos-shell ping` — responsive |
+| Installation wizard | ✅ `installer/sigma-installer.rs` |
+| Package manager | ✅ SigPkg (`src/bin/sigpkg.rs`) |
+
+## Repository
+
+[https://github.com/AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS)

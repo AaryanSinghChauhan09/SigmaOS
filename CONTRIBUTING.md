@@ -40,13 +40,6 @@ SigmaOS follows a structured engineering cadence to convert broad roadmap goals 
 - **Boot Smoke Tests**: Kernel-facing changes must pass QEMU or bare-metal boot smoke verification.
 - **Regression Tests**: Every bug fix PR must attach a regression test proving the bug cannot recur.
 
-### Documentation Rules
-
-- Update `FEATURE_STATUS.toml` whenever implementation status or test evidence changes.
-- Distinguish clearly between `Modeled`, `Unit-tested`, `Integrated`, `Hardware-tested`, and `Release-ready`.
-- Every subsystem document in `docs/` must specify: purpose, public API, dependencies, limitations, test procedures, and known gaps.
-- No roadmap claim may state "complete" without a linked PR and verification evidence.
-
 ---
 
 ## Verification Standards

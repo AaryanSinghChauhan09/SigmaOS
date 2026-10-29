@@ -8,7 +8,7 @@ Welcome to SigmaOS. As an automated engineering agent, you are responsible for m
 
 ### 1. Scope & Plan Execution
 - Keep PRs focused on a single subsystem boundary or task.
-- Before making changes, formulate a plan and request plan review using `request_plan_review`.
+- Before making changes, formulate a plan and request plan review.
 - Always verify changes after modifying files using read-only tools or test runs.
 
 ### 2. Mandatory Verification Suite
