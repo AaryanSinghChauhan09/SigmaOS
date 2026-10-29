@@ -21,11 +21,15 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-use super::voicecraft;
-use super::voicecraft::Phoneme;
-use super::voicecraft::PhonemeType;
-use super::voicecraft::VoiceActivityDetector;
-use super::voicecraft::SAMPLE_RATE;
+#[cfg(feature = "standalone_test")]
+#[path = "voicecraft.rs"]
+pub mod voicecraft;
+
+#[cfg(feature = "standalone_test")]
+use voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
+
+#[cfg(not(feature = "standalone_test"))]
+use super::voicecraft::{self, Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
 
 /// Structured PR proposal manifest for VoiceCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
