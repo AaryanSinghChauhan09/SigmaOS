@@ -33,223 +33,7 @@ pub struct CleanupOption {
     pub name: String,
     pub description: String,
     pub path: String,
-    pub enabled: bool,
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::SeqCst)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(core::sync::atomic::Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::SeqCst)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category.clone(),
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for CleanupOption {
-    fn clone(&self) -> Self {
-        Self {
-            category: self.category,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
+    pub enabled: AtomicBool,
 }
 
 impl Clone for CleanupOption {
@@ -310,7 +94,7 @@ impl SystemCleanupManager {
             name,
             description,
             path,
-            enabled: true,
+            enabled: AtomicBool::new(true),
         };
         self.options.push(option);
     }
@@ -344,7 +128,7 @@ impl SystemCleanupManager {
         let mut errors = 0;
 
         for option in self.options.iter() {
-            if option.enabled {
+            if option.enabled.load(Ordering::Relaxed) {
                 // Simulate cleanup
                 files_cleaned += 10;
                 bytes_freed += 1_000_000;
@@ -367,7 +151,7 @@ impl SystemCleanupManager {
         let mut errors = 0;
 
         for option in self.options.iter() {
-            if option.category == category && option.enabled {
+            if option.category == category && option.enabled.load(Ordering::Relaxed) {
                 files_cleaned += 5;
                 bytes_freed += 500_000;
             }

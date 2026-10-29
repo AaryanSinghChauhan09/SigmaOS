@@ -41,10 +41,10 @@ pub use creative::craftlibs_artcraft_missing_components_v69_pr::*;
 pub use creative::craftlibs_missing_components_parity_pr::*;
 // pub use creative::craftlibs_missing_components_parity_pr::*;
 pub use creative::designcraft::*;
-pub use creative::designcraft_artcraft_missing_components_v65_pr::*;
+// pub use creative::designcraft_artcraft_missing_components_v65_pr::*; // TODO: Implement missing module
 pub use creative::designcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::designcraft_artcraft_missing_components_v67_pr::*;
-pub use creative::designcraft_artcraft_missing_components_v68_pr::*;
+// pub use creative::designcraft_artcraft_missing_components_v68_pr::*; // TODO: Implement missing module
 // pub use creative::deckcraft_artcraft_parity_pr::*;
 // pub use creative::deckcraft_missing_components_parity_pr::*;
 pub use creative::deckcraft::*;
@@ -72,7 +72,7 @@ pub use creative::figcraft_artcraft_missing_components_v69_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v67_pr::*;
-pub use creative::filmcraft_artcraft_missing_components_v68_pr::*;
+// pub use creative::filmcraft_artcraft_missing_components_v68_pr::*; // TODO: Implement missing module
 pub use creative::filmcraft_artcraft_missing_components_v69_pr::*;
 pub use creative::gridcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::gridcraft_artcraft_missing_components_v67_pr::*;
