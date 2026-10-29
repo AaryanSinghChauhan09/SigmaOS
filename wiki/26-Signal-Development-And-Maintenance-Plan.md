@@ -1,4 +1,4 @@
-# 26 Signal Development And Maintenance Plan
+# SigmaOS Signal Development and Maintenance Plan
 
 ## Executive Summary
 SigmaOS implements POSIX.1-2024 as its portable signal API baseline, taking Linux and FreeBSD as behavioral references without asserting full ABI identity. While signal-related models and components exist across the repository, runtime end-to-end signal delivery in userland processes requires strict evidence-based verification. This document establishes the master signal development plan, engineering principles, 19-PR implementation sequence, periodic maintenance cadences, cross-component integration guidelines, PR template, merge gates, and rollout criteria.

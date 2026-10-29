@@ -9,6 +9,7 @@
 - [Process Synchronization Master Architecture Plan](PROCESS_SYNCHRONIZATION_PLAN.md)
 - [Scheduler Status and Development Plan](SCHEDULER_DEVELOPMENT_PLAN.md)
 - [Signal Handler Master Plan](SIGNAL_HANDLER_PLAN.md)
+- [Signal Development and Maintenance Plan](signal/SIGNAL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md)
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
 - [SIGMAOS GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md)
 - [SIGMAOS CLI Development Plan](SIGMAOS_CLI_DEVELOPMENT_PLAN.md)
