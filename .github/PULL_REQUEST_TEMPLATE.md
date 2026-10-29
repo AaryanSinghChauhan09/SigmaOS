@@ -31,6 +31,19 @@ Closes #<issue-id>
 - Maturity before:
 - Maturity after:
 - Runtime path affected:
+- Integration impact
+
+## IPC handler
+
+- IPC semantics
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+- Capability status
+
+## Shell component
+
+## Shell safety review
 
 ## Shell component
 
@@ -86,7 +99,8 @@ make format
 - [ ] Untrusted input is validated
 - [ ] Package scripts are sandboxed, if applicable
 - [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- [ ] Security review
+- [ ] Capability/namespace checks enforced
 
 ## Security review
 
