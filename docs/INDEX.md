@@ -13,3 +13,4 @@
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
 - [SIGMAOS GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md)
 - [SIGMAOS CLI Development Plan](SIGMAOS_CLI_DEVELOPMENT_PLAN.md)
+- [System-Call Development and Maintenance Plan](syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md)
