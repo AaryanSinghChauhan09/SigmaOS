@@ -647,30 +647,43 @@ pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, FirecrackerCloudHypervisorV61Engine, FirecrackerCloudHypervisorV63Engine,
     FirecrackerCloudHypervisorV67Engine, FirecrackerCloudHypervisorV68Engine,
-    FirecrackerCloudHypervisorV80Engine, FreeBsdJailsZonesV61Engine, FreeBsdJailsZonesV63Engine,
-    FreeBsdJailsZonesV67Engine, FreeBsdJailsZonesV68Engine, FreeBsdJailsZonesV80Engine,
+    // FirecrackerCloudHypervisorV80Engine, // TODO: Implement V80 version
+    FreeBsdJailsZonesV61Engine, FreeBsdJailsZonesV63Engine,
+    FreeBsdJailsZonesV67Engine, FreeBsdJailsZonesV68Engine,
+    // FreeBsdJailsZonesV80Engine, // TODO: Implement V80 version
     GvisorKataAppleHvV61Engine, GvisorKataAppleHvV63Engine, GvisorKataAppleHvV67Engine,
-    GvisorKataAppleHvV68Engine, GvisorKataAppleHvV80Engine, KubernetesK3sRancherV61Engine,
+    GvisorKataAppleHvV68Engine,
+    // GvisorKataAppleHvV80Engine, // TODO: Implement V80 version
+    KubernetesK3sRancherV61Engine,
     KubernetesK3sRancherV63Engine, KubernetesK3sRancherV67Engine, KubernetesK3sRancherV68Engine,
-    KubernetesK3sRancherV80Engine, KubernetesPod, KvmQemuV61Engine, KvmQemuV63Engine,
-    KvmQemuV67Engine, KvmQemuV68Engine, KvmQemuV80Engine, LibvirtDomainV61Engine,
+    // KubernetesK3sRancherV80Engine, // TODO: Implement V80 version
+    KubernetesPod, KvmQemuV61Engine, KvmQemuV63Engine,
+    KvmQemuV67Engine, KvmQemuV68Engine,
+    // KvmQemuV80Engine, // TODO: Implement V80 version
+    LibvirtDomainV61Engine,
     LibvirtDomainV63Engine, LibvirtDomainV67Engine, LibvirtDomainV68Engine,
-    LibvirtDomainV80Engine, LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine, LxcLxdNspawnV67Engine,
-    LxcLxdNspawnV68Engine, LxcLxdNspawnV80Engine, OciDockerPodmanRuncV61Engine,
+    // LibvirtDomainV80Engine, // TODO: Implement V80 version
+    LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine, LxcLxdNspawnV67Engine,
+    LxcLxdNspawnV68Engine,
+    // LxcLxdNspawnV80Engine, // TODO: Implement V80 version
+    OciDockerPodmanRuncV61Engine,
     OciDockerPodmanRuncV63Engine, OciDockerPodmanRuncV67Engine, OciDockerPodmanRuncV68Engine,
-    OciDockerPodmanRuncV80Engine, ResourcePool,
+    // OciDockerPodmanRuncV80Engine, // TODO: Implement V80 version
+    ResourcePool,
     SovereignVirtualizationAndContainersParityV61Gateway,
     SovereignVirtualizationAndContainersParityV63Gateway,
     SovereignVirtualizationAndContainersParityV67Gateway,
     SovereignVirtualizationAndContainersParityV68Gateway,
-    SovereignVirtualizationAndContainersParityV80Gateway,
+    // SovereignVirtualizationAndContainersParityV80Gateway, // TODO: Implement V80 version
     SovereignVirtualizationAndContainersParityV81Gateway,
-    SovereignVirtualizationAndContainersV80PrGatewayEngine,
+    // SovereignVirtualizationAndContainersV80PrGatewayEngine, // TODO: Implement V80 version
     SovereignVirtualizationAndContainersV81PrGatewayEngine, VirtualBoxBhyveVmmV61Engine,
     VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualBoxBhyveVmmV68Engine,
-    VirtualBoxBhyveVmmV80Engine, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
+    // VirtualBoxBhyveVmmV80Engine, // TODO: Implement V80 version
+    VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
     VirtualizationTech, VmState, XenHypervisorV61Engine, XenHypervisorV63Engine,
-    XenHypervisorV67Engine, XenHypervisorV68Engine, XenHypervisorV80Engine,
+    XenHypervisorV67Engine, XenHypervisorV68Engine,
+    // XenHypervisorV80Engine, // TODO: Implement V80 version
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};

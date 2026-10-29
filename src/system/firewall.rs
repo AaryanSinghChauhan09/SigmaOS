@@ -47,7 +47,7 @@ pub struct FirewallRule {
     pub port: Option<u16>,
     pub from_address: Option<String>,
     pub to_address: Option<String>,
-    pub enabled: bool,
+    pub enabled: AtomicBool,
 }
 
 impl Clone for FirewallRule {
@@ -418,7 +418,7 @@ impl FirewallManager {
             port,
             from_address: None,
             to_address: None,
-            enabled: true,
+            enabled: AtomicBool::new(true),
         };
         self.rules.push(rule);
         id

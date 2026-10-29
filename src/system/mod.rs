@@ -340,7 +340,7 @@ pub use firewall::{
     Protocol, RuleAction,
 };
 pub use logrotate::{
-    get_log_rotate, init_log_rotate, CompressionType, LogFileConfig, LogRotateManager,
+    get_log_rotate, init_log_rotate, CompressionType, SysLogFileConfig, LogRotateManager,
     RotationSchedule,
 };
 pub use restore::{
@@ -561,7 +561,7 @@ pub use sigmalight::{
     LightType, LightingScene, SigmaLight,
 };
 pub use sigmalogrotate::{
-    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig as SigmaLogFileConfig,
+    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, SigmaLogFileConfig,
     SigmaLogRotate,
 };
 pub use sigmalvm::{
