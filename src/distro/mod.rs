@@ -530,6 +530,10 @@ pub mod openbsd_missing_components_v67_pr;
 pub use openbsd_missing_components_v67_pr::*;
 pub mod openbsd_missing_components_v68_pr;
 pub use openbsd_missing_components_v68_pr::*;
+pub mod openbsd_missing_components_v69_pr;
+pub use openbsd_missing_components_v69_pr::*;
+pub mod openbsd_missing_components_v70_pr;
+pub use openbsd_missing_components_v70_pr::*;
 pub mod openbsd_missing_components_v59_pr;
 pub use openbsd_missing_components_v59_pr::*;
 
