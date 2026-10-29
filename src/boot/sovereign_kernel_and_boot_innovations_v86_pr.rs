@@ -3,11 +3,11 @@
 //! Advanced Kernel, Module, Driver, Firmware, Initramfs, Bootloader, UEFI/BIOS, FDT, and Kexec Subsystems
 //! inspired by Linux (6.38+) and BSD Operating Systems (FreeBSD 16.8+, OpenBSD 9.6+, NetBSD 13.1+, DragonFly BSD 8.5+):
 //! 1. `LinuxBsdKernelInnovationsV86Engine`:
-//!    - Linux EEVDF latency-sensitive dynamic slicing, Sched-ext eBPF AI scheduler policy selection (LAVD, Rustland, Nest, Optical), io_uring SQPOLL zero-syscall submission ring, Bcachefs multi-device tiering CoW storage & Blake3 integrity.
+//!    - Linux EEVDF latency-sensitive dynamic slicing, Sched-ext eBPF AI predictive scheduler policies (LAVD, Rustland, Nest, Optical), io_uring SQPOLL zero-syscall submission ring, Bcachefs multi-device tiering CoW storage & Blake3 integrity.
 //!    - FreeBSD Capsicum `pdfork` process descriptors, VNET virtualized network stack isolation per jail, GELI disk encryption, ZFS `bectl` boot environments.
 //!    - OpenBSD Pledge/Unveil capability limits, KARL kernel randomized link, softraid CRYPTO disk volume manager, FineIBT CFI shadow stack guards.
 //!    - NetBSD Rump kernel userland driver server isolation, NPF JIT bytecode firewall rule compiler.
-//!    - DragonFly BSD HAMMER3 PFS direct I/O erasure coding, varsyms variant symlinks, lock-free VFS namecache.
+//!    - DragonFly BSD HAMMER3 PFS direct-IO erasure coding, varsyms variant symlinks, lock-free VFS namecache.
 //! 2. `KernelModuleAndDriverRuntimeV86Engine`: ELF `.ko` & BSD `.kmod` relocation processing (`R_X86_64_64`, `R_X86_64_PC32`), symbol resolution table, bus enumeration (PCI, ACPI, USB, FDT), driver probe/attach & remove/detach lifecycle, MMIO/BAR allocation, MSI-X interrupt routing.
 //! 3. `FirmwareAndMicrocodeLoaderV86Engine`: Hardware firmware blob loader (`/lib/firmware`, GPU GSP, Wi-Fi), Intel/AMD CPU microcode patch header verification & early CPIO prepending (`early_cpio`).
 //! 4. `InitramfsInitrdStagingV86Engine`: CPIO `newc` archive builder & parser, compression pipelines (Zstd, LZ4, XZ, Gzip), `switch_root`/`pivot_root` staging, LUKS2/GELI volume unsealing during boot.
@@ -76,8 +76,8 @@ impl LinuxBsdKernelInnovationsV86Engine {
         self.configs.push(KernelFeatureConfigV86 {
             flavor: KernelFlavorV86::LinuxEevdfSchedExt,
             name: "Linux 6.38+ Sovereign Core".to_string(),
-            latency_target_ns: 800_000, // 0.8ms EEVDF target
-            ebpfsched_policy: "scx_ai_predictive_v86".to_string(),
+            latency_target_ns: 1_000_000, // 1.0ms EEVDF target
+            ebpfsched_policy: "scx_optical_interactive_v86".to_string(),
             io_uring_sqpoll_active: true,
             bcachefs_cow_tiering: true,
             capsicum_rights_mask: 0,
@@ -96,7 +96,7 @@ impl LinuxBsdKernelInnovationsV86Engine {
         self.configs.push(KernelFeatureConfigV86 {
             flavor: KernelFlavorV86::FreeBsdCapsicumVnetGeli,
             name: "FreeBSD 16.8+ Sovereign Core".to_string(),
-            latency_target_ns: 3_000_000,
+            latency_target_ns: 3_500_000,
             ebpfsched_policy: String::new(),
             io_uring_sqpoll_active: false,
             bcachefs_cow_tiering: false,
@@ -119,7 +119,7 @@ impl LinuxBsdKernelInnovationsV86Engine {
         self.configs.push(KernelFeatureConfigV86 {
             flavor: KernelFlavorV86::OpenBsdPledgeKarlSoftraid,
             name: "OpenBSD 9.6+ Sovereign Security Core".to_string(),
-            latency_target_ns: 6_000_000,
+            latency_target_ns: 7_000_000,
             ebpfsched_policy: String::new(),
             io_uring_sqpoll_active: false,
             bcachefs_cow_tiering: false,
@@ -145,7 +145,7 @@ impl LinuxBsdKernelInnovationsV86Engine {
         self.configs.push(KernelFeatureConfigV86 {
             flavor: KernelFlavorV86::NetBsdRumpNpfJit,
             name: "NetBSD 13.1+ Sovereign Rump Core".to_string(),
-            latency_target_ns: 4_500_000,
+            latency_target_ns: 5_000_000,
             ebpfsched_policy: String::new(),
             io_uring_sqpoll_active: false,
             bcachefs_cow_tiering: false,
@@ -155,7 +155,7 @@ impl LinuxBsdKernelInnovationsV86Engine {
             unveil_paths: Vec::new(),
             karl_seed: 0,
             softraid_crypto_algo: String::new(),
-            rump_driver_server: "rump_pci_pnet_nvme_v86".to_string(),
+            rump_driver_server: "rump_pci_pnet_nvme".to_string(),
             npf_jit_bytecode_rules: 2048,
             hammer3_pfs_replicas: 0,
             varsyms_bindings: BTreeMap::new(),
@@ -168,7 +168,7 @@ impl LinuxBsdKernelInnovationsV86Engine {
         self.configs.push(KernelFeatureConfigV86 {
             flavor: KernelFlavorV86::DragonFlyHammer3Varsyms,
             name: "DragonFly BSD 8.5+ HAMMER3 Cluster Core".to_string(),
-            latency_target_ns: 2_500_000,
+            latency_target_ns: 3_000_000,
             ebpfsched_policy: String::new(),
             io_uring_sqpoll_active: false,
             bcachefs_cow_tiering: false,
@@ -249,7 +249,7 @@ impl KernelModuleAndDriverRuntimeV86Engine {
             KernelModuleV86 {
                 name: "nvme".to_string(),
                 license: "GPL".to_string(),
-                version: "3.2.0".to_string(),
+                version: "2.8.0".to_string(),
                 exported_symbols: vec![
                     "nvme_alloc_request".to_string(),
                     "nvme_submit_cmd".to_string(),
@@ -375,7 +375,7 @@ impl FirmwareAndMicrocodeLoaderV86Engine {
             "kernel/x86/microcode/GenuineIntel.bin".to_string(),
             FirmwareBlobV86 {
                 path: "kernel/x86/microcode/GenuineIntel.bin".to_string(),
-                size_bytes: 8_388_608, // 8MB
+                size_bytes: 4_194_304, // 4MB
                 vendor: "Intel".to_string(),
                 sha256_hash: "a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0"
                     .to_string(),
@@ -388,7 +388,7 @@ impl FirmwareAndMicrocodeLoaderV86Engine {
             "kernel/x86/microcode/AuthenticAMD.bin".to_string(),
             FirmwareBlobV86 {
                 path: "kernel/x86/microcode/AuthenticAMD.bin".to_string(),
-                size_bytes: 3_145_728, // 3MB
+                size_bytes: 1_572_864, // 1.5MB
                 vendor: "AMD".to_string(),
                 sha256_hash: "b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef01"
                     .to_string(),
@@ -401,7 +401,7 @@ impl FirmwareAndMicrocodeLoaderV86Engine {
             "/lib/firmware/amdgpu/gc_11_0_0_mes.bin".to_string(),
             FirmwareBlobV86 {
                 path: "/lib/firmware/amdgpu/gc_11_0_0_mes.bin".to_string(),
-                size_bytes: 1_048_576,
+                size_bytes: 524_288,
                 vendor: "AMD Radeon".to_string(),
                 sha256_hash: "c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef012"
                     .to_string(),
@@ -484,17 +484,17 @@ impl InitramfsInitrdStagingV86Engine {
         self.files.push(InitramfsFileV86 {
             path: "init".to_string(),
             permissions: 0o755,
-            size_bytes: 2_500_000,
+            size_bytes: 2_100_000,
         });
         self.files.push(InitramfsFileV86 {
             path: "bin/busybox".to_string(),
             permissions: 0o755,
-            size_bytes: 1_200_000,
+            size_bytes: 1_100_000,
         });
         self.files.push(InitramfsFileV86 {
             path: "sbin/cryptsetup".to_string(),
             permissions: 0o755,
-            size_bytes: 1_500_000,
+            size_bytes: 1_350_000,
         });
         self.files.push(InitramfsFileV86 {
             path: "etc/fstab".to_string(),
@@ -708,7 +708,7 @@ impl UefiBiosGopHandoffV86Engine {
         let mut engine = Self {
             active_gop: None,
             nvram_vars: BTreeMap::new(),
-            smbios_tables_count: 18,
+            smbios_tables_count: 16,
             acpi_rsdp_address: 0x000F_0000,
             csm_legacy_fallback: false,
         };
@@ -865,7 +865,7 @@ impl KexecFastRebootV86Engine {
         Self {
             staged_segments: Vec::new(),
             kernel_entry_point: 0,
-            crash_kernel_reserved_mb: 512,
+            crash_kernel_reserved_mb: 256,
             is_staged: false,
         }
     }
@@ -1060,7 +1060,7 @@ mod tests {
         assert!(engine
             .blobs
             .contains_key("kernel/x86/microcode/GenuineIntel.bin"));
-        assert!(engine.total_microcode_size() >= 8_388_608);
+        assert!(engine.total_microcode_size() >= 4_194_304);
     }
 
     #[test]
