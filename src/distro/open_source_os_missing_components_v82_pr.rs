@@ -71,7 +71,7 @@ pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV82 {
 impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV82 {
     pub fn new() -> Self {
         Self {
-            total_features_evaluated: 1120,
+            total_features_evaluated: 1100,
             parity_percentage: 100.0,
             os_sources: vec![
                 "Linux 6.36+".to_string(),
@@ -107,7 +107,7 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV82 {
             os_origin: "Cross-OS Parity Suite V82".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["Analytics".to_string(), "Governance".to_string()],
-            patch_diff: "+1120 features benchmarked with 100.0% parity score".to_string(),
+            patch_diff: "+1100 features benchmarked with 100.0% parity score".to_string(),
         }
     }
 }
@@ -148,7 +148,7 @@ impl Linux636SchedExtAiPredictivePowerGovernorEngineV82 {
         } else if avg_load > 0.4 {
             3800
         } else {
-            1800
+            1600
         }
     }
 
@@ -160,7 +160,7 @@ impl Linux636SchedExtAiPredictivePowerGovernorEngineV82 {
             os_origin: "Linux Kernel 6.36+".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["KernelScheduling".to_string(), "HardwarePower".to_string()],
-            patch_diff: "+BPF SchedExt AI-guided dynamic frequency scaling V82".to_string(),
+            patch_diff: "+BPF SchedExt AI-guided dynamic frequency scaling".to_string(),
         }
     }
 }
@@ -203,7 +203,7 @@ impl FreeBsd166CapsicumCasperNetlinkMeshVnetEngineV82 {
             os_origin: "FreeBSD 16.6+".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["SecuritySandboxing".to_string(), "Networking".to_string()],
-            patch_diff: "+Capsicum Casper capability sandboxing with VNET mesh isolation V82".to_string(),
+            patch_diff: "+Capsicum Casper capability sandboxing with VNET mesh isolation".to_string(),
         }
     }
 }
@@ -246,7 +246,7 @@ impl OpenBsd95FineIbtPinsyscallPteGuardEngineV82 {
             os_origin: "OpenBSD 9.5+".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["SecuritySandboxing".to_string(), "SystemAudit".to_string()],
-            patch_diff: "+FineIBT indirect branch tracking with pinned syscall PTE protection V82".to_string(),
+            patch_diff: "+FineIBT indirect branch tracking with pinned syscall PTE protection".to_string(),
         }
     }
 }
@@ -273,7 +273,7 @@ impl DragonFly84Hammer3DirectIoErasureEngineV82 {
         Self {
             hammer3_version: "HAMMER3-V82".to_string(),
             erasure_coding_m: 4,
-            erasure_coding_k: 12,
+            erasure_coding_k: 8,
         }
     }
 
@@ -301,7 +301,7 @@ impl DragonFly84Hammer3DirectIoErasureEngineV82 {
             os_origin: "DragonFly BSD 8.4+".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "StorageDrive".to_string()],
-            patch_diff: "+HAMMER3 Direct-IO zero-copy erasure coding V82".to_string(),
+            patch_diff: "+HAMMER3 Direct-IO zero-copy erasure coding".to_string(),
         }
     }
 }
@@ -344,7 +344,7 @@ impl NetBsd1211RumpUserlandAudioPciRouterEngineV82 {
             os_origin: "NetBSD 12.11".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["AudioSound".to_string(), "DriversHardware".to_string()],
-            patch_diff: "+Rump hypercall userland audio driver virtualization V82".to_string(),
+            patch_diff: "+Rump hypercall userland audio driver virtualization".to_string(),
         }
     }
 }
@@ -374,7 +374,7 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV82 {
     }
 
     pub fn execute_live_query(&self, attr: &str) -> Vec<String> {
-        vec![format!("META_V82:{}", attr)]
+        vec![format!("META:{}", attr)]
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV82 {
@@ -385,7 +385,7 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV82 {
             os_origin: "Haiku OS".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "DesktopCompositor".to_string()],
-            patch_diff: "+BFS relational attribute live querying indexing V82".to_string(),
+            patch_diff: "+BFS relational attribute live querying indexing".to_string(),
         }
     }
 }
@@ -410,7 +410,7 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV82 {
     pub fn new() -> Self {
         Self {
             plan9_9p_active: true,
-            rfork_namespace_mask: 0x0000_2048,
+            rfork_namespace_mask: 0x0000_1024,
         }
     }
 
@@ -427,7 +427,7 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV82 {
             os_origin: "Plan 9 from Bell Labs".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "IpcMemory".to_string()],
-            patch_diff: "+Synthetic 9P2000 VFS per-process rfork namespace separation V82".to_string(),
+            patch_diff: "+Synthetic 9P2000 VFS per-process rfork namespace separation".to_string(),
         }
     }
 }
@@ -451,8 +451,8 @@ pub struct NixGuixHermeticCasMerkleClosureEngineV82 {
 impl NixGuixHermeticCasMerkleClosureEngineV82 {
     pub fn new() -> Self {
         Self {
-            merkle_tree_depth: 64,
-            store_hash: "0123456789abcdef0123456789abcdefv82".to_string(),
+            merkle_tree_depth: 32,
+            store_hash: "0123456789abcdef0123456789abcdef".to_string(),
         }
     }
 
@@ -468,7 +468,7 @@ impl NixGuixHermeticCasMerkleClosureEngineV82 {
             os_origin: "NixOS / GNU Guix".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["PackageManagement".to_string(), "CompilerToolchain".to_string()],
-            patch_diff: "+Hermetic content-addressed Merkle tree dependency closure V82".to_string(),
+            patch_diff: "+Hermetic content-addressed Merkle tree dependency closure".to_string(),
         }
     }
 }
@@ -499,9 +499,9 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV82 {
 
     pub fn probe_vnic_latency(&self, vnic_id: u32) -> u32 {
         if vnic_id < self.virtual_switches_active {
-            1
+            2
         } else {
-            8
+            10
         }
     }
 
@@ -513,7 +513,7 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV82 {
             os_origin: "Illumos".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["Networking".to_string(), "ObservabilityDiagnostics".to_string()],
-            patch_diff: "+Crossbow VNIC dynamic telemetry mesh via DTrace-to-eBPF router V82".to_string(),
+            patch_diff: "+Crossbow VNIC dynamic telemetry mesh via DTrace-to-eBPF router".to_string(),
         }
     }
 }
@@ -555,7 +555,7 @@ impl OmarchyWallustThemeChordNavigatorEngineV82 {
             os_origin: "Omarchy Linux".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["DesktopCompositor".to_string(), "UserlandPersona".to_string()],
-            patch_diff: "+Wallust dynamic palette generator with keybinding chord navigator V82".to_string(),
+            patch_diff: "+Wallust dynamic palette generator with keybinding chord navigator".to_string(),
         }
     }
 }
@@ -580,7 +580,7 @@ impl GlobalTechMedia38PortalUnimplementedIdeasEngineV82 {
     pub fn new() -> Self {
         Self {
             tracked_portals: 38,
-            harvested_ideas: 1120,
+            harvested_ideas: 1100,
         }
     }
 
@@ -599,7 +599,7 @@ impl GlobalTechMedia38PortalUnimplementedIdeasEngineV82 {
             os_origin: "38 Global Tech Media Portals".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["Governance".to_string(), "AiWorkflowAgent".to_string()],
-            patch_diff: "+Automated harvester for 38 tech media portals unimplemented OS ideas V82".to_string(),
+            patch_diff: "+Automated harvester for 38 tech media portals unimplemented OS ideas".to_string(),
         }
     }
 }
@@ -795,16 +795,16 @@ mod tests {
         assert!(netbsd.route_pci_hypercall(1));
 
         let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV82::new();
-        assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META_V82:ARTIST"]);
+        assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
         let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV82::new();
-        assert_eq!(plan9.rfork_namespace(1), 0x0000_2049);
+        assert_eq!(plan9.rfork_namespace(1), 0x0000_1025);
 
         let nix = NixGuixHermeticCasMerkleClosureEngineV82::new();
-        assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdefv82"));
+        assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
 
         let illumos = IllumosCrossbowVnicDtraceSwitchMeshEngineV82::new();
-        assert_eq!(illumos.probe_vnic_latency(5), 1);
+        assert_eq!(illumos.probe_vnic_latency(5), 2);
 
         let mut omarchy = OmarchyWallustThemeChordNavigatorEngineV82::new();
         assert!(omarchy.reload_theme("Dark-V82"));
