@@ -766,6 +766,26 @@ if [ -f "src/creative/fontcraft_advancements_v78_pr.rs" ]; then
     ./build/test_fontcraft_v78
 fi
 
+if [ -f "src/creative/fontcraft_advancements_v80_pr.rs" ]; then
+    echo "Running Sovereign FontCraft Advancements V80 PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/fontcraft_advancements_v80_pr.rs --edition=2021 -o build/test_fontcraft_v80
+    ./build/test_fontcraft_v80
+
+    rustc --test tests/test_fontcraft_advancements_v80_pr.rs --edition=2021 -o build/test_fontcraft_v80_integration
+    ./build/test_fontcraft_v80_integration
+fi
+
+if [ -f "src/creative/fontcraft_advancements_v81_pr.rs" ]; then
+    echo "Running Sovereign FontCraft Advancements V81 PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/fontcraft_advancements_v81_pr.rs --edition=2021 -o build/test_fontcraft_v81
+    ./build/test_fontcraft_v81
+
+    rustc --test tests/test_fontcraft_advancements_v81_pr.rs --edition=2021 -o build/test_fontcraft_v81_integration
+    ./build/test_fontcraft_v81_integration
+fi
+
 if [ -f "src/creative/voicecraft.rs" ]; then
     echo "Running Sovereign VoiceCraft Engine test suite..."
     mkdir -p build

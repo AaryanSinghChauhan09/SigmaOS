@@ -63,6 +63,8 @@ pub mod filmcraft_lightcraft_mediacraft_artcraft_parity_pr;
 pub mod fontcraft;
 pub mod fontcraft_advancements_v77_pr;
 pub mod fontcraft_advancements_v78_pr;
+pub mod fontcraft_advancements_v80_pr;
+pub mod fontcraft_advancements_v81_pr;
 pub mod fontcraft_artcraft_missing_components_v66_pr;
 pub mod fontcraft_artcraft_parity_pr;
 pub mod fontcraft_missing_components_parity_pr;
@@ -205,6 +207,8 @@ pub use filmcraft_artcraft_parity_pr::*;
 pub use filmcraft_lightcraft_mediacraft_artcraft_parity_pr::*;
 pub use fontcraft_advancements_v77_pr::*;
 pub use fontcraft_advancements_v78_pr::*;
+pub use fontcraft_advancements_v80_pr::*;
+pub use fontcraft_advancements_v81_pr::*;
 pub use fontcraft_artcraft_missing_components_v66_pr::*;
 pub use gridcraft::{
     get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
