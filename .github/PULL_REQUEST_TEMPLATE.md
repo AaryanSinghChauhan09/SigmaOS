@@ -1,76 +1,96 @@
 ## Summary
 
-<!-- What component does this PR improve or add? -->
+<!-- What changed and why? -->
 
-## Related issue
+## Task type
+
+- [ ] Daily CI maintenance
+- [ ] Weekly dependency/security review
+- [ ] Weekly open-source study
+- [ ] Biweekly component gap review
+- [ ] Monthly boot validation
+- [ ] Monthly installer/recovery rehearsal
+- [ ] Monthly package/update rehearsal
+- [ ] Quarterly release review
+- [ ] Quarterly architecture review
+- [ ] Quarterly hardware audit
+
+## Related issue / study
 
 Closes #<issue-id>
+- Upstream study:
+- Reference study / ADR:
 
-## Upstream study
+## Component
 
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
+- [ ] Boot / platform
+- [ ] Kernel
+- [ ] Memory
+- [ ] Scheduler
+- [ ] VFS / filesystems
+- [ ] Syscalls
+- [ ] Drivers
+- [ ] Networking
+- [ ] IPC / IPC handler
+- [ ] Security
+- [ ] Userspace
+- [ ] Desktop
+- [ ] Packaging / installer
+- [ ] Documentation
+- [ ] CI / tooling
 
-## What SigmaOS adopts
+## Shell component
 
-<!-- State the design principle or mechanism adopted. -->
+- [ ] Interactive shell
+- [ ] Builtins
+- [ ] Lexer / Parser
+- [ ] Environment / Variables
 
-## What SigmaOS changes or rejects
+## What SigmaOS adopts / changes
 
-<!-- State simplifications, deviations, and rejected ideas. -->
-
-## Component impact
-
-- Component:
-- Maturity before:
-- Maturity after:
-- Runtime path affected:
+<!-- State design principles adopted, deviations, or IPC semantics / shell behavior -->
+- IPC semantics:
+  - Blocking behavior:
+  - Non-blocking behavior:
+  - EOF / closure behavior:
 
 ## Changes
 
 - [ ] Source implementation
 - [ ] Unit tests
 - [ ] Integration tests
-- [ ] QEMU/runtime test
+- [ ] QEMU / runtime test
 - [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+- [ ] Status updates (`FEATURE_STATUS.toml` / `CAPABILITY_MATRIX.toml`)
 
 ## Verification
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-make check
-make test
-make format
-```
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] QEMU boot evidence, if applicable
+- [ ] Installer/recovery evidence, if applicable
+- [ ] Hardware evidence, if applicable
 
-## Runtime evidence
+## Shell safety review
 
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
+- [ ] Redirection safety verified
+- [ ] Signal handling verified
+- [ ] No unbounded input buffers
 
 ## Safety and rollback
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- [ ] Shell safety review completed
+- [ ] Security review requested / completed
+- [ ] Capability/namespace checks enforced
+- [ ] Untrusted input validated
+- [ ] Risk:
+- [ ] Rollback:
 
 ## Reviewer checklist
 
-- [ ] Scope is narrow
-- [ ] Tests cover the change
+- [ ] Scope is narrow and well-defined
+- [ ] Tests cover positive and failure paths
 - [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported parity claims
+- [ ] Documentation reflects actual implementation
