@@ -37,17 +37,15 @@
 
 ## Recurring task
 
-- [ ] PR-level validation
-- [ ] Daily CI triage
-- [ ] Weekly subsystem review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly syscall/ABI review
-- [ ] Biweekly memory/concurrency audit
-- [ ] Monthly boot validation
-- [ ] Monthly driver/hardware audit
-- [ ] Monthly fuzz triage
-- [ ] Monthly diagnostics rehearsal
-- [ ] Quarterly release/architecture/security review
+## Shell component
+
+<!-- Specify if this affects shell or userland components. -->
+
+## Shell safety review
+
+<!-- Specify shell safety review criteria. -->
+
+## Component impact
 
 ## Reference study
 
