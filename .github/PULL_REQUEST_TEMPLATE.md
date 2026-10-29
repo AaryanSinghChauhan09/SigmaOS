@@ -2,99 +2,57 @@
 
 <!-- What changed and why? -->
 
-## Subsystem / Component
+## Task type
 
-### Kernel component
+- [ ] Daily CI maintenance
+- [ ] Weekly dependency/security review
+- [ ] Weekly open-source study
+- [ ] Biweekly component gap review
+- [ ] Monthly boot validation
+- [ ] Monthly installer/recovery rehearsal
+- [ ] Monthly package/update rehearsal
+- [ ] Quarterly release review
+- [ ] Quarterly architecture review
+- [ ] Quarterly hardware audit
 
-## Shell component
+## Related issue / study
 
-- [ ] Lexer
-- [ ] Parser
-- [ ] Expansion
-- [ ] Executor
-- [ ] Pipelines
-- [ ] Redirection
-- [ ] Job control
-- [ ] Signals
-- [ ] Built-ins
-- [ ] Interactive line editor
-- [ ] Script runner
-- [ ] Diagnostics
-- [ ] Security / sandboxing
+Closes #<issue-id>
+- Upstream study:
+- Reference study / ADR:
+
+## Component
+
+- [ ] Boot / platform
+- [ ] Kernel
+- [ ] Memory
+- [ ] Scheduler
+- [ ] VFS / filesystems
+- [ ] Syscalls
+- [ ] Drivers
+- [ ] Networking
+- [ ] IPC / IPC handler
+- [ ] Security
+- [ ] Userspace
+- [ ] Desktop
+- [ ] Packaging / installer
 - [ ] Documentation
 - [ ] CI / tooling
 
-## IPC handler & IPC semantics
+## Shell component
 
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-- Integration impact:
-
-## Recurring task
-
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly feature/bug triage
-- [ ] Weekly POSIX/sh study
-- [ ] Biweekly parser/expansion audit
-- [ ] Biweekly built-in review
-- [ ] Monthly boot-to-shell validation
-- [ ] Monthly compatibility suite
-- [ ] Monthly fuzz triage
-- [ ] Monthly security review
-- [ ] Quarterly release/UX/performance review
-
-## Upstream study
-
-### Shell component
-
+- [ ] Interactive shell
+- [ ] Builtins
 - [ ] Lexer / Parser
-- [ ] Expansion & Globbing
-- [ ] Pipelines & Redirection
-- [ ] Built-ins & Exit Codes
-- [ ] Interactive & Prompt
-- [ ] Diagnostics & Errors
+- [ ] Environment / Variables
 
-### IPC handler & IPC semantics
+## What SigmaOS adopts / changes
 
-- [ ] Message Queues / Buffers
-- [ ] Blocking behavior: timeout / wait
-- [ ] Non-blocking behavior: EAGAIN / EWOULDBLOCK
-- [ ] EOF / closure behavior: single close / teardown
-
-## Recurring task
-
-## Shell component
-
-<!-- Specify if this affects shell or userland components. -->
-
-## Shell safety review
-
-<!-- Specify shell safety review criteria. -->
-
-## Reference behavior
-
-- POSIX section:
-- Bash/dash/Zsh/BusyBox reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
-
-## Component impact
-
-- Component:
-
-## Shell component
-
-<!-- Shell component affected if applicable -->
-
-## Shell safety review
-
-<!-- Shell safety review details if applicable -->
-- Maturity before:
-- Maturity after:
-- Runtime path affected:
+<!-- State design principles adopted, deviations, or IPC semantics / shell behavior -->
+- IPC semantics:
+  - Blocking behavior:
+  - Non-blocking behavior:
+  - EOF / closure behavior:
 
 ## Shell component
 
@@ -141,59 +99,38 @@
 - [ ] `./run_sigma_tests.sh`
 - [ ] New/updated unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or reason for exemption
-- [ ] QEMU boot evidence, if boot-affecting
-- [ ] Driver/hardware evidence, if driver-affecting
-- [ ] Security review requested, if applicable
+- [ ] QEMU / runtime test
+- [ ] Documentation
+- [ ] Status updates (`FEATURE_STATUS.toml` / `CAPABILITY_MATRIX.toml`)
 
 ## Shell safety review
 
-- [ ] Expansion order is correct
-- [ ] Quoting behavior is preserved
-- [ ] Redirection failures are handled
-- [ ] Exit codes are explicit
-- [ ] Signal behavior is defined
-- [ ] No unbounded recursion or allocation
-- [ ] Interactive terminal state is restored
-- [ ] Script mode does not execute invalid partial input
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] QEMU boot evidence, if applicable
+- [ ] Installer/recovery evidence, if applicable
+- [ ] Hardware evidence, if applicable
+
+## Shell safety review
+
+- [ ] Redirection safety verified
+- [ ] Signal handling verified
+- [ ] No unbounded input buffers
 
 ## Safety and rollback
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- [ ] Shell safety review completed
+- [ ] Security review requested / completed
 - [ ] Capability/namespace checks enforced
-
-## Verification
-
-- [ ] Capability status updated in `FEATURE_STATUS.toml` / `CAPABILITY_MATRIX.toml`
-- [ ] Integration impact and component documentation updated
-- [ ] Boot matrix, if applicable
-- [ ] Hardware matrix, if applicable
-
-## Risks and rollback
-
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
-
-## Status updates
-
-- [ ] Capability status
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Shell documentation
-- [ ] Boot matrix, if applicable
+- [ ] Untrusted input validated
+- [ ] Risk:
+- [ ] Rollback:
 
 ## Reviewer checklist
 
-- [ ] Scope is narrow
-- [ ] Tests cover the change
+- [ ] Scope is narrow and well-defined
+- [ ] Tests cover positive and failure paths
 - [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported parity claims
+- [ ] Documentation reflects actual implementation
