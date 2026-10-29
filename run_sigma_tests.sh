@@ -456,6 +456,12 @@ if [ -f "src/creative/effectcraft_artcraft_missing_components_v69_pr.rs" ]; then
     ./build/test_effectcraft_v69
 fi
 
+if [ -f "src/creative/effectcraft_artcraft_missing_components_v70_pr.rs" ]; then
+    echo "Running EffectCraft & ArtCraft Missing Components V70 PR Suite..."
+    rustc --test src/creative/effectcraft_artcraft_missing_components_v70_pr.rs --edition=2021 -o build/test_effectcraft_v70
+    ./build/test_effectcraft_v70
+fi
+
 if [ -f "src/creative/soundcraft.rs" ]; then
     echo "Running Sovereign SoundCraft Audio Synthesis DAW PR test suite..."
     mkdir -p build
