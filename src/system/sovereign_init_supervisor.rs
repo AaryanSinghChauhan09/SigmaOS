@@ -116,8 +116,14 @@ mod sovereign_init_and_supervisor_advancements_v63;
 #[path = "sovereign_init_and_supervisor_advancements_v67.rs"]
 pub mod sovereign_init_and_supervisor_advancements_v67;
 
+#[path = "sovereign_init_and_supervisor_advancements_v86_pr.rs"]
+pub mod sovereign_init_and_supervisor_advancements_v86_pr;
+
 use sovereign_init_and_supervisor_advancements_v63::*;
 use sovereign_init_and_supervisor_advancements_v67::SovereignInitAndSupervisorAdvancementsV67Suite;
+use sovereign_init_and_supervisor_advancements_v86_pr::{
+    SovereignInitAndSupervisorAdvancementsV86Suite, SovereignInitAndSupervisorV86PrGatewayEngine,
+};
 
 pub struct SovereignInitSupervisor {
     pub next_pid: AtomicU32,
@@ -134,6 +140,8 @@ pub struct SovereignInitSupervisor {
     pub scheduler_v63_engine: SchedulerTimersAdvancementsV63Engine,
     pub pr_gateway_v63: SovereignInitSupervisorV63PrGateway,
     pub suite_v67: SovereignInitAndSupervisorAdvancementsV67Suite,
+    pub suite_v86: SovereignInitAndSupervisorAdvancementsV86Suite,
+    pub pr_gateway_v86: SovereignInitAndSupervisorV86PrGatewayEngine,
 }
 
 impl SovereignInitSupervisor {
@@ -153,6 +161,8 @@ impl SovereignInitSupervisor {
             scheduler_v63_engine: SchedulerTimersAdvancementsV63Engine::new(),
             pr_gateway_v63: SovereignInitSupervisorV63PrGateway::new(),
             suite_v67: SovereignInitAndSupervisorAdvancementsV67Suite::new(),
+            suite_v86: SovereignInitAndSupervisorAdvancementsV86Suite::new(),
+            pr_gateway_v86: SovereignInitAndSupervisorV86PrGatewayEngine::new(),
         }
     }
 
@@ -444,6 +454,14 @@ mod tests {
         let supervisor = SovereignInitSupervisor::new();
         assert!(supervisor.suite_v67.run_master_verification());
         let manifests = supervisor.suite_v67.collect_all_manifests();
+        assert_eq!(manifests.len(), 7);
+    }
+
+    #[test]
+    fn test_v86_suite_integration() {
+        let supervisor = SovereignInitSupervisor::new();
+        let sig = [0u8; 64];
+        let manifests = supervisor.pr_gateway_v86.orchestrate_core_userland_v86(&sig).unwrap();
         assert_eq!(manifests.len(), 7);
     }
 }
