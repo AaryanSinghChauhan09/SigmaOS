@@ -18,6 +18,11 @@ fn test_milestones_and_rules_completeness() {
 
     assert_eq!(milestones[0].code(), "M0");
     assert_eq!(milestones[8].code(), "M8");
+
+    for m in &milestones {
+        assert!(!m.missing_capability().is_empty());
+    }
+
     assert_eq!(rules[0].id(), 1);
     assert_eq!(rules[11].id(), 12);
 }
