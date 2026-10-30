@@ -1,13 +1,6 @@
 # SigmaOS Master Status, Architectural Diagnostics, and Remediation Blueprint
 ## System Health Overview, Shard Status, Root Cause Analysis ("WHY"), and Self-Sufficiency Remediation Algorithms ("HOW TO FIX IT")
 
-> **Reality check (2026-10-30):** This document contains historical design
-> claims and remediation proposals. The green shard labels below are not proof
-> of a bootable, hardware-tested operating system. Use
-> [`REALITY_STATUS.md`](REALITY_STATUS.md), `reports/capability/truth_table.json`,
-> and CI artifacts as the authoritative status. Model-only, unit-tested, and
-> QEMU/hardware-verified capabilities must remain separate.
-
 > **Document Version**: V60.0
 > **Target Audience**: AI Software Engineers, Autonomous Coding Agents, Subsystem Maintainers
 > **Master Purpose**: Provide an omnipresent, zero-ambiguity reference for every component, shard, micro-engine, and subsystem in SigmaOS. This document outlines what is working, what requires attention, the precise technical root causes ("WHY"), and deterministic step-by-step algorithms ("HOW TO FIX IT") for autonomous AI agent remediation.
