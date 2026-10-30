@@ -21,6 +21,28 @@ canonical_repositories_published = [
     "SigmaOS-brand",
 ]
 
+# Component-level ownership inside canonical repositories. A component gets a
+# separate repository only when its API, ownership, tests, and release cadence
+# justify independent extraction.
+[component_owners]
+bootloader = "SigmaOS-core"
+installer = "SigmaOS-tools"
+kernel = "SigmaOS-core"
+init = "SigmaOS-core"
+storage = "SigmaOS-services"
+nvme = "SigmaOS-services"
+wifi = "SigmaOS-services"
+acpi = "SigmaOS-core"
+graphics = "SigmaOS-shell"
+desktop-session = "SigmaOS-shell"
+accessibility = "SigmaOS-desktop"
+network-manager = "SigmaOS-services"
+package-manager = "SigmaOS-tools"
+system-updater = "SigmaOS-tools"
+backup-recovery = "SigmaOS-services"
+software-center = "SigmaOS-apps"
+documentation = "SigmaOS-docs"
+
 [[component]]
 name = "bootloader"
 repository = "SigmaOS-bootloader"
