@@ -1,11 +1,11 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit baseline: 1,535 declarations / 1,481 unique component names.
+# Registry audit baseline: 1,532 declarations / 1,481 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
-# GitHub account audit: 294 repositories; 260 registry checkouts are local;
-# 1,292 unique declarations are not present in the account and are stale or
+# GitHub account audit: 303 repositories; 253 registry checkouts are local;
+# 1,228 unique declarations are not present in the account and are stale or
 # unpublished until an authoritative remote is supplied.
 
 [[component]]
@@ -206,7 +206,6 @@ language = "shell"
 inspirations = ["https://github.com/linuxmint/mintupgrade-legacy"]
 visibility = "public"
 
-[[component]]
 [[component]]
 name = "SigmaOS-backup-tool"
 description = "Backup / restore with manifest & verification"
@@ -7957,7 +7956,6 @@ inspirations = ["https://archlinux.org", "https://github.com/gnu-grub"]
 visibility = "public"
 
 [[component]]
-[[component]]
 name = "SigmaOS-rolling-release"
 description = "Rolling release update system component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rolling-release"
@@ -8326,7 +8324,6 @@ language = "go"
 inspirations = ["https://github.com/junegust/fzf"]
 visibility = "public"
 
-[[component]]
 [[component]]
 name = "SigmaOS-oh-my-zsh"
 description = "Oh My Zsh component for SigmaOS"

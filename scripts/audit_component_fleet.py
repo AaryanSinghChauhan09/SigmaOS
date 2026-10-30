@@ -39,10 +39,22 @@ def audit(root: Path) -> dict[str, object]:
     data = tomllib.loads(registry_path.read_text(encoding="utf-8"))
     entries = data.get("component", [])
 
-    names = [entry.get("name", "") for entry in entries]
+    invalid_entries = [
+        index
+        for index, entry in enumerate(entries, start=1)
+        if not isinstance(entry.get("name"), str) or not entry["name"].strip()
+    ]
+    names = [
+        entry["name"].strip()
+        for entry in entries
+        if isinstance(entry.get("name"), str) and entry["name"].strip()
+    ]
     groups: dict[str, list[dict[str, object]]] = {}
     for entry in entries:
-        name = entry.get("name", "")
+        raw_name = entry.get("name")
+        if not isinstance(raw_name, str) or not raw_name.strip():
+            continue
+        name = raw_name.strip()
         if name:
             groups.setdefault(name, []).append(entry)
     duplicates = sorted(name for name, group in groups.items() if len(group) > 1)
@@ -73,6 +85,7 @@ def audit(root: Path) -> dict[str, object]:
     return {
         "registry_entries": len(entries),
         "unique_components": len(set(names)),
+        "invalid_entries": invalid_entries,
         "missing_local_checkouts": sorted(
             set(names) - {item["name"] for item in components if item["checkout"]}
         ),
@@ -97,6 +110,7 @@ def summary(report: dict[str, object]) -> str:
         (
             f"registry entries: {report['registry_entries']}",
             f"unique components: {report['unique_components']}",
+            f"invalid unnamed entries: {len(report['invalid_entries'])}",
             f"local git checkouts: {checkout}",
             f"missing local checkouts: {missing_local}",
             f"missing origin: {no_origin}",
