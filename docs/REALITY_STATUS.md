@@ -20,6 +20,7 @@ repeatable.
 | Dynamic ELF loading | Relocation engine supports checked `RELATIVE` entries, indexed symbol resolution, and fails closed for unresolved symbols | Not verified end-to-end |
 | GPU/Wayland desktop | Prototype and architectural code; no real GPU session evidence | Prototype |
 | Package transactions | Dependency preparation, conflict checks, and scoped rollback are unit-tested | Partial |
+| Distribution release lifecycle | Signed architecture-specific manifests with edge → RC → stable promotion gates | Implemented as policy; repository publishing and installer integration remain |
 
 ## Product wedge
 
