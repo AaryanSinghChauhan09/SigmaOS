@@ -30,4 +30,6 @@ __pycache__/
 !docs/process/*.md
 !docs/ipc-handler.md
 !wiki/ipc-handler.md
+!docs/DISPATCHER_PLAN.md
+!wiki/DISPATCHER_PLAN.md
 !.github/PULL_REQUEST_TEMPLATE.md
