@@ -44,7 +44,7 @@ pub struct UnifiedOsDebianV82PrProposal {
 }
 
 pub struct OpenSourceOsDebianUnimplementedIdeasV82PrSuite {
-    pub os_unimplemented_suite: OpenSourceOsUnimplementedIdeasV82PrSuite,
+    pub os_unimplemented_suite: SovereignUnimplementedIdeasSuiteV82,
     pub debian_missing_suite: DebianGithubRepoMissingComponentsV82PrSuite,
 }
 
@@ -57,13 +57,13 @@ impl Default for OpenSourceOsDebianUnimplementedIdeasV82PrSuite {
 impl OpenSourceOsDebianUnimplementedIdeasV82PrSuite {
     pub fn new() -> Self {
         Self {
-            os_unimplemented_suite: OpenSourceOsUnimplementedIdeasV82PrSuite::new(),
+            os_unimplemented_suite: SovereignUnimplementedIdeasSuiteV82::new(),
             debian_missing_suite: DebianGithubRepoMissingComponentsV82PrSuite::new(),
         }
     }
 
     pub fn generate_unified_pr_proposals(&self) -> Vec<UnifiedOsDebianV82PrProposal> {
-        let os_specs = self.os_unimplemented_suite.collect_all_proposals();
+        let os_specs = self.os_unimplemented_suite.collect_all_manifests();
         let debian_specs = self.debian_missing_suite.collect_all_pr_specs();
 
         let mut proposals = Vec::new();
@@ -96,7 +96,7 @@ impl OpenSourceOsDebianUnimplementedIdeasV82PrSuite {
     }
 
     pub fn evaluate_distro_parity_score(&self) -> u32 {
-        let os_proposals = self.os_unimplemented_suite.collect_all_proposals();
+        let os_proposals = self.os_unimplemented_suite.collect_all_manifests();
         if os_proposals.is_empty() {
             100
         } else {
