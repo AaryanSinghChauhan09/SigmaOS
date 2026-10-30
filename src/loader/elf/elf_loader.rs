@@ -194,7 +194,9 @@ pub enum ElfLoadError {
     SegmentOutOfBounds,
     InvalidSegmentSize,
     InvalidAlignment,
+    InvalidLoadBias,
     AddressOverflow,
+    ImageTooLarge,
     WritableExecutableSegment,
     EntryNotExecutable,
 }
@@ -204,6 +206,22 @@ pub enum ElfLoadError {
 pub struct ElfLoadPlan<'a> {
     pub entry_point: u64,
     pub segments: Vec<ElfLoadSegment<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MaterializedElfSegment {
+    pub offset: usize,
+    pub memory_size: usize,
+    pub flags: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MaterializedElfImage {
+    pub load_bias: u64,
+    pub base_address: u64,
+    pub entry_point: u64,
+    pub bytes: Vec<u8>,
+    pub segments: Vec<MaterializedElfSegment>,
 }
 
 impl<'a> ElfLoadPlan<'a> {
@@ -291,12 +309,97 @@ impl<'a> ElfLoadPlan<'a> {
         if !segments.iter().any(|segment| {
             segment.flags & PF_X != 0
                 && entry_point >= segment.virtual_address
-                && entry_point < segment.virtual_address + segment.memory_size
+                && segment
+                    .virtual_address
+                    .checked_add(segment.memory_size)
+                    .is_some_and(|end| entry_point < end)
         }) {
             return Err(ElfLoadError::EntryNotExecutable);
         }
         Ok(Self {
             entry_point,
+            segments,
+        })
+    }
+
+    /// Materialize the validated load segments into a zero-initialized image.
+    /// Page-table mapping and permission installation remain the mapper's job.
+    pub fn materialize(
+        &self,
+        load_bias: u64,
+        max_image_size: usize,
+    ) -> Result<MaterializedElfImage, ElfLoadError> {
+        const PAGE_SIZE: u64 = 4096;
+
+        if load_bias % PAGE_SIZE != 0 {
+            return Err(ElfLoadError::InvalidLoadBias);
+        }
+
+        let min_address = self
+            .segments
+            .iter()
+            .map(|segment| segment.virtual_address & !(PAGE_SIZE - 1))
+            .min()
+            .ok_or(ElfLoadError::ImageTooLarge)?;
+        let max_address = self.segments.iter().try_fold(0u64, |current, segment| {
+            let end = segment
+                .virtual_address
+                .checked_add(segment.memory_size)
+                .ok_or(ElfLoadError::AddressOverflow)?;
+            let aligned_end = end
+                .checked_add(PAGE_SIZE - 1)
+                .ok_or(ElfLoadError::AddressOverflow)?
+                & !(PAGE_SIZE - 1);
+            Ok::<u64, ElfLoadError>(current.max(aligned_end))
+        })?;
+        let image_size_u64 = max_address
+            .checked_sub(min_address)
+            .ok_or(ElfLoadError::AddressOverflow)?;
+        let image_size =
+            usize::try_from(image_size_u64).map_err(|_| ElfLoadError::ImageTooLarge)?;
+        if image_size > max_image_size {
+            return Err(ElfLoadError::ImageTooLarge);
+        }
+
+        let base_address = min_address
+            .checked_add(load_bias)
+            .ok_or(ElfLoadError::AddressOverflow)?;
+        let entry_point = self
+            .entry_point
+            .checked_add(load_bias)
+            .ok_or(ElfLoadError::AddressOverflow)?;
+        let mut bytes = vec![0u8; image_size];
+        let mut segments = Vec::with_capacity(self.segments.len());
+
+        for segment in &self.segments {
+            let offset_u64 = segment
+                .virtual_address
+                .checked_sub(min_address)
+                .ok_or(ElfLoadError::AddressOverflow)?;
+            let offset = usize::try_from(offset_u64).map_err(|_| ElfLoadError::ImageTooLarge)?;
+            let file_size =
+                usize::try_from(segment.file_size).map_err(|_| ElfLoadError::ImageTooLarge)?;
+            let memory_size =
+                usize::try_from(segment.memory_size).map_err(|_| ElfLoadError::ImageTooLarge)?;
+            let end = offset
+                .checked_add(file_size)
+                .ok_or(ElfLoadError::ImageTooLarge)?;
+            if end > bytes.len() || segment.image.len() != file_size {
+                return Err(ElfLoadError::ImageTooLarge);
+            }
+            bytes[offset..end].copy_from_slice(segment.image);
+            segments.push(MaterializedElfSegment {
+                offset,
+                memory_size,
+                flags: segment.flags,
+            });
+        }
+
+        Ok(MaterializedElfImage {
+            load_bias,
+            base_address,
+            entry_point,
+            bytes,
             segments,
         })
     }
@@ -435,5 +538,33 @@ mod tests {
             ElfLoadPlan::parse(&image),
             Err(ElfLoadError::SegmentOutOfBounds)
         );
+    }
+
+    #[test]
+    fn test_materialize_load_plan() {
+        let mut image = minimal_elf(PF_X, 16, 136);
+        image[120] = 0xAA;
+        let plan = ElfLoadPlan::parse(&image).unwrap();
+        let loaded = plan.materialize(0x1000000, 8192).unwrap();
+
+        assert_eq!(loaded.load_bias, 0x1000000);
+        assert_eq!(loaded.base_address, 0x1400000);
+        assert_eq!(loaded.entry_point, 0x1400080);
+        assert_eq!(loaded.bytes.len(), 4096);
+        assert_eq!(loaded.bytes[0], 0xAA);
+        assert_eq!(loaded.bytes[16], 0);
+        assert_eq!(loaded.segments[0].memory_size, 4096);
+    }
+
+    #[test]
+    fn test_materialize_rejects_unaligned_bias_and_large_images() {
+        let image = minimal_elf(PF_X, 16, 136);
+        let plan = ElfLoadPlan::parse(&image).unwrap();
+
+        assert_eq!(
+            plan.materialize(1, 8192),
+            Err(ElfLoadError::InvalidLoadBias)
+        );
+        assert_eq!(plan.materialize(0, 1024), Err(ElfLoadError::ImageTooLarge));
     }
 }
