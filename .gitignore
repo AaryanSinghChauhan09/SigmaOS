@@ -33,6 +33,8 @@ __pycache__/
 !wiki/ipc-handler.md
 !docs/DISPATCHER_PLAN.md
 !wiki/DISPATCHER_PLAN.md
+!docs/PROCESS_SYNCHRONIZATION_PLAN.md
+!wiki/PROCESS_SYNCHRONIZATION_PLAN.md
 !docs/shell/
 !docs/shell/*.md
 !docs/studies/
