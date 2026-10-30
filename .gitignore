@@ -20,6 +20,7 @@ __pycache__/
 *~
 .DS_Store
 *.md
+!README.md
 *.txt
 !docs/INTERRUPT_HANDLER_PLAN.md
 !wiki/INTERRUPT_HANDLER_PLAN.md
