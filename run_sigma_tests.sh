@@ -2556,6 +2556,19 @@ if [ -f "src/distro/cachy_linux_missing_components_v78_pr.rs" ]; then
     ./build/test_cachy_v78_pr_integration
 fi
 
+if [ -f "src/distro/cachy_linux_missing_components_v83_pr.rs" ]; then
+    echo "Running Open Source OS & Cachy Linux V83 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_v83_pr.rs --edition=2021 -o build/test_os_ideas_v83_pr
+    ./build/test_os_ideas_v83_pr
+
+    rustc --test src/distro/cachy_linux_missing_components_v83_pr.rs --edition=2021 -o build/test_cachy_v83_pr
+    ./build/test_cachy_v83_pr
+
+    rustc --test tests/test_open_source_os_and_cachy_linux_v83_pr.rs --edition=2021 -o build/test_open_source_os_and_cachy_v83_integration
+    ./build/test_open_source_os_and_cachy_v83_integration
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
     mkdir -p build

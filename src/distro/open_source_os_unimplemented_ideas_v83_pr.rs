@@ -62,7 +62,7 @@ pub struct LinuxKernel637SchedExtAdvancementsEngineV83 {
     pub sched_ext_ebpf_v7_active: bool,
     pub eevdf_bore_v7_latency_target_us: u32,
     pub folio_multi_memcg_compaction_active: bool,
-    pub io_uring_256_zero_copy_sqpoll: bool,
+    pub io_uring_512_zero_copy_sqpoll: bool,
     pub active_sched_tasks: u32,
 }
 
@@ -70,16 +70,19 @@ impl LinuxKernel637SchedExtAdvancementsEngineV83 {
     pub fn new() -> Self {
         Self {
             sched_ext_ebpf_v7_active: true,
-            eevdf_bore_v7_latency_target_us: 110,
+            eevdf_bore_v7_latency_target_us: 100,
             folio_multi_memcg_compaction_active: true,
-            io_uring_256_zero_copy_sqpoll: true,
+            io_uring_512_zero_copy_sqpoll: true,
             active_sched_tasks: 32768,
         }
     }
 
     pub fn tune_eevdf_bore_v7_latency(&mut self, latency_us: u32) -> String {
         self.eevdf_bore_v7_latency_target_us = latency_us;
-        format!("Linux Kernel 6.37+ SchedExt: EEVDF BORE V7 latency target updated to {} us for {} active tasks", latency_us, self.active_sched_tasks)
+        format!(
+            "Linux Kernel 6.37+ SchedExt: EEVDF BORE V7 latency target updated to {} us for {} active tasks",
+            latency_us, self.active_sched_tasks
+        )
     }
 
     pub fn trigger_folio_compaction(&mut self) -> String {
@@ -134,7 +137,10 @@ impl FreeBsd167OpenZfsCapsicumParityEngineV83 {
 
     pub fn trim_openzfs_arc_pressure(&mut self, free_mb: u64) -> String {
         self.openzfs_direct_io_arc_trim_active = true;
-        format!("FreeBSD 16.7+ OpenZFS: Direct-IO ARC memory pressure trimmed by {} MB; GEOM depth: {}", free_mb, self.geom_async_vdev_queue_depth)
+        format!(
+            "FreeBSD 16.7+ OpenZFS: Direct-IO ARC memory pressure trimmed by {} MB; GEOM depth: {}",
+            free_mb, self.geom_async_vdev_queue_depth
+        )
     }
 
     pub fn verify_capsicum_casper_v6(&self) -> bool {
@@ -170,7 +176,7 @@ impl Default for FreeBsd167OpenZfsCapsicumParityEngineV83 {
 
 #[derive(Debug, Clone)]
 pub struct OpenBsd96PinsyscallFineIbtSecurityEngineV83 {
-    pub pinsyscall_fine_ibt_v2_active: bool,
+    pub pinsyscall_fine_ibt_active: bool,
     pub retguard_xor_v6_canary: u64,
     pub unveil_v7_wildcards_enabled: bool,
     pub pledge_sandboxed_domains: u32,
@@ -179,15 +185,18 @@ pub struct OpenBsd96PinsyscallFineIbtSecurityEngineV83 {
 impl OpenBsd96PinsyscallFineIbtSecurityEngineV83 {
     pub fn new() -> Self {
         Self {
-            pinsyscall_fine_ibt_v2_active: true,
-            retguard_xor_v6_canary: 0xCAFE_BABE_DEAD_BEEF,
+            pinsyscall_fine_ibt_active: true,
+            retguard_xor_v6_canary: 0xFACE_BEEF_C0DE_CAFE,
             unveil_v7_wildcards_enabled: true,
             pledge_sandboxed_domains: 1024,
         }
     }
 
     pub fn enforce_pinsyscall_fine_ibt(&self, syscall_id: u32) -> String {
-        format!("OpenBSD 9.6+: FineIBT V2 shadow call stack verified for pinned syscall #{} with canary 0x{:016X}", syscall_id, self.retguard_xor_v6_canary)
+        format!(
+            "OpenBSD 9.6+: FineIBT shadow call stack verified for pinned syscall #{} with canary 0x{:016X}",
+            syscall_id, self.retguard_xor_v6_canary
+        )
     }
 
     pub fn evaluate_unveil_wildcard_path(&self, path: &str) -> bool {
@@ -197,7 +206,7 @@ impl OpenBsd96PinsyscallFineIbtSecurityEngineV83 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV83 {
         OpenSourceOsPrProposalV83 {
             pr_id: "PR-SIGMA-V83-03-OPENBSD-96".to_string(),
-            title: "feat(openbsd): OpenBSD 9.6+ Pinsyscall FineIBT V2 & Unveil V7 Wildcard Security Sandbox".to_string(),
+            title: "feat(openbsd): OpenBSD 9.6+ Pinsyscall FineIBT & Unveil V7 Wildcard Security Sandbox".to_string(),
             component_name: "sigmaos-openbsd96-security-engine".to_string(),
             os_origin: "OpenBSD 9.6+".to_string(),
             status: OsPrStatusV83::Validated,
@@ -238,7 +247,10 @@ impl DragonFlyBsdHAMMER3ReplicationEngineV83 {
     }
 
     pub fn sync_replica_node(&mut self, node_id: u32) -> String {
-        format!("DragonFly BSD 8.5+: HAMMER3 multi-master CoW snapshot synced to node #{} (depth {})", node_id, self.lockless_cow_btree_depth)
+        format!(
+            "DragonFly BSD 8.5+: HAMMER3 multi-master CoW snapshot synced to node #{} (depth {})",
+            node_id, self.lockless_cow_btree_depth
+        )
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV83 {
@@ -287,7 +299,10 @@ impl NetBsd132RumpVirtio9pEngineV83 {
     }
 
     pub fn verify_binary_integrity(&self, path: &str) -> String {
-        format!("NetBSD 13.2: Veriexec V9 Merkle tree verified integrity for binary '{}' via isolated Rump driver RPC", path)
+        format!(
+            "NetBSD 13.2: Veriexec V9 Merkle tree verified integrity for binary '{}' via isolated Rump driver RPC",
+            path
+        )
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV83 {
@@ -336,7 +351,10 @@ impl IllumosOpenZfsDTraceEBPFEngineV83 {
     }
 
     pub fn translate_dtrace_script(&self, d_script: &str) -> String {
-        format!("Illumos / OpenZFS: Translated DTrace script '{}' to eBPF bytecode for dynamic Crossbow VNIC tracing V83", d_script.trim())
+        format!(
+            "Illumos / OpenZFS V83: Translated DTrace script '{}' to eBPF bytecode for dynamic Crossbow VNIC tracing",
+            d_script.trim()
+        )
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV83 {
@@ -385,7 +403,10 @@ impl HaikuPlan9RedoxMicrokernelSchemeEngineV83 {
     }
 
     pub fn route_plumber_message(&self, msg: &str) -> String {
-        format!("Plan 9 / Haiku / Redox V83: Plumber router matched message '{}' across {} registered capability schemes", msg, self.active_plumber_routes)
+        format!(
+            "Plan 9 / Haiku / Redox V83: Plumber router matched message '{}' across {} registered capability schemes",
+            msg, self.active_plumber_routes
+        )
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV83 {
@@ -412,40 +433,43 @@ impl Default for HaikuPlan9RedoxMicrokernelSchemeEngineV83 {
 }
 
 // ============================================================================
-// 8. Global Tech Media 39 Portals Harvester Engine
+// 8. Global Tech Media Harvester Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct TechMedia39PortalsHarvesterEngineV83 {
+pub struct TechMediaHarvesterEngineV83 {
     pub active_media_portals_count: u32,
     pub ai_summarizer_pipeline_ready: bool,
     pub latest_crawled_topics: Vec<String>,
 }
 
-impl TechMedia39PortalsHarvesterEngineV83 {
+impl TechMediaHarvesterEngineV83 {
     pub fn new() -> Self {
         Self {
-            active_media_portals_count: 39,
+            active_media_portals_count: 42,
             ai_summarizer_pipeline_ready: true,
             latest_crawled_topics: vec![
-                "9to5Linux: Linux 6.37+ SchedExt EEVDF BORE V7".to_string(),
+                "9to5Linux: Linux 6.37+ SchedExt".to_string(),
                 "Phoronix: OpenZFS Direct-IO V83 Benchmarks".to_string(),
-                "TechCrunch: AI OS Microkernel Orchestration".to_string(),
+                "TechCrunch: AI Operating System Paradigms V83".to_string(),
                 "TomsHardware: CXL 3.3 Memory Fabric".to_string(),
-                "ArsTechnica: FineIBT V2 Shadow Stack Security".to_string(),
+                "ArsTechnica: Microkernel Security Paradigms".to_string(),
                 "LWN: eBPF SchedExt Neural Predictor V83".to_string(),
             ],
         }
     }
 
     pub fn harvest_all_tech_feeds(&mut self) -> String {
-        format!("Global Tech Media Engine V83: Crawled {} media portals with AI synthesis", self.active_media_portals_count)
+        format!(
+            "Global Tech Media Engine V83: Crawled {} media portals with AI synthesis",
+            self.active_media_portals_count
+        )
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV83 {
         OpenSourceOsPrProposalV83 {
             pr_id: "PR-SIGMA-V83-08-TECH-MEDIA".to_string(),
-            title: "feat(media): Global Tech Media 39 Portals RSS/Atom Crawler & AI Summary Aggregator V83".to_string(),
+            title: "feat(media): Global Tech Media RSS/Atom Crawler & AI Summary Aggregator V83".to_string(),
             component_name: "sigmaos-tech-media-harvester-v83-engine".to_string(),
             os_origin: "Global Tech Media & OS Publication Ecosystem".to_string(),
             status: OsPrStatusV83::Validated,
@@ -459,14 +483,14 @@ impl TechMedia39PortalsHarvesterEngineV83 {
     }
 }
 
-impl Default for TechMedia39PortalsHarvesterEngineV83 {
+impl Default for TechMediaHarvesterEngineV83 {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 9. Omarchy Hyprland Chord & Wallust Engine V83
+// 9. Omarchy Wallust Chord Navigator Engine V83
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -488,7 +512,10 @@ impl OmarchyWallustChordNavigatorEngineV83 {
     }
 
     pub fn trigger_chord_action(&self, chord: &str) -> String {
-        format!("Omarchy Navigator V83: Executed Hyprland chorded hotkey '{}' with Wallust dynamic palette color sync", chord)
+        format!(
+            "Omarchy Navigator V83: Executed Hyprland chorded hotkey '{}' with Wallust dynamic palette color sync",
+            chord
+        )
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV83 {
@@ -527,7 +554,7 @@ pub struct SovereignUnimplementedIdeasSuiteV83 {
     pub netbsd132_engine: NetBsd132RumpVirtio9pEngineV83,
     pub illumos_engine: IllumosOpenZfsDTraceEBPFEngineV83,
     pub microkernel_engine: HaikuPlan9RedoxMicrokernelSchemeEngineV83,
-    pub tech_media_engine: TechMedia39PortalsHarvesterEngineV83,
+    pub tech_media_engine: TechMediaHarvesterEngineV83,
     pub omarchy_engine: OmarchyWallustChordNavigatorEngineV83,
 }
 
@@ -541,7 +568,7 @@ impl SovereignUnimplementedIdeasSuiteV83 {
             netbsd132_engine: NetBsd132RumpVirtio9pEngineV83::new(),
             illumos_engine: IllumosOpenZfsDTraceEBPFEngineV83::new(),
             microkernel_engine: HaikuPlan9RedoxMicrokernelSchemeEngineV83::new(),
-            tech_media_engine: TechMedia39PortalsHarvesterEngineV83::new(),
+            tech_media_engine: TechMediaHarvesterEngineV83::new(),
             omarchy_engine: OmarchyWallustChordNavigatorEngineV83::new(),
         }
     }
@@ -603,8 +630,8 @@ mod tests {
     #[test]
     fn test_v83_individual_engines() {
         let mut linux_engine = LinuxKernel637SchedExtAdvancementsEngineV83::new();
-        let tune_msg = linux_engine.tune_eevdf_bore_v7_latency(110);
-        assert!(tune_msg.contains("110 us"));
+        let tune_msg = linux_engine.tune_eevdf_bore_v7_latency(100);
+        assert!(tune_msg.contains("100 us"));
 
         let mut freebsd_engine = FreeBsd167OpenZfsCapsicumParityEngineV83::new();
         let trim_msg = freebsd_engine.trim_openzfs_arc_pressure(16384);
@@ -613,7 +640,7 @@ mod tests {
 
         let openbsd_engine = OpenBsd96PinsyscallFineIbtSecurityEngineV83::new();
         let sec_msg = openbsd_engine.enforce_pinsyscall_fine_ibt(128);
-        assert!(sec_msg.contains("FineIBT V2 shadow call stack"));
+        assert!(sec_msg.contains("FineIBT shadow call stack"));
         assert!(openbsd_engine.evaluate_unveil_wildcard_path("/usr/local/*"));
 
         let mut dfbsd_engine = DragonFlyBsdHAMMER3ReplicationEngineV83::new();
@@ -632,9 +659,9 @@ mod tests {
         let plumber_msg = microkernel_engine.route_plumber_message("kind=text data=open");
         assert!(plumber_msg.contains("Plumber router matched"));
 
-        let mut media_engine = TechMedia39PortalsHarvesterEngineV83::new();
+        let mut media_engine = TechMediaHarvesterEngineV83::new();
         let crawl_msg = media_engine.harvest_all_tech_feeds();
-        assert!(crawl_msg.contains("39 media portals"));
+        assert!(crawl_msg.contains("42 media portals"));
 
         let omarchy_engine = OmarchyWallustChordNavigatorEngineV83::new();
         let chord_msg = omarchy_engine.trigger_chord_action("SUPER+ALT+ENTER");
