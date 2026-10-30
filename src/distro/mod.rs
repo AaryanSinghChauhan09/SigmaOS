@@ -740,6 +740,9 @@ pub use sovereign_lfs_bsd_synthesis_v79_pr::*;
 pub mod sovereign_lfs_bsd_synthesis_v80_pr;
 pub use sovereign_lfs_bsd_synthesis_v80_pr::*;
 
+pub mod sovereign_lfs_bsd_synthesis_v84_pr;
+pub use sovereign_lfs_bsd_synthesis_v84_pr::*;
+
 pub mod bootable_vertical_slices_missing_components_pr;
 pub mod sigmaos_gap_closing_evidence_gated_roadmap_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
