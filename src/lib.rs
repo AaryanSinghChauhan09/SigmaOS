@@ -742,6 +742,7 @@ pub use media::sovereign_audio_video_advancements_v76_pr::*;
 pub use media::sovereign_audio_video_advancements_v80_pr::*;
 pub use media::sovereign_audio_video_advancements_v84_pr::*;
 pub use media::sovereign_audio_video_advancements_v86_pr::*;
+pub use media::sovereign_audio_video_advancements_v88_pr::*;
 pub use media::sovereign_web_browser_advancements_v82_pr::*;
 pub use media::sovereign_web_browser_advancements_v86_pr::*;
 pub mod microphone;
