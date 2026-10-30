@@ -17,7 +17,6 @@ pub mod atomic;
 pub mod delta;
 pub mod distro_update_parity;
 pub mod manager;
-pub mod release_channels;
 
 pub use distro_update_parity::{
     ArchRollingReleaseUpdater, DebianUnattendedUpgradesEngine, FreeBsdPatchEntry,
@@ -29,8 +28,4 @@ pub use manager::{
     PreflightCheckResult, SovereignSystemUpdateManager, SystemUpdatePayload, SystemUpdatePolicy,
     SystemUpdateStrategy, UpdateHealthVerifier, UpdateLedgerEntry, UpdateSeverity,
     UpdateTransactionLedger,
-};
-pub use release_channels::{
-    ReleaseArchitecture, ReleaseArtifact, ReleaseChannel, ReleaseManifest, ReleasePromotion,
-    ReleaseValidationError,
 };

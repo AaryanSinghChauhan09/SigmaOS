@@ -6,7 +6,7 @@ After=graphical-session.target
 
 [Service]
 Type=exec
-ExecStart=/usr/bin/sigmaos-shell daemon
+ExecStart=/usr/bin/sigmaos-shell
 Restart=on-failure
 RestartSec=2
 

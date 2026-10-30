@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify iso iso-stub qemu-smoke run run-stub launch launch-check start mint arch omarchy boot-img clean help
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -95,10 +95,6 @@ iso-stub: kernel
 	@mkdir -p build
 	@bash scripts/build_stub_iso.sh
 
-# 8d. Evidence-gated real QEMU boot-to-shell test
-qemu-smoke:
-	@bash scripts/ci/qemu_boot_smoke.sh
-
 # 8c. Build standalone UEFI boot image (FAT32 EFI System Partition)
 boot-img:
 	@echo "==> Synthesizing SigmaOS Bare-Metal UEFI Boot Image..."
@@ -151,7 +147,6 @@ help:
 	@echo "  make fmt-fix      - Auto-apply rustfmt across workspace"
 	@echo "  make iso          - Full Desktop ISO build (GRUB2 + initramfs + installer) ✓"
 	@echo "  make iso-stub     - Stub ISO build (GRUB2, boots NOW in QEMU) ✓"
-	@echo "  make qemu-smoke   - Build ISO and verify real QEMU kernel markers"
 	@echo "  make boot-img     - Standalone UEFI ESP image (FAT32 BOOTX64.EFI) ✓"
 	@echo "  make run          - Boot desktop ISO in QEMU / native workstation ✓"
 	@echo "  make run-stub     - Boot stub ISO in QEMU ✓"

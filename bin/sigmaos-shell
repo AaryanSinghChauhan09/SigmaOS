@@ -8,7 +8,6 @@
 #   sigmaos-shell summon <plugin> [payload]     - Open a shell plugin overlay
 #   sigmaos-shell hide <plugin>                 - Close a shell plugin overlay
 #   sigmaos-shell toggle-bar on|off             - Toggle bar visibility
-#   sigmaos-shell daemon                        - Keep the shell service alive
 #
 # Plugin overlays are implemented as separate scripts that render a
 # temporary UI layer (waybar module, wofi menu, mako notification, etc.)
@@ -153,14 +152,6 @@ cmd_toggle_bar() {
   echo "bar ${state}"
 }
 
-cmd_daemon() {
-  log "shell controller ready"
-  trap 'log "shell controller stopping"; exit 0' TERM INT
-  while :; do
-    sleep 60
-  done
-}
-
 # ---------------------------------------------------------------------------
 # Main dispatch
 # ---------------------------------------------------------------------------
@@ -183,11 +174,8 @@ main() {
     toggle-bar)
       cmd_toggle_bar "${2:-}"
       ;;
-    daemon)
-      cmd_daemon
-      ;;
     *)
-      echo "Usage: sigmaos-shell <ping|listPlugins|summon|hide|toggle-bar|daemon> [args...]" >&2
+      echo "Usage: sigmaos-shell <ping|listPlugins|summon|hide|toggle-bar> [args...]" >&2
       exit 1
       ;;
   esac
