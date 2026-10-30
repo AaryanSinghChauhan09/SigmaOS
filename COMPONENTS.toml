@@ -4,6 +4,9 @@
 # Registry audit baseline: 1,578 declarations / 1,467 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
+# GitHub account audit: 294 repositories; 280 registry checkouts are local;
+# 1,222 unique declarations are not present in the account and are stale or
+# unpublished until an authoritative remote is supplied.
 
 [[component]]
 name = "SigmaOS-kernel"
