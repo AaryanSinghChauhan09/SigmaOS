@@ -34,8 +34,15 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
+#[cfg(not(test))]
 use crate::distro::arch_linux_missing_components_v82_pr::SovereignArchLinuxMissingComponentsV82PrSuite;
+#[cfg(not(test))]
 use crate::distro::open_source_os_missing_components_v82_pr::SovereignOpenSourceOsMissingComponentsV82PrSuite;
+
+#[cfg(test)]
+use super::arch_linux_missing_components_v82_pr::SovereignArchLinuxMissingComponentsV82PrSuite;
+#[cfg(test)]
+use super::open_source_os_missing_components_v82_pr::SovereignOpenSourceOsMissingComponentsV82PrSuite;
 
 /// Combined Master Synthesis Spec V82
 #[derive(Debug, Clone)]
