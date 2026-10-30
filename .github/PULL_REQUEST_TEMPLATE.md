@@ -51,6 +51,7 @@
 <!-- Required for lifecycle, ABI, or scheduler changes -->
 
 - POSIX section:
+- Upstream study:
 - Linux/BSD/Redox/xv6 reference:
 - SigmaOS current behavior:
 - New behavior:

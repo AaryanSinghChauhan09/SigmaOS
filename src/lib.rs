@@ -192,8 +192,8 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
     SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV64,
     SovereignDistroPackageAdvancementsSuiteV66, SovereignDistroPackageAdvancementsSuiteV67,
-    SovereignDistroPackageAdvancementsSuiteV68, SovereignDistroPackagePrGatewayV68,
-    SovereignDistroPackageAdvancementsSuiteV86, SovereignDistroPackagePrGatewayV86,
+    SovereignDistroPackageAdvancementsSuiteV68, SovereignDistroPackageAdvancementsSuiteV86,
+    SovereignDistroPackagePrGatewayV68, SovereignDistroPackagePrGatewayV86,
     SovereignUniversalPackageVerifier, UniversalDistroPackageOrchestrator,
     UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter, UniversalPackageFormat,
     UniversalPackageImporter, UniversalPackageTriggerEngine, UniversalPackageTriggerType,
@@ -630,8 +630,8 @@ pub use shell::{
     ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
     SovereignShellsTerminalsSupervisorsParityPrGateway,
     SovereignShellsTerminalsSupervisorsParityV78Gateway,
-    SovereignShellsTerminalsSupervisorsV78PrSuite,
-    TerminalMultiplexersAndEmulatorsPrEngine, ZshPromptFormatter,
+    SovereignShellsTerminalsSupervisorsV78PrSuite, TerminalMultiplexersAndEmulatorsPrEngine,
+    ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
@@ -657,29 +657,47 @@ pub use userland::sovereign_coreutils_and_userland_advancements_v78_pr::*;
 pub use userland::sovereign_coreutils_and_userland_advancements_v86_pr::*;
 pub use userland::system_utilities::*;
 pub use virtualization::{
-    Container, FirecrackerCloudHypervisorV61Engine, FirecrackerCloudHypervisorV63Engine,
-    FirecrackerCloudHypervisorV67Engine, FirecrackerCloudHypervisorV68Engine,
+    Container,
+    FirecrackerCloudHypervisorV61Engine,
+    FirecrackerCloudHypervisorV63Engine,
+    FirecrackerCloudHypervisorV67Engine,
+    FirecrackerCloudHypervisorV68Engine,
     // FirecrackerCloudHypervisorV80Engine, // TODO: Implement V80 version
-    FreeBsdJailsZonesV61Engine, FreeBsdJailsZonesV63Engine,
-    FreeBsdJailsZonesV67Engine, FreeBsdJailsZonesV68Engine,
+    FreeBsdJailsZonesV61Engine,
+    FreeBsdJailsZonesV63Engine,
+    FreeBsdJailsZonesV67Engine,
+    FreeBsdJailsZonesV68Engine,
     // FreeBsdJailsZonesV80Engine, // TODO: Implement V80 version
-    GvisorKataAppleHvV61Engine, GvisorKataAppleHvV63Engine, GvisorKataAppleHvV67Engine,
+    GvisorKataAppleHvV61Engine,
+    GvisorKataAppleHvV63Engine,
+    GvisorKataAppleHvV67Engine,
     GvisorKataAppleHvV68Engine,
     // GvisorKataAppleHvV80Engine, // TODO: Implement V80 version
     KubernetesK3sRancherV61Engine,
-    KubernetesK3sRancherV63Engine, KubernetesK3sRancherV67Engine, KubernetesK3sRancherV68Engine,
+    KubernetesK3sRancherV63Engine,
+    KubernetesK3sRancherV67Engine,
+    KubernetesK3sRancherV68Engine,
     // KubernetesK3sRancherV80Engine, // TODO: Implement V80 version
-    KubernetesPod, KvmQemuV61Engine, KvmQemuV63Engine,
-    KvmQemuV67Engine, KvmQemuV68Engine,
+    KubernetesPod,
+    KvmQemuV61Engine,
+    KvmQemuV63Engine,
+    KvmQemuV67Engine,
+    KvmQemuV68Engine,
     // KvmQemuV80Engine, // TODO: Implement V80 version
     LibvirtDomainV61Engine,
-    LibvirtDomainV63Engine, LibvirtDomainV67Engine, LibvirtDomainV68Engine,
+    LibvirtDomainV63Engine,
+    LibvirtDomainV67Engine,
+    LibvirtDomainV68Engine,
     // LibvirtDomainV80Engine, // TODO: Implement V80 version
-    LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine, LxcLxdNspawnV67Engine,
+    LxcLxdNspawnV61Engine,
+    LxcLxdNspawnV63Engine,
+    LxcLxdNspawnV67Engine,
     LxcLxdNspawnV68Engine,
     // LxcLxdNspawnV80Engine, // TODO: Implement V80 version
     OciDockerPodmanRuncV61Engine,
-    OciDockerPodmanRuncV63Engine, OciDockerPodmanRuncV67Engine, OciDockerPodmanRuncV68Engine,
+    OciDockerPodmanRuncV63Engine,
+    OciDockerPodmanRuncV67Engine,
+    OciDockerPodmanRuncV68Engine,
     // OciDockerPodmanRuncV80Engine, // TODO: Implement V80 version
     ResourcePool,
     SovereignVirtualizationAndContainersParityV61Gateway,
@@ -689,12 +707,21 @@ pub use virtualization::{
     // SovereignVirtualizationAndContainersParityV80Gateway, // TODO: Implement V80 version
     SovereignVirtualizationAndContainersParityV81Gateway,
     // SovereignVirtualizationAndContainersV80PrGatewayEngine, // TODO: Implement V80 version
-    SovereignVirtualizationAndContainersV81PrGatewayEngine, VirtualBoxBhyveVmmV61Engine,
-    VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualBoxBhyveVmmV68Engine,
+    SovereignVirtualizationAndContainersV81PrGatewayEngine,
+    VirtualBoxBhyveVmmV61Engine,
+    VirtualBoxBhyveVmmV63Engine,
+    VirtualBoxBhyveVmmV67Engine,
+    VirtualBoxBhyveVmmV68Engine,
     // VirtualBoxBhyveVmmV80Engine, // TODO: Implement V80 version
-    VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
-    VirtualizationTech, VmState, XenHypervisorV61Engine, XenHypervisorV63Engine,
-    XenHypervisorV67Engine, XenHypervisorV68Engine,
+    VirtualMachine,
+    VirtualizationError,
+    VirtualizationOrchestrator,
+    VirtualizationTech,
+    VmState,
+    XenHypervisorV61Engine,
+    XenHypervisorV63Engine,
+    XenHypervisorV67Engine,
+    XenHypervisorV68Engine,
     // XenHypervisorV80Engine, // TODO: Implement V80 version
 };
 
@@ -812,7 +839,6 @@ pub use crate::distro::arch_linux_missing_components_v71_pr::*;
 pub use crate::distro::arch_linux_missing_components_v73_pr::*;
 pub use crate::distro::arch_linux_missing_components_v74_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
-pub use crate::distro::repeatable_agent_operating_loop_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v68_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v69_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v71_pr::*;
@@ -848,6 +874,7 @@ pub use crate::distro::open_source_os_unimplemented_ideas_v69_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v70_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v71_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
+pub use crate::distro::repeatable_agent_operating_loop_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
 pub use crate::distro::sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
