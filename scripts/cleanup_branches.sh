@@ -1,44 +1,50 @@
 #!/bin/bash
 # SigmaOS Branch Cleanup Utility
 # 
-# Automatically fetches all remote branches, attempts to safely merge 
-# non-conflicting feature branches into main, and deletes the redundant 
-# remote branches to maintain a clean Git repository.
+# Audits remote branches against main and optionally deletes only branches
+# already proven to be merged. It never merges or deletes unreviewed work.
 
-set -e
+set -euo pipefail
+
+DRY_RUN=true
+if [[ "${1:-}" == "--apply" ]]; then
+    DRY_RUN=false
+elif [[ "${1:-}" != "" ]]; then
+    echo "Usage: $0 [--apply]" >&2
+    exit 2
+fi
 
 echo "=================================================="
 echo "    SigmaOS Automated Branch Consolidation        "
 echo "=================================================="
 
-# Ensure we're on main
-git checkout main
-git pull origin main --rebase
+# Ensure the audit is performed from main without changing the worktree.
+if [[ "$(git branch --show-current)" != "main" ]]; then
+    echo "Run this script from the main branch." >&2
+    exit 1
+fi
 
 echo "[*] Fetching and pruning remote tracking branches..."
 git fetch --prune --all
 
-echo "[*] Processing remote branches..."
-for branch in $(git branch -r | grep 'origin/' | grep -v 'HEAD' | grep -v 'origin/main'); do
-    b=$(echo $branch | sed 's/origin\///' | xargs)
-    echo " -> Merging $b into main..."
-    if git merge "origin/$b" --no-edit -m "Merge branch '$b' into main"; then
-        echo "    Successfully merged."
+echo "[*] Auditing remote branches against main..."
+while read -r remote_branch; do
+    [[ -z "$remote_branch" ]] && continue
+    branch="${remote_branch#origin/}"
+    if git merge-base --is-ancestor "$remote_branch" main; then
+        echo " -> $branch: merged into main"
+        if [[ "$DRY_RUN" == false ]]; then
+            git push origin --delete "$branch"
+        fi
     else
-        echo "    [!] Conflict detected. Aborting merge for $b..."
-        git merge --abort
+        echo " -> $branch: retained (not proven merged)"
     fi
-done
+done < <(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ | \
+    grep -vE '^origin/(HEAD|main)$')
 
-echo "[*] Pushing consolidated main branch..."
-git push origin main
-
-echo "[*] Deleting redundant remote branches..."
-for branch in $(git branch -r | grep 'origin/' | grep -v 'HEAD' | grep -v 'origin/main'); do
-    b=$(echo $branch | sed 's/origin\///' | xargs)
-    echo " -> Deleting remote branch: $b"
-    git push origin --delete "$b" || true
-done
+if [[ "$DRY_RUN" == true ]]; then
+    echo "[*] Dry run only. Pass --apply to delete proven-merged branches."
+fi
 
 echo "=================================================="
 echo " Cleanup Complete: Repository is unified on main. "

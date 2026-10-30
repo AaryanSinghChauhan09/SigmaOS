@@ -2,9 +2,9 @@ name: OpenBSD Security Sandbox & PF Firewall CI
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   security-verification:

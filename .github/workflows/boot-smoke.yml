@@ -2,9 +2,9 @@ name: SigmaOS QEMU Boot Smoke Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
   schedule:
     - cron: '0 0 * * *' # Daily boot validation
   workflow_dispatch:

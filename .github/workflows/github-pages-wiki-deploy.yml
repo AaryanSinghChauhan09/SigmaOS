@@ -2,7 +2,7 @@ name: GitHub Pages Documentation & Wiki Sync
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
     paths:
       - 'docs/**'
       - 'wiki/**'

@@ -2,9 +2,9 @@ name: SigmaOS PR Fast Checks
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main ]
   push:
-    branches: [ develop ]
+    branches: [ main ]
 
 permissions:
   contents: read

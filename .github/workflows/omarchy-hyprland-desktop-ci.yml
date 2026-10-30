@@ -2,9 +2,9 @@ name: Omarchy Hyprland Desktop & Wayland Compositor CI
 
 on:
   push:
-    branches: [ main, master, "docs/**", "feat/**" ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 permissions:
   contents: read

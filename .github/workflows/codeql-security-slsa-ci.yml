@@ -2,9 +2,9 @@ name: CodeQL Security Scanning & SLSA Provenance Assurance
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
   schedule:
     - cron: '30 2 * * 0'
 
