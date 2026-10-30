@@ -282,6 +282,13 @@ export function renderCommandResults(query = "") {
   const cmdInput = document.getElementById("cmd-input");
   if (!resultsContainer) return [];
 
+  if (!resultsContainer.hasAttribute("role")) {
+    resultsContainer.setAttribute("role", "listbox");
+  }
+  if (!resultsContainer.hasAttribute("aria-label")) {
+    resultsContainer.setAttribute("aria-label", "Command suggestions");
+  }
+
   const cleanQuery = query.trim().toLowerCase();
   const filtered = SYSTEM_COMMANDS.filter((cmd) => cmd.name.toLowerCase().includes(cleanQuery));
 
@@ -480,6 +487,9 @@ export function initCommandPalette() {
 
   if (!cmdInput.hasAttribute("aria-haspopup")) {
     cmdInput.setAttribute("aria-haspopup", "listbox");
+  }
+  if (!cmdInput.hasAttribute("aria-controls")) {
+    cmdInput.setAttribute("aria-controls", "cmd-results");
   }
 
   cmdInput.addEventListener("input", (e) => {

@@ -96,6 +96,8 @@ const cmdInputEl = createMockElement("cmd-input");
 const allCommands = zenith.renderCommandResults("");
 console.log(`✓ Rendered all commands: count = ${allCommands.length}`);
 assert.strictEqual(allCommands.length, 14, "Expected 14 default system commands");
+assert.strictEqual(cmdResultsEl.getAttribute("role"), "listbox", "Expected role='listbox' on cmd-results");
+assert.strictEqual(cmdResultsEl.getAttribute("aria-label"), "Command suggestions", "Expected aria-label='Command suggestions' on cmd-results");
 assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), "cmd-option-0", "Expected aria-activedescendant to point to first option 'cmd-option-0'");
 assert.strictEqual(cmdResultsEl.children[0].id, "cmd-option-0", "Expected option child element to have id 'cmd-option-0'");
 assert.strictEqual(cmdResultsEl.children[0].role, "option", "Expected option element to have role='option'");
@@ -116,6 +118,7 @@ assert.strictEqual(cmdInputEl.getAttribute("aria-activedescendant"), undefined, 
 // Test 4: closeCommandPalette resets aria-expanded and initCommandPalette sets aria-haspopup
 zenith.initCommandPalette();
 assert.strictEqual(cmdInputEl.getAttribute("aria-haspopup"), "listbox", "Expected aria-haspopup='listbox' on cmdInput");
+assert.strictEqual(cmdInputEl.getAttribute("aria-controls"), "cmd-results", "Expected aria-controls='cmd-results' on cmdInput");
 
 zenith.renderCommandResults("");
 // Simulate ArrowDown key press on input to verify active option traversal and aria-activedescendant update
