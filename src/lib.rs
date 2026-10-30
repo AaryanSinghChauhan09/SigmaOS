@@ -237,6 +237,7 @@ pub use desktop::sovereign_desktop_toolkits_and_services_v75_pr::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v76_pr::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v82_pr::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v88_pr::*;
+pub use desktop::sovereign_desktop_toolkits_and_services_v90_pr::*;
 pub use desktop::{
     CachyosGamescopeHandheldOverlay, Gnome46MutterEngine, ItsFossQuickShareAndBackupHud,
     KdePlasma6Engine, LuminaBsdDesktopEngine, PhoronixPerformanceBenchmarkWidget,
