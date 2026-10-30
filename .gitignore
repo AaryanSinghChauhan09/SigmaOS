@@ -28,3 +28,6 @@ __pycache__/
 !wiki/26-System-Utilities-Development-Plan.md
 !docs/process/
 !docs/process/*.md
+!docs/ipc-handler.md
+!wiki/ipc-handler.md
+!.github/PULL_REQUEST_TEMPLATE.md
