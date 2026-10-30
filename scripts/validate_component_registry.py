@@ -23,6 +23,14 @@ def main() -> int:
     repositories = [entry["repository"] for entry in components.values()]
     if len(repositories) != len(set(repositories)):
         raise SystemExit("duplicate component repository names")
+    ownership_path = path.parent / "MODULE_OWNERSHIP.toml"
+    ownership = tomllib.loads(ownership_path.read_text(encoding="utf-8"))
+    for module in ownership["module"]:
+        if not (path.parents[1] / module["path"]).exists():
+            raise SystemExit(f"module path does not exist: {module['path']}")
+        if module["owner"] not in published:
+            raise SystemExit(f"module owner is not published: {module['owner']}")
+    print(f"validated {len(ownership['module'])} source-module ownership boundaries")
     print(f"validated {len(components)} components and {len(published)} published repositories")
     return 0
 

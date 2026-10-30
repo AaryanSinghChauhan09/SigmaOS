@@ -1,0 +1,155 @@
+# Source-tree ownership map for modular extraction from the SigmaOS integration
+# repository. Paths remain in the main branch until their owning repository has
+# an API, tests, CI, and a release contract.
+
+schema_version = 1
+
+[[module]]
+path = "src/arch"
+owner = "SigmaOS-core"
+component = "kernel architecture"
+
+[[module]]
+path = "src/boot"
+owner = "SigmaOS-core"
+component = "bootloader integration"
+
+[[module]]
+path = "src/kernel"
+owner = "SigmaOS-core"
+component = "kernel"
+
+[[module]]
+path = "src/init"
+owner = "SigmaOS-core"
+component = "init and service lifecycle"
+
+[[module]]
+path = "src/process"
+owner = "SigmaOS-core"
+component = "process lifecycle"
+
+[[module]]
+path = "src/syscall"
+owner = "SigmaOS-core"
+component = "system-call ABI"
+
+[[module]]
+path = "src/loader"
+owner = "SigmaOS-core"
+component = "ELF and userspace loading"
+
+[[module]]
+path = "src/memory"
+owner = "SigmaOS-core"
+component = "memory management"
+
+[[module]]
+path = "src/net"
+owner = "SigmaOS-services"
+component = "network transport"
+
+[[module]]
+path = "src/network"
+owner = "SigmaOS-services"
+component = "network control"
+
+[[module]]
+path = "src/wireless"
+owner = "SigmaOS-services"
+component = "wireless networking"
+
+[[module]]
+path = "src/storage"
+owner = "SigmaOS-services"
+component = "block and storage services"
+
+[[module]]
+path = "src/audio"
+owner = "SigmaOS-services"
+component = "audio services"
+
+[[module]]
+path = "src/bluetooth"
+owner = "SigmaOS-services"
+component = "Bluetooth services"
+
+[[module]]
+path = "src/power"
+owner = "SigmaOS-services"
+component = "power management"
+
+[[module]]
+path = "src/compositor"
+owner = "SigmaOS-shell"
+component = "compositor"
+
+[[module]]
+path = "src/shell"
+owner = "SigmaOS-shell"
+component = "shell runtime"
+
+[[module]]
+path = "src/quickshell"
+owner = "SigmaOS-shell"
+component = "shell integration"
+
+[[module]]
+path = "src/desktop"
+owner = "SigmaOS-desktop"
+component = "desktop UX"
+
+[[module]]
+path = "src/accessibility"
+owner = "SigmaOS-desktop"
+component = "accessibility"
+
+[[module]]
+path = "src/notification"
+owner = "SigmaOS-desktop"
+component = "notifications"
+
+[[module]]
+path = "src/customization"
+owner = "SigmaOS-config"
+component = "configuration profiles"
+
+[[module]]
+path = "src/theming"
+owner = "SigmaOS-config"
+component = "themes"
+
+[[module]]
+path = "src/package"
+owner = "SigmaOS-tools"
+component = "package management"
+
+[[module]]
+path = "src/installer"
+owner = "SigmaOS-tools"
+component = "installation"
+
+[[module]]
+path = "src/update"
+owner = "SigmaOS-tools"
+component = "system updates"
+
+[[module]]
+path = "src/recovery"
+owner = "SigmaOS-tools"
+component = "recovery"
+
+[[module]]
+path = "src/software_manager"
+owner = "SigmaOS-apps"
+component = "software center"
+
+[[module]]
+path = "src/browser_handoff"
+owner = "SigmaOS-apps"
+component = "browser integration"
+
+[[module]]
+path = "src/branding"
+owner = "SigmaOS-brand"
+component = "brand assets"
