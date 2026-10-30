@@ -13,7 +13,7 @@ repeatable.
 | Multiboot kernel | C source and linker script exist; real boot is CI-gated | In progress |
 | QEMU boot-to-shell | Real ISO/QEMU harness added; first CI run is required | In progress |
 | Ring-3 proof workload | 32-bit Multiboot kernel now configures GDT/TSS/IDT and enters a test workload through `iret`; hardware/QEMU execution still needs CI evidence | In progress |
-| ELF load plan | Bounds-checked ELF64/x86_64 `PT_LOAD` parser with W^X, entry validation, and zero-initialized image materialization | Verified by library build; page-table mapping and execution are not integrated |
+| ELF load plan | Bounds-checked ELF64/x86_64 `PT_LOAD` parser with W^X, entry validation, zero-initialized image materialization, and page-level mapping plan | Formatting/static validation passes; page-table mapping and execution are not integrated |
 | x86_64 syscall MSRs | Validated `STAR`/`LSTAR`/`FMASK` configuration abstraction added; privileged install is not yet wired into boot | Partial |
 | User mode and Linux ABI | No end-to-end unmodified Linux workload evidence | Not verified |
 | Virtio block/network | Models and partial implementations exist; interrupt-driven path is not proven | Partial |
