@@ -40,7 +40,18 @@ def audit(root: Path) -> dict[str, object]:
     entries = data.get("component", [])
 
     names = [entry.get("name", "") for entry in entries]
-    duplicates = sorted({name for name in names if name and names.count(name) > 1})
+    groups: dict[str, list[dict[str, object]]] = {}
+    for entry in entries:
+        name = entry.get("name", "")
+        if name:
+            groups.setdefault(name, []).append(entry)
+    duplicates = sorted(name for name, group in groups.items() if len(group) > 1)
+    exact_duplicates = sorted(
+        name
+        for name, group in groups.items()
+        if len(group) > 1
+        and len({tuple(sorted((key, repr(value)) for key, value in item.items())) for item in group}) == 1
+    )
     components: list[dict[str, object]] = []
 
     for entry in entries:
@@ -66,6 +77,8 @@ def audit(root: Path) -> dict[str, object]:
             set(names) - {item["name"] for item in components if item["checkout"]}
         ),
         "duplicate_names": duplicates,
+        "exact_duplicate_names": exact_duplicates,
+        "variant_duplicate_names": sorted(set(duplicates) - set(exact_duplicates)),
         "components": components,
     }
 
@@ -92,6 +105,8 @@ def summary(report: dict[str, object]) -> str:
             f"license present: {license_count}",
             f"GitHub workflows directory: {ci}",
             f"duplicate registry names: {len(report['duplicate_names'])}",
+            f"exact duplicate names: {len(report['exact_duplicate_names'])}",
+            f"metadata-variant duplicate names: {len(report['variant_duplicate_names'])}",
         )
     )
 
