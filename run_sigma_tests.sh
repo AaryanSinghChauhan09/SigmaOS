@@ -3417,6 +3417,13 @@ if [ -f "tests/test_lfs_bsd_synthesis_v80_pr.rs" ]; then
     TMPDIR=$(pwd)/build rustc --test tests/test_lfs_bsd_synthesis_v80_pr.rs --edition=2021 -o build/test_lfs_bsd_v80_pr
     ./build/test_lfs_bsd_v80_pr
 fi
+
+if [ -f "tests/test_lfs_bsd_synthesis_v84_pr.rs" ]; then
+    echo "Running Sovereign LFS & BSD Synthesis V84 PR Gateway test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test tests/test_lfs_bsd_synthesis_v84_pr.rs --edition=2021 -o build/test_lfs_bsd_v84_pr
+    ./build/test_lfs_bsd_v84_pr
+fi
 echo "All SigmaOS test suites completed."
 
 if [ -f "src/customization/sovereign_customized_editions.rs" ]; then
