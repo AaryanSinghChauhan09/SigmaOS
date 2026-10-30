@@ -1,0 +1,81 @@
+# Canonical SigmaOS repository architecture.
+# The main repository is the release/integration point. The listed component
+# repositories are intentional extraction boundaries, not a requirement to
+# create empty repositories before code, ownership, tests, and releases exist.
+
+schema_version = 1
+organization = "AaryanSinghChauhan09"
+integration_repository = "SigmaOS"
+canonical_branch = "main"
+release_channels = ["edge", "rc", "stable"]
+published_component_repositories = [
+    "SigmaOS-core",
+    "SigmaOS-shell",
+    "SigmaOS-services",
+    "SigmaOS-desktop",
+    "SigmaOS-config",
+    "SigmaOS-apps",
+    "SigmaOS-tools",
+    "SigmaOS-docs",
+    "SigmaOS-brand",
+]
+
+[[repository]]
+name = "SigmaOS"
+role = "umbrella"
+responsibility = "integration, release metadata, capability evidence, issue triage, and links"
+depends_on = []
+
+[[repository]]
+name = "SigmaOS-core"
+role = "platform"
+responsibility = "boot integration, kernel boundary, init, ABI contracts, and base system"
+depends_on = ["SigmaOS-config"]
+
+[[repository]]
+name = "SigmaOS-shell"
+role = "desktop-runtime"
+responsibility = "Wayland session, compositor integration, window management, bar, and shortcuts"
+depends_on = ["SigmaOS-core", "SigmaOS-config"]
+
+[[repository]]
+name = "SigmaOS-services"
+role = "system-services"
+responsibility = "network, audio, Bluetooth, power, authentication, storage, and backup services"
+depends_on = ["SigmaOS-core", "SigmaOS-config"]
+
+[[repository]]
+name = "SigmaOS-desktop"
+role = "desktop-ux"
+responsibility = "settings, control center, notifications, accessibility, applets, and widgets"
+depends_on = ["SigmaOS-shell", "SigmaOS-services", "SigmaOS-config"]
+
+[[repository]]
+name = "SigmaOS-config"
+role = "configuration"
+responsibility = "versioned schemas, profiles, defaults, themes, and migration rules"
+depends_on = []
+
+[[repository]]
+name = "SigmaOS-apps"
+role = "applications"
+responsibility = "curated default applications, integrations, and application profiles"
+depends_on = ["SigmaOS-config", "SigmaOS-services"]
+
+[[repository]]
+name = "SigmaOS-tools"
+role = "lifecycle"
+responsibility = "installer, ISO builder, updater, snapshot/rollback, packaging, and CI tooling"
+depends_on = ["SigmaOS-core", "SigmaOS-config", "SigmaOS-services"]
+
+[[repository]]
+name = "SigmaOS-docs"
+role = "documentation"
+responsibility = "manual, installation, troubleshooting, architecture, and release guides"
+depends_on = ["SigmaOS"]
+
+[[repository]]
+name = "SigmaOS-brand"
+role = "identity"
+responsibility = "logos, visual identity, themes, screenshots, and marketing assets"
+depends_on = ["SigmaOS-config"]
