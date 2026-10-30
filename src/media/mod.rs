@@ -18,6 +18,8 @@ pub mod sovereign_audio_video_advancements_v84_pr;
 pub use sovereign_audio_video_advancements_v84_pr::*;
 pub mod sovereign_audio_video_advancements_v86_pr;
 pub use sovereign_audio_video_advancements_v86_pr::*;
+pub mod sovereign_audio_video_advancements_v88_pr;
+pub use sovereign_audio_video_advancements_v88_pr::*;
 pub mod sovereign_screen_recorder;
 pub mod sovereign_video_editor;
 pub mod sovereign_video_player;
