@@ -32,7 +32,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 #[cfg(feature = "standalone_test")]
 use std::string::{String, ToString};
 #[cfg(feature = "standalone_test")]

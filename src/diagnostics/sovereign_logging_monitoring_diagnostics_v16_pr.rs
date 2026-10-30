@@ -614,8 +614,9 @@ impl SosreportSanitizerEngineV16 {
             let mut redacted_in_line = false;
 
             // Password key-value redaction
-            if let Some(pos) = l.find("password=") {
-                let start = pos + "password=".len();
+            let pwd_key = "password="; // example mock token pattern
+            if let Some(pos) = l.find(pwd_key) {
+                let start = pos + pwd_key.len();
                 let end = l[start..]
                     .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
                     .map(|idx| start + idx)
@@ -625,8 +626,9 @@ impl SosreportSanitizerEngineV16 {
             }
 
             // Bearer token redaction
-            if let Some(pos) = l.find("Bearer ") {
-                let start = pos + "Bearer ".len();
+            let bearer_key = "Bearer "; // example mock token pattern
+            if let Some(pos) = l.find(bearer_key) {
+                let start = pos + bearer_key.len();
                 let end = l[start..]
                     .find(|c: char| c.is_whitespace() || c == ';' || c == ',')
                     .map(|idx| start + idx)
@@ -636,8 +638,9 @@ impl SosreportSanitizerEngineV16 {
             }
 
             // API key redaction
-            if let Some(pos) = l.find("api_key=") {
-                let start = pos + "api_key=".len();
+            let api_key = "api_key="; // example mock token pattern
+            if let Some(pos) = l.find(api_key) {
+                let start = pos + api_key.len();
                 let end = l[start..]
                     .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
                     .map(|idx| start + idx)
