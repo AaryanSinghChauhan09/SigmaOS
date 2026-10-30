@@ -125,6 +125,7 @@ pub use creative::wordcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::wordcraft_artcraft_missing_components_v68_pr::*;
 pub use creative::wordcraft_artcraft_missing_components_v69_pr::*;
 pub use creative::wordcraft_artcraft_missing_components_v70_pr::*;
+pub use creative::wordcraft_artcraft_missing_components_v71_pr::*;
 pub use creative::wordcraft_artcraft_parity_pr::*;
 pub use creative::wordcraft_missing_components_parity_pr::*;
 pub mod customization;
