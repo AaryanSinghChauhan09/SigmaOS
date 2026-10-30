@@ -542,9 +542,8 @@ impl SosreportSanitizerEngineV15 {
             let mut redacted_in_line = false;
 
             // Password key-value redaction
-            if let Some(pos) = l.find("password=") {
-                // TODO: example mock token check
-                let start = pos + "password=".len(); // example mock token check
+            if let Some(pos) = l.find("password=") { // test mock
+                let start = pos + "password=".len(); // test mock
                 let end = l[start..]
                     .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
                     .map(|idx| start + idx)
