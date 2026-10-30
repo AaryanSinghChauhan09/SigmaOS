@@ -32,6 +32,9 @@ jobs:
       - name: Static Check (cargo check)
         run: cargo check --lib
 
+      - name: Audit managed component fleet
+        run: make registry-audit
+
       - name: Cargo Unit Tests (cargo test)
         run: cargo test --lib
 

@@ -7,8 +7,8 @@ PYTHON ?= python3
 all: check test
 
 # 0. Milestone M0 reproducible verify target
-verify: fmt check test
-	@echo "==> make verify succeeded: formatting, check, and standalone test suite passed cleanly."
+verify: fmt check test registry-audit
+	@echo "==> make verify succeeded: formatting, check, tests, and registry audit passed cleanly."
 
 # Read-only inventory of all repositories declared in COMPONENTS.toml.
 registry-audit:
