@@ -1,11 +1,11 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit baseline: 1,578 declarations / 1,467 unique component names.
+# Registry audit baseline: 1,586 declarations / 1,475 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
 # GitHub account audit: 294 repositories; 280 registry checkouts are local;
-# 1,222 unique declarations are not present in the account and are stale or
+# 1,214 unique declarations are not present in the account and are stale or
 # unpublished until an authoritative remote is supplied.
 
 [[component]]
@@ -14226,4 +14226,76 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clock-global"
 engine = "clock_applet"
 language = "rust"
 inspirations = ["https://github.com/omacom/elsewhen"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-apps"
+description = "Curated default applications, integrations, and application profiles"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apps"
+engine = "application_profiles"
+language = "metadata"
+inspirations = ["https://github.com/omacom/omarchy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-brand"
+description = "Visual identity, logos, themes, screenshots, and product assets"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-brand"
+engine = "brand_assets"
+language = "metadata"
+inspirations = ["https://github.com/omacom/omarchy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-core"
+description = "Boot, kernel boundary, init, ABI contracts, and base system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-core"
+engine = "core_platform"
+language = "rust"
+inspirations = ["native"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-desktop-session"
+description = "Graphical session lifecycle, compositor selection, environment, and readiness"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-session"
+engine = "desktop_session"
+language = "metadata"
+inspirations = ["https://github.com/omacom/omarchy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-docs"
+description = "User manual, installation, troubleshooting, architecture, and release guides"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-docs"
+engine = "documentation"
+language = "markdown"
+inspirations = ["https://github.com/omacom/omarchy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-nvme"
+description = "NVMe MMIO controller, queue pairs, DMA-safe submission, and completion"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nvme"
+engine = "nvme_driver"
+language = "rust"
+inspirations = ["native"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-services"
+description = "Network, audio, Bluetooth, power, authentication, storage, and backup services"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-services"
+engine = "system_services"
+language = "rust"
+inspirations = ["native"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-wifi"
+description = "Wi-Fi device discovery, firmware lifecycle, interface control, and link events"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wifi"
+engine = "wifi_networking"
+language = "rust"
+inspirations = ["native"]
 visibility = "public"
