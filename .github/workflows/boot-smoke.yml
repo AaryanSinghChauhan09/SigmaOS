@@ -26,11 +26,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install boot test dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc grub-pc-bin qemu-system-x86 xorriso
-
       - name: Run Boot-to-Shell Smoke Test
         run: |
           chmod +x scripts/ci/qemu_boot_smoke.sh
