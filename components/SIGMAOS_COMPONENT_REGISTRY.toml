@@ -19,7 +19,17 @@ canonical_repositories_published = [
     "SigmaOS-tools",
     "SigmaOS-docs",
     "SigmaOS-brand",
+    "SigmaOS-nvme",
+    "SigmaOS-wifi",
+    "SigmaOS-desktop-session",
 ]
+repository_creation_pending = ["SigmaOS-network-manager"]
+
+[component_repository_status]
+"SigmaOS-nvme" = "published-scaffold"
+"SigmaOS-wifi" = "published-scaffold"
+"SigmaOS-desktop-session" = "published-scaffold"
+"SigmaOS-network-manager" = "pending-github-rate-limit"
 
 # Component-level ownership inside canonical repositories. A component gets a
 # separate repository only when its API, ownership, tests, and release cadence
