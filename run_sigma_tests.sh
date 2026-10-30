@@ -3418,3 +3418,17 @@ if [ -f "tests/test_lfs_bsd_synthesis_v80_pr.rs" ]; then
     ./build/test_lfs_bsd_v80_pr
 fi
 echo "All SigmaOS test suites completed."
+
+if [ -f "src/customization/sovereign_customized_editions.rs" ]; then
+    echo "Running Sovereign Customized Editions test suite..."
+    mkdir -p build
+    rustc --test src/customization/sovereign_customized_editions.rs --edition=2021 -o build/test_customized_editions
+    ./build/test_customized_editions
+fi
+
+if [ -f "src/productivity/sovereign_office_suites_engine.rs" ]; then
+    echo "Running Sovereign Office Suites Engine test suite..."
+    mkdir -p build
+    rustc --test src/productivity/sovereign_office_suites_engine.rs --edition=2021 -o build/test_office_suites
+    ./build/test_office_suites
+fi
