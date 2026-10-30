@@ -32,7 +32,7 @@ use std::vec::Vec;
 use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
 
 #[cfg(feature = "standalone_test")]
-use crate::sovereign_distro_package_advancements_v73::universal::{
+use crate::package::sovereign_distro_package_advancements_v73::universal::{
     PackageError, PackageFormat, PackageState, UnifiedPackage,
 };
 
