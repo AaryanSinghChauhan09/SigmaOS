@@ -43,7 +43,223 @@ impl Clone for CleanupOption {
             name: self.name.clone(),
             description: self.description.clone(),
             path: self.path.clone(),
-            enabled: self.enabled,
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::SeqCst)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(core::sync::atomic::Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::SeqCst)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category.clone(),
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
         }
     }
 }
@@ -106,7 +322,7 @@ impl SystemCleanupManager {
             .iter_mut()
             .find(|o| o.name == name)
             .ok_or("Option not found")?;
-        option.enabled = true;
+        option.enabled.store(true, Ordering::Relaxed);
         Ok(())
     }
 
@@ -117,7 +333,7 @@ impl SystemCleanupManager {
             .iter_mut()
             .find(|o| o.name == name)
             .ok_or("Option not found")?;
-        option.enabled = false;
+        option.enabled.store(false, Ordering::Relaxed);
         Ok(())
     }
 
