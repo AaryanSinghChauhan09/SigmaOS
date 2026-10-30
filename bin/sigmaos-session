@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# sigmaos-session - the single graphical-session entry point
+#
+# The session owns policy (which desktop backend is selected); the backend
+# owns mechanism (Wayland/compositor startup). This keeps the distro usable on
+# systems with or without UWSM while avoiding a silent fallback to a different
+# desktop.
+
+set -euo pipefail
+
+SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+SESSION_BACKEND="${SIGMAOS_SESSION_BACKEND:-hyprland}"
+export SIGMAOS_PATH XDG_CURRENT_DESKTOP="SigmaOS" XDG_SESSION_DESKTOP="sigmaos"
+
+log() { echo "[sigmaos-session] $*" >&2; }
+fail() { log "ERROR: $*"; exit 1; }
+
+case "${SESSION_BACKEND}" in
+  hyprland)
+    command -v Hyprland >/dev/null 2>&1 || fail "Hyprland is not installed"
+    if command -v uwsm >/dev/null 2>&1; then
+      log "Starting Hyprland through UWSM"
+      exec uwsm start -- Hyprland
+    fi
+    log "Starting Hyprland directly (UWSM unavailable)"
+    exec Hyprland
+    ;;
+  zenith)
+    command -v sigmaos-zenith >/dev/null 2>&1 || fail "sigmaos-zenith is not installed"
+    exec sigmaos-zenith
+    ;;
+  *)
+    fail "Unsupported session backend: ${SESSION_BACKEND}"
+    ;;
+esac

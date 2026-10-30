@@ -21,6 +21,9 @@ TIMEOUT_SECONDS = int(os.environ.get("SIGMAOS_QEMU_TIMEOUT", "15"))
 REQUIRED_MARKERS = (
     "SIGMAOS SOVEREIGN KERNEL",
     "[kernel] Multiboot header validated.",
+    "[kernel] GDT, TSS, and DPL3 syscall gate initialized.",
+    "[kernel] Entering Ring 3 userspace workload.",
+    "[userspace] int 0x80 syscall reached in Ring 0.",
     "[kernel] Entering sovereign interactive shell.",
 )
 
