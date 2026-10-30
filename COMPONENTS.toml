@@ -1,7 +1,7 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit baseline: 1,567 declarations / 1,475 unique component names.
+# Registry audit baseline: 1,539 declarations / 1,475 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
 # GitHub account audit: 294 repositories; 280 registry checkouts are local;
@@ -1395,15 +1395,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-apturl"
-description = "APT URL handler component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apturl"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-blueferry"
 description = "Blueberry fork for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blueferry"
@@ -1416,15 +1407,6 @@ visibility = "public"
 name = "SigmaOS-blueman"
 description = "Bluetooth manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blueman"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-brand-logo"
-description = "Brand logo component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-brand-logo"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -1461,15 +1443,6 @@ visibility = "public"
 name = "SigmaOS-celluloid"
 description = "Media player component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-celluloid"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-cinnamon"
-description = "Cinnamon desktop component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -1638,15 +1611,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-folder-color-switcher"
-description = "Folder color switcher component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-folder-color-switcher"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-forums-theme"
 description = "Forums theme component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-forums-theme"
@@ -1701,27 +1665,9 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-indicator-sound"
-description = "Sound indicator component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-indicator-sound"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-jargonaut"
 description = "Jargonaut component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jargonaut"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-libappindicator"
-description = "Libappindicator component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libappindicator"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -1818,15 +1764,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-mint-dev-tools"
-description = "Mint dev tools component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-dev-tools"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-mint-doc"
 description = "Mint documentation component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-doc"
@@ -1890,15 +1827,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-mozjs"
-description = "Mozjs component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mozjs"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-nemo"
 description = "Nemo file manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nemo"
@@ -1956,15 +1884,6 @@ visibility = "public"
 name = "SigmaOS-omarchy-chromium"
 description = "Omarchy chromium component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-chromium"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-omarchy-configurator"
-description = "Omarchy configurator component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-configurator"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -2052,15 +1971,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-omarchy-security"
-description = "Omarchy security component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-security"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-omareel"
 description = "Omarchy reel component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omareel"
@@ -2136,24 +2046,6 @@ visibility = "public"
 name = "SigmaOS-signed"
 description = "Signed component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-signed"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-simple-scan"
-description = "Simple scan component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-simple-scan"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-spreadsheet"
-description = "Spreadsheet component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-spreadsheet"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -2250,33 +2142,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-website"
-description = "Website component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-website"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-welcome-screen"
-description = "Welcome screen component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-welcome-screen"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-wallpaper-engine"
-description = "Wallpaper engine component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper-engine"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-vide-cut"
 description = "Video cut component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vide-cut"
@@ -2316,15 +2181,6 @@ visibility = "public"
 name = "SigmaOS-package-manager"
 description = "Package manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-manager"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-system-monitor"
-description = "System monitor component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-monitor"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -2403,15 +2259,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-calculator"
-description = "Calculator component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calculator"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-file-compressor"
 description = "File compressor component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-compressor"
@@ -2469,15 +2316,6 @@ visibility = "public"
 name = "SigmaOS-network-manager"
 description = "Network manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-manager"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-power-manager"
-description = "Power manager component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-manager"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -2574,15 +2412,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-grub-customizer"
-description = "GRUB customizer component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grub-customizer"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-boot-manager"
 description = "Boot manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot-manager"
@@ -2631,15 +2460,6 @@ visibility = "public"
 name = "SigmaOS-screensaver-package"
 description = "Screensaver package component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screensaver-package"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-desktop-environment"
-description = "Desktop environment component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-environment"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -3231,15 +3051,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-system-configs"
-description = "System configs component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-configs"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-user-configs"
 description = "User configs component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-configs"
@@ -3441,15 +3252,6 @@ visibility = "public"
 name = "SigmaOS-terminal-themes"
 description = "Terminal themes component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-terminal-themes"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-icon-themes"
-description = "Icon themes component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-icon-themes"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -3906,33 +3708,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-bootloader"
-description = "Bootloader component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bootloader"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-kernel"
-description = "Kernel component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-filesystem"
-description = "Filesystem component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-security-core"
 description = "Security core component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security-core"
@@ -4041,15 +3816,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-desktop"
-description = "Desktop component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-server"
 description = "Server component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-server"
@@ -4071,15 +3837,6 @@ visibility = "public"
 name = "SigmaOS-library"
 description = "Library component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-system"
-description = "System component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -5376,15 +5133,6 @@ visibility = "public"
 name = "SigmaOS-link"
 description = "Link component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-link"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-network"
-description = "Network component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
