@@ -1,122 +1,61 @@
 ## Summary
 
-<!-- What scheduler, kernel, shell, or subsystem behavior changed and why? -->
+<!-- What component does this PR improve, add, or regulate? -->
 
-## Scheduler component
+## Related issue
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
-- [ ] fork / clone
-- [ ] exec
-- [ ] Scheduler / run queue
-- [ ] Context switch
-- [ ] Signals
-- [ ] Wait / zombie / reaping
-- [ ] Process groups / sessions
-- [ ] Resource limits
-- [ ] Namespaces / isolation
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
+Closes #<issue-id>
 
-## Shell component
+## Component
 
-- [ ] Parser / Lexer
-- [ ] Expansion / Splitting
-- [ ] Redirection / Pipes
-- [ ] Builtins / Environment
-- [ ] Interactive / Line editing
-- [ ] Diagnostics / Exit codes
+<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, etc. -->
 
-## Subsystem component
+## Upstream study
 
-- [ ] Kernel lifecycle
-- [ ] IPC handler
-- [ ] Memory / VFS / Drivers
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
 
-## Recurring task
+## Component rules added or enforced
 
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly scheduler audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] New rule
+- [ ] Existing rule enforced
+- [ ] Rule test added
+- [ ] CI gate added
+- [ ] Documentation updated
 
-## Shell component
+## What SigmaOS adopts
 
-<!-- Required for lifecycle, ABI, or scheduler changes -->
+<!-- State the upstream principle or mechanism adopted. -->
 
-- POSIX section:
-- Upstream study:
-- Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
 
 ## Changes
 
--
--
-
-## Scheduler safety review
-
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-reap prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
-
-## Shell safety review
-
-- [ ] Deterministic script execution
-- [ ] Safe expansion ordering
-- [ ] Quoting integrity maintained
-- [ ] Redirection safety enforced
-- [ ] Signal handling verified
-
-## IPC semantics and safety
-
-- [ ] IPC handler
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-- Capability/namespace checks enforced
-
-## Security review
-
-- [ ] Security review requested, if applicable
-- [ ] Capability/namespace checks enforced
-
-## Evidence / Verification
-
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
+- [ ] Source implementation
+- [ ] Unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Scheduler benchmark, if performance-affecting
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
 
-## Status updates / Capability status
+## Verification
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Process documentation
-- [ ] Boot matrix, if applicable
-- Integration impact:
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
 
-## Risks and rollback
+## Runtime evidence
 
 - [ ] QEMU boot log
 - [ ] Installer/update test log
@@ -124,19 +63,20 @@
 - [ ] Hardware test log, if applicable
 - [ ] Artifact hash
 
-## Shell safety review
-
 ## Safety and rollback
 
 - [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
+- [ ] Untrusted input validated
+- [ ] Package scripts sandboxed, if applicable
 - [ ] Rollback/recovery behavior defined
 - [ ] Security review completed, if applicable
 
 ## Reviewer checklist
 
-- [ ] Scope is narrow and well-defined
-- [ ] Tests cover positive and failure paths
+- [ ] Scope is narrow
+- [ ] Component rules are enforceable
+- [ ] Tests cover the rules
 - [ ] Runtime evidence is linked
-- [ ] Documentation reflects actual implementation
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported Linux/BSD parity claims

@@ -1070,6 +1070,8 @@ pub use open_suse::*;
 pub mod ubuntu;
 pub use ubuntu::*;
 
+pub mod open_source_os_unimplemented_ideas_v78_pr;
+pub use open_source_os_unimplemented_ideas_v78_pr::*;
 pub mod open_source_os_unimplemented_ideas_v81_pr;
 pub use open_source_os_unimplemented_ideas_v81_pr::*;
 
