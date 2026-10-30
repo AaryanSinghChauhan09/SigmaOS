@@ -17,6 +17,7 @@
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
 typedef unsigned long size_t;
 
 #define VGA_WIDTH 80
@@ -205,6 +206,164 @@ static const char scancode_ascii[128] = {
 
 static int serial_has_data(void) {
     return inb(COM1_PORT + 5) & 1;
+}
+
+/* --------------------------------------------------------------------------
+ * Protected-mode privilege boundary
+ * --------------------------------------------------------------------------
+ * This is a deliberately small Ring-3 proof for the current 32-bit Multiboot
+ * kernel. It proves GDT/TSS/IDT entry and return semantics; it is not yet the
+ * x86_64 Linux ABI or a complete userspace loader.
+ */
+struct gdt_ptr {
+    uint16_t limit;
+    uint32_t base;
+} __attribute__((packed));
+
+struct idt_gate {
+    uint16_t offset_low;
+    uint16_t selector;
+    uint8_t zero;
+    uint8_t type_attr;
+    uint16_t offset_high;
+} __attribute__((packed));
+
+struct idt_ptr {
+    uint16_t limit;
+    uint32_t base;
+} __attribute__((packed));
+
+struct tss32 {
+    uint32_t prev_tss;
+    uint32_t esp0;
+    uint32_t ss0;
+    uint32_t esp1;
+    uint32_t ss1;
+    uint32_t esp2;
+    uint32_t ss2;
+    uint32_t cr3;
+    uint32_t eip;
+    uint32_t eflags;
+    uint32_t eax;
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t ebx;
+    uint32_t esp;
+    uint32_t ebp;
+    uint32_t esi;
+    uint32_t edi;
+    uint32_t es;
+    uint32_t cs;
+    uint32_t ss;
+    uint32_t ds;
+    uint32_t fs;
+    uint32_t gs;
+    uint32_t ldt;
+    uint16_t trap;
+    uint16_t iomap_base;
+} __attribute__((packed));
+
+static uint64_t gdt[6] __attribute__((aligned(8)));
+static struct idt_gate idt[256] __attribute__((aligned(8)));
+static struct tss32 tss __attribute__((aligned(4)));
+static uint8_t user_stack[16384] __attribute__((aligned(16)));
+static uint8_t stack[32768] __attribute__((aligned(16)));
+
+static void set_idt_gate(uint8_t vector, void (*handler)(void), uint8_t attributes) {
+    uint32_t address = (uint32_t)handler;
+    idt[vector].offset_low = (uint16_t)(address & 0xFFFF);
+    idt[vector].selector = 0x08;
+    idt[vector].zero = 0;
+    idt[vector].type_attr = attributes;
+    idt[vector].offset_high = (uint16_t)(address >> 16);
+}
+
+static void init_privilege_boundary(void);
+static void syscall_isr(void);
+
+void syscall_dispatch(void) {
+    kputs("[userspace] int 0x80 syscall reached in Ring 0.\n");
+}
+
+__attribute__((naked)) static void syscall_isr(void) {
+    __asm__ volatile(
+        "pusha\n"
+        "call syscall_dispatch\n"
+        "popa\n"
+        "iretl\n");
+}
+
+__attribute__((section(".usertext"), noinline)) static void user_program(void) {
+    __asm__ volatile("movl $1, %%eax\n\tint $0x80" ::: "eax", "memory");
+    for (;;) {
+        __asm__ volatile("hlt");
+    }
+}
+
+static void enter_user_program(void) {
+    uint32_t user_stack_top = (uint32_t)(user_stack + sizeof(user_stack) - 16);
+    uint32_t user_entry = (uint32_t)user_program;
+
+    kputs("[kernel] Entering Ring 3 userspace workload.\n");
+    __asm__ volatile(
+        "pushl $0x23\n"       /* user SS */
+        "pushl %[stack]\n"    /* user ESP */
+        "pushfl\n"
+        "pushl $0x1B\n"       /* user CS */
+        "pushl %[entry]\n"    /* user EIP */
+        "iretl\n"
+        :
+        : [stack] "r"(user_stack_top), [entry] "r"(user_entry)
+        : "memory");
+}
+
+static void init_privilege_boundary(void) {
+    struct gdt_ptr gdt_descriptor;
+    struct idt_ptr idt_descriptor;
+
+    gdt[0] = 0;
+    gdt[1] = 0x00CF9A000000FFFFULL; /* Ring 0 code */
+    gdt[2] = 0x00CF92000000FFFFULL; /* Ring 0 data */
+    gdt[3] = 0x00CFFA000000FFFFULL; /* Ring 3 code */
+    gdt[4] = 0x00CFF2000000FFFFULL; /* Ring 3 data */
+
+    tss.esp0 = (uint32_t)(stack + sizeof(stack) - 16);
+    tss.ss0 = 0x10;
+    tss.iomap_base = sizeof(tss);
+    uint32_t tss_base = (uint32_t)&tss;
+    uint32_t tss_limit = sizeof(tss) - 1;
+    gdt[5] = (uint64_t)(tss_limit & 0xFFFF)
+        | ((uint64_t)(tss_base & 0xFFFFFF) << 16)
+        | 0x0000890000000000ULL
+        | ((uint64_t)((tss_limit >> 16) & 0xF) << 48)
+        | ((uint64_t)((tss_base >> 24) & 0xFF) << 56);
+
+    for (uint16_t vector = 0; vector < 256; vector++) {
+        idt[vector].offset_low = 0;
+        idt[vector].selector = 0;
+        idt[vector].zero = 0;
+        idt[vector].type_attr = 0;
+        idt[vector].offset_high = 0;
+    }
+    set_idt_gate(0x80, syscall_isr, 0xEE); /* present, DPL3, 32-bit interrupt */
+
+    gdt_descriptor.limit = sizeof(gdt) - 1;
+    gdt_descriptor.base = (uint32_t)&gdt;
+    idt_descriptor.limit = sizeof(idt) - 1;
+    idt_descriptor.base = (uint32_t)&idt;
+
+    __asm__ volatile(
+        "lgdt %[gdt]\n"
+        "ltr %%ax\n"
+        "lidt %[idt]\n"
+        "movw $0x23, %%ax\n"
+        "movw %%ax, %%ds\n"
+        "movw %%ax, %%es\n"
+        "movw %%ax, %%fs\n"
+        "movw %%ax, %%gs\n"
+        :
+        : [gdt] "m"(gdt_descriptor), [idt] "m"(idt_descriptor), "a"((uint16_t)0x28)
+        : "memory");
 }
 
 char kgetc(void) {
@@ -400,8 +559,11 @@ void kernel_main(uint32_t magic, void* mb_info) {
     kputs("[kernel] VGA console initialized at 0xB8000.\n");
     kputs("[kernel] Serial COM1 initialized at 115200 8N1.\n");
     kputs("[kernel] PS/2 keyboard controller ready.\n");
+    init_privilege_boundary();
+    kputs("[kernel] GDT, TSS, and DPL3 syscall gate initialized.\n");
     kputs("[kernel] Entering sovereign interactive shell.\n\n");
 
+    enter_user_program();
     kernel_shell();
 }
 
@@ -422,7 +584,5 @@ void _start(void) {
 }
 
 /* 32 KiB Kernel Stack */
-__attribute__((section(".bss"), aligned(16)))
-static uint8_t stack[32768];
 __attribute__((used))
 static uint8_t* stack_top = stack + sizeof(stack);
