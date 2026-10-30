@@ -1019,11 +1019,11 @@ visibility = "public"
 
 [[component]]
 name = "SigmaOS-zsh"
-description = "Zsh config & plugins"
+description = "Zsh shell configuration and plugin integration component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zsh"
-engine = "shell_config"
+engine = "shell"
 language = "shell"
-inspirations = ["https://github.com/omacom/omarchy-zsh"]
+inspirations = ["https://github.com/omacom/omarchy-zsh", "https://archlinux.org", "https://github.com/zsh/zsh"]
 visibility = "public"
 
 [[component]]
@@ -8327,14 +8327,6 @@ inspirations = ["https://github.com/junegust/fzf"]
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-zsh"
-description = "Zsh shell component for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zsh"
-engine = "shell"
-language = "shell"
-inspirations = ["https://archlinux.org", "https://github.com/zsh/zsh"]
-visibility = "public"
-
 [[component]]
 name = "SigmaOS-oh-my-zsh"
 description = "Oh My Zsh component for SigmaOS"
