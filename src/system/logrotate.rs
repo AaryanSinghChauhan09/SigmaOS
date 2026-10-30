@@ -294,3 +294,4 @@ mod tests {
         assert_eq!(manager.rotated_logs.len(), 3);
     }
 }
+pub type LogFileConfig = SysLogFileConfig;

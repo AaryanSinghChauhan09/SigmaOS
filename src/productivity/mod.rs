@@ -222,3 +222,6 @@ pub mod libreoffice_parity;
 pub use libreoffice_parity::*;
 pub mod openoffice_parity;
 pub use openoffice_parity::*;
+
+pub mod sovereign_office_suites_engine;
+pub use sovereign_office_suites_engine::*;

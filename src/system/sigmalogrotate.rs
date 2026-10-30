@@ -427,3 +427,4 @@ mod tests {
         assert!(result.is_ok());
     }
 }
+pub type LogFileConfig = SigmaLogFileConfig;
