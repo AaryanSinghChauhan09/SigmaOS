@@ -8,6 +8,17 @@ organization = "AaryanSinghChauhan09"
 integration_repository = "SigmaOS"
 canonical_branch = "main"
 release_channels = ["edge", "rc", "stable"]
+published_component_repositories = [
+    "SigmaOS-core",
+    "SigmaOS-shell",
+    "SigmaOS-services",
+    "SigmaOS-desktop",
+    "SigmaOS-config",
+    "SigmaOS-apps",
+    "SigmaOS-tools",
+    "SigmaOS-docs",
+    "SigmaOS-brand",
+]
 
 [[repository]]
 name = "SigmaOS"

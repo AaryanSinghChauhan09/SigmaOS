@@ -9,6 +9,17 @@ schema_version = 1
 organization = "AaryanSinghChauhan09"
 integration_repository = "SigmaOS"
 default_branch = "main"
+canonical_repositories_published = [
+    "SigmaOS-core",
+    "SigmaOS-shell",
+    "SigmaOS-services",
+    "SigmaOS-desktop",
+    "SigmaOS-config",
+    "SigmaOS-apps",
+    "SigmaOS-tools",
+    "SigmaOS-docs",
+    "SigmaOS-brand",
+]
 
 [[component]]
 name = "bootloader"
