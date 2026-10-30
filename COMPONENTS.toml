@@ -1,7 +1,7 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit baseline: 1,586 declarations / 1,475 unique component names.
+# Registry audit baseline: 1,567 declarations / 1,475 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
 # GitHub account audit: 294 repositories; 280 registry checkouts are local;
@@ -1683,15 +1683,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-gtk"
-description = "GTK component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gtk"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-herdr"
 description = "Herdr component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-herdr"
@@ -1776,15 +1767,6 @@ visibility = "public"
 name = "SigmaOS-m1n1"
 description = "M1N1 bootloader component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-m1n1"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-mate"
-description = "Mate desktop component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mate"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -1935,15 +1917,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-nvidia-prime-applet"
-description = "Nvidia prime applet component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nvidia-prime-applet"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-omadots"
 description = "Omarchy dots component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omadots"
@@ -2001,15 +1974,6 @@ visibility = "public"
 name = "SigmaOS-omarchy-fish"
 description = "Omarchy fish component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-fish"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-omarchy-iso"
-description = "Omarchy ISO component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-iso"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -2154,15 +2118,6 @@ visibility = "public"
 name = "SigmaOS-repolib"
 description = "Repolib component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-repolib"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-ripgrep"
-description = "Ripgrep component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ripgrep"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -2352,24 +2307,6 @@ visibility = "public"
 name = "SigmaOS-file-manager"
 description = "File manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-manager"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-terminal"
-description = "Terminal component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-terminal"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-shell"
-description = "Shell component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shell"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -2934,15 +2871,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-system-utility"
-description = "System utility component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-utility"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-file-utility"
 description = "File utility component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-utility"
@@ -3270,15 +3198,6 @@ visibility = "public"
 name = "SigmaOS-var-ports"
 description = "VAR ports component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-var-ports"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-etc-configs"
-description = "ETC configs component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-etc-configs"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -3834,15 +3753,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-system-daemons"
-description = "System daemons component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-daemons"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-user-services"
 description = "User services component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-services"
@@ -3852,27 +3762,9 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-user-daemons"
-description = "User daemons component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-daemons"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-core-services"
 description = "Core services component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-core-services"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-core-daemons"
-description = "Core daemons component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-core-daemons"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -4035,15 +3927,6 @@ visibility = "public"
 name = "SigmaOS-filesystem"
 description = "Filesystem component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-network-stack"
-description = "Network stack component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-stack"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -4455,51 +4338,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-alchemy"
-description = "Alchemy component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-alchemy"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-enchanting"
-description = "Enchanting component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-enchanting"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-repair"
-description = "Repair component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-repair"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-smithing"
-description = "Smithing component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-smithing"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-tailoring"
-description = "Tailoring component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tailoring"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-weaving"
 description = "Weaving component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-weaving"
@@ -4656,15 +4494,6 @@ visibility = "public"
 name = "SigmaOS-store"
 description = "Store component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-store"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-mall"
-description = "Mall component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mall"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
