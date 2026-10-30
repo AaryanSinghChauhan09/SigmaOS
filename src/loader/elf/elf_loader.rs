@@ -8,6 +8,12 @@ use std::vec::Vec;
 
 /// ELF magic number
 const ELF_MAGIC: [u8; 4] = [0x7f, b'E', b'L', b'F'];
+const ELFCLASS64: u8 = 2;
+const ELFDATA2LSB: u8 = 1;
+const EM_X86_64: u16 = 62;
+const PT_LOAD: u32 = 1;
+const PF_X: u32 = 1;
+const PF_W: u32 = 2;
 
 /// Auxiliary Vector Types expected by glibc / musl `ld.so`
 pub mod auxv_types {
@@ -164,6 +170,155 @@ pub struct ElfBinary {
     entry_point: u64,
 }
 
+/// A validated loadable ELF segment. The loader performs the actual mapping;
+/// this type contains only checked metadata and a borrowed file image.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ElfLoadSegment<'a> {
+    pub virtual_address: u64,
+    pub file_offset: u64,
+    pub file_size: u64,
+    pub memory_size: u64,
+    pub flags: u32,
+    pub image: &'a [u8],
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ElfLoadError {
+    TruncatedHeader,
+    InvalidMagic,
+    UnsupportedClass,
+    UnsupportedEncoding,
+    UnsupportedMachine,
+    InvalidProgramHeaderSize,
+    ProgramHeadersOutOfBounds,
+    SegmentOutOfBounds,
+    InvalidSegmentSize,
+    InvalidAlignment,
+    AddressOverflow,
+    WritableExecutableSegment,
+    EntryNotExecutable,
+}
+
+/// Validated ELF64 x86_64 load plan for a future address-space mapper.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ElfLoadPlan<'a> {
+    pub entry_point: u64,
+    pub segments: Vec<ElfLoadSegment<'a>>,
+}
+
+impl<'a> ElfLoadPlan<'a> {
+    pub fn parse(image: &'a [u8]) -> Result<Self, ElfLoadError> {
+        if image.len() < 64 {
+            return Err(ElfLoadError::TruncatedHeader);
+        }
+        if image[0..4] != ELF_MAGIC {
+            return Err(ElfLoadError::InvalidMagic);
+        }
+        if image[4] != ELFCLASS64 {
+            return Err(ElfLoadError::UnsupportedClass);
+        }
+        if image[5] != ELFDATA2LSB || image[6] != 1 {
+            return Err(ElfLoadError::UnsupportedEncoding);
+        }
+        if read_u16(image, 18) != Some(EM_X86_64) {
+            return Err(ElfLoadError::UnsupportedMachine);
+        }
+
+        let entry_point = read_u64(image, 24).ok_or(ElfLoadError::TruncatedHeader)?;
+        let program_header_offset = read_u64(image, 32).ok_or(ElfLoadError::TruncatedHeader)?;
+        let program_header_size = read_u16(image, 54).ok_or(ElfLoadError::TruncatedHeader)? as u64;
+        let program_header_count = read_u16(image, 56).ok_or(ElfLoadError::TruncatedHeader)? as u64;
+        if program_header_size < 56 {
+            return Err(ElfLoadError::InvalidProgramHeaderSize);
+        }
+
+        let headers_size = program_header_size
+            .checked_mul(program_header_count)
+            .ok_or(ElfLoadError::ProgramHeadersOutOfBounds)?;
+        let headers_end = program_header_offset
+            .checked_add(headers_size)
+            .ok_or(ElfLoadError::ProgramHeadersOutOfBounds)?;
+        if headers_end > image.len() as u64 {
+            return Err(ElfLoadError::ProgramHeadersOutOfBounds);
+        }
+
+        let mut segments = Vec::new();
+        for index in 0..program_header_count {
+            let header_offset = program_header_offset + index * program_header_size;
+            let header =
+                &image[header_offset as usize..(header_offset + program_header_size) as usize];
+            if read_u32(header, 0) != Some(PT_LOAD) {
+                continue;
+            }
+
+            let flags = read_u32(header, 4).ok_or(ElfLoadError::InvalidProgramHeaderSize)?;
+            let file_offset = read_u64(header, 8).ok_or(ElfLoadError::InvalidProgramHeaderSize)?;
+            let virtual_address =
+                read_u64(header, 16).ok_or(ElfLoadError::InvalidProgramHeaderSize)?;
+            let file_size = read_u64(header, 32).ok_or(ElfLoadError::InvalidProgramHeaderSize)?;
+            let memory_size = read_u64(header, 40).ok_or(ElfLoadError::InvalidProgramHeaderSize)?;
+            let alignment = read_u64(header, 48).ok_or(ElfLoadError::InvalidProgramHeaderSize)?;
+
+            if file_size > memory_size {
+                return Err(ElfLoadError::InvalidSegmentSize);
+            }
+            if alignment > 1 && !alignment.is_power_of_two() {
+                return Err(ElfLoadError::InvalidAlignment);
+            }
+            if flags & PF_W != 0 && flags & PF_X != 0 {
+                return Err(ElfLoadError::WritableExecutableSegment);
+            }
+            let file_end = file_offset
+                .checked_add(file_size)
+                .ok_or(ElfLoadError::AddressOverflow)?;
+            virtual_address
+                .checked_add(memory_size)
+                .ok_or(ElfLoadError::AddressOverflow)?;
+            if file_end > image.len() as u64 {
+                return Err(ElfLoadError::SegmentOutOfBounds);
+            }
+
+            segments.push(ElfLoadSegment {
+                virtual_address,
+                file_offset,
+                file_size,
+                memory_size,
+                flags,
+                image: &image[file_offset as usize..file_end as usize],
+            });
+        }
+
+        if !segments.iter().any(|segment| {
+            segment.flags & PF_X != 0
+                && entry_point >= segment.virtual_address
+                && entry_point < segment.virtual_address + segment.memory_size
+        }) {
+            return Err(ElfLoadError::EntryNotExecutable);
+        }
+        Ok(Self {
+            entry_point,
+            segments,
+        })
+    }
+}
+
+fn read_u16(data: &[u8], offset: usize) -> Option<u16> {
+    let bytes = data.get(offset..offset + 2)?;
+    Some(u16::from_le_bytes([bytes[0], bytes[1]]))
+}
+
+fn read_u32(data: &[u8], offset: usize) -> Option<u32> {
+    let bytes = data.get(offset..offset + 4)?;
+    Some(u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]))
+}
+
+fn read_u64(data: &[u8], offset: usize) -> Option<u64> {
+    let bytes = data.get(offset..offset + 8)?;
+    Some(u64::from_le_bytes([
+        bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
+    ]))
+}
+
 impl ElfBinary {
     pub unsafe fn new(data: *const u8, size: usize) -> Option<Self> {
         if size < 64 {
@@ -229,5 +384,56 @@ mod tests {
         assert_eq!(resolver.resolve("free"), Some(0x7FFF_0001_0010));
         assert_eq!(resolver.resolve("pthread_create"), Some(0x7FFF_0001_0070));
         assert_eq!(resolver.resolve("non_existent_symbol"), None);
+    }
+
+    fn minimal_elf(flags: u32, file_size: u64, image_size: usize) -> Vec<u8> {
+        let mut image = vec![0u8; image_size.max(136)];
+        image[0..4].copy_from_slice(&ELF_MAGIC);
+        image[4] = ELFCLASS64;
+        image[5] = ELFDATA2LSB;
+        image[6] = 1;
+        image[18..20].copy_from_slice(&EM_X86_64.to_le_bytes());
+        image[24..32].copy_from_slice(&0x400080u64.to_le_bytes());
+        image[32..40].copy_from_slice(&64u64.to_le_bytes());
+        image[52..54].copy_from_slice(&64u16.to_le_bytes());
+        image[54..56].copy_from_slice(&56u16.to_le_bytes());
+        image[56..58].copy_from_slice(&1u16.to_le_bytes());
+
+        let ph = &mut image[64..120];
+        ph[0..4].copy_from_slice(&PT_LOAD.to_le_bytes());
+        ph[4..8].copy_from_slice(&flags.to_le_bytes());
+        ph[8..16].copy_from_slice(&120u64.to_le_bytes());
+        ph[16..24].copy_from_slice(&0x400000u64.to_le_bytes());
+        ph[32..40].copy_from_slice(&file_size.to_le_bytes());
+        ph[40..48].copy_from_slice(&4096u64.to_le_bytes());
+        ph[48..56].copy_from_slice(&4096u64.to_le_bytes());
+        image
+    }
+
+    #[test]
+    fn test_validated_load_plan() {
+        let image = minimal_elf(PF_X, 16, 136);
+        let plan = ElfLoadPlan::parse(&image).unwrap();
+        assert_eq!(plan.entry_point, 0x400080);
+        assert_eq!(plan.segments.len(), 1);
+        assert_eq!(plan.segments[0].image.len(), 16);
+    }
+
+    #[test]
+    fn test_load_plan_rejects_wx_segments() {
+        let image = minimal_elf(PF_W | PF_X, 16, 136);
+        assert_eq!(
+            ElfLoadPlan::parse(&image),
+            Err(ElfLoadError::WritableExecutableSegment)
+        );
+    }
+
+    #[test]
+    fn test_load_plan_rejects_truncated_segment() {
+        let image = minimal_elf(PF_X, 32, 136);
+        assert_eq!(
+            ElfLoadPlan::parse(&image),
+            Err(ElfLoadError::SegmentOutOfBounds)
+        );
     }
 }
