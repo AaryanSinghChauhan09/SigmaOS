@@ -26,3 +26,5 @@ __pycache__/
 !docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
 !wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
 !wiki/26-System-Utilities-Development-Plan.md
+!docs/process/
+!docs/process/*.md
