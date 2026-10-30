@@ -1,3 +1,4 @@
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // Test Suite for Bootable Vertical Slices Missing Components PR Engine
 // (`tests/test_bootable_vertical_slices.rs`)
