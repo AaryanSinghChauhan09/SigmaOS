@@ -12,6 +12,7 @@ repeatable.
 | Rust library build | `CARGO_BUILD_JOBS=1 cargo check --lib` | Verified locally |
 | Multiboot kernel | C source and linker script exist; real boot is CI-gated | In progress |
 | QEMU boot-to-shell | Real ISO/QEMU harness added; first CI run is required | In progress |
+| x86_64 syscall MSRs | Validated `STAR`/`LSTAR`/`FMASK` configuration abstraction added; privileged install is not yet wired into boot | Partial |
 | User mode and Linux ABI | No end-to-end unmodified Linux workload evidence | Not verified |
 | Virtio block/network | Models and partial implementations exist; interrupt-driven path is not proven | Partial |
 | Dynamic ELF loading | No verified end-to-end loader path | Not verified |
