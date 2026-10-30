@@ -1,7 +1,7 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit baseline: 1,539 declarations / 1,481 unique component names.
+# Registry audit baseline: 1,535 declarations / 1,481 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
 # GitHub account audit: 294 repositories; 260 registry checkouts are local;
@@ -1359,15 +1359,6 @@ inspirations = ["https://github.com/linuxmint/indicator-sound"]
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-accerciser"
-description = "Accessibility component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accerciser"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-aether.nvim"
 description = "Neovim aether plugin for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-aether.nvim"
@@ -2061,15 +2052,6 @@ inspirations = "None"
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-cinnamon"
-description = "Cinnamon desktop component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
 name = "SigmaOS-mate"
 description = "Mate desktop component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mate"
@@ -2100,15 +2082,6 @@ visibility = "public"
 name = "SigmaOS-nvidia-prime-applet"
 description = "Nvidia prime applet component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nvidia-prime-applet"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-indicator-sound"
-description = "Sound indicator component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-indicator-sound"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
@@ -2496,15 +2469,6 @@ visibility = "public"
 name = "SigmaOS-desktop-effects"
 description = "Desktop effects component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-effects"
-engine = "unknown"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-
-[[component]]
-name = "SigmaOS-wallpaper-engine"
-description = "Wallpaper engine component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper-engine"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"
