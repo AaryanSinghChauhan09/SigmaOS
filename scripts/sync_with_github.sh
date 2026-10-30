@@ -15,7 +15,11 @@
 
 set -euo pipefail
 
-TOKEN="${GITHUB_TOKEN:-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}"
+if [ -z "${GITHUB_TOKEN:-}" ]; then
+    echo "error: GITHUB_TOKEN must be set; refusing to call GitHub without credentials" >&2
+    exit 2
+fi
+TOKEN="$GITHUB_TOKEN"
 COMPONENTS_FILE="COMPONENTS.toml"
 WIKI_DIR="SigmaOS.wiki"
 
@@ -122,12 +126,12 @@ with open('COMPONENTS.toml', 'rb') as f:
 lines = []
 lines.append("# SOFTWARE CATEGORY MATRIX — SigmaOS Multi-Repository Ecosystem")
 lines.append("")
-lines.append("*Generated from `COMPONENTS.toml`, modelled on Linux Mint & Omarchy Linux sub-repository architecture (150 total repos, multiple focused repos instead of one monolithic repo).*")
+components = data.get('component', [])
+unique_names = len({c.get('name') for c in components})
+lines.append(f"*Generated from `COMPONENTS.toml`, modelled on Linux Mint & Omarchy Linux sub-repository architecture ({unique_names} unique declarations, multiple focused repos instead of one monolithic repo).*")
 lines.append("")
 lines.append("| Repo | Category | Engine | Language | Visibility | Upstream Inspirations |")
 lines.append("|------|----------|--------|----------|------------|-----------------------|")
-
-components = data.get('component', [])
 for c in components:
     repo = c['name']
     cat = c.get('category', '')

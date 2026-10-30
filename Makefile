@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -9,6 +9,10 @@ all: check test
 # 0. Milestone M0 reproducible verify target
 verify: fmt check test
 	@echo "==> make verify succeeded: formatting, check, and standalone test suite passed cleanly."
+
+# Read-only inventory of all repositories declared in COMPONENTS.toml.
+registry-audit:
+	@$(PYTHON) scripts/audit_component_fleet.py
 
 # 1. Code formatting
 fmt-fix:
@@ -150,6 +154,7 @@ help:
 	@echo "  make test-fast    - Memory-safe cargo unit tests (timed)"
 	@echo "  make bench        - Benchmarks on thin-LTO release-fast profile"
 	@echo "  make fmt          - Verify formatting style (strict)"
+	@echo "  make registry-audit - Audit managed component checkouts and metadata (read-only)"
 	@echo "  make fmt-fix      - Auto-apply rustfmt across workspace"
 	@echo "  make iso          - Full Desktop ISO build (GRUB2 + initramfs + installer) ✓"
 	@echo "  make iso-stub     - Stub ISO build (GRUB2, boots NOW in QEMU) ✓"
