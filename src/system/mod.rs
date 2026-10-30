@@ -924,6 +924,9 @@ pub use sovereign_init_and_supervisor_advancements_v63_pr::*;
 pub mod sovereign_init_and_supervisor_advancements_v88_pr;
 pub use sovereign_init_and_supervisor_advancements_v88_pr::*;
 
+pub mod sovereign_init_and_supervisor_advancements_v89_pr;
+pub use sovereign_init_and_supervisor_advancements_v89_pr::*;
+
 pub mod sovereign_init_and_supervisor_advancements_v67;
 pub use sovereign_init_and_supervisor_advancements_v67::*;
 
