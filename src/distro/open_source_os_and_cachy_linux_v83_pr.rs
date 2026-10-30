@@ -5,8 +5,8 @@
 #![allow(non_camel_case_types)]
 #![allow(dead_code)]
 
-use crate::distro::cachy_linux_missing_components_v83_pr::*;
-use crate::distro::open_source_os_unimplemented_ideas_v83_pr::*;
+use super::cachy_linux_missing_components_v83_pr::*;
+use super::open_source_os_unimplemented_ideas_v83_pr::*;
 
 /// Master Gateway combining V83 Open Source OS Unimplemented Ideas and CachyOS Missing Components PR Suites.
 #[derive(Debug, Clone)]

@@ -4,9 +4,16 @@
 //! Integration Test Suite for V83 Open Source OS Unimplemented Ideas & Cachy Linux Missing Components PR Engine
 //! (`tests/test_open_source_os_and_cachy_linux_v83_pr.rs`)
 
-use sigmaos::distro::cachy_linux_missing_components_v83_pr::*;
-use sigmaos::distro::open_source_os_and_cachy_linux_v83_pr::*;
-use sigmaos::distro::open_source_os_unimplemented_ideas_v83_pr::*;
+#[path = "../src/distro/cachy_linux_missing_components_v83_pr.rs"]
+mod cachy_linux_missing_components_v83_pr;
+#[path = "../src/distro/open_source_os_and_cachy_linux_v83_pr.rs"]
+mod open_source_os_and_cachy_linux_v83_pr;
+#[path = "../src/distro/open_source_os_unimplemented_ideas_v83_pr.rs"]
+mod open_source_os_unimplemented_ideas_v83_pr;
+
+use cachy_linux_missing_components_v83_pr::*;
+use open_source_os_and_cachy_linux_v83_pr::*;
+use open_source_os_unimplemented_ideas_v83_pr::*;
 
 #[test]
 fn test_open_source_os_v83_engines_and_manifests() {
