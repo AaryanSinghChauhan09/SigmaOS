@@ -97,6 +97,7 @@ pub mod pdfcraft;
 pub mod pdfcraft_artcraft_missing_components_v68_pr;
 pub mod pdfcraft_artcraft_missing_components_v69_pr;
 pub mod pdfcraft_artcraft_missing_components_v70_pr;
+pub mod pdfcraft_artcraft_missing_components_v71_pr;
 pub mod pdfcraft_artcraft_parity_pr;
 pub mod pdfcraft_missing_components_parity_pr;
 pub mod photocraft;
@@ -280,6 +281,7 @@ pub use pdfcraft::{
 pub use pdfcraft_artcraft_missing_components_v68_pr::*;
 pub use pdfcraft_artcraft_missing_components_v69_pr::*;
 pub use pdfcraft_artcraft_missing_components_v70_pr::*;
+pub use pdfcraft_artcraft_missing_components_v71_pr::*;
 pub use pdfcraft_artcraft_parity_pr::*;
 pub use pdfcraft_missing_components_parity_pr::*;
 pub use photocraft::{
