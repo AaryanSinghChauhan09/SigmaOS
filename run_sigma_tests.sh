@@ -2569,6 +2569,26 @@ if [ -f "src/distro/cachy_linux_missing_components_v83_pr.rs" ]; then
     ./build/test_open_source_os_and_cachy_v83_integration
 fi
 
+if [ -f "src/distro/open_source_os_unimplemented_ideas_v84_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas V84 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_unimplemented_ideas_v84_pr.rs --edition=2021 -o build/test_os_ideas_v84_pr
+    ./build/test_os_ideas_v84_pr
+
+    rustc --test tests/test_open_source_os_unimplemented_ideas_v84_pr.rs --edition=2021 -o build/test_os_ideas_v84_integration
+    ./build/test_os_ideas_v84_integration
+fi
+
+if [ -f "src/distro/omarchy_linux_missing_components_v84_pr.rs" ]; then
+    echo "Running Omarchy Linux Missing Components V84 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_linux_missing_components_v84_pr.rs --edition=2021 -o build/test_omarchy_v84_pr
+    ./build/test_omarchy_v84_pr
+
+    rustc --test tests/test_omarchy_linux_v84_pr.rs --edition=2021 -o build/test_omarchy_v84_integration
+    ./build/test_omarchy_v84_integration
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
     mkdir -p build
