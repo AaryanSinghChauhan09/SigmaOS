@@ -23,3 +23,6 @@ __pycache__/
 *.txt
 !docs/INTERRUPT_HANDLER_PLAN.md
 !wiki/INTERRUPT_HANDLER_PLAN.md
+!docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
+!wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
+!wiki/26-System-Utilities-Development-Plan.md
