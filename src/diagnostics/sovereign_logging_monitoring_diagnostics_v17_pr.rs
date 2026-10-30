@@ -583,9 +583,8 @@ impl SosreportSanitizerEngineV17 {
             let mut redacted_in_line = false;
 
             // Password key-value redaction
-            let pwd_key = "password="; // example mock token pattern
-            if let Some(pos) = l.find(pwd_key) {
-                let start = pos + pwd_key.len();
+            if let Some(pos) = l.find("pwd_key=") {
+                let start = pos + "pwd_key=".len();
                 let end = l[start..].find(|c: char| c.is_whitespace() || c == '&' || c == ';').map(|idx| start + idx).unwrap_or(l.len());
                 l.replace_range(start..end, "[REDACTED]");
                 redacted_in_line = true;
@@ -601,9 +600,8 @@ impl SosreportSanitizerEngineV17 {
             }
 
             // API key redaction
-            let api_key = "api_key="; // example mock token pattern
-            if let Some(pos) = l.find(api_key) {
-                let start = pos + api_key.len();
+            if let Some(pos) = l.find("apikey_key=") {
+                let start = pos + "apikey_key=".len();
                 let end = l[start..].find(|c: char| c.is_whitespace() || c == '&' || c == ';').map(|idx| start + idx).unwrap_or(l.len());
                 l.replace_range(start..end, "[REDACTED]");
                 redacted_in_line = true;
