@@ -215,38 +215,35 @@ impl MuslDynamicRelocator {
         let mut resolved_count = 0;
 
         for rela in &obj.relocations {
-            let target_addr = load_base + rela.offset;
-            let offset_in_buffer = rela.offset as usize;
-
-            if offset_in_buffer + 8 > target_memory.len() {
-                continue; // Virtual target out of simulated buffer range
+            let offset_in_buffer = usize::try_from(rela.offset)
+                .map_err(|_| "Relocation offset does not fit target memory")?;
+            let end = offset_in_buffer
+                .checked_add(core::mem::size_of::<u64>())
+                .ok_or("Relocation target overflows target memory")?;
+            if end > target_memory.len() {
+                return Err("Relocation target is outside target memory");
             }
 
             match rela.reloctype() {
                 R_X86_64_RELATIVE => {
                     // B + A: Base load address + Addend
-                    let value = (load_base as i64).wrapping_add(rela.addend) as u64;
-                    target_memory[offset_in_buffer..offset_in_buffer + 8]
-                        .copy_from_slice(&value.to_ne_bytes());
+                    let value = if rela.addend >= 0 {
+                        load_base
+                            .checked_add(rela.addend as u64)
+                            .ok_or("Relative relocation overflows address")?
+                    } else {
+                        load_base
+                            .checked_sub(rela.addend.unsigned_abs())
+                            .ok_or("Relative relocation underflows address")?
+                    };
+                    target_memory[offset_in_buffer..end].copy_from_slice(&value.to_le_bytes());
                     resolved_count += 1;
                 }
-                R_X86_64_GLOB_DAT | R_X86_64_JUMP_SLOT => {
-                    // S: Symbol value
-                    // In a full implementation, symbol is found via rela.sym_idx
-                    // For test/emulation, write simulated resolved pointer
-                    let dummy_sym_val = load_base + 0x1000;
-                    target_memory[offset_in_buffer..offset_in_buffer + 8]
-                        .copy_from_slice(&dummy_sym_val.to_ne_bytes());
-                    resolved_count += 1;
+                R_X86_64_NONE => {}
+                R_X86_64_GLOB_DAT | R_X86_64_JUMP_SLOT | R_X86_64_64 => {
+                    return Err("Symbol relocation requires a resolved symbol table");
                 }
-                R_X86_64_64 => {
-                    // S + A
-                    let value = (load_base as i64).wrapping_add(rela.addend) as u64;
-                    target_memory[offset_in_buffer..offset_in_buffer + 8]
-                        .copy_from_slice(&value.to_ne_bytes());
-                    resolved_count += 1;
-                }
-                _ => {}
+                _ => return Err("Unsupported x86_64 relocation type"),
             }
         }
 
@@ -340,5 +337,33 @@ mod tests {
         assert_eq!(auxv.first().unwrap().0, AT_PHDR);
         assert_eq!(auxv.first().unwrap().1, 0x400040);
         assert_eq!(auxv.last().unwrap().0, AT_NULL);
+    }
+
+    #[test]
+    fn test_relocator_rejects_out_of_bounds_target() {
+        let mut relocator = MuslDynamicRelocator::new();
+        let mut app = SharedObject::new("test_app", 0x400000);
+        app.relocations
+            .push(DynamicRela::new(0x40, R_X86_64_RELATIVE, 0, 0));
+        relocator.add_shared_object(app);
+
+        assert_eq!(
+            relocator.apply_relocations("test_app", &mut [0u8; 64]),
+            Err("Relocation target is outside target memory")
+        );
+    }
+
+    #[test]
+    fn test_relocator_does_not_fabricate_symbol_addresses() {
+        let mut relocator = MuslDynamicRelocator::new();
+        let mut app = SharedObject::new("test_app", 0x400000);
+        app.relocations
+            .push(DynamicRela::new(0x20, R_X86_64_JUMP_SLOT, 1, 0));
+        relocator.add_shared_object(app);
+
+        assert_eq!(
+            relocator.apply_relocations("test_app", &mut [0u8; 64]),
+            Err("Symbol relocation requires a resolved symbol table")
+        );
     }
 }
