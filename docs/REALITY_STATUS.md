@@ -13,6 +13,7 @@ repeatable.
 | Multiboot kernel | C source and linker script exist; real boot is CI-gated | In progress |
 | QEMU boot-to-shell | Real ISO/QEMU harness added; first CI run is required | In progress |
 | ISO release artifact | Builder now requires a SigmaOS kernel and a real ISO9660 tool; host-kernel and tar fallbacks removed | Build-verified locally; boot/install integration remains |
+| Installer safety | Explicit target and destructive-action confirmation, dry-run mode, NVMe partition naming, and fail-fast package/bootloader checks | Script-verified locally; real disk installation not exercised |
 | Ring-3 proof workload | 32-bit Multiboot kernel now configures GDT/TSS/IDT and enters a test workload through `iret`; hardware/QEMU execution still needs CI evidence | In progress |
 | ELF load plan | Bounds-checked ELF64/x86_64 `PT_LOAD` parser with W^X, entry validation, zero-initialized image materialization, and page-level mapping plan | Formatting/static validation passes; page-table mapping and execution are not integrated |
 | x86_64 syscall MSRs | Validated `STAR`/`LSTAR`/`FMASK` configuration abstraction added; privileged install is not yet wired into boot | Partial |
