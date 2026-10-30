@@ -3417,6 +3417,13 @@ if [ -f "tests/test_lfs_bsd_synthesis_v80_pr.rs" ]; then
     TMPDIR=$(pwd)/build rustc --test tests/test_lfs_bsd_synthesis_v80_pr.rs --edition=2021 -o build/test_lfs_bsd_v80_pr
     ./build/test_lfs_bsd_v80_pr
 fi
+
+if [ -f "tests/test_open_source_os_unimplemented_ideas_v83_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas V83 PR test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test tests/test_open_source_os_unimplemented_ideas_v83_pr.rs --edition=2021 -o build/test_open_source_os_v83_pr
+    ./build/test_open_source_os_v83_pr
+fi
 echo "All SigmaOS test suites completed."
 
 if [ -f "src/customization/sovereign_customized_editions.rs" ]; then
