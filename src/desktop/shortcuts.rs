@@ -57,7 +57,6 @@ impl KeyAction {
             KeyAction::MaximizeWindow | KeyAction::TileWindow | KeyAction::CloseWindow => {
                 ShortcutCategory::WindowManagement
             }
-            _ => ShortcutCategory::Application,
         }
     }
 
@@ -217,6 +216,35 @@ impl KeyboardShortcutsManager {
 
     pub fn add_shortcut(&mut self, shortcut: KeyboardShortcut) {
         self.shortcuts.push(shortcut);
+    }
+
+    /// Validate the shortcut registry before it is handed to a compositor.
+    ///
+    /// A conflicting registry is ambiguous: `handle_key_press` would return the
+    /// first matching action, making the result depend on registration order.
+    /// Keep registration permissive so configuration editors can show errors, but
+    /// make the invalid state explicit and machine-checkable.
+    pub fn validate(&self) -> Result<(), Vec<String>> {
+        let mut errors = Vec::new();
+        let mut combinations = std::collections::BTreeMap::<String, &KeyboardShortcut>::new();
+
+        for shortcut in &self.shortcuts {
+            let combination = shortcut.get_key_combination();
+            if let Some(previous) = combinations.insert(combination.clone(), shortcut) {
+                errors.push(format!(
+                    "conflicting shortcut '{}': {} and {}",
+                    combination,
+                    previous.action.as_str(),
+                    shortcut.action.as_str()
+                ));
+            }
+        }
+
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors)
+        }
     }
 
     pub fn add_default_shortcuts(&mut self) {
@@ -509,6 +537,30 @@ mod tests {
         let mut manager = KeyboardShortcutsManager::new();
         manager.add_default_shortcuts();
         assert!(!manager.shortcuts.is_empty());
+        assert!(manager.validate().is_ok());
+    }
+
+    #[test]
+    fn test_keyboard_shortcuts_manager_rejects_conflicting_registry() {
+        let mut manager = KeyboardShortcutsManager::new();
+        manager.add_shortcut(KeyboardShortcut::new(
+            vec![KeyModifier::Super],
+            String::from("T"),
+            KeyAction::OpenTerminal,
+            String::from("Open terminal"),
+        ));
+        manager.add_shortcut(KeyboardShortcut::new(
+            vec![KeyModifier::Super],
+            String::from("T"),
+            KeyAction::OpenLauncher,
+            String::from("Open launcher"),
+        ));
+
+        let errors = manager
+            .validate()
+            .expect_err("duplicate bindings must fail validation");
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].contains("Super+T"));
     }
 
     #[test]
