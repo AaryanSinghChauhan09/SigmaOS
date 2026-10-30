@@ -206,7 +206,7 @@ pub fn validate_email(email: &[u8]) -> Result<(), ValidationError> {
 
     // Check valid local-part unquoted characters
     for &b in local {
-        if !b.is_ascii_alphanumeric() && !b"!#$%&'*+-/=?^_`{|}~.".contains(&b) {
+        if !is_valid_email_local_char(b) {
             return Err(ValidationError::InvalidChars);
         }
     }
@@ -812,6 +812,26 @@ pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
 
 // ── HTTP Header Validation ──────────────────────────────────────────────────
 
+/// Check whether a byte is a valid HTTP token character (`tchar`) per RFC 7230 / RFC 9110.
+#[inline]
+fn is_valid_http_token_char(b: u8) -> bool {
+    b.is_ascii_alphanumeric()
+        || matches!(
+            b,
+            b'!' | b'#' | b'$' | b'%' | b'&' | b'\'' | b'*' | b'+' | b'-' | b'.' | b'^' | b'_' | b'`' | b'|' | b'~'
+        )
+}
+
+/// Check whether a byte is a valid unquoted email local-part character per RFC 5322.
+#[inline]
+fn is_valid_email_local_char(b: u8) -> bool {
+    b.is_ascii_alphanumeric()
+        || matches!(
+            b,
+            b'!' | b'#' | b'$' | b'%' | b'&' | b'\'' | b'*' | b'+' | b'-' | b'/' | b'=' | b'?' | b'^' | b'_' | b'`' | b'{' | b'|' | b'}' | b'~' | b'.'
+        )
+}
+
 /// Validate an HTTP header field name per RFC 7230 / RFC 9110 (`token`).
 ///
 /// Rules:
@@ -831,7 +851,7 @@ pub fn validate_http_header_name(name: &[u8]) -> Result<(), ValidationError> {
         if b == 0 {
             return Err(ValidationError::NullByte);
         }
-        if b.is_ascii_alphanumeric() || b"!#$%&'*+-.^_`|~".contains(&b) {
+        if is_valid_http_token_char(b) {
             continue;
         }
         return Err(ValidationError::InvalidChars);
@@ -1816,6 +1836,68 @@ mod tests {
         assert_eq!(
             validate_email(b"user@example..com"),
             Err(ValidationError::InvalidChars)
+        );
+    }
+
+    #[test]
+    fn test_http_header_validation() {
+        // Valid HTTP header field names
+        assert_eq!(validate_http_header_name(b"Content-Type"), Ok(()));
+        assert_eq!(validate_http_header_name(b"X-Custom-Header_123"), Ok(()));
+        assert_eq!(validate_http_header_name(b"Accept-Encoding"), Ok(()));
+
+        // Invalid HTTP header field names
+        assert_eq!(
+            validate_http_header_name(b""),
+            Err(ValidationError::EmptyInput)
+        );
+        assert_eq!(
+            validate_http_header_name(b"Content\x00Type"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_http_header_name(b"Host:Port"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_http_header_name(b"Content\r\nType"),
+            Err(ValidationError::InvalidChars)
+        );
+        let long_name = vec![b'a'; MAX_HTTP_HEADER_NAME_LEN + 1];
+        assert_eq!(
+            validate_http_header_name(&long_name),
+            Err(ValidationError::TooLong)
+        );
+
+        // Valid HTTP header field values
+        assert_eq!(validate_http_header_value(b"application/json"), Ok(()));
+        assert_eq!(
+            validate_http_header_value(b"text/html; charset=utf-8"),
+            Ok(())
+        );
+        assert_eq!(validate_http_header_value(b"gzip, deflate, br"), Ok(()));
+
+        // Invalid HTTP header field values
+        assert_eq!(
+            validate_http_header_value(b"val\x00ue"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_http_header_value(b"value\r\nSet-Cookie: session=pwned"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_http_header_value(b"value\nHeader: foo"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_http_header_value(b"value\x07"),
+            Err(ValidationError::InvalidChars)
+        );
+        let long_val = vec![b'v'; MAX_HTTP_HEADER_VALUE_LEN + 1];
+        assert_eq!(
+            validate_http_header_value(&long_val),
+            Err(ValidationError::TooLong)
         );
     }
 }
