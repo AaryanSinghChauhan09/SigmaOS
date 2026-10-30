@@ -707,12 +707,11 @@ pub use virtualization::{
     SovereignVirtualizationAndContainersParityV68Gateway,
     // SovereignVirtualizationAndContainersParityV80Gateway, // TODO: Implement V80 version
     SovereignVirtualizationAndContainersParityV81Gateway,
+    SovereignVirtualizationAndContainersParityV87Gateway,
     // SovereignVirtualizationAndContainersV80PrGatewayEngine, // TODO: Implement V80 version
     SovereignVirtualizationAndContainersV81PrGatewayEngine,
-    VirtualBoxBhyveVmmV61Engine,
-    VirtualBoxBhyveVmmV63Engine,
-    VirtualBoxBhyveVmmV67Engine,
-    VirtualBoxBhyveVmmV68Engine,
+    SovereignVirtualizationAndContainersV87PrGatewayEngine, VirtualBoxBhyveVmmV61Engine,
+    VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualBoxBhyveVmmV68Engine,
     // VirtualBoxBhyveVmmV80Engine, // TODO: Implement V80 version
     VirtualMachine,
     VirtualizationError,

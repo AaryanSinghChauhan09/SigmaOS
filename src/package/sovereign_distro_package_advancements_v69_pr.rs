@@ -32,11 +32,9 @@ use std::vec::Vec;
 use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
 
 #[cfg(feature = "standalone_test")]
-#[path = "universal.rs"]
-pub mod universal;
-
-#[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+use crate::package::sovereign_distro_package_advancements_v69::universal::{
+    PackageError, PackageFormat, PackageState, UnifiedPackage,
+};
 
 /// Pull Request Proposal Manifest V69
 #[derive(Debug, Clone, PartialEq, Eq)]
