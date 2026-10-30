@@ -421,6 +421,10 @@ mod tests {
         assert_eq!(milestones.len(), 9);
         assert_eq!(milestones[0].code(), "M0");
         assert_eq!(milestones[8].code(), "M8");
+
+        for m in &milestones {
+            assert!(!m.missing_capability().is_empty());
+        }
     }
 
     #[test]
