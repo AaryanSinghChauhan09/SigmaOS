@@ -161,6 +161,37 @@ fn test_plan_eventfd_contract() {
 }
 
 #[test]
+fn test_process_synchronization_documentation_plan_verification() {
+    use std::fs;
+
+    let docs_plan = fs::read_to_string("docs/PROCESS_SYNCHRONIZATION_PLAN.md")
+        .expect("docs/PROCESS_SYNCHRONIZATION_PLAN.md must exist");
+    let wiki_plan = fs::read_to_string("wiki/PROCESS_SYNCHRONIZATION_PLAN.md")
+        .expect("wiki/PROCESS_SYNCHRONIZATION_PLAN.md must exist");
+
+    assert!(docs_plan.contains("SigmaOS Process Synchronization Master Architecture & PR Proposal Plan"));
+    assert!(docs_plan.contains("Core Design Rules"));
+    assert!(docs_plan.contains("Name the synchronization domain"));
+    assert!(docs_plan.contains("Separate lock from event"));
+    assert!(docs_plan.contains("Never sleep in atomic context"));
+    assert!(docs_plan.contains("Specify ownership and failure semantics"));
+    assert!(docs_plan.contains("Wait on predicates, not notifications"));
+    assert!(docs_plan.contains("Prevent lost wakeups"));
+    assert!(docs_plan.contains("Use explicit memory ordering"));
+    assert!(docs_plan.contains("Address priority inversion and starvation"));
+    assert!(docs_plan.contains("Treat user-memory objects as untrusted"));
+    assert!(docs_plan.contains("Test races systematically"));
+    assert!(docs_plan.contains("Proposed PR Sequence Roadmap"));
+    assert!(docs_plan.contains("Priority order:"));
+    assert!(docs_plan.contains("Periodic Maintenance PR Cadence"));
+    assert!(docs_plan.contains("Component-Specific Rules"));
+    assert!(docs_plan.contains("PR Review Template and Merge Gates"));
+    assert!(docs_plan.contains("Completion Gates"));
+
+    assert_eq!(docs_plan, wiki_plan, "wiki/PROCESS_SYNCHRONIZATION_PLAN.md must mirror docs/PROCESS_SYNCHRONIZATION_PLAN.md exactly");
+}
+
+#[test]
 fn test_process_synchronization_architecture_rules_and_pr_sequence() {
     // Verify 5-layer progression architecture rules
     let layers = [
