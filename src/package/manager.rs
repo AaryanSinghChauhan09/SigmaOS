@@ -152,7 +152,7 @@ impl GuiAppStoreManager {
         author: &str,
         rating_stars: u8,
         comment: &str,
-    ) -> Result<(), &'static str> {
+    ) -> Result<(), PackageError> {
         let stars = rating_stars.clamp(1, 5);
         for app in &mut self.store_listings {
             if app.app_id == app_id {
@@ -166,7 +166,7 @@ impl GuiAppStoreManager {
                 return Ok(());
             }
         }
-        Err("App ID not found in store registry")
+        Err(PackageError::PackageNotFound)
     }
 
     pub fn search_apps(&self, keyword: &str) -> std::vec::Vec<&AppListing> {
@@ -180,14 +180,14 @@ impl GuiAppStoreManager {
             .collect()
     }
 
-    pub fn install_gui_app(&mut self, app_id: &str) -> Result<(), &'static str> {
+    pub fn install_gui_app(&mut self, app_id: &str) -> Result<(), PackageError> {
         for app in &mut self.store_listings {
             if app.app_id == app_id {
                 app.is_installed = true;
                 return Ok(());
             }
         }
-        Err("App ID not found in store")
+        Err(PackageError::PackageNotFound)
     }
 }
 
@@ -197,13 +197,16 @@ impl Default for GuiAppStoreManager {
     }
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum PackageError {
-    Success = 0,
-    PackageNotFound = 1,
-    InstallFailed = 2,
-    UpdateFailed = 3,
+    Success,
+    PackageNotFound,
+    InstallFailed,
+    UpdateFailed,
+    UnresolvedDependency(String),
+    DependencyBreakage,
+    Conflict(String),
+    TransactionNotFound,
 }
 
 pub struct SimplePackageManager {
@@ -231,7 +234,7 @@ impl PackageManager for SimplePackageManager {
         for pkg_option in &mut self.packages {
             if let Some(ref pkg) = *pkg_option {
                 if pkg.id() == id {
-                    self.packages.clear();
+                    *pkg_option = None;
                     return Ok(());
                 }
             }
