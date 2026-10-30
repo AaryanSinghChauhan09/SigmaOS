@@ -38,7 +38,7 @@ pub enum Direction {
 }
 
 /// Firewall rule
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FirewallRule {
     pub id: u32,
     pub action: RuleAction,
@@ -48,321 +48,6 @@ pub struct FirewallRule {
     pub from_address: Option<String>,
     pub to_address: Option<String>,
     pub enabled: bool,
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::SeqCst)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(core::sync::atomic::Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::SeqCst)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action.clone(),
-            protocol: self.protocol.clone(),
-            direction: self.direction.clone(),
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
-}
-
-impl Clone for FirewallRule {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            action: self.action,
-            protocol: self.protocol,
-            direction: self.direction,
-            port: self.port,
-            from_address: self.from_address.clone(),
-            to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
-        }
-    }
 }
 
 /// Firewall profile
@@ -442,7 +127,7 @@ impl FirewallManager {
             .iter_mut()
             .find(|r| r.id == rule_id)
             .ok_or("Rule not found")?;
-        rule.enabled.store(true, Ordering::Relaxed);
+        rule.enabled = true;
         Ok(())
     }
 
@@ -453,7 +138,7 @@ impl FirewallManager {
             .iter_mut()
             .find(|r| r.id == rule_id)
             .ok_or("Rule not found")?;
-        rule.enabled.store(false, Ordering::Relaxed);
+        rule.enabled = false;
         Ok(())
     }
 
@@ -621,15 +306,13 @@ mod tests {
         assert!(!manager
             .get_rule(id)
             .unwrap()
-            .enabled
-            .load(Ordering::Relaxed));
+            .enabled);
 
         manager.enable_rule(id).unwrap();
         assert!(manager
             .get_rule(id)
             .unwrap()
-            .enabled
-            .load(Ordering::Relaxed));
+            .enabled);
     }
 
     #[test]
