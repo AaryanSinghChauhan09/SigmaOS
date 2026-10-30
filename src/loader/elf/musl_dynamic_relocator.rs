@@ -117,6 +117,8 @@ pub struct SharedObject {
     pub name: String,
     pub load_base: u64,
     pub symbols: BTreeMap<String, DynamicSymbol>,
+    /// Dynamic-symbol-table order; relocation `sym_idx` values index this list.
+    pub symbol_names: Vec<String>,
     pub relocations: Vec<DynamicRela>,
     pub needed_libraries: Vec<String>,
     pub init_func: Option<u64>,
@@ -129,6 +131,7 @@ impl SharedObject {
             name: String::from(name),
             load_base,
             symbols: BTreeMap::new(),
+            symbol_names: Vec::new(),
             relocations: Vec::new(),
             needed_libraries: Vec::new(),
             init_func: None,
@@ -137,6 +140,18 @@ impl SharedObject {
     }
 
     pub fn export_symbol(&mut self, name: &str, offset: u64, size: u64) {
+        if self.symbol_names.is_empty() {
+            self.symbol_names.push(String::new());
+        }
+        self.export_symbol_at(self.symbol_names.len() as u32, name, offset, size);
+    }
+
+    pub fn export_symbol_at(&mut self, index: u32, name: &str, offset: u64, size: u64) {
+        let index = index as usize;
+        if self.symbol_names.len() <= index {
+            self.symbol_names.resize(index + 1, String::new());
+        }
+        self.symbol_names[index] = String::from(name);
         self.symbols.insert(
             String::from(name),
             DynamicSymbol {
@@ -241,7 +256,19 @@ impl MuslDynamicRelocator {
                 }
                 R_X86_64_NONE => {}
                 R_X86_64_GLOB_DAT | R_X86_64_JUMP_SLOT | R_X86_64_64 => {
-                    return Err("Symbol relocation requires a resolved symbol table");
+                    let symbol_name = obj
+                        .symbol_names
+                        .get(rela.sym_idx as usize)
+                        .filter(|name| !name.is_empty())
+                        .ok_or("Relocation references an unknown symbol index")?;
+                    let symbol_value = self
+                        .global_symbol_index
+                        .get(symbol_name)
+                        .copied()
+                        .ok_or("Relocation references an unresolved symbol")?;
+                    let value = add_signed(symbol_value, rela.addend)?;
+                    target_memory[offset_in_buffer..end].copy_from_slice(&value.to_le_bytes());
+                    resolved_count += 1;
                 }
                 _ => return Err("Unsupported x86_64 relocation type"),
             }
@@ -274,6 +301,16 @@ impl MuslDynamicRelocator {
         auxv.push((AT_RANDOM, random_bytes_addr));
         auxv.push((AT_NULL, 0));
         auxv
+    }
+}
+
+fn add_signed(base: u64, addend: i64) -> Result<u64, &'static str> {
+    if addend >= 0 {
+        base.checked_add(addend as u64)
+            .ok_or("Relocation addend overflows address")
+    } else {
+        base.checked_sub(addend.unsigned_abs())
+            .ok_or("Relocation addend underflows address")
     }
 }
 
@@ -363,7 +400,23 @@ mod tests {
 
         assert_eq!(
             relocator.apply_relocations("test_app", &mut [0u8; 64]),
-            Err("Symbol relocation requires a resolved symbol table")
+            Err("Relocation references an unknown symbol index")
         );
+    }
+
+    #[test]
+    fn test_relocator_resolves_symbol_index() {
+        let mut relocator = MuslDynamicRelocator::new();
+        let mut app = SharedObject::new("test_app", 0x400000);
+        app.symbol_names.resize(2, String::new());
+        app.symbol_names[1] = String::from("printf");
+        app.relocations
+            .push(DynamicRela::new(0x20, R_X86_64_JUMP_SLOT, 1, 8));
+        relocator.add_shared_object(app);
+
+        let mut memory = [0u8; 64];
+        assert_eq!(relocator.apply_relocations("test_app", &mut memory), Ok(1));
+        let written = u64::from_le_bytes(memory[0x20..0x28].try_into().unwrap());
+        assert_eq!(written, 0x7FFF_0000_0000 + 0x3000 + 8);
     }
 }

@@ -17,7 +17,7 @@ repeatable.
 | x86_64 syscall MSRs | Validated `STAR`/`LSTAR`/`FMASK` configuration abstraction added; privileged install is not yet wired into boot | Partial |
 | User mode and Linux ABI | No end-to-end unmodified Linux workload evidence | Not verified |
 | Virtio block/network | Models and partial implementations exist; interrupt-driven path is not proven | Partial |
-| Dynamic ELF loading | Relocation engine supports checked `RELATIVE` entries and fails closed for unresolved symbol relocations | Not verified end-to-end |
+| Dynamic ELF loading | Relocation engine supports checked `RELATIVE` entries, indexed symbol resolution, and fails closed for unresolved symbols | Not verified end-to-end |
 | GPU/Wayland desktop | Prototype and architectural code; no real GPU session evidence | Prototype |
 | Package transactions | Dependency preparation, conflict checks, and scoped rollback are unit-tested | Partial |
 
