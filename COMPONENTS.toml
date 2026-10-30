@@ -1,7 +1,7 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit baseline: 1,539 declarations / 1,475 unique component names.
+# Registry audit baseline: 1,539 declarations / 1,481 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
 # GitHub account audit: 294 repositories; 280 registry checkouts are local;
@@ -10107,7 +10107,7 @@ inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/themes-ma
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-omarchy-tm"
+name = "SigmaOS-omarchy-themes-manager"
 description = "Themes manager for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-themes-manager"
 engine = "themes_manager"
@@ -10116,7 +10116,7 @@ inspirations = ["https://omarchy.org", "https://github.com/omarchy/themes-manage
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-arch-tm"
+name = "SigmaOS-arch-themes-manager"
 description = "Themes manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-themes-manager"
 engine = "themes_manager"
@@ -10512,7 +10512,7 @@ inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/snap-stor
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-omarchy-ss"
+name = "SigmaOS-omarchy-snap-store"
 description = "Snap store for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-snap-store"
 engine = "snap_store"
@@ -10521,7 +10521,7 @@ inspirations = ["https://omarchy.org", "https://github.com/omarchy/snap-store"]
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-arch-ss"
+name = "SigmaOS-arch-snap-store"
 description = "Snap store for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-snap-store"
 engine = "snap_store"
@@ -10593,7 +10593,7 @@ inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-se
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-omarchy-ss"
+name = "SigmaOS-omarchy-system-security"
 description = "System security for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-security"
 engine = "system_security"
@@ -10602,7 +10602,7 @@ inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-securi
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-arch-ss"
+name = "SigmaOS-arch-system-security"
 description = "System security for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-security"
 engine = "system_security"
@@ -10701,7 +10701,7 @@ inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/password-
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-omarchy-pm2"
+name = "SigmaOS-omarchy-password-manager"
 description = "Password manager for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-password-manager"
 engine = "password_manager"
@@ -10710,7 +10710,7 @@ inspirations = ["https://omarchy.org", "https://github.com/omarchy/password-mana
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-arch-pm2"
+name = "SigmaOS-arch-password-manager"
 description = "Password manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-password-manager"
 engine = "password_manager"
