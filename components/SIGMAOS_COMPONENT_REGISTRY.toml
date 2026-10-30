@@ -1,0 +1,147 @@
+# SigmaOS component repository registry.
+#
+# This is an inventory and ownership contract, not a claim that every
+# component is implemented. A component may move to a separate repository
+# only after it has a tested interface, a maintainer, a license, and a release
+# path. Keep the main repository as the integration point.
+
+schema_version = 1
+organization = "AaryanSinghChauhan09"
+integration_repository = "SigmaOS"
+default_branch = "main"
+
+[[component]]
+name = "bootloader"
+repository = "SigmaOS-bootloader"
+status = "planned"
+priority = "critical"
+capability = "uefi_boot"
+upstreams = ["omacom/m1n1", "limine-bootloader/limine"]
+
+[[component]]
+name = "installer"
+repository = "SigmaOS-installer"
+status = "partial"
+priority = "critical"
+capability = "installer_dry_run_and_hardware_partitioning"
+upstreams = ["linuxmint/ubiquity", "linuxmint/live-installer"]
+
+[[component]]
+name = "kernel"
+repository = "SigmaOS-kernel"
+status = "partial"
+priority = "critical"
+capability = "kernel_boot_and_user_mode"
+upstreams = ["omacom/linux-aurora", "torvalds/linux"]
+
+[[component]]
+name = "init"
+repository = "SigmaOS-init"
+status = "modeled"
+priority = "critical"
+capability = "userspace_process_manager"
+upstreams = ["systemd/systemd", "void-linux/runit"]
+
+[[component]]
+name = "storage"
+repository = "SigmaOS-storage"
+status = "partial"
+priority = "critical"
+capability = "secondary_memory_subsystem"
+upstreams = ["torvalds/linux", "freebsd/freebsd-src"]
+
+[[component]]
+name = "nvme"
+repository = "SigmaOS-nvme"
+status = "partial"
+priority = "critical"
+capability = "nvme_driver_mmio"
+upstreams = ["torvalds/linux", "freebsd/freebsd-src"]
+
+[[component]]
+name = "wifi"
+repository = "SigmaOS-wifi"
+status = "partial"
+priority = "critical"
+capability = "wifi_networking"
+upstreams = ["torvalds/linux", "linux-firmware/linux-firmware"]
+
+[[component]]
+name = "acpi"
+repository = "SigmaOS-acpi"
+status = "partial"
+priority = "critical"
+capability = "acpi_table_parser"
+upstreams = ["acpica/acpica", "torvalds/linux"]
+
+[[component]]
+name = "graphics"
+repository = "SigmaOS-graphics"
+status = "partial"
+priority = "critical"
+capability = "drm_kms_graphics"
+upstreams = ["mesa3d/mesa", "torvalds/linux"]
+
+[[component]]
+name = "desktop-session"
+repository = "SigmaOS-desktop-session"
+status = "partial"
+priority = "high"
+capability = "wayland_zenith_compositor"
+upstreams = ["hyprwm/Hyprland", "omacom/omarchy"]
+
+[[component]]
+name = "accessibility"
+repository = "SigmaOS-accessibility"
+status = "planned"
+priority = "high"
+capability = "desktop_accessibility"
+upstreams = ["linuxmint/orca", "GNOME/accerciser"]
+
+[[component]]
+name = "network-manager"
+repository = "SigmaOS-network-manager"
+status = "planned"
+priority = "high"
+capability = "network_configuration"
+upstreams = ["NetworkManager/NetworkManager", "linuxmint/network-discovery"]
+
+[[component]]
+name = "package-manager"
+repository = "SigmaOS-packages"
+status = "partial"
+priority = "high"
+capability = "package_manager"
+upstreams = ["archlinux/pacman", "linuxmint/aptkit", "omacom/omarchy-pkgs"]
+
+[[component]]
+name = "system-updater"
+repository = "SigmaOS-update"
+status = "partial"
+priority = "high"
+capability = "software_update_and_rollback"
+upstreams = ["linuxmint/mintupdate", "coreos/rpm-ostree"]
+
+[[component]]
+name = "backup-recovery"
+repository = "SigmaOS-backup-tool"
+status = "planned"
+priority = "high"
+capability = "snapshot_and_recovery"
+upstreams = ["linuxmint/timeshift", "linuxmint/mintbackup"]
+
+[[component]]
+name = "software-center"
+repository = "SigmaOS-software-manager"
+status = "planned"
+priority = "high"
+capability = "graphical_package_management"
+upstreams = ["linuxmint/mintinstall", "PackageKit/PackageKit"]
+
+[[component]]
+name = "documentation"
+repository = "SigmaOS-guide"
+status = "partial"
+priority = "high"
+capability = "user_and_developer_guides"
+upstreams = ["linuxmint/mintdoc", "archlinux/archwiki"]
