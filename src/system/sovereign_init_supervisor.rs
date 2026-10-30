@@ -122,6 +122,9 @@ pub mod sovereign_init_and_supervisor_advancements_v86_pr;
 #[path = "sovereign_init_and_supervisor_advancements_v88_pr.rs"]
 pub mod sovereign_init_and_supervisor_advancements_v88_pr;
 
+#[path = "sovereign_init_and_supervisor_advancements_v92_pr.rs"]
+pub mod sovereign_init_and_supervisor_advancements_v92_pr;
+
 use sovereign_init_and_supervisor_advancements_v63::*;
 use sovereign_init_and_supervisor_advancements_v67::SovereignInitAndSupervisorAdvancementsV67Suite;
 use sovereign_init_and_supervisor_advancements_v86_pr::{
@@ -129,6 +132,9 @@ use sovereign_init_and_supervisor_advancements_v86_pr::{
 };
 use sovereign_init_and_supervisor_advancements_v88_pr::{
     SovereignInitAndSupervisorAdvancementsV88Suite, SovereignInitAndSupervisorV88PrGatewayEngine,
+};
+use sovereign_init_and_supervisor_advancements_v92_pr::{
+    SovereignInitAndSupervisorAdvancementsV92Suite, SovereignInitAndSupervisorV92PrGatewayEngine,
 };
 
 pub struct SovereignInitSupervisor {
@@ -150,6 +156,8 @@ pub struct SovereignInitSupervisor {
     pub pr_gateway_v86: SovereignInitAndSupervisorV86PrGatewayEngine,
     pub suite_v88: SovereignInitAndSupervisorAdvancementsV88Suite,
     pub pr_gateway_v88: SovereignInitAndSupervisorV88PrGatewayEngine,
+    pub suite_v92: SovereignInitAndSupervisorAdvancementsV92Suite,
+    pub pr_gateway_v92: SovereignInitAndSupervisorV92PrGatewayEngine,
 }
 
 impl SovereignInitSupervisor {
@@ -173,6 +181,8 @@ impl SovereignInitSupervisor {
             pr_gateway_v86: SovereignInitAndSupervisorV86PrGatewayEngine::new(),
             suite_v88: SovereignInitAndSupervisorAdvancementsV88Suite::new(),
             pr_gateway_v88: SovereignInitAndSupervisorV88PrGatewayEngine::new(),
+            suite_v92: SovereignInitAndSupervisorAdvancementsV92Suite::new(),
+            pr_gateway_v92: SovereignInitAndSupervisorV92PrGatewayEngine::new(),
         }
     }
 
@@ -480,6 +490,14 @@ mod tests {
         let supervisor = SovereignInitSupervisor::new();
         let sig = [0u8; 64];
         let manifests = supervisor.pr_gateway_v88.orchestrate_core_userland_v88(&sig).unwrap();
+        assert_eq!(manifests.len(), 7);
+    }
+
+    #[test]
+    fn test_v92_suite_integration() {
+        let supervisor = SovereignInitSupervisor::new();
+        let sig = [0u8; 64];
+        let manifests = supervisor.pr_gateway_v92.orchestrate_core_userland_v92(&sig).unwrap();
         assert_eq!(manifests.len(), 7);
     }
 }
