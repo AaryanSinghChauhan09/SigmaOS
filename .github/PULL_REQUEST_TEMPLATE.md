@@ -29,6 +29,10 @@
 ## Security review
 
 - Kernel safety review:
+
+## Shell safety review
+
+- Shell safety review:
 - Capability/namespace checks enforced:
 - Shared-memory or descriptor implications:
 - Input validation and failure behavior:
