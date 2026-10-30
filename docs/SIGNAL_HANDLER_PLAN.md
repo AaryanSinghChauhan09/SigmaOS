@@ -21,8 +21,8 @@ Implementing `sigaction()` alone does not deliver a handler. POSIX.1-2024 specif
 4. **Enforce Uncatchable Signals in Kernel:** `SIGKILL` (signal 9) and `SIGSTOP` (signal 19) cannot be caught, ignored, or blocked under any circumstances. The kernel rejects attempts to modify their dispositions or include them in blocked signal masks (`sigprocmask` / `pthread_sigmask`).
 5. **Respect Masks and Nesting:** The delivered signal is automatically added to the thread's signal mask during handler execution unless `SA_NODEFER` is set. Additional signals specified in `sa_mask` are also blocked. The saved mask is restored upon return via `sigreturn`.
 6. **Define Syscall Interruption Behavior:** Blocking system calls interrupted by a signal return `EINTR` or restart automatically if `SA_RESTART` is specified in `sa_flags`. The interruption contract is defined per syscall.
-7. **Minimal and Auditable Handler Path:** The kernel signal delivery and return paths operate without dynamic memory allocations, never sleep in invalid contexts, and never trust handler-modified privileged CPU flags or addresses. User handlers must obey async-signal-safety requirements.
-8. **Truth in Status Claims:** No feature is marked "Integrated" or "Supported" based solely on unit tests, struct definitions, or synthetic models. Integration requires real Ring 3 execution, handler entry, trampoline execution, and safe context restoration.
+7. **Minimal and Auditable Handler-Path Behavior:** The kernel signal delivery and return paths operate without dynamic memory allocations, never sleep in invalid contexts, and never trust handler-modified privileged CPU flags or addresses. User handlers must obey async-signal-safety requirements.
+8. **No False Status Claims:** No feature is marked "Integrated" or "Supported" based solely on unit tests, struct definitions, or synthetic models. Integration requires real Ring 3 execution, handler entry, trampoline execution, and safe context restoration.
 
 ---
 
