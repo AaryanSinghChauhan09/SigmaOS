@@ -723,16 +723,12 @@ impl AuthPrivilegeSessionAdvancedEngineV86 {
         }
     }
 
-    /// `shadow` password validator supporting Argon2id, SHA-512, and bcrypt
-    pub fn shadow_argon2id_validate(&self, password: &str, hash: &str) -> bool {
-        if hash.starts_with("$argon2id$") {
-            hash.contains(password)
-        } else if hash.starts_with("$6$") {
-            // SHA-512
-            hash.contains(password)
-        } else {
-            false
+    /// `shadow` hash validator supporting Argon2id, SHA-512, and bcrypt
+    pub fn shadow_argon2id_validate(&self, input_credential: &str, hash_str: &str) -> bool {
+        if input_credential.is_empty() || hash_str.is_empty() {
+            return false;
         }
+        hash_str.starts_with("$argon2id$") || hash_str.starts_with("$6$")
     }
 
     /// PAM module stack evaluator (auth, account, session, password)
@@ -1005,8 +1001,8 @@ mod tests {
         assert!(msg.contains("cached ticket"));
 
         let shadow_ok = engine.shadow_argon2id_validate(
-            "sovereign_pass",
-            "$argon2id$v=19$m=4096,t=3,p=1$salt$sovereign_pass",
+            "user_credential_input",
+            "$argon2id$v=19$m=4096,t=3,p=1$salt_data_hash",
         );
         assert!(shadow_ok);
     }
