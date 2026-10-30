@@ -62,6 +62,9 @@ def audit(root: Path) -> dict[str, object]:
     return {
         "registry_entries": len(entries),
         "unique_components": len(set(names)),
+        "missing_local_checkouts": sorted(
+            set(names) - {item["name"] for item in components if item["checkout"]}
+        ),
         "duplicate_names": duplicates,
         "components": components,
     }
@@ -71,6 +74,7 @@ def summary(report: dict[str, object]) -> str:
     components = report["components"]
     assert isinstance(components, list)
     checkout = sum(bool(item["checkout"]) for item in components)
+    missing_local = len(report["missing_local_checkouts"])
     no_origin = sum(bool(item["checkout"]) and not item["origin"] for item in components)
     dirty = sum(bool(item["dirty"]) for item in components)
     readme = sum(bool(item["readme"]) for item in components)
@@ -81,6 +85,7 @@ def summary(report: dict[str, object]) -> str:
             f"registry entries: {report['registry_entries']}",
             f"unique components: {report['unique_components']}",
             f"local git checkouts: {checkout}",
+            f"missing local checkouts: {missing_local}",
             f"missing origin: {no_origin}",
             f"dirty worktrees: {dirty}",
             f"README present: {readme}",
