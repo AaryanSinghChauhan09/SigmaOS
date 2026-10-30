@@ -17,10 +17,12 @@
 
 set -euo pipefail
 
-TARGET_DEVICE="/dev/sda"
+TARGET_DEVICE=""
 HOSTNAME="sigmaos"
 USERNAME="sigma"
 MOUNT_POINT="/mnt/sigmaos"
+CONFIRM_DESTRUCTIVE=0
+DRY_RUN=0
 
 log_info()  { echo "[sigmaos-install] [INFO]  $*" >&2; }
 log_step()  { echo "[sigmaos-install] [STEP]  $*" >&2; }
@@ -29,10 +31,12 @@ log_error() { echo "[sigmaos-install] [ERROR] $*" >&2; }
 
 usage() {
   cat <<EOF
-Usage: sigmaos-install [--target DEVICE] [--hostname NAME] [--username NAME]
-  --target    Target block device (default: /dev/sda)
+Usage: sigmaos-install --target DEVICE --yes-i-understand [--hostname NAME] [--username NAME]
+  --target    Explicit target block device; no destructive default is used
   --hostname  System hostname (default: sigmaos)
   --username  Primary user account (default: sigma)
+  --yes-i-understand  Confirm that the target device will be erased
+  --dry-run   Validate arguments and required tools without changing disks
 EOF
   exit 1
 }
@@ -40,9 +44,11 @@ EOF
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --target) TARGET_DEVICE="$2"; shift 2 ;;
+    --target) [[ $# -ge 2 ]] || { log_error "--target requires a device"; exit 1; }; TARGET_DEVICE="$2"; shift 2 ;;
     --hostname) HOSTNAME="$2"; shift 2 ;;
     --username) USERNAME="$2"; shift 2 ;;
+    --yes-i-understand) CONFIRM_DESTRUCTIVE=1; shift ;;
+    --dry-run) DRY_RUN=1; shift ;;
     --help|-h) usage ;;
     *) log_error "Unknown option: $1"; usage ;;
   esac
@@ -68,17 +74,56 @@ log_info "SigmaOS root: ${SIGMAOS_ROOT}"
 # ---------------------------------------------------------------------------
 preflight() {
   log_step "Pre-flight checks"
-  if [[ $EUID -ne 0 ]]; then
+  if [[ -z "${TARGET_DEVICE}" ]]; then
+    log_error "An explicit --target device is required"
+    exit 1
+  fi
+  if [[ "${TARGET_DEVICE}" != /dev/* ]]; then
+    log_error "Target must be a device path under /dev: ${TARGET_DEVICE}"
+    exit 1
+  fi
+  if [[ "${DRY_RUN}" -eq 0 && "${CONFIRM_DESTRUCTIVE}" -ne 1 ]]; then
+    log_error "Refusing destructive install without --yes-i-understand"
+    exit 1
+  fi
+  if [[ "${DRY_RUN}" -eq 0 && $EUID -ne 0 ]]; then
     log_error "Must run as root"
     exit 1
   fi
-  if [[ ! -b "${TARGET_DEVICE}" ]]; then
+  if [[ "${DRY_RUN}" -eq 0 && ! -b "${TARGET_DEVICE}" ]]; then
     log_error "Target device ${TARGET_DEVICE} not found"
     exit 1
   fi
   log_info "Target device: ${TARGET_DEVICE}"
   log_info "Hostname: ${HOSTNAME}"
   log_info "Username: ${USERNAME}"
+  if [[ "${DRY_RUN}" -eq 1 ]]; then
+    log_info "Dry-run: no device changes will be made"
+    return
+  fi
+  if findmnt -rn -S "${TARGET_DEVICE}" >/dev/null 2>&1; then
+    log_error "Target device or one of its partitions is mounted"
+    exit 1
+  fi
+  if findmnt -rn -T / | grep -q "${TARGET_DEVICE}"; then
+    log_error "Refusing to overwrite the device hosting the running system"
+    exit 1
+  fi
+  for tool in parted mkfs.fat mkfs.ext4 mount blkid; do
+    command -v "${tool}" >/dev/null 2>&1 || { log_error "Required tool missing: ${tool}"; exit 1; }
+  done
+  command -v pacstrap >/dev/null 2>&1 || {
+    log_error "pacstrap is required; refusing to install packages into the host system"
+    exit 1
+  }
+}
+
+partition_path() {
+  if [[ "${TARGET_DEVICE}" =~ (nvme|mmcblk|loop)[0-9]+$ ]]; then
+    printf '%s p%s\n' "${TARGET_DEVICE}" "$1" | tr -d ' '
+  else
+    printf '%s%s\n' "${TARGET_DEVICE}" "$1"
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -93,14 +138,16 @@ partition() {
   parted -s "${TARGET_DEVICE}" mkpart primary ext4 512MiB 100%
   
   # Format
-  mkfs.fat -F 32 "${TARGET_DEVICE}1"
-  mkfs.ext4 -F "${TARGET_DEVICE}2"
+  EFI_PARTITION="$(partition_path 1)"
+  ROOT_PARTITION="$(partition_path 2)"
+  mkfs.fat -F 32 "${EFI_PARTITION}"
+  mkfs.ext4 -F "${ROOT_PARTITION}"
   
   # Mount
   mkdir -p "${MOUNT_POINT}"
-  mount "${TARGET_DEVICE}2" "${MOUNT_POINT}"
+  mount "${ROOT_PARTITION}" "${MOUNT_POINT}"
   mkdir -p "${MOUNT_POINT}/boot"
-  mount "${TARGET_DEVICE}1" "${MOUNT_POINT}/boot"
+  mount "${EFI_PARTITION}" "${MOUNT_POINT}/boot"
   
   log_info "Partitioned and mounted ${TARGET_DEVICE}"
 }
@@ -111,14 +158,11 @@ partition() {
 install_packages() {
   log_step "Installing base packages"
   
-  if command -v pacstrap >/dev/null 2>&1; then
-    pacstrap "${MOUNT_POINT}" - < "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" 2>/dev/null || \
-      pacstrap "${MOUNT_POINT}" $(grep -v '^#' "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" | grep -v '^$')
-  elif command -v pacman >/dev/null 2>&1; then
-    pacman -Sy --needed --noconfirm $(grep -v '^#' "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" | grep -v '^$')
-  else
-    log_warn "No package manager found, skipping package installation"
-  fi
+  [[ -r "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" ]] || {
+    log_error "Base package manifest is missing"
+    exit 1
+  }
+  pacstrap "${MOUNT_POINT}" - < "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages"
 }
 
 # ---------------------------------------------------------------------------
@@ -126,7 +170,8 @@ install_packages() {
 # ---------------------------------------------------------------------------
 generate_fstab() {
   log_step "Generating fstab"
-  genfstab -U "${MOUNT_POINT}" >> "${MOUNT_POINT}/etc/fstab" 2>/dev/null || true
+  command -v genfstab >/dev/null 2>&1 || { log_error "genfstab is required"; exit 1; }
+  genfstab -U "${MOUNT_POINT}" > "${MOUNT_POINT}/etc/fstab"
 }
 
 # ---------------------------------------------------------------------------
@@ -176,16 +221,21 @@ configure_bootloader() {
   log_step "Configuring limine bootloader"
   
   # Replace UUID placeholder in limine.conf
-  ROOT_UUID=$(blkid -s UUID -o value "${TARGET_DEVICE}2" 2>/dev/null || echo "REPLACE_ME")
+  ROOT_UUID=$(blkid -s UUID -o value "$(partition_path 2)" 2>/dev/null)
+  [[ -n "${ROOT_UUID}" ]] || { log_error "Could not determine root filesystem UUID"; exit 1; }
   if [ -f "${MOUNT_POINT}/boot/limine/limine.conf" ]; then
     sed -i "s/__ROOT_UUID__/${ROOT_UUID}/g" "${MOUNT_POINT}/boot/limine/limine.conf"
   fi
   
   # Install limine to EFI partition
+  EFI_PARTITION="$(partition_path 1)"
   if command -v limine-deploy >/dev/null 2>&1; then
-    limine-deploy --efi "${TARGET_DEVICE}1" 2>/dev/null || true
+    limine-deploy --efi "${EFI_PARTITION}"
   elif command -v limine-install >/dev/null 2>&1; then
-    limine-install "${TARGET_DEVICE}1" 2>/dev/null || true
+    limine-install "${EFI_PARTITION}"
+  else
+    log_error "No Limine installer found; refusing to leave an unbootable system"
+    exit 1
   fi
   
   log_info "Bootloader configured"
@@ -224,6 +274,10 @@ enable_services() {
 # ---------------------------------------------------------------------------
 main() {
   preflight
+  if [[ "${DRY_RUN}" -eq 1 ]]; then
+    log_step "Dry-run complete"
+    return 0
+  fi
   partition
   install_packages
   generate_fstab
