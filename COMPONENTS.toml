@@ -207,14 +207,6 @@ inspirations = ["https://github.com/linuxmint/mintupgrade-legacy"]
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-timeshift"
-description = "Btrfs/rsync system snapshots & restore"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timeshift"
-engine = "snapshot"
-language = "shell"
-inspirations = ["https://github.com/linuxmint/timeshift"]
-visibility = "public"
-
 [[component]]
 name = "SigmaOS-backup-tool"
 description = "Backup / restore with manifest & verification"
@@ -388,11 +380,11 @@ visibility = "public"
 
 [[component]]
 name = "SigmaOS-desktop-environment"
-description = "SigmaOS desktop environment (panels, menus, WM glue)"
+description = "Polyglot desktop environment, compositor, shell, panels, menus, and window-management glue"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-environment"
-engine = "desktop_lib"
-language = "rust"
-inspirations = ["https://github.com/linuxmint/cinnamon"]
+engine = "desktop_environment"
+language = "Rust, Zig, Nim"
+inspirations = ["https://github.com/linuxmint/cinnamon", "https://archlinux.org", "https://wiki.archlinux.org"]
 visibility = "public"
 
 [[component]]
@@ -7965,14 +7957,6 @@ inspirations = ["https://archlinux.org", "https://github.com/gnu-grub"]
 visibility = "public"
 
 [[component]]
-name = "SigmaOS-desktop-environment"
-description = "Desktop environment component for SigmaOS with Arch Linux workflow"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-environment"
-engine = "desktop_env"
-language = "shell"
-inspirations = ["https://archlinux.org", "https://wiki.archlinux.org"]
-visibility = "public"
-
 [[component]]
 name = "SigmaOS-rolling-release"
 description = "Rolling release update system component for SigmaOS"
@@ -8164,11 +8148,11 @@ visibility = "public"
 
 [[component]]
 name = "SigmaOS-timeshift"
-description = "Timeshift snapshot component for SigmaOS inspired by Linux Mint timeshift"
+description = "System snapshot and restore tool using rsync-style and Btrfs snapshot modes, inspired by Linux Mint Timeshift"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timeshift"
 engine = "snapshot"
-language = "shell"
-inspirations = ["https://linuxmint.com", "https://github.com/teejee2008/timeshift"]
+language = "rust"
+inspirations = ["https://linuxmint.com", "https://github.com/teejee2008/timeshift", "https://github.com/linuxmint/timeshift"]
 visibility = "public"
 
 [[component]]
