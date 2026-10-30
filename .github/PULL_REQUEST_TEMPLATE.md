@@ -6,6 +6,18 @@
 - User-visible behavior:
 - Related issue or plan:
 
+## Upstream study and reference behavior
+
+- Reference study:
+- Upstream project, document, or behavior reviewed:
+- What SigmaOS adopts:
+- What remains intentionally different:
+
+## Risks and rollback
+
+- Risks and rollback:
+- Recovery or downgrade procedure:
+
 ## IPC handler
 
 - [ ] This change affects IPC handler behavior, or I confirm it does not.
@@ -16,6 +28,7 @@
 
 ## Security review
 
+- Kernel safety review:
 - Capability/namespace checks enforced:
 - Shared-memory or descriptor implications:
 - Input validation and failure behavior:
