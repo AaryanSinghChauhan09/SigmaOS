@@ -12,6 +12,7 @@ const ELFCLASS64: u8 = 2;
 const ELFDATA2LSB: u8 = 1;
 const EM_X86_64: u16 = 62;
 const PT_LOAD: u32 = 1;
+const PF_R: u32 = 4;
 const PF_X: u32 = 1;
 const PF_W: u32 = 2;
 
@@ -211,6 +212,7 @@ pub struct ElfLoadPlan<'a> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MaterializedElfSegment {
     pub offset: usize,
+    pub file_size: usize,
     pub memory_size: usize,
     pub flags: u32,
 }
@@ -222,6 +224,16 @@ pub struct MaterializedElfImage {
     pub entry_point: u64,
     pub bytes: Vec<u8>,
     pub segments: Vec<MaterializedElfSegment>,
+}
+
+/// One virtual page in a materialized image. `image_offset` is `None` for a
+/// page that contains only zero-filled BSS; the page allocator must provide a
+/// zeroed frame in that case.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ElfPageMapping {
+    pub virtual_address: u64,
+    pub image_offset: Option<usize>,
+    pub flags: u32,
 }
 
 impl<'a> ElfLoadPlan<'a> {
@@ -390,6 +402,7 @@ impl<'a> ElfLoadPlan<'a> {
             bytes[offset..end].copy_from_slice(segment.image);
             segments.push(MaterializedElfSegment {
                 offset,
+                file_size,
                 memory_size,
                 flags: segment.flags,
             });
@@ -402,6 +415,74 @@ impl<'a> ElfLoadPlan<'a> {
             bytes,
             segments,
         })
+    }
+}
+
+impl MaterializedElfImage {
+    /// Build the page-level contract consumed by an address-space mapper.
+    /// Overlapping load segments are coalesced and their permissions are
+    /// unioned, while W^X is preserved as a hard invariant.
+    pub fn page_mappings(&self) -> Result<Vec<ElfPageMapping>, ElfLoadError> {
+        const PAGE_SIZE: u64 = 4096;
+        let mut mappings = Vec::new();
+
+        for segment in &self.segments {
+            let segment_address = self
+                .base_address
+                .checked_add(segment.offset as u64)
+                .ok_or(ElfLoadError::AddressOverflow)?;
+            let segment_end = segment_address
+                .checked_add(segment.memory_size as u64)
+                .ok_or(ElfLoadError::AddressOverflow)?;
+            let first_page = segment_address & !(PAGE_SIZE - 1);
+            let last_page = segment_end
+                .checked_add(PAGE_SIZE - 1)
+                .ok_or(ElfLoadError::AddressOverflow)?
+                & !(PAGE_SIZE - 1);
+            let mut page = first_page;
+
+            while page < last_page {
+                let file_end_offset = segment
+                    .offset
+                    .checked_add(segment.file_size)
+                    .ok_or(ElfLoadError::ImageTooLarge)?;
+                let image_offset = if page < segment_address {
+                    (segment.offset < file_end_offset).then_some(segment.offset)
+                } else {
+                    let relative = usize::try_from(page - segment_address)
+                        .map_err(|_| ElfLoadError::ImageTooLarge)?;
+                    let offset = segment
+                        .offset
+                        .checked_add(relative)
+                        .ok_or(ElfLoadError::ImageTooLarge)?;
+                    (offset < file_end_offset).then_some(offset)
+                };
+
+                if let Some(existing) = mappings
+                    .iter_mut()
+                    .find(|mapping: &&mut ElfPageMapping| mapping.virtual_address == page)
+                {
+                    existing.flags |= segment.flags & (PF_R | PF_W | PF_X);
+                    if existing.flags & PF_W != 0 && existing.flags & PF_X != 0 {
+                        return Err(ElfLoadError::WritableExecutableSegment);
+                    }
+                    if existing.image_offset.is_none() {
+                        existing.image_offset = image_offset;
+                    }
+                } else {
+                    mappings.push(ElfPageMapping {
+                        virtual_address: page,
+                        image_offset,
+                        flags: segment.flags & (PF_R | PF_W | PF_X),
+                    });
+                }
+                page = page
+                    .checked_add(PAGE_SIZE)
+                    .ok_or(ElfLoadError::AddressOverflow)?;
+            }
+        }
+
+        Ok(mappings)
     }
 }
 
@@ -554,6 +635,13 @@ mod tests {
         assert_eq!(loaded.bytes[0], 0xAA);
         assert_eq!(loaded.bytes[16], 0);
         assert_eq!(loaded.segments[0].memory_size, 4096);
+
+        let mappings = loaded.page_mappings().unwrap();
+        assert_eq!(mappings.len(), 1);
+        assert_eq!(mappings[0].virtual_address, 0x1400000);
+        assert_eq!(mappings[0].image_offset, Some(0));
+        assert_eq!(mappings[0].flags, PF_X);
+        assert_eq!(loaded.segments[0].file_size, 16);
     }
 
     #[test]
