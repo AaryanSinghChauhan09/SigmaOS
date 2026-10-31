@@ -13,6 +13,8 @@
 //! 9. Firecracker & Cloud-Hypervisor Engine (Fast boot MicroVMs <5ms, virtio-vsock, virtio-mem ballooning, direct ELF kernel boot)
 //! 10. gVisor, Kata Containers & Apple Hypervisor Engine (Sentry syscall proxy, Kata microVMs, Apple Hypervisor.framework hv_vcpu, Rosetta 2)
 
+#![allow(dead_code)]
+
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
