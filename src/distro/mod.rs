@@ -421,6 +421,7 @@ pub mod community_ecosystem;
 pub use community_ecosystem::*;
 
 pub mod additional_linux_bsd_components;
+#[rustfmt::skip]
 pub mod sovereign_thousands_distro_components;
 pub use sovereign_thousands_distro_components::*;
 pub mod tech_media_distro_innovations;
