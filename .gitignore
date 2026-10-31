@@ -38,3 +38,11 @@ __pycache__/
 !docs/studies/
 !docs/studies/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!.jules/
+!.jules/*.md
+!docs/roadmap/
+!docs/roadmap/*.md
+!wiki/*.md
+!WIKI/*.md
