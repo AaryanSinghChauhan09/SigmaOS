@@ -1,22 +1,32 @@
-# SigmaOS pull request
+## Summary
 
-## Component impact
+<!-- One paragraph: what changed and why. -->
 
-- Component/repository:
-- User-visible behavior:
-- Related issue or plan:
+## Component
 
-## Upstream study and reference behavior
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
+- [ ] CI / tooling
 
-- Reference study:
-- Upstream project, document, or behavior reviewed:
-- What SigmaOS adopts:
-- What remains intentionally different:
+## Changes
 
-## Risks and rollback
+-
 
-- Risks and rollback:
-- Recovery or downgrade procedure:
+## Motivation
+
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+
+## Implementation notes
+
+<!-- Design decisions, data structures, locking, error handling. -->
 
 ## IPC handler
 
@@ -26,35 +36,47 @@
 - Non-blocking behavior:
 - EOF / closure behavior:
 
-## Security review
+## Tests
 
-- Kernel safety review:
-
-## Shell safety review
-
-- Shell safety review:
-- Capability/namespace checks enforced:
-- Shared-memory or descriptor implications:
-- Input validation and failure behavior:
-- Rollback or downgrade path:
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
 
 ## Verification
 
-- [ ] Focused unit tests pass.
-- [ ] ./run_sigma_tests.sh
-- [ ] Documentation and wiki mirrors updated where applicable.
-- Test/evidence commands:
-- Results:
+```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+```
+
+Paste relevant output below.
 
 ## Capability status
 
-- Current status:
-- Evidence supporting the status:
-- Claims intentionally left partial:
+- Previous status:
+- New status:
+- Evidence:
 
 ## Integration impact
 
-- APIs, ABI, protocols, or file formats affected:
-- Cross-repository synchronization required:
-- Release or migration notes:
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
 
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated
+- [ ] No unsupported compatibility claim

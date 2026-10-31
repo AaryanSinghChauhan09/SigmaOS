@@ -21,7 +21,11 @@ __pycache__/
 .DS_Store
 *.md
 !README.md
+!CONTRIBUTING.md
+!AGENTS.md
 *.txt
+!docs/thread-manager.md
+!wiki/thread-manager.md
 !docs/INTERRUPT_HANDLER_PLAN.md
 !wiki/INTERRUPT_HANDLER_PLAN.md
 !docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
