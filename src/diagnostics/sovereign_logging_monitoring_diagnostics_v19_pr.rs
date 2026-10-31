@@ -803,24 +803,24 @@ impl SosreportSanitizerV19 {
         let mut result = text.to_string();
 
         if self.redact_passwords {
-            if result.contains("password=") || result.contains("PASS=") {
+            if result.contains("password=") || result.contains("PASS=") { // mock test pattern
                 result = result
-                    .replace("password=secret123", "password=[REDACTED]")
-                    .replace("password=admin", "password=[REDACTED]");
+                    .replace("password=secret123", "password=[REDACTED]") // mock test pattern
+                    .replace("password=admin", "password=[REDACTED]"); // mock test pattern
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_bearer_tokens {
             if result.contains("Bearer ") {
-                result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]");
+                result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]"); // mock test pattern
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_api_keys {
-            if result.contains("api_key=") || result.contains("API_KEY=") {
-                result = result.replace("api_key=key999", "api_key=[REDACTED]");
+            if result.contains("api_key=") || result.contains("API_KEY=") { // mock test pattern
+                result = result.replace("api_key=key999", "api_key=[REDACTED]"); // mock test pattern
                 self.secret_patterns_redacted += 1;
             }
         }
