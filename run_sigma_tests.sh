@@ -3432,3 +3432,10 @@ if [ -f "src/productivity/sovereign_office_suites_engine.rs" ]; then
     rustc --test src/productivity/sovereign_office_suites_engine.rs --edition=2021 -o build/test_office_suites
     ./build/test_office_suites
 fi
+
+if [ -f "tests/test_shells_terminals_supervisors_v89_pr.rs" ]; then
+    echo "Running Sovereign Shells, Terminals & Supervisors V89 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_shells_terminals_supervisors_v89_pr.rs --edition=2021 -o build/test_shells_v89_pr
+    ./build/test_shells_v89_pr
+fi
