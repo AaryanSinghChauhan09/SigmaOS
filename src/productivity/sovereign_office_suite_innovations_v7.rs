@@ -462,8 +462,9 @@ impl SovereignZohoDeskKbAiRouterEngine {
     ) -> KbRoutingResult {
         // Zero-allocation search filtering for ASCII queries and keywords,
         // eliminating per-keyword heap String allocations (`k.to_lowercase()`).
+        // Preserves exact query.contains(keyword) semantics.
         let match_art = articles.iter().find(|a| {
-            a.keywords.iter().any(|k| contains_ignore_case(query, k) || contains_ignore_case(k, query))
+            a.keywords.iter().any(|k| contains_ignore_case(query, k))
         });
 
         if let Some(art) = match_art {
