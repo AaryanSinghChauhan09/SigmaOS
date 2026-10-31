@@ -1,4 +1,5 @@
-// Secure Boot Chain-of-Trust Verification Engine for SigmaOS
+// Secure Boot Chain-of-Trust verification model for SigmaOS.
+// This module has no cryptographic verifier and never authenticates signatures.
 // Location: src/boot/secure_boot.rs
 
 use std::string::String;
@@ -14,6 +15,8 @@ pub enum SecureBootState {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VerificationResult {
     Verified,
+    VerificationDisabled,
+    VerifierUnavailable,
     UnsignedKernel,
     SignatureInvalid,
     KeyRevokedDbx,
@@ -56,11 +59,11 @@ impl SecureBootVerifier {
     pub fn verify_kernel_signature(
         &self,
         key_id: u64,
-        payload_hash: &[u8; 32],
+        _payload_hash: &[u8; 32],
         signature: &[u8; 64],
     ) -> VerificationResult {
         if self.state == SecureBootState::Disabled {
-            return VerificationResult::Verified;
+            return VerificationResult::VerificationDisabled;
         }
 
         // Check dbx (revocation database)
@@ -69,17 +72,13 @@ impl SecureBootVerifier {
         }
 
         // Search allowed database db
-        if let Some(entry) = self.db.iter().find(|e| e.key_id == key_id) {
-            // Verify mock signature (first byte match or non-zero signature check)
+        if self.db.iter().any(|entry| entry.key_id == key_id) {
             if signature.iter().all(|&b| b == 0) {
                 return VerificationResult::UnsignedKernel;
             }
-            // Mock cryptographic verification
-            if signature[0] == entry.public_key[0] {
-                VerificationResult::Verified
-            } else {
-                VerificationResult::SignatureInvalid
-            }
+            // No cryptographic verifier is configured. Never report a
+            // non-empty signature as verified based on a byte comparison.
+            VerificationResult::VerifierUnavailable
         } else {
             VerificationResult::KeyNotFound
         }
@@ -98,18 +97,18 @@ mod tests {
         verifier.enroll_allowed_key(1001, pubkey);
 
         let hash = [0u8; 32];
-        let mut valid_sig = [0u8; 64];
-        valid_sig[0] = 0xAA; // Matches pubkey[0]
+        let mut unverified_sig = [0u8; 64];
+        unverified_sig[0] = 0xAA; // Matching one byte is not verification.
 
         assert_eq!(
-            verifier.verify_kernel_signature(1001, &hash, &valid_sig),
-            VerificationResult::Verified
+            verifier.verify_kernel_signature(1001, &hash, &unverified_sig),
+            VerificationResult::VerifierUnavailable
         );
 
         // Test revoked key in dbx
         verifier.revoke_key_dbx(1001);
         assert_eq!(
-            verifier.verify_kernel_signature(1001, &hash, &valid_sig),
+            verifier.verify_kernel_signature(1001, &hash, &unverified_sig),
             VerificationResult::KeyRevokedDbx
         );
     }

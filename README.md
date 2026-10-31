@@ -30,6 +30,10 @@ documented contracts. Their implementation and release status must be supported
 by tests and integration evidence; registry presence alone does not establish
 readiness.
 
+The current boot signature-verification model has no cryptographic backend and
+returns `VerifierUnavailable` for signed payloads. It is not a Secure Boot
+trust boundary.
+
 ## Desktop defaults
 
 [`scripts/sigma_omarchy_bootstrap.sh`](scripts/sigma_omarchy_bootstrap.sh)
