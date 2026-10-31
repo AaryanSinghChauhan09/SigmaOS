@@ -3046,6 +3046,20 @@ if [ -f "tests/test_kernel_and_boot_v86.rs" ]; then
     ./build/test_kernel_boot_v86_integration
 fi
 
+if [ -f "src/boot/sovereign_kernel_and_boot_innovations_v87_pr.rs" ]; then
+    echo "Running Sovereign Kernel & Boot Innovations V87 Suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_kernel_and_boot_innovations_v87_pr.rs --edition=2021 -o build/test_kernel_boot_v87_pr
+    ./build/test_kernel_boot_v87_pr
+fi
+
+if [ -f "tests/test_kernel_and_boot_v87.rs" ]; then
+    echo "Running Sovereign Kernel & Boot Innovations V87 Integration Suite..."
+    mkdir -p build
+    rustc --test tests/test_kernel_and_boot_v87.rs --edition=2021 -o build/test_kernel_boot_v87_integration
+    ./build/test_kernel_boot_v87_integration
+fi
+
 if [ -f "src/community/sovereign_documentation_consolidation_pr_engine.rs" ]; then
     echo "Running Sovereign Documentation & GitHub Wiki Consolidation Engine test suite..."
     mkdir -p build
