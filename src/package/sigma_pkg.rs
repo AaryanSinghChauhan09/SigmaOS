@@ -83,6 +83,11 @@ pub enum UniversalPackageFormat {
     BedrockStratum,  // .stratum (Bedrock Linux)
     SpackHpc,        // .spack (Spack HPC)
     ConanCpp,        // .conan (Conan C++)
+    OpenSuseZypper,  // .rpm / .drpm (openSUSE Zypper)
+    SolarisIllumosIps, // .p5p / IPS pkg (Solaris/Illumos IPS)
+    AndroidApex,     // .apex (Android Pony EXpress)
+    GuixNar,         // .nar / .narinfo (GNU Guix NAR)
+    GoboLinuxRecipe, // .recipe (GoboLinux Recipes)
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -158,6 +163,16 @@ impl UniversalPackageImporter {
             Some(UniversalPackageFormat::SpackHpc)
         } else if filename.ends_with(".conan") {
             Some(UniversalPackageFormat::ConanCpp)
+        } else if filename.ends_with(".drpm") {
+            Some(UniversalPackageFormat::OpenSuseZypper)
+        } else if filename.ends_with(".p5p") || filename.ends_with(".ips") {
+            Some(UniversalPackageFormat::SolarisIllumosIps)
+        } else if filename.ends_with(".apex") {
+            Some(UniversalPackageFormat::AndroidApex)
+        } else if filename.ends_with(".nar") || filename.ends_with(".narinfo") {
+            Some(UniversalPackageFormat::GuixNar)
+        } else if filename.ends_with(".gobo.recipe") {
+            Some(UniversalPackageFormat::GoboLinuxRecipe)
         } else if filename.ends_with(".spec") {
             Some(UniversalPackageFormat::FedoraRpm)
         } else if filename.contains("PKGBUILD") || filename.ends_with(".pkgbuild") {
@@ -308,6 +323,26 @@ impl UniversalPackageImporter {
                 vec!["spack-runtime".to_string(), "openmpi".to_string()],
             ),
             UniversalPackageFormat::ConanCpp => ("MIT", vec!["conan-center".to_string()]),
+            UniversalPackageFormat::OpenSuseZypper => (
+                "GPL-2.0-or-later",
+                vec!["glibc".to_string(), "libzypp".to_string(), "libssl3".to_string()],
+            ),
+            UniversalPackageFormat::SolarisIllumosIps => (
+                "CDDL-1.0",
+                vec!["system/library".to_string(), "openssl".to_string()],
+            ),
+            UniversalPackageFormat::AndroidApex => (
+                "Apache-2.0",
+                vec!["bionic".to_string(), "libcrypto".to_string()],
+            ),
+            UniversalPackageFormat::GuixNar => (
+                "GPL-3.0-or-later",
+                vec!["guix-daemon".to_string(), "glibc".to_string()],
+            ),
+            UniversalPackageFormat::GoboLinuxRecipe => (
+                "GPL-2.0",
+                vec!["gobo-base".to_string(), "glibc".to_string()],
+            ),
         };
 
         let translated_deps = Self::translate_foreign_dependencies(&raw_deps);
@@ -1287,6 +1322,10 @@ pub enum SandboxActionType {
     UpdateIconCache,
     RegisterSystemdUnit,
     BlockedDangerousCommand,
+    CompileGlibSchemas,
+    UpdateMimeDatabase,
+    RunLdconfig,
+    RebuildFontCache,
 }
 
 #[derive(Debug, Clone)]
@@ -1330,6 +1369,14 @@ impl UniversalScriptletSandbox {
                 || trimmed.contains("systemctl daemon-reload")
             {
                 actions.push(SandboxActionType::RegisterSystemdUnit);
+            } else if trimmed.contains("glib-compile-schemas") {
+                actions.push(SandboxActionType::CompileGlibSchemas);
+            } else if trimmed.contains("update-mime-database") {
+                actions.push(SandboxActionType::UpdateMimeDatabase);
+            } else if trimmed.contains("ldconfig") {
+                actions.push(SandboxActionType::RunLdconfig);
+            } else if trimmed.contains("fc-cache") {
+                actions.push(SandboxActionType::RebuildFontCache);
             }
         }
 
@@ -2065,6 +2112,54 @@ impl SigmaPkg {
                 action = "search";
                 action_explicitly_set = true;
             }
+        } else if pm == "zypper" {
+            if args.contains(&"install") || args.contains(&"in") {
+                action = "install";
+                action_explicitly_set = true;
+            } else if args.contains(&"remove") || args.contains(&"rm") {
+                action = "remove";
+                action_explicitly_set = true;
+            } else if args.contains(&"search") || args.contains(&"se") {
+                action = "search";
+                action_explicitly_set = true;
+            } else if args.contains(&"update") || args.contains(&"up") || args.contains(&"dup") {
+                action = "upgrade";
+                action_explicitly_set = true;
+            } else if args.contains(&"info") {
+                action = "query_info";
+                action_explicitly_set = true;
+            }
+        } else if pm == "pkg" || pm == "pkgin" {
+            if args.contains(&"install") || args.contains(&"add") || args.contains(&"in") {
+                action = "install";
+                action_explicitly_set = true;
+            } else if args.contains(&"delete") || args.contains(&"remove") || args.contains(&"rm") {
+                action = "remove";
+                action_explicitly_set = true;
+            } else if args.contains(&"search") || args.contains(&"se") {
+                action = "search";
+                action_explicitly_set = true;
+            } else if args.contains(&"upgrade") || args.contains(&"update") || args.contains(&"up") {
+                action = "upgrade";
+                action_explicitly_set = true;
+            } else if args.contains(&"info") {
+                action = "query_info";
+                action_explicitly_set = true;
+            }
+        } else if pm == "guix" {
+            if args.contains(&"install") {
+                action = "install";
+                action_explicitly_set = true;
+            } else if args.contains(&"remove") {
+                action = "remove";
+                action_explicitly_set = true;
+            } else if args.contains(&"upgrade") {
+                action = "upgrade";
+                action_explicitly_set = true;
+            } else if args.contains(&"search") {
+                action = "search";
+                action_explicitly_set = true;
+            }
         }
 
         for arg in args {
@@ -2302,6 +2397,42 @@ impl UniversalPackageTriggerEngine {
             let res = TriggerExecutionResult {
                 trigger_type: UniversalPackageTriggerType::UpdateDesktopDatabase,
                 target_dir: "/usr/share/applications".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+        if files.iter().any(|f| f.ends_with(".gschema.xml")) {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::GlibCompileSchemas,
+                target_dir: "/usr/share/glib-2.0/schemas".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+        if files.iter().any(|f| f.contains("/icons/") || f.ends_with(".png") || f.ends_with(".svg")) {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::IconThemeCache,
+                target_dir: "/usr/share/icons/hicolor".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+        if files.iter().any(|f| f.contains("/fonts/") || f.ends_with(".ttf") || f.ends_with(".otf")) {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::FontconfigCache,
+                target_dir: "/usr/share/fonts".to_string(),
+                executed_successfully: true,
+            };
+            self.execution_log.push(res.clone());
+            results.push(res);
+        }
+        if files.iter().any(|f| f.contains("/man/") || f.ends_with(".1.gz")) {
+            let res = TriggerExecutionResult {
+                trigger_type: UniversalPackageTriggerType::MandbUpdate,
+                target_dir: "/usr/share/man".to_string(),
                 executed_successfully: true,
             };
             self.execution_log.push(res.clone());
@@ -3082,5 +3213,37 @@ mod tests {
             .execute_universal_cli_command("conan install boost/1.81.0")
             .unwrap();
         assert!(conan_res.contains("boost/1.81.0"));
+
+        let zypper_in = pkg_mgr
+            .execute_universal_cli_command("zypper in vlc")
+            .unwrap();
+        assert!(zypper_in.contains("vlc"));
+
+        let pkgin_res = pkg_mgr
+            .execute_universal_cli_command("pkgin install tmux")
+            .unwrap();
+        assert!(pkgin_res.contains("tmux"));
+
+        let guix_res = pkg_mgr
+            .execute_universal_cli_command("guix install hello")
+            .unwrap();
+        assert!(guix_res.contains("hello"));
+
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("package.drpm"),
+            Some(UniversalPackageFormat::OpenSuseZypper)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("system.p5p"),
+            Some(UniversalPackageFormat::SolarisIllumosIps)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("module.apex"),
+            Some(UniversalPackageFormat::AndroidApex)
+        );
+        assert_eq!(
+            UniversalPackageImporter::autodetect_format("archive.nar"),
+            Some(UniversalPackageFormat::GuixNar)
+        );
     }
 }
