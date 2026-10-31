@@ -29,6 +29,9 @@ pub const MOD_HYPER: u8 = 0b0001_0000;
 
 pub type HotkeyID = usize;
 
+/// Maximum action payload stored by [`SimpleHotkey`].
+pub const MAX_HOTKEY_ACTION_LEN: usize = 64;
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HotkeyError {
@@ -57,7 +60,7 @@ pub struct SimpleHotkey {
 impl SimpleHotkey {
     pub fn new(id: HotkeyID, modifiers: u8, key: u8, action: &[u8]) -> Self {
         let mut action_array = [0u8; 64];
-        let action_len = action.len().min(63);
+        let action_len = action.len().min(MAX_HOTKEY_ACTION_LEN);
         for i in 0..action_len {
             action_array[i] = action[i];
         }
@@ -122,6 +125,9 @@ impl HotkeyManager for SimpleHotkeyManager {
         key: u8,
         action: &[u8],
     ) -> Result<HotkeyID, HotkeyError> {
+        if action.len() > MAX_HOTKEY_ACTION_LEN {
+            return Err(HotkeyError::InvalidProfile);
+        }
         for hotkey_option in &self.hotkeys {
             if let Some(ref hotkey) = *hotkey_option {
                 if hotkey.modifiers() == modifiers && hotkey.key() == key {
