@@ -3105,6 +3105,12 @@ if [ -f "tests/process/pid_allocator.rs" ]; then
     rustc --test tests/process/namespaces/namespace_test.rs --edition=2021 -o build/test_proc_ns && ./build/test_proc_ns
 fi
 
+if [ -f "tests/process/test_process_manager_plan.rs" ]; then
+    echo "Running Process Manager Master Architecture & Plan Verification test suite..."
+    mkdir -p build
+    rustc --test tests/process/test_process_manager_plan.rs --edition=2021 -o build/test_proc_mgr_plan && ./build/test_proc_mgr_plan
+fi
+
 if [ -f "tests/process/test_process_synchronization_plan.rs" ]; then
     echo "Running Process Synchronization Subsystem test suite..."
     mkdir -p build
