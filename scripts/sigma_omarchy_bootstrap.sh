@@ -18,6 +18,11 @@ files are never overwritten. This script does not install packages or fonts.
 EOF
 }
 
+if [[ "$#" -gt 1 ]]; then
+    usage >&2
+    exit 2
+fi
+
 case "${1:-}" in
     "") ;;
     --dry-run) MODE="dry-run" ;;
@@ -97,6 +102,7 @@ if [[ "$MODE" == "dry-run" ]]; then
     printf 'Dry run only; pass --apply to stage missing files.\n'
 elif (( conflicts > 0 )); then
     printf 'Applied with %d existing config conflict(s); no existing files were overwritten.\n' "$conflicts"
+    exit 2
 else
     printf 'Staged %d config file(s); %d already matched.\n' "$installed" "$unchanged"
 fi
