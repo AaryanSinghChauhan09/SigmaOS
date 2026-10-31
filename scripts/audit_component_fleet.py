@@ -16,7 +16,7 @@ import tomllib
 from pathlib import Path
 
 
-REQUIRED_FILES = ("README.md", "README")
+REQUIRED_FILES = ("README.md", "README", "README.rst", "readme.md")
 LICENSE_FILES = ("LICENSE", "LICENSE.md", "COPYING")
 
 
@@ -32,6 +32,13 @@ def git(repo: Path, *args: str) -> str:
 
 def has_file(repo: Path, candidates: tuple[str, ...]) -> bool:
     return any((repo / candidate).is_file() for candidate in candidates)
+
+
+def has_license(repo: Path) -> bool:
+    """Recognize single-file notices and Cargo's conventional dual-license pair."""
+    if has_file(repo, LICENSE_FILES):
+        return True
+    return (repo / "LICENSE-MIT").is_file() and (repo / "LICENSE-APACHE").is_file()
 
 
 def audit(root: Path) -> dict[str, object]:
@@ -77,7 +84,7 @@ def audit(root: Path) -> dict[str, object]:
             "origin": git(repo, "remote", "get-url", "origin") if exists else "",
             "dirty": bool(git(repo, "status", "--porcelain")) if exists else False,
             "readme": has_file(repo, REQUIRED_FILES) if exists else False,
-            "license": has_file(repo, LICENSE_FILES) if exists else False,
+            "license": has_license(repo) if exists else False,
             "ci": (repo / ".github" / "workflows").is_dir() if exists else False,
         }
         components.append(record)
