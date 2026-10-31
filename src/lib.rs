@@ -678,6 +678,7 @@ pub use virtualization::{
     SovereignVirtualizationAndContainersParityV68Gateway,
     SovereignVirtualizationAndContainersParityV80Gateway,
     SovereignVirtualizationAndContainersParityV81Gateway,
+    SovereignVirtualizationAndContainersParityV88Gateway,
     SovereignVirtualizationAndContainersV80PrGatewayEngine,
     SovereignVirtualizationAndContainersV81PrGatewayEngine, VirtualBoxBhyveVmmV61Engine,
     VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualBoxBhyveVmmV68Engine,
