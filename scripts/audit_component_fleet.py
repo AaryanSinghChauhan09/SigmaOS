@@ -126,6 +126,58 @@ def audit(root: Path) -> dict[str, object]:
     }
 
 
+def github_inventory(root: Path) -> dict[str, object]:
+    """Compare registry URLs with the authenticated user's live GitHub repos."""
+    try:
+        user = subprocess.run(
+            ("gh", "api", "user", "--jq", ".login"),
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+        names = subprocess.run(
+            ("gh", "api", "--paginate", "user/repos", "--jq", "." + "[]" + ".full_name"),
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.splitlines()
+    except (FileNotFoundError, subprocess.CalledProcessError) as error:
+        detail = getattr(error, "stderr", "") or str(error)
+        raise RuntimeError(f"GitHub inventory query failed: {detail.strip()}") from error
+
+    account_repos = {
+        name.strip().casefold()
+        for name in names
+        if name.strip().partition("/")[0].casefold() == user.casefold()
+        and name.strip().partition("/")[2].casefold().startswith("sigmaos-")
+    }
+    data = tomllib.loads((root / "COMPONENTS.toml").read_text(encoding="utf-8"))
+    declared_repos: set[str] = set()
+    declared_component_names: set[str] = set()
+    names_by_repo: dict[str, set[str]] = {}
+    for entry in data.get("component", []):
+        normalized = normalize_remote(str(entry.get("repo", "")))
+        prefix = f"github.com/{user}/"
+        if normalized.startswith(prefix.casefold()):
+            declared = normalized.removeprefix(prefix.casefold())
+            if declared.startswith("sigmaos-"):
+                full_name = f"{user}/{declared}".casefold()
+                declared_repos.add(full_name)
+                name = entry.get("name", "")
+                if isinstance(name, str) and name.startswith("SigmaOS-"):
+                    declared_component_names.add(name)
+                    names_by_repo.setdefault(full_name, set()).add(name)
+
+    return {
+        "account_repositories": sorted(account_repos),
+        "declared_repositories": sorted(declared_repos),
+        "declared_component_names": len(declared_component_names),
+        "component_name_aliases": sum(max(0, len(names) - 1) for names in names_by_repo.values()),
+        "unregistered_account_repositories": sorted(account_repos - declared_repos),
+        "unpublished_registry_repositories": sorted(declared_repos - account_repos),
+    }
+
+
 def summary(report: dict[str, object]) -> str:
     components = report["components"]
     assert isinstance(components, list)
@@ -163,10 +215,33 @@ def summary(report: dict[str, object]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", help="emit the full report as JSON")
+    parser.add_argument(
+        "--github",
+        action="store_true",
+        help="compare registry URLs with the authenticated GitHub account using gh",
+    )
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     report = audit(root)
-    print(json.dumps(report, indent=2) if args.json else summary(report))
+    if args.github:
+        try:
+            report["github_inventory"] = github_inventory(root)
+        except RuntimeError as error:
+            parser.error(str(error))
+    if args.json:
+        print(json.dumps(report, indent=2))
+    else:
+        print(summary(report))
+        if args.github:
+            inventory = report["github_inventory"]
+            assert isinstance(inventory, dict)
+            print(f"live SigmaOS-prefixed GitHub repos: {len(inventory['account_repositories'])}")
+            print(f"registered live repo URLs: {len(inventory['account_repositories']) - len(inventory['unregistered_account_repositories'])}")
+            print(f"account repos missing registry records: {len(inventory['unregistered_account_repositories'])}")
+            print(f"component names mapped to repository URLs: {inventory['declared_component_names']}")
+            print(f"additional component names sharing URLs: {inventory['component_name_aliases']}")
+            print(f"unique registry repository URLs: {len(inventory['declared_repositories'])}")
+            print(f"registry URLs absent from account: {len(inventory['unpublished_registry_repositories'])}")
     return 0
 
 

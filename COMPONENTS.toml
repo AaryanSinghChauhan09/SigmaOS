@@ -5,8 +5,8 @@
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
 # GitHub account audit (2026-10-31): 308 SigmaOS-prefixed repositories;
-# the account inventory is mirrored by component records; 1,276 registry
-# declarations remain unpublished until an authoritative remote is supplied.
+# all are represented by registry URLs. 1,557 unique URLs are declared, of
+# which 1,249 are unpublished; 25 extra component names alias existing URLs.
 
 [[component]]
 name = "SigmaOS-kernel"
