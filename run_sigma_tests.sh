@@ -2199,6 +2199,13 @@ if [ -f "src/distro/distro_maintainer_operating_model_pr.rs" ]; then
     ./build/test_distro_maintainer_operating_model
 fi
 
+if [ -f "src/distro/continuous_open_source_os_improvement_pr.rs" ]; then
+    echo "Running Continuous Open Source OS Improvement PR Suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_continuous_improvement_pr.rs --edition=2021 -o build/test_open_source_os_continuous_improvement
+    ./build/test_open_source_os_continuous_improvement
+fi
+
 if [ -f "tests/test_periodic_pr_only_research_pipeline.rs" ]; then
     echo "Running Periodic PR-Only Research-and-Implementation Pipeline Suite..."
     mkdir -p build
