@@ -71,6 +71,7 @@ if [ -f "tests/storage/block.rs" ]; then
     rustc --test tests/storage_block_tests.rs --edition=2021 -o build/test_storage_block_standalone && ./build/test_storage_block_standalone
     rustc --test tests/filesystem_cache_tests.rs --edition=2021 -o build/test_fs_cache_standalone && ./build/test_fs_cache_standalone
     rustc --test tests/filesystem_core_tests.rs --edition=2021 -o build/test_fs_core_standalone && ./build/test_fs_core_standalone
+    rustc --test tests/test_secondary_memory_lifecycle.rs --edition=2021 -o build/test_secondary_memory_lifecycle && ./build/test_secondary_memory_lifecycle
 fi
 
 if [ -f "./algorithm_and_components_inspection_tests" ]; then
