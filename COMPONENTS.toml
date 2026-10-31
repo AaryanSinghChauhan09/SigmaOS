@@ -4,9 +4,9 @@
 # Registry audit baseline: 1,531 declarations / 1,480 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
-# GitHub account audit: 303 repositories; 252 registry checkouts are local;
-# 1,228 unique declarations are not present in the account and are stale or
-# unpublished until an authoritative remote is supplied.
+# GitHub account audit (2026-10-31): 308 SigmaOS-prefixed repositories;
+# the account inventory is mirrored by component records; 1,276 registry
+# declarations remain unpublished until an authoritative remote is supplied.
 
 [[component]]
 name = "SigmaOS-kernel"
@@ -13803,4 +13803,836 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wifi"
 engine = "wifi_networking"
 language = "rust"
 inspirations = ["native"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS--Dante"
+description = "SigmaOS component; consult its README for scope and implementation status."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS--Dante"
+language = "unknown"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ab"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-ab."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ab"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-abduco"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component whose name is SigmaOS-abduco."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-abduco"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-abiword"
+description = "This repository is currently a minimal no_std component identity scaffold. The library exposes a Component named SigmaOS-abiword."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-abiword"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-abs"
+description = "Arch Linux-inspired component for SigmaOS."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-abs"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ac"
+description = "This crate is currently an empty no_std library scaffold. No ac command or other component behavior is implemented; the existing test only checks basic arithmetic."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ac"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-accelerate"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-accelerate."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accelerate"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-acceleration"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-acceleration."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-acceleration"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-access"
+description = "Access control and permission primitives for SigmaOS."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-access"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-access-control"
+description = "This repository is currently a minimal no_std component scaffold. Its library exposes a Component value with the fixed name SigmaOS-access-control."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-access-control"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-access-log"
+description = "Linux Mint/Omarchy/Arch-inspired component for SigmaOS."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-access-log"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-accomplishment"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-accomplishment."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accomplishment"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-accountability"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-accountability."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accountability"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-acct"
+description = "This crate is currently an empty no_std library scaffold. It contains no account database, user/group management, or acct command implementation. The existing test module only checks basic Rust arithmetic and does not validate account functionality."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-acct"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-achievement"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-achievement."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-achievement"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-acpi"
+description = "ACPI table parsing primitives for SigmaOS."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-acpi"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-acronis"
+description = "This crate is currently an empty no_std library scaffold. The only source beyond the crate declaration is a basic arithmetic test; no Acronis backup, recovery, storage, or security functionality is implemented."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-acronis"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-activeandroid"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-activeandroid."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-activeandroid"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-activedirectory"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-activedirectory."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-activedirectory"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-activemq"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-activemq."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-activemq"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-activity-log"
+description = "Linux Mint/Omarchy/Arch-inspired component for SigmaOS."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-activity-log"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-activitypub"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-activitypub."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-activitypub"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ad"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-ad."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ad"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ada"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-ada."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ada"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-adaptability"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-adaptability."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adaptability"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-adaptation"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-adaptation."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adaptation"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-adaptive-server"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-adaptive-server."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adaptive-server"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-adaware"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-adaware."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adaware"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-adium"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-adium."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adium"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-adler32"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-adler32."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adler32"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-adobe-fonts"
+description = "This crate is currently an empty no_std library scaffold. The source contains no font files, font installation logic, or Adobe Fonts integration; the test module only checks basic arithmetic."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adobe-fonts"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ai"
+description = "AI and machine learning experiments organized as a Rust library. The crate exposes ai and ml modules, including agent and orchestration code, local inference interfaces, quantization helpers, tensor data structures, and training primitives."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ai"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-allocators"
+description = "Low-level Rust memory allocation primitives for SigmaOS, currently comprising a buddy frame allocator and slab allocation/cache code."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-allocators"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch"
+description = "Architecture and hardware abstraction code for SigmaOS. The crate exposes arch and re-exports its Arch interface. The current module tree contains shared HAL and portability code, x86_64 support, and target-gated AArch64 and RISC-V modules."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-kernel"
+description = "A Rust library collecting kernel and Arch Linux inspired mechanisms, including a KUnit-style expectation runner, package transaction and dependency models, advisory tracking, signing policy models, initramfs hook configuration, rebuild ordering, package signoff, and reproducible-build records."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-audio"
+description = "An evolving Rust audio library exposing AudioManager and modules for audio graphs, codec and driver abstractions, ALSA/PipeWire related types, podcast data, editing effects, and audio routing."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-audio"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-audit"
+description = "An evolving no_std Rust library for audit-related data structures and policy prototypes. The crate exposes AuditManager; the audit module defines event and severity types and includes memory-audit and process-pledge code."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-audit"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-auth"
+description = "Authentication and authorization framework for the SigmaOS project."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-auth"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-bar-widgets"
+description = "A Rust model for organizing status-bar widgets. It provides BarWidget values with position, visibility, enabled state, interaction metadata, and string configuration, plus a BarWidgetsManager for registration, filtering, moving, ordering, and removal."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bar-widgets"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-bar_widgets"
+description = "A Rust status-bar widget state model. The crate exposes widget positions and interaction metadata, widget configuration and visibility state, and a manager for organizing widgets in left, center, and right groups."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bar_widgets"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-bin"
+description = "This package contains Rust command-line entry points for SigmaOS and package-management experiments. The source tree defines binaries in src/bin/, including sigmaos, sigpkg, and sigma_pkg, and exposes a SystemBinaries library module."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bin"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-boot"
+description = "Boot protocol, image, and verified-boot primitives for SigmaOS."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-boot-config"
+description = "A Rust library for modeling boot-menu settings, kernel parameters, and boot entries. BootConfigManager stores these values, builds a kernel command line, generates GRUB-style configuration text, and reports validation messages."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot-config"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-boot_config"
+description = "A Rust model for boot-menu settings, kernel parameters, and boot entries. It formats command-line parameters and generates GRUB-style configuration text in memory."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot_config"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-branding"
+description = "A Rust library for holding and editing branding metadata: distribution name, version, tagline, copyright, support URL, and text logo lines. Branding can return these values and assemble a human-readable about summary."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-branding"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-browser-handoff"
+description = "A Rust state model for browser selection and URL handoff. BrowserHandoff tracks a default or custom browser, records deferred URLs when no browser is configured, exposes handoff outcomes, and includes URL-host extraction helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-browser-handoff"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-browser_handoff"
+description = "A Rust state model for browser choice and URL handoff. It represents default/custom browser selection, reports handoff outcomes, stores URLs deferred when no browser is configured, and provides host extraction helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-browser_handoff"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-bulk-renamer"
+description = "SigmaOS component: SigmaOS-bulk-renamer (Inspiration: https://github.com/linuxmint/bulky)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bulk-renamer"
+language = "python"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-cinnamon-menus"
+description = "Part of SigmaOS multi-repository architecture."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon-menus"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-cinnamon-settings-daemon"
+description = "Part of SigmaOS multi-repository architecture."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon-settings-daemon"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-cinnamon-themes"
+description = "Part of SigmaOS multi-repository architecture."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon-themes"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-cli-router"
+description = "A Rust command-routing model. CliRouter registers command metadata, resolves routes against arguments, groups and lists commands, and records route conflicts."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cli-router"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-clipboard"
+description = "Clipboard management for the SigmaOS project."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clipboard"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-community"
+description = "Part of SigmaOS architecture: SigmaOS-community"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-community"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-compatibility"
+description = "Part of SigmaOS architecture: SigmaOS-compatibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-compatibility"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-compiler"
+description = "SigmaOS Compiler Toolchain"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-compiler"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-compositor"
+description = "Display compositor (Wayland-based) for the SigmaOS project."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-compositor"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-config"
+description = "Versioned configuration schemas, profiles, defaults, themes, and migrations"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-config"
+language = "unknown"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-container"
+description = "Part of SigmaOS architecture: SigmaOS-container"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-container"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-continue-check"
+description = "continue check"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-continue-check"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-contributing"
+description = "Part of SigmaOS architecture: SigmaOS-contributing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-contributing"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-creative"
+description = "Part of SigmaOS architecture: SigmaOS-creative"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-creative"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-crypto"
+description = "Cryptographic primitives and libraries for the SigmaOS project."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crypto"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-customization"
+description = "Part of SigmaOS architecture: SigmaOS-customization"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-customization"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-dashboard"
+description = "Part of SigmaOS architecture: SigmaOS-dashboard"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dashboard"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-database"
+description = "Part of SigmaOS architecture: SigmaOS-database"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-database"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-desklet-manager"
+description = "SigmaOS desklet manager for desktop widgets and applets"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desklet-manager"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-distro"
+description = "SigmaOS distribution configuration and identity layer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distro"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-distro-inspirations"
+description = "SigmaOS distro inspiration sources and comparisons"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distro-inspirations"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-expanded-wiki"
+description = "SigmaOS expanded documentation and wiki content"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-expanded-wiki"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-extended-distro"
+description = "SigmaOS extended distribution features"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-extended-distro"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fs"
+description = "SigmaOS filesystem abstractions and VFS layer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fs"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-functions"
+description = "SigmaOS core function library and utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-functions"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-futuristic"
+description = "SigmaOS futuristic features and experimental components"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-futuristic"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-governance"
+description = "SigmaOS project governance, do-ocracy, and community rules"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-governance"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-graphics"
+description = "SigmaOS graphics subsystem and rendering pipeline"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-graphics"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-init"
+description = "An evolving Rust library for system initialization and service/session models. It exposes SigmaInit through the InitSystem alias and includes service state and restart-policy types, systemd-style unit parsing and service structures, login session models, and timesyncd configuration."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-init"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-input"
+description = "Input device management (keyboard, mouse, touch) for the SigmaOS project."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-input"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-integration"
+description = "SigmaOS component integration layer and glue code"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-integration"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-interrupt"
+description = "SigmaOS interrupt handling and IRQ management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-interrupt"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-io"
+description = "SigmaOS I/O subsystem, drivers, and device interfaces"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-io"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ipc"
+description = "SigmaOS inter-process communication primitives"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ipc"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-iso-root"
+description = "SigmaOS ISO root filesystem structure and livecd builder"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-iso-root"
+language = "shell"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-klib"
+description = "SigmaOS Kernel Library and Core Utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-klib"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-lang"
+description = "SigmaOS language support and locale management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lang"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-launch-ready"
+description = "SigmaOS launch readiness checks and startup validation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-launch-ready"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-launcher"
+description = "SigmaOS application launcher and quick access"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-launcher"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-legal"
+description = "SigmaOS legal documents, licenses, and compliance"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-legal"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-linuxmint"
+description = "SigmaOS Linux Mint compatibility and integration layer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-linuxmint"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-loader"
+description = "SigmaOS module loader and dynamic library support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-loader"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-location"
+description = "SigmaOS location services and geolocation support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-location"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-logging"
+description = "SigmaOS structured logging and observability framework"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-logging"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mintdrivers"
+description = "Part of SigmaOS multi-repository architecture."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mintdrivers"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mintlocale"
+description = "Part of SigmaOS multi-repository architecture."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mintlocale"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mintupdate"
+description = "SigmaOS software update manager inspired by mintupdate"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mintupdate"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ml"
+description = "SigmaOS machine learning integration and AI subsystem"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ml"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mm"
+description = "SigmaOS memory management and virtual memory subsystem"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mm"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-monitor"
+description = "SigmaOS display monitor configuration and management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-monitor"
+language = "zig"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-monitoring"
+description = "SigmaOS system monitoring metrics and telemetry"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-monitoring"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-networking"
+description = "SigmaOS networking stack and protocol implementations"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-networking"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-nightlight"
+description = "SigmaOS night light and blue-light filter"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nightlight"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-printing"
+description = "Printing system and printer management for the SigmaOS project."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-printing"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-quickpanel"
+description = "Quick panel applet"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quickpanel"
+language = "rust"
+canonical_branch = "main"
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-tools"
+description = "Installer, ISO builder, updater, rollback, packaging, and CI tooling"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools"
+language = "rust"
+canonical_branch = "main"
 visibility = "public"
