@@ -460,9 +460,16 @@ pub mod toolchain {
     pub mod sovereign_toolchain_development_advancements_pr;
     pub mod sovereign_toolchain_development_advancements_v74_pr;
     pub mod sovereign_toolchain_development_advancements_v76_pr;
+    pub mod sovereign_toolchain_development_advancements_v77_pr;
+    pub mod sovereign_toolchain_development_advancements_v78_pr;
+    pub mod sovereign_toolchain_development_advancements_v79_pr;
 }
 pub use toolchain::sovereign_toolchain_development_advancements_pr::*;
 pub use toolchain::sovereign_toolchain_development_advancements_v74_pr::*;
+pub use toolchain::sovereign_toolchain_development_advancements_v76_pr::*;
+pub use toolchain::sovereign_toolchain_development_advancements_v77_pr::*;
+pub use toolchain::sovereign_toolchain_development_advancements_v78_pr::*;
+pub use toolchain::sovereign_toolchain_development_advancements_v79_pr::*;
 pub mod scheduler;
 
 pub use accessibility::{
