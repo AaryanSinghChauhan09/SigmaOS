@@ -38,3 +38,8 @@ __pycache__/
 !docs/studies/
 !docs/studies/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
+!SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
+!docs/**/*.md
+!wiki/**/*.md
+!.jules/
+!.jules/*.md
