@@ -1619,6 +1619,27 @@ if [ -f "tests/test_package_advancements_v87.rs" ]; then
     ./build/test_package_advancements_v87
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v88.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V88 test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test src/package/sovereign_distro_package_advancements_v88.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v88_test
+    ./build/sovereign_advancements_v88_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v88_pr.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V88 PR test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test src/package/sovereign_distro_package_advancements_v88_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v88_pr_test
+    ./build/sovereign_advancements_v88_pr_test
+fi
+
+if [ -f "tests/test_package_advancements_v88.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V88 Integration test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test tests/test_package_advancements_v88.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v88
+    ./build/test_package_advancements_v88
+fi
+
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
     mkdir -p build
