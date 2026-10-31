@@ -12,6 +12,9 @@ repository verification gates and `make test` for the native test suites. The
 managed component inventory and local checkout status can be inspected with
 `make registry-audit`.
 
+For a live GitHub URL comparison, run
+`python3 scripts/audit_component_fleet.py --github` with `gh` authenticated.
+
 ## Component boundaries
 
 Focused components live in separate repositories and integrate through
