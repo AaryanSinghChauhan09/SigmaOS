@@ -1,53 +1,102 @@
 #!/usr/bin/env bash
-# SigmaOS - Omarchy Developer Workstation Bootstrap
-# single-command setup for the ultimate developer workstation
+# Stage SigmaOS desktop defaults without overwriting existing user configs.
 
 set -euo pipefail
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME:?HOME must be set}/.config}"
+MODE="dry-run"
 
-echo -e "${BLUE}Starting SigmaOS Omarchy Workstation Bootstrap...${NC}"
+usage() {
+    cat <<'EOF'
+Usage: sigma_omarchy_bootstrap.sh [--dry-run | --apply]
 
-# Pre-flight checks
-echo -e "${YELLOW}Running pre-flight checks...${NC}"
-DEPENDENCIES=("git" "curl" "tar" "unzip")
-for cmd in "${DEPENDENCIES[@]}"; do
-    if ! command -v "$cmd" &> /dev/null; then
-        echo -e "${RED}Error: Required command '$cmd' is not installed.${NC}"
-        exit 1
+By default, show which bundled desktop defaults would be staged. Pass --apply
+to copy defaults only when the destination does not already exist. Existing
+files are never overwritten. This script does not install packages or fonts.
+EOF
+}
+
+case "${1:-}" in
+    "") ;;
+    --dry-run) MODE="dry-run" ;;
+    --apply) MODE="apply" ;;
+    --help|-h) usage; exit 0 ;;
+    *) usage >&2; exit 2 ;;
+esac
+
+case "$CONFIG_HOME" in
+    /*) ;;
+    *) printf 'XDG_CONFIG_HOME must be an absolute path: %s\n' "$CONFIG_HOME" >&2; exit 2 ;;
+esac
+
+installed=0
+unchanged=0
+conflicts=0
+
+stage_config() {
+    local source="$1"
+    local destination="$2"
+
+    if [[ ! -f "$source" ]]; then
+        printf 'Missing bundled default: %s\n' "$source" >&2
+        return 1
     fi
-done
-echo -e "${GREEN}Pre-flight checks passed.${NC}"
 
-# Verify System Fonts
-echo -e "${YELLOW}Verifying system fonts (JetBrainsMono Nerd Font)...${NC}"
-if ! fc-list | grep -iq "JetBrainsMono Nerd Font"; then
-    echo -e "${BLUE}Installing JetBrainsMono Nerd Font...${NC}"
-    # Simulated install
-    sleep 1
+    if [[ -e "$destination" || -L "$destination" ]]; then
+        if [[ -f "$destination" ]] && cmp -s -- "$source" "$destination"; then
+            printf 'Already current: %s\n' "$destination"
+            ((unchanged += 1))
+        else
+            printf 'Preserving existing config: %s\n' "$destination"
+            ((conflicts += 1))
+        fi
+        return 0
+    fi
+
+    if [[ "$MODE" == "dry-run" ]]; then
+        printf 'Would stage: %s -> %s\n' "$source" "$destination"
+        return 0
+    fi
+
+    mkdir -p -- "$(dirname -- "$destination")"
+    if cp -n -- "$source" "$destination"; then
+        if [[ -f "$destination" ]] && cmp -s -- "$source" "$destination"; then
+            printf 'Staged: %s\n' "$destination"
+            ((installed += 1))
+        else
+            printf 'Preserving concurrently-created config: %s\n' "$destination"
+            ((conflicts += 1))
+        fi
+    else
+        printf 'Could not stage: %s\n' "$destination" >&2
+        return 1
+    fi
+}
+
+printf 'SigmaOS desktop defaults (%s)\n' "$MODE"
+printf 'Config directory: %s\n' "$CONFIG_HOME"
+
+stage_config "$ROOT_DIR/default/hypr/hyprland.conf" "$CONFIG_HOME/hypr/hyprland.conf"
+stage_config "$ROOT_DIR/default/waybar/config" "$CONFIG_HOME/waybar/config"
+stage_config "$ROOT_DIR/default/waybar/style.css" "$CONFIG_HOME/waybar/style.css"
+stage_config "$ROOT_DIR/default/ghostty/config" "$CONFIG_HOME/ghostty/config"
+
+if command -v fc-list >/dev/null 2>&1; then
+    if fc-list 2>/dev/null | grep -iq 'JetBrainsMono Nerd Font'; then
+        printf 'Font available: JetBrainsMono Nerd Font\n'
+    else
+        printf 'Font not detected: JetBrainsMono Nerd Font (not installed by this script)\n'
+    fi
+else
+    printf 'Font check skipped: fc-list is unavailable\n'
 fi
-echo -e "${GREEN}Fonts configured.${NC}"
 
-# Setup Dotfiles & Configurations
-echo -e "${YELLOW}Staging configuration files...${NC}"
-mkdir -p "$HOME/.config/hypr"
-mkdir -p "$HOME/.config/ghostty"
-mkdir -p "$HOME/.config/nvim"
-mkdir -p "$HOME/.config/quickshell"
-
-echo -e "${BLUE}Symlinking dotfiles...${NC}"
-# Simulated symlinks
-sleep 1
-echo -e "${GREEN}Configurations staged successfully.${NC}"
-
-# Configure Dev Tools
-echo -e "${YELLOW}Configuring Neovim, Ghostty, Hyprland...${NC}"
-sleep 1
-echo -e "${GREEN}Developer tools configured.${NC}"
-
-echo -e "${BLUE}Omarchy Bootstrap Complete. Welcome to your sovereign workstation!${NC}"
+if [[ "$MODE" == "dry-run" ]]; then
+    printf 'Dry run only; pass --apply to stage missing files.\n'
+elif (( conflicts > 0 )); then
+    printf 'Applied with %d existing config conflict(s); no existing files were overwritten.\n' "$conflicts"
+else
+    printf 'Staged %d config file(s); %d already matched.\n' "$installed" "$unchanged"
+fi
