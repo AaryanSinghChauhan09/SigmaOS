@@ -34,6 +34,10 @@ The current boot signature-verification model has no cryptographic backend and
 returns `VerifierUnavailable` for signed payloads. It is not a Secure Boot
 trust boundary.
 
+The package signing model also has no cryptographic backend: verification
+returns `VerifierUnavailable`, and signing returns an explicit error instead of
+producing an empty signature.
+
 ## Desktop defaults
 
 [`scripts/sigma_omarchy_bootstrap.sh`](scripts/sigma_omarchy_bootstrap.sh)

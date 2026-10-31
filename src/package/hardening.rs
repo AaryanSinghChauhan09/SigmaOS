@@ -29,6 +29,7 @@ pub struct PackageSignature {
 pub enum PackageVerificationResult {
     Valid,
     InvalidSignature,
+    VerifierUnavailable,
     ExpiredKey,
     UnknownKey,
     VerificationError,
@@ -51,7 +52,7 @@ impl PackageSigningEngine {
         self.signing_keys.push(key_id);
     }
 
-    /// Verify package signature
+    /// Reject verification because this model has no cryptographic backend.
     pub fn verify_signature(
         &self,
         signature: &PackageSignature,
@@ -62,10 +63,10 @@ impl PackageSigningEngine {
             return PackageVerificationResult::UnknownKey;
         }
 
-        PackageVerificationResult::Valid
+        PackageVerificationResult::VerifierUnavailable
     }
 
-    /// Sign package data
+    /// Reject signing because this model has no cryptographic backend.
     pub fn sign_package(
         &self,
         key_id: &str,
@@ -75,11 +76,7 @@ impl PackageSigningEngine {
             return Err("Key not found in trusted keys");
         }
 
-        Ok(PackageSignature {
-            signature_type: PackageSignatureType::Ed25519,
-            signature_data: Vec::new(),
-            key_id: key_id.to_string(),
-        })
+        Err("cryptographic signer unavailable")
     }
 }
 
@@ -117,7 +114,7 @@ impl PackageSecurityMetadata {
         engine: &PackageSigningEngine,
         package_data: &[u8],
     ) -> bool {
-        self.signatures.iter().all(|sig| {
+        !self.signatures.is_empty() && self.signatures.iter().all(|sig| {
             matches!(
                 engine.verify_signature(sig, package_data),
                 PackageVerificationResult::Valid
@@ -330,9 +327,7 @@ mod tests {
         engine.add_trusted_key("test-key-1".to_string());
 
         let package_data = b"test package data";
-        let signature = engine.sign_package("test-key-1", package_data).unwrap();
-
-        assert_eq!(signature.key_id, "test-key-1");
+        assert!(engine.sign_package("test-key-1", package_data).is_err());
     }
 
     #[test]
@@ -342,12 +337,12 @@ mod tests {
 
         let signature = PackageSignature {
             signature_type: PackageSignatureType::Ed25519,
-            signature_data: Vec::new(),
+            signature_data: vec![1, 2, 3],
             key_id: "test-key-1".to_string(),
         };
 
         let result = engine.verify_signature(&signature, b"test data");
-        assert_eq!(result, PackageVerificationResult::Valid);
+        assert_eq!(result, PackageVerificationResult::VerifierUnavailable);
     }
 
     #[test]
