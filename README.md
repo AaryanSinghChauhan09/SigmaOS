@@ -15,6 +15,14 @@ managed component inventory and local checkout status can be inspected with
 For a live GitHub URL comparison, run
 `python3 scripts/audit_component_fleet.py --github` with `gh` authenticated.
 
+Prepared public repositories can be reviewed with
+`python3 scripts/publish_registry_repositories.py`. It plans from the registry
+and existing clean local checkouts; it does not generate placeholder repos.
+Pass `--apply` with an exact `--name COMPONENT` or a bounded `--limit N` to
+create and push selected `main` branches. Ambiguous registry aliases, dirty
+checkouts, and mismatched origins are skipped. The legacy
+`scripts/create_repository.sh` command delegates to the same dry-run-first tool.
+
 ## Component boundaries
 
 Focused components live in separate repositories and integrate through
