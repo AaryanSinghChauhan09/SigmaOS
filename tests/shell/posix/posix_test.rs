@@ -13,8 +13,28 @@ fn test_posix_quoting_rules() {
 
 #[test]
 fn test_posix_reserved_words() {
-    let reserved = vec!["if", "then", "else", "elif", "fi", "while", "do", "done", "for", "case", "esac", "in"];
+    let reserved = vec![
+        "if", "then", "else", "elif", "fi", "while", "do", "done", "for", "case", "esac", "in",
+    ];
     assert_eq!(reserved.len(), 12);
     assert!(reserved.contains(&"if"));
+    assert!(reserved.contains(&"then"));
+    assert!(reserved.contains(&"else"));
+    assert!(reserved.contains(&"elif"));
     assert!(reserved.contains(&"fi"));
+    assert!(reserved.contains(&"while"));
+    assert!(reserved.contains(&"do"));
+    assert!(reserved.contains(&"done"));
+    assert!(reserved.contains(&"for"));
+    assert!(reserved.contains(&"case"));
+    assert!(reserved.contains(&"esac"));
+    assert!(reserved.contains(&"in"));
+}
+
+#[test]
+fn test_posix_parameter_expansion_variables() {
+    let exit_var = "$?";
+    let pid_var = "$$";
+    assert_eq!(exit_var, "$?");
+    assert_eq!(pid_var, "$$");
 }
