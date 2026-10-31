@@ -69,9 +69,9 @@ impl HardwareSensor {
 
     /// Calculate sensor state based on current value
     fn calculate_state(current: f64, min: f64, max: f64) -> SensorState {
-        if current < min * 0.9 || current > max * 1.1 {
+        if current < min || current >= max * 1.05 {
             SensorState::Critical
-        } else if current < min * 0.95 || current > max * 1.05 {
+        } else if current >= max * 0.90 {
             SensorState::Warning
         } else {
             SensorState::Normal

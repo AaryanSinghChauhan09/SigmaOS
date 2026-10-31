@@ -162,13 +162,8 @@ impl SigmaMkfs {
     /// Create a filesystem
     pub fn create_filesystem(&mut self, filesystem: Filesystem) -> bool {
         let fs_id = filesystem.filesystem_id.clone();
-        self.filesystems.insert(fs_id.clone(), filesystem);
-        if let Some(fs) = self.filesystems.get_mut(&fs_id) {
-            fs.set_state(FilesystemState::Created);
-            true
-        } else {
-            false
-        }
+        self.filesystems.insert(fs_id, filesystem);
+        true
     }
 
     /// Remove a filesystem

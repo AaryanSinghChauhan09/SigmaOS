@@ -42,9 +42,10 @@ impl SigmaHelperManager {
     }
 
     pub fn search_helpers(&self, query: &str) -> Vec<&HelperCommand> {
+        let q_lower = query.to_lowercase();
         self.helpers
             .iter()
-            .filter(|h| h.name.contains(query) || h.description.contains(query))
+            .filter(|h| h.name.to_lowercase().contains(&q_lower) || h.description.to_lowercase().contains(&q_lower))
             .collect()
     }
 }
