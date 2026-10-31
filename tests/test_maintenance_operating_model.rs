@@ -56,6 +56,82 @@ fn test_maintenance_calendar_tasks_count() {
 }
 
 #[test]
+fn test_maintenance_cadences_and_roles() {
+    let cadences = [
+        (MaintenanceCadence::Daily, "Daily"),
+        (MaintenanceCadence::Weekly, "Weekly"),
+        (MaintenanceCadence::Biweekly, "Biweekly"),
+        (MaintenanceCadence::Monthly, "Monthly"),
+        (MaintenanceCadence::Quarterly, "Quarterly"),
+        (MaintenanceCadence::Semiannual, "Semiannual"),
+    ];
+    for (cadence, expected_name) in cadences {
+        assert_eq!(cadence.name(), expected_name);
+    }
+
+    let roles = [
+        (MaintenanceRole::BuildCiMaintainer, "Build/CI Maintainer"),
+        (MaintenanceRole::ReleaseEngineer, "Release Engineer"),
+        (MaintenanceRole::SecurityMaintainer, "Security Maintainer"),
+        (MaintenanceRole::ComponentMaintainer, "Component Maintainer"),
+        (MaintenanceRole::DocsMaintainer, "Docs Maintainer"),
+        (MaintenanceRole::PlatformMaintainer, "Platform Maintainer"),
+        (MaintenanceRole::TestingMaintainer, "Testing Maintainer"),
+        (MaintenanceRole::InstallerMaintainer, "Installer Maintainer"),
+        (MaintenanceRole::PackagingMaintainer, "Packaging Maintainer"),
+        (MaintenanceRole::ReleaseManager, "Release Manager"),
+        (MaintenanceRole::TechLead, "Tech Lead"),
+        (MaintenanceRole::DriverMaintainer, "Driver Maintainer"),
+        (MaintenanceRole::ComplianceOwner, "Compliance Owner"),
+    ];
+    for (role, expected_title) in roles {
+        assert_eq!(role.title(), expected_title);
+    }
+}
+
+#[test]
+fn test_task_artifacts_and_status_variants() {
+    let pr = TaskArtifact::PullRequest {
+        pr_number: 42,
+        title: "feat(boot): add boot smoke".into(),
+    };
+    assert!(pr.summary().contains("PR #42"));
+
+    let issue = TaskArtifact::Issue {
+        issue_number: 10,
+        title: "gap(kernel): missing futex".into(),
+    };
+    assert!(issue.summary().contains("Issue #10"));
+
+    let report = TaskArtifact::Report {
+        title: "Boot Smoke".into(),
+        path: "build/boot.log".into(),
+    };
+    assert!(report.summary().contains("Report 'Boot Smoke' at build/boot.log"));
+
+    let test_res = TaskArtifact::TestResult {
+        suite_name: "scheduler_tests".into(),
+        passed: true,
+    };
+    assert!(test_res.summary().contains("Test Suite 'scheduler_tests': PASS"));
+
+    let adr = TaskArtifact::DocumentedDecision {
+        adr_number: 7,
+        title: "Boot validation before drivers".into(),
+    };
+    assert!(adr.summary().contains("ADR-0007: Boot validation before drivers"));
+
+    let statuses = [
+        (TaskResultStatus::CodeExists, false),
+        (TaskResultStatus::TestsPass, false),
+        (TaskResultStatus::SystemBehaviorVerified, true),
+    ];
+    for (st, verified) in statuses {
+        assert_eq!(st.is_verified(), verified);
+    }
+}
+
+#[test]
 fn test_task_completion_recording() {
     let mut engine = MaintenanceOperatingModelEngine::new();
 
@@ -116,6 +192,13 @@ fn test_hardware_matrix_updates() {
 fn test_release_tier_readiness_gates() {
     let mut engine = MaintenanceOperatingModelEngine::new();
 
+    // Verify required_evidence descriptions
+    assert!(ReleaseTier::Experimental.required_evidence().contains("Build and unit tests pass"));
+    assert!(ReleaseTier::DeveloperPreview.required_evidence().contains("shell/diagnostic"));
+    assert!(ReleaseTier::TestDistribution.required_evidence().contains("VM installation"));
+    assert!(ReleaseTier::ReleaseCandidate.required_evidence().contains("Full regression"));
+    assert!(ReleaseTier::Stable.required_evidence().contains("Hardware matrix"));
+
     // Experimental is ready by default
     assert!(engine.evaluate_release_readiness(ReleaseTier::Experimental));
     assert!(!engine.evaluate_release_readiness(ReleaseTier::DeveloperPreview));
@@ -148,6 +231,7 @@ fn test_release_tier_readiness_gates() {
         .unwrap();
 
     assert!(engine.evaluate_release_readiness(ReleaseTier::TestDistribution));
+    assert!(!engine.evaluate_release_readiness(ReleaseTier::ReleaseCandidate));
     assert!(!engine.evaluate_release_readiness(ReleaseTier::Stable));
 
     // Mark all hardware classes as verified
@@ -171,5 +255,6 @@ fn test_release_tier_readiness_gates() {
         );
     }
 
+    assert!(engine.evaluate_release_readiness(ReleaseTier::ReleaseCandidate));
     assert!(engine.evaluate_release_readiness(ReleaseTier::Stable));
 }

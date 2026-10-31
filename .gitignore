@@ -38,3 +38,15 @@ __pycache__/
 !docs/studies/
 !docs/studies/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
+!docs/platform/
+!docs/platform/*.md
+!docs/operations/
+!docs/operations/*.md
+!docs/kernel/
+!docs/kernel/*.md
+!SECURITY_ARCHITECTURE.md
+!docs/security/
+!docs/security/*.md
+!docs/release/
+!docs/release/*.md
+!.github/ISSUE_TEMPLATE/*.md
