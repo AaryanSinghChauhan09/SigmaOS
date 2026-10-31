@@ -37,4 +37,6 @@ __pycache__/
 !docs/shell/*.md
 !docs/studies/
 !docs/studies/*.md
+!docs/component-rules/
+!docs/component-rules/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
