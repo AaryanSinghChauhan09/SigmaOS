@@ -1,7 +1,7 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit baseline: 1,531 declarations / 1,480 unique component names.
+# Registry audit baseline: 1,635 declarations / 1,584 unique component names.
 # Keep this comment synchronized with `make registry-audit`; duplicate names are
 # reported rather than silently discarded.
 # GitHub account audit (2026-10-31): 308 SigmaOS-prefixed repositories;
