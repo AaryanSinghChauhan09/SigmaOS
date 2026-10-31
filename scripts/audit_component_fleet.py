@@ -93,7 +93,8 @@ def audit(root: Path) -> dict[str, object]:
     for entry in entries:
         name = entry.get("name", "")
         repo = root.parent / name
-        exists = (repo / ".git").is_dir()
+        # Linked worktrees use a .git file that points at the common git dir.
+        exists = (repo / ".git").exists()
         expected_origin = entry.get("repo", "")
         origin = git(repo, "remote", "get-url", "origin") if exists else ""
         record: dict[str, object] = {
