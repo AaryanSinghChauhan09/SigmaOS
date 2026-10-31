@@ -427,6 +427,8 @@ pub use package::sovereign_distro_package_advancements_v73::*;
 pub use package::sovereign_distro_package_advancements_v74::*;
 pub use package::sovereign_distro_package_advancements_v87::*;
 pub use package::sovereign_distro_package_advancements_v87_pr::*;
+pub use package::sovereign_distro_package_advancements_v88::*;
+pub use package::sovereign_distro_package_advancements_v88_pr::*;
 pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;
