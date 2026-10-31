@@ -21,6 +21,7 @@ pub mod c_runtime_and_linker_advancements_v65_pr;
 pub mod c_runtime_and_linker_advancements_v66_pr;
 pub mod c_runtime_and_linker_advancements_v77_pr;
 pub mod c_runtime_and_linker_advancements_v78_pr;
+pub mod c_runtime_and_linker_advancements_v79_pr;
 pub mod c_runtime_and_linker_inspirations_pr;
 pub mod language;
 pub mod node_distribution;
@@ -34,6 +35,7 @@ pub use c_runtime_and_linker_advancements_v65_pr::*;
 pub use c_runtime_and_linker_advancements_v66_pr::*;
 pub use c_runtime_and_linker_advancements_v77_pr::*;
 pub use c_runtime_and_linker_advancements_v78_pr::*;
+pub use c_runtime_and_linker_advancements_v79_pr::*;
 pub use c_runtime_and_linker_inspirations_pr::*;
 pub use node_distribution::{
     LibcFlavor, NodeBinaryDistroEngine, NodeBinaryPackage, NodeReleaseStream, NodeSecurityPolicy,
