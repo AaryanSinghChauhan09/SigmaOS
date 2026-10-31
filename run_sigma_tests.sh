@@ -192,6 +192,16 @@ if [ -f "src/system/sovereign_init_and_supervisor_advancements_v82_pr.rs" ]; the
     ./build/test_init_v82_integration
 fi
 
+if [ -f "src/system/sovereign_init_and_supervisor_advancements_v89_pr.rs" ]; then
+    echo "Running Sovereign Init & Supervisor Advancements V89 test suite..."
+    mkdir -p build
+    rustc --test src/system/sovereign_init_and_supervisor_advancements_v89_pr.rs --edition=2021 -o build/test_init_advancements_v89
+    ./build/test_init_advancements_v89
+
+    rustc --test tests/test_init_and_supervisor_v89_pr.rs --edition=2021 -o build/test_init_v89_integration
+    ./build/test_init_v89_integration
+fi
+
 if [ -f "src/memory/huge_pages.rs" ]; then
     echo "Running huge pages & transparent huge pages (THP) test suite..."
     mkdir -p build
