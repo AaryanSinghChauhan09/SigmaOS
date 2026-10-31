@@ -839,6 +839,7 @@ pub use crate::distro::open_source_os_unimplemented_ideas_v70_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v71_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
 pub use crate::distro::repeatable_agent_operating_loop_pr::*;
+pub use crate::distro::continuous_open_source_os_improvement_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
 pub use crate::distro::sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
