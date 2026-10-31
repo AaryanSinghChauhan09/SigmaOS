@@ -1199,7 +1199,7 @@ visibility = "public"
 [[component]]
 name = "SigmaOS-GTK+"
 description = "Blueman & Celluloid GTK app wrappers"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-GTK+"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gtk-plus"
 engine = "gtk_lib"
 language = "shell"
 inspirations = ["https://github.com/linuxmint/blueman", "https://github.com/linuxmint/celluloid"]
@@ -1613,7 +1613,7 @@ visibility = "public"
 [[component]]
 name = "SigmaOS-github-actions"
 description = "GitHub Actions component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-github-actions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-Github-Action"
 engine = "unknown"
 language = "unknown"
 inspirations = "None"

@@ -14,6 +14,7 @@ import subprocess
 import sys
 import tomllib
 from pathlib import Path
+from urllib.parse import urlsplit
 
 
 REQUIRED_FILES = ("README.md", "README", "README.rst", "readme.md")
@@ -39,6 +40,22 @@ def has_license(repo: Path) -> bool:
     if has_file(repo, LICENSE_FILES):
         return True
     return (repo / "LICENSE-MIT").is_file() and (repo / "LICENSE-APACHE").is_file()
+
+
+def normalize_remote(remote: str) -> str:
+    """Normalize common HTTPS and SSH GitHub remotes for URL comparisons."""
+    remote = remote.strip()
+    if remote.startswith("git@github.com:"):
+        path = remote.removeprefix("git@github.com:")
+        host = "github.com"
+    else:
+        parsed = urlsplit(remote)
+        host = parsed.hostname or ""
+        path = parsed.path
+    path = path.strip("/")
+    if path.endswith(".git"):
+        path = path[:-4]
+    return f"{host.lower()}/{path}".lower() if host and path else ""
 
 
 def audit(root: Path) -> dict[str, object]:
@@ -77,11 +94,16 @@ def audit(root: Path) -> dict[str, object]:
         name = entry.get("name", "")
         repo = root.parent / name
         exists = (repo / ".git").is_dir()
+        expected_origin = entry.get("repo", "")
+        origin = git(repo, "remote", "get-url", "origin") if exists else ""
         record: dict[str, object] = {
             "name": name,
             "path": str(repo),
             "checkout": exists,
-            "origin": git(repo, "remote", "get-url", "origin") if exists else "",
+            "origin": origin,
+            "expected_origin": expected_origin,
+            "origin_matches_registry": bool(origin)
+            and normalize_remote(origin) == normalize_remote(expected_origin),
             "dirty": bool(git(repo, "status", "--porcelain")) if exists else False,
             "readme": has_file(repo, REQUIRED_FILES) if exists else False,
             "license": has_license(repo) if exists else False,
@@ -109,6 +131,10 @@ def summary(report: dict[str, object]) -> str:
     checkout = sum(bool(item["checkout"]) for item in components)
     missing_local = len(report["missing_local_checkouts"])
     no_origin = sum(bool(item["checkout"]) and not item["origin"] for item in components)
+    wrong_origin = sum(
+        bool(item["checkout"] and item["origin"] and not item["origin_matches_registry"])
+        for item in components
+    )
     dirty = sum(bool(item["dirty"]) for item in components)
     readme = sum(bool(item["readme"]) for item in components)
     license_count = sum(bool(item["license"]) for item in components)
@@ -121,6 +147,7 @@ def summary(report: dict[str, object]) -> str:
             f"local git checkouts: {checkout}",
             f"missing local checkouts: {missing_local}",
             f"missing origin: {no_origin}",
+            f"origin differs from registry URL: {wrong_origin}",
             f"dirty worktrees: {dirty}",
             f"README present: {readme}",
             f"license present: {license_count}",
