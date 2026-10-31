@@ -67,6 +67,23 @@ pub enum ComponentLifecycleStep {
 }
 
 impl ComponentLifecycleStep {
+    pub fn all() -> &'static [Self] {
+        &[
+            Self::Step1SelectComponent,
+            Self::Step2MeasureCurrentCapability,
+            Self::Step3SelectUpstreamReference,
+            Self::Step4StudyOneMechanism,
+            Self::Step5WriteComponentRules,
+            Self::Step6OpenResearchAdrPr,
+            Self::Step7ImplementSmallestSafeChange,
+            Self::Step8AddTestsAndRuntimeValidation,
+            Self::Step9UpdateDocsAndCapabilityStatus,
+            Self::Step10OpenReviewPr,
+            Self::Step11MergeOnlyAfterGatesPass,
+            Self::Step12MonitorForRegressions,
+        ]
+    }
+
     pub fn number(&self) -> u8 {
         match self {
             Self::Step1SelectComponent => 1,
@@ -117,6 +134,20 @@ pub enum ComponentDomain {
 }
 
 impl ComponentDomain {
+    pub fn all() -> &'static [Self] {
+        &[
+            Self::Kernel,
+            Self::Memory,
+            Self::VfsFilesystems,
+            Self::Ipc,
+            Self::Security,
+            Self::Drivers,
+            Self::Packaging,
+            Self::Desktop,
+            Self::InstallerUpdate,
+        ]
+    }
+
     pub fn name(&self) -> &'static str {
         match self {
             Self::Kernel => "Kernel",
@@ -180,6 +211,25 @@ pub enum IndustryStandardRule {
 }
 
 impl IndustryStandardRule {
+    pub fn all() -> &'static [Self] {
+        &[
+            Self::Rule1EverythingIsPullRequest,
+            Self::Rule2OneComponentOneOutcome,
+            Self::Rule3StudyBeforeImplementation,
+            Self::Rule4RulesMustBeTestable,
+            Self::Rule5RuntimeEvidenceControlsStatus,
+            Self::Rule6Reproducibility,
+            Self::Rule7LeastPrivilege,
+            Self::Rule8SecurityReviewIsSeparate,
+            Self::Rule9FailSafely,
+            Self::Rule10RegressionTestsMandatory,
+            Self::Rule11LicenseComplianceFirst,
+            Self::Rule12NoBorrowedStatusClaims,
+            Self::Rule13HumanApprovalHighRisk,
+            Self::Rule14ArchiveStaleResearch,
+        ]
+    }
+
     pub fn number(&self) -> u8 {
         match self {
             Self::Rule1EverythingIsPullRequest => 1,
@@ -427,8 +477,12 @@ impl PeriodicPrComponentRulesEngine {
             report.push_str("No PR proposals validated in current session.\n");
         } else {
             for v in &self.validations {
+                let issue_tag = match v.study_issue_id {
+                    Some(id) => format!(" (Issue: #{})", id),
+                    None => String::new(),
+                };
                 report.push_str(&format!(
-                    "- [{}] PR: '{}' (Branch: `{}`) | Component: {} | Evidence: {}\n",
+                    "- [{}] PR: '{}'{issue_tag} (Branch: `{}`) | Component: {} | Evidence: {}\n",
                     if v.unit_tests_passed && v.integration_tests_passed {
                         "PASSED"
                     } else {
