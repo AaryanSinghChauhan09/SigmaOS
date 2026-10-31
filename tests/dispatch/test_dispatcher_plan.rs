@@ -1,26 +1,147 @@
 // Comprehensive Unit Tests for Dispatcher Status, Invariants, and Plan Verification
 
+use std::fs;
+
 #[test]
 fn test_dispatcher_documentation_plan_verification() {
-    use std::fs;
-
     let docs_plan = fs::read_to_string("docs/DISPATCHER_PLAN.md")
         .expect("docs/DISPATCHER_PLAN.md must exist");
     let wiki_plan = fs::read_to_string("wiki/DISPATCHER_PLAN.md")
         .expect("wiki/DISPATCHER_PLAN.md must exist");
 
     assert!(docs_plan.contains("SigmaOS Dispatcher Master Architecture & Support Matrix Plan"));
-    assert!(docs_plan.contains("Invariants and Scope"));
+    assert!(docs_plan.contains("Invariants and scope"));
     assert!(docs_plan.contains("Single scheduling decision path"));
     assert!(docs_plan.contains("Context integrity"));
+    assert!(docs_plan.contains("Correct state ordering"));
+    assert!(docs_plan.contains("Interrupt and preemption safety"));
+    assert!(docs_plan.contains("Kernel/user return is a security boundary"));
     assert!(docs_plan.contains("No blocking work in hard-interrupt context"));
-    assert!(docs_plan.contains("Proposed PR Sequence Roadmap"));
-    assert!(docs_plan.contains("Periodic Maintenance PR Cadence"));
-    assert!(docs_plan.contains("Component-Specific Rules"));
-    assert!(docs_plan.contains("PR Template and Merge Gates"));
-    assert!(docs_plan.contains("Completion Criteria"));
+    assert!(docs_plan.contains("No lost wakeups or double execution"));
+    assert!(docs_plan.contains("Feature claims follow test tier"));
+    assert!(docs_plan.contains("Proposed PR sequence"));
+    assert!(docs_plan.contains("Periodic maintenance PR cadence"));
+    assert!(docs_plan.contains("Component-specific rules"));
+    assert!(docs_plan.contains("PR template and merge gates"));
+    assert!(docs_plan.contains("Completion criteria"));
 
-    assert_eq!(docs_plan, wiki_plan, "wiki/DISPATCHER_PLAN.md must mirror docs/DISPATCHER_PLAN.md exactly");
+    assert_eq!(
+        docs_plan, wiki_plan,
+        "wiki/DISPATCHER_PLAN.md must mirror docs/DISPATCHER_PLAN.md exactly"
+    );
+}
+
+#[test]
+fn test_dispatcher_plan_invariants_content() {
+    let content = fs::read_to_string("docs/DISPATCHER_PLAN.md")
+        .expect("Failed to read docs/DISPATCHER_PLAN.md");
+
+    let required_invariants = [
+        "Single scheduling decision path",
+        "Context integrity",
+        "Correct state ordering",
+        "Interrupt and preemption safety",
+        "Kernel/user return is a security boundary",
+        "No blocking work in hard-interrupt context",
+        "No lost wakeups or double execution",
+        "Feature claims follow test tier",
+    ];
+
+    for invariant in &required_invariants {
+        assert!(
+            content.contains(invariant),
+            "Missing invariant in plan: {}",
+            invariant
+        );
+    }
+}
+
+#[test]
+fn test_dispatcher_plan_pr_sequence() {
+    let content = fs::read_to_string("docs/DISPATCHER_PLAN.md")
+        .expect("Failed to read docs/DISPATCHER_PLAN.md");
+
+    for pr_num in 1..=16 {
+        let pr_marker = format!("| {} |", pr_num);
+        assert!(
+            content.contains(&pr_marker),
+            "Missing PR marker: {}",
+            pr_marker
+        );
+    }
+
+    assert!(
+        content.contains("`docs(dispatch): define scheduler-dispatcher-IRQ boundaries`"),
+        "Missing PR 1 title"
+    );
+    assert!(
+        content.contains("`feat(dispatch): connect scheduler selection to x86_64 context switch`"),
+        "Missing PR 4 title"
+    );
+    assert!(
+        content.contains("`feat(dispatch): add run-queue locking and SMP switch protocol`"),
+        "Missing PR 9 title"
+    );
+    assert!(
+        content.contains("`docs(dispatch): publish support matrix and recovery guide`"),
+        "Missing PR 16 title"
+    );
+    assert!(
+        content.contains("Prioritize PRs 1–8"),
+        "Missing priority recommendation for PRs 1-8"
+    );
+}
+
+#[test]
+fn test_dispatcher_plan_cadence_and_rules() {
+    let content = fs::read_to_string("docs/DISPATCHER_PLAN.md")
+        .expect("Failed to read docs/DISPATCHER_PLAN.md");
+
+    let cadences = [
+        "Every PR",
+        "Weekly",
+        "Monthly",
+        "Quarterly",
+        "Each release candidate",
+        "After an incident",
+    ];
+
+    for cadence in &cadences {
+        assert!(
+            content.contains(cadence),
+            "Missing maintenance cadence: {}",
+            cadence
+        );
+    }
+
+    let completion_criteria = ["Prototype:", "Integrated:", "Supported:"];
+
+    for criteria in &completion_criteria {
+        assert!(
+            content.contains(criteria),
+            "Missing completion criteria: {}",
+            criteria
+        );
+    }
+}
+
+#[test]
+fn test_feature_status_toml_dispatcher_registration() {
+    let content = fs::read_to_string("FEATURE_STATUS.toml")
+        .expect("Failed to read FEATURE_STATUS.toml");
+
+    assert!(
+        content.contains("[kernel.dispatcher]"),
+        "FEATURE_STATUS.toml must contain [kernel.dispatcher]"
+    );
+    assert!(
+        content.contains("docs/DISPATCHER_PLAN.md"),
+        "FEATURE_STATUS.toml must reference docs/DISPATCHER_PLAN.md"
+    );
+    assert!(
+        content.contains("wiki/DISPATCHER_PLAN.md"),
+        "FEATURE_STATUS.toml must reference wiki/DISPATCHER_PLAN.md"
+    );
 }
 
 #[test]
