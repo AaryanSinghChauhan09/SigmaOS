@@ -3293,6 +3293,15 @@ if [ -f "src/creative/artcraft_advancements_v80_pr.rs" ]; then
     ./build/test_artcraft_v80_integration
 fi
 
+if [ -f "src/creative/artcraft_advancements_v85_pr.rs" ]; then
+    echo "Running Sovereign Artcraft Advancements V85 PR test suite..."
+    rustc --test src/creative/artcraft_advancements_v85_pr.rs --edition=2021 -o build/test_artcraft_v85_pr
+    ./build/test_artcraft_v85_pr
+
+    rustc --test tests/test_artcraft_advancements_v85_pr.rs --edition=2021 -o build/test_artcraft_v85_integration
+    ./build/test_artcraft_v85_integration
+fi
+
 if [ -f "src/creative/artcraft_advancements_pr.rs" ]; then
     echo "Running Sovereign Artcraft Advancements PR test suite..."
     rustc --test src/creative/artcraft_advancements_pr.rs --edition=2021 -o build/test_artcraft_advancements_pr
