@@ -37,4 +37,8 @@ __pycache__/
 !docs/shell/*.md
 !docs/studies/
 !docs/studies/*.md
+!docs/storage/
+!docs/storage/*.md
+!docs/filesystem/
+!docs/filesystem/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
