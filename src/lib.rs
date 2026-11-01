@@ -616,11 +616,16 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
-    CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy, SovereignSecurityAndHardeningParityPrGateway,
+    AnonSurfShunt, AntivirusAndCryptoEngineV80Engine, AppSandboxEngine,
+    ArithmeticSubstitutionDeobfuscator, AuditAndIntrusionPreventionV80Engine,
+    BsdHardeningAndIsolationV80Engine, CapabilityGate, CapabilityToken, ForensicStorageFilter,
+    IdentityAndEnterpriseAuthV80Engine, LinuxAccessControlAndSandboxingV80Engine, Permission,
+    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy,
+    SecurityV80PrProposalManifest, SovereignSecurityAndHardeningParityPrGateway,
     SovereignSecurityAndHardeningParityV61Gateway, SovereignSecurityAndHardeningParityV64Gateway,
     SovereignSecurityAndHardeningParityV68Gateway, SovereignSecurityAndHardeningParityV70Gateway,
+    SovereignSecurityAndHardeningParityV76Gateway, SovereignSecurityAndHardeningParityV77Gateway,
+    SovereignSecurityAndHardeningParityV80Gateway,
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
