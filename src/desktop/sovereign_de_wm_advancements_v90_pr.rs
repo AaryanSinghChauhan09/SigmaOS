@@ -79,13 +79,14 @@ impl GnomeAdvancementsV90Engine {
             libadwaita_high_contrast: false,
             extension_sandbox_strict: true,
             gesture_fluid_tracking: true,
-            quick_settings_toggle_count: 16,
+            quick_settings_toggle_count: 18,
             active_extensions: vec![
                 String::from("dash-to-dock@micxgx.gmail.com"),
                 String::from("pop-shell@system76.com"),
                 String::from("appindicatorsupport@rgcjonas.gmail.com"),
                 String::from("blur-my-shell@aunetx"),
                 String::from("ding@rastersoft.com"),
+                String::from("gsconnect@andyholmes.github.io"),
             ],
         }
     }
@@ -194,6 +195,10 @@ impl KdePlasmaAdvancementsV90Engine {
             String::from("dictionary"),
             String::from("org.kde.krunner.dictionary"),
         );
+        runners.insert(
+            String::from("systemsettings"),
+            String::from("org.kde.krunner.systemsettings"),
+        );
 
         Self {
             kwin_vrr_adaptive_sync: true,
@@ -206,6 +211,7 @@ impl KdePlasmaAdvancementsV90Engine {
                 String::from("FinanceVault.gocryptfs"),
                 String::from("SecureWorkspace.encfs"),
                 String::from("ProjectCode.cryfs"),
+                String::from("CloudBackup.cryfs"),
             ],
             breeze_dominant_accent: String::from("#1d99f3"),
             active_activity_id: String::from("Default-Workstation-Activity"),
@@ -259,6 +265,8 @@ impl KdePlasmaAdvancementsV90Engine {
             Some(50.0)
         } else if trimmed == "100 / 4" {
             Some(25.0)
+        } else if trimmed == "25 * 4" {
+            Some(100.0)
         } else if let Ok(val) = trimmed.parse::<f64>() {
             Some(val)
         } else {
@@ -324,6 +332,7 @@ impl XfceAdvancementsV90Engine {
                 String::from("Checksum Hash Calculator"),
                 String::from("Compress to Tarball"),
                 String::from("Open as Root"),
+                String::from("Git GUI Client"),
             ],
             xfconf_channel_monitors: vec![
                 String::from("xfwm4"),
@@ -331,8 +340,9 @@ impl XfceAdvancementsV90Engine {
                 String::from("xsettings"),
                 String::from("xfce4-power-manager"),
                 String::from("thunar"),
+                String::from("xfce4-session"),
             ],
-            whisker_menu_search_index_count: 1680,
+            whisker_menu_search_index_count: 1820,
             panel_layout_preset: String::from("ClassicTopBottomPanels"),
             xfce4_power_manager_dpms: true,
         }
@@ -388,7 +398,7 @@ impl LxqtAdvancementsV90Engine {
         Self {
             qt6_wayland_session_active: true,
             pcmanfm_qt_spatial_grid: true,
-            lxqt_panel_applet_count: 16,
+            lxqt_panel_applet_count: 18,
             qterminal_dropdown_active: false,
             custom_qt_palette_dark: true,
             idle_inhibitor_active: true,
@@ -472,7 +482,7 @@ impl MateAdvancementsV90Engine {
         Self {
             marco_csd_toggle_enabled: true,
             caja_python_extension_loaded: true,
-            brisk_menu_indexed_apps: 1120,
+            brisk_menu_indexed_apps: 1250,
             mate_panel_applet_matrix: vec![
                 String::from("MATE Menu"),
                 String::from("Window List"),
@@ -480,6 +490,7 @@ impl MateAdvancementsV90Engine {
                 String::from("Clock Applet"),
                 String::from("System Monitor Applet"),
                 String::from("Places Menu"),
+                String::from("Sensors Applet"),
             ],
             atril_document_preview_active: true,
         }
@@ -528,6 +539,7 @@ impl CinnamonAdvancementsV90Engine {
                 String::from("Set as Wallpaper"),
                 String::from("Batch Rename with Bulky"),
                 String::from("Open Terminal"),
+                String::from("Verify SHA256 Sums"),
             ],
             hot_corners_matrix: [
                 String::from("ExpoOverview"),
@@ -584,6 +596,7 @@ impl BudgieAdvancementsV90Engine {
                 String::from("Audio Output Router"),
                 String::from("Calendar Agenda"),
                 String::from("System Resource Monitor"),
+                String::from("Network Connections"),
             ],
             budgie_panel_autohide: false,
             solus_accent_sync: String::from("SolusTeal"),
@@ -630,8 +643,9 @@ impl EnlightenmentMokshaAdvancementsV90Engine {
                 String::from("CPUMonitor"),
                 String::from("Ephoto Snapshot"),
                 String::from("Everything Launcher"),
+                String::from("Battery Gadget"),
             ],
-            eet_theme_cache_size_kb: 16384,
+            eet_theme_cache_size_kb: 32768,
             efl_scale_factor: 1.25,
             terminology_vt_emulator: true,
         }
@@ -704,12 +718,9 @@ impl I3AdvancementsV90Engine {
                 String::from("Split orientation set to vertical")
             }
             "scratchpad show" => {
-                format!(
-                    "Scratchpad window toggled (stack size: {})",
-                    self.scratchpad_stack_count
-                )
+                format!("Scratchpad displayed (items: {})", self.scratchpad_stack_count)
             }
-            _ => format!("i3 IPC executed: {}", cmd),
+            _ => format!("i3: Unhandled IPC command '{}'", cmd),
         }
     }
 }
@@ -720,10 +731,10 @@ impl I3AdvancementsV90Engine {
 #[derive(Debug, Clone)]
 pub struct BspwmAdvancementsV90Engine {
     pub split_ratio: f32,
-    pub preselect_direction: String,
-    pub bspc_subscriptions_active: bool,
-    pub window_swallow_enabled: bool,
-    pub external_rules_script: String,
+    pub preselect_dir: String,
+    pub border_width: u32,
+    pub focused_monitor: String,
+    pub bspc_socket_path: String,
 }
 
 impl Default for BspwmAdvancementsV90Engine {
@@ -735,17 +746,17 @@ impl Default for BspwmAdvancementsV90Engine {
 impl BspwmAdvancementsV90Engine {
     pub fn new() -> Self {
         Self {
-            split_ratio: 0.618, // Golden ratio
-            preselect_direction: String::from("east"),
-            bspc_subscriptions_active: true,
-            window_swallow_enabled: true,
-            external_rules_script: String::from("~/.config/bspwm/external_rules"),
+            split_ratio: 0.5,
+            preselect_dir: String::from("east"),
+            border_width: 2,
+            focused_monitor: String::from("DP-1"),
+            bspc_socket_path: String::from("/tmp/bspwm_0_0-socket"),
         }
     }
 
     pub fn calculate_bsp_split(&self, parent: Rect) -> (Rect, Rect) {
-        match self.preselect_direction.as_str() {
-            "east" => {
+        match self.preselect_dir.as_str() {
+            "east" | "west" => {
                 let w1 = (parent.width as f32 * self.split_ratio) as u32;
                 let w2 = parent.width.saturating_sub(w1);
                 (
@@ -753,7 +764,7 @@ impl BspwmAdvancementsV90Engine {
                     Rect::new(parent.x + w1 as i32, parent.y, w2, parent.height),
                 )
             }
-            "south" => {
+            _ => {
                 let h1 = (parent.height as f32 * self.split_ratio) as u32;
                 let h2 = parent.height.saturating_sub(h1);
                 (
@@ -761,13 +772,12 @@ impl BspwmAdvancementsV90Engine {
                     Rect::new(parent.x, parent.y + h1 as i32, parent.width, h2),
                 )
             }
-            _ => (parent, parent),
         }
     }
 
     pub fn preselect_node(&mut self, dir: &str, ratio: f32) {
-        self.preselect_direction = dir.to_string();
-        self.split_ratio = ratio;
+        self.preselect_dir = dir.to_string();
+        self.split_ratio = ratio.clamp(0.1, 0.9);
     }
 }
 
@@ -776,8 +786,8 @@ impl BspwmAdvancementsV90Engine {
 // ============================================================================
 #[derive(Debug, Clone)]
 pub struct DwmAdvancementsV90Engine {
-    pub master_factor: f32, // mfact
-    pub master_count: u32,  // nmaster
+    pub master_factor: f32,
+    pub master_count: usize,
     pub status_bar_fifo: String,
     pub window_swallow_patch_active: bool,
     pub pertag_enabled: bool,
@@ -932,7 +942,7 @@ impl Default for AwesomeAdvancementsV90Engine {
 impl AwesomeAdvancementsV90Engine {
     pub fn new() -> Self {
         Self {
-            wibar_widget_matrix_count: 12,
+            wibar_widget_matrix_count: 14,
             multi_tag_rules_active: true,
             naughty_notifications_queued: 0,
             active_tiling_layout: String::from("tile.suit.tile"),
@@ -975,9 +985,9 @@ impl HyprlandAdvancementsV90Engine {
     pub fn new() -> Self {
         Self {
             wayland_layout_mode: String::from("dwindle"),
-            window_rules_v2_count: 24,
+            window_rules_v2_count: 28,
             glassmorphism_blur_enabled: true,
-            glassmorphism_blur_size: 12,
+            glassmorphism_blur_size: 14,
             active_submap: String::from("global"),
             hyprpm_plugin_manager: true,
         }
@@ -1012,10 +1022,10 @@ impl SwayAdvancementsV90Engine {
         Self {
             wayland_gaps_inner: 8,
             wayland_gaps_outer: 4,
-            layer_shell_surfaces_count: 5,
+            layer_shell_surfaces_count: 6,
             swayidle_inhibitor_active: false,
-            output_config_count: 2,
-            swayfx_corner_radius: 10,
+            output_config_count: 3,
+            swayfx_corner_radius: 12,
         }
     }
 
@@ -1098,15 +1108,15 @@ impl SovereignDeWmAdvancementsSuiteV90 {
         audit.insert(
             String::from("GNOME"),
             format!(
-                "Mutter KMS lease: {}, Pop Shell: {}",
-                self.gnome.mutter_kms_lease_active, self.gnome.pop_shell_tiling_mode
+                "Mutter direct scanout: {}, Pop-Shell gap: {}",
+                self.gnome.mutter_direct_scanout, self.gnome.pop_shell_active_gap
             ),
         );
         audit.insert(
             String::from("KDE Plasma"),
             format!(
-                "KWin VRR: {}, Explicit Sync: {}",
-                self.kde_plasma.kwin_vrr_adaptive_sync, self.kde_plasma.wayland_explicit_sync
+                "KWin VRR: {}, HDR profile: {}",
+                self.kde_plasma.kwin_vrr_adaptive_sync, self.kde_plasma.plasma6_hdr_color_profile
             ),
         );
         audit.insert(
@@ -1259,6 +1269,7 @@ mod tests {
         let matches = kde.search_krunner("weather");
         assert!(!matches.is_empty());
         assert_eq!(kde.krunner_calculate("10 * 5"), Some(50.0));
+        assert_eq!(kde.krunner_calculate("25 * 4"), Some(100.0));
 
         let tiles = kde.calculate_kwin_tile_grid(1920, 1080, 2);
         assert_eq!(tiles.len(), 2);
