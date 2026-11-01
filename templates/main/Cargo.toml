@@ -1,0 +1,108 @@
+[package]
+name = "COMPONENT_NAME"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+authors = ["SigmaOS Contributors"]
+description = "SigmaOS component: COMPONENT_NAME"
+repository = "https://github.com/sigmaos/COMPONENT_NAME"
+license = "MIT"
+keywords = ["sigmaos", "os", "systems"]
+categories = ["os"]
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "COMPONENT_NAME"
+path = "src/main.rs"
+
+[lib]
+name = "COMPONENT_NAME_lib"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
+# -----------------------------------------------------------------------------
+# Dependencies
+# -----------------------------------------------------------------------------
+[dependencies]
+# Serialisation / deserialisation
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+
+# Ergonomic error types
+thiserror = "1.0"
+
+# Structured logging facade
+log = { version = "0.4", features = ["std"] }
+
+# Log initialisation (CLI / daemon use only; disable for library-only crates)
+env_logger = { version = "0.11", default-features = false, features = ["auto-color"] }
+
+# CLI argument parsing (only for binary; move to [dev-dependencies] if lib-only)
+clap = { version = "4.5", features = ["derive", "env"] }
+
+# -----------------------------------------------------------------------------
+# Development dependencies
+# -----------------------------------------------------------------------------
+[dev-dependencies]
+# Property-based testing
+proptest = "1.4"
+
+# Test assertions
+pretty_assertions = "1.4"
+
+# Temporary file/dir helpers for integration tests
+tempfile = "3.10"
+
+# -----------------------------------------------------------------------------
+# Feature flags
+# Keep this section minimal (YAGNI). Add features only when proven necessary.
+# -----------------------------------------------------------------------------
+[features]
+default = []
+
+# Enable async runtime support (tokio) — opt-in only
+async = ["dep:tokio"]
+
+# Enable metrics / instrumentation
+metrics = ["dep:metrics"]
+
+# Optional async runtime (only pulled in when async feature is enabled)
+tokio = { version = "1.37", features = ["rt-multi-thread", "macros"], optional = true }
+
+# Optional metrics facade
+metrics = { version = "0.23", optional = true }
+
+# -----------------------------------------------------------------------------
+# Release profile — optimised for production systems use
+# -----------------------------------------------------------------------------
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+debug = false
+overflow-checks = false
+
+# -----------------------------------------------------------------------------
+# Development profile
+# -----------------------------------------------------------------------------
+[profile.dev]
+opt-level = 0
+debug = true
+overflow-checks = true
+
+# -----------------------------------------------------------------------------
+# Test / benchmark profile
+# -----------------------------------------------------------------------------
+[profile.test]
+opt-level = 1
+debug = true
+overflow-checks = true
+
+# Faster link times during iterative development (requires lld or mold)
+# Uncomment if your toolchain supports it:
+# [profile.dev.package."*"]
+# opt-level = 3

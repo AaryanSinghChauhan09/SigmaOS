@@ -1,0 +1,229 @@
+# =============================================================================
+# SigmaOS Component .gitignore
+# Covers: Rust, C, Python, Shell
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Rust
+# -----------------------------------------------------------------------------
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Rust incremental compilation artifacts
+/target/
+**/target/
+
+# Rust coverage
+tarpaulin-report.html
+lcov.info
+coverage/
+
+# -----------------------------------------------------------------------------
+# C / C++
+# -----------------------------------------------------------------------------
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.elf
+*.bin
+*.hex
+*.map
+*.d
+
+# Build outputs
+build/
+dist/
+out/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile.cmake
+compile_commands.json
+
+# Autotools
+Makefile.in
+configure
+autom4te.cache/
+aclocal.m4
+config.log
+config.status
+config.guess
+config.sub
+install-sh
+ltmain.sh
+missing
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+*.manifest
+*.spec
+.installed.cfg
+lib/
+lib64/
+site-packages/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# pyenv
+.python-version
+
+# Poetry
+poetry.lock
+
+# -----------------------------------------------------------------------------
+# Shell / Scripts
+# -----------------------------------------------------------------------------
+*.swp
+*.swo
+*~
+
+# -----------------------------------------------------------------------------
+# Editors & IDEs
+# -----------------------------------------------------------------------------
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains / CLion / RustRover / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Vim / Neovim
+*.swp
+*.swo
+.netrwhist
+Session.vim
+
+# Emacs
+*~
+\#*\#
+.\#*
+.dir-locals.el
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Helix
+.helix/
+
+# -----------------------------------------------------------------------------
+# OS artifacts
+# -----------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+.Trash-*/
+*.nfs*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# -----------------------------------------------------------------------------
+# SigmaOS-specific
+# -----------------------------------------------------------------------------
+# Local environment / secrets — never commit
+.env
+.env.*
+*.secret
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Cross-compilation sysroots / toolchains
+sysroot/
+toolchain/
+cross/
+
+# Build artefacts for embedded targets
+*.uf2
+*.srec
+*.ihex
+
+# Profiling / tracing
+perf.data
+perf.data.old
+flamegraph.svg
+*.perfmap
+
+# Sanitizer outputs
+asan.log*
+ubsan.log*
+msan.log*
+tsan.log*
+
+# Benchmarks raw output
+criterion/
+benches/results/
+
+# Temporary scaffolding artifacts
+.scaffold_tmp/
+
+# Documentation (docs branch only — keep main clean)
+*.md
+*.txt
+*.rst
+*.adoc
+*.org

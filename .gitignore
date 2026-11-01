@@ -19,22 +19,22 @@ __pycache__/
 *.pyc
 *~
 .DS_Store
+# Documentation files: kept ONLY in wiki/, docs/, templates/docs/, .github/
+# Root-level .md/.txt files are banned from main (move to docs branch)
 *.md
-!README.md
 *.txt
-!docs/INTERRUPT_HANDLER_PLAN.md
-!wiki/INTERRUPT_HANDLER_PLAN.md
-!docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
-!wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
-!wiki/26-System-Utilities-Development-Plan.md
-!docs/process/
-!docs/process/*.md
-!docs/ipc-handler.md
-!wiki/ipc-handler.md
-!docs/DISPATCHER_PLAN.md
-!wiki/DISPATCHER_PLAN.md
-!docs/shell/
-!docs/shell/*.md
-!docs/studies/
-!docs/studies/*.md
-!.github/PULL_REQUEST_TEMPLATE.md
+# Allow wiki directory (canonical wiki source)
+!wiki/
+!wiki/**
+!wiki/**/*.md
+# Allow docs directory (architecture plans, guides)
+!docs/
+!docs/**
+!docs/**/*.md
+# Allow templates/docs (scaffolding templates)
+!templates/docs/
+!templates/docs/*.md
+# Allow GitHub-specific markdown
+!.github/
+!.github/**
+!.github/**/*.md
