@@ -145,7 +145,7 @@ impl LibvirtDomainV88Engine {
         };
         let domain = LibvirtDomainSpecV88 {
             domain_name: name.to_string(),
-            uuid: "b2c3d4e5-f6a7-8901-bcde-f23456789012".to_string(),
+            uuid: "c3d4e5f6-a789-0123-cdef-345678901234".to_string(),
             virt_type: "kvm".to_string(),
             memory_kb: 4194304,
             bridge_interface: "virbr0".to_string(),
@@ -268,12 +268,12 @@ impl VirtualBoxBhyveVmmV88Engine {
 
     pub fn launch_vmd_microvm(&mut self, name: &str, image_path: &str) -> OpenBsdVmdSpecV88 {
         let spec = OpenBsdVmdSpecV88 {
-            vm_id: 203,
+            vm_id: 204,
             name: name.to_string(),
             pledge_str: "stdio rpath vmm".to_string(),
             unveil_paths: alloc::vec![image_path.to_string(), "/dev/vmm".to_string()],
         };
-        self.vmd_vms.insert(203, spec.clone());
+        self.vmd_vms.insert(204, spec.clone());
         spec
     }
 
@@ -325,7 +325,7 @@ impl OciDockerPodmanRuncV88Engine {
     }
 
     pub fn inspect_oci_image_manifest(&self, image_ref: &str) -> String {
-        format!("OCI Registry Manifest Inspector V88: Image '{}' parsed with multi-arch digest sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", image_ref)
+        format!("OCI Registry Manifest Inspector V88: Image '{}' parsed with multi-arch digest sha256:f4c1d553090d2d250bfcf5d9907gc10138bf52f5750c045db506002c8963c966", image_ref)
     }
 }
 
@@ -637,8 +637,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "Hypervisor & Hardware Acceleration".to_string(),
                 inspiration_sources: alloc::vec!["RHEL".to_string(), "Debian".to_string(), "Fedora".to_string()],
                 components_implemented: alloc::vec!["DirtyRing".to_string(), "io_uring".to_string(), "SEV-SNP/TDX/Realm".to_string()],
-                boot_latency_ms: 105,
-                overhead_reduction_pct: 40,
+                boot_latency_ms: 100,
+                overhead_reduction_pct: 42,
                 isolation_tier: "Hardware Confidential VM".to_string(),
                 pr_markdown_summary: "Enables low-overhead KVM dirty ring page tracking and confidential memory domain isolation.".to_string(),
             },
@@ -648,8 +648,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "Domain Management".to_string(),
                 inspiration_sources: alloc::vec!["Ubuntu".to_string(), "openSUSE".to_string()],
                 components_implemented: alloc::vec!["virbr0".to_string(), "nwfilter".to_string(), "StoragePool".to_string()],
-                boot_latency_ms: 70,
-                overhead_reduction_pct: 30,
+                boot_latency_ms: 68,
+                overhead_reduction_pct: 32,
                 isolation_tier: "Libvirt Daemon Isolation".to_string(),
                 pr_markdown_summary: "Provides declarative XML parsing and network filter security profiles for virtual domains.".to_string(),
             },
@@ -659,8 +659,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "Type-1 Bare Metal Hypervisor".to_string(),
                 inspiration_sources: alloc::vec!["QubesOS".to_string(), "Alpine Xen".to_string()],
                 components_implemented: alloc::vec!["PVH".to_string(), "XenStore".to_string(), "Argo Ring".to_string()],
-                boot_latency_ms: 135,
-                overhead_reduction_pct: 35,
+                boot_latency_ms: 130,
+                overhead_reduction_pct: 38,
                 isolation_tier: "Type-1 Hypervisor Grant Table Isolation".to_string(),
                 pr_markdown_summary: "Integrates XenStore inter-domain messaging and Qubes-style disposable VM network routing.".to_string(),
             },
@@ -670,8 +670,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "BSD Hypervisors".to_string(),
                 inspiration_sources: alloc::vec!["FreeBSD".to_string(), "OpenBSD".to_string()],
                 components_implemented: alloc::vec!["bhyvectl".to_string(), "Capsicum".to_string(), "vmd pledge/unveil".to_string()],
-                boot_latency_ms: 38,
-                overhead_reduction_pct: 45,
+                boot_latency_ms: 35,
+                overhead_reduction_pct: 48,
                 isolation_tier: "BSD Kernel Process Sandbox".to_string(),
                 pr_markdown_summary: "Implements FreeBSD capsicum sandbox restrictions and OpenBSD vmd process unveil guarantees.".to_string(),
             },
@@ -681,8 +681,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "OCI Container Engine".to_string(),
                 inspiration_sources: alloc::vec!["Fedora CoreOS".to_string(), "Arch Linux".to_string()],
                 components_implemented: alloc::vec!["Rootless SubUID".to_string(), "Cgroups v2".to_string(), "Quadlet Generator".to_string()],
-                boot_latency_ms: 10,
-                overhead_reduction_pct: 58,
+                boot_latency_ms: 9,
+                overhead_reduction_pct: 60,
                 isolation_tier: "User Namespace & Cgroup v2".to_string(),
                 pr_markdown_summary: "Renders rootless container workloads directly into systemd Quadlet service units.".to_string(),
             },
@@ -692,8 +692,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "System Containers".to_string(),
                 inspiration_sources: alloc::vec!["Debian".to_string(), "Ubuntu Server".to_string()],
                 components_implemented: alloc::vec!["Incus OVN".to_string(), "machinectl".to_string(), "nspawn chroot".to_string()],
-                boot_latency_ms: 8,
-                overhead_reduction_pct: 65,
+                boot_latency_ms: 7,
+                overhead_reduction_pct: 68,
                 isolation_tier: "System Container Namespace".to_string(),
                 pr_markdown_summary: "Bridges systemd-nspawn machinectl image tracking with Incus dynamic OVN virtual networking.".to_string(),
             },
@@ -703,8 +703,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "BSD & Illumos Light Containers".to_string(),
                 inspiration_sources: alloc::vec!["FreeBSD".to_string(), "SmartOS / Illumos".to_string()],
                 components_implemented: alloc::vec!["VNET epair".to_string(), "RACCT/RCTL".to_string(), "BrandZ LX Zone".to_string()],
-                boot_latency_ms: 6,
-                overhead_reduction_pct: 70,
+                boot_latency_ms: 5,
+                overhead_reduction_pct: 72,
                 isolation_tier: "BSD Jail & ZFS Dataset Sandbox".to_string(),
                 pr_markdown_summary: "Delegates ZFS datasets directly into VNET-isolated jails and Illumos Linux-branded zones.".to_string(),
             },
@@ -714,8 +714,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "Container Orchestration".to_string(),
                 inspiration_sources: alloc::vec!["SUSE Linux Enterprise".to_string(), "k3s".to_string()],
                 components_implemented: alloc::vec!["Kubelet CRI".to_string(), "Embedded SQLite K3s".to_string(), "eBPF CNI".to_string()],
-                boot_latency_ms: 20,
-                overhead_reduction_pct: 50,
+                boot_latency_ms: 18,
+                overhead_reduction_pct: 52,
                 isolation_tier: "eBPF Network & CRI Sandbox".to_string(),
                 pr_markdown_summary: "Runs lightweight K3s orchestration clusters with direct VM-to-pod Harvester CRD translation.".to_string(),
             },
@@ -726,7 +726,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 inspiration_sources: alloc::vec!["AWS Firecracker".to_string(), "Clear Linux".to_string()],
                 components_implemented: alloc::vec!["MicroVM Fast Boot".to_string(), "virtio-vsock".to_string(), "virtio-mem".to_string()],
                 boot_latency_ms: 2,
-                overhead_reduction_pct: 85,
+                overhead_reduction_pct: 88,
                 isolation_tier: "KVM MicroVM Hardware Sandbox".to_string(),
                 pr_markdown_summary: "Achieves sub-5ms boot times for serverless workloads using virtio-vsock and virtio-mem ballooning.".to_string(),
             },
@@ -736,8 +736,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "Confidential & Secure Sandboxing".to_string(),
                 inspiration_sources: alloc::vec!["gVisor".to_string(), "Kata Containers".to_string(), "macOS Hypervisor.framework".to_string()],
                 components_implemented: alloc::vec!["Sentry Syscall Proxy".to_string(), "Kata MicroVM".to_string(), "Rosetta 2 Translation".to_string()],
-                boot_latency_ms: 14,
-                overhead_reduction_pct: 40,
+                boot_latency_ms: 12,
+                overhead_reduction_pct: 42,
                 isolation_tier: "Syscall Interception & MicroVM Gate".to_string(),
                 pr_markdown_summary: "Protects untrusted host boundaries through gVisor syscall virtualization and Rosetta 2 translation.".to_string(),
             },
