@@ -65,7 +65,7 @@ impl OfficeSuite {
             ],
             Self::OnlyOffice => vec![
                 OfficeModule::Documents, OfficeModule::Spreadsheets,
-                OfficeModule::Presentations, OfficeModule::Pdf,
+                OfficeModule::Slides, OfficeModule::Pdf,
             ],
             Self::BetterOffice => vec![
                 OfficeModule::Documents, OfficeModule::Spreadsheets,

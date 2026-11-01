@@ -8,13 +8,13 @@
 /// EndeavourOS release identifier.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EndeavourRelease {
-    Cassini(2023),
-    Galileo(2024),
+    Cassini,
+    Galileo,
 }
 
 impl EndeavourRelease {
     pub fn name(self) -> &'static str {
-        match self { Self::Cassini(_) => "Cassini", Self::Galileo(_) => "Galileo" }
+        match self { Self::Cassini => "Cassini", Self::Galileo => "Galileo" }
     }
 }
 

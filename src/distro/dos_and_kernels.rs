@@ -9,7 +9,7 @@
 /// DOS variant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DosVariant {
-    FreeDOS,
+    FreeDos,
     MsDos,
     EnhancedDos,
 }

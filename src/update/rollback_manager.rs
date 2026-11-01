@@ -120,7 +120,7 @@ impl UpdateManager {
 
     /// Build an update plan from a list of pending updates.
     pub fn create_update_plan(&self, updates: &[PendingUpdate]) -> UpdatePlan {
-        let total = updates.iter().map(|u| u.size_bytes).sum();
+        let total: u64 = updates.iter().map(|u| u.size_bytes).sum();
         let duration = (total / (5u64 * 1024 * 1024)).max(10u64); // ~5 MiB/s
         UpdatePlan {
             channel: UpdateChannel::Stable,

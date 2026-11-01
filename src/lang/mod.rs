@@ -9,3 +9,5 @@ pub use kuroko_lang::{
     BuiltinFn, CodeObject, Instruction, KurokoCompiler, KurokoError, KurokoObject, KurokoREPL,
     KurokoVM, KurokoValue, Opcode, Token, TokenType,
 };
+pub mod i18n;
+pub use i18n::{KeyboardLayout, Locale, LocaleManager, KEYBOARD_LAYOUTS, SUPPORTED_LOCALES};

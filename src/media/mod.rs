@@ -96,3 +96,6 @@ pub use sovereign_video_player::{
 pub use sovereign_video_editor::{
     AscCdl, EditorError, SovereignVideoEditor, TimelineClip, VideoTrack,
 };
+pub mod codecs;
+pub use codecs::{CodecManager, HwDecodeBackend, MediaCodec, V1_CODECS};
+pub mod sovereign_audio_video_advancements_v92_pr;
