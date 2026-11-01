@@ -71,7 +71,9 @@ impl FilmcraftNeuralSceneCutDetectionV70PrEngine {
         let mut last_cut = 0usize;
 
         for (idx, &diff) in frame_difference_metrics.iter().enumerate() {
-            if diff >= self.sensitivity_threshold && (idx - last_cut >= self.min_scene_duration_frames as usize || last_cut == 0) {
+            if diff >= self.sensitivity_threshold
+                && (idx - last_cut >= self.min_scene_duration_frames as usize || last_cut == 0)
+            {
                 cut_indices.push(idx as u64);
                 last_cut = idx;
             }
@@ -124,7 +126,11 @@ impl FilmcraftHardwareAcceleratedAv1DecoderV70PrEngine {
     }
 
     /// Decode AV1 bitstream chunk into raw frame buffer metadata.
-    pub fn decode_av1_packet(&self, bitstream_packet: &[u8], decoded_yuv_out: &mut Vec<u8>) -> Result<usize, &'static str> {
+    pub fn decode_av1_packet(
+        &self,
+        bitstream_packet: &[u8],
+        decoded_yuv_out: &mut Vec<u8>,
+    ) -> Result<usize, &'static str> {
         if bitstream_packet.is_empty() {
             return Err("Empty AV1 bitstream packet");
         }
@@ -140,13 +146,21 @@ impl FilmcraftHardwareAcceleratedAv1DecoderV70PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV70PrProposalManifest {
         FilmcraftV70PrProposalManifest {
             pr_id: 7052,
-            pr_title: String::from("filmcraft/codec: Hardware-Accelerated AV1 12-Bit 4:4:4 Multi-Stream Decoder V70"),
+            pr_title: String::from(
+                "filmcraft/codec: Hardware-Accelerated AV1 12-Bit 4:4:4 Multi-Stream Decoder V70",
+            ),
             target_subsystem: String::from("creative::filmcraft::codec_av1"),
             original_suite: String::from("ArtCraft Filmcraft v70 High-Fidelity AV1 Pipeline"),
             components_added: vec![
-                String::from("Zero-copy NVMM / VA-API / Vulkan Video AV1 12-bit 4:4:4 decoder pipeline"),
-                String::from("Multi-stream asynchronous tile decoding with frame-header parallel parser"),
-                String::from("Film grain synthesis hardware acceleration in HDR mastering color spaces"),
+                String::from(
+                    "Zero-copy NVMM / VA-API / Vulkan Video AV1 12-bit 4:4:4 decoder pipeline",
+                ),
+                String::from(
+                    "Multi-stream asynchronous tile decoding with frame-header parallel parser",
+                ),
+                String::from(
+                    "Film grain synthesis hardware acceleration in HDR mastering color spaces",
+                ),
             ],
             performance_multiplier: String::from("6.2x playback throughput with zero CPU hitching"),
             status: String::from("Proposed"),
@@ -213,12 +227,16 @@ impl FilmcraftSpatialAudioDolbyAtmosBedRendererV70PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV70PrProposalManifest {
         FilmcraftV70PrProposalManifest {
             pr_id: 7053,
-            pr_title: String::from("filmcraft/audio: Object-Based Spatial Audio Dolby Atmos Bed Renderer V70"),
+            pr_title: String::from(
+                "filmcraft/audio: Object-Based Spatial Audio Dolby Atmos Bed Renderer V70",
+            ),
             target_subsystem: String::from("creative::filmcraft::spatial_audio"),
             original_suite: String::from("ArtCraft Filmcraft v70 Immersive Spatial Audio"),
             components_added: vec![
                 String::from("Direct 7.1.4 bed rendering with ADM-BWF object metadata parser"),
-                String::from("Phase-aligned binaural rendering downmix with custom HRTF profile support"),
+                String::from(
+                    "Phase-aligned binaural rendering downmix with custom HRTF profile support",
+                ),
                 String::from("Dynamic 128-object coordinate panner with Doppler simulation"),
             ],
             performance_multiplier: String::from("8.5x faster multi-channel spatial convolution"),
@@ -255,7 +273,13 @@ impl FilmcraftRealtimeNeuralMagicMaskRotoscopingV70PrEngine {
     }
 
     /// Compute alpha matte for foreground segmentation given bounding mask seed.
-    pub fn generate_magic_matte(&self, input_rgb: &[u8], seed_x: u32, seed_y: u32, alpha_matte_out: &mut Vec<u8>) -> Result<usize, &'static str> {
+    pub fn generate_magic_matte(
+        &self,
+        input_rgb: &[u8],
+        seed_x: u32,
+        seed_y: u32,
+        alpha_matte_out: &mut Vec<u8>,
+    ) -> Result<usize, &'static str> {
         if input_rgb.is_empty() {
             return Err("Empty input image buffer");
         }
@@ -278,13 +302,21 @@ impl FilmcraftRealtimeNeuralMagicMaskRotoscopingV70PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV70PrProposalManifest {
         FilmcraftV70PrProposalManifest {
             pr_id: 7054,
-            pr_title: String::from("filmcraft/vfx: Real-time Neural Magic Mask Rotoscoping Engine V70"),
+            pr_title: String::from(
+                "filmcraft/vfx: Real-time Neural Magic Mask Rotoscoping Engine V70",
+            ),
             target_subsystem: String::from("creative::filmcraft::magic_mask"),
             original_suite: String::from("ArtCraft Filmcraft v70 Neural Segmentation"),
             components_added: vec![
-                String::from("Deep high-resolution segmenter for human subjects, limbs, clothing and faces"),
-                String::from("Subpixel guided filter boundary refiner with hair strand detail preservation"),
-                String::from("Bidirectional temporal optical flow tracker across complex occlusions"),
+                String::from(
+                    "Deep high-resolution segmenter for human subjects, limbs, clothing and faces",
+                ),
+                String::from(
+                    "Subpixel guided filter boundary refiner with hair strand detail preservation",
+                ),
+                String::from(
+                    "Bidirectional temporal optical flow tracker across complex occlusions",
+                ),
             ],
             performance_multiplier: String::from("14.7x faster than manual bezier rotoscoping"),
             status: String::from("Proposed"),
@@ -320,7 +352,11 @@ impl FilmcraftAiAutomatedVoiceIsolationLoudnessNormalizeV70PrEngine {
     }
 
     /// Process raw audio samples to isolate speech and normalize perceived loudness.
-    pub fn isolate_and_normalize_audio(&self, pcm_samples: &[f32], processed_samples: &mut Vec<f32>) -> Result<f32, &'static str> {
+    pub fn isolate_and_normalize_audio(
+        &self,
+        pcm_samples: &[f32],
+        processed_samples: &mut Vec<f32>,
+    ) -> Result<f32, &'static str> {
         if pcm_samples.is_empty() {
             return Err("Audio buffer is empty");
         }
@@ -344,15 +380,25 @@ impl FilmcraftAiAutomatedVoiceIsolationLoudnessNormalizeV70PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV70PrProposalManifest {
         FilmcraftV70PrProposalManifest {
             pr_id: 7055,
-            pr_title: String::from("filmcraft/audio: AI Automated Voice Isolation & ITU Loudness Normalizer V70"),
+            pr_title: String::from(
+                "filmcraft/audio: AI Automated Voice Isolation & ITU Loudness Normalizer V70",
+            ),
             target_subsystem: String::from("creative::filmcraft::voice_isolation"),
             original_suite: String::from("ArtCraft Filmcraft v70 Audio Restoration"),
             components_added: vec![
-                String::from("Deep speech extraction model separating dialogue from background environment"),
-                String::from("ITU-R BS.1770-4 integrated, short-term, and momentary loudness measurement"),
-                String::from("Brickwall true-peak limiter with 4x inter-sample oversampling filter"),
+                String::from(
+                    "Deep speech extraction model separating dialogue from background environment",
+                ),
+                String::from(
+                    "ITU-R BS.1770-4 integrated, short-term, and momentary loudness measurement",
+                ),
+                String::from(
+                    "Brickwall true-peak limiter with 4x inter-sample oversampling filter",
+                ),
             ],
-            performance_multiplier: String::from("11.3x faster than traditional multi-band de-noiser"),
+            performance_multiplier: String::from(
+                "11.3x faster than traditional multi-band de-noiser",
+            ),
             status: String::from("Proposed"),
         }
     }
@@ -388,7 +434,12 @@ impl FilmcraftCrdtMultiUserTimelineBranchMergeV70PrEngine {
     /// Submit atomic timeline edit operation generating Lamport timestamp delta.
     pub fn commit_timeline_edit(&mut self, edit_descriptor: &str) -> (u64, String) {
         self.lamport_clock += 1;
-        let commit_hash = format!("v70-tx-{:x}-{}-{}", self.lamport_clock, self.local_replica_id, edit_descriptor.len());
+        let commit_hash = format!(
+            "v70-tx-{:x}-{}-{}",
+            self.lamport_clock,
+            self.local_replica_id,
+            edit_descriptor.len()
+        );
         (self.lamport_clock, commit_hash)
     }
 
@@ -466,15 +517,25 @@ impl FilmcraftColorGradingAcesCcLut1d3dTetrahedralV70PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV70PrProposalManifest {
         FilmcraftV70PrProposalManifest {
             pr_id: 7057,
-            pr_title: String::from("filmcraft/color: ACEScc Color Grading & 3D Tetrahedral LUT Pipeline V70"),
+            pr_title: String::from(
+                "filmcraft/color: ACEScc Color Grading & 3D Tetrahedral LUT Pipeline V70",
+            ),
             target_subsystem: String::from("creative::filmcraft::acescc_color"),
             original_suite: String::from("ArtCraft Filmcraft v70 Color Science"),
             components_added: vec![
-                String::from("Strict ACES 1.3 color management with OpenColorIO 2.3 OCIOv2 backend"),
-                String::from("65x65x65 3D tetrahedral interpolation preserving chromaticity boundaries"),
-                String::from("HDR highlight roll-off with parametric tonemapping and skin hue protection"),
+                String::from(
+                    "Strict ACES 1.3 color management with OpenColorIO 2.3 OCIOv2 backend",
+                ),
+                String::from(
+                    "65x65x65 3D tetrahedral interpolation preserving chromaticity boundaries",
+                ),
+                String::from(
+                    "HDR highlight roll-off with parametric tonemapping and skin hue protection",
+                ),
             ],
-            performance_multiplier: String::from("9.8x accelerated GPU 3D texture grading throughput"),
+            performance_multiplier: String::from(
+                "9.8x accelerated GPU 3D texture grading throughput",
+            ),
             status: String::from("Proposed"),
         }
     }
@@ -577,13 +638,19 @@ impl FilmcraftMotionVectorSdfKineticTitleRendererV70PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV70PrProposalManifest {
         FilmcraftV70PrProposalManifest {
             pr_id: 7059,
-            pr_title: String::from("filmcraft/motion: Motion Vector SDF Kinetic Title & Particle Renderer V70"),
+            pr_title: String::from(
+                "filmcraft/motion: Motion Vector SDF Kinetic Title & Particle Renderer V70",
+            ),
             target_subsystem: String::from("creative::filmcraft::kinetic_sdf_titles"),
             original_suite: String::from("ArtCraft Filmcraft v70 Kinetic Typography"),
             components_added: vec![
-                String::from("Multi-channel Signed Distance Field (MSDF) text rendering at infinite zoom"),
+                String::from(
+                    "Multi-channel Signed Distance Field (MSDF) text rendering at infinite zoom",
+                ),
                 String::from("Physics-based spring dynamics, bounce and kinetic layout animator"),
-                String::from("Subpixel motion-blurred particle emitter integrated with timeline velocity"),
+                String::from(
+                    "Subpixel motion-blurred particle emitter integrated with timeline velocity",
+                ),
             ],
             performance_multiplier: String::from("120+ FPS 4K kinetic text compositing on GPU"),
             status: String::from("Proposed"),
@@ -619,7 +686,12 @@ impl FilmcraftUniversalEdlXmlOpenTimelineIoBridgeV70PrEngine {
     }
 
     /// Convert timeline project between interchange representations.
-    pub fn interchange_timeline(&self, source_format: &str, destination_format: &str, clip_count: usize) -> Result<String, &'static str> {
+    pub fn interchange_timeline(
+        &self,
+        source_format: &str,
+        destination_format: &str,
+        clip_count: usize,
+    ) -> Result<String, &'static str> {
         if clip_count == 0 {
             return Err("Zero clip entries in timeline project");
         }
@@ -673,16 +745,37 @@ impl SovereignFilmcraftArtcraftMissingComponentsV70PrGateway {
             proposals: BTreeMap::new(),
         };
 
-        gateway.register_proposal(FilmcraftNeuralSceneCutDetectionV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftHardwareAcceleratedAv1DecoderV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftSpatialAudioDolbyAtmosBedRendererV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftRealtimeNeuralMagicMaskRotoscopingV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftAiAutomatedVoiceIsolationLoudnessNormalizeV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftCrdtMultiUserTimelineBranchMergeV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftColorGradingAcesCcLut1d3dTetrahedralV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftSubframeAudioTransientSnapPitchShiftV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftMotionVectorSdfKineticTitleRendererV70PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftUniversalEdlXmlOpenTimelineIoBridgeV70PrEngine::new().generate_proposal());
+        gateway.register_proposal(
+            FilmcraftNeuralSceneCutDetectionV70PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftHardwareAcceleratedAv1DecoderV70PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftSpatialAudioDolbyAtmosBedRendererV70PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftRealtimeNeuralMagicMaskRotoscopingV70PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftAiAutomatedVoiceIsolationLoudnessNormalizeV70PrEngine::new()
+                .generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftCrdtMultiUserTimelineBranchMergeV70PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftColorGradingAcesCcLut1d3dTetrahedralV70PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftSubframeAudioTransientSnapPitchShiftV70PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftMotionVectorSdfKineticTitleRendererV70PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftUniversalEdlXmlOpenTimelineIoBridgeV70PrEngine::new().generate_proposal(),
+        );
 
         gateway
     }
@@ -745,7 +838,9 @@ mod tests {
     #[test]
     fn test_v70_scene_cut_detection() {
         let engine = FilmcraftNeuralSceneCutDetectionV70PrEngine::new();
-        let metrics = [0.1f32, 0.2, 0.95, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.88];
+        let metrics = [
+            0.1f32, 0.2, 0.95, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.88,
+        ];
         let cuts = engine.detect_scene_cuts(&metrics);
         assert_eq!(cuts, vec![2, 14]);
 
@@ -781,7 +876,9 @@ mod tests {
         let engine = FilmcraftRealtimeNeuralMagicMaskRotoscopingV70PrEngine::new();
         let rgb_input = [100u8, 150, 200, 50, 75, 100];
         let mut alpha_out = Vec::new();
-        let count = engine.generate_magic_matte(&rgb_input, 10, 20, &mut alpha_out).unwrap();
+        let count = engine
+            .generate_magic_matte(&rgb_input, 10, 20, &mut alpha_out)
+            .unwrap();
         assert_eq!(count, 2);
         assert_eq!(alpha_out.len(), 2);
 
@@ -794,7 +891,9 @@ mod tests {
         let engine = FilmcraftAiAutomatedVoiceIsolationLoudnessNormalizeV70PrEngine::new();
         let pcm = [0.1f32, -0.2, 0.3, -0.4, 0.5];
         let mut processed = Vec::new();
-        let lufs = engine.isolate_and_normalize_audio(&pcm, &mut processed).unwrap();
+        let lufs = engine
+            .isolate_and_normalize_audio(&pcm, &mut processed)
+            .unwrap();
         assert_eq!(processed.len(), 5);
         assert!(lufs < 0.0);
 
