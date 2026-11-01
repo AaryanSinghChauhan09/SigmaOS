@@ -652,7 +652,6 @@ impl OpenBsdMissingComponentsV72PrSuite {
 
     pub fn run_all_checks(&mut self) -> Vec<String> {
         let mut reports = Vec::new();
-        reports.push(format!("Suite: {}", self.suite_name));
         reports.push(self.pinsyscall_engine.get_summary());
         reports.push(self.unveil_engine.get_summary());
         reports.push(self.pledge_engine.get_summary());
@@ -815,6 +814,6 @@ mod tests {
     fn test_openbsd_master_suite_v72() {
         let mut suite = OpenBsdMissingComponentsV72PrSuite::new();
         let summaries = suite.run_all_checks();
-        assert_eq!(summaries.len(), 11);
+        assert_eq!(summaries.len(), 10);
     }
 }
