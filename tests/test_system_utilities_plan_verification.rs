@@ -47,12 +47,81 @@ fn test_system_utilities_documentation_plan_verification() {
 
     // Verify key sections and contracts exist in documentation
     assert!(docs_content.contains("SigmaOS System Utilities Development Plan"));
-    assert!(docs_content.contains("Baseline Rules & Operating Principles"));
-    assert!(docs_content.contains("Proposed 18-PR Roadmap Sequence"));
+    assert!(docs_content.contains("Baseline rules"));
+    assert!(docs_content.contains("Define each command’s contract:"));
+    assert!(docs_content.contains("Make tools composable:"));
+    assert!(docs_content.contains("Treat JSON as a separate interface:"));
+    assert!(docs_content.contains("Separate inspection from mutation:"));
+    assert!(docs_content.contains("Never claim success for an unavailable backend:"));
+    assert!(docs_content.contains("Test runtime behavior:"));
+    assert!(docs_content.contains("Keep periodic checks safe and bounded:"));
+    assert!(docs_content.contains("Use focused PRs and protected branches:"));
+
+    assert!(docs_content.contains("Proposed PR roadmap"));
+    for pr_num in 1..=18 {
+        let pr_marker = format!("| {} |", pr_num);
+        assert!(
+            docs_content.contains(&pr_marker),
+            "Missing PR marker: {}",
+            pr_marker
+        );
+    }
+    assert!(docs_content.contains("`docs(utils): audit current tools and define compatibility policy`"));
+    assert!(docs_content.contains("`feat(utils): implement minimal file and directory utilities`"));
+    assert!(docs_content.contains("`release(utils): publish utility support matrix`"));
+
     assert!(docs_content.contains("Initial High-Value Sequence Focus"));
-    assert!(docs_content.contains("Periodic Maintenance PR Cadences"));
-    assert!(docs_content.contains("PR Review Template & Merge Gates"));
-    assert!(docs_content.contains("Completion & Feature Status Gates"));
+    assert!(docs_content.contains("PRs 1–4, 11, and 15"));
+
+    assert!(docs_content.contains("Periodic maintenance PRs"));
+    let cadences = [
+        "Every PR",
+        "Weekly",
+        "Monthly",
+        "Quarterly",
+        "Each release candidate",
+        "After each incident",
+    ];
+    for cadence in &cadences {
+        assert!(
+            docs_content.contains(cadence),
+            "Missing maintenance cadence: {}",
+            cadence
+        );
+    }
+
+    assert!(docs_content.contains("Component rules"));
+    assert!(docs_content.contains("File utilities:"));
+    assert!(docs_content.contains("Text utilities:"));
+    assert!(docs_content.contains("Process utilities:"));
+    assert!(docs_content.contains("Storage utilities:"));
+    assert!(docs_content.contains("System reporting:"));
+    assert!(docs_content.contains("Maintenance runner:"));
+    assert!(docs_content.contains("Documentation:"));
+    assert!(docs_content.contains("Testing:"));
+
+    assert!(docs_content.contains("PR review template and merge gates"));
+    assert!(docs_content.contains("## Summary"));
+    assert!(docs_content.contains("## Command contract"));
+    assert!(docs_content.contains("## Runtime evidence"));
+    assert!(docs_content.contains("## Safety and side effects"));
+    assert!(docs_content.contains("## Checklist"));
+
+    assert!(docs_content.contains("Completion gate"));
+    assert!(docs_content.contains("Integrated"));
+    assert!(docs_content.contains("Supported"));
+}
+
+#[test]
+fn test_feature_status_toml_system_utilities_registration() {
+    let toml_content = fs::read_to_string("FEATURE_STATUS.toml")
+        .expect("FEATURE_STATUS.toml must exist");
+
+    assert!(toml_content.contains("[userspace.system_utilities]"));
+    assert!(toml_content.contains("docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
+    assert!(toml_content.contains("wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
+    assert!(toml_content.contains("wiki/26-System-Utilities-Development-Plan.md"));
+    assert!(toml_content.contains("src/userland/system_utilities.rs"));
 }
 
 #[test]
@@ -64,6 +133,7 @@ fn test_system_utilities_registry_and_parser_contract_verification() {
     let cat_cmd = registry.get_command("cat").expect("cat command registered");
     assert_eq!(cat_cmd.privilege, PrivilegeLevel::User);
     assert_eq!(cat_cmd.mutation, MutationBehavior::ReadOnly);
+    assert_eq!(cat_cmd.status, UtilityStatus::Integrated);
 
     let rm_cmd = registry.get_command("rm").expect("rm command registered");
     assert_eq!(rm_cmd.mutation, MutationBehavior::MutatingDestructive);
@@ -97,6 +167,29 @@ fn test_system_utilities_registry_and_parser_contract_verification() {
 
     let rm_root = RmEngine::run(&["/"], &parser);
     assert_eq!(rm_root.exit_status, EXIT_PERMISSION_DENIED);
+
+    // Test Touch and Mkdir engines
+    let touch_res = TouchEngine::run(&["/tmp/newfile.txt"], &parser);
+    assert_eq!(touch_res.exit_status, EXIT_SUCCESS);
+
+    let mkdir_res = MkdirEngine::run(&["/tmp/testdir"], &parser);
+    assert_eq!(mkdir_res.exit_status, EXIT_SUCCESS);
+
+    // Test Cp and Wc engines
+    let cp_res = CpEngine::run("/tmp/a", "/tmp/b", &parser);
+    assert_eq!(cp_res.exit_status, EXIT_SUCCESS);
+
+    let wc_res = WcEngine::run("line 1\nline 2\nword3", "file.txt", &parser);
+    assert_eq!(wc_res.exit_status, EXIT_SUCCESS);
+
+    // Test Env and Uname engines
+    let env_res = EnvEngine::run(&[("SIGMA_ENV", "testing")], &parser);
+    assert_eq!(env_res.exit_status, EXIT_SUCCESS);
+    assert!(env_res.stdout.contains("SIGMA_ENV=testing"));
+
+    let uname_res = UnameEngine::run("SigmaOS", "sigma-node", "0.1.0", "x86_64", &parser);
+    assert_eq!(uname_res.exit_status, EXIT_SUCCESS);
+    assert!(uname_res.stdout.contains("SigmaOS"));
 
     // Test Diagnostics Engine
     let diag_ok = SigmaDiagEngine::run(true, "qemu-target", 7200);
