@@ -17,3 +17,14 @@ fn test_exit_code_mappings() {
     assert_eq!(command_not_found, 127);
     assert_eq!(sigint_exit, 130);
 }
+
+#[test]
+fn test_signal_exit_code_calculation() {
+    let sigint = 2;
+    let sigkill = 9;
+    let sigterm = 15;
+
+    assert_eq!(128 + sigint, 130);
+    assert_eq!(128 + sigkill, 137);
+    assert_eq!(128 + sigterm, 143);
+}

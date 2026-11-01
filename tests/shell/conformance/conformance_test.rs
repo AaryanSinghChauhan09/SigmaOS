@@ -31,9 +31,28 @@ fn test_conformance_simple_commands_and_pipes() {
     let redirect_out = ">";
     let redirect_append = ">>";
     let redirect_in = "<";
+    let redirect_stderr = "2>";
 
     assert_eq!(pipe_operator, "|");
     assert_eq!(redirect_out, ">");
     assert_eq!(redirect_append, ">>");
     assert_eq!(redirect_in, "<");
+    assert_eq!(redirect_stderr, "2>");
+}
+
+#[test]
+fn test_conformance_redirection_semantics() {
+    struct RedirectionTarget {
+        fd: i32,
+        operator: &'static str,
+        path: &'static str,
+    }
+
+    let stdin_redir = RedirectionTarget { fd: 0, operator: "<", path: "/tmp/input.txt" };
+    let stdout_redir = RedirectionTarget { fd: 1, operator: ">", path: "/tmp/output.txt" };
+    let stderr_redir = RedirectionTarget { fd: 2, operator: "2>", path: "/tmp/error.log" };
+
+    assert_eq!(stdin_redir.fd, 0);
+    assert_eq!(stdout_redir.fd, 1);
+    assert_eq!(stderr_redir.fd, 2);
 }

@@ -15,3 +15,18 @@ fn test_diagnostics_formatting_output() {
     assert!(not_found_err.contains("command not found"));
     assert!(not_found_err.contains("did you mean 'grep'?"));
 }
+
+#[test]
+fn test_diagnostics_redirection_error_message() {
+    let redir_err = ShellDiagnosticsEngine::format_redirection_error("/etc/shadow", "Permission denied");
+    assert_eq!(redir_err, "sigma-sh: /etc/shadow: Permission denied");
+}
+
+#[test]
+fn test_diagnostics_unclosed_block_error() {
+    let unclosed_err = ShellDiagnosticsEngine::format_unclosed_block_error("while", 5);
+    assert_eq!(
+        unclosed_err,
+        "sigma-sh: unclosed construct 'while' originating at line 5"
+    );
+}
