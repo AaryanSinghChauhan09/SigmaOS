@@ -1,45 +1,21 @@
 ## Summary
 
-<!-- What changed and why? -->
+<!-- What kernel behavior changed and why? -->
 
-## Task type
+## Kernel component
 
-- [ ] Daily CI maintenance
-- [ ] Weekly dependency/security review
-- [ ] Weekly open-source study
-- [ ] Biweekly component gap review
-- [ ] Monthly boot validation
-- [ ] Monthly installer/recovery rehearsal
-- [ ] Monthly package/update rehearsal
-- [ ] Quarterly release review
-- [ ] Quarterly architecture review
-- [ ] Quarterly hardware audit
-
-## Component
-
-- [ ] Boot / platform
-- [ ] Kernel
-- [ ] Memory
-- [ ] Scheduler
+- [ ] Boot / arch init
+- [ ] Interrupts / traps
+- [ ] Memory / paging / swap
+- [ ] Scheduler / processes
 - [ ] VFS / filesystems
-- [ ] Syscalls
+- [ ] Syscalls / ELF
 - [ ] Drivers
-- [ ] Networking
-- [ ] IPC
-- [ ] Security
-- [ ] Userspace
-- [ ] Desktop
-- [ ] Packaging / installer
-- [ ] Documentation
-- [ ] CI / tooling
-
-## Summary
-
-<!-- What behavior changed and why? -->
-
-## Summary
-
-<!-- What I/O-management behavior changed and why? -->
+- [ ] Networking / sockets
+- [ ] IPC / signals / timers
+- [ ] Security / capabilities
+- [ ] Diagnostics
+- [ ] Build / CI
 
 ## Component impact
 
@@ -47,36 +23,28 @@
 - User-visible behavior:
 - Related issue or plan:
 
-## I/O component
-
-- [ ] I/O policy
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Interrupt manager
-- [ ] DMA manager
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] Submit / complete
-- [ ] Callback
-- [ ] Interrupt
-- [ ] DMA
-- [ ] Buffer
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
-
 ## Recurring task
 
-- [ ] PR validation
+- [ ] PR-level validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
+- [ ] Weekly subsystem review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly I/O audit
-- [ ] Biweekly signal/wait audit
+- [ ] Biweekly syscall/ABI review
+- [ ] Biweekly memory/concurrency audit
 - [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Monthly driver/hardware audit
+- [ ] Monthly fuzz triage
+- [ ] Monthly diagnostics rehearsal
+- [ ] Quarterly release/architecture/security review
+
+## Reference study
+
+<!-- Required for design-changing kernel PRs -->
+
+- Study document:
+- Linux/BSD/Redox/xv6 reference:
+- Decision: Adopt / Adapt / Reject
+- Reason:
 
 ## Upstream study and reference behavior
 
@@ -94,56 +62,20 @@
 -
 -
 
-## Evidence
+## Kernel safety review
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New or updated tests
-- [ ] QEMU boot evidence, if applicable
-- [ ] Installer/recovery evidence, if applicable
-- [ ] Hardware evidence, if applicable
-- [ ] Security review requested, if applicable
-
-## Status updates
-
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Roadmap or release checklist
-
-## Reference behavior
-
-<!-- Required for lifecycle, ABI, or I/O changes -->
-
-- POSIX section:
-- Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
-
-## Changes
-
--
--
-
-## I/O safety review
-
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
+- [ ] No unnecessary `unsafe`
+- [ ] Every `unsafe` block documents invariants
+- [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Allocation limits defined
+- [ ] OOM behavior defined
+- [ ] Error paths tested
+- [ ] No silent failure introduced
 
-## Security review
+## Shell safety review
 
-- Kernel safety review:
+- Shell safety review:
 - Capability/namespace checks enforced:
 - Shared-memory or descriptor implications:
 - Input validation and failure behavior:
@@ -156,6 +88,24 @@
 - Blocking behavior:
 - Non-blocking behavior:
 - EOF / closure behavior:
+
+## Security review
+
+- Kernel safety review:
+- Capability/namespace checks enforced:
+
+## Evidence
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or reason for exemption
+- [ ] QEMU boot evidence, if boot-affecting
+- [ ] Driver/hardware evidence, if driver-affecting
+- [ ] Security review requested, if applicable
 
 ## Verification
 
@@ -210,3 +160,18 @@
 - APIs, ABI, protocols, or file formats affected:
 - Cross-repository synchronization required:
 - Release or migration notes:
+
+## Status updates
+
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Component documentation
+- [ ] Boot matrix, if applicable
+- [ ] Hardware matrix, if applicable
+
+## Risks and rollback
+
+- Risk:
+- Rollback:
+- Risks and rollback:
+- Recovery or downgrade procedure:

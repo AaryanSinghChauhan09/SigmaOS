@@ -1,25 +1,17 @@
 # SigmaOS Capability Policy
 
-## Overview
-SigmaOS implements capability-based security. Rather than granting monolithic root privileges, processes possess explicit, granular capability bits modeled after POSIX capabilities and Capsicum rights.
+## Capability System
 
----
+SigmaOS utilizes fine-grained process capabilities to restrict root/privileged system operations.
 
-## Granular Capability Hierarchy
+## Enforceable Capabilities
 
-| Capability | Description | Permitted Subsystems |
-|---|---|---|
-| `CAP_SYS_ADMIN` | Reserved for core init and mount management | Init (PID 1), Mount daemon |
-| `CAP_NET_BIND_SERVICE` | Bind to privileged network ports (< 1024) | NetworkManager, Web servers |
-| `CAP_NET_RAW` | Transmit raw Ethernet and IP frames | Packet diagnostics, Ping |
-| `CAP_SYS_RAWIO` | Direct I/O port and MMIO register access | Serial driver, PCI bus controller |
-| `CAP_IPC_LOCK` | Lock pages into physical RAM (mlock) | Cryptographic vault, Real-time audio |
-| `CAP_SYS_PTRACE` | Trace system calls and debug arbitrary tasks | Process debugger (`kdb`, `gdb`) |
-| `CAP_DAC_OVERRIDE` | Bypass standard file read/write permissions | Backup service, Package installer |
+- `CAP_SYS_ADMIN`: Overall system administration and hardware configuration.
+- `CAP_NET_ADMIN`: Network interface and routing configuration.
+- `CAP_DAC_OVERRIDE`: Bypass file read/write permission checks.
+- `CAP_SYS_PTRACE`: Process tracing and debugging inspection.
+- `CAP_SYS_RAWIO`: Raw port/device I/O access.
 
----
+## Enforcement
 
-## Capability Enforcement Rules
-1. **Inheritance Restriction**: Capabilities are dropped across `execve` unless explicitly flagged as inheritable in the binary metadata.
-2. **Ambient Disallowance**: Ambient capability sets default to empty.
-3. **Bounding Sets**: Subprocesses cannot acquire capabilities outside their configured bounding set.
+Capabilities are attached to process descriptors and checked explicitly at syscall boundaries.

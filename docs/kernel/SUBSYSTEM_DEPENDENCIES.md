@@ -1,57 +1,22 @@
-# SigmaOS Kernel Subsystem Dependencies & Initialization Graph
+# SigmaOS Subsystem Dependencies Map
 
-## Hierarchy & Boot Sequence
-Subsystem initialization follows a strict directed acyclic graph (DAG). Cyclic dependencies between kernel modules are prohibited by automated architecture checks.
+## Dependency Hierarchy
 
-```
-+------------------------+
-| 1. Firmware & ACPI     |
-+-----------+------------+
-            |
-            v
-+------------------------+
-| 2. GDT / IDT & Traps   |
-+-----------+------------+
-            |
-            v
-+------------------------+
-| 3. Physical Allocator  |
-+-----------+------------+
-            |
-            v
-+------------------------+
-| 4. Virtual Memory/Page |
-+-----------+------------+
-            |
-            v
-+------------------------+
-| 5. APIC & Timers       |
-+-----------+------------+
-            |
-            v
-+------------------------+
-| 6. Scheduler Core      |
-+-----------+------------+
-            |
-            v
-+------------------------+
-| 7. Virtual File System |
-+-----------+------------+
-            |
-            v
-+------------------------+
-| 8. Device Drivers      |
-+-----------+------------+
-            |
-            v
-+------------------------+
-| 9. Userspace Init (PID1|
-+------------------------+
+```text
+1. Firmware (UEFI / BIOS)
+   └─► 2. Bootloader (boot/arch init)
+         └─► 3. Kernel Entry & Early CPU Init
+               ├─► 4. Memory Allocators & Paging (src/memory, src/mm)
+               ├─► 5. Interrupt & Exception Handlers (src/interrupt)
+               ├─► 6. Scheduler & Process Control (src/scheduler, src/process)
+               ├─► 7. VFS & Filesystem Mounts (src/fs, src/filesystem)
+               ├─► 8. Driver Probe & Device Initialization (src/drivers, src/storage)
+               ├─► 9. IPC, Signals, Timers (src/ipc, src/signal, src/timer)
+               └─► 10. Userspace Init Launch -> 11. Interactive Shell Ready
 ```
 
----
+## Subsystem Isolation Rules
 
-## Dependency Rules
-1. **Memory Before Scheduler**: The scheduler must not allocate thread control blocks or run-queue buckets before the virtual memory manager has mapped heap and stack regions.
-2. **Interrupt Safety**: Interrupts must remain disabled until the interrupt descriptor table (IDT) and APIC controllers are completely initialized.
-3. **Driver Isolation**: Drivers interact with hardware solely via defined MMIO or I/O port abstractions granted by the architecture subsystem.
+1. Paging and physical memory managers must not depend on high-level VFS or process structures.
+2. Interrupt handlers must be interrupt-safe and must not invoke blocking locks or dynamic allocation unless explicitly permitted.
+3. Drivers interface with generic kernel subsystems (VFS, block layer, network stack) through typed abstractions.
