@@ -42,10 +42,8 @@ __pycache__/
 !wiki/ipc-handler.md
 !docs/DISPATCHER_PLAN.md
 !wiki/DISPATCHER_PLAN.md
-!docs/SCHEDULER_STATUS_AND_INVARIANTS.md
-!wiki/SCHEDULER_STATUS_AND_INVARIANTS.md
-!docs/SCHEDULER_DEVELOPMENT_PLAN.md
-!wiki/SCHEDULER_DEVELOPMENT_PLAN.md
+!docs/PROCESS_SYNCHRONIZATION_PLAN.md
+!wiki/PROCESS_SYNCHRONIZATION_PLAN.md
 !docs/shell/
 !docs/shell/*.md
 !docs/studies/

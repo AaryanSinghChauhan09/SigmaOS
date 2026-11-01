@@ -24,13 +24,13 @@ mod pipe;
 #[path = "../../src/kernel/eventfd.rs"]
 mod eventfd;
 
-use wait_queue::*;
-use sigma_spinlock::*;
-use semaphore::*;
-use futex::*;
-use flock::*;
-use pipe::*;
 use eventfd::*;
+use flock::*;
+use futex::*;
+use pipe::*;
+use semaphore::*;
+use sigma_spinlock::*;
+use wait_queue::*;
 
 #[test]
 fn test_plan_wait_queue_contract() {
@@ -95,7 +95,10 @@ fn test_plan_semaphore_contract() {
     let mgr = SemaphoreManager::new();
     let set_id = mgr.create_semaphore_set(100);
     let sem_id = mgr.create_semaphore(set_id, 0, 10).unwrap();
-    assert_eq!(mgr.try_wait(set_id, sem_id).unwrap(), SemaphoreResult::WouldBlock);
+    assert_eq!(
+        mgr.try_wait(set_id, sem_id).unwrap(),
+        SemaphoreResult::WouldBlock
+    );
 }
 
 #[test]
@@ -111,7 +114,19 @@ fn test_plan_futex_contract() {
     assert_eq!(queue.len(), 0);
 
     let mut manager = FutexManager::new();
-    assert!(manager.futex_op(0x1000, FutexOp::Wait, 42, 42, 0, 0, 100, 1, FutexFlags::PRIVATE).is_ok());
+    assert!(manager
+        .futex_op(
+            0x1000,
+            FutexOp::Wait,
+            42,
+            42,
+            0,
+            0,
+            100,
+            1,
+            FutexFlags::PRIVATE
+        )
+        .is_ok());
     assert_eq!(manager.stats().active_waiters, 1);
 }
 
@@ -158,6 +173,38 @@ fn test_plan_eventfd_contract() {
     let val = efd.read().unwrap();
     assert_eq!(val, 5);
     assert!(!efd.is_readable());
+}
+
+#[test]
+fn test_process_synchronization_documentation_plan_verification() {
+    use std::fs;
+
+    let docs_plan = fs::read_to_string("docs/PROCESS_SYNCHRONIZATION_PLAN.md")
+        .expect("docs/PROCESS_SYNCHRONIZATION_PLAN.md must exist");
+    let wiki_plan = fs::read_to_string("wiki/PROCESS_SYNCHRONIZATION_PLAN.md")
+        .expect("wiki/PROCESS_SYNCHRONIZATION_PLAN.md must exist");
+
+    assert!(docs_plan
+        .contains("SigmaOS Process Synchronization Master Architecture & PR Proposal Plan"));
+    assert!(docs_plan.contains("Core Design Rules"));
+    assert!(docs_plan.contains("Name the synchronization domain"));
+    assert!(docs_plan.contains("Separate lock from event"));
+    assert!(docs_plan.contains("Never sleep in atomic context"));
+    assert!(docs_plan.contains("Specify ownership and failure semantics"));
+    assert!(docs_plan.contains("Wait on predicates, not notifications"));
+    assert!(docs_plan.contains("Prevent lost wakeups"));
+    assert!(docs_plan.contains("Use explicit memory ordering"));
+    assert!(docs_plan.contains("Address priority inversion and starvation"));
+    assert!(docs_plan.contains("Treat user-memory objects as untrusted"));
+    assert!(docs_plan.contains("Test races systematically"));
+    assert!(docs_plan.contains("Proposed PR Sequence Roadmap"));
+    assert!(docs_plan.contains("Priority order:"));
+    assert!(docs_plan.contains("Periodic Maintenance PR Cadence"));
+    assert!(docs_plan.contains("Component-Specific Rules"));
+    assert!(docs_plan.contains("PR Review Template and Merge Gates"));
+    assert!(docs_plan.contains("Completion Gates"));
+
+    assert_eq!(docs_plan, wiki_plan, "wiki/PROCESS_SYNCHRONIZATION_PLAN.md must mirror docs/PROCESS_SYNCHRONIZATION_PLAN.md exactly");
 }
 
 #[test]
