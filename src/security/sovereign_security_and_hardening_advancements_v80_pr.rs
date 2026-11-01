@@ -488,10 +488,15 @@ impl IdentityAndEnterpriseAuthV80Engine {
 
     /// Validate Kerberos v5 Ticket Granting Ticket (TGT) realm and principal structure.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
-        !realm.is_empty()
-            && !principal.is_empty()
-            && principal.contains('@')
-            && !ticket_bytes.is_empty()
+        if realm.is_empty() || principal.is_empty() || ticket_bytes.is_empty() {
+            return false;
+        }
+        if let Some(at_idx) = principal.rfind('@') {
+            let principal_realm = &principal[at_idx + 1..];
+            principal_realm == realm
+        } else {
+            false
+        }
     }
 
     /// Generate SSSD domain configuration block text.
