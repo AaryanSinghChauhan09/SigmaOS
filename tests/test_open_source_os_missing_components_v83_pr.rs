@@ -29,7 +29,7 @@ fn test_integration_individual_v83_engines() {
     assert!(report.contains("Feature Parity Matrix V83"));
 
     let sched = Linux637SchedExtAiPredictivePowerGovernorEngineV83::new();
-    assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5800);
+    assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5600);
 
     let freebsd = FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV83::new();
     assert!(freebsd.verify_jail_vnet_isolation(10));
@@ -54,15 +54,15 @@ fn test_integration_individual_v83_engines() {
     assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
 
     let illumos = IllumosCrossbowVnicDtraceSwitchMeshEngineV83::new();
-    assert_eq!(illumos.probe_vnic_latency(5), 2);
+    assert_eq!(illumos.probe_vnic_latency(5), 1);
 
     let mut omarchy = OmarchyWallustThemeChordNavigatorEngineV83::new();
     assert!(omarchy.reload_theme("Dark-V83"));
     assert_eq!(omarchy.active_theme, "Dark-V83");
 
-    let media = GlobalTechMedia39PortalUnimplementedIdeasEngineV83::new();
+    let media = GlobalTechMedia40PortalUnimplementedIdeasEngineV83::new();
     let page = media.generate_wiki_documentation_page("V83 Test");
-    assert!(page.contains("39 Tech Media Portals"));
+    assert!(page.contains("40 Tech Media Portals"));
 
     let adapter = UniversalSubsystemCrossDistroAdapterEngineV83::new();
     assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));
