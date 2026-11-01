@@ -21,6 +21,10 @@
 
 <!-- What secondary-memory behavior changed and why? -->
 
+## Summary
+
+<!-- What secondary-memory, kernel, IPC, shell, or system behavior changed and why? -->
+
 ## Component impact
 
 - Component/repository:
@@ -55,23 +59,17 @@
 
 ## Upstream study and reference behavior
 
-- Reference study:
-- Upstream project, document, or behavior reviewed:
-- POSIX section:
-- Bash/dash/Zsh/BusyBox reference:
-- SigmaOS current behavior:
-- What SigmaOS adopts:
-- What remains intentionally different:
-- Compatibility impact:
-
-## Reference behavior
-
 <!-- Required for lifecycle, ABI, or storage changes -->
 
+- Upstream study:
+- Reference study:
+- Upstream project, document, or behavior reviewed:
 - POSIX section:
 - Linux/BSD/Redox/xv6 reference:
 - SigmaOS current behavior:
 - New behavior:
+- What SigmaOS adopts:
+- What remains intentionally different:
 - Compatibility impact:
 
 ## Changes
@@ -95,7 +93,24 @@
 ## Security review
 
 - Kernel safety review:
+- Safety and rollback:
+- Reviewer checklist:
+
+## Shell safety review
+
+- Shell safety review:
 - Capability/namespace checks enforced:
+- Shared-memory or descriptor implications:
+- Input validation and failure behavior:
+- Rollback or downgrade path:
+
+## IPC handler
+
+- [ ] This change affects IPC handler behavior, or I confirm it does not.
+- IPC semantics:
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
 
 ## Evidence
 
@@ -105,18 +120,10 @@
 - [ ] `./run_sigma_tests.sh`
 - [ ] New/updated unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or reason for exemption
-- [ ] QEMU boot evidence, if boot-affecting
-- [ ] Driver/hardware evidence, if driver-affecting
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Storage benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
-
-## IPC handler
-
-- [ ] This change affects IPC handler behavior, or I confirm it does not.
-- IPC semantics:
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
 
 ## Verification
 
@@ -134,31 +141,12 @@
 - Test/evidence commands:
 - Results:
 
-## Evidence
-
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Storage benchmark, if performance-affecting
-- [ ] Security review requested, if applicable
-
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
 - [ ] Storage documentation
 - [ ] Boot matrix, if applicable
-
-## Risks and rollback
-
-- Risk:
-- Rollback:
-- Recovery or downgrade procedure:
 
 ## Capability status
 
@@ -171,3 +159,10 @@
 - APIs, ABI, protocols, or file formats affected:
 - Cross-repository synchronization required:
 - Release or migration notes:
+
+## Risks and rollback
+
+- Risks and rollback:
+- Risk:
+- Rollback:
+- Recovery or downgrade procedure:

@@ -1,35 +1,43 @@
-# Architectural Decision Record: Secondary Memory Lifecycle Subsystem
+# ADR 0004: SigmaOS Secondary Memory Lifecycle and Architecture
 
 ## Status
 Accepted
 
 ## Context
-SigmaOS previously featured isolated models and prototype drivers across ZFS, swap, paging, virtio, and userland filesystems. However, without an authoritative lifecycle state machine, bounded queue allocations, and typed failure recovery contracts, the storage layer risked memory leaks, request exhaustion panics, lost completions, lost writebacks, and filesystem corruption upon sudden device detachment or I/O failure.
-
-A secondary memory subsystem must govern persistent block devices, storage controllers, caches, mount trees, and filesystems under strict bounds and reproducible recovery guarantees.
+SigmaOS requires a robust, observable, and recoverable secondary memory subsystem to handle block storage,
+caching, filesystems, and swap/paging. Historically, storage components existed as isolated models,
+lacking unified lifecycle state machine guarantees, bounds on kernel memory queues, and fail-safe recovery
+contracts. Without a formal lifecycle and clear boundaries, system hangs, double-completions, lost writebacks,
+and filesystem corruption could occur under hardware failure or memory pressure.
 
 ## Decision
-
-1. **One Authoritative Lifecycle State Machine**:
-   Adopt an explicit 11-stage storage lifecycle:
+1. **Authoritative 11-Stage Storage Lifecycle**:
+   Enforce a deterministic lifecycle sequence:
    `probe -> identify -> block layer -> cache -> filesystem -> mount -> read/write -> flush -> unmount -> detach -> error/recovery`.
-   Every transition has strict preconditions, atomic operations, and deterministic post-conditions.
+   Every subsystem component must adhere to its stage-specific contracts.
 
-2. **Bounded Resource Allocation**:
-   All request queues, cache metadata pools, and volume capacity quotas must be strictly bounded at allocation time. Unbounded growth is forbidden. When resource capacity is reached, functions must return typed errors (`RequestExhaustion`, `CapacityExceeded`, `CacheFull`) rather than allocating unboundedly or panicking.
+2. **Bounded Block Device Management**:
+   Block device request queues must be bounded. Request allocation must be race-free, and completions must
+   occur exactly once. Duplicate completions (`BlockError::DoubleCompletion`) and request exhaustion
+   (`BlockError::RequestExhaustion`) are explicitly rejected and typed.
 
-3. **Exactly-Once Request Completion**:
-   Block requests transition monotonically through `Unallocated -> Pending -> InFlight -> Completed -> Reaped`. Double-completion and lost-completion are detected and rejected. Request IDs cannot be reused until reaped.
+3. **Hybrid Page/Buffer Cache with LRU and OOM Observability**:
+   Block caching is bounded by maximum page limits. Dirty pages are committed prior to eviction to prevent
+   lost updates. Cache pressure is categorized into observable watermarks (`Normal`, `PressureWarn`, `OomCritical`).
 
-4. **Failure-Safe Mount and Lost-Update Prevention**:
-   Filesystem mounts must implement rollback on failure. Volume modifications and file transactions track monotonically increasing sequence numbers and transaction records (`FileTransactionRecord`) to detect and abort conflicting concurrent updates (`LostUpdateDetected`).
-
-5. **Observable OOM and Watermark Semantics**:
-   The cache manager models memory pressure through explicit watermarks (`Normal`, `HighPressure`, `OomCritical`), exposing eviction metrics and writeback statistics for system telemetry and governor daemons.
+4. **Failure-Safe Mount and Transactional Filesystem Core**:
+   Filesystem allocations must be checked against hard volume boundaries. Filesystem transactions prevent lost
+   updates by validating transaction IDs at commit time. Mount points are tracked in a centralized table
+   preventing duplicate mounts and double unmounts.
 
 ## Consequences
 
-- **Positive**: Eliminates arbitrary memory leaks in storage request paths. Prevents data corruption from race conditions during mount/unmount and cache eviction.
-- **Positive**: Provides clear observability into storage queue depth, cache hit rates, and error conditions.
-- **Negative**: Adds explicit bounds checking and status validation overhead across storage subsystem calls.
-- **Neutral**: Requires driver implementations and test suites to adhere strictly to the lifecycle state machine and PR evidence standards.
+### Positive
+- Predictable and bounded kernel memory utilization under heavy I/O loads.
+- Complete observability into request states, cache watermarks, and filesystem health.
+- Clear error propagation and fail-safe recovery preventing persistent filesystem corruption.
+- Full compliance with `STORAGE_RULES.toml` and pull request verification standards.
+
+### Negative
+- Requests exceeding bounded queue depth will fail or require upper-layer retry/throttling.
+- Slight metadata overhead to track transaction logs and cache page timestamps.

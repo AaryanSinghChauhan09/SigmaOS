@@ -1,34 +1,31 @@
-# SigmaOS Filesystem & Mount Policy
+# SigmaOS Mount and Filesystem Policy
 
 ## Overview
-This document specifies the filesystem core manager and mount subsystem contracts implemented in `src/filesystem/core.rs` and `src/filesystem/mount.rs`.
+The mount and filesystem subsystem handles VFS mount points, filesystem lifecycle state machines,
+volume capacity tracking, and transactional durability.
 
-## Requirements & Invariants
+## Core Requirements
 
-### 1. Race-Free Mount Operations
-- All mount operations register in the global mount table (`MountManager`) protected by atomic lifecycle checks.
-- A mount entry transitions monotonically: `Unmounted -> Mounting -> Mounted -> Unmounting -> Unmounted`.
-- Concurrent mount attempts targeting the same mount point or block device are serialized or rejected.
+### 1. Atomic, Race-Free Mount Operations
+- Mount points are registered in a synchronized table (`MountManager`).
+- Re-mounting an active path returns `MountError::AlreadyMounted`.
+- Mount initialization validates device presence, permissions, and superblock consistency.
+- Any failure during mount setup initiates automatic rollback of acquired locks and data structures.
 
-### 2. Bounded Filesystem Capacity
-- Volumes register with strict capacity bounds (`VolumeCapacityBounds`):
-  - Total and used storage bytes (`total_bytes`, `used_bytes`).
-  - Total and used inode counts (`total_inodes`, `used_inodes`).
-- Allocation requests exceeding free space return `Err(FsCoreError::CapacityExceeded)` immediately.
+### 2. Double-Unmount Prevention
+- Unmounting transitions mount state: `Mounted -> Unmounting -> Unmounted`.
+- Attempting to unmount a path that is not mounted returns `MountError::NotMounted`.
+- All file descriptors open on the unmounting filesystem must be drained or revoked prior to detachment.
 
-### 3. Failure-Safe Mount / Unmount and Rollback
-- If volume verification, journal replay, or permission checks fail during `mount()`, `MountManager` triggers an automatic rollback (`MountError::RollbackSuccessful`), restoring the mount state cleanly to `Unmounted`.
-- No orphan mounts or half-mounted filesystems can linger.
+### 3. Bounded Filesystem Capacity
+- Volumes registered with `FilesystemCoreManager` specify fixed storage capacity limits (`total_capacity_bytes`).
+- Attempting to allocate blocks beyond remaining volume capacity returns `FsCoreError::CapacityExceeded`.
 
 ### 4. Lost-Update Prevention
-- File transactions and metadata modifications record atomic sequence numbers (`FileTransactionRecord`).
-- When committing changes via `commit_transaction(tx_id, sequence_number)`, the core verifies that the transaction sequence matches expected monotonic progression.
-- Mismatched or stale sequence commits return `Err(FsCoreError::LostUpdateDetected)` and are rejected.
+- Filesystem core tracks mutations through transactional records (`FileTransactionRecord`).
+- Committing a transaction verifies current file version against the transaction start version.
+- Mismatched versions indicate concurrent mutation and return `FsCoreError::LostUpdateDetected`.
 
-### 5. Double-Unmount Prevention
-- Attempting to unmount a target that is already unmounted or not registered returns `Err(MountError::NotMounted)` or `Err(MountError::DoubleUnmount)`.
-- References and allocated resources are freed exactly once.
-
-### 6. Observable Health and OOM Enforcement
-- Volume health status is continuously tracked in `health_map` (`Healthy`, `Degraded`, `ReadOnly`, `Corrupted`).
-- Capacity thresholds and out-of-space events emit structured diagnostics, enabling administrative intervention before hard filesystem corruption occurs.
+### 5. Health Monitoring and Recovery
+- Filesystem health status is tracked per volume (`FsHealthStatus::Healthy`, `Degraded`, `ReadOnly`, `Corrupted`).
+- Storage errors cause automated transition to `ReadOnly` or trigger self-healing rebuilds.
