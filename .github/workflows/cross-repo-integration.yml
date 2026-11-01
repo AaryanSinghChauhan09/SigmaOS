@@ -24,6 +24,41 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
+  submodule-cargo-check:
+    name: Submodule cargo check (${{ matrix.repo }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - repo: SigmaOS-kernel
+            git_url: https://github.com/AaryanSinghChauhan09/SigmaOS-kernel.git
+          - repo: SigmaOS-filesystem
+            git_url: https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem.git
+          - repo: SigmaOS-network
+            git_url: https://github.com/AaryanSinghChauhan09/SigmaOS-network.git
+          - repo: SigmaOS-security
+            git_url: https://github.com/AaryanSinghChauhan09/SigmaOS-security.git
+          - repo: SigmaOS-system
+            git_url: https://github.com/AaryanSinghChauhan09/SigmaOS-system.git
+          - repo: SigmaOS-desktop
+            git_url: https://github.com/AaryanSinghChauhan09/SigmaOS-desktop.git
+          - repo: SigmaOS-packages
+            git_url: https://github.com/AaryanSinghChauhan09/SigmaOS-packages.git
+    steps:
+      - name: Checkout ${{ matrix.repo }}
+        uses: actions/checkout@v4
+        with:
+          repository: AaryanSinghChauhan09/${{ matrix.repo }}
+          path: repo
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: cargo check --lib (${{ matrix.repo }})
+        run: cargo check --lib
+        working-directory: repo
+
   boot-chain-validation:
     name: Boot Chain Validation
     runs-on: ubuntu-latest
@@ -169,6 +204,7 @@ jobs:
     name: Trigger Component Repository Workflows
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && success()
+    needs: [submodule-cargo-check]
     steps:
       - name: Checkout main repository
         uses: actions/checkout@v4
@@ -214,7 +250,7 @@ jobs:
     name: Integration Test Summary
     runs-on: ubuntu-latest
     if: always()
-    needs: [boot-chain-validation, version-matrix-consistency, dependency-health-check]
+    needs: [submodule-cargo-check, boot-chain-validation, version-matrix-consistency, dependency-health-check]
     steps:
       - name: Generate integration test report
         run: |
@@ -222,12 +258,14 @@ jobs:
           echo ""
           echo "| Check | Status |"
           echo "|-------|--------|"
+          echo "| Submodule cargo check (all 7) | ${{ needs.submodule-cargo-check.result }} |"
           echo "| Boot Chain Validation | ${{ needs.boot-chain-validation.result }} |"
           echo "| Version Matrix | ${{ needs.version-matrix-consistency.result }} |"
           echo "| Dependency Health | ${{ needs.dependency-health-check.result }} |"
           echo ""
           
-          if [ "${{ needs.boot-chain-validation.result }}" = "success" ] && \
+          if [ "${{ needs.submodule-cargo-check.result }}" = "success" ] && \
+             [ "${{ needs.boot-chain-validation.result }}" = "success" ] && \
              [ "${{ needs.version-matrix-consistency.result }}" = "success" ] && \
              [ "${{ needs.dependency-health-check.result }}" = "success" ]; then
             echo "✅ All cross-repo integration checks passed"

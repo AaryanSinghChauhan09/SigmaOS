@@ -2,24 +2,26 @@
 	path = src_modules/SigmaOS-kernel
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-kernel.git
 
-[submodule "SigmaOS-filesystem"]
+[submodule "src_modules/SigmaOS-filesystem"]
 	path = src_modules/SigmaOS-filesystem
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem
 
-[submodule "SigmaOS-network"]
+[submodule "src_modules/SigmaOS-network"]
 	path = src_modules/SigmaOS-network
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-network.git
-[submodule "SigmaOS-security"]
+
+[submodule "src_modules/SigmaOS-security"]
 	path = src_modules/SigmaOS-security
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-security.git
 
-[submodule "SigmaOS-system"]
+[submodule "src_modules/SigmaOS-system"]
 	path = src_modules/SigmaOS-system
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-system.git
 
-[submodule "SigmaOS-desktop"]
+[submodule "src_modules/SigmaOS-desktop"]
 	path = src_modules/SigmaOS-desktop
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-desktop.git
-[submodule "SigmaOS-packages"]
+
+[submodule "src_modules/SigmaOS-packages"]
 	path = src_modules/SigmaOS-packages
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-packages.git
