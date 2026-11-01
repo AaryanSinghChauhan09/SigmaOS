@@ -496,11 +496,11 @@ LICENSE
   git -C "$repodir" config user.email "sigmaos-bot@users.noreply.github.com"
   git -C "$repodir" config user.name  "SigmaOS Bot"
 
-  git -C "$repodir" add .gitignore LICENSE src/.gitkeep -q
-  git -C "$repodir" commit -m "chore: initial skeleton (main branch)" -q
+  git -C "$repodir" add .gitignore LICENSE src/.gitkeep
+  git -C "$repodir" commit -m "chore: initial skeleton (main branch)" --quiet
 
   git -C "$repodir" remote add origin "https://github.com/${OWNER}/${repo}.git"
-  git -C "$repodir" push -u origin main -q
+  git -C "$repodir" push -u origin main --quiet
 }
 
 # ---------------------------------------------------------------------------
@@ -511,7 +511,7 @@ bootstrap_docs() {
   local desc="$2"
   local repodir="${WORKDIR}/${repo}"
 
-  git -C "$repodir" checkout -b docs -q
+  git -C "$repodir" checkout -b docs
 
   cat > "${repodir}/README.md" <<README
 # ${repo}
@@ -532,12 +532,12 @@ for contribution instructions, build requirements, and architecture docs.
 [MIT](LICENSE) © $(date +%Y) AaryanSinghChauhan09
 README
 
-  git -C "$repodir" add README.md -q
-  git -C "$repodir" commit -m "docs: add README on docs branch" -q
-  git -C "$repodir" push -u origin docs -q
+  git -C "$repodir" add README.md
+  git -C "$repodir" commit -m "docs: add README on docs branch" --quiet
+  git -C "$repodir" push -u origin docs --quiet
 
   # Switch back to main — nothing else to do
-  git -C "$repodir" checkout main -q
+  git -C "$repodir" checkout main --quiet
 }
 
 # ---------------------------------------------------------------------------
