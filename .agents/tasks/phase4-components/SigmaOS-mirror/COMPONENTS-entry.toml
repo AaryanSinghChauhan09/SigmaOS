@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-mirror"
+description = "Repository mirror management tool for automating package repository synchronisation"
+category = "system"
+license = "MIT"

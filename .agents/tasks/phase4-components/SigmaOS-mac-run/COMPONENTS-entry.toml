@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-mac-run"
+description = "macOS application compatibility layer providing runtime shims for SigmaOS"
+category = "compatibility"
+license = "MIT"

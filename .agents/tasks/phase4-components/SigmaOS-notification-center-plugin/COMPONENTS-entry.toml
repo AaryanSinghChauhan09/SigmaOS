@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-notification-center-plugin"
+description = "Notification center panel plugin aggregating system notifications into a history panel"
+category = "panel-applets"
+license = "MIT"

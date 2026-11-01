@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-mozjs"
+description = "Mozilla SpiderMonkey JavaScript engine integration for SigmaOS shell extensions"
+category = "runtime"
+license = "MIT"
