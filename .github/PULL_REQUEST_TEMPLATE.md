@@ -1,4 +1,37 @@
-# SigmaOS pull request
+## Summary
+
+<!-- What changed and why? -->
+
+## Task type
+
+- [ ] Daily CI maintenance
+- [ ] Weekly dependency/security review
+- [ ] Weekly open-source study
+- [ ] Biweekly component gap review
+- [ ] Monthly boot validation
+- [ ] Monthly installer/recovery rehearsal
+- [ ] Monthly package/update rehearsal
+- [ ] Quarterly release review
+- [ ] Quarterly architecture review
+- [ ] Quarterly hardware audit
+
+## Component
+
+- [ ] Boot / platform
+- [ ] Kernel
+- [ ] Memory
+- [ ] Scheduler
+- [ ] VFS / filesystems
+- [ ] Syscalls
+- [ ] Drivers
+- [ ] Networking
+- [ ] IPC
+- [ ] Security
+- [ ] Userspace
+- [ ] Desktop
+- [ ] Packaging / installer
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## Summary
 
@@ -53,9 +86,34 @@
 - What remains intentionally different:
 - Compatibility impact:
 
+## Changes
+
+-
+-
+
+## Evidence
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New or updated tests
+- [ ] QEMU boot evidence, if applicable
+- [ ] Installer/recovery evidence, if applicable
+- [ ] Hardware evidence, if applicable
+- [ ] Security review requested, if applicable
+
+## Status updates
+
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Component documentation
+- [ ] Roadmap or release checklist
+
 ## Risks and rollback
 
-- Risks and rollback:
+- Risk:
+- Rollback:
 - Recovery or downgrade procedure:
 
 ## IPC handler
@@ -69,21 +127,14 @@
 ## Security review
 
 - Kernel safety review:
-
-## Shell safety review
-
-- [ ] Expansion order is correct
-- [ ] Quoting behavior is preserved
-- [ ] Redirection failures are handled
-- [ ] Exit codes are explicit
-- [ ] Signal behavior is defined
-- [ ] No unbounded recursion or allocation
-- [ ] Interactive terminal state is restored
-- [ ] Script mode does not execute invalid partial input
 - Capability/namespace checks enforced:
 - Shared-memory or descriptor implications:
 - Input validation and failure behavior:
 - Rollback or downgrade path:
+
+## Shell safety review
+
+- Shell safety review:
 
 ## Verification
 

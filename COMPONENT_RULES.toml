@@ -1,14 +1,34 @@
 [rule.status_honesty]
-requirement = "A component may not be marked complete without runtime or integration evidence."
-enforcement = "CI status audit"
+requirement = "No component may be marked complete without runtime or integration evidence."
+enforcement = "CI status audit + review"
 
 [rule.test_minimum]
-requirement = "Every new public function has at least one positive and one failure-path test."
-enforcement = "PR checklist + code review"
+requirement = "Every public behavior change includes positive and failure-path tests."
+enforcement = "PR checklist"
 
 [rule.no_silent_failure]
-requirement = "Errors must be typed, logged where appropriate, and propagated or explicitly handled."
+requirement = "Errors must be typed, propagated, logged where appropriate, or explicitly handled."
 enforcement = "Clippy + review"
+
+[rule.unsafe_justification]
+requirement = "Every unsafe block documents invariants and reviewer approval."
+enforcement = "CODEOWNERS + review"
+
+[rule.resource_limits]
+requirement = "Kernel and no_std paths define allocation, queue, and timeout limits."
+enforcement = "Review + stress tests"
+
+[rule.security_review]
+requirement = "Syscall, privilege, filesystem, network, crypto, driver, and update changes require security review."
+enforcement = "CODEOWNERS + label"
+
+[rule.destructive_operation_safety]
+requirement = "Installer, partitioning, update, and filesystem operations require dry-run, confirmation, logging, and recovery guidance."
+enforcement = "Installer test suite"
+
+[rule.documentation_currency]
+requirement = "Docs, FEATURE_STATUS, and CAPABILITY_MATRIX must reflect actual verified behavior."
+enforcement = "Docs audit + CI"
 
 [rule.no_unbounded_allocation]
 requirement = "Kernel and no_std paths must document allocation limits and OOM behavior."
@@ -17,10 +37,6 @@ enforcement = "Review + targeted tests"
 [rule.api_stability]
 requirement = "Public kernel/userspace APIs require an ADR and compatibility note."
 enforcement = "PR label + review"
-
-[rule.security_review]
-requirement = "Privilege, syscall, filesystem, network, crypto, and driver changes require security review."
-enforcement = "CODEOWNERS + PR label"
 
 [rule.documentation]
 requirement = "Every component has purpose, interface, limitations, tests, and status."
