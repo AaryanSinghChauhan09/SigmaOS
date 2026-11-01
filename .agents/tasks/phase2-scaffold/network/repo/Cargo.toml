@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-network"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR GPL-2.0"
+description = "SigmaOS network stack: TCP/IP, TLS, DNS, mDNS discovery"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-network"
+
+[lib]
+name = "sigmaos_network"
+path = "src/lib.rs"
+
+[dependencies]
+thiserror = "1.0"
+
+[dev-dependencies]
