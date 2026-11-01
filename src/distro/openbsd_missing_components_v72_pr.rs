@@ -17,6 +17,7 @@
 // 11. OpenBsdMissingComponentsV72PrSuite (Master PR Gateway Suite)
 
 extern crate alloc;
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -426,7 +427,7 @@ impl OpenBsdSmtpdSpamTrapDkimPqcSignerV72PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD OpenSMTPD Spam Trap DKIM PQC Signer V72"),
-            spam_traps: Vec::from([String::from("trap71@sigmaos.org")]),
+            spam_traps: Vec::from([String::from("trap72@sigmaos.org")]),
             dkim_selector: String::from("sig2026v72"),
         }
     }
@@ -717,14 +718,14 @@ mod tests {
     fn test_softraid_kryptex_dilithium5_v72() {
         let mut engine = OpenBsdSoftraidKryptexPqcDilithium5KeyringV72PrEngine::new();
         engine.register_keyring(SoftraidPqcDilithium5SpecV72 {
-            volume_id: String::from("vol-sec-71"),
+            volume_id: String::from("vol-sec-72"),
             pqc_algorithm: String::from("Dilithium5"),
             master_key_unlocked: false,
             chunk_drives: Vec::from([String::from("sd0a"), String::from("sd1a")]),
             dilithium5_sig_valid: true,
         });
 
-        let unlock = engine.unlock_volume("vol-sec-71", "master_key_phrase");
+        let unlock = engine.unlock_volume("vol-sec-72", "master_key_phrase");
         assert!(unlock.is_ok());
         assert!(unlock.unwrap());
     }
@@ -733,7 +734,7 @@ mod tests {
     fn test_pf_pfsync_flow_v72() {
         let mut engine = OpenBsdPfStatefulPfsyncMultiQueueFlowV72PrEngine::new();
         engine.add_flow(PfStatefulPfsyncFlowEntryV72 {
-            flow_id: 2001,
+            flow_id: 2002,
             source_ip: String::from("10.0.0.1"),
             destination_ip: String::from("10.0.0.2"),
             source_port: 443,
@@ -742,7 +743,7 @@ mod tests {
             queue_id: 1,
         });
 
-        assert!(engine.trigger_pfsync(2001));
+        assert!(engine.trigger_pfsync(2002));
         assert_eq!(engine.total_pfsync_sync_events, 1);
     }
 
@@ -750,7 +751,7 @@ mod tests {
     fn test_vmd_virtio_gpu_3d_v72() {
         let mut engine = OpenBsdVmdVirtioGpu3dPassthroughV72PrEngine::new();
         let res = engine.configure_gpu_passthrough(VmdVirtioGpu3dConfigV72 {
-            vm_id: 7,
+            vm_id: 8,
             vm_name: String::from("openbsd-desktop-v72"),
             vram_mb: 512,
             virgl_enabled: true,
@@ -764,7 +765,7 @@ mod tests {
     #[test]
     fn test_smtpd_spamtrap_dkim_pqc_v72() {
         let engine = OpenBsdSmtpdSpamTrapDkimPqcSignerV72PrEngine::new();
-        let res = engine.process_outgoing_mail("msg-71", "user@sigmaos.org", "sigmaos.org");
+        let res = engine.process_outgoing_mail("msg-72", "user@sigmaos.org", "sigmaos.org");
         assert!(!res.is_spam_trap);
         assert!(res.dkim_signature.contains("d=sigmaos.org"));
         assert_eq!(res.pqc_scheme, "CRYSTALS-Dilithium5");
