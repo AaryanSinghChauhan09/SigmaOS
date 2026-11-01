@@ -31,6 +31,9 @@ fn test_periodic_cadence_metadata() {
 
 #[test]
 fn test_component_lifecycle_steps() {
+    let all_steps = ComponentLifecycleStep::all();
+    assert_eq!(all_steps.len(), 12);
+
     assert_eq!(ComponentLifecycleStep::Step1SelectComponent.number(), 1);
     assert_eq!(
         ComponentLifecycleStep::Step1SelectComponent.title(),
@@ -51,10 +54,24 @@ fn test_component_lifecycle_steps() {
         ComponentLifecycleStep::Step12MonitorForRegressions.title(),
         "MONITOR FOR REGRESSIONS"
     );
+
+    for (idx, step) in all_steps.iter().enumerate() {
+        assert_eq!(step.number(), (idx + 1) as u8);
+        assert!(!step.title().is_empty());
+    }
 }
 
 #[test]
 fn test_component_domain_mapping_and_gates() {
+    let all_domains = ComponentDomain::all();
+    assert_eq!(all_domains.len(), 9);
+
+    for domain in all_domains {
+        assert!(!domain.name().is_empty());
+        assert!(domain.rules_file().starts_with("docs/component-rules/"));
+        assert!(!domain.additional_gate().is_empty());
+    }
+
     let kernel = ComponentDomain::Kernel;
     assert_eq!(kernel.name(), "Kernel");
     assert_eq!(kernel.rules_file(), "docs/component-rules/kernel.md");
@@ -71,10 +88,33 @@ fn test_component_domain_mapping_and_gates() {
     let sec = ComponentDomain::Security;
     assert_eq!(sec.name(), "Security");
     assert_eq!(sec.additional_gate(), "Denial tests and fuzzing");
+
+    let packaging = ComponentDomain::Packaging;
+    assert_eq!(packaging.name(), "Packaging");
+    assert_eq!(packaging.rules_file(), "docs/component-rules/packaging.md");
+    assert_eq!(packaging.additional_gate(), "Metadata corpus and dry-run tests");
+
+    let desktop = ComponentDomain::Desktop;
+    assert_eq!(desktop.name(), "Desktop");
+    assert_eq!(desktop.rules_file(), "docs/component-rules/desktop.md");
+    assert_eq!(desktop.additional_gate(), "Graphical smoke test");
+
+    let installer = ComponentDomain::InstallerUpdate;
+    assert_eq!(installer.name(), "Installer/update");
+    assert_eq!(installer.rules_file(), "docs/component-rules/installer_update.md");
+    assert_eq!(installer.additional_gate(), "Clean install and rollback test");
 }
 
 #[test]
 fn test_industry_standard_rules() {
+    let all_rules = IndustryStandardRule::all();
+    assert_eq!(all_rules.len(), 14);
+
+    for (idx, rule) in all_rules.iter().enumerate() {
+        assert_eq!(rule.number(), (idx + 1) as u8);
+        assert!(!rule.title().is_empty());
+    }
+
     assert_eq!(
         IndustryStandardRule::Rule1EverythingIsPullRequest.number(),
         1
@@ -112,6 +152,13 @@ fn test_study_schedule_and_milestones() {
     assert_eq!(schedule[11].week, 12);
     assert_eq!(schedule[11].component_improved, "Zenith desktop");
 
+    for entry in &schedule {
+        assert!(entry.week >= 1 && entry.week <= 12);
+        assert!(!entry.study_focus.is_empty());
+        assert!(!entry.component_improved.is_empty());
+        assert!(!entry.pr_deliverable.is_empty());
+    }
+
     let milestones = PeriodicPrComponentRulesEngine::monthly_milestones();
     assert_eq!(milestones.len(), 10);
     assert_eq!(milestones[0].month, 1);
@@ -124,6 +171,12 @@ fn test_study_schedule_and_milestones() {
         milestones[9].promotion_target,
         "Desktop: Prototype or Integrated"
     );
+
+    for entry in &milestones {
+        assert!(entry.month >= 1 && entry.month <= 10);
+        assert!(!entry.milestone_description.is_empty());
+        assert!(!entry.promotion_target.is_empty());
+    }
 }
 
 #[test]

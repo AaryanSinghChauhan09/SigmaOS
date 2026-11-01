@@ -25,37 +25,30 @@
 
 <!-- What secondary-memory, kernel, IPC, shell, or system behavior changed and why? -->
 
+## Summary
+
+<!-- What component does this PR improve, add, or regulate? -->
+
+## Related issue
+
+Closes #<issue-id>
+
+## Component
+
+<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer/update, etc. -->
+
 ## Component impact
 
 - Component/repository:
 - User-visible behavior:
 - Related issue or plan:
 
-## Storage component
+## Upstream study
 
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
-
-## Recurring task
-
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly storage audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
 
 ## Upstream study and reference behavior
 
@@ -72,37 +65,32 @@
 - What remains intentionally different:
 - Compatibility impact:
 
+## Component rules added or enforced
+
+- [ ] New rule
+- [ ] Existing rule enforced
+- [ ] Rule test added
+- [ ] CI gate added
+- [ ] Documentation updated
+
+## What SigmaOS adopts
+
+<!-- State the upstream principle or mechanism adopted. -->
+
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
+
 ## Changes
 
--
--
-
-## Storage safety review
-
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
-
-## Security review
-
-- Kernel safety review:
-- Safety and rollback:
-- Reviewer checklist:
-
-## Shell safety review
-
-- Shell safety review:
-- Capability/namespace checks enforced:
-- Shared-memory or descriptor implications:
-- Input validation and failure behavior:
-- Rollback or downgrade path:
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
 
 ## IPC handler
 
@@ -127,10 +115,15 @@
 
 ## Verification
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
+
 - [ ] Focused unit tests pass.
 - [ ] New/updated shell tests
 - [ ] POSIX/conformance test evidence
@@ -141,12 +134,13 @@
 - Test/evidence commands:
 - Results:
 
-## Status updates
+## Runtime evidence
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Storage documentation
-- [ ] Boot matrix, if applicable
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
 
 ## Capability status
 
@@ -160,9 +154,43 @@
 - Cross-repository synchronization required:
 - Release or migration notes:
 
-## Risks and rollback
+## Safety and rollback
 
 - Risks and rollback:
-- Risk:
-- Rollback:
 - Recovery or downgrade procedure:
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input validated
+- [ ] Package scripts sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
+
+## IPC handler
+
+- [ ] This change affects IPC handler behavior, or I confirm it does not.
+- IPC semantics:
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+
+## Security review
+
+- Kernel safety review:
+- Security review completed:
+
+## Shell safety review
+
+- Shell safety review:
+- Capability/namespace checks enforced:
+- Shared-memory or descriptor implications:
+- Input validation and failure behavior:
+- Rollback or downgrade path:
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Component rules are enforceable
+- [ ] Tests cover the rules
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported Linux/BSD parity claims
