@@ -2,9 +2,9 @@
 
 SigmaOS’s README describes an experimental OS codebase, not a supported general-purpose installation. Its feature inventory says the shell is a prototype with only echo, pwd, and ls built-ins and still needs process execution; the hosted system-report tool has no SigmaOS runtime integration; and init still needs process spawning and service-dependency enforcement. So the plan starts with a small set of real, useful utilities backed by working OS interfaces, rather than treating a large list of command names as an implemented userland.
 
-The format below is a sequence of proposed PRs, plus recurring maintenance PRs. Use POSIX utility conventions for common command behavior, while clearly marking GNU/Linux/BSD-inspired extensions.
+This plan defines the evidence-gated path for a safe, predictable system-utility layer. Utilities are modeled as small commands with explicit privilege, mutation, argument, exit-status, and maintenance contracts. The format below is a sequence of proposed PRs, plus recurring maintenance PRs. Use POSIX utility conventions for common command behavior, while clearly marking GNU/Linux/BSD-inspired extensions.
 
-## Baseline rules
+The format below is a sequence of proposed PRs, plus recurring maintenance PRs. Use POSIX utility conventions for common command behavior, while clearly marking GNU/Linux/BSD-inspired extensions.
 
 - **Define each command’s contract:** synopsis, options, operands, stdin/stdout/stderr, exit status, environment, and compatibility profile. POSIX’s utility conventions provide a baseline for option and operand syntax.
 - **Make tools composable:** keep normal results on stdout and diagnostics on stderr; support stdin for stream-oriented tools; use stable exit statuses; never mix human text into machine-readable output.
@@ -14,8 +14,21 @@ The format below is a sequence of proposed PRs, plus recurring maintenance PRs. 
 - **Test runtime behavior:** label unit/model, hosted, QEMU booted SigmaOS, and physical-device evidence separately. Linux’s testing guidance distinguishes in-kernel white-box tests from userspace selftests that exercise actual interfaces.
 - **Keep periodic checks safe and bounded:** maintenance tasks should be idempotent where possible, have time/output limits, and report whether they passed, found an issue, or could not run. FreeBSD’s periodic framework is a useful reference for daily, weekly, monthly, and security-oriented tasks.
 - **Use focused PRs and protected branches:** require relevant review and passing checks; GitHub supports required pull-request reviews, status checks, and conversation resolution for protected branches.
+- Prefer read-only behavior and least privilege by default.
+- Destructive mutation requires explicit validation, bounded scope, and a recoverable failure path.
+- Preserve POSIX argument conventions, including the `--` delimiter.
+- Keep command registration, implementation, documentation, and tests aligned.
+- Make output deterministic and support machine-readable diagnostics where useful.
+- Never hide permission failures or treat an unverified operation as successful.
+- Every new command requires focused tests and an evidence-linked review.
 
-## Proposed PR roadmap
+## Initial High-Value Sequence Focus
+
+The highest-value initial sequence is PRs 1–4, 11, and 15: establish truthful status, consistent command behavior, basic VFS utilities, runtime-backed reports, and the test path. Defer process, storage, and account tools until their kernel and service interfaces are integrated. The repository’s own status file says process spawning, syscall dispatch, and several runtime paths remain milestones—not established general-purpose OS capabilities.
+
+The first implementation sequence prioritizes pwd, ls, cat, wc, env, uname, mkdir, touch, cp, mv, rm, and sigma-diag. Each command records its privilege level, mutation behavior, supported arguments, exit status, and integration state in the registry.
+
+## Periodic maintenance PRs
 
 | PR | Proposed title | Scope | Acceptance criteria |
 |---|---|---|---|
@@ -38,11 +51,7 @@ The format below is a sequence of proposed PRs, plus recurring maintenance PRs. 
 | 17 | `ci(utils): validate registry, help, manuals, and status matrix` | Check installed command list, registry, help output, manual pages, feature status, and test coverage for drift. | CI fails on undocumented commands, stale claims, missing manuals, or parser/docs mismatches. |
 | 18 | `release(utils): publish utility support matrix` | List commands, versions, compatibility profile, privilege, backend, architecture, and known gaps. | “Supported” tools have repeatable runtime evidence; unsupported behavior is explicitly listed. |
 
-## Initial High-Value Sequence Focus
-
-The highest-value initial sequence is PRs 1–4, 11, and 15: establish truthful status, consistent command behavior, basic VFS utilities, runtime-backed reports, and the test path. Defer process, storage, and account tools until their kernel and service interfaces are integrated. The repository’s own status file says process spawning, syscall dispatch, and several runtime paths remain milestones—not established general-purpose OS capabilities.
-
-## Periodic maintenance PRs
+These are recurring review tasks, not automatic code changes. FreeBSD’s periodic model demonstrates daily, weekly, monthly, and security checks as distinct operational categories; SigmaOS should only enable checks whose data sources and safe behavior are implemented.
 
 | Cadence | Proposed PR/task | Acceptance evidence |
 |---|---|---|
@@ -59,7 +68,7 @@ The highest-value initial sequence is PRs 1–4, 11, and 15: establish truthful 
 
 These are recurring review tasks, not automatic code changes. FreeBSD’s periodic model demonstrates daily, weekly, monthly, and security checks as distinct operational categories; SigmaOS should only enable checks whose data sources and safe behavior are implemented.
 
-## Component rules
+## Component Rules
 
 - **File utilities:** Treat names as data, not shell syntax; define symlink-following, overwrite, recursion, and partial-I/O semantics; preserve file metadata only when explicitly specified.
 - **Text utilities:** Stream large input; define byte-vs-text behavior, locale, and invalid encoding handling; avoid hidden buffering that can exhaust memory.
@@ -70,7 +79,14 @@ These are recurring review tasks, not automatic code changes. FreeBSD’s period
 - **Documentation:** Use a consistent manual structure with synopsis, description, options, environment, exit status, examples, and standards/compatibility notes.
 - **Testing:** Use unit tests for isolated logic and end-to-end tests for actual userspace interfaces. Linux distinguishes KUnit’s internal white-box tests from kselftest’s userspace/system-level tests; SigmaOS should preserve this distinction in reports.
 
-## PR review template and merge gates
+- **File utilities:** Treat names as data, not shell syntax; define symlink-following, overwrite, recursion, and partial-I/O semantics; preserve file metadata only when explicitly specified.
+- **Text utilities:** Stream large input; define byte-vs-text behavior, locale, and invalid encoding handling; avoid hidden buffering that can exhaust memory.
+- **Process utilities:** Use kernel process APIs; authorize signals and inspection; make stale IDs/races predictable; do not report process state from a model or cache as live state.
+- **Storage utilities:** Separate inspection from destructive operations; show stable device identity and exact target; require preview/confirmation/recovery for future writes.
+- **System reporting:** Mark each value live, cached, host-derived, or unavailable; bound output and redact credentials and private user data.
+- **Maintenance runner:** Make tasks idempotent and read-only by default; set time/resource limits; record task ID, start/end, result category, and concise output; allow administrator policy to disable tasks.
+- **Documentation:** Use a consistent manual structure with synopsis, description, options, environment, exit status, examples, and standards/compatibility notes.
+- **Testing:** Use unit tests for isolated logic and end-to-end tests for actual userspace interfaces. Linux distinguishes KUnit’s internal white-box tests from kselftest’s userspace/system-level tests; SigmaOS should preserve this distinction in reports.
 
 ```text
 ## Summary
@@ -111,6 +127,10 @@ Explain the evidence behind the status.
 
 Require maintainer review and required checks for all changes; require an additional security or subsystem reviewer for privileged, destructive, or data-handling utilities. GitHub protected branches can enforce PR approvals, status checks, conversation resolution, and restrictions on force pushes.
 
-## Completion gate
+```text
+## Summary
+What utility or maintenance task does this PR add or fix?
 
-Mark a utility Integrated only when it uses the real SigmaOS interface on a documented boot target. Mark it Supported only after repeatable tests, documented behavior, permissions, failure paths, and manual pages all agree. Periodic checks must additionally show safe reruns, bounded runtime/output, and explicit handling when their provider is unavailable. This matches the repo’s warning that code presence and unit tests alone do not prove a usable OS.
+- **Prototype:** registry contract, parser behavior, and unit tests exist.
+- **Integrated:** Mark a utility Integrated only when it uses the real SigmaOS interface on a documented boot target, is wired through the registry, and is exercised by a deterministic integration or shell smoke test.
+- **Supported:** Mark it Supported only after repeatable tests, documented behavior, permissions, failure paths, resource bounds, and manual pages all agree across the supported target environments. Periodic checks must additionally show safe reruns, bounded runtime/output, and explicit handling when their provider is unavailable. This matches the repo’s warning that code presence and unit tests alone do not prove a usable OS.
