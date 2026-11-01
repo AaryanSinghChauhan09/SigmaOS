@@ -1,9 +1,10 @@
 // Comprehensive Unit Tests for CPU Scheduler Policies, Invariants, and Plan Verification
 
+use std::fs;
+use std::path::Path;
+
 #[test]
 fn test_scheduler_documentation_policy_verification() {
-    use std::fs;
-
     let sched_policy = fs::read_to_string("docs/process/SCHEDULER_POLICY.md")
         .expect("docs/process/SCHEDULER_POLICY.md must exist");
     let sched_adr = fs::read_to_string("docs/process/SCHEDULER_ADR.md")
@@ -27,6 +28,146 @@ fn test_scheduler_documentation_policy_verification() {
     assert!(preempt_policy.contains("Preemption Policy Specification"));
     assert!(fairness_policy.contains("Fairness and Starvation Prevention Policy"));
     assert!(affinity_policy.contains("CPU Affinity Policy Specification"));
+}
+
+#[test]
+fn test_scheduler_master_plan_documents_exist_and_match() {
+    let doc_invariants = Path::new("docs/SCHEDULER_STATUS_AND_INVARIANTS.md");
+    let wiki_invariants = Path::new("wiki/SCHEDULER_STATUS_AND_INVARIANTS.md");
+    let doc_plan = Path::new("docs/SCHEDULER_DEVELOPMENT_PLAN.md");
+    let wiki_plan = Path::new("wiki/SCHEDULER_DEVELOPMENT_PLAN.md");
+
+    assert!(doc_invariants.exists(), "docs/SCHEDULER_STATUS_AND_INVARIANTS.md must exist");
+    assert!(wiki_invariants.exists(), "wiki/SCHEDULER_STATUS_AND_INVARIANTS.md must exist");
+    assert!(doc_plan.exists(), "docs/SCHEDULER_DEVELOPMENT_PLAN.md must exist");
+    assert!(wiki_plan.exists(), "wiki/SCHEDULER_DEVELOPMENT_PLAN.md must exist");
+
+    let doc_inv_content = fs::read_to_string(doc_invariants).expect("read doc invariants");
+    let wiki_inv_content = fs::read_to_string(wiki_invariants).expect("read wiki invariants");
+    assert_eq!(doc_inv_content, wiki_inv_content, "wiki copy must match docs copy for invariants");
+
+    let doc_plan_content = fs::read_to_string(doc_plan).expect("read doc plan");
+    let wiki_plan_content = fs::read_to_string(wiki_plan).expect("read wiki plan");
+    assert_eq!(doc_plan_content, wiki_plan_content, "wiki copy must match docs copy for development plan");
+}
+
+#[test]
+fn test_scheduler_master_plan_invariants_and_rules() {
+    let content = fs::read_to_string("docs/SCHEDULER_STATUS_AND_INVARIANTS.md")
+        .expect("read docs/SCHEDULER_STATUS_AND_INVARIANTS.md");
+
+    let required_rules = [
+        "Separate policy from mechanism.",
+        "Define task states and transitions.",
+        "Fair scheduling needs a measurable contract.",
+        "Real-time policies need guardrails.",
+        "Scheduler changes require data, not anecdotes.",
+        "Concurrency is part of correctness.",
+        "Resource controls must affect real scheduling.",
+        "Keep architecture status separate.",
+        "Keep diagnostics bounded and stable.",
+    ];
+
+    for rule in &required_rules {
+        assert!(content.contains(rule), "Missing required invariant rule: {}", rule);
+    }
+}
+
+#[test]
+fn test_scheduler_master_plan_pr_sequence() {
+    let content = fs::read_to_string("docs/SCHEDULER_DEVELOPMENT_PLAN.md")
+        .expect("read docs/SCHEDULER_DEVELOPMENT_PLAN.md");
+
+    for pr_num in 1..=18 {
+        let pr_marker = format!("| {} |", pr_num);
+        assert!(
+            content.contains(&pr_marker),
+            "Missing PR sequence marker: {}",
+            pr_marker
+        );
+    }
+
+    assert!(
+        content.contains("`docs(scheduler): audit scheduler status and define invariants`"),
+        "Missing PR 1 title"
+    );
+    assert!(
+        content.contains("`feat(scheduler): implement EEVDF fair-class prototype`"),
+        "Missing PR 8 title"
+    );
+    assert!(
+        content.contains("`docs(scheduler): publish policy guide and support matrix`"),
+        "Missing PR 18 title"
+    );
+
+    assert!(
+        content.contains("Complete PRs 1–7 before deciding whether EEVDF or BORE becomes the default fair policy"),
+        "Missing recommended milestone text"
+    );
+}
+
+#[test]
+fn test_scheduler_master_plan_cadence_and_gates() {
+    let content = fs::read_to_string("docs/SCHEDULER_DEVELOPMENT_PLAN.md")
+        .expect("read docs/SCHEDULER_DEVELOPMENT_PLAN.md");
+
+    let cadences = [
+        "Every PR",
+        "Weekly",
+        "Monthly",
+        "Quarterly",
+        "Each release candidate",
+        "After each incident",
+    ];
+
+    for cadence in &cadences {
+        assert!(
+            content.contains(cadence),
+            "Missing maintenance cadence: {}",
+            cadence
+        );
+    }
+
+    let completion_gates = ["**Prototype**", "**Integrated**", "**Supported**"];
+
+    for gate in &completion_gates {
+        assert!(
+            content.contains(gate),
+            "Missing completion gate: {}",
+            gate
+        );
+    }
+}
+
+#[test]
+fn test_feature_status_toml_scheduler_registration() {
+    let content = fs::read_to_string("FEATURE_STATUS.toml")
+        .expect("read FEATURE_STATUS.toml");
+
+    let required_sections = [
+        "[scheduler.core]",
+        "[scheduler.bore]",
+        "[scheduler.cfs]",
+        "[scheduler.realtime]",
+        "[scheduler.eevdf]",
+    ];
+
+    for section in &required_sections {
+        assert!(
+            content.contains(section),
+            "FEATURE_STATUS.toml must contain {}",
+            section
+        );
+    }
+
+    assert!(
+        content.contains("docs/SCHEDULER_STATUS_AND_INVARIANTS.md"),
+        "FEATURE_STATUS.toml must reference docs/SCHEDULER_STATUS_AND_INVARIANTS.md"
+    );
+    assert!(
+        content.contains("docs/SCHEDULER_DEVELOPMENT_PLAN.md"),
+        "FEATURE_STATUS.toml must reference docs/SCHEDULER_DEVELOPMENT_PLAN.md"
+    );
 }
 
 #[test]
@@ -105,6 +246,7 @@ fn test_scheduler_task_state_machine_invariants() {
 
     let mut task = Task::new(101);
     assert_eq!(task.state, TaskState::New);
+    assert_eq!(task.pid, 101);
 
     assert!(task.enqueue(0).is_ok());
     assert_eq!(task.state, TaskState::Ready);
