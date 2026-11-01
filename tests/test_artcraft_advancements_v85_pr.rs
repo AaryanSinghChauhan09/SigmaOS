@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-// Integration test for Sovereign ArtCraft Creative Suite Advancements V85 PR Proposal Suite
+// SigmaOS - ArtCraft Advancements V85 PR Integration Test Suite
+// (`tests/test_artcraft_advancements_v85_pr.rs`)
 
 #[path = "../src/creative/artcraft_advancements_v85_pr.rs"]
 mod artcraft_advancements_v85_pr;
@@ -9,8 +10,8 @@ use artcraft_advancements_v85_pr::{
     ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85,
     ArtcraftLosslessVectorAssetExchangeFormatPrEngineV85,
     ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85,
-    ArtcraftWideGamutOklabLutColorGradingPrEngineV85, BrushDabPoint, LinearRgb, LiveFilterKind,
-    SovereignArtcraftAdvancementsV85MasterSuite, VectorRecordV85,
+    ArtcraftWideGamutOklabLutColorGradingPrEngineV85, LiveFilterNodeType,
+    SovereignArtcraftAdvancementsV85MasterSuite, StylusInputSample, VectorCommand,
 };
 
 #[test]
@@ -55,59 +56,61 @@ fn test_artcraft_advancements_v85_integration_suite() {
 
 #[test]
 fn test_individual_v85_engines_integration() {
-    // 1. Oklab 3D LUT Color Grading
-    let color_engine = ArtcraftWideGamutOklabLutColorGradingPrEngineV85::new(17, 0.2);
-    let srgb = LinearRgb { r: 0.7, g: 0.4, b: 0.2 };
-    let oklab = color_engine.srgb_to_oklab(srgb);
-    let recon = color_engine.oklab_to_srgb(oklab);
-    assert!((srgb.r - recon.r).abs() < 0.05);
+    // 1. Wide-Gamut Oklab/Oklch & 3D LUT Engine
+    let wide_gamut = ArtcraftWideGamutOklabLutColorGradingPrEngineV85::new(17);
+    let oklab = wide_gamut.linear_srgb_to_oklab([0.7, 0.3, 0.2]);
+    assert!(oklab.l > 0.0);
+    let oklch = wide_gamut.oklab_to_oklch(oklab);
+    assert!(oklch.l > 0.0 && oklch.c >= 0.0);
+    let lut_out = wide_gamut.sample_lut_trilinear([0.4, 0.4, 0.4]);
+    assert_eq!(lut_out.len(), 3);
 
-    // 2. Ultra HDR Gainmap
-    let hdr_engine = ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85::new(1200.0);
-    let sdr = LinearRgb { r: 0.4, g: 0.4, b: 0.4 };
-    let boosted = hdr_engine.blend_gainmap_pixel(sdr, 0.9);
-    assert!(boosted.r >= sdr.r);
+    // 2. HDR Gainmap Compositor Engine
+    let hdr_engine = ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85::new();
+    let hdr_color = hdr_engine.reconstruct_hdr_pixel([0.6, 0.6, 0.6], 0.9, 4.0);
+    assert!(hdr_color[0] >= 0.6);
+    let eotf = hdr_engine.pq_eotf_curve(500.0);
+    assert!(eotf > 0.0);
 
-    // 3. Compute Shader Dynamic Dab Stamping
-    let brush_engine = ArtcraftComputeShaderBrushStampSimulationPrEngineV85::new(0.25, 0.15);
-    let dab = BrushDabPoint {
-        x: 16.0,
-        y: 16.0,
-        pressure: 0.85,
-        tilt_angle: 0.1,
-        radius: 10.0,
-        opacity: 0.9,
+    // 3. Brush Stamp Simulation Engine
+    let brush_sim = ArtcraftComputeShaderBrushStampSimulationPrEngineV85::new(40.0, 0.3, 0.1);
+    let sample = StylusInputSample {
+        x: 10.0,
+        y: 20.0,
+        pressure: 0.75,
+        tilt_azimuth: 30.0,
+        tilt_altitude: 45.0,
     };
-    let mut tile_buf = vec![0u8; 32 * 32 * 4];
-    let modified = brush_engine.stamp_dab_to_tile(dab, (0, 0), 32, &mut tile_buf);
-    assert!(modified > 0);
+    let radius = brush_sim.compute_stamp_radius(sample);
+    assert!(radius > 0.0);
+    let alpha = brush_sim.evaluate_stamp_alpha(radius * 0.2, radius);
+    assert!(alpha > 0.0 && alpha <= 1.0);
 
-    // 4. DAG Live Filter Graph
-    let mut filter_engine = ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85::new();
-    filter_engine.add_filter(1, LiveFilterKind::GaussianBlur { radius: 3.0 });
-    filter_engine.add_filter(2, LiveFilterKind::ChromaticAberration { shift_px: 2.0 });
-    let (hash1, recomputed1) = filter_engine.evaluate_graph_pipeline(999);
-    assert_eq!(recomputed1, 2);
-    let (hash2, recomputed2) = filter_engine.evaluate_graph_pipeline(999);
-    assert_eq!(recomputed2, 0);
-    assert_eq!(hash1, hash2);
+    // 4. Live Filter Adjustment Graph Engine
+    let mut filter_graph = ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85::new();
+    filter_graph.add_filter_node(LiveFilterNodeType::LevelsAndCurves, 1.1, 1.0);
+    filter_graph.add_filter_node(LiveFilterNodeType::VibranceSaturation, 1.2, 0.9);
+    let out_ch = filter_graph.evaluate_channel_adjustment(0.5);
+    assert!(out_ch > 0.0 && out_ch <= 1.0);
 
-    filter_engine.mark_node_dirty(1);
-    let (_hash3, recomputed3) = filter_engine.evaluate_graph_pipeline(999);
-    assert_eq!(recomputed3, 1);
-
-    // 5. Binary Vector Asset Stream
-    let mut vector_engine = ArtcraftLosslessVectorAssetExchangeFormatPrEngineV85::new();
-    vector_engine.append_record(VectorRecordV85::PathBezier {
-        points_count: 8,
-        closed: false,
-    });
-    vector_engine.append_record(VectorRecordV85::TextSpan {
-        glyphs_count: 15,
-        font_size_pt: 12.0,
-    });
-    let stream = vector_engine.serialize_to_binary_stream();
-    assert!(stream.len() >= 12);
-    let count = vector_engine.validate_and_count_stream(&stream).unwrap();
-    assert_eq!(count, 2);
+    // 5. Vector Asset Interchange Format Engine
+    let vector_fmt = ArtcraftLosslessVectorAssetExchangeFormatPrEngineV85::new();
+    let commands = vec![
+        VectorCommand::MoveTo { x: 0.0, y: 0.0 },
+        VectorCommand::LineTo { x: 50.0, y: 50.0 },
+        VectorCommand::CubicCurveTo {
+            cp1x: 60.0,
+            cp1y: 60.0,
+            cp2x: 80.0,
+            cp2y: 70.0,
+            end_x: 100.0,
+            end_y: 100.0,
+        },
+        VectorCommand::Close,
+    ];
+    let bytes = vector_fmt.serialize_path_commands(&commands);
+    let count = vector_fmt
+        .validate_and_count_stream(&bytes)
+        .expect("Valid stream");
+    assert_eq!(count, 4);
 }
