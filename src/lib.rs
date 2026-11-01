@@ -893,8 +893,7 @@ pub use crate::graphics::sovereign_graphics_display_v88_pr::*;
 pub use crate::distro::cachy_linux_missing_components_v83_pr::*;
 pub use crate::distro::open_source_os_and_cachy_linux_v83_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v83_pr::*;
-pub use crate::distro::arch_linux_missing_components_v83_pr::*;
-pub use crate::distro::open_source_os_and_arch_missing_components_v83_pr::*;
+pub use crate::distro::cachy_linux_missing_components_v84_pr::*;
 
 pub mod screen;
 pub mod software_manager;
