@@ -101,6 +101,7 @@ pub use creative::fontcraft_missing_components_parity_pr::*;
 pub use creative::lightcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::pdfcraft_artcraft_missing_components_v71_pr::*;
 pub use creative::pdfcraft_artcraft_missing_components_v72_pr::*;
+pub use creative::pdfcraft_artcraft_missing_components_v73_pr::*;
 pub use creative::pdfcraft_artcraft_parity_pr::*;
 pub use creative::pdfcraft_missing_components_parity_pr::*;
 pub use creative::photocraft_artcraft_missing_components_v65_pr::*;
