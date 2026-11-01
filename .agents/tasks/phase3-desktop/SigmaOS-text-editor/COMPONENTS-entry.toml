@@ -1,0 +1,11 @@
+[[component]]
+name = "SigmaOS-text-editor"
+tier = 2
+language = "Rust"
+status = "scaffolded"
+upstream = [
+  "https://github.com/linuxmint/xed",
+  "https://github.com/LazyVim/LazyVim",
+]
+depends_on = ["sigmaos-filesystem", "sigmaos-compositor"]
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-text-editor"

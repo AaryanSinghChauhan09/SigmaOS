@@ -1,0 +1,29 @@
+[package]
+name = "sigma-terminal"
+version = "0.1.0"
+edition = "2021"
+description = "GPU-accelerated terminal emulator for SigmaOS"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/SigmaOS/SigmaOS-terminal"
+
+[lib]
+name = "sigma_terminal"
+path = "src/lib.rs"
+
+[dependencies]
+alacritty_terminal = "0.23"
+winit = "0.29"
+wgpu = "0.19"
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }
+thiserror = "1"
+tracing = "0.1"
+unicode-width = "0.1"
+
+[dev-dependencies]
+tempfile = "3"
+
+[features]
+default = ["sixel", "kitty-graphics"]
+sixel = []
+kitty-graphics = []

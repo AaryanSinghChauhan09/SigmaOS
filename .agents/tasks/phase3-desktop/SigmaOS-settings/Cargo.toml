@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-settings"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Contributors"]
+description = "System settings UI for SigmaOS"
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-settings"
+
+[lib]
+name = "sigmaos_settings"
+path = "src/lib.rs"
+
+[dependencies]
+
+[dev-dependencies]

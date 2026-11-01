@@ -1,0 +1,10 @@
+[[component]]
+name = "SigmaOS-theme-engine"
+tier = 2
+language = "Rust"
+status = "scaffolded"
+upstream = [
+  "https://github.com/linuxmint/cinnamon",
+]
+depends_on = ["sigmaos-desktop"]
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-engine"

@@ -1,0 +1,13 @@
+[[component]]
+name = "SigmaOS-terminal"
+tier = 2
+language = "Rust"
+status = "scaffolded"
+upstream = [
+  "https://codeberg.org/dnkl/foot",
+  "https://github.com/ghostty-org/ghostty",
+  "https://github.com/alacritty/alacritty",
+  "https://github.com/kovidgoyal/kitty",
+]
+depends_on = ["sigmaos-compositor"]
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-terminal"

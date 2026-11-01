@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-compositor"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Contributors"]
+description = "Wayland compositor server for SigmaOS desktop"
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-compositor"
+
+[lib]
+name = "sigmaos_compositor"
+path = "src/lib.rs"
+
+[dependencies]
+
+[dev-dependencies]

@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-app-framework"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Contributors"]
+description = "Shared library for SigmaOS desktop apps (widgets, theming, accessibility)"
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-app-framework"
+
+[lib]
+name = "sigmaos_app_framework"
+path = "src/lib.rs"
+
+[dependencies]
+
+[dev-dependencies]
