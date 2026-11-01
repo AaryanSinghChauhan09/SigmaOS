@@ -322,6 +322,9 @@ mod tests {
         let mut battery = BatteryInfo::new("BAT0".to_string());
         battery.set_capacity(15);
         assert!(battery.is_low());
+        assert!(!battery.is_critical());
+        battery.set_capacity(5);
+        assert!(battery.is_low());
         assert!(battery.is_critical());
     }
 
