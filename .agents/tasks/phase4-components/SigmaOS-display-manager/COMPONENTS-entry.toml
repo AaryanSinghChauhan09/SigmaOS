@@ -1,0 +1,8 @@
+name = "SigmaOS-display-manager"
+description = "Graphical login and display manager for SigmaOS"
+category = "Desktop/UI"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

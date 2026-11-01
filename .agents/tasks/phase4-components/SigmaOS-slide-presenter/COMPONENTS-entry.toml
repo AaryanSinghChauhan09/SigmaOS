@@ -1,0 +1,4 @@
+name = "SigmaOS-slide-presenter"
+description = "Presentation tool for SigmaOS enabling creation and delivery of slide-based presentations"
+category = "tools"
+license = "MIT"

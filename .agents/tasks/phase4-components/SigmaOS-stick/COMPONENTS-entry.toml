@@ -1,0 +1,4 @@
+name = "SigmaOS-stick"
+description = "Bootable USB drive creator for SigmaOS. Flash ISO images to USB drives safely and reliably."
+category = "utilities"
+license = "MIT"

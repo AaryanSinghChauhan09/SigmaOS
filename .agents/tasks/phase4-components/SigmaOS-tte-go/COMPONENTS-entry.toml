@@ -1,0 +1,8 @@
+name = "SigmaOS-tte-go"
+description = "Terminal text effects engine in Go for SigmaOS"
+category = "Utilities"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

@@ -1,0 +1,8 @@
+name = "SigmaOS-backup-tool"
+description = "System backup and restore utility for SigmaOS"
+category = "System Services"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

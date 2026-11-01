@@ -1,0 +1,8 @@
+name = "SigmaOS-guide-docs"
+description = "Documentation portal and guide index for SigmaOS"
+category = "Documentation"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

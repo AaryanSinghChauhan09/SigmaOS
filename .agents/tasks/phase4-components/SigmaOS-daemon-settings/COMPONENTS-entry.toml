@@ -1,0 +1,8 @@
+name = "SigmaOS-daemon-settings"
+description = "Settings daemon for desktop services and preferences"
+category = "System Services"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

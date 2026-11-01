@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-marketplace"
+category    = "themes"
+description = "Theme discovery and download marketplace for SigmaOS."
+upstream    = ["GNOME-Look.org"]
+build       = "cargo build --release"
+license     = "MIT"

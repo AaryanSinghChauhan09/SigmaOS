@@ -1,0 +1,8 @@
+name = "SigmaOS-guide-developer"
+description = "Developer contribution guide for SigmaOS"
+category = "Documentation"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

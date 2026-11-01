@@ -1,0 +1,8 @@
+name = "SigmaOS-folder-color-switcher"
+description = "Folder icon color customizer for SigmaOS file manager"
+category = "Desktop/UI"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

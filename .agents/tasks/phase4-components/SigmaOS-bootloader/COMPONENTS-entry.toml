@@ -1,0 +1,8 @@
+name = "SigmaOS-bootloader"
+description = "System bootloader integration and configuration for SigmaOS"
+category = "System Services"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

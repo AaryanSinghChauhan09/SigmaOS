@@ -1,0 +1,8 @@
+name = "SigmaOS-brand-logo"
+description = "Brand assets, logos, and visual identity for SigmaOS"
+category = "Documentation"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

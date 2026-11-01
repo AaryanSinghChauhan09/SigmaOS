@@ -1,0 +1,8 @@
+name = "SigmaOS-system-admin"
+description = "Component for SigmaOS"
+category = "Utilities"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

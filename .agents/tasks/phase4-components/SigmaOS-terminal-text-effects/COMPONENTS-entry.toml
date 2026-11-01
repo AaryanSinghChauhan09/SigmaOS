@@ -1,0 +1,8 @@
+name = "SigmaOS-terminal-text-effects"
+description = "Terminal text animation effects for SigmaOS"
+category = "Utilities"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

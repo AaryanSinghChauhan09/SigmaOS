@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-mdm"
+category    = "themes"
+description = "Display manager theme collection for SigmaOS."
+upstream    = ["mdm-themes"]
+build       = "make install"
+license     = "MIT"

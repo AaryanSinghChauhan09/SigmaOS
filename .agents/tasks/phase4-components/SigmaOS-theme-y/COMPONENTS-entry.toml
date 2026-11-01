@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-y"
+category    = "themes"
+description = "Y theme series for SigmaOS."
+upstream    = ["mint-y-theme"]
+build       = "make install"
+license     = "MIT"

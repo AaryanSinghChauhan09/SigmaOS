@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-accessibility"
+description = "Accessibility tools and AT-SPI bridge for SigmaOS, enabling assistive technology support for all desktop components."
+category    = "accessibility"
+license     = "MIT"
+upstream    = ["accerciser", "orca"]

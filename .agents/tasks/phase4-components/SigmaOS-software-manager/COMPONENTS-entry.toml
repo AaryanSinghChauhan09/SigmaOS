@@ -1,0 +1,8 @@
+[component]
+name        = "SigmaOS-software-manager"
+category    = "utilities"
+description = "Software center and app store for SigmaOS."
+upstream    = ["mintinstall", "gnome-software"]
+language    = "rust"
+build       = "cargo build --release"
+license     = "MIT"

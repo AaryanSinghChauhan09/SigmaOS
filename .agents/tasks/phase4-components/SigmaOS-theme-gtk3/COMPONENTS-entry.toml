@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-gtk3"
+category    = "themes"
+description = "GTK3 theme collection for SigmaOS."
+upstream    = ["mint-themes-gtk3"]
+build       = "make install"
+license     = "MIT"

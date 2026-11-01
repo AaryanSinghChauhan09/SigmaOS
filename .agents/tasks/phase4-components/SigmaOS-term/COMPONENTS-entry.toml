@@ -1,0 +1,8 @@
+name = "SigmaOS-term"
+description = "Terminal emulator with multiple backend support for SigmaOS"
+category = "Desktop/UI"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

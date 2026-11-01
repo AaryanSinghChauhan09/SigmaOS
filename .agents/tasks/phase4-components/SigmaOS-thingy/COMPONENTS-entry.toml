@@ -1,0 +1,5 @@
+name = "SigmaOS-thingy"
+category = "utilities"
+upstream = "thingy"
+license = "MIT"
+language = "rust"

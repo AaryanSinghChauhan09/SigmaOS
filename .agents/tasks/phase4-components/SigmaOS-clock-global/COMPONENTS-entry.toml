@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-clock-global"
+description = "World clock and timezone management tool for SigmaOS, showing times across multiple configured timezones."
+category    = "utilities"
+license     = "MIT"
+upstream    = ["elsewhen", "gnome-clocks"]

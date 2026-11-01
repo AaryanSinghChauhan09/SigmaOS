@@ -1,0 +1,8 @@
+name = "SigmaOS-vpn-pia"
+description = "VPN client integration for SigmaOS"
+category = "Network"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

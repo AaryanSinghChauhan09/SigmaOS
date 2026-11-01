@@ -1,0 +1,8 @@
+name = "SigmaOS-desktop-environment"
+description = "Full desktop environment stack for SigmaOS"
+category = "Desktop/UI"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

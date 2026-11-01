@@ -1,0 +1,8 @@
+name = "SigmaOS-fish"
+description = "Fish shell configuration and plugins for SigmaOS"
+category = "Utilities"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-actions"
+description = "File manager context menu actions and extensions for the SigmaOS file manager, allowing custom right-click actions."
+category    = "file-manager"
+license     = "MIT"
+upstream    = ["cinnamon-spices-actions"]

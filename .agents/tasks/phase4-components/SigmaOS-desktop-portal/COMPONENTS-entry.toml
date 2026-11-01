@@ -1,0 +1,8 @@
+name = "SigmaOS-desktop-portal"
+description = "XDG desktop portal implementation for SigmaOS"
+category = "Desktop/UI"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

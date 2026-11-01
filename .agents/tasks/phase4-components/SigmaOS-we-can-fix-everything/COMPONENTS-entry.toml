@@ -1,0 +1,8 @@
+name = "SigmaOS-we-can-fix-everything"
+description = "Community issue tracking and fix coordination for SigmaOS"
+category = "Utilities"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

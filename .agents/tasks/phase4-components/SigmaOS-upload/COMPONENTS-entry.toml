@@ -1,0 +1,6 @@
+name = "SigmaOS-upload"
+category = "utilities"
+description = "File upload utility for SigmaOS. Upload files to remote servers via FTP, SFTP, or HTTP with progress tracking. Inspired by mintupload."
+upstream = ["mintupload"]
+build = "cargo build --release"
+license = "MIT"

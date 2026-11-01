@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-draw"
+description = "Vector drawing and screen annotation application for SigmaOS, supporting SVG output and presentation aids."
+category    = "graphics"
+license     = "MIT"
+upstream    = ["drawing", "xournalpp"]

@@ -1,0 +1,8 @@
+name = "SigmaOS-setup"
+description = "Initial system setup wizard for SigmaOS"
+category = "System Services"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

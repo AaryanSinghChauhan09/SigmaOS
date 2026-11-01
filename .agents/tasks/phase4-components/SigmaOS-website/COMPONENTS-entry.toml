@@ -1,0 +1,8 @@
+name = "SigmaOS-website"
+description = "Project website and documentation site for SigmaOS"
+category = "Documentation"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

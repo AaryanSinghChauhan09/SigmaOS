@@ -1,0 +1,4 @@
+name = "SigmaOS-spreadsheet"
+description = "Spreadsheet application component for SigmaOS, offering cell-based data entry, formulas, and chart generation"
+category = "tools"
+license = "MIT"

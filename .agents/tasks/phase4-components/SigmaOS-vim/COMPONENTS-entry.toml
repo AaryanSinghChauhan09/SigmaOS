@@ -1,0 +1,8 @@
+name = "SigmaOS-vim"
+description = "Vim and editor integration for SigmaOS"
+category = "Developer Tools"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []
