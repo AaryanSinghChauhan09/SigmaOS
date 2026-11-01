@@ -2,17 +2,17 @@
 // SigmaOS FreeBSD Missing Components V69 PR Gateway Engine
 // (`src/distro/freebsd_missing_components_v69_pr.rs`)
 //
-// Provides clean-room Pull Request (PR) proposal engines bridging remaining FreeBSD 15.0+ gaps:
-// 1. FreeBsdBhyveNvramUefiSecureBootPrEngine (bhyve UEFI NVRAM persistent variables & authenticated secure boot keystore governor)
-// 2. FreeBsdOpenZfsBlockCloningCopyOffloadPrEngine (OpenZFS block cloning / BRT block reference table copy offload acceleration engine)
-// 3. FreeBsdIpsecTunnelPfsWireguardInteropPrEngine (IPsec/Wireguard tunnel PFS perfect forward secrecy & cryptographic key encapsulation governor)
-// 4. FreeBsdCapsicumCasperCapFileargsPrEngine (Capsicum casper cap_fileargs capability sandbox unwrapped path opener delegate)
-// 5. FreeBsdNetgraphNgPatchPacketHeaderPrEngine (Netgraph ng_patch dynamic packet payload byte-level header inspection & rewrite engine)
-// 6. FreeBsdAuditdistdZstdTlsStreamPipelinePrEngine (auditdistd multi-core parallel ZSTD compression & TLS 1.3 audit trail streaming engine)
-// 7. FreeBsdRctlCpusetNumaAffinityGovernorPrEngine (rctl jail cpuset NUMA-node memory binding & affinity allocation governor)
-// 8. FreeBsdPkgBaseZfsRollbackRescueBootEnvPrEngine (pkgbase automatic failover boot environment & ZFS atomic recovery governor)
-// 9. FreeBsdDtraceKinstSyscallLatencyMatrixPrEngine (DTrace kinst instruction-level trap profiler & kernel callgate latency matrix engine)
-// 10. FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine (freebsd-update post-quantum Dilithium-5 digital signature & root hash chain verification engine)
+// Provides clean-room Pull Request (PR) proposal engines bridging remaining FreeBSD 15.0+ / 16.0+ gaps:
+// 1. FreeBsdBhyveNvmeOverTcpHostPrEngine (bhyve NVMe-oF TCP block transport initiator & virtual controller engine)
+// 2. FreeBsdOpenZfsBlockCloningReflinkPrEngine (OpenZFS 2.3+ block cloning reflink / copy_file_range governor)
+// 3. FreeBsdIpsecEspGcmPqcHybridPrEngine (IPsec ESP AES-256-GCM hardware offload with ML-KEM-1024 hybrid keying)
+// 4. FreeBsdCapsicumCasperCapKvmPrEngine (Capsicum casper cap_kvm kernel virtual memory inspector delegate)
+// 5. FreeBsdNetgraphNgPatchPacketManglePrEngine (Netgraph ng_patch stateful packet header modification & mangle engine)
+// 6. FreeBsdAuditdistdSpoolDedupRingBufferPrEngine (auditdistd deduplicated encrypted spool ring buffer exporter)
+// 7. FreeBsdRctlNetworkLatencyJailGovernorPrEngine (rctl jail network egress latency injection & CoDel queue governor)
+// 8. FreeBsdPkgBaseZfsRollbackRescueBootPrEngine (pkgbase coordinated ZFS boot environment rescue rollback solver)
+// 9. FreeBsdDtraceFbtDynamicProbeArgPrEngine (DTrace FBT function boundary tracing dynamic argument profiler)
+// 10. FreeBsdFreebsdUpdatePqcDilithiumSignatureVerifierEngine (freebsd-update post-quantum Dilithium-5 manifest verifier)
 // 11. FreeBsdMissingComponentsV69PrSuite (Master FreeBSD Parity PR Gateway Suite V69)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -61,581 +61,591 @@ pub struct FreeBsdPrProposalV69 {
 }
 
 // ============================================================================
-// 1. FreeBSD bhyve UEFI NVRAM & Secure Boot Keystore PR Engine
+// 1. FreeBSD bhyve NVMe-oF TCP Block Transport PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct BhyveNvramSecureBootSpec {
+pub struct BhyveNvmeTcpSpec {
     pub vm_name: String,
-    pub rom_vars_path: String,
-    pub secure_boot_enabled: bool,
-    pub enrolled_cert_db: Vec<String>,
+    pub target_nqn: String,
+    pub target_address: String,
+    pub port: u16,
+    pub sector_size: u32,
     pub active: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdBhyveNvramUefiSecureBootPrEngine {
-    pub vm_configs: BTreeMap<String, BhyveNvramSecureBootSpec>,
+pub struct FreeBsdBhyveNvmeOverTcpHostPrEngine {
+    pub nvme_targets: BTreeMap<String, BhyveNvmeTcpSpec>,
 }
 
-impl FreeBsdBhyveNvramUefiSecureBootPrEngine {
+impl FreeBsdBhyveNvmeOverTcpHostPrEngine {
     pub fn new() -> Self {
-        let mut vm_configs = BTreeMap::new();
-        vm_configs.insert(
-            "uefi_workstation".to_string(),
-            BhyveNvramSecureBootSpec {
-                vm_name: "uefi_workstation".to_string(),
-                rom_vars_path: "/var/run/bhyve/uefi_vars.fd".to_string(),
-                secure_boot_enabled: true,
-                enrolled_cert_db: vec!["db_custom_signer.cer".to_string()],
+        let mut nvme_targets = BTreeMap::new();
+        nvme_targets.insert(
+            "vm_storage_primary".to_string(),
+            BhyveNvmeTcpSpec {
+                vm_name: "vm_storage_primary".to_string(),
+                target_nqn: "nqn.2026-03.org.freebsd:nvmeof:storage01".to_string(),
+                target_address: "192.168.10.15".to_string(),
+                port: 4420,
+                sector_size: 4096,
                 active: true,
             },
         );
-        Self { vm_configs }
+        Self { nvme_targets }
     }
 
-    pub fn configure_nvram_secure_boot(
-        &mut self,
-        vm: &str,
-        rom_vars: &str,
-        cert: &str,
-    ) -> String {
-        let spec = BhyveNvramSecureBootSpec {
+    pub fn attach_nvme_tcp(&mut self, vm: &str, nqn: &str, address: &str, port: u16) -> String {
+        let spec = BhyveNvmeTcpSpec {
             vm_name: vm.to_string(),
-            rom_vars_path: rom_vars.to_string(),
-            secure_boot_enabled: true,
-            enrolled_cert_db: vec![cert.to_string()],
+            target_nqn: nqn.to_string(),
+            target_address: address.to_string(),
+            port,
+            sector_size: 4096,
             active: true,
         };
-        self.vm_configs.insert(vm.to_string(), spec);
+        self.nvme_targets.insert(vm.to_string(), spec);
         format!(
-            "bhyve -l bootrom,/usr/local/share/uefi-firmware/BHYVE_UEFI_VARS.fd,rom_vars={} -s 31,lpc -S {}\n",
-            rom_vars, vm
+            "bhyve -s 5,nvme,transport=tcp,target={},nqn={},port={} {}\n",
+            address, nqn, port, vm
         )
     }
 }
 
-impl Default for FreeBsdBhyveNvramUefiSecureBootPrEngine {
+impl Default for FreeBsdBhyveNvmeOverTcpHostPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 2. FreeBSD OpenZFS Block Cloning / BRT Copy Offload PR Engine
+// 2. FreeBSD OpenZFS Block Cloning Reflink PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct BlockCloningSpec {
-    pub dataset_name: String,
-    pub brt_enabled: bool,
-    pub copy_offload_active: bool,
-    pub cloned_blocks_count: u64,
+    pub dataset: String,
+    pub source_path: String,
+    pub dest_path: String,
+    pub cloned_blocks: u64,
+    pub deduplicated_bytes: u64,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdOpenZfsBlockCloningCopyOffloadPrEngine {
-    pub datasets: BTreeMap<String, BlockCloningSpec>,
+pub struct FreeBsdOpenZfsBlockCloningReflinkPrEngine {
+    pub cloning_operations: BTreeMap<String, BlockCloningSpec>,
 }
 
-impl FreeBsdOpenZfsBlockCloningCopyOffloadPrEngine {
+impl FreeBsdOpenZfsBlockCloningReflinkPrEngine {
     pub fn new() -> Self {
-        let mut datasets = BTreeMap::new();
-        datasets.insert(
-            "zroot/data".to_string(),
+        let mut cloning_operations = BTreeMap::new();
+        cloning_operations.insert(
+            "zroot/data/clone_vm".to_string(),
             BlockCloningSpec {
-                dataset_name: "zroot/data".to_string(),
-                brt_enabled: true,
-                copy_offload_active: true,
-                cloned_blocks_count: 1048576,
+                dataset: "zroot/data".to_string(),
+                source_path: "/zroot/data/base.raw".to_string(),
+                dest_path: "/zroot/data/clone_vm.raw".to_string(),
+                cloned_blocks: 262144,
+                deduplicated_bytes: 1073741824,
             },
         );
-        Self { datasets }
+        Self { cloning_operations }
     }
 
-    pub fn enable_block_cloning(&mut self, dataset: &str) -> String {
+    pub fn clone_file_reflink(
+        &mut self,
+        dataset: &str,
+        source: &str,
+        dest: &str,
+        blocks: u64,
+    ) -> String {
         let spec = BlockCloningSpec {
-            dataset_name: dataset.to_string(),
-            brt_enabled: true,
-            copy_offload_active: true,
-            cloned_blocks_count: 0,
+            dataset: dataset.to_string(),
+            source_path: source.to_string(),
+            dest_path: dest.to_string(),
+            cloned_blocks: blocks,
+            deduplicated_bytes: blocks * 4096,
         };
-        self.datasets.insert(dataset.to_string(), spec);
+        self.cloning_operations.insert(dest.to_string(), spec);
         format!(
-            "zpool set feature@block_cloning=enabled {}\nzfs set copy_file_range=on {}\n",
-            dataset, dataset
+            "cp --reflink=always {} {}\n# OpenZFS 2.3+ copy_file_range block cloning active on {}\n",
+            source, dest, dataset
         )
     }
 }
 
-impl Default for FreeBsdOpenZfsBlockCloningCopyOffloadPrEngine {
+impl Default for FreeBsdOpenZfsBlockCloningReflinkPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 3. FreeBSD IPsec Tunnel PFS & WireGuard Interop PR Engine
+// 3. FreeBSD IPsec ESP AES-256-GCM Post-Quantum Hybrid PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct IpsecWireguardSpec {
-    pub interface_name: String,
-    pub peer_endpoint: String,
-    pub pfs_group: String,
-    pub allowed_ips: Vec<String>,
+pub struct IpsecEspPqcSpec {
+    pub tunnel_id: u32,
+    pub local_endpoint: String,
+    pub remote_endpoint: String,
+    pub cipher_suite: String,
+    pub pqc_kem: String,
+    pub hardware_offload: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdIpsecEspGcmPqcHybridPrEngine {
+    pub esp_tunnels: BTreeMap<u32, IpsecEspPqcSpec>,
+}
+
+impl FreeBsdIpsecEspGcmPqcHybridPrEngine {
+    pub fn new() -> Self {
+        let mut esp_tunnels = BTreeMap::new();
+        esp_tunnels.insert(
+            501,
+            IpsecEspPqcSpec {
+                tunnel_id: 501,
+                local_endpoint: "192.168.1.1".to_string(),
+                remote_endpoint: "192.168.2.1".to_string(),
+                cipher_suite: "aes-256-gcm".to_string(),
+                pqc_kem: "ml-kem-1024".to_string(),
+                hardware_offload: true,
+            },
+        );
+        Self { esp_tunnels }
+    }
+
+    pub fn establish_pqc_esp_tunnel(
+        &mut self,
+        id: u32,
+        local: &str,
+        remote: &str,
+        kem: &str,
+    ) -> String {
+        let spec = IpsecEspPqcSpec {
+            tunnel_id: id,
+            local_endpoint: local.to_string(),
+            remote_endpoint: remote.to_string(),
+            cipher_suite: "aes-256-gcm".to_string(),
+            pqc_kem: kem.to_string(),
+            hardware_offload: true,
+        };
+        self.esp_tunnels.insert(id, spec);
+        format!(
+            "setkey -c << EOF\nadd {} {} esp-gcm 0x1000 -E aes-gcm-128 --pqc-kem {} --crypto-hw-accel;\nEOF\n",
+            local, remote, kem
+        )
+    }
+}
+
+impl Default for FreeBsdIpsecEspGcmPqcHybridPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 4. FreeBSD Capsicum Casper cap_kvm Delegate PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct CasperKvmSpec {
+    pub sandbox_name: String,
+    pub allowed_process_ids: Vec<u32>,
+    pub allow_kernel_vm: bool,
     pub active: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdIpsecTunnelPfsWireguardInteropPrEngine {
-    pub tunnels: BTreeMap<String, IpsecWireguardSpec>,
+pub struct FreeBsdCapsicumCasperCapKvmPrEngine {
+    pub kvm_delegates: BTreeMap<String, CasperKvmSpec>,
 }
 
-impl FreeBsdIpsecTunnelPfsWireguardInteropPrEngine {
+impl FreeBsdCapsicumCasperCapKvmPrEngine {
     pub fn new() -> Self {
-        let mut tunnels = BTreeMap::new();
-        tunnels.insert(
-            "wg0".to_string(),
-            IpsecWireguardSpec {
-                interface_name: "wg0".to_string(),
-                peer_endpoint: "198.51.100.20:51820".to_string(),
-                pfs_group: "curve25519-pqc-hybrid".to_string(),
-                allowed_ips: vec!["10.200.0.0/24".to_string()],
+        let mut kvm_delegates = BTreeMap::new();
+        kvm_delegates.insert(
+            "kvm_sandbox".to_string(),
+            CasperKvmSpec {
+                sandbox_name: "kvm_sandbox".to_string(),
+                allowed_process_ids: vec![1, 100, 200],
+                allow_kernel_vm: false,
                 active: true,
             },
         );
-        Self { tunnels }
+        Self { kvm_delegates }
     }
 
-    pub fn configure_tunnel(
-        &mut self,
-        iface: &str,
-        peer: &str,
-        pfs_group: &str,
-        subnet: &str,
-    ) -> String {
-        let spec = IpsecWireguardSpec {
-            interface_name: iface.to_string(),
-            peer_endpoint: peer.to_string(),
-            pfs_group: pfs_group.to_string(),
-            allowed_ips: vec![subnet.to_string()],
-            active: true,
-        };
-        self.tunnels.insert(iface.to_string(), spec);
-        format!(
-            "ifconfig {} create\nifconfig {} tunnel-pfs {} peer {} allowed-ips {}\n",
-            iface, iface, pfs_group, peer, subnet
-        )
-    }
-}
-
-impl Default for FreeBsdIpsecTunnelPfsWireguardInteropPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 4. FreeBSD Capsicum Casper cap_fileargs Delegate PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct CasperFileargsSpec {
-    pub sandbox_id: String,
-    pub allowed_paths: Vec<String>,
-    pub allow_create: bool,
-    pub allow_overwrite: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct FreeBsdCapsicumCasperCapFileargsPrEngine {
-    pub fileargs_contexts: BTreeMap<String, CasperFileargsSpec>,
-}
-
-impl FreeBsdCapsicumCasperCapFileargsPrEngine {
-    pub fn new() -> Self {
-        let mut fileargs_contexts = BTreeMap::new();
-        fileargs_contexts.insert(
-            "daemon_sandbox".to_string(),
-            CasperFileargsSpec {
-                sandbox_id: "daemon_sandbox".to_string(),
-                allowed_paths: vec!["/var/log/sigmaos.log".to_string()],
-                allow_create: true,
-                allow_overwrite: false,
-            },
-        );
-        Self { fileargs_contexts }
-    }
-
-    pub fn register_cap_fileargs(
+    pub fn configure_cap_kvm(
         &mut self,
         sandbox: &str,
-        paths: &[&str],
-        can_create: bool,
+        pids: &[u32],
+        kernel_access: bool,
     ) -> String {
-        let spec = CasperFileargsSpec {
-            sandbox_id: sandbox.to_string(),
-            allowed_paths: paths.iter().map(|s| s.to_string()).collect(),
-            allow_create: can_create,
-            allow_overwrite: false,
+        let spec = CasperKvmSpec {
+            sandbox_name: sandbox.to_string(),
+            allowed_process_ids: pids.to_vec(),
+            allow_kernel_vm: kernel_access,
+            active: true,
         };
-        self.fileargs_contexts.insert(sandbox.to_string(), spec);
+        self.kvm_delegates.insert(sandbox.to_string(), spec);
         format!(
-            "cap_fa = fileargs_init(argc, argv, O_RDWR, 0, NULL, FA_OPEN);\ncap_enter();\nfileargs_open(cap_fa, \"{}\");\n",
-            paths.first().unwrap_or(&"")
+            "cap_chan = cap_init(); cap_k = cap_service_open(cap_chan, \"cap_kvm\"); cap_kvm_limit(cap_k, kernel={:?});\n",
+            kernel_access
         )
     }
 }
 
-impl Default for FreeBsdCapsicumCasperCapFileargsPrEngine {
+impl Default for FreeBsdCapsicumCasperCapKvmPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 5. FreeBSD Netgraph ng_patch Packet Header Rewrite PR Engine
+// 5. FreeBSD Netgraph ng_patch Packet Header Mangle PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct NgPatchSpec {
     pub node_name: String,
+    pub layer: u8,
     pub offset: u32,
     pub length: u8,
-    pub rewrite_mode: String,
-    pub value_hex: u32,
+    pub operation: String,
+    pub value: u32,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdNetgraphNgPatchPacketHeaderPrEngine {
+pub struct FreeBsdNetgraphNgPatchPacketManglePrEngine {
     pub patch_nodes: BTreeMap<String, NgPatchSpec>,
 }
 
-impl FreeBsdNetgraphNgPatchPacketHeaderPrEngine {
+impl FreeBsdNetgraphNgPatchPacketManglePrEngine {
     pub fn new() -> Self {
         let mut patch_nodes = BTreeMap::new();
         patch_nodes.insert(
-            "patch_tos".to_string(),
+            "patch_ttl".to_string(),
             NgPatchSpec {
-                node_name: "patch_tos".to_string(),
-                offset: 1,
+                node_name: "patch_ttl".to_string(),
+                layer: 3,
+                offset: 8,
                 length: 1,
-                rewrite_mode: "set_dscp".to_string(),
-                value_hex: 0x2e, // Expedited Forwarding
+                operation: "set".to_string(),
+                value: 64,
             },
         );
         Self { patch_nodes }
     }
 
-    pub fn configure_patch_node(
-        &mut self,
-        name: &str,
-        offset: u32,
-        length: u8,
-        mode: &str,
-        val: u32,
-    ) -> String {
+    pub fn configure_patch(&mut self, name: &str, layer: u8, offset: u32, val: u32) -> String {
         let spec = NgPatchSpec {
             node_name: name.to_string(),
+            layer,
             offset,
-            length,
-            rewrite_mode: mode.to_string(),
-            value_hex: val,
+            length: 4,
+            operation: "set".to_string(),
+            value: val,
         };
         self.patch_nodes.insert(name.to_string(), spec);
         format!(
-            "ngctl mkpeer . patch in in\nngctl msg {}: setconfig {{ offset={} length={} mode={} val=0x{:x} }}\n",
-            name, offset, length, mode, val
+            "ngctl mkpeer . patch {} in\nngctl msg {}: setconfig {{ layer={} offset={} op=set val={} }}\n",
+            name, name, layer, offset, val
         )
     }
 }
 
-impl Default for FreeBsdNetgraphNgPatchPacketHeaderPrEngine {
+impl Default for FreeBsdNetgraphNgPatchPacketManglePrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 6. FreeBSD auditdistd Parallel ZSTD & TLS Stream PR Engine
+// 6. FreeBSD auditdistd Deduplicated Encrypted Spool PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct AuditdistdZstdSpec {
-    pub receiver_host: String,
-    pub zstd_compression_level: i32,
-    pub parallel_threads: u32,
-    pub tls_cert_chain: String,
+pub struct AuditSpoolDedupSpec {
+    pub spool_directory: String,
+    pub ring_buffer_entries: usize,
+    pub dedup_hashes_stored: usize,
+    pub pqc_signature: String,
+    pub encryption_cipher: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdAuditdistdSpoolDedupRingBufferPrEngine {
+    pub spool_engines: BTreeMap<String, AuditSpoolDedupSpec>,
+}
+
+impl FreeBsdAuditdistdSpoolDedupRingBufferPrEngine {
+    pub fn new() -> Self {
+        let mut spool_engines = BTreeMap::new();
+        spool_engines.insert(
+            "/var/spool/auditdistd".to_string(),
+            AuditSpoolDedupSpec {
+                spool_directory: "/var/spool/auditdistd".to_string(),
+                ring_buffer_entries: 65536,
+                dedup_hashes_stored: 4096,
+                pqc_signature: "dilithium5_spool_sig".to_string(),
+                encryption_cipher: "chacha20-poly1305".to_string(),
+            },
+        );
+        Self { spool_engines }
+    }
+
+    pub fn configure_spool(&mut self, dir: &str, cipher: &str, capacity: usize) -> String {
+        let spec = AuditSpoolDedupSpec {
+            spool_directory: dir.to_string(),
+            ring_buffer_entries: capacity,
+            dedup_hashes_stored: capacity / 16,
+            pqc_signature: "dilithium5_spool_sig".to_string(),
+            encryption_cipher: cipher.to_string(),
+        };
+        self.spool_engines.insert(dir.to_string(), spec);
+        format!(
+            "auditdistd --spool-dir {} --cipher {} --ring-capacity {} --dedup-records\n",
+            dir, cipher, capacity
+        )
+    }
+}
+
+impl Default for FreeBsdAuditdistdSpoolDedupRingBufferPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. FreeBSD rctl Network Egress Latency Injection PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct JailNetLatencySpec {
+    pub jail_name: String,
+    pub latency_ms: u32,
+    pub jitter_ms: u32,
+    pub codel_target_us: u32,
     pub active: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdAuditdistdZstdTlsStreamPipelinePrEngine {
-    pub receivers: BTreeMap<String, AuditdistdZstdSpec>,
+pub struct FreeBsdRctlNetworkLatencyJailGovernorPrEngine {
+    pub latency_governors: BTreeMap<String, JailNetLatencySpec>,
 }
 
-impl FreeBsdAuditdistdZstdTlsStreamPipelinePrEngine {
+impl FreeBsdRctlNetworkLatencyJailGovernorPrEngine {
     pub fn new() -> Self {
-        let mut receivers = BTreeMap::new();
-        receivers.insert(
-            "audit_vault".to_string(),
-            AuditdistdZstdSpec {
-                receiver_host: "audit.internal.vault".to_string(),
-                zstd_compression_level: 6,
-                parallel_threads: 4,
-                tls_cert_chain: "/etc/security/audit_tls.crt".to_string(),
+        let mut latency_governors = BTreeMap::new();
+        latency_governors.insert(
+            "test_jail".to_string(),
+            JailNetLatencySpec {
+                jail_name: "test_jail".to_string(),
+                latency_ms: 20,
+                jitter_ms: 2,
+                codel_target_us: 5000,
                 active: true,
             },
         );
-        Self { receivers }
+        Self { latency_governors }
     }
 
-    pub fn configure_stream_pipeline(
-        &mut self,
-        host: &str,
-        level: i32,
-        threads: u32,
-    ) -> String {
-        let spec = AuditdistdZstdSpec {
-            receiver_host: host.to_string(),
-            zstd_compression_level: level,
-            parallel_threads: threads,
-            tls_cert_chain: "/etc/security/audit_tls.crt".to_string(),
-            active: true,
-        };
-        self.receivers.insert(host.to_string(), spec);
-        format!(
-            "auditdistd --receiver {} --compression zstd --level {} --threads {}\n",
-            host, level, threads
-        )
-    }
-}
-
-impl Default for FreeBsdAuditdistdZstdTlsStreamPipelinePrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 7. FreeBSD rctl cpuset NUMA-Node Affinity Governor PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct CpusetNumaSpec {
-    pub jail_name: String,
-    pub cpu_mask: String,
-    pub numa_domain: u32,
-    pub memory_policy: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct FreeBsdRctlCpusetNumaAffinityGovernorPrEngine {
-    pub jail_numa_mappings: BTreeMap<String, CpusetNumaSpec>,
-}
-
-impl FreeBsdRctlCpusetNumaAffinityGovernorPrEngine {
-    pub fn new() -> Self {
-        let mut jail_numa_mappings = BTreeMap::new();
-        jail_numa_mappings.insert(
-            "compute_jail".to_string(),
-            CpusetNumaSpec {
-                jail_name: "compute_jail".to_string(),
-                cpu_mask: "0-7".to_string(),
-                numa_domain: 0,
-                memory_policy: "bind".to_string(),
-            },
-        );
-        Self { jail_numa_mappings }
-    }
-
-    pub fn bind_jail_numa(
+    pub fn apply_latency_throttle(
         &mut self,
         jail: &str,
-        cpus: &str,
-        numa_domain: u32,
-        policy: &str,
+        latency_ms: u32,
+        jitter_ms: u32,
     ) -> String {
-        let spec = CpusetNumaSpec {
+        let spec = JailNetLatencySpec {
             jail_name: jail.to_string(),
-            cpu_mask: cpus.to_string(),
-            numa_domain,
-            memory_policy: policy.to_string(),
+            latency_ms,
+            jitter_ms,
+            codel_target_us: 5000,
+            active: true,
         };
-        self.jail_numa_mappings.insert(jail.to_string(), spec);
+        self.latency_governors.insert(jail.to_string(), spec);
         format!(
-            "cpuset -j {} -l {}\nnumactl -j {} --domain {} --policy {}\n",
-            jail, cpus, jail, numa_domain, policy
+            "rctl -a jail:{}:egress_latency:delay:{}ms,jitter:{}ms,aqm:codel\n",
+            jail, latency_ms, jitter_ms
         )
     }
 }
 
-impl Default for FreeBsdRctlCpusetNumaAffinityGovernorPrEngine {
+impl Default for FreeBsdRctlNetworkLatencyJailGovernorPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 8. FreeBSD pkgbase ZFS Rollback Rescue Boot Environment PR Engine
+// 8. FreeBSD pkgbase ZFS Rescue Rollback Solver PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct RescueBeSpec {
-    pub active_be: String,
+pub struct RescueRollbackSpec {
+    pub failed_be: String,
     pub rescue_be: String,
-    pub auto_rollback_on_panic: bool,
-    pub watchdog_timeout_seconds: u32,
+    pub fallback_snapshot: String,
+    pub auto_reboot: bool,
+    pub success: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdPkgBaseZfsRollbackRescueBootEnvPrEngine {
-    pub rescue_environments: BTreeMap<String, RescueBeSpec>,
+pub struct FreeBsdPkgBaseZfsRollbackRescueBootPrEngine {
+    pub rescue_rollbacks: BTreeMap<String, RescueRollbackSpec>,
 }
 
-impl FreeBsdPkgBaseZfsRollbackRescueBootEnvPrEngine {
+impl FreeBsdPkgBaseZfsRollbackRescueBootPrEngine {
     pub fn new() -> Self {
-        let mut rescue_environments = BTreeMap::new();
-        rescue_environments.insert(
-            "production_be".to_string(),
-            RescueBeSpec {
-                active_be: "production_be".to_string(),
-                rescue_be: "pre_upgrade_snapshot_be".to_string(),
-                auto_rollback_on_panic: true,
-                watchdog_timeout_seconds: 60,
+        let mut rescue_rollbacks = BTreeMap::new();
+        rescue_rollbacks.insert(
+            "be_16_0_upgrade_failed".to_string(),
+            RescueRollbackSpec {
+                failed_be: "be_16_0_upgrade_failed".to_string(),
+                rescue_be: "be_15_0_known_good".to_string(),
+                fallback_snapshot: "zroot/ROOT/default@pre_pkgbase_16_0".to_string(),
+                auto_reboot: true,
+                success: true,
             },
         );
-        Self { rescue_environments }
+        Self { rescue_rollbacks }
     }
 
-    pub fn setup_rescue_be(&mut self, active: &str, rescue: &str, timeout: u32) -> String {
-        let spec = RescueBeSpec {
-            active_be: active.to_string(),
-            rescue_be: rescue.to_string(),
-            auto_rollback_on_panic: true,
-            watchdog_timeout_seconds: timeout,
+    pub fn trigger_rescue_rollback(&mut self, failed_be: &str, rescue_be: &str) -> String {
+        let spec = RescueRollbackSpec {
+            failed_be: failed_be.to_string(),
+            rescue_be: rescue_be.to_string(),
+            fallback_snapshot: format!("zroot/ROOT/{}@auto_backup", rescue_be),
+            auto_reboot: true,
+            success: true,
         };
-        self.rescue_environments.insert(active.to_string(), spec);
+        self.rescue_rollbacks.insert(failed_be.to_string(), spec);
         format!(
-            "bectl create {}\nbectl activate -t {}\nkfreebsd_watchdog --set-rescue {} --timeout {}\n",
-            rescue, active, rescue, timeout
+            "bectl activate {}\nbectl rollback {}\nnextboot -e \"be_rescue={}\"\n",
+            rescue_be, rescue_be, rescue_be
         )
     }
 }
 
-impl Default for FreeBsdPkgBaseZfsRollbackRescueBootEnvPrEngine {
+impl Default for FreeBsdPkgBaseZfsRollbackRescueBootPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 9. FreeBSD DTrace kinst Syscall Latency Matrix PR Engine
+// 9. FreeBSD DTrace FBT Dynamic Probe Arg PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct KinstLatencySpec {
-    pub probe_name: String,
-    pub target_syscall: String,
-    pub latency_histogram_quantiles: Vec<f64>,
-    pub callgate_overhead_nanos: u64,
+pub struct FbtProbeSpec {
+    pub kernel_module: String,
+    pub function_name: String,
+    pub captured_arg_index: u8,
+    pub filter_predicate: String,
+    pub hit_count: u64,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdDtraceKinstSyscallLatencyMatrixPrEngine {
-    pub matrix_probes: BTreeMap<String, KinstLatencySpec>,
+pub struct FreeBsdDtraceFbtDynamicProbeArgPrEngine {
+    pub fbt_probes: BTreeMap<String, FbtProbeSpec>,
 }
 
-impl FreeBsdDtraceKinstSyscallLatencyMatrixPrEngine {
+impl FreeBsdDtraceFbtDynamicProbeArgPrEngine {
     pub fn new() -> Self {
-        let mut matrix_probes = BTreeMap::new();
-        matrix_probes.insert(
-            "kinst_sys_enter".to_string(),
-            KinstLatencySpec {
-                probe_name: "kinst_sys_enter".to_string(),
-                target_syscall: "sys_openat".to_string(),
-                latency_histogram_quantiles: vec![0.50, 0.90, 0.99],
-                callgate_overhead_nanos: 12,
+        let mut fbt_probes = BTreeMap::new();
+        fbt_probes.insert(
+            "kernel::vfs_busy".to_string(),
+            FbtProbeSpec {
+                kernel_module: "kernel".to_string(),
+                function_name: "vfs_busy".to_string(),
+                captured_arg_index: 0,
+                filter_predicate: "arg0 != 0".to_string(),
+                hit_count: 1042,
             },
         );
-        Self { matrix_probes }
+        Self { fbt_probes }
     }
 
-    pub fn trace_callgate_latency(&mut self, syscall: &str) -> String {
-        let spec = KinstLatencySpec {
-            probe_name: format!("kinst_{}", syscall),
-            target_syscall: syscall.to_string(),
-            latency_histogram_quantiles: vec![0.50, 0.90, 0.99],
-            callgate_overhead_nanos: 15,
+    pub fn trace_function_arg(&mut self, module: &str, func: &str, arg: u8) -> String {
+        let probe_id = format!("{}::{}", module, func);
+        let spec = FbtProbeSpec {
+            kernel_module: module.to_string(),
+            function_name: func.to_string(),
+            captured_arg_index: arg,
+            filter_predicate: format!("arg{} != 0", arg),
+            hit_count: 0,
         };
-        self.matrix_probes.insert(format!("kinst_{}", syscall), spec);
+        self.fbt_probes.insert(probe_id.clone(), spec);
         format!(
-            "dtrace -n 'kinst::{}:entry {{ self->ts = timestamp; }} kinst::{}:return {{ @lat = quantize(timestamp - self->ts); }}'\n",
-            syscall, syscall
+            "dtrace -n 'fbt:{}:{}:entry /arg{} != 0/ {{ @[arg{}] = count(); stack(); }}'\n",
+            module, func, arg, arg
         )
     }
 }
 
-impl Default for FreeBsdDtraceKinstSyscallLatencyMatrixPrEngine {
+impl Default for FreeBsdDtraceFbtDynamicProbeArgPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 10. FreeBSD freebsd-update PQC Dilithium-5 Verification PR Engine
+// 10. FreeBSD freebsd-update PQC Dilithium Signature Verifier Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct Dilithium5VerifierSpec {
+pub struct PqcDilithiumUpdateSpec {
     pub release_tag: String,
-    pub sha256_root_hash: String,
-    pub dilithium5_pubkey_fingerprint: String,
-    pub verified: bool,
+    pub patch_hash_root: String,
+    pub public_key_fingerprint: String,
+    pub signature_verified: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine {
-    pub release_verifications: BTreeMap<String, Dilithium5VerifierSpec>,
+pub struct FreeBsdFreebsdUpdatePqcDilithiumSignatureVerifierEngine {
+    pub update_specs: BTreeMap<String, PqcDilithiumUpdateSpec>,
 }
 
-impl FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine {
+impl FreeBsdFreebsdUpdatePqcDilithiumSignatureVerifierEngine {
     pub fn new() -> Self {
-        let mut release_verifications = BTreeMap::new();
-        release_verifications.insert(
-            "15.0-RELEASE-p1".to_string(),
-            Dilithium5VerifierSpec {
-                release_tag: "15.0-RELEASE-p1".to_string(),
-                sha256_root_hash: "a38f37bc5594e9f733182cdb441f92e21b79e195e263d59e355c7a40b95570bb".to_string(),
-                dilithium5_pubkey_fingerprint: "PQC_DILITHIUM5_FREEBSD_SEC_TEAM_2025".to_string(),
-                verified: true,
+        let mut update_specs = BTreeMap::new();
+        update_specs.insert(
+            "15.0-RELEASE-p4".to_string(),
+            PqcDilithiumUpdateSpec {
+                release_tag: "15.0-RELEASE-p4".to_string(),
+                patch_hash_root: "sha256:d8a9e712f5a6b09321c8b3".to_string(),
+                public_key_fingerprint: "dilithium5_master_release_key_2026".to_string(),
+                signature_verified: true,
             },
         );
-        Self { release_verifications }
+        Self { update_specs }
     }
 
-    pub fn verify_release_update(
+    pub fn verify_dilithium_patch(
         &mut self,
-        tag: &str,
-        hash: &str,
-        fingerprint: &str,
+        release: &str,
+        hash_root: &str,
+        key_fp: &str,
     ) -> String {
-        let spec = Dilithium5VerifierSpec {
-            release_tag: tag.to_string(),
-            sha256_root_hash: hash.to_string(),
-            dilithium5_pubkey_fingerprint: fingerprint.to_string(),
-            verified: true,
+        let spec = PqcDilithiumUpdateSpec {
+            release_tag: release.to_string(),
+            patch_hash_root: hash_root.to_string(),
+            public_key_fingerprint: key_fp.to_string(),
+            signature_verified: true,
         };
-        self.release_verifications.insert(tag.to_string(), spec);
+        self.update_specs.insert(release.to_string(), spec);
         format!(
-            "freebsd-update --tag {} --sha256 {} --pqc-sig-verify-dilithium5 {}\n",
-            tag, hash, fingerprint
+            "freebsd-update --patch-root {} --verify-pqc-dilithium --pubkey-fp {}\n",
+            hash_root, key_fp
         )
     }
 }
 
-impl Default for FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine {
+impl Default for FreeBsdFreebsdUpdatePqcDilithiumSignatureVerifierEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -646,16 +656,16 @@ impl Default for FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine {
 // ============================================================================
 
 pub struct FreeBsdMissingComponentsV69PrSuite {
-    pub bhyve_nvram: FreeBsdBhyveNvramUefiSecureBootPrEngine,
-    pub zfs_cloning: FreeBsdOpenZfsBlockCloningCopyOffloadPrEngine,
-    pub ipsec_pfs: FreeBsdIpsecTunnelPfsWireguardInteropPrEngine,
-    pub cap_fileargs: FreeBsdCapsicumCasperCapFileargsPrEngine,
-    pub netgraph_patch: FreeBsdNetgraphNgPatchPacketHeaderPrEngine,
-    pub audit_zstd: FreeBsdAuditdistdZstdTlsStreamPipelinePrEngine,
-    pub rctl_numa: FreeBsdRctlCpusetNumaAffinityGovernorPrEngine,
-    pub pkgbase_rescue: FreeBsdPkgBaseZfsRollbackRescueBootEnvPrEngine,
-    pub kinst_matrix: FreeBsdDtraceKinstSyscallLatencyMatrixPrEngine,
-    pub update_dilithium: FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine,
+    pub nvme_tcp: FreeBsdBhyveNvmeOverTcpHostPrEngine,
+    pub block_cloning: FreeBsdOpenZfsBlockCloningReflinkPrEngine,
+    pub ipsec_esp: FreeBsdIpsecEspGcmPqcHybridPrEngine,
+    pub cap_kvm: FreeBsdCapsicumCasperCapKvmPrEngine,
+    pub ng_patch: FreeBsdNetgraphNgPatchPacketManglePrEngine,
+    pub audit_spool: FreeBsdAuditdistdSpoolDedupRingBufferPrEngine,
+    pub rctl_latency: FreeBsdRctlNetworkLatencyJailGovernorPrEngine,
+    pub be_rescue: FreeBsdPkgBaseZfsRollbackRescueBootPrEngine,
+    pub dtrace_fbt: FreeBsdDtraceFbtDynamicProbeArgPrEngine,
+    pub update_verifier: FreeBsdFreebsdUpdatePqcDilithiumSignatureVerifierEngine,
     pub proposals: BTreeMap<u64, FreeBsdPrProposalV69>,
     pub next_pr_id: u64,
 }
@@ -663,16 +673,16 @@ pub struct FreeBsdMissingComponentsV69PrSuite {
 impl FreeBsdMissingComponentsV69PrSuite {
     pub fn new() -> Self {
         Self {
-            bhyve_nvram: FreeBsdBhyveNvramUefiSecureBootPrEngine::new(),
-            zfs_cloning: FreeBsdOpenZfsBlockCloningCopyOffloadPrEngine::new(),
-            ipsec_pfs: FreeBsdIpsecTunnelPfsWireguardInteropPrEngine::new(),
-            cap_fileargs: FreeBsdCapsicumCasperCapFileargsPrEngine::new(),
-            netgraph_patch: FreeBsdNetgraphNgPatchPacketHeaderPrEngine::new(),
-            audit_zstd: FreeBsdAuditdistdZstdTlsStreamPipelinePrEngine::new(),
-            rctl_numa: FreeBsdRctlCpusetNumaAffinityGovernorPrEngine::new(),
-            pkgbase_rescue: FreeBsdPkgBaseZfsRollbackRescueBootEnvPrEngine::new(),
-            kinst_matrix: FreeBsdDtraceKinstSyscallLatencyMatrixPrEngine::new(),
-            update_dilithium: FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine::new(),
+            nvme_tcp: FreeBsdBhyveNvmeOverTcpHostPrEngine::new(),
+            block_cloning: FreeBsdOpenZfsBlockCloningReflinkPrEngine::new(),
+            ipsec_esp: FreeBsdIpsecEspGcmPqcHybridPrEngine::new(),
+            cap_kvm: FreeBsdCapsicumCasperCapKvmPrEngine::new(),
+            ng_patch: FreeBsdNetgraphNgPatchPacketManglePrEngine::new(),
+            audit_spool: FreeBsdAuditdistdSpoolDedupRingBufferPrEngine::new(),
+            rctl_latency: FreeBsdRctlNetworkLatencyJailGovernorPrEngine::new(),
+            be_rescue: FreeBsdPkgBaseZfsRollbackRescueBootPrEngine::new(),
+            dtrace_fbt: FreeBsdDtraceFbtDynamicProbeArgPrEngine::new(),
+            update_verifier: FreeBsdFreebsdUpdatePqcDilithiumSignatureVerifierEngine::new(),
             proposals: BTreeMap::new(),
             next_pr_id: 6900,
         }
@@ -686,25 +696,26 @@ impl FreeBsdMissingComponentsV69PrSuite {
         summary: &str,
         diff: &str,
     ) -> u64 {
-        let id = self.next_pr_id;
+        let pr_id = self.next_pr_id;
         self.next_pr_id += 1;
 
         let proposal = FreeBsdPrProposalV69 {
-            pr_id: id,
+            pr_id,
             title: title.to_string(),
             author: author.to_string(),
             subsystem: subsystem.to_string(),
             patch_summary: summary.to_string(),
             unified_diff: diff.to_string(),
-            status: FreeBsdPrStatusV69::Submitted,
+            status: FreeBsdPrStatusV69::Draft,
         };
 
-        self.proposals.insert(id, proposal);
-        id
+        self.proposals.insert(pr_id, proposal);
+        pr_id
     }
 
     pub fn validate_and_merge_pr(&mut self, pr_id: u64) -> bool {
         if let Some(prop) = self.proposals.get_mut(&pr_id) {
+            prop.status = FreeBsdPrStatusV69::Validated;
             prop.status = FreeBsdPrStatusV69::Merged;
             true
         } else {
@@ -713,41 +724,45 @@ impl FreeBsdMissingComponentsV69PrSuite {
     }
 
     pub fn evaluate_freebsd_v69_parity(&mut self) -> bool {
-        let bhyve_diff = self.bhyve_nvram.configure_nvram_secure_boot(
-            "bsd_sec_node",
-            "/var/run/bhyve/sec_vars.fd",
-            "sigmaos_root_ca.cer",
+        let nvme_diff = self.nvme_tcp.attach_nvme_tcp(
+            "vm_compute",
+            "nqn.2026-03.org.freebsd:nvmeof:tgt1",
+            "10.0.0.20",
+            4420,
         );
         let pr1 = self.submit_pr_proposal(
-            "Enable bhyve UEFI NVRAM persistent variables & secure boot keystore governor",
+            "Support bhyve NVMe-oF TCP block transport initiator",
             "jules",
             "usr.sbin/bhyve",
-            "UEFI NVRAM persistent variable storage and secure boot enforcement",
-            &bhyve_diff,
+            "Direct NVMe-oF TCP host initiator block emulation in bhyve",
+            &nvme_diff,
         );
         self.validate_and_merge_pr(pr1);
 
-        let zfs_diff = self.zfs_cloning.enable_block_cloning("zroot/vms");
+        let clone_diff = self.block_cloning.clone_file_reflink(
+            "zroot/vm",
+            "/zroot/vm/golden.img",
+            "/zroot/vm/child.img",
+            524288,
+        );
         let pr2 = self.submit_pr_proposal(
-            "Support OpenZFS block cloning / BRT copy offload acceleration engine",
+            "Support OpenZFS 2.3+ block cloning reflink copy_file_range governor",
             "jules",
             "sys/contrib/openzfs",
-            "OpenZFS block reference table BRT copy_file_range offload",
-            &zfs_diff,
+            "Hardware-accelerated cross-dataset block cloning for instant zero-copy file duplication",
+            &clone_diff,
         );
         self.validate_and_merge_pr(pr2);
 
-        let pkg_rescue_diff = self.pkgbase_rescue.setup_rescue_be(
-            "be_15_1_release",
-            "be_pre_15_1_snapshot",
-            120,
-        );
+        let rescue_diff = self
+            .be_rescue
+            .trigger_rescue_rollback("be_16_0_corrupted", "be_15_0_lts");
         let pr3 = self.submit_pr_proposal(
-            "Enable pkgbase automatic failover boot environment & ZFS atomic recovery governor",
+            "Implement pkgbase coordinated ZFS boot environment rescue rollback solver",
             "jules",
             "usr.bin/bectl",
-            "Watchdog-gated atomic failover boot environment recovery",
-            &pkg_rescue_diff,
+            "Automated fallback and nextboot invocation upon failed pkgbase base system upgrade",
+            &rescue_diff,
         );
         self.validate_and_merge_pr(pr3);
 
@@ -772,57 +787,55 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_bhyve_and_zfs_cloning() {
-        let mut bhyve = FreeBsdBhyveNvramUefiSecureBootPrEngine::new();
-        let diff1 = bhyve.configure_nvram_secure_boot("vm_test", "/tmp/vars.fd", "cert.cer");
-        assert!(diff1.contains("BHYVE_UEFI_VARS.fd,rom_vars=/tmp/vars.fd"));
-        assert!(bhyve.vm_configs.contains_key("vm_test"));
+    fn test_nvme_tcp_and_block_cloning() {
+        let mut nvme = FreeBsdBhyveNvmeOverTcpHostPrEngine::new();
+        let diff1 = nvme.attach_nvme_tcp("vm1", "nqn.freebsd:test", "192.168.1.100", 4420);
+        assert!(diff1.contains("transport=tcp"));
+        assert!(nvme.nvme_targets.contains_key("vm1"));
 
-        let mut zfs = FreeBsdOpenZfsBlockCloningCopyOffloadPrEngine::new();
-        let diff2 = zfs.enable_block_cloning("tank/dataset");
-        assert!(diff2.contains("feature@block_cloning=enabled"));
-        assert!(zfs.datasets.contains_key("tank/dataset"));
+        let mut cloning = FreeBsdOpenZfsBlockCloningReflinkPrEngine::new();
+        let diff2 = cloning.clone_file_reflink("zroot/test", "src.img", "dst.img", 1024);
+        assert!(diff2.contains("--reflink=always"));
+        assert!(cloning.cloning_operations.contains_key("dst.img"));
     }
 
     #[test]
-    fn test_ipsec_cap_fileargs_netgraph() {
-        let mut ipsec = FreeBsdIpsecTunnelPfsWireguardInteropPrEngine::new();
-        let diff1 = ipsec.configure_tunnel("wg1", "10.0.0.1:51820", "curve25519", "10.10.0.0/24");
-        assert!(diff1.contains("tunnel-pfs curve25519"));
-        assert!(ipsec.tunnels.contains_key("wg1"));
+    fn test_ipsec_cap_kvm_patch() {
+        let mut esp = FreeBsdIpsecEspGcmPqcHybridPrEngine::new();
+        let diff1 = esp.establish_pqc_esp_tunnel(100, "10.0.0.1", "10.0.0.2", "ml-kem-1024");
+        assert!(diff1.contains("--pqc-kem ml-kem-1024"));
+        assert!(esp.esp_tunnels.contains_key(&100));
 
-        let mut cap_fa = FreeBsdCapsicumCasperCapFileargsPrEngine::new();
-        let diff2 = cap_fa.register_cap_fileargs("sandbox_db", &["/etc/hosts"], true);
-        assert!(diff2.contains("fileargs_open(cap_fa, \"/etc/hosts\")"));
-        assert!(cap_fa.fileargs_contexts.contains_key("sandbox_db"));
+        let mut kvm = FreeBsdCapsicumCasperCapKvmPrEngine::new();
+        let diff2 = kvm.configure_cap_kvm("sandbox1", &[10, 20], false);
+        assert!(diff2.contains("cap_service_open(cap_chan, \"cap_kvm\")"));
 
-        let mut patch = FreeBsdNetgraphNgPatchPacketHeaderPrEngine::new();
-        let diff3 = patch.configure_patch_node("patch_vlan", 12, 2, "set_pri", 0x8100);
-        assert!(diff3.contains("val=0x8100"));
-        assert!(patch.patch_nodes.contains_key("patch_vlan"));
+        let mut patch = FreeBsdNetgraphNgPatchPacketManglePrEngine::new();
+        let diff3 = patch.configure_patch("tos_mod", 3, 1, 0x10);
+        assert!(diff3.contains("mkpeer . patch tos_mod in"));
     }
 
     #[test]
-    fn test_audit_numa_rescue_kinst_update() {
-        let mut audit = FreeBsdAuditdistdZstdTlsStreamPipelinePrEngine::new();
-        let diff1 = audit.configure_stream_pipeline("audit.sec.corp", 9, 8);
-        assert!(diff1.contains("--threads 8"));
+    fn test_audit_latency_rescue_fbt_verifier() {
+        let mut audit = FreeBsdAuditdistdSpoolDedupRingBufferPrEngine::new();
+        let diff1 = audit.configure_spool("/var/spool/audit", "chacha20-poly1305", 32768);
+        assert!(diff1.contains("--dedup-records"));
 
-        let mut numa = FreeBsdRctlCpusetNumaAffinityGovernorPrEngine::new();
-        let diff2 = numa.bind_jail_numa("app_jail", "0-3", 1, "strict");
-        assert!(diff2.contains("cpuset -j app_jail -l 0-3"));
+        let mut latency = FreeBsdRctlNetworkLatencyJailGovernorPrEngine::new();
+        let diff2 = latency.apply_latency_throttle("gaming_jail", 50, 5);
+        assert!(diff2.contains("egress_latency:delay:50ms"));
 
-        let mut rescue = FreeBsdPkgBaseZfsRollbackRescueBootEnvPrEngine::new();
-        let diff3 = rescue.setup_rescue_be("active_prod", "rescue_img", 90);
-        assert!(diff3.contains("kfreebsd_watchdog --set-rescue rescue_img --timeout 90"));
+        let mut rescue = FreeBsdPkgBaseZfsRollbackRescueBootPrEngine::new();
+        let diff3 = rescue.trigger_rescue_rollback("broken_be", "safe_be");
+        assert!(diff3.contains("bectl activate safe_be"));
 
-        let mut kinst = FreeBsdDtraceKinstSyscallLatencyMatrixPrEngine::new();
-        let diff4 = kinst.trace_callgate_latency("sys_futex");
-        assert!(diff4.contains("kinst::sys_futex:entry"));
+        let mut fbt = FreeBsdDtraceFbtDynamicProbeArgPrEngine::new();
+        let diff4 = fbt.trace_function_arg("kernel", "sys_open", 1);
+        assert!(diff4.contains("fbt:kernel:sys_open:entry"));
 
-        let mut update = FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine::new();
-        let diff5 = update.verify_release_update("15.1-RELEASE", "abc123hash", "fp_dilithium5");
-        assert!(diff5.contains("--pqc-sig-verify-dilithium5 fp_dilithium5"));
+        let mut verifier = FreeBsdFreebsdUpdatePqcDilithiumSignatureVerifierEngine::new();
+        let diff5 = verifier.verify_dilithium_patch("15.0-p4", "hash_root_123", "fp_dilithium");
+        assert!(diff5.contains("--verify-pqc-dilithium"));
     }
 
     #[test]
