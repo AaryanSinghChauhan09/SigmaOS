@@ -6,16 +6,12 @@
 mod artcraft_advancements_v85_pr;
 
 use artcraft_advancements_v85_pr::{
-    ArtcraftAdvancementsV85ParitySuite,
-    ArtcraftComputeShaderBrushStampSimulationPrEngineV85,
+    ArtcraftAdvancementsV85ParitySuite, ArtcraftComputeShaderBrushStampSimulationPrEngineV85,
     ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85,
     ArtcraftLosslessVectorAssetExchangeFormatPrEngineV85,
     ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85,
-    ArtcraftWideGamutOklabLutColorGradingPrEngineV85,
-    LiveFilterNodeType,
-    StylusInputSample,
-    VectorCommand,
-    SovereignArtcraftAdvancementsV85MasterSuite,
+    ArtcraftWideGamutOklabLutColorGradingPrEngineV85, LiveFilterNodeType,
+    SovereignArtcraftAdvancementsV85MasterSuite, StylusInputSample, VectorCommand,
 };
 
 #[test]
@@ -113,6 +109,8 @@ fn test_individual_v85_engines_integration() {
         VectorCommand::Close,
     ];
     let bytes = vector_fmt.serialize_path_commands(&commands);
-    let count = vector_fmt.validate_and_count_stream(&bytes).expect("Valid stream");
+    let count = vector_fmt
+        .validate_and_count_stream(&bytes)
+        .expect("Valid stream");
     assert_eq!(count, 4);
 }

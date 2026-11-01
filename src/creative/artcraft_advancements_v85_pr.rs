@@ -70,9 +70,21 @@ impl ArtcraftWideGamutOklabLutColorGradingPrEngineV85 {
         for b in 0..lut_dimension {
             for g in 0..lut_dimension {
                 for r in 0..lut_dimension {
-                    let rf = if lut_dimension > 1 { r as f32 / (lut_dimension - 1) as f32 } else { 0.0 };
-                    let gf = if lut_dimension > 1 { g as f32 / (lut_dimension - 1) as f32 } else { 0.0 };
-                    let bf = if lut_dimension > 1 { b as f32 / (lut_dimension - 1) as f32 } else { 0.0 };
+                    let rf = if lut_dimension > 1 {
+                        r as f32 / (lut_dimension - 1) as f32
+                    } else {
+                        0.0
+                    };
+                    let gf = if lut_dimension > 1 {
+                        g as f32 / (lut_dimension - 1) as f32
+                    } else {
+                        0.0
+                    };
+                    let bf = if lut_dimension > 1 {
+                        b as f32 / (lut_dimension - 1) as f32
+                    } else {
+                        0.0
+                    };
                     lut_table.push([rf, gf, bf]);
                 }
             }
@@ -234,9 +246,16 @@ impl ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85 {
     }
 
     /// Reconstructs HDR luminance from SDR base and 8-bit gainmap value based on display target boost.
-    pub fn reconstruct_hdr_pixel(&self, sdr_rgb: [f32; 3], gainmap_val: f32, display_boost: f32) -> [f32; 3] {
+    pub fn reconstruct_hdr_pixel(
+        &self,
+        sdr_rgb: [f32; 3],
+        gainmap_val: f32,
+        display_boost: f32,
+    ) -> [f32; 3] {
         let meta = &self.default_metadata;
-        let weight = ((display_boost - meta.hdr_capacity_min) / (meta.hdr_capacity_max - meta.hdr_capacity_min).max(1e-4)).clamp(0.0, 1.0);
+        let weight = ((display_boost - meta.hdr_capacity_min)
+            / (meta.hdr_capacity_max - meta.hdr_capacity_min).max(1e-4))
+        .clamp(0.0, 1.0);
 
         let g = gainmap_val.clamp(0.0, 1.0).powf(1.0 / meta.gamma);
         let log_boost = (1.0 - g) * meta.min_content_boost.ln() + g * meta.max_content_boost.ln();
@@ -267,15 +286,19 @@ impl ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85 {
     pub fn generate_proposal(&self) -> ArtcraftV85PrProposalManifest {
         ArtcraftV85PrProposalManifest {
             pr_id: 8502,
-            pr_title: "feat(artcraft): Implement HDR10 & Ultra HDR ISO Gainmap Dual-Layer Compositor".to_string(),
+            pr_title:
+                "feat(artcraft): Implement HDR10 & Ultra HDR ISO Gainmap Dual-Layer Compositor"
+                    .to_string(),
             target_subsystem: "ArtCraft High Dynamic Range Subsystem".to_string(),
             original_suite: "ArtCraft HDR Compositor".to_string(),
             components_added: vec![
                 "ISO 21496-1 single-file backward-compatible Ultra HDR gainmap decode".to_string(),
-                "SMPTE ST 2084 Perceptual Quantizer (PQ) electro-optical transfer engine".to_string(),
+                "SMPTE ST 2084 Perceptual Quantizer (PQ) electro-optical transfer engine"
+                    .to_string(),
                 "Target display headroom adaptive luminance tone-reconstruction pass".to_string(),
             ],
-            performance_multiplier: "Instantaneous dual-layer SDR/HDR render (<12ms 4K UltraHD)".to_string(),
+            performance_multiplier: "Instantaneous dual-layer SDR/HDR render (<12ms 4K UltraHD)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -349,7 +372,9 @@ impl ArtcraftComputeShaderBrushStampSimulationPrEngineV85 {
     pub fn generate_proposal(&self) -> ArtcraftV85PrProposalManifest {
         ArtcraftV85PrProposalManifest {
             pr_id: 8503,
-            pr_title: "feat(artcraft): Implement Compute-Shader Dynamic Brush Stamp & Wet-Edge Simulation".to_string(),
+            pr_title:
+                "feat(artcraft): Implement Compute-Shader Dynamic Brush Stamp & Wet-Edge Simulation"
+                    .to_string(),
             target_subsystem: "ArtCraft Paint & Raster Brush Engine".to_string(),
             original_suite: "ArtCraft Brush Engine".to_string(),
             components_added: vec![
@@ -357,7 +382,8 @@ impl ArtcraftComputeShaderBrushStampSimulationPrEngineV85 {
                 "Non-linear wet-edge pigment flow boundary accumulation physics".to_string(),
                 "Lock-free GPU compute tile stamp dispatch and dab rasterizer".to_string(),
             ],
-            performance_multiplier: "120 FPS high-precision digital painting (<2.5ms input-to-pixel)".to_string(),
+            performance_multiplier:
+                "120 FPS high-precision digital painting (<2.5ms input-to-pixel)".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -404,7 +430,12 @@ impl ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85 {
         Self { nodes: Vec::new() }
     }
 
-    pub fn add_filter_node(&mut self, filter_type: LiveFilterNodeType, intensity: f32, opacity: f32) -> u32 {
+    pub fn add_filter_node(
+        &mut self,
+        filter_type: LiveFilterNodeType,
+        intensity: f32,
+        opacity: f32,
+    ) -> u32 {
         let node_id = self.nodes.len() as u32 + 1;
         self.nodes.push(LiveAdjustmentNode {
             node_id,
@@ -436,9 +467,7 @@ impl ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85 {
                 LiveFilterNodeType::GaussianBlur | LiveFilterNodeType::HighPass => {
                     val * 0.9 + 0.1 * node.intensity
                 }
-                LiveFilterNodeType::UnsharpMask => {
-                    val + (val - 0.5) * node.intensity * 0.2
-                }
+                LiveFilterNodeType::UnsharpMask => val + (val - 0.5) * node.intensity * 0.2,
             };
 
             val = val * (1.0 - node.opacity) + filtered * node.opacity;
@@ -450,7 +479,9 @@ impl ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85 {
     pub fn generate_proposal(&self) -> ArtcraftV85PrProposalManifest {
         ArtcraftV85PrProposalManifest {
             pr_id: 8504,
-            pr_title: "feat(artcraft): Implement Non-Destructive Live Filter DAG Adjustment Graph Engine".to_string(),
+            pr_title:
+                "feat(artcraft): Implement Non-Destructive Live Filter DAG Adjustment Graph Engine"
+                    .to_string(),
             target_subsystem: "ArtCraft Compositor & Adjustment Layer Core".to_string(),
             original_suite: "ArtCraft Layer Stack".to_string(),
             components_added: vec![
@@ -458,7 +489,8 @@ impl ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85 {
                 "Separable 2-pass GPU blur and sharpening convolution kernels".to_string(),
                 "Per-layer vector mask feathered alpha blend compositing".to_string(),
             ],
-            performance_multiplier: "Real-time non-destructive layer preview (<4ms per 4K compositing pass)".to_string(),
+            performance_multiplier:
+                "Real-time non-destructive layer preview (<4ms per 4K compositing pass)".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -480,9 +512,22 @@ impl Default for ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85 {
 /// Vector path segment command in binary interchange format.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum VectorCommand {
-    MoveTo { x: f32, y: f32 },
-    LineTo { x: f32, y: f32 },
-    CubicCurveTo { cp1x: f32, cp1y: f32, cp2x: f32, cp2y: f32, end_x: f32, end_y: f32 },
+    MoveTo {
+        x: f32,
+        y: f32,
+    },
+    LineTo {
+        x: f32,
+        y: f32,
+    },
+    CubicCurveTo {
+        cp1x: f32,
+        cp1y: f32,
+        cp2x: f32,
+        cp2y: f32,
+        end_x: f32,
+        end_y: f32,
+    },
     Close,
 }
 
@@ -519,7 +564,14 @@ impl ArtcraftLosslessVectorAssetExchangeFormatPrEngineV85 {
                     buffer.extend_from_slice(&x.to_bits().to_be_bytes());
                     buffer.extend_from_slice(&y.to_bits().to_be_bytes());
                 }
-                VectorCommand::CubicCurveTo { cp1x, cp1y, cp2x, cp2y, end_x, end_y } => {
+                VectorCommand::CubicCurveTo {
+                    cp1x,
+                    cp1y,
+                    cp2x,
+                    cp2y,
+                    end_x,
+                    end_y,
+                } => {
                     buffer.push(0x03);
                     buffer.extend_from_slice(&cp1x.to_bits().to_be_bytes());
                     buffer.extend_from_slice(&cp1y.to_bits().to_be_bytes());
@@ -594,8 +646,11 @@ impl SovereignArtcraftAdvancementsV85MasterSuite {
         Self {
             wide_gamut_engine: ArtcraftWideGamutOklabLutColorGradingPrEngineV85::new(17),
             hdr_gainmap_engine: ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85::new(),
-            brush_simulation_engine: ArtcraftComputeShaderBrushStampSimulationPrEngineV85::new(32.0, 0.4, 0.2),
-            live_filter_graph_engine: ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85::default(),
+            brush_simulation_engine: ArtcraftComputeShaderBrushStampSimulationPrEngineV85::new(
+                32.0, 0.4, 0.2,
+            ),
+            live_filter_graph_engine:
+                ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85::default(),
             vector_exchange_engine: ArtcraftLosslessVectorAssetExchangeFormatPrEngineV85::new(),
         }
     }
@@ -609,7 +664,9 @@ impl SovereignArtcraftAdvancementsV85MasterSuite {
         let gamut_ok = oklch.l > 0.0 && lut_sample[0] > 0.0;
 
         // 2. HDR Gainmap test
-        let hdr_pixel = self.hdr_gainmap_engine.reconstruct_hdr_pixel([0.8, 0.8, 0.8], 0.75, 4.0);
+        let hdr_pixel = self
+            .hdr_gainmap_engine
+            .reconstruct_hdr_pixel([0.8, 0.8, 0.8], 0.75, 4.0);
         let pq = self.hdr_gainmap_engine.pq_eotf_curve(1000.0);
         let hdr_ok = hdr_pixel[0] >= 0.8 && pq > 0.0;
 
@@ -622,11 +679,15 @@ impl SovereignArtcraftAdvancementsV85MasterSuite {
             tilt_altitude: 60.0,
         };
         let radius = self.brush_simulation_engine.compute_stamp_radius(sample);
-        let alpha = self.brush_simulation_engine.evaluate_stamp_alpha(radius * 0.5, radius);
+        let alpha = self
+            .brush_simulation_engine
+            .evaluate_stamp_alpha(radius * 0.5, radius);
         let brush_ok = radius > 0.0 && alpha > 0.0;
 
         // 4. Live filter graph test
-        let adj_val = self.live_filter_graph_engine.evaluate_channel_adjustment(0.6);
+        let adj_val = self
+            .live_filter_graph_engine
+            .evaluate_channel_adjustment(0.6);
         let filter_ok = adj_val > 0.0 && adj_val <= 1.0;
 
         // 5. Vector exchange test
@@ -636,7 +697,9 @@ impl SovereignArtcraftAdvancementsV85MasterSuite {
             VectorCommand::Close,
         ];
         let serialized = self.vector_exchange_engine.serialize_path_commands(&cmds);
-        let count_res = self.vector_exchange_engine.validate_and_count_stream(&serialized);
+        let count_res = self
+            .vector_exchange_engine
+            .validate_and_count_stream(&serialized);
         let vector_ok = count_res.is_ok() && count_res.unwrap() == 3;
 
         gamut_ok && hdr_ok && brush_ok && filter_ok && vector_ok
@@ -658,7 +721,10 @@ impl SovereignArtcraftAdvancementsV85MasterSuite {
             return 0.0;
         }
 
-        let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
+        let ready_count = proposals
+            .iter()
+            .filter(|p| p.status == "Ready for Merge")
+            .count();
         (ready_count as f64 / proposals.len() as f64) * 100.0
     }
 
