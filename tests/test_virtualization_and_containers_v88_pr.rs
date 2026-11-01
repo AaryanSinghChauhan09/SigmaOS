@@ -20,6 +20,7 @@ fn test_integration_virtualization_and_containers_v88_suite() {
     assert!(summary.contains("Sovereign Virtualization & Container Ecosystem Parity Suite (v88)"));
     assert!(summary.contains("KVM/QEMU Dirty Ring"));
     assert!(summary.contains("gVisor Sentry"));
+    assert!(summary.contains("DILITHIUM5_SIG_V88_8801_OK"));
 }
 
 #[test]
