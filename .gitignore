@@ -22,6 +22,8 @@ __pycache__/
 # Documentation files: kept ONLY in wiki/, docs/, templates/docs/, .github/
 # Root-level .md/.txt files are banned from main (move to docs branch)
 *.md
+!README.md
+!FUTURE-DEVELOPMENT-ROADMAP.md
 *.txt
 !docs/PHYSICAL_MEMORY_MANAGER_PLAN.md
 !wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md
