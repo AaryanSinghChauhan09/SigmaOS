@@ -1114,3 +1114,11 @@ pub use open_source_os_and_cachy_linux_v83_pr::*;
 
 pub mod continuous_open_source_os_improvement_pr;
 pub use continuous_open_source_os_improvement_pr::*;
+
+// ─── Jules-left BSD, Linux, DOS, and kernel modules ──────────────
+pub mod bsd_jules_left;
+pub use bsd_jules_left::*;
+pub mod endeavours;
+pub use endeavours::*;
+pub mod dos_and_kernels;
+pub use dos_and_kernels::*;

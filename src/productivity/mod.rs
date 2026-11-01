@@ -225,3 +225,6 @@ pub use openoffice_parity::*;
 
 pub mod sovereign_office_suites_engine;
 pub use sovereign_office_suites_engine::*;
+
+pub mod office_suites;
+pub use office_suites::*;
