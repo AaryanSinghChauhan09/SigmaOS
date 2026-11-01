@@ -96,3 +96,26 @@ fn test_weekly_calendar_dispatch() {
         .assigned_roles
         .contains(&MaintenanceRole::ReleaseManager));
 }
+
+#[test]
+fn test_gateway_pr_generation_and_export() {
+    let gateway = RoleBasedOperatingPlanPrGateway::new();
+    let spec = gateway.generate_proposal_spec();
+    assert_eq!(spec.roles_count, 12);
+    assert_eq!(spec.phases_count, 4);
+    assert_eq!(spec.execution_steps_count, 8);
+    assert_eq!(spec.calendar_days_count, 5);
+    assert_eq!(spec.guardrails_count, 7);
+
+    let pr_md = gateway.generate_pr_proposal_markdown();
+    assert!(pr_md.contains("# feat(governance): Adopt Role-Based Operating Plan and Strategic Wedge Roadmap"));
+    assert!(pr_md.contains("Reality Check & Strategic Wedge"));
+    assert!(pr_md.contains("12 Operating Maintenance Roles"));
+    assert!(pr_md.contains("8-Step Team Execution Plan"));
+    assert!(pr_md.contains("7 Governance Guardrails"));
+
+    let diff = gateway.generate_patch_diff();
+    assert!(diff.contains("PR_SPEC_ROLE_BASED_GOVERNANCE_AND_OPERATING_PLAN.md"));
+    assert!(diff.contains("Roles Count: 12"));
+    assert!(diff.contains("Phases Count: 4"));
+}
