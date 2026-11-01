@@ -17,34 +17,41 @@
 - [ ] Diagnostics
 - [ ] Build / CI
 
+## Summary
+
+<!-- What secondary-memory behavior changed and why? -->
+
 ## Component impact
 
 - Component/repository:
 - User-visible behavior:
 - Related issue or plan:
 
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
+- [ ] Documentation
+- [ ] CI / tooling
+
 ## Recurring task
 
-- [ ] PR-level validation
+- [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly subsystem review
+- [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly syscall/ABI review
-- [ ] Biweekly memory/concurrency audit
+- [ ] Biweekly storage audit
+- [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
-- [ ] Monthly driver/hardware audit
-- [ ] Monthly fuzz triage
-- [ ] Monthly diagnostics rehearsal
-- [ ] Quarterly release/architecture/security review
-
-## Reference study
-
-<!-- Required for design-changing kernel PRs -->
-
-- Study document:
-- Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject
-- Reason:
+- [ ] Quarterly architecture/security/release review
 
 ## Upstream study and reference behavior
 
@@ -57,37 +64,33 @@
 - What remains intentionally different:
 - Compatibility impact:
 
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or storage changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
+
 ## Changes
 
 -
 -
 
-## Kernel safety review
+## Storage safety review
 
-- [ ] No unnecessary `unsafe`
-- [ ] Every `unsafe` block documents invariants
-- [ ] Lock ordering documented
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
 - [ ] Interrupt-context safety considered
-- [ ] Allocation limits defined
-- [ ] OOM behavior defined
-- [ ] Error paths tested
-- [ ] No silent failure introduced
-
-## Shell safety review
-
-- Shell safety review:
-- Capability/namespace checks enforced:
-- Shared-memory or descriptor implications:
-- Input validation and failure behavior:
-- Rollback or downgrade path:
-
-## IPC handler
-
-- [ ] This change affects IPC handler behavior, or I confirm it does not.
-- IPC semantics:
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Security review
 
@@ -106,6 +109,14 @@
 - [ ] QEMU boot evidence, if boot-affecting
 - [ ] Driver/hardware evidence, if driver-affecting
 - [ ] Security review requested, if applicable
+
+## IPC handler
+
+- [ ] This change affects IPC handler behavior, or I confirm it does not.
+- IPC semantics:
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
 
 ## Verification
 
@@ -132,15 +143,15 @@
 - [ ] New/updated unit tests
 - [ ] Integration tests
 - [ ] Fuzz target or documented exemption
-- [ ] Boot-to-boot evidence, if boot-affecting
-- [ ] I/O benchmark, if performance-affecting
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Storage benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] I/O documentation
+- [ ] Storage documentation
 - [ ] Boot matrix, if applicable
 
 ## Risks and rollback
@@ -160,18 +171,3 @@
 - APIs, ABI, protocols, or file formats affected:
 - Cross-repository synchronization required:
 - Release or migration notes:
-
-## Status updates
-
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Boot matrix, if applicable
-- [ ] Hardware matrix, if applicable
-
-## Risks and rollback
-
-- Risk:
-- Rollback:
-- Risks and rollback:
-- Recovery or downgrade procedure:
