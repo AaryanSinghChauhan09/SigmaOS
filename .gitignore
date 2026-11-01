@@ -37,4 +37,7 @@ __pycache__/
 !docs/shell/*.md
 !docs/studies/
 !docs/studies/*.md
+!docs/syscall/
+!docs/syscall/*.md
+!wiki/36-SigmaOS-Syscall-Development-Plan.md
 !.github/PULL_REQUEST_TEMPLATE.md
