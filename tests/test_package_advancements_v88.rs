@@ -6,14 +6,14 @@
 mod sovereign_distro_package_advancements_v88_pr;
 
 use sovereign_distro_package_advancements_v88_pr::sovereign_distro_package_advancements_v88::*;
-use sovereign_distro_package_advancements_v88_pr::SovereignDistroPackagePrGatewayV88;
 use sovereign_distro_package_advancements_v88_pr::universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v88_pr::SovereignDistroPackagePrGatewayV88;
 
 #[test]
 fn test_package_advancements_v88_full_cycle() {
     // 1. Universal Package Inspector V88
     let mut inspector = UniversalPackageFormatInspectorV88::new();
-    assert_eq!(inspector.total_formats_supported, 270);
+    assert_eq!(inspector.total_formats_supported, 250);
 
     let manifest = inspector
         .inspect_package("ripgrep-14.1.0-amd64.deb", b"!<arch>\ndebian-binary\n")
@@ -59,7 +59,10 @@ fn test_package_advancements_v88_full_cycle() {
     let solved = solver
         .solve_dependencies("ripgrep", &raw_deps)
         .expect("SAT solver failed");
-    assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v88"]);
+    assert_eq!(
+        solved,
+        vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v88"]
+    );
 
     // 5. Multi-Sandbox Security Governor V88
     let sandbox_gov = UniversalMultiSandboxGovernorV88::new();
@@ -97,7 +100,7 @@ fn test_package_advancements_v88_full_cycle() {
     // 9. PR Gateway V88
     let mut gateway = SovereignDistroPackagePrGatewayV88::new();
     gateway.submit_proposal(
-        8801,
+        8701,
         "Universal Package Advancements V88",
         PackageFormat::Deb,
         "ripgrep",

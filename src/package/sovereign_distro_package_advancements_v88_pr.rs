@@ -37,7 +37,9 @@ pub mod sovereign_distro_package_advancements_v88;
 pub use sovereign_distro_package_advancements_v88::universal;
 
 #[cfg(feature = "standalone_test")]
-pub use sovereign_distro_package_advancements_v88::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+pub use sovereign_distro_package_advancements_v88::universal::{
+    PackageError, PackageFormat, PackageState, UnifiedPackage,
+};
 
 /// Pull Request Proposal Manifest V88
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -104,7 +106,7 @@ mod tests {
     fn test_pr_gateway_v88() {
         let mut gateway = SovereignDistroPackagePrGatewayV88::new();
         gateway.submit_proposal(
-            8801,
+            8701,
             "Universal Interop for Debian DEB in Sigma-pkg V88",
             PackageFormat::Deb,
             "ripgrep",
@@ -112,7 +114,7 @@ mod tests {
         );
 
         assert_eq!(gateway.total_proposals(), 1);
-        let prop = gateway.get_proposal(8801).unwrap();
+        let prop = gateway.get_proposal(8701).unwrap();
         assert_eq!(prop.target_package, "ripgrep");
         assert_eq!(prop.source_format, PackageFormat::Deb);
         assert_eq!(prop.verified_slsa_level, 4);
