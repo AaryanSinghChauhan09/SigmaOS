@@ -1,0 +1,54 @@
+# Memory Management and Safety Rules
+
+# Rules governing memory allocation, deallocation, and safety practices
+
+[allocation]
+# Memory allocation strategy: stack-preferred or heap-based
+allocation_strategy = "stack-preferred"
+
+# Maximum stack size per task (bytes)
+max_stack_size = 8388608  # 8MB
+
+# Heap allocation requires tracking
+track_heap_allocations = true
+
+[safety]
+# Memory safety checks enabled
+memory_safety_checks = true
+
+# Bounds checking required
+require_bounds_checking = true
+
+# Null pointer checks required
+require_null_checks = true
+
+# Use-after-free prevention required
+prevent_use_after_free = true
+
+[optimization]
+# Allow memory optimization passes
+allow_memory_optimization = true
+
+# Cache-aware allocation preferred
+cache_aware_allocation = true
+
+[alignment]
+# Minimum memory alignment (bytes)
+min_alignment = 8
+
+# Page alignment for large allocations
+page_align_threshold = 4096
+
+[garbage_collection]
+# Garbage collection enabled
+gc_enabled = false
+
+# Memory leaks must be prevented
+leak_prevention_required = true
+
+[profiling]
+# Memory profiling enabled in debug builds
+debug_profiling = true
+
+# Memory profiling enabled in release builds
+release_profiling = false

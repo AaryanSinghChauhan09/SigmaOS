@@ -1,0 +1,39 @@
+[rule.lifecycle_completeness]
+requirement = "Every process reaches a defined terminal state and is eventually reaped."
+enforcement = "Lifecycle tests"
+
+[rule.no_orphan_zombies]
+requirement = "Orphaned zombies must be adopted and reaped by a deterministic reaper."
+enforcement = "Fork/exit stress tests"
+
+[rule.pid_safety]
+requirement = "PID allocation, lookup, reuse, and exhaustion are race-free and bounded."
+enforcement = "Concurrency tests"
+
+[rule.scheduler_fairness]
+requirement = "Scheduler defines fairness, preemption, priority, and starvation behavior."
+enforcement = "Scheduler tests + benchmarks"
+
+[rule.signal_determinism]
+requirement = "Signal pending, blocking, delivery, and terminal behavior are deterministic."
+enforcement = "Signal conformance tests"
+
+[rule.single_reap]
+requirement = "A process may be reaped only once; duplicate waits must fail safely."
+enforcement = "Wait/reap tests"
+
+[rule.limit_enforcement]
+requirement = "Every declared rlimit has an observable enforcement path and failure code."
+enforcement = "Limit rehearsal"
+
+[rule.isolation_default]
+requirement = "Cross-namespace or privileged process operations require explicit capability."
+enforcement = "Security review"
+
+[rule.no_model_only_status]
+requirement = "Process features cannot be marked complete from model tests alone."
+enforcement = "Status audit"
+
+[rule.runtime_evidence]
+requirement = "Boot-affecting process changes require boot-to-shell or integration evidence."
+enforcement = "CI boot gate"

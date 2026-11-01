@@ -1,0 +1,61 @@
+# Development Process and Workflow Rules
+
+# Rules governing how SigmaOS development and contribution processes work
+
+[version_control]
+# Git-based workflow
+vcs = "git"
+
+# Main branch protection
+main_branch = "main"
+protect_main = true
+
+# Branch naming convention
+branch_pattern = "^(feature|fix|refactor|docs|chore)/[a-z0-9_-]+$"
+
+[code_review]
+# Code review required before merge
+require_review = true
+
+# Minimum number of approvals
+min_approvals = 2
+
+# Maximum review turnaround time (hours)
+review_turnaround_hours = 48
+
+[testing]
+# Tests required before merge
+require_tests = true
+
+# Minimum code coverage percentage
+min_coverage_percent = 80
+
+# Test types required
+required_test_types = ["unit", "integration"]
+
+[commits]
+# Conventional commit format required
+conventional_commits = true
+
+# Commit message format: type(scope): description
+commit_format = "^(feat|fix|docs|style|refactor|test|chore)(\\(.+\\))?: .+"
+
+# Maximum characters per commit subject line
+commit_subject_max = 72
+
+[releases]
+# Semantic versioning required
+semantic_versioning = true
+
+# Release process requires tagged commit
+tag_required = true
+
+# Changelog update required
+changelog_required = true
+
+[documentation]
+# Documentation updates required for API changes
+doc_updates_required = true
+
+# README must be kept current
+readme_current = true

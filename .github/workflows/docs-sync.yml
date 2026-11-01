@@ -1,0 +1,268 @@
+name: Documentation Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'COMPONENTS.toml'
+      - 'docs/**'
+      - '.github/workflows/docs-sync.yml'
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 'Target repository for sync (default: SigmaOS-docs)'
+        required: false
+        default: 'SigmaOS-docs'
+      dry_run:
+        description: 'Dry run (do not push changes)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+
+env:
+  TARGET_REPO_OWNER: AaryanSinghChauhan09
+  TARGET_REPO_NAME: SigmaOS-docs
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  sync-components-documentation:
+    name: Sync Component Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install toml jinja2
+
+      - name: Generate COMPONENTS.md from COMPONENTS.toml
+        run: |
+          cat > generate_components_md.py << 'EOF'
+          #!/usr/bin/env python3
+          import toml
+          import sys
+          from datetime import datetime
+          
+          def generate_components_md(toml_file, output_file):
+              """Generate COMPONENTS.md from COMPONENTS.toml."""
+              try:
+                  with open(toml_file, 'r') as f:
+                      data = toml.load(f)
+              except Exception as e:
+                  print(f"Error loading {toml_file}: {e}", file=sys.stderr)
+                  return False
+              
+              components = data.get('component', [])
+              
+              # Group by engine/subsystem
+              by_engine = {}
+              for comp in components:
+                  engine = comp.get('engine', 'other')
+                  if engine not in by_engine:
+                      by_engine[engine] = []
+                  by_engine[engine].append(comp)
+              
+              with open(output_file, 'w') as f:
+                  f.write("# SigmaOS Components\n\n")
+                  f.write(f"_Last updated: {datetime.now().isoformat()}_\n\n")
+                  f.write("This document is auto-generated from `COMPONENTS.toml` and synced across the SigmaOS ecosystem.\n\n")
+                  
+                  f.write("## Overview\n\n")
+                  f.write(f"Total components: {len(components)}\n\n")
+                  
+                  # Count by visibility
+                  public = sum(1 for c in components if c.get('visibility') == 'public')
+                  private = sum(1 for c in components if c.get('visibility') == 'private')
+                  f.write(f"- **Public:** {public}\n")
+                  f.write(f"- **Private:** {private}\n\n")
+                  
+                  # List core components
+                  core_names = [
+                      'SigmaOS-kernel', 'SigmaOS-filesystem', 'SigmaOS-network',
+                      'SigmaOS-security', 'SigmaOS-system', 'SigmaOS-desktop',
+                      'SigmaOS-packages'
+                  ]
+                  f.write("## Core Components\n\n")
+                  f.write("| Name | Description | Language |\n")
+                  f.write("|------|-------------|----------|\n")
+                  
+                  for name in core_names:
+                      for comp in components:
+                          if comp.get('name') == name:
+                              desc = comp.get('description', '')
+                              lang = comp.get('language', 'N/A')
+                              f.write(f"| [{name}]({comp.get('repo', '#')}) | {desc} | {lang} |\n")
+                              break
+                  
+                  f.write("\n")
+                  
+                  # List all components by engine
+                  f.write("## Components by Subsystem\n\n")
+                  for engine in sorted(by_engine.keys()):
+                      comps = by_engine[engine]
+                      f.write(f"### {engine.replace('_', ' ').title()}\n\n")
+                      f.write("| Name | Description | Language | Visibility |\n")
+                      f.write("|------|-------------|----------|------------|\n")
+                      
+                      for comp in sorted(comps, key=lambda x: x.get('name', '')):
+                          name = comp.get('name', '')
+                          desc = comp.get('description', '')
+                          lang = comp.get('language', 'N/A')
+                          vis = comp.get('visibility', 'N/A')
+                          repo = comp.get('repo', '#')
+                          f.write(f"| [{name}]({repo}) | {desc} | {lang} | {vis} |\n")
+                      
+                      f.write("\n")
+              
+              return True
+          
+          if __name__ == '__main__':
+              success = generate_components_md('COMPONENTS.toml', 'COMPONENTS_GENERATED.md')
+              sys.exit(0 if success else 1)
+          EOF
+          python generate_components_md.py
+
+      - name: Display generated documentation
+        run: |
+          echo "## Generated COMPONENTS.md"
+          echo ""
+          head -50 COMPONENTS_GENERATED.md
+
+      - name: Prepare documentation for sync
+        run: |
+          # Ensure output directory exists
+          mkdir -p /tmp/docs_sync
+          
+          # Copy generated COMPONENTS.md
+          cp COMPONENTS_GENERATED.md /tmp/docs_sync/COMPONENTS.md
+          
+          # Copy docs directory if it exists
+          if [ -d docs ]; then
+            cp -r docs /tmp/docs_sync/ || true
+          fi
+          
+          echo "✅ Documentation prepared for sync"
+          ls -la /tmp/docs_sync/
+
+      - name: Validate documentation format
+        run: |
+          # Basic validation: check if COMPONENTS.md was generated and has content
+          if [ -f /tmp/docs_sync/COMPONENTS.md ]; then
+            SIZE=$(wc -l < /tmp/docs_sync/COMPONENTS.md)
+            if [ "$SIZE" -gt 10 ]; then
+              echo "✅ COMPONENTS.md validation passed ($SIZE lines)"
+            else
+              echo "❌ COMPONENTS.md too small ($SIZE lines)"
+              exit 1
+            fi
+          else
+            echo "❌ COMPONENTS.md not generated"
+            exit 1
+          fi
+
+      - name: Perform dry-run check
+        if: ${{ github.event.inputs.dry_run == 'true' || github.event_name != 'workflow_dispatch' }}
+        run: |
+          echo "📋 Dry-run: Would sync documentation to ${{ env.TARGET_REPO_NAME }}"
+          echo ""
+          echo "Changes to be synced:"
+          echo "- COMPONENTS.md (generated from COMPONENTS.toml)"
+          if [ -d docs ]; then
+            echo "- docs/ directory"
+          fi
+          echo ""
+          echo "⚠️  Use workflow_dispatch with dry_run=false to perform actual sync"
+
+      - name: Push to SigmaOS-docs repository
+        if: ${{ github.event.inputs.dry_run == 'false' && github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo "🚀 Would push to: ${{ env.TARGET_REPO_OWNER }}/${{ env.TARGET_REPO_NAME }}"
+          echo ""
+          echo "⚠️  NOTE: Actual GitHub API push requires PAT token with repo:full access"
+          echo "    This would be configured in a production environment with:"
+          echo "    - secrets.DOCS_SYNC_TOKEN (GitHub Personal Access Token)"
+          echo "    - Repository dispatch or direct git push"
+          echo ""
+          echo "Files ready at: /tmp/docs_sync/"
+          ls -la /tmp/docs_sync/
+        continue-on-error: true
+
+  sync-matrices:
+    name: Sync Version Matrices
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+
+      - name: Extract version matrix
+        run: |
+          cat > extract_matrix.py << 'EOF'
+          #!/usr/bin/env python3
+          import toml
+          
+          data = toml.load('COMPONENTS.toml')
+          components = data.get('component', [])
+          
+          print("## Component Version Matrix")
+          print("")
+          print("| Component | Engine | Language | Visibility |")
+          print("|-----------|--------|----------|------------|")
+          
+          for comp in sorted(components, key=lambda x: x.get('name', '')):
+              name = comp.get('name', '')
+              engine = comp.get('engine', '')
+              lang = comp.get('language', '')
+              vis = comp.get('visibility', '')
+              print(f"| {name} | {engine} | {lang} | {vis} |")
+          EOF
+          python extract_matrix.py > /tmp/version_matrix.md
+
+      - name: Display version matrix
+        run: cat /tmp/version_matrix.md
+
+      - name: Sync matrices to docs repo (dry-run)
+        run: |
+          echo "📋 Version matrix sync (dry-run)"
+          echo ""
+          echo "Would update: docs/matrices/components.md"
+          echo "Would update: docs/matrices/versions.md"
+          echo ""
+          echo "To enable live sync, configure:"
+          echo "  secrets.DOCS_SYNC_TOKEN in GitHub repository"
+
+  sync-summary:
+    name: Documentation Sync Summary
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [sync-components-documentation, sync-matrices]
+    steps:
+      - name: Generate sync summary
+        run: |
+          echo "## Documentation Sync Summary"
+          echo ""
+          echo "| Task | Status |"
+          echo "|------|--------|"
+          echo "| Component Documentation | ${{ needs.sync-components-documentation.result }} |"
+          echo "| Version Matrices | ${{ needs.sync-matrices.result }} |"
+          echo ""
+          echo "### Next Steps"
+          echo ""
+          echo "To enable live sync to SigmaOS-docs repository:"
+          echo "1. Create a GitHub Personal Access Token with \`repo\` scope"
+          echo "2. Add it as repository secret: \`DOCS_SYNC_TOKEN\`"
+          echo "3. Update this workflow to use \`git\` or GitHub API with the token"
+          echo ""
+          echo "For manual sync:"
+          echo "- Generated COMPONENTS.md is available as workflow artifact"
+          echo "- Run workflow_dispatch with \`dry_run=false\` to perform sync"

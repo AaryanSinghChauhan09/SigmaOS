@@ -1,0 +1,70 @@
+# Virtual File System Rules
+
+# Rules governing filesystem operations, semantics, and behavior
+
+[path_handling]
+# Path separator character
+path_separator = "/"
+
+# Maximum path length (characters)
+max_path_length = 4096
+
+# Case sensitivity: case-sensitive or case-insensitive
+case_sensitivity = "case-sensitive"
+
+[file_operations]
+# POSIX compatibility required
+posix_compatible = true
+
+# Atomic operations required
+atomic_operations = true
+
+# File locking support required
+file_locking_support = true
+
+[permissions]
+# Permission model: Unix-style or ACL
+permission_model = "unix"
+
+# Default file permissions (octal)
+default_file_perms = "0644"
+
+# Default directory permissions (octal)
+default_dir_perms = "0755"
+
+[caching]
+# VFS caching enabled
+caching_enabled = true
+
+# Cache invalidation strategy: time-based or event-based
+cache_invalidation = "event-based"
+
+# Maximum cache size (bytes)
+max_cache_size = 1073741824  # 1GB
+
+[link_handling]
+# Symbolic links supported
+symlink_support = true
+
+# Hard links supported
+hardlink_support = true
+
+# Link cycle detection required
+cycle_detection_required = true
+
+[special_files]
+# Device files supported
+device_files = true
+
+# FIFO/named pipes supported
+fifo_support = true
+
+# Sockets supported
+socket_support = true
+
+[attributes]
+# Extended attributes supported
+xattr_support = true
+
+# Maximum attribute size (bytes)
+max_attr_size = 65536

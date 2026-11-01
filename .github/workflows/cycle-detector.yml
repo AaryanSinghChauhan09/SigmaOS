@@ -1,0 +1,201 @@
+name: Dependency Cycle Detection
+
+on:
+  schedule:
+    # Run nightly at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      fail_on_cycles:
+        description: 'Fail workflow if cycles detected'
+        required: false
+        default: 'true'
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  detect-cycles:
+    name: Detect Dependency Cycles
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install toml networkx pyyaml
+
+      - name: Create cycle detection script
+        run: |
+          cat > cycle_detector.py << 'EOF'
+          #!/usr/bin/env python3
+          import toml
+          import sys
+          from collections import defaultdict, deque
+          
+          def load_components(toml_file):
+              """Load component definitions from COMPONENTS.toml."""
+              try:
+                  with open(toml_file, 'r') as f:
+                      data = toml.load(f)
+                  components = {}
+                  for comp in data.get('component', []):
+                      name = comp.get('name')
+                      if name:
+                          components[name] = {
+                              'name': name,
+                              'description': comp.get('description', ''),
+                              'engine': comp.get('engine', ''),
+                              'dependencies': comp.get('dependencies', [])
+                          }
+                  return components
+              except Exception as e:
+                  print(f"Error loading COMPONENTS.toml: {e}", file=sys.stderr)
+                  return {}
+          
+          def build_dependency_graph(components):
+              """Build a directed graph from component dependencies."""
+              graph = defaultdict(list)
+              for name, info in components.items():
+                  deps = info.get('dependencies', [])
+                  for dep in deps:
+                      graph[name].append(dep)
+              return graph
+          
+          def find_cycles(graph):
+              """Find all cycles in the dependency graph using DFS."""
+              cycles = []
+              visited = set()
+              rec_stack = set()
+              path = []
+              
+              def dfs(node, path, rec_stack):
+                  visited.add(node)
+                  rec_stack.add(node)
+                  path.append(node)
+                  
+                  for neighbor in graph.get(node, []):
+                      if neighbor not in visited:
+                          dfs(neighbor, path[:], rec_stack.copy())
+                      elif neighbor in rec_stack:
+                          # Found a cycle
+                          cycle_start = path.index(neighbor)
+                          cycle = path[cycle_start:] + [neighbor]
+                          cycles.append(cycle)
+              
+              for node in graph:
+                  if node not in visited:
+                      dfs(node, [], set())
+              
+              return cycles
+          
+          def report_cycles(cycles, components):
+              """Print cycle detection report."""
+              if not cycles:
+                  print("✅ No dependency cycles detected")
+                  return True
+              
+              print(f"❌ Found {len(cycles)} dependency cycle(s):")
+              for i, cycle in enumerate(cycles, 1):
+                  print(f"\nCycle {i}:")
+                  for j, comp in enumerate(cycle[:-1]):
+                      next_comp = cycle[j + 1]
+                      print(f"  {comp} → {next_comp}")
+              return False
+          
+          if __name__ == '__main__':
+              components = load_components('COMPONENTS.toml')
+              graph = build_dependency_graph(components)
+              cycles = find_cycles(graph)
+              success = report_cycles(cycles, components)
+              sys.exit(0 if success else 1)
+          EOF
+          chmod +x cycle_detector.py
+
+      - name: Run cycle detection
+        id: cycle_check
+        run: |
+          python cycle_detector.py 2>&1 | tee /tmp/cycle_report.txt
+          CYCLE_STATUS=${PIPESTATUS[0]}
+          
+          # Save report for later steps
+          echo "report_path=/tmp/cycle_report.txt" >> $GITHUB_OUTPUT
+          echo "has_cycles=$([[ $CYCLE_STATUS -eq 1 ]] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+          
+          exit $CYCLE_STATUS
+        continue-on-error: true
+
+      - name: Parse cycle detection results
+        id: results
+        run: |
+          if [ -f /tmp/cycle_report.txt ]; then
+            CYCLE_COUNT=$(grep -c "Cycle" /tmp/cycle_report.txt || echo "0")
+            echo "cycle_count=$CYCLE_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "cycle_count=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue on cycle detection failure
+        if: failure() && steps.cycle_check.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/cycle_report.txt', 'utf8');
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🔴 Dependency Cycle Detected',
+              body: `Nightly cycle detection found dependency cycles in the component graph.\n\n\`\`\`\n${report}\n\`\`\`\n\nPlease review the component dependencies and resolve the cycles.`,
+              labels: ['bug', 'ci', 'dependency'],
+              assignees: []
+            });
+        continue-on-error: true
+
+      - name: Decide workflow status
+        run: |
+          FAIL_ON_CYCLES="${{ github.event.inputs.fail_on_cycles }}"
+          HAS_CYCLES="${{ steps.cycle_check.outcome }}"
+          
+          if [ "$FAIL_ON_CYCLES" = "true" ] && [ "$HAS_CYCLES" = "failure" ]; then
+            echo "❌ Failing workflow: cycles detected and fail_on_cycles=true"
+            exit 1
+          else
+            echo "✅ Cycle detection completed (fail_on_cycles=$FAIL_ON_CYCLES)"
+            exit 0
+          fi
+
+  cycle-report:
+    name: Cycle Detection Report
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [detect-cycles]
+    steps:
+      - name: Summarize cycle detection
+        run: |
+          echo "## Dependency Cycle Detection Report"
+          echo ""
+          echo "| Status | Result |"
+          echo "|--------|--------|"
+          echo "| Cycle Detection | ${{ needs.detect-cycles.result }} |"
+          echo ""
+          
+          if [ "${{ needs.detect-cycles.result }}" = "success" ]; then
+            echo "✅ No dependency cycles found in COMPONENTS.toml"
+          else
+            echo "❌ Dependency cycles detected - check logs for details"
+          fi

@@ -1,0 +1,132 @@
+name: Component Security Scanning
+
+on:
+  workflow_call:
+    inputs:
+      component_name:
+        required: true
+        type: string
+        description: "Name of the component being scanned"
+      languages:
+        required: false
+        type: string
+        default: rust
+        description: "Comma-separated list of languages for CodeQL"
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  RUST_BACKTRACE: 1
+
+jobs:
+  codeql-scan:
+    name: CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ inputs.languages }}
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:${{ inputs.languages }}
+
+  semgrep-scan:
+    name: Semgrep SAST Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: p/security-audit,p/rust,p/owasp-top-ten
+          generateSarif: true
+          sarif-output: semgrep.sarif
+
+      - name: Upload Semgrep SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep-${{ inputs.component_name }}
+
+  cargo-audit:
+    name: Cargo Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Run cargo audit
+        run: cargo audit --deny warnings --color always
+        continue-on-error: true
+
+  unsafe-code-check:
+    name: Unsafe Code Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-unsafe-stats
+        run: cargo install cargo-geiger || true
+
+      - name: Check unsafe code
+        run: |
+          # Report unsafe code usage but don't fail
+          cargo geiger --output-format GitHubMarkdown || true
+        continue-on-error: true
+
+  secrets-scan:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog Secret Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug
+
+  security-report:
+    name: Security Scan Report
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [codeql-scan, semgrep-scan, cargo-audit, unsafe-code-check, secrets-scan]
+    steps:
+      - name: Summarize security checks
+        run: |
+          echo "## Security Scan Summary for ${{ inputs.component_name }}"
+          echo ""
+          echo "| Check | Status |"
+          echo "|-------|--------|"
+          echo "| CodeQL | ${{ needs.codeql-scan.result }} |"
+          echo "| Semgrep | ${{ needs.semgrep-scan.result }} |"
+          echo "| Cargo Audit | ${{ needs.cargo-audit.result }} |"
+          echo "| Unsafe Code | ${{ needs.unsafe-code-check.result }} |"
+          echo "| Secrets | ${{ needs.secrets-scan.result }} |"

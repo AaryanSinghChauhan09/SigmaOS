@@ -1,0 +1,39 @@
+# Rust build artifacts
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test artifacts
+.tarpaulin-report.html
+cobertura.xml
+
+# Fuzzing
+/fuzz/target/
+/fuzz/artifacts/
+
+# Build outputs
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+*.elf
+
+# Documentation
+/docs/generated/
+
+# OS-specific
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak

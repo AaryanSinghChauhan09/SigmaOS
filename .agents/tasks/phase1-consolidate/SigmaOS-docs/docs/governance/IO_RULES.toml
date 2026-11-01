@@ -1,0 +1,63 @@
+# I/O Operations and Device Management Rules
+
+# Rules governing I/O operations, device management, and data transfer
+
+[io_operations]
+# I/O model: blocking or non-blocking
+io_model = "non-blocking"
+
+# Asynchronous I/O required
+async_io_required = true
+
+# I/O completion notification method: callback or polling
+io_notification = "callback"
+
+[buffering]
+# I/O buffering strategy: single or double
+buffering_strategy = "double"
+
+# Default buffer size (bytes)
+default_buffer_size = 65536  # 64KB
+
+# Maximum buffer size (bytes)
+max_buffer_size = 1048576   # 1MB
+
+[device_management]
+# Device driver model: character or block
+device_driver_model = "character"
+
+# Device hot-plug support required
+hotplug_support = true
+
+# Device power management enabled
+power_management = true
+
+[interrupts]
+# Interrupt handling: top-half/bottom-half
+interrupt_handling = "two_level"
+
+# Maximum interrupt latency (microseconds)
+max_interrupt_latency = 100
+
+# Interrupt priority levels
+priority_levels = 16
+
+[dma]
+# Direct Memory Access supported
+dma_supported = true
+
+# DMA bounce buffers for unsafe devices
+dma_bounce_buffers = true
+
+# Maximum DMA transfer size (bytes)
+max_dma_size = 4294967296  # 4GB
+
+[error_handling]
+# I/O error recovery required
+error_recovery_required = true
+
+# Retry policy: exponential backoff
+retry_policy = "exponential_backoff"
+
+# Maximum retry attempts
+max_retries = 5
