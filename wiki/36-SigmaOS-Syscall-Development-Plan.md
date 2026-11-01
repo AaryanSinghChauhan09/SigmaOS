@@ -1,27 +1,56 @@
 # SigmaOS System-Call Development and Maintenance Plan
 
-I reviewed SigmaOS’s public README, `FEATURE_STATUS.toml`, and project wiki. The syscall inventory says 64 numbers are defined and libc wrappers exist, but overall syscall ABI status is **partial** and “compile-only”; it names kernel-side dispatch as the next milestone. The x86_64 entry path and Ring 3 transition are also not fully validated: the inventory calls out the need for a Ring 3 syscall test and real user-mode transition work. These are the first gaps this PR plan addresses.
+## Summary
 
-The approach is deliberately evidence-driven: first prove a minimal syscall from a real user process reaches the kernel and returns correctly, then stabilize the ABI and add process, file, memory, and IPC interfaces in dependency order. Linux guidance recommends considering alternatives to a new syscall, designing the ABI for extension, and submitting implementation, architecture wiring, selftest, and man page as reviewable pieces. POSIX defines standardized system interfaces for portability, but does not prescribe one kernel’s syscall table or implementation.
+This document establishes the authoritative SigmaOS System-Call Development and
+Maintenance Plan. The syscall subsystem defines the core boundary between untrusted
+user-mode applications (Ring 3) and the privileged operating system kernel (Ring 0).
 
-## Existing gaps and proposed policy
+The approach is deliberately evidence-driven: first prove a minimal syscall from a real
+user process reaches the kernel and returns correctly, then stabilize the ABI and add
+process, file, memory, and IPC interfaces in dependency order.
 
-The repository already contains syscall-related code and compatibility experiments—such as syscall ABI definitions, libc wrappers, and modules for `eventfd`, `ioctl`, signals, `pipe`, process groups, resource limits, namespaces, and file descriptors. Their presence is not proof that they are dispatched from user mode, enforce permissions, or operate end to end. For each capability, reconcile source, tests, boot path, and status before expanding it.
+## Existing Gaps and Proposed Policy
 
-Adopt these rules:
+The repository contains syscall-related interfaces, libc wrappers, and modules for
+`eventfd`, `ioctl`, signals, `pipe`, process groups, resource limits, namespaces, and
+file descriptors. However, their presence alone is not proof that they are safely
+dispatched from user mode, enforce permissions, or operate end to end.
 
-- **Stable ABI:** Once published to userspace, syscall number, argument layout, return convention, error behavior, and semantics are stable. Add interfaces rather than silently changing or reusing published numbers. Linux documents syscall ABI as a stable userspace interface expected to persist.
-- **Avoid unnecessary syscalls:** First consider an existing syscall, file-descriptor API, filesystem interface, or other typed mechanism. Avoid opaque “multiplexer” interfaces except for close analogues or simple flags.
-- **Extensible arguments:** Prefer a flags parameter for simple extensions and a size-versioned structure for complex argument sets. Reject unknown flags and incompatible nonzero extension fields rather than guessing.
-- **Validate user memory safely:** Never directly dereference a userspace pointer. Validate address ranges and copy data through fault-safe user-memory helpers; invalid/unmapped memory must return a defined error rather than crash the kernel. Linux’s user-memory APIs distinguish preliminary range checks from fault-safe copy operations.
-- **Authorization in the kernel:** Enforce object ownership, permissions, capabilities, namespace boundaries, and resource limits at syscall entry or the shared kernel helper—not only in libc or command-line tools.
-- **Portable ABI types:** Use fixed-width UAPI types; define alignment, padding, endianness where relevant, and 32/64-bit compatibility behavior explicitly. Avoid ABI-visible native pointers, `usize`, `long`, or compiler-dependent layouts unless the ABI intentionally specifies them.
-- **File descriptors for kernel objects:** Prefer FD-backed handles for pollable objects; document close-on-exec and polling semantics. Linux syscall design guidance recommends FD handles and close-on-exec support for new FD-returning calls.
-- **No kernel-to-syscall calls:** Kernel subsystems call shared internal helpers; syscall entry points are user/kernel boundary wrappers, not internal kernel APIs.
-- **Status means tested behavior:** “Integrated” requires a real userspace-to-kernel path on a documented boot target. “Supported” additionally requires repeatable test coverage and documented compatibility limits. SigmaOS itself cautions that module tests do not establish runtime integration.
-- **Security and maintenance:** Follow NIST SSDF’s lifecycle approach: prepare secure development, protect software and build inputs, produce well-secured releases, and respond to vulnerabilities.
+### Mandatory ABI Policies
 
-## Proposed PR sequence
+1. **Stable ABI:** Once published to userspace, syscall number, argument layout,
+   return convention, error behavior, and semantics are stable. Add interfaces rather
+   than silently changing or reusing published numbers.
+2. **Avoid unnecessary syscalls:** First consider an existing syscall, file-descriptor
+   API, filesystem interface, or other typed mechanism. Avoid opaque multiplexer
+   interfaces except for close analogues or simple flags.
+3. **Extensible arguments:** Prefer a flags parameter for simple extensions and a
+   size-versioned structure for complex argument sets. Reject unknown flags and
+   incompatible nonzero extension fields rather than guessing.
+4. **Validate user memory safely:** Never directly dereference a userspace pointer.
+   Validate address ranges and copy data through fault-safe user-memory helpers;
+   invalid/unmapped memory must return a defined error (`EFAULT`) rather than crash
+   or panic the kernel.
+5. **Authorization in the kernel:** Enforce object ownership, permissions, capabilities,
+   namespace boundaries, and resource limits at syscall entry or the shared kernel
+   helper—not only in libc or command-line tools.
+6. **Portable ABI types:** Use fixed-width UAPI types; define alignment, padding,
+   endianness where relevant, and 32/64-bit compatibility behavior explicitly. Avoid
+   ABI-visible native pointers, `usize`, `long`, or compiler-dependent layouts unless
+   the ABI intentionally specifies them.
+7. **File descriptors for kernel objects:** Prefer FD-backed handles for pollable objects;
+   document close-on-exec and polling semantics.
+8. **No kernel-to-syscall calls:** Kernel subsystems call shared internal helpers;
+   syscall entry points are user/kernel boundary wrappers, not internal kernel APIs.
+9. **Status means tested behavior:** "Integrated" requires a real userspace-to-kernel
+   path on a documented boot target. "Supported" additionally requires repeatable test
+   coverage and documented compatibility limits.
+10. **Security and maintenance:** Follow NIST SSDF's lifecycle approach: prepare secure
+    development, protect software and build inputs, produce well-secured releases, and
+    respond to vulnerabilities.
+
+## Proposed PR Sequence
 
 | PR | Proposed title | Scope | Acceptance criteria |
 |---|---|---|---|
@@ -39,13 +68,11 @@ Adopt these rules:
 | 12 | `feat(syscall): enforce namespace and resource-control boundaries` | Connect existing namespace, cgroup/resource, and limits modules to dispatch and target objects. | A process cannot inspect or modify another namespace’s objects without authorization; limits are enforced in kernel paths; tests demonstrate denial and allowed delegation. |
 | 13 | `security(syscall): enforce seccomp and capability checks at dispatch` | Integrate seccomp/pledge/Landlock/capability policy only where the underlying policy model is sufficiently specified; apply checks consistently. | Tests prove policy denial occurs before side effects; rule bypass through alternate syscall paths is tested; feature status says “Integrated” only when enforced in dispatch/VFS/network paths. |
 | 14 | `feat(libc): bind syscall wrappers to stable kernel ABI` | Align the current libc shim and inline-assembly wrappers with actual dispatch, register ABI, error mapping, and supported architecture. | Wrapper tests verify register/stack conventions, return/error translation, and ABI constants; unsupported calls fail predictably rather than appearing implemented. |
-| 15 | `docs(syscall): add syscall reference and manual pages` | Document each implemented call, arguments, errors, permissions, blocking behavior, ABI stability, and examples; add man-page style references. | Every public syscall has documentation matching tests and implementation; no placeholder syscall is documented as fully supported. Linux’s submission guidance calls for a complete man page alongside a new syscall proposal. |
-| 16 | `test(syscall): add architecture and userspace conformance matrix` | Add native and cross-architecture ABI/layout tests for supported targets; use selftests and selected Linux/BSD behavior references without assuming binary compatibility. | Each claimed architecture executes applicable tests; unsupported ABI combinations are documented; test results are stored per target. Linux recommends syscall selftests across supported architectures. |
-| 17 | `ci(syscall): gate ABI changes and protect syscall ownership` | Add code ownership for syscall tables/UAPI/entry paths, required CI, branch protection, and a syscall-change review checklist. | Every ABI change gets an ABI/security review, selftests pass, and protected branches require review/status checks. GitHub supports required reviews, checks, resolved conversations, and branch protections. |
+| 15 | `docs(syscall): add syscall reference and manual pages` | Document each implemented call, arguments, errors, permissions, blocking behavior, ABI stability, and examples; add man-page style references. | Every public syscall has documentation matching tests and implementation; no placeholder syscall is documented as fully supported. |
+| 16 | `test(syscall): add architecture and userspace conformance matrix` | Add native and cross-architecture ABI/layout tests for supported targets; use selftests and selected Linux/BSD behavior references without assuming binary compatibility. | Each claimed architecture executes applicable tests; unsupported ABI combinations are documented; test results are stored per target. |
+| 17 | `ci(syscall): gate ABI changes and protect syscall ownership` | Add code ownership for syscall tables/UAPI/entry paths, required CI, branch protection, and a syscall-change review checklist. | Every ABI change gets an ABI/security review, selftests pass, and protected branches require review/status checks. |
 
-### Suggested ABI priority
-
-Do not implement every syscall-like filename in one batch. Build a minimal coherent userspace path first:
+### Suggested ABI Priority
 
 1. `write`/`exit` for a ring-3 smoke test.
 2. Safe user memory access and error handling.
@@ -55,9 +82,7 @@ Do not implement every syscall-like filename in one batch. Build a minimal coher
 6. Signals and resource controls.
 7. Optional namespaces and Linux/BSD compatibility extensions.
 
-This order follows the repository’s stated next milestone—kernel-side dispatch after a 64-number ABI definition—and its separate Ring 3 validation blocker.
-
-## Periodic maintenance PR cadence
+## Periodic Maintenance PR Cadence
 
 | Cadence | Proposed recurring PR/task | Required output |
 |---|---|---|
@@ -72,23 +97,32 @@ This order follows the repository’s stated next milestone—kernel-side dispat
 | Each release candidate | `release(syscall): certify userspace ABI claims` | Tested kernel revision, ABI headers, libc build, QEMU/hardware target, selftest results, known gaps, and compatibility statement. |
 | After a syscall incident | `fix(syscall): add regression coverage for <issue>` | Root cause, affected versions, regression test, security/ABI impact, and backport/release decision. |
 
-These are proposed review cadences, not a claim that SigmaOS currently has staffed release or security teams. If maintainers cannot meet a cadence, keep it as an issue checklist rather than generating empty maintenance PRs.
+## Rules for Syscall-Related Components
 
-## Rules for syscall-related components
+- **Architecture entry code:** Each architecture documents syscall instruction/trap mechanism,
+  argument registers, return register, clobbers, stack transition, interrupt masking, and compatibility ABI.
+- **Dispatch table:** Have one source of truth or generated tables; reserve numbers permanently once published;
+  define feature-disabled and unknown-call behavior; detect duplicates in CI.
+- **Argument decoding:** Decode into typed kernel values before business logic. Reject unknown flags and invalid
+  enum values; guard size arithmetic and structure versioning.
+- **User-memory layer:** Separate safe copy-in, copy-out, and string-copy helpers; cap lengths; define behavior
+  for faults and partial copies. Do not rely on an address-range check alone as proof the memory remains accessible.
+- **VFS and file descriptors:** Perform permission checks against the effective calling context; define descriptor
+  lifetime, inheritance, close-on-exec, poll readiness, and cleanup on every error path.
+- **Process and thread calls:** Specify target ownership and authorization; define races with exit/reuse; never trust
+  user-supplied process IDs as object references without validation.
+- **Signals and blocking:** Define interruption, restart, timeout units, and cancellation behavior consistently; test
+  actual blocked tasks rather than only state-machine models.
+- **Security framework:** A seccomp, capability, pledge, unveil, Capsicum, or MAC module is only a policy model until
+  syscall dispatch or the relevant subsystem enforces it.
+- **Libc and compatibility layer:** Treat wrappers as part of the ABI; test their register/stack calling convention
+  and error translation against the kernel, and keep architecture-specific details out of generic code where possible.
+- **Diagnostics and observability:** Provide trace/logging that can identify syscall name/number, process, and error
+  without leaking pointer contents, secrets, or unnecessary user data. Keep tracing off or access-controlled by default.
+- **Cross-distro inspiration:** Linux, FreeBSD, and OpenBSD interfaces differ; reuse concepts thoughtfully, but document
+  which ABI is native, which is POSIX-facing through libc, and which is an emulation layer.
 
-- **Architecture entry code:** Each architecture documents syscall instruction/trap mechanism, argument registers, return register, clobbers, stack transition, interrupt masking, and compatibility ABI. The current inventory lists x86_64, AArch64, and RISC-V work at different validation levels; do not share one “supported syscall ABI” label across them without per-architecture evidence.
-- **Dispatch table:** Have one source of truth or generated tables; reserve numbers permanently once published; define feature-disabled and unknown-call behavior; detect duplicates in CI.
-- **Argument decoding:** Decode into typed kernel values before business logic. Reject unknown flags and invalid enum values; guard size arithmetic and structure versioning.
-- **User-memory layer:** Separate safe copy-in, copy-out, and string-copy helpers; cap lengths; define behavior for faults and partial copies. Do not rely on an address-range check alone as proof the memory remains accessible.
-- **VFS and file descriptors:** Perform permission checks against the effective calling context; define descriptor lifetime, inheritance, close-on-exec, poll readiness, and cleanup on every error path.
-- **Process and thread calls:** Specify target ownership and authorization; define races with exit/reuse; never trust user-supplied process IDs as object references without validation.
-- **Signals and blocking:** Define interruption, restart, timeout units, and cancellation behavior consistently; test actual blocked tasks rather than only state-machine models.
-- **Security framework:** A seccomp, capability, pledge, unveil, Capsicum, or MAC module is only a policy model until syscall dispatch or the relevant subsystem enforces it. The repository itself names kernel enforcement as a next milestone for several such modules.
-- **Libc and compatibility layer:** Treat wrappers as part of the ABI; test their register/stack calling convention and error translation against the kernel, and keep architecture-specific details out of generic code where possible.
-- **Diagnostics and observability:** Provide trace/logging that can identify syscall name/number, process, and error without leaking pointer contents, secrets, or unnecessary user data. Keep tracing off or access-controlled by default.
-- **Cross-distro inspiration:** Linux, FreeBSD, and OpenBSD interfaces differ; reuse concepts thoughtfully, but document which ABI is native, which is POSIX-facing through libc, and which is an emulation layer. POSIX defines source-level system interfaces and does not mandate identical kernel syscall numbers across operating systems.
-
-## PR review and merge gates
+## PR Review and Merge Gates
 
 Use this template for any syscall PR:
 
@@ -133,12 +167,11 @@ Integrated/Supported evidence.
 - [ ] Required CI checks pass; review comments resolved
 ```
 
-For a genuinely new syscall, use separate but linked PRs or commits: **(1)** API proposal and alternative analysis, **(2)** kernel helper/dispatch and architecture entry, **(3)** libc wrapper and userspace selftest, and **(4)** documentation/manual. Linux follows this split and asks for user-facing tests and a man page; FreeBSD likewise maintains a syscall master definition from which generated interface files are produced, reinforcing the value of one canonical syscall inventory rather than hand-maintained drift.
+## Rollout and Exit Criteria
 
-Require at least one maintainer approval for routine fixes and two relevant reviewers for ABI design, architecture entry, user-pointer handling, process permissions, or policy enforcement. Protect the default branch with required PR review, passing status checks, resolved conversations, and no force pushes; GitHub documents these as branch-protection controls.
-
-## Rollout and exit criteria
-
-Start with PRs 1–7 and the ring-3 test path. Avoid adding “compatibility” calls until there is a working syscall boundary, stable UAPI, and evidence that the process, VFS, and permission models are enforced. The most urgent gaps shown by the repository are dispatch, real ring-3 execution, and end-to-end validation—not syscall count.
-
-Call the syscall subsystem **Integrated** only after a user process invokes the real kernel dispatch path on a documented target, including successful and failing calls. Call it **Supported** only after the ABI inventory, libc wrappers, architecture wiring, user-memory safety, permission tests, and public documentation agree and pass repeatably. For all future syscall additions, require a design review before implementation, selftests for normal and failure behavior, and a manual page; Linux’s syscall process uses this review discipline because syscall interfaces are long-lived user/kernel contracts.
+- **Proposed:** ABI proposal, alternative analysis, and review checklist defined.
+- **Prototype:** Kernel helper/dispatch, architecture entry, or userspace harness modeled and covered by unit tests.
+- **Integrated:** A user process invokes the real kernel dispatch path on a documented target, including successful
+  and failing calls.
+- **Supported:** The ABI inventory, libc wrappers, architecture wiring, user-memory safety, permission tests,
+  and public documentation agree and pass repeatably.

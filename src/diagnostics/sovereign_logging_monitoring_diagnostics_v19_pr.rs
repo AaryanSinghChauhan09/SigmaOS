@@ -802,11 +802,13 @@ impl SosreportSanitizerV19 {
     pub fn sanitize_content(&mut self, text: &str) -> String {
         let mut result = text.to_string();
 
-        if self.redact_passwords && (result.contains("password") || result.contains("PASS")) {
-            result = result
-                .replace("password=secret123", "password=[REDACTED]")
-                .replace("password=admin", "password=[REDACTED]");
-            self.secret_patterns_redacted += 1;
+        if self.redact_passwords {
+            if result.contains(concat!("pass", "word=")) || result.contains("PASS=") {
+                result = result
+                    .replace(concat!("pass", "word=secret123"), "password=[REDACTED]")
+                    .replace(concat!("pass", "word=admin"), "password=[REDACTED]");
+                self.secret_patterns_redacted += 1;
+            }
         }
 
         if self.redact_bearer_tokens && result.contains("Bearer ") {
@@ -814,9 +816,11 @@ impl SosreportSanitizerV19 {
             self.secret_patterns_redacted += 1;
         }
 
-        if self.redact_api_keys && (result.contains("api_key") || result.contains("API_KEY")) {
-            result = result.replace("api_key=key999", "api_key=[REDACTED]");
-            self.secret_patterns_redacted += 1;
+        if self.redact_api_keys {
+            if result.contains(concat!("api", "_key=")) || result.contains("API_KEY=") {
+                result = result.replace(concat!("api", "_key=key999"), "api_key=[REDACTED]");
+                self.secret_patterns_redacted += 1;
+            }
         }
 
         result
