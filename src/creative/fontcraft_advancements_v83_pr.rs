@@ -58,7 +58,13 @@ impl FontcraftVariableFontDesignSpaceGridPrEngineV83 {
     }
 
     /// Normalize an axis coordinate in the design space tuple [-1.0, 1.0]
-    pub fn normalize_axis_value_v83(&self, value: f32, min_val: f32, default_val: f32, max_val: f32) -> f32 {
+    pub fn normalize_axis_value_v83(
+        &self,
+        value: f32,
+        min_val: f32,
+        default_val: f32,
+        max_val: f32,
+    ) -> f32 {
         if value < default_val {
             if default_val > min_val {
                 ((value - default_val) / (default_val - min_val)).clamp(-1.0, 0.0)
@@ -77,7 +83,12 @@ impl FontcraftVariableFontDesignSpaceGridPrEngineV83 {
     }
 
     /// Interpolate multi-axis design space grid vector deltas (`wght`, `wdth`, `slnt`, `ital`, `opsz`, `GRAD`)
-    pub fn calculate_multi_axis_grid_deltas_v83(&self, base_advance: f32, normalized_axes: &[f32], axis_deltas: &[f32]) -> f32 {
+    pub fn calculate_multi_axis_grid_deltas_v83(
+        &self,
+        base_advance: f32,
+        normalized_axes: &[f32],
+        axis_deltas: &[f32],
+    ) -> f32 {
         let mut advance = base_advance;
         let count = normalized_axes.len().min(axis_deltas.len());
         for i in 0..count {
@@ -120,7 +131,13 @@ impl FontcraftGlyphOutlineSdfTextureAtlasPrEngineV83 {
     }
 
     /// Compute Multi-Channel Signed Distance Field (MSDF) distance sample
-    pub fn sample_msdf_outline_distance_v83(&self, px: f32, py: f32, seg_a: (f32, f32), seg_b: (f32, f32)) -> (f32, f32, f32) {
+    pub fn sample_msdf_outline_distance_v83(
+        &self,
+        px: f32,
+        py: f32,
+        seg_a: (f32, f32),
+        seg_b: (f32, f32),
+    ) -> (f32, f32, f32) {
         let vx = seg_b.0 - seg_a.0;
         let vy = seg_b.1 - seg_a.1;
         let wx = px - seg_a.0;
@@ -193,10 +210,15 @@ impl FontcraftOpentypeGsubGposComplexShapingPrEngineV83 {
         let mut i = 0;
 
         while i < chars.len() {
-            if i + 2 < chars.len() && chars[i] == 'f' && chars[i + 1] == 'f' && chars[i + 2] == 'i' {
+            if i + 2 < chars.len() && chars[i] == 'f' && chars[i + 1] == 'f' && chars[i + 2] == 'i'
+            {
                 shaped.push((0xFB03, 750));
                 i += 3;
-            } else if i + 2 < chars.len() && chars[i] == 'f' && chars[i + 1] == 'f' && chars[i + 2] == 'l' {
+            } else if i + 2 < chars.len()
+                && chars[i] == 'f'
+                && chars[i + 1] == 'f'
+                && chars[i + 2] == 'l'
+            {
                 shaped.push((0xFB04, 780));
                 i += 3;
             } else if i + 1 < chars.len() && chars[i] == 'f' && chars[i + 1] == 'i' {
@@ -243,7 +265,9 @@ impl FontcraftOpentypeGsubGposComplexShapingPrEngineV83 {
     pub fn generate_pr_manifest(&self) -> FontcraftV83PrProposalManifest {
         FontcraftV83PrProposalManifest {
             pr_id: 8303,
-            pr_title: "feat(fontcraft): OpenType GSUB/GPOS Complex Script Text Shaping & Bidi Engine V83".to_string(),
+            pr_title:
+                "feat(fontcraft): OpenType GSUB/GPOS Complex Script Text Shaping & Bidi Engine V83"
+                    .to_string(),
             target_subsystem: "FontCraft Typography & Text Shaping".to_string(),
             original_suite: "FontCraft Sovereign Typography Studio".to_string(),
             components_added: vec![
@@ -274,7 +298,12 @@ impl FontcraftColorEmojiColrV1BitmapCompositorPrEngineV83 {
     }
 
     /// Composite base and layer RGBA colors using linear alpha blending
-    pub fn composite_colrv1_paint_layer_v83(&self, base_color: (u8, u8, u8), layer_color: (u8, u8, u8), alpha: f32) -> (u8, u8, u8) {
+    pub fn composite_colrv1_paint_layer_v83(
+        &self,
+        base_color: (u8, u8, u8),
+        layer_color: (u8, u8, u8),
+        alpha: f32,
+    ) -> (u8, u8, u8) {
         let opacity = alpha.clamp(0.0, 1.0);
         let r = (base_color.0 as f32 * (1.0 - opacity) + layer_color.0 as f32 * opacity) as u8;
         let g = (base_color.1 as f32 * (1.0 - opacity) + layer_color.1 as f32 * opacity) as u8;
@@ -325,7 +354,10 @@ impl FontcraftWoff2BrotliTranscoderSubsettingPrEngineV83 {
     }
 
     /// Validate WOFF2 compressed header and estimate output size
-    pub fn validate_brotli_stream_header_v83(&self, compressed_bytes: usize) -> Result<usize, &'static str> {
+    pub fn validate_brotli_stream_header_v83(
+        &self,
+        compressed_bytes: usize,
+    ) -> Result<usize, &'static str> {
         if compressed_bytes == 0 {
             return Err("Empty WOFF2 buffer");
         }
@@ -333,7 +365,11 @@ impl FontcraftWoff2BrotliTranscoderSubsettingPrEngineV83 {
     }
 
     /// Extract a glyph subset from font directory
-    pub fn subset_glyph_directory_v83(&self, total_glyphs: u16, selected_glyphs: &[u16]) -> Vec<u16> {
+    pub fn subset_glyph_directory_v83(
+        &self,
+        total_glyphs: u16,
+        selected_glyphs: &[u16],
+    ) -> Vec<u16> {
         let mut subset = Vec::new();
         for &glyph in selected_glyphs {
             if glyph < total_glyphs {
@@ -405,7 +441,8 @@ impl SovereignFontcraftAdvancementsV83MasterSuite {
     }
 
     pub fn export_pr_manifest_markdown(&self) -> String {
-        let mut md = String::from("# FontCraft Typography & Vector Font V83 Advancements PR Manifest\n\n");
+        let mut md =
+            String::from("# FontCraft Typography & Vector Font V83 Advancements PR Manifest\n\n");
         for manifest in self.collect_all_pr_manifests() {
             let digest = fnv1a_fontcraft_v83_pr_digest(manifest.pr_id, &manifest.pr_title);
             md.push_str(&format!(
@@ -461,7 +498,8 @@ mod tests {
         let norm_max = engine.normalize_axis_value_v83(650.0, 100.0, 400.0, 900.0);
         assert!((norm_max - 0.5).abs() < 1e-4);
 
-        let advance = engine.calculate_multi_axis_grid_deltas_v83(500.0, &[0.5, 0.2], &[100.0, -50.0]);
+        let advance =
+            engine.calculate_multi_axis_grid_deltas_v83(500.0, &[0.5, 0.2], &[100.0, -50.0]);
         assert_eq!(advance, 540.0);
     }
 
@@ -483,7 +521,8 @@ mod tests {
         assert_eq!(shaped[0], ('o' as u32, 500));
         assert_eq!(shaped[1], (0xFB03, 750));
 
-        let spans = engine.reorder_bidi_spans_v83("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
+        let spans =
+            engine.reorder_bidi_spans_v83("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
         assert_eq!(spans.len(), 2);
         assert!(!spans[0].1);
         assert!(spans[1].1);
@@ -499,7 +538,10 @@ mod tests {
         assert_ne!(key, 0);
 
         let woff2_engine = FontcraftWoff2BrotliTranscoderSubsettingPrEngineV83::new();
-        assert_eq!(woff2_engine.validate_brotli_stream_header_v83(100).unwrap(), 400);
+        assert_eq!(
+            woff2_engine.validate_brotli_stream_header_v83(100).unwrap(),
+            400
+        );
 
         let subset = woff2_engine.subset_glyph_directory_v83(100, &[5, 10, 150]);
         assert_eq!(subset, vec![5, 10]);
@@ -514,7 +556,9 @@ mod tests {
         assert_eq!(manifests.len(), 5);
 
         let markdown = suite.export_pr_manifest_markdown();
-        assert!(markdown.contains("FontCraft Typography & Vector Font V83 Advancements PR Manifest"));
+        assert!(
+            markdown.contains("FontCraft Typography & Vector Font V83 Advancements PR Manifest")
+        );
         assert!(markdown.contains("OpenType GSUB/GPOS Complex Script Text Shaping"));
 
         let parity_suite = FontcraftAdvancementsV83ParitySuite::new();
