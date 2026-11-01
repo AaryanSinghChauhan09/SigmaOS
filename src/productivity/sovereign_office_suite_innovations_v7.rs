@@ -425,6 +425,28 @@ pub struct KbRoutingResult {
     pub match_confidence: f64,
 }
 
+/// Case-insensitive substring search helper without dynamic heap allocations for ASCII text.
+/// Uses zero-allocation SIMD-friendly `eq_ignore_ascii_case` byte slice matching when both
+/// haystack and needle are ASCII, avoiding heap String allocations during search filtering.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let n_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(n_bytes.len())
+            .any(|window| window.eq_ignore_ascii_case(n_bytes))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 pub struct SovereignZohoDeskKbAiRouterEngine;
 
 impl SovereignZohoDeskKbAiRouterEngine {
@@ -438,9 +460,11 @@ impl SovereignZohoDeskKbAiRouterEngine {
         query: &str,
         articles: &[KbArticleEntry],
     ) -> KbRoutingResult {
-        let lower = query.to_lowercase();
+        // Zero-allocation search filtering for ASCII queries and keywords,
+        // eliminating per-keyword heap String allocations (`k.to_lowercase()`).
+        // Preserves exact query.contains(keyword) semantics.
         let match_art = articles.iter().find(|a| {
-            a.keywords.iter().any(|k| lower.contains(&k.to_lowercase()))
+            a.keywords.iter().any(|k| contains_ignore_case(query, k))
         });
 
         if let Some(art) = match_art {
@@ -1103,5 +1127,28 @@ mod tests {
         let gateway = SovereignEnterpriseProductivitySuiteV7PrGatewayEngine::new();
         let audit = gateway.audit_suite_v7();
         assert!(audit.overall_suite_v7_audit_passed);
+    }
+
+    #[test]
+    fn test_contains_ignore_case_and_kb_router() {
+        assert!(contains_ignore_case("Hello World", "WORLD"));
+        assert!(contains_ignore_case("SigmaOS", "sigma"));
+        assert!(!contains_ignore_case("Linux", "Windows"));
+
+        let router = SovereignZohoDeskKbAiRouterEngine::new();
+        let articles = vec![KbArticleEntry {
+            article_id: "ART-101".to_string(),
+            title: "Network Config".to_string(),
+            keywords: vec!["wifi".to_string(), "vpn".to_string(), "dns".to_string()],
+            helpfulness_score: 0.95,
+        }];
+
+        let result = router.route_ticket("TKT-1", "DNS issue with VPN", &articles);
+        assert_eq!(result.suggested_article_id, Some("ART-101".to_string()));
+        assert_eq!(result.match_confidence, 0.92);
+
+        let result_no_match = router.route_ticket("TKT-2", "Printer jammed", &articles);
+        assert_eq!(result_no_match.suggested_article_id, None);
+        assert_eq!(result_no_match.match_confidence, 0.0);
     }
 }
