@@ -208,7 +208,7 @@ impl NvmeSubmissionQueueEntry {
     }
 
     pub fn set_command_id(&mut self, cid: u16) {
-        self.dword0 = (self.dword0 & 0xFFFF0000) | (cid as u32);
+        self.dword0 = (self.dword0 & 0x0000FFFF) | ((cid as u32) << 16);
     }
 
     pub fn set_opcode(&mut self, opcode: u8) {
@@ -941,7 +941,7 @@ mod tests {
         sqe.set_prp2(0x3000);
 
         assert_eq!(sqe.dword0 & 0xFF, NVME_CMD_READ as u32);
-        assert_eq!(sqe.dword0 & 0xFFFF, 42);
+        assert_eq!((sqe.dword0 >> 16) & 0xFFFF, 42);
     }
 
     #[test]
