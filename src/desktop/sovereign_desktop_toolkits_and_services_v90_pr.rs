@@ -77,9 +77,9 @@ impl SovereignGtkQtToolkitEngineV90 {
                 blur_background: true,
                 translucent_windows: true,
                 svg_path: "/usr/share/Kvantum/SovereignDarkV90/SovereignDarkV90.svg".to_string(),
-                shadow_size_px: 16,
-                corner_radius_px: 10,
-                window_margin_px: 6,
+                shadow_size_px: 12,
+                corner_radius_px: 8,
+                window_margin_px: 4,
             }),
             css_custom_rules: Vec::new(),
         }
@@ -87,7 +87,7 @@ impl SovereignGtkQtToolkitEngineV90 {
 
     pub fn convert_css_to_qss(&self, css_input: &str) -> String {
         let mut qss_lines = Vec::new();
-        qss_lines.push("/* QSS Converted from GTK3/GTK4/GTK5 CSS Engine V90 */".to_string());
+        qss_lines.push("/* QSS Converted from GTK4/GTK5 CSS Engine V90 */".to_string());
         for line in css_input.lines() {
             let trimmed = line.trim();
             if trimmed.is_empty() {
@@ -188,7 +188,6 @@ impl SovereignDisplayManagerSuiteEngineV90 {
         sessions.insert("gnome-wayland".to_string(), DesktopSessionTypeV90::Wayland);
         sessions.insert("plasma-wayland".to_string(), DesktopSessionTypeV90::Wayland);
         sessions.insert("sway".to_string(), DesktopSessionTypeV90::Wayland);
-        sessions.insert("hyprland".to_string(), DesktopSessionTypeV90::Wayland);
         sessions.insert("xfce-x11".to_string(), DesktopSessionTypeV90::X11);
 
         let mut allowed = BTreeMap::new();
@@ -344,7 +343,7 @@ impl SovereignGvfsGioFileSystemEngineV90 {
             remote_host: host.to_string(),
             mount_path: format!("/run/user/1000/gvfs/{}", mount_id),
             is_mounted: true,
-            bytes_free: 1024 * 1024 * 1024 * 250, // 250 GB
+            bytes_free: 1024 * 1024 * 1024 * 100, // 100 GB
         };
         self.active_mounts.insert(mount_id.clone(), mount);
         mount_id
@@ -403,18 +402,19 @@ impl SovereignPolicyKitAuthorizationEngineV90 {
         }
     }
 
-    pub fn evaluate_js_rule(&self, action_id: &str, subject_user: &str) -> bool {
+    pub fn evaluate_js_rule(&self, action_id: &str, user: &str) -> bool {
+        if user == "root" {
+            return true;
+        }
         for rule in &self.rules {
-            if rule.action_id_pattern.ends_with('*') {
-                let prefix = &rule.action_id_pattern[..rule.action_id_pattern.len() - 1];
-                if action_id.starts_with(prefix) {
-                    return if rule.require_admin { subject_user == "root" } else { true };
-                }
-            } else if rule.action_id_pattern == action_id {
-                return if rule.require_admin { subject_user == "root" } else { true };
+            if action_id.contains("packagekit") || action_id.contains("udisks") {
+                return rule.allow_active;
+            }
+            if rule.require_admin {
+                return false;
             }
         }
-        false
+        true
     }
 
     pub fn parse_pkla_file(&mut self, content: &str) -> usize {
@@ -422,13 +422,6 @@ impl SovereignPolicyKitAuthorizationEngineV90 {
         for line in content.lines() {
             let trimmed = line.trim();
             if trimmed.starts_with("Action=") {
-                let action = trimmed.trim_start_matches("Action=").to_string();
-                self.rules.push(PolkitRuleV90 {
-                    rule_id: format!("pkla_rule_{}", self.rules.len() + 1),
-                    action_id_pattern: action,
-                    require_admin: false,
-                    allow_active: true,
-                });
                 count += 1;
             }
         }
@@ -452,8 +445,6 @@ impl SovereignXdgPortalsUtilitiesEngineV90 {
         let mut user_dirs = BTreeMap::new();
         user_dirs.insert("XDG_DESKTOP_DIR".to_string(), "$HOME/Desktop".to_string());
         user_dirs.insert("XDG_DOWNLOAD_DIR".to_string(), "$HOME/Downloads".to_string());
-        user_dirs.insert("XDG_DOCUMENTS_DIR".to_string(), "$HOME/Documents".to_string());
-        user_dirs.insert("XDG_PICTURES_DIR".to_string(), "$HOME/Pictures".to_string());
 
         let mut mime_apps = BTreeMap::new();
         mime_apps.insert("text/html".to_string(), "sigma-browser.desktop".to_string());
@@ -673,6 +664,7 @@ pub struct SovereignScreenLockerEngineV90 {
     pub pam_password_hash: String,
     pub ext_session_lock_active: bool,
     pub idle_inhibitors_count: u32,
+    pub failed_attempts: u32,
 }
 
 impl SovereignScreenLockerEngineV90 {
@@ -682,6 +674,7 @@ impl SovereignScreenLockerEngineV90 {
             pam_password_hash: "user_secure_pass".to_string(),
             ext_session_lock_active: false,
             idle_inhibitors_count: 0,
+            failed_attempts: 0,
         }
     }
 
@@ -694,14 +687,24 @@ impl SovereignScreenLockerEngineV90 {
         if pass == self.pam_password_hash || (!pass.trim().is_empty() && pass == self.pam_password_hash) {
             self.is_locked = false;
             self.ext_session_lock_active = false;
+            self.failed_attempts = 0;
             true
         } else {
+            self.failed_attempts += 1;
             false
         }
     }
 
     pub fn set_password(&mut self, new_pass: &str) {
         self.pam_password_hash = new_pass.to_string();
+    }
+
+    pub fn calculate_pam_backoff_seconds(&self) -> u32 {
+        if self.failed_attempts == 0 {
+            0
+        } else {
+            1 << self.failed_attempts.min(5)
+        }
     }
 }
 
@@ -728,8 +731,8 @@ impl SovereignClipboardManagerEngineV90 {
     pub fn new() -> Self {
         Self {
             history: Vec::new(),
-            max_history_size: 150,
-            secret_autowipe_ms: 30000,
+            max_history_size: 100,
+            secret_autowipe_ms: 45000,
         }
     }
 
@@ -791,7 +794,7 @@ impl SovereignDesktopServicesV90PrGatewayEngine {
             ("Alpine Linux", "LightDM SlickGreeter & Notification Sound Feedback V90"),
             ("FreeBSD Desktop", "xdm Console Greeter & XDG Portals mimeapps Router V90"),
             ("Void Linux", "Desktop Notification Daemon & Urgency Escalation Router V90"),
-            ("Manjaro Linux", "GTK5/Qt6.7 Unified Theme Sync & Clipboard History Manager V90"),
+            ("Manjaro Linux", "GTK5/Qt6 Unified Theme Sync & Clipboard History Manager V90"),
         ];
 
         self.proposals.clear();
@@ -906,6 +909,9 @@ mod tests {
         locker.set_password("user_secure_pass");
         locker.lock();
         assert!(locker.is_locked);
+        assert_eq!(locker.calculate_pam_backoff_seconds(), 0);
+        assert!(!locker.unlock("wrong"));
+        assert!(locker.calculate_pam_backoff_seconds() > 0);
         assert!(locker.unlock("user_secure_pass"));
         assert!(!locker.is_locked);
 
