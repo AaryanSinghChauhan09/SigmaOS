@@ -37,4 +37,6 @@ __pycache__/
 !docs/shell/*.md
 !docs/studies/
 !docs/studies/*.md
+!docs/SIGMAOS_GUI_DEVELOPMENT_PLAN.md
+!wiki/30-SigmaOS-GUI-Development-Plan.md
 !.github/PULL_REQUEST_TEMPLATE.md
