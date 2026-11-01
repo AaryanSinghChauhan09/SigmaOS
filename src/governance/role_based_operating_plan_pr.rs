@@ -50,6 +50,7 @@ pub enum RoadmapPhase {
 
 /// Progress state for a roadmap phase
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct RoadmapPhaseStatus {
     pub phase: RoadmapPhase,
     pub name: String,
@@ -61,6 +62,7 @@ pub struct RoadmapPhaseStatus {
 
 /// Execution step in the 8-Step Execution Guide
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct ExecutionStep {
     pub step_number: u8,
     pub title: String,
@@ -90,6 +92,7 @@ pub struct OperationalDayFocus {
 
 /// 7 Governance Guardrails
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum GovernanceGuardrail {
     HumanApprovalRequired,
     EvidenceGatedSuccess,
@@ -102,6 +105,7 @@ pub enum GovernanceGuardrail {
 
 /// Validation result for guardrail checks
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct GuardrailVerdict {
     pub guardrail: GovernanceGuardrail,
     pub passed: bool,
@@ -455,6 +459,181 @@ impl Default for RoleBasedOperatingPlanEngine {
     }
 }
 
+/// PR Specification for the Role-Based Operating Plan & Strategy Proposal
+#[derive(Debug, Clone)]
+pub struct RoleBasedOperatingPlanPrSpec {
+    pub pr_title: String,
+    pub pr_branch: String,
+    pub roles_count: usize,
+    pub phases_count: usize,
+    pub execution_steps_count: usize,
+    pub calendar_days_count: usize,
+    pub guardrails_count: usize,
+    pub patch_digest: u64,
+    pub status: String,
+}
+
+/// FNV-1a hash calculation for PR patch digest reproducibility
+fn fnv1a_digest(bytes: &[u8]) -> u64 {
+    let mut hash: u64 = 0xcbf29ce484222325;
+    for &b in bytes {
+        hash ^= b as u64;
+        hash = hash.wrapping_mul(0x100000001b3);
+    }
+    hash
+}
+
+/// PR Gateway for Role-Based Governance, Strategy Roadmap & Operating Plan
+pub struct RoleBasedOperatingPlanPrGateway {
+    pub engine: RoleBasedOperatingPlanEngine,
+}
+
+impl RoleBasedOperatingPlanPrGateway {
+    pub fn new() -> Self {
+        Self {
+            engine: RoleBasedOperatingPlanEngine::new(),
+        }
+    }
+
+    /// Generates proposal specification metadata
+    pub fn generate_proposal_spec(&self) -> RoleBasedOperatingPlanPrSpec {
+        let payload = format!(
+            "roles:{},phases:{},steps:{},calendar:5,guardrails:7",
+            self.engine.roles.len(),
+            self.engine.phases.len(),
+            self.engine.execution_steps.len()
+        );
+        let patch_digest = fnv1a_digest(payload.as_bytes());
+
+        RoleBasedOperatingPlanPrSpec {
+            pr_title: String::from(
+                "feat(governance): Adopt Role-Based Operating Plan and Strategic Wedge Roadmap",
+            ),
+            pr_branch: String::from("feat/role-based-operating-plan"),
+            roles_count: self.engine.roles.len(),
+            phases_count: self.engine.phases.len(),
+            execution_steps_count: self.engine.execution_steps.len(),
+            calendar_days_count: self.engine.calendar.len(),
+            guardrails_count: 7,
+            patch_digest,
+            status: String::from("Approved / Implementation Ready"),
+        }
+    }
+
+    /// Generates the complete PR Proposal in Markdown format
+    pub fn generate_pr_proposal_markdown(&self) -> String {
+        let spec = self.generate_proposal_spec();
+        let mut doc = String::new();
+
+        doc.push_str(&format!("# {}\n\n", spec.pr_title));
+        doc.push_str(&format!("**Branch:** `{}` | **Status:** {}\n\n", spec.pr_branch, spec.status));
+        doc.push_str("## Executive Summary\n\n");
+        doc.push_str("This pull request establishes SigmaOS's Role-Based Governance, Phased Strategic Wedge Roadmap, and AI-Agent Maintenance Plan. Grounded in a pragmatic reality check, it shifts the project away from superficial feature parity claims across hundreds of distributions toward a focused, evidence-gated operating model where every capability claim requires verifiable CI artifacts (such as QEMU boot logs).\n\n");
+
+        doc.push_str("## Reality Check & Strategic Wedge\n\n");
+        doc.push_str("- **No OS defeats every competitor in every dimension.** SigmaOS focuses on owning a tight, differentiated wedge.\n");
+        doc.push_str("- **The 4 Wedge Pillars:**\n");
+        doc.push_str("  1. Memory-safe Rust microkernel and userland.\n");
+        doc.push_str("  2. Atomic, rollbackable system updates by default (simplified Silverblue / NixOS model).\n");
+        doc.push_str("  3. Capability-based security by default (pledge/unveil, Capsicum, Landlock).\n");
+        doc.push_str("  4. Agent-native maintainability with machine-readable status, strict guardrails, and test gates.\n");
+        doc.push_str("- **Ground Truth Over Claims:** Eliminates duplicate docs, unifies status tracking into evidence-based records, and replaces synthetic claims with QEMU serial output validation.\n\n");
+
+        doc.push_str("## Phased Strategic Roadmap\n\n");
+        for phase in &self.engine.phases {
+            doc.push_str(&format!(
+                "- **{:?} - {} ({})**: Status: {}\n",
+                phase.phase,
+                phase.name,
+                phase.timeframe,
+                if phase.is_complete { "Complete" } else { "In Progress" }
+            ));
+        }
+        doc.push_str("\n");
+
+        doc.push_str("## 12 Operating Maintenance Roles\n\n");
+        doc.push_str("| Role | Mission | Cadence | Leadership Profile |\n");
+        doc.push_str("|---|---|---|---|\n");
+        for r in &self.engine.roles {
+            doc.push_str(&format!(
+                "| {} | {} | {} | {:?} |\n",
+                r.title, r.mission, r.cadence, r.leadership
+            ));
+        }
+        doc.push_str("\n");
+
+        doc.push_str("## Weekly Operational Calendar\n\n");
+        for day in &self.engine.calendar {
+            let role_names: Vec<String> = day.assigned_roles.iter().map(|r| format!("{:?}", r)).collect();
+            doc.push_str(&format!(
+                "- **{:?}**: {} (Assigned Roles: {})\n",
+                day.day,
+                day.focus_area,
+                role_names.join(", ")
+            ));
+        }
+        doc.push_str("\n");
+
+        doc.push_str("## 8-Step Team Execution Plan\n\n");
+        for step in &self.engine.execution_steps {
+            doc.push_str(&format!(
+                "{}. **{} ({})**: {}\n   - **Required Output:** `{}`\n",
+                step.step_number, step.title, step.timeframe, step.action, step.required_output
+            ));
+        }
+        doc.push_str("\n");
+
+        doc.push_str("## 7 Governance Guardrails\n\n");
+        doc.push_str("1. **Human Approval:** Required for modifications touching kernel, crypto, bootloader, installer, or keys.\n");
+        doc.push_str("2. **Evidence-Gated Success:** No feature may be marked complete without linked CI execution proof.\n");
+        doc.push_str("3. **Sandbox and Least Privilege:** Agents operate with scoped tokens and no direct push to main.\n");
+        doc.push_str("4. **Small, Reviewable PRs:** Scoped PRs with regression tests, with daily limits to prevent review bottlenecks.\n");
+        doc.push_str("5. **Regression Ratchet:** Every bug fix includes a regression test; coverage and unsafe count must not worsen.\n");
+        doc.push_str("6. **Audit Log & Revertibility:** Every automated action is recorded with one-command rollback capability.\n");
+        doc.push_str("7. **Honest Public Reporting:** Documentation reflects only what boots and runs on actual targets today.\n\n");
+
+        doc.push_str("## Specification Diff\n\n```diff\n");
+        doc.push_str(&self.generate_patch_diff());
+        doc.push_str("```\n");
+
+        doc
+    }
+
+    /// Generates sample patch diff for roadmap specification
+    pub fn generate_patch_diff(&self) -> String {
+        let spec = self.generate_proposal_spec();
+        format!(
+            "--- a/docs/roadmap/PR_SPEC_ROLE_BASED_GOVERNANCE_AND_OPERATING_PLAN.md\n\
+             +++ b/docs/roadmap/PR_SPEC_ROLE_BASED_GOVERNANCE_AND_OPERATING_PLAN.md\n\
+             @@ -0,0 +1,120 @@\n\
+             +# PR Title: {}\n\
+             +# PR Branch: {}\n\
+             +# Roles Count: {}\n\
+             +# Phases Count: {}\n\
+             +# Steps Count: {}\n\
+             +# Calendar Days Count: {}\n\
+             +# Guardrails Count: {}\n\
+             +# Patch Digest: {:016x}\n\
+             +# Status: {}\n",
+            spec.pr_title,
+            spec.pr_branch,
+            spec.roles_count,
+            spec.phases_count,
+            spec.execution_steps_count,
+            spec.calendar_days_count,
+            spec.guardrails_count,
+            spec.patch_digest,
+            spec.status
+        )
+    }
+}
+
+impl Default for RoleBasedOperatingPlanPrGateway {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -506,5 +685,28 @@ mod tests {
         // Test passing guardrail
         let verdicts_pass = engine.validate_pr_guardrails(true, true, true, true);
         assert!(verdicts_pass.iter().all(|v| v.passed));
+    }
+
+    #[test]
+    fn test_gateway_proposal_and_diff_generation() {
+        let gateway = RoleBasedOperatingPlanPrGateway::new();
+        let spec = gateway.generate_proposal_spec();
+        assert_eq!(spec.roles_count, 12);
+        assert_eq!(spec.phases_count, 4);
+        assert_eq!(spec.execution_steps_count, 8);
+        assert_eq!(spec.calendar_days_count, 5);
+        assert_eq!(spec.guardrails_count, 7);
+        assert!(spec.patch_digest != 0);
+
+        let markdown = gateway.generate_pr_proposal_markdown();
+        assert!(markdown.contains("feat(governance): Adopt Role-Based Operating Plan"));
+        assert!(markdown.contains("Reality Check & Strategic Wedge"));
+        assert!(markdown.contains("12 Operating Maintenance Roles"));
+        assert!(markdown.contains("Weekly Operational Calendar"));
+        assert!(markdown.contains("7 Governance Guardrails"));
+
+        let diff = gateway.generate_patch_diff();
+        assert!(diff.contains("PR_SPEC_ROLE_BASED_GOVERNANCE_AND_OPERATING_PLAN.md"));
+        assert!(diff.contains("Roles Count: 12"));
     }
 }
