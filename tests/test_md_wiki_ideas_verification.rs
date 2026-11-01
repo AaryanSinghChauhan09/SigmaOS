@@ -9,6 +9,9 @@ mod sovereign_wiki_master_engine;
 #[path = "../src/wiki_unimplemented_ideas.rs"]
 mod wiki_unimplemented_ideas;
 
+#[path = "../src/distro/open_source_os_unimplemented_ideas_v83_pr.rs"]
+mod open_source_os_unimplemented_ideas_v83_pr;
+
 #[path = "../src/distro/wiki_ideas_implementation.rs"]
 mod wiki_ideas_implementation;
 
@@ -515,4 +518,17 @@ fn test_hybrid_scheduler_innovations_wiki_parity() {
         CpuFrequencyGovernor::OnDemand,
     ];
     assert_eq!(freq_govs.len(), 4);
+}
+
+#[test]
+fn test_unimplemented_ideas_v83_pr_full_parity() {
+    let suite = open_source_os_unimplemented_ideas_v83_pr::SovereignUnimplementedIdeasSuiteV83::new();
+    let manifests = suite.collect_all_manifests();
+    assert_eq!(manifests.len(), 9);
+
+    let summary = suite.generate_suite_summary();
+    assert_eq!(summary.get("suite_version").unwrap(), "v83.0");
+    assert_eq!(summary.get("total_proposals").unwrap(), "9");
+    assert_eq!(summary.get("pqc_signature_algorithm").unwrap(), "Dilithium-5");
+    assert_eq!(summary.get("interoperability_score").unwrap(), "100.0%");
 }
