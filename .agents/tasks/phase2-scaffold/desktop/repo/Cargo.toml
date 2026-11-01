@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-desktop"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR GPL-2.0"
+description = "SigmaOS desktop layer: Wayland compositor, input, theme synthesis, window management"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop"
+
+[lib]
+name = "sigmaos_desktop"
+path = "src/lib.rs"
+
+[dependencies]
+thiserror = "1.0"
+
+[dev-dependencies]

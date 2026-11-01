@@ -16,3 +16,7 @@
 [submodule "SigmaOS-system"]
 	path = src_modules/SigmaOS-system
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-system.git
+
+[submodule "SigmaOS-desktop"]
+	path = src_modules/SigmaOS-desktop
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-desktop.git
