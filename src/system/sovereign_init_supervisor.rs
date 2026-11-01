@@ -122,8 +122,8 @@ pub mod sovereign_init_and_supervisor_advancements_v86_pr;
 #[path = "sovereign_init_and_supervisor_advancements_v88_pr.rs"]
 pub mod sovereign_init_and_supervisor_advancements_v88_pr;
 
-#[path = "sovereign_init_and_supervisor_advancements_v92_pr.rs"]
-pub mod sovereign_init_and_supervisor_advancements_v92_pr;
+#[path = "sovereign_init_and_supervisor_advancements_v90_pr.rs"]
+pub mod sovereign_init_and_supervisor_advancements_v90_pr;
 
 use sovereign_init_and_supervisor_advancements_v63::*;
 use sovereign_init_and_supervisor_advancements_v67::SovereignInitAndSupervisorAdvancementsV67Suite;
@@ -133,8 +133,8 @@ use sovereign_init_and_supervisor_advancements_v86_pr::{
 use sovereign_init_and_supervisor_advancements_v88_pr::{
     SovereignInitAndSupervisorAdvancementsV88Suite, SovereignInitAndSupervisorV88PrGatewayEngine,
 };
-use sovereign_init_and_supervisor_advancements_v92_pr::{
-    SovereignInitAndSupervisorAdvancementsV92Suite, SovereignInitAndSupervisorV92PrGatewayEngine,
+use sovereign_init_and_supervisor_advancements_v90_pr::{
+    SovereignInitAndSupervisorAdvancementsV90Suite, SovereignInitAndSupervisorV90PrGatewayEngine,
 };
 
 pub struct SovereignInitSupervisor {
@@ -156,8 +156,8 @@ pub struct SovereignInitSupervisor {
     pub pr_gateway_v86: SovereignInitAndSupervisorV86PrGatewayEngine,
     pub suite_v88: SovereignInitAndSupervisorAdvancementsV88Suite,
     pub pr_gateway_v88: SovereignInitAndSupervisorV88PrGatewayEngine,
-    pub suite_v92: SovereignInitAndSupervisorAdvancementsV92Suite,
-    pub pr_gateway_v92: SovereignInitAndSupervisorV92PrGatewayEngine,
+    pub suite_v90: SovereignInitAndSupervisorAdvancementsV90Suite,
+    pub pr_gateway_v90: SovereignInitAndSupervisorV90PrGatewayEngine,
 }
 
 impl SovereignInitSupervisor {
@@ -181,8 +181,8 @@ impl SovereignInitSupervisor {
             pr_gateway_v86: SovereignInitAndSupervisorV86PrGatewayEngine::new(),
             suite_v88: SovereignInitAndSupervisorAdvancementsV88Suite::new(),
             pr_gateway_v88: SovereignInitAndSupervisorV88PrGatewayEngine::new(),
-            suite_v92: SovereignInitAndSupervisorAdvancementsV92Suite::new(),
-            pr_gateway_v92: SovereignInitAndSupervisorV92PrGatewayEngine::new(),
+            suite_v90: SovereignInitAndSupervisorAdvancementsV90Suite::new(),
+            pr_gateway_v90: SovereignInitAndSupervisorV90PrGatewayEngine::new(),
         }
     }
 
@@ -494,10 +494,10 @@ mod tests {
     }
 
     #[test]
-    fn test_v92_suite_integration() {
+    fn test_v90_suite_integration() {
         let supervisor = SovereignInitSupervisor::new();
         let sig = [0u8; 64];
-        let manifests = supervisor.pr_gateway_v92.orchestrate_core_userland_v92(&sig).unwrap();
+        let manifests = supervisor.pr_gateway_v90.orchestrate_core_userland_v90(&sig).unwrap();
         assert_eq!(manifests.len(), 7);
     }
 }
