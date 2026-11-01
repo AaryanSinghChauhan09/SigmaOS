@@ -927,6 +927,16 @@ if [ -f "src/creative/voicecraft_advancements_v80_pr.rs" ]; then
     ./build/test_voicecraft_v80_integration
 fi
 
+if [ -f "src/creative/voicecraft_advancements_v81_pr.rs" ]; then
+    echo "Running Sovereign VoiceCraft Advancements V81 PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/voicecraft_advancements_v81_pr.rs --edition=2021 -o build/test_voicecraft_v81
+    ./build/test_voicecraft_v81
+
+    rustc --test tests/test_voicecraft_advancements_v81_pr.rs --edition=2021 -o build/test_voicecraft_v81_integration
+    ./build/test_voicecraft_v81_integration
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build
