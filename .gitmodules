@@ -12,3 +12,7 @@
 [submodule "SigmaOS-security"]
 	path = src_modules/SigmaOS-security
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-security.git
+
+[submodule "SigmaOS-system"]
+	path = src_modules/SigmaOS-system
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-system.git
