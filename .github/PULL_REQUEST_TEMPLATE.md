@@ -1,95 +1,32 @@
 ## Summary
 
-<!-- What changed and why? -->
-
-## Task type
-
-- [ ] Daily CI maintenance
-- [ ] Weekly dependency/security review
-- [ ] Weekly open-source study
-- [ ] Biweekly component gap review
-- [ ] Monthly boot validation
-- [ ] Monthly installer/recovery rehearsal
-- [ ] Monthly package/update rehearsal
-- [ ] Quarterly release review
-- [ ] Quarterly architecture review
-- [ ] Quarterly hardware audit
+<!-- One paragraph: what changed and why. -->
 
 ## Component
 
-- [ ] Boot / platform
-- [ ] Kernel
-- [ ] Memory
+- [ ] Thread manager
 - [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
 - [ ] VFS / filesystems
-- [ ] Syscalls
 - [ ] Drivers
-- [ ] Networking
 - [ ] IPC
 - [ ] Security
-- [ ] Userspace
-- [ ] Desktop
-- [ ] Packaging / installer
+- [ ] Installer / packaging
 - [ ] Documentation
 - [ ] CI / tooling
-
-## Component impact
-
-- Component/repository:
-- User-visible behavior:
-- Related issue or plan:
-
-## Upstream study
-
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
-
-## Upstream study and reference behavior
-
-<!-- Required for lifecycle, ABI, or storage changes -->
-
-- Upstream study:
-- Reference study:
-- Upstream project, document, or behavior reviewed:
-- POSIX section:
-- Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- What SigmaOS adopts:
-- What remains intentionally different:
-- Compatibility impact:
 
 ## Changes
 
 -
--
 
-## Evidence
+## Motivation
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New or updated tests
-- [ ] QEMU boot evidence, if applicable
-- [ ] Installer/recovery evidence, if applicable
-- [ ] Hardware evidence, if applicable
-- [ ] Security review requested, if applicable
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
 
-## Status updates
+## Implementation notes
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Roadmap or release checklist
-
-## Risks and rollback
-
-- Risk:
-- Rollback:
-- Recovery or downgrade procedure:
+<!-- Design decisions, data structures, locking, error handling. -->
 
 ## IPC handler
 
@@ -99,13 +36,14 @@
 - Non-blocking behavior:
 - EOF / closure behavior:
 
-## Evidence
+## Tests
 
-- Kernel safety review:
-- Capability/namespace checks enforced:
-- Shared-memory or descriptor implications:
-- Input validation and failure behavior:
-- Rollback or downgrade path:
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
 
 ## Shell safety review
 
@@ -114,23 +52,14 @@
 ## Verification
 
 ```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
-make check
-make test
-make format
 ```
 
-- [ ] Focused unit tests pass.
-- [ ] New/updated shell tests
-- [ ] POSIX/conformance test evidence
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Security review requested, if applicable
-- [ ] Documentation and wiki mirrors updated where applicable.
-- Test/evidence commands:
-- Results:
+Paste relevant output below.
 
 ## Runtime evidence
 
@@ -142,12 +71,24 @@ make format
 
 ## Capability status
 
-- Current status:
-- Evidence supporting the status:
-- Claims intentionally left partial:
+- Previous status:
+- New status:
+- Evidence:
 
 ## Integration impact
 
-- APIs, ABI, protocols, or file formats affected:
-- Cross-repository synchronization required:
-- Release or migration notes:
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated
+- [ ] No unsupported compatibility claim

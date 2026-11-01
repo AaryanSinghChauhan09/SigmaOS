@@ -23,10 +23,11 @@ __pycache__/
 # Root-level .md/.txt files are banned from main (move to docs branch)
 *.md
 !README.md
-!FUTURE-DEVELOPMENT-ROADMAP.md
+!CONTRIBUTING.md
+!AGENTS.md
 *.txt
-!docs/PHYSICAL_MEMORY_MANAGER_PLAN.md
-!wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md
+!docs/thread-manager.md
+!wiki/thread-manager.md
 !docs/INTERRUPT_HANDLER_PLAN.md
 !wiki/INTERRUPT_HANDLER_PLAN.md
 !docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md

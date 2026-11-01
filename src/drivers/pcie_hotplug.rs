@@ -369,9 +369,24 @@ mod tests {
         let slot_id = manager.register_slot(0, 1, 0);
         manager.identify_device(slot_id, 0x8086, 0x100E).unwrap();
 
-        // Set up dummy interrupt vector for testing
+        // Register dummy interrupt vector in controller and MSI routing for test
+        let vector = 0x30;
+        let device_id = slot_id as u32;
+        manager.interrupt_controller.allocate_irq(vector, 0);
+        manager.msi_routing.msi_vectors.insert(
+            device_id,
+            crate::kernel::msi_routing::MsiVector {
+                device_id,
+                vector: vector as u8,
+                msg_addr: 0xFEE00000,
+                msg_data: vector as u32,
+                mask_bit: 0,
+                allocated: true,
+            },
+        );
+
         if let Some(slot_mut) = manager.slots.get_mut(&slot_id) {
-            slot_mut.interrupt_vector = Some(0x30);
+            slot_mut.interrupt_vector = Some(vector as u8);
         }
 
         manager
@@ -390,8 +405,11 @@ mod tests {
         let slot_id = manager.register_slot(0, 1, 0);
         manager.identify_device(slot_id, 0x8086, 0x100E).unwrap();
 
+        let vector = 0x30;
+        manager.interrupt_controller.allocate_irq(vector, 0);
+
         if let Some(slot_mut) = manager.slots.get_mut(&slot_id) {
-            slot_mut.interrupt_vector = Some(0x30);
+            slot_mut.interrupt_vector = Some(vector as u8);
         }
 
         manager
