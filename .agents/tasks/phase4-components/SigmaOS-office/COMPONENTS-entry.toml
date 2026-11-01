@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-office"
+description = "Office productivity suite integration for SigmaOS with SigmaOS-native theming and desktop integration"
+category = "productivity"
+license = "MIT"

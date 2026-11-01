@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-panel"
+description = "Desktop taskbar and panel for SigmaOS with applet support, workspace switcher, and system tray"
+category = "desktop"
+license = "MIT"

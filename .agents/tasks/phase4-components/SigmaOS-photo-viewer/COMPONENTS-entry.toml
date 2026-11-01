@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-photo-viewer"
+description = "Image viewer for SigmaOS with common format support, basic editing tools, and slideshow capabilities"
+category = "media"
+license = "MIT"

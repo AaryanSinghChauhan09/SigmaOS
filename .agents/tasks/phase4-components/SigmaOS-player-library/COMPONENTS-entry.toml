@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-player-library"
+description = "Media player playlist library for SigmaOS with playlist parsing, metadata extraction, and streaming URI resolution"
+category = "libraries"
+license = "MIT"
