@@ -12,5 +12,16 @@ name = "sigmaos_app_framework"
 path = "src/lib.rs"
 
 [dependencies]
+gtk4 = { version = "0.7", optional = true }
+libadwaita = { version = "0.5", optional = true }
+zbus = { version = "4", optional = true }
+thiserror = "1"
+tracing = "0.1"
 
 [dev-dependencies]
+tempfile = "3"
+
+[features]
+default = []
+gtk = ["gtk4", "libadwaita"]
+dbus = ["zbus"]

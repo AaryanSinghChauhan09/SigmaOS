@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-quickshell"
+description = "Keyboard-driven application launcher and shell with fuzzy search for SigmaOS"
+category = "desktop"
+license = "MIT"

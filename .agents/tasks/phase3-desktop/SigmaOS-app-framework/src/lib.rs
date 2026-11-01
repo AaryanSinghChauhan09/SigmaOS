@@ -6,6 +6,10 @@
 //! - GTK:              <https://github.com/linuxmint/gtk>
 //! - cinnamon-desktop: <https://github.com/linuxmint/cinnamon-desktop>
 
+pub mod ipc;
+pub mod layout;
+pub mod widgets;
+
 use std::fmt;
 
 // ---------------------------------------------------------------------------

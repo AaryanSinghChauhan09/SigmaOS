@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-reel"
+description = "Screen recording and reel creation tool for SigmaOS"
+category = "media"
+license = "MIT"

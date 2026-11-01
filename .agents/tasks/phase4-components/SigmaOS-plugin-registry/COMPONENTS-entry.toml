@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-plugin-registry"
+description = "Plugin registry and discovery service for SigmaOS"
+category = "desktop"
+license = "MIT"

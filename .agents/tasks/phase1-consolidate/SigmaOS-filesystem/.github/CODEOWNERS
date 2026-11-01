@@ -1,0 +1,9 @@
+# Component owners
+* @AaryanSinghChauhan09
+
+# Dependency files
+/Cargo.toml @AaryanSinghChauhan09
+/Cargo.lock @AaryanSinghChauhan09
+
+# Workflows
+/.github/workflows/ @AaryanSinghChauhan09

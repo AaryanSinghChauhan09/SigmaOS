@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-renamer-bulk"
+description = "Bulk file renaming tool for SigmaOS with regex patterns and sequential numbering"
+category = "file-management"
+license = "MIT"
