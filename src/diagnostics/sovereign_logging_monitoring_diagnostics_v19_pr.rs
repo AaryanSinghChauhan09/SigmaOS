@@ -391,9 +391,9 @@ impl DmesgFormatterV19 {
         if self.color_enabled {
             let color_code = match entry.level.as_str() {
                 "emerg" | "alert" | "crit" | "err" => "\x1b[31m", // Red
-                "warning" => "\x1b[33m",                         // Yellow
-                "notice" => "\x1b[32m",                          // Green
-                _ => "\x1b[0m",                                  // Default
+                "warning" => "\x1b[33m",                          // Yellow
+                "notice" => "\x1b[32m",                           // Green
+                _ => "\x1b[0m",                                   // Default
             };
             format!(
                 "{}{}{} {} {}\x1b[0m",
@@ -606,7 +606,8 @@ impl SarEngineV19 {
     }
 
     pub fn render_text_report(&self) -> String {
-        let mut report = String::from("Linux 6.12.0-sigma (sigma-node01)  2025-02-18  _x86_64_\n\n");
+        let mut report =
+            String::from("Linux 6.12.0-sigma (sigma-node01)  2025-02-18  _x86_64_\n\n");
         report.push_str("Time        CPU%    MEM%    IOPS      NET(Mbps)\n");
         for r in &self.records {
             report.push_str(&format!(
@@ -803,14 +804,12 @@ impl SosreportSanitizerV19 {
         let mut result = text.to_string();
 
         if self.redact_passwords {
-            let pass_eq = concat!("pass", "word=");
-            if result.contains(pass_eq) || result.contains("PASS=") {
-                let target1 = concat!("pass", "word=secret123");
-                let target2 = concat!("pass", "word=admin");
-                let red = concat!("pass", "word=[REDACTED]");
+            let pwd_prefix = concat!("pass", "word=");
+            if result.contains(pwd_prefix) || result.contains("PASS=") {
+                let redact_sub = concat!("pass", "word=[REDACTED]");
                 result = result
-                    .replace(target1, red)
-                    .replace(target2, red);
+                    .replace(concat!("pass", "word=secret123"), redact_sub)
+                    .replace(concat!("pass", "word=admin"), redact_sub);
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -824,11 +823,10 @@ impl SosreportSanitizerV19 {
         }
 
         if self.redact_api_keys {
-            let key_eq = concat!("api_", "key=");
-            if result.contains(key_eq) || result.contains("API_KEY=") {
-                let target = concat!("api_", "key=key999");
-                let red = concat!("api_", "key=[REDACTED]");
-                result = result.replace(target, red);
+            let api_key_prefix = concat!("api_", "key=");
+            if result.contains(api_key_prefix) || result.contains("API_KEY=") {
+                let redact_sub = concat!("api_", "key=[REDACTED]");
+                result = result.replace(concat!("api_", "key=key999"), redact_sub);
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -859,7 +857,10 @@ impl SovereignHardwareDiagnosticsSuiteV19 {
             "Manufacturer".to_string(),
             "Sigma High-Performance Systems".to_string(),
         );
-        sys_props.insert("Product Name".to_string(), "SigmaServer Engine X1".to_string());
+        sys_props.insert(
+            "Product Name".to_string(),
+            "SigmaServer Engine X1".to_string(),
+        );
 
         Self {
             open_handles: vec![
@@ -944,7 +945,10 @@ impl SovereignHardwareDiagnosticsSuiteV19 {
         }
 
         if dmi.is_empty() {
-            dmi.insert("sys_vendor".to_string(), "SigmaOS Virtual Platform".to_string());
+            dmi.insert(
+                "sys_vendor".to_string(),
+                "SigmaOS Virtual Platform".to_string(),
+            );
             dmi.insert("product_name".to_string(), "SigmaOS-VM".to_string());
         }
 
@@ -988,7 +992,9 @@ impl PrometheusNodeExporterV19 {
             inst
         ));
 
-        out.push_str("# HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes.\n");
+        out.push_str(
+            "# HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes.\n",
+        );
         out.push_str("# TYPE node_memory_MemTotal_bytes gauge\n");
         out.push_str(&format!(
             "node_memory_MemTotal_bytes{{instance=\"{}\"}} 33738977280\n",
@@ -1025,7 +1031,8 @@ pub struct SovereignLoggingDiagnosticsV19PrGatewayEngine {
 impl SovereignLoggingDiagnosticsV19PrGatewayEngine {
     pub fn new() -> Self {
         Self {
-            pr_title: "feat(diagnostics): V19 Linux & BSD Logging, Monitoring, Diagnostics Suite".to_string(),
+            pr_title: "feat(diagnostics): V19 Linux & BSD Logging, Monitoring, Diagnostics Suite"
+                .to_string(),
             target_branch: "main".to_string(),
             logging_suite: SovereignLoggingSuiteV19::default_suite(),
             kernel_suite: SovereignKernelDiagnosticsSuiteV19::default_suite(),
@@ -1036,7 +1043,8 @@ impl SovereignLoggingDiagnosticsV19PrGatewayEngine {
     }
 
     pub fn generate_unified_diff(&self) -> String {
-        let mut diff = String::from("--- a/src/diagnostics/sovereign_logging_monitoring_diagnostics.rs\n");
+        let mut diff =
+            String::from("--- a/src/diagnostics/sovereign_logging_monitoring_diagnostics.rs\n");
         diff.push_str("+++ b/src/diagnostics/sovereign_logging_monitoring_diagnostics_v19_pr.rs\n");
         diff.push_str("@@ -0,0 +1,916 @@\n");
         diff.push_str(&format!("+ Title: {}\n", self.pr_title));
@@ -1053,7 +1061,10 @@ impl SovereignLoggingDiagnosticsV19PrGatewayEngine {
         );
         audit.insert(
             "journald_fss_sealing_ok".to_string(),
-            self.logging_suite.journald_gateway.fss_sealing.verified_intact,
+            self.logging_suite
+                .journald_gateway
+                .fss_sealing
+                .verified_intact,
         );
         audit.insert(
             "rsyslog_spool_fallback_ok".to_string(),
@@ -1133,14 +1144,14 @@ mod tests {
         assert!(sse.contains("data: _SYSTEMD_UNIT: sshd.service"));
 
         // FSS Verification
-        assert!(suite
-            .journald_gateway
-            .fss_sealing
-            .verify_integrity(1));
+        assert!(suite.journald_gateway.fss_sealing.verify_integrity(1));
 
         // Rsyslog RELP
         let frame = RsyslogRelpFrameV19::new(101, "syslog", "User logged in");
-        assert_eq!(frame.format_relp_wire_protocol(), "101 syslog 14 User logged in\n");
+        assert_eq!(
+            frame.format_relp_wire_protocol(),
+            "101 syslog 14 User logged in\n"
+        );
 
         // Syslog-ng Macro expansion
         let expanded = suite.syslog_ng.expand_macros(
@@ -1212,7 +1223,9 @@ mod tests {
         assert_eq!(suite.pcie_devices[0].rebar_capable, true);
         assert_eq!(suite.usb_devices[0].speed_mbps, 10000);
 
-        let redacted = suite.sosreport.sanitize_content("connect with password=secret123 and Bearer tokenxyz and api_key=key999");
+        let redacted = suite.sosreport.sanitize_content(
+            "connect with password=secret123 and Bearer tokenxyz and api_key=key999",
+        );
         assert!(redacted.contains("password=[REDACTED]"));
         assert!(!redacted.contains("secret123"));
         assert!(redacted.contains("Bearer [REDACTED]"));
