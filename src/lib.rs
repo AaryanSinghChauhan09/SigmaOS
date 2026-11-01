@@ -659,7 +659,11 @@ pub use shell::{
     ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
     SovereignShellsTerminalsSupervisorsParityPrGateway,
     SovereignShellsTerminalsSupervisorsParityV78Gateway,
-    SovereignShellsTerminalsSupervisorsV78PrSuite, TerminalMultiplexersAndEmulatorsPrEngine,
+    SovereignShellsTerminalsSupervisorsV78PrSuite,
+    SovereignShellsTerminalsSupervisorsParityV83Gateway,
+    SovereignShellsTerminalsSupervisorsV83PrSuite,
+    SovereignShellsTerminalsSupervisorsParityV89Gateway,
+    SovereignShellsTerminalsSupervisorsV89PrSuite, TerminalMultiplexersAndEmulatorsPrEngine,
     ZshPromptFormatter,
 };
 pub use sigpkg::{

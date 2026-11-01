@@ -3571,9 +3571,9 @@ if [ -f "src/productivity/sovereign_office_suites_engine.rs" ]; then
     ./build/test_office_suites
 fi
 
-if [ -f "tests/test_networking_stack_and_daemons_v87_pr.rs" ]; then
-    echo "Running Sovereign Networking Stack & Daemons V87 PR Gateway test suite..."
+if [ -f "tests/test_shells_terminals_supervisors_v89_pr.rs" ]; then
+    echo "Running Sovereign Shells, Terminals & Supervisors V89 PR test suite..."
     mkdir -p build
-    rustc --test tests/test_networking_stack_and_daemons_v87_pr.rs --edition=2021 -o build/test_networking_stack_v87_pr
-    ./build/test_networking_stack_v87_pr
+    rustc --test tests/test_shells_terminals_supervisors_v89_pr.rs --edition=2021 -o build/test_shells_v89_pr
+    ./build/test_shells_v89_pr
 fi
