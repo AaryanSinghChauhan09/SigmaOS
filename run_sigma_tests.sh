@@ -3652,3 +3652,12 @@ if [ -f "tests/test_networking_stack_and_daemons_v87_pr.rs" ]; then
     rustc --test tests/test_networking_stack_and_daemons_v87_pr.rs --edition=2021 -o build/test_networking_v87_pr
     ./build/test_networking_v87_pr
 fi
+
+if [ -f "tests/test_storage_filesystem_innovations_v90_pr.rs" ]; then
+    echo "Running Sovereign Storage & Filesystem Advancements V90 PR test suite..."
+    mkdir -p build
+    rustc --test src/storage/sovereign_storage_filesystem_innovations_v90_pr.rs --edition=2021 -o build/test_storage_v90_pr
+    ./build/test_storage_v90_pr
+    rustc --test tests/test_storage_filesystem_innovations_v90_pr.rs --edition=2021 -o build/test_storage_v90_integration
+    ./build/test_storage_v90_integration
+fi
