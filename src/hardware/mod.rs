@@ -38,3 +38,7 @@ pub use tech_powerup_hardware_monitors::{
     HardwareBustersPsuRailMonitorEngine, PcWorldBatteryHealthControllerEngine,
     SovereignTechPowerUpHardwareMonitorsSuite, TechPowerUpGpuProfilerEngine,
 };
+pub mod compatibility_matrix;
+pub mod validator;
+pub mod gpu_support;
+pub mod suspend_resume;

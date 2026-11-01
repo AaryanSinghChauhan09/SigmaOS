@@ -1,3 +1,6 @@
+pub mod first_boot_wizard;
+pub mod partition_manager;
+pub mod user_profile_generator;
 pub mod arch_install_scripts;
 pub mod gui_wizard;
 pub mod iso_installer;

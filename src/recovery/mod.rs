@@ -1,3 +1,6 @@
+pub mod rescue_mode;
+pub mod update_rollback;
+pub mod emergency_shell;
 //! System Recovery and Backup (Timeshift/Borg Inspiration)
 //! System snapshots, incremental backups, and disaster recovery
 

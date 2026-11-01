@@ -29,3 +29,4 @@ pub use manager::{
     SystemUpdateStrategy, UpdateHealthVerifier, UpdateLedgerEntry, UpdateSeverity,
     UpdateTransactionLedger,
 };
+pub mod rollback_manager;
