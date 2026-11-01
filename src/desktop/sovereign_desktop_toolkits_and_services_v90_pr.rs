@@ -1,8 +1,8 @@
 // Sovereign Desktop Services & Toolkits Advancements (V90 PR)
 // Clean-Room Rust PR Format Engines for Linux & BSD Desktop Ecosystems
-// Covers GTK4/Libadwaita/GTK5, Qt6/Kvantum, Display Managers (GDM, SDDM, LightDM, XDMCP, SlickGreeter, greetd, xdm),
+// Covers GTK4/GTK5, Qt6/Kvantum, Display Managers (GDM, SDDM, LightDM, XDMCP, SlickGreeter, xdm),
 // GVfs/GIO, PolicyKit, XDG Portals/Utilities, fontconfig/FreeType/HarfBuzz/Pango/Cairo/Skia,
-// IBus/Fcitx5, Notification Daemons, Screen Lockers (ext-session-lock-v1), Clipboard Managers, and 10-Distro PR Gateway.
+// IBus/Fcitx5, Notification Daemons, Screen Lockers, Clipboard Managers, and 10-Distro PR Gateway.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
@@ -12,7 +12,7 @@ use std::vec::Vec;
 static NEXT_V90_DESKTOP_SERVICE_ID: AtomicUsize = AtomicUsize::new(90000);
 
 // ============================================================================
-// 1. GTK4/GTK5/Libadwaita & Qt6/Kvantum Toolkit Sync Engine V90
+// 1. GTK4/GTK5 & Qt6/Kvantum Toolkit Sync Engine V90
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -77,9 +77,9 @@ impl SovereignGtkQtToolkitEngineV90 {
                 blur_background: true,
                 translucent_windows: true,
                 svg_path: "/usr/share/Kvantum/SovereignDarkV90/SovereignDarkV90.svg".to_string(),
-                shadow_size_px: 12,
-                corner_radius_px: 8,
-                window_margin_px: 4,
+                shadow_size_px: 16,
+                corner_radius_px: 10,
+                window_margin_px: 6,
             }),
             css_custom_rules: Vec::new(),
         }
@@ -122,12 +122,7 @@ impl SovereignGtkQtToolkitEngineV90 {
         if let Some(ref kv) = self.kvantum_spec {
             format!(
                 "[General]\ntheme={}\nblur={}\ntranslucent={}\nsvg_path={}\nshadow_size={}\ncorner_radius={}\n",
-                kv.theme_name,
-                kv.blur_background,
-                kv.translucent_windows,
-                kv.svg_path,
-                kv.shadow_size_px,
-                kv.corner_radius_px
+                kv.theme_name, kv.blur_background, kv.translucent_windows, kv.svg_path, kv.shadow_size_px, kv.corner_radius_px
             )
         } else {
             "[General]\ntheme=Default\n".to_string()
@@ -136,7 +131,7 @@ impl SovereignGtkQtToolkitEngineV90 {
 }
 
 // ============================================================================
-// 2. Display Manager Suite Engine V90 (GDM, SDDM, LightDM, Greetd, SlickGreeter, xdm)
+// 2. Display Manager Suite Engine V90 (GDM, SDDM, LightDM, XDMCP, SlickGreeter, xdm)
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -145,7 +140,6 @@ pub enum DisplayManagerKindV90 {
     Sddm,
     LightDm,
     SlickGreeter,
-    Greetd,
     Xdm,
     Console,
 }
@@ -291,12 +285,6 @@ impl SovereignDisplayManagerSuiteEngineV90 {
                     self.auto_login_user.as_deref().unwrap_or("")
                 )
             }
-            DisplayManagerKindV90::Greetd => {
-                format!(
-                    "[terminal]\nvt = 1\n[default_session]\ncommand = \"regreet\"\nuser = \"greetd\"\n[initial_session]\ncommand = \"sigma-compositor\"\nuser = \"{}\"\n",
-                    self.auto_login_user.as_deref().unwrap_or("sigma_user")
-                )
-            }
             DisplayManagerKindV90::Xdm | DisplayManagerKindV90::Console => {
                 format!("! XDM Config V90\nDisplayManager.requestPort: {}\n", if self.xdmcp_enabled { 177 } else { 0 })
             }
@@ -318,7 +306,6 @@ pub enum MountSchemeV90 {
     Ftp,
     Archive,
     Trash,
-    Nfs,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -357,7 +344,7 @@ impl SovereignGvfsGioFileSystemEngineV90 {
             remote_host: host.to_string(),
             mount_path: format!("/run/user/1000/gvfs/{}", mount_id),
             is_mounted: true,
-            bytes_free: 1024 * 1024 * 1024 * 100, // 100 GB
+            bytes_free: 1024 * 1024 * 1024 * 250, // 250 GB
         };
         self.active_mounts.insert(mount_id.clone(), mount);
         mount_id
@@ -409,12 +396,6 @@ impl SovereignPolicyKitAuthorizationEngineV90 {
             require_admin: true,
             allow_active: false,
         });
-        default_rules.push(PolkitRuleV90 {
-            rule_id: "org.freedesktop.systemd1.manage-units".to_string(),
-            action_id_pattern: "org.freedesktop.systemd1.manage-units".to_string(),
-            require_admin: true,
-            allow_active: true,
-        });
 
         Self {
             rules: default_rules,
@@ -422,19 +403,18 @@ impl SovereignPolicyKitAuthorizationEngineV90 {
         }
     }
 
-    pub fn evaluate_js_rule(&self, action_id: &str, user: &str) -> bool {
-        if user == "root" {
-            return true;
-        }
+    pub fn evaluate_js_rule(&self, action_id: &str, subject_user: &str) -> bool {
         for rule in &self.rules {
-            if action_id.contains("packagekit") || action_id.contains("udisks") {
-                return rule.allow_active;
-            }
-            if rule.action_id_pattern == action_id && rule.require_admin {
-                return false;
+            if rule.action_id_pattern.ends_with('*') {
+                let prefix = &rule.action_id_pattern[..rule.action_id_pattern.len() - 1];
+                if action_id.starts_with(prefix) {
+                    return if rule.require_admin { subject_user == "root" } else { true };
+                }
+            } else if rule.action_id_pattern == action_id {
+                return if rule.require_admin { subject_user == "root" } else { true };
             }
         }
-        true
+        false
     }
 
     pub fn parse_pkla_file(&mut self, content: &str) -> usize {
@@ -442,6 +422,13 @@ impl SovereignPolicyKitAuthorizationEngineV90 {
         for line in content.lines() {
             let trimmed = line.trim();
             if trimmed.starts_with("Action=") {
+                let action = trimmed.trim_start_matches("Action=").to_string();
+                self.rules.push(PolkitRuleV90 {
+                    rule_id: format!("pkla_rule_{}", self.rules.len() + 1),
+                    action_id_pattern: action,
+                    require_admin: false,
+                    allow_active: true,
+                });
                 count += 1;
             }
         }
@@ -471,7 +458,6 @@ impl SovereignXdgPortalsUtilitiesEngineV90 {
         let mut mime_apps = BTreeMap::new();
         mime_apps.insert("text/html".to_string(), "sigma-browser.desktop".to_string());
         mime_apps.insert("application/pdf".to_string(), "xreader.desktop".to_string());
-        mime_apps.insert("inode/directory".to_string(), "nemo.desktop".to_string());
 
         Self {
             portals_config: BTreeMap::new(),
@@ -512,10 +498,6 @@ impl SovereignXdgPortalsUtilitiesEngineV90 {
 
     pub fn open_uri_handler(&self, uri: &str) -> String {
         format!("Launching browser or default handler for URI: {}", uri)
-    }
-
-    pub fn query_mime_handler(&self, mime: &str) -> Option<&String> {
-        self.mime_apps.get(mime)
     }
 }
 
@@ -647,7 +629,6 @@ pub struct SovereignNotificationDaemonEngineV90 {
     pub active_notifications: BTreeMap<u32, NotificationV90>,
     pub next_notification_id: u32,
     pub sound_feedback_enabled: bool,
-    pub do_not_disturb: bool,
 }
 
 impl SovereignNotificationDaemonEngineV90 {
@@ -656,7 +637,6 @@ impl SovereignNotificationDaemonEngineV90 {
             active_notifications: BTreeMap::new(),
             next_notification_id: 1,
             sound_feedback_enabled: true,
-            do_not_disturb: false,
         }
     }
 
@@ -681,10 +661,6 @@ impl SovereignNotificationDaemonEngineV90 {
     pub fn close_notification(&mut self, id: u32) -> bool {
         self.active_notifications.remove(&id).is_some()
     }
-
-    pub fn set_dnd(&mut self, enabled: bool) {
-        self.do_not_disturb = enabled;
-    }
 }
 
 // ============================================================================
@@ -697,7 +673,6 @@ pub struct SovereignScreenLockerEngineV90 {
     pub pam_password_hash: String,
     pub ext_session_lock_active: bool,
     pub idle_inhibitors_count: u32,
-    pub failed_attempts: u32,
 }
 
 impl SovereignScreenLockerEngineV90 {
@@ -707,7 +682,6 @@ impl SovereignScreenLockerEngineV90 {
             pam_password_hash: "user_secure_pass".to_string(),
             ext_session_lock_active: false,
             idle_inhibitors_count: 0,
-            failed_attempts: 0,
         }
     }
 
@@ -720,10 +694,8 @@ impl SovereignScreenLockerEngineV90 {
         if pass == self.pam_password_hash || (!pass.trim().is_empty() && pass == self.pam_password_hash) {
             self.is_locked = false;
             self.ext_session_lock_active = false;
-            self.failed_attempts = 0;
             true
         } else {
-            self.failed_attempts += 1;
             false
         }
     }
@@ -756,8 +728,8 @@ impl SovereignClipboardManagerEngineV90 {
     pub fn new() -> Self {
         Self {
             history: Vec::new(),
-            max_history_size: 100,
-            secret_autowipe_ms: 45000,
+            max_history_size: 150,
+            secret_autowipe_ms: 30000,
         }
     }
 
@@ -879,9 +851,6 @@ mod tests {
         let resp = dm.authenticate_pam(&req);
         assert!(resp.authenticated);
         assert_eq!(resp.home_dir, "/home/sigma_user");
-
-        let greetd = SovereignDisplayManagerSuiteEngineV90::new(DisplayManagerKindV90::Greetd);
-        assert!(greetd.generate_dm_config().contains("greetd"));
     }
 
     #[test]
@@ -917,7 +886,6 @@ mod tests {
         let dirs_count = portals.parse_user_dirs("XDG_DOCUMENTS_DIR=\"$HOME/Documents\"\n");
         assert_eq!(dirs_count, 1);
         assert_eq!(portals.user_dirs.get("XDG_DOCUMENTS_DIR"), Some(&"$HOME/Documents".to_string()));
-        assert_eq!(portals.query_mime_handler("text/html"), Some(&"sigma-browser.desktop".to_string()));
     }
 
     #[test]
@@ -933,8 +901,6 @@ mod tests {
         let mut notif = SovereignNotificationDaemonEngineV90::new();
         let nid = notif.notify("App", "Sum", "Body", 1, 3000);
         assert!(notif.close_notification(nid));
-        notif.set_dnd(true);
-        assert!(notif.do_not_disturb);
 
         let mut locker = SovereignScreenLockerEngineV90::new();
         locker.set_password("user_secure_pass");
