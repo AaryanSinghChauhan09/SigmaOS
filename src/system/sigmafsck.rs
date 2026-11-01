@@ -276,7 +276,7 @@ impl SigmaFSCK {
 
     /// List results with errors
     pub fn list_results_with_errors(&self) -> Vec<&CheckResult> {
-        self.check_results.values().filter(|r| !r.clean).collect()
+        self.check_results.values().filter(|r| r.total_errors > 0).collect()
     }
 
     /// List results with critical errors

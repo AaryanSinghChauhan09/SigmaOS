@@ -1,32 +1,76 @@
 ## Summary
 
+<!-- What kernel behavior changed and why? -->
+
+## Kernel component
+
+- [ ] Boot / arch init
+- [ ] Interrupts / traps
+- [ ] Memory / paging / swap
+- [ ] Scheduler / processes
+- [ ] VFS / filesystems
+- [ ] Syscalls / ELF
+- [ ] Drivers
+- [ ] Networking / sockets
+- [ ] IPC / signals / timers
+- [ ] Security / capabilities
+- [ ] Diagnostics
+- [ ] Build / CI
+
 <!-- One paragraph: what changed and why. -->
 
 ## Component
 
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
-- [ ] Documentation
-- [ ] CI / tooling
+## Recurring task
+
+- [ ] PR-level validation
+- [ ] Daily CI triage
+- [ ] Weekly subsystem review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly syscall/ABI review
+- [ ] Biweekly memory/concurrency audit
+- [ ] Monthly boot validation
+- [ ] Monthly driver/hardware audit
+- [ ] Monthly fuzz triage
+- [ ] Monthly diagnostics rehearsal
+- [ ] Quarterly release/architecture/security review
+
+## Reference study
+
+<!-- Required for design-changing kernel PRs -->
+
+- Study document:
+- Linux/BSD/Redox/xv6 reference:
+- Decision: Adopt / Adapt / Reject
+- Reason:
+
+## Upstream study and reference behavior
+
+## Changes
 
 ## Changes
 
 -
+-
 
-## Motivation
+## Kernel safety review
 
-<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+- [ ] No unnecessary `unsafe`
+- [ ] Every `unsafe` block documents invariants
+- [ ] Lock ordering documented
+- [ ] Interrupt-context safety considered
+- [ ] Allocation limits defined
+- [ ] OOM behavior defined
+- [ ] Error paths tested
+- [ ] No silent failure introduced
 
-## Implementation notes
+## Shell safety review
 
-<!-- Design decisions, data structures, locking, error handling. -->
+- Shell safety review:
+- Capability/namespace checks enforced:
+- Shared-memory or descriptor implications:
+- Input validation and failure behavior:
+- Rollback or downgrade path:
 
 ## IPC handler
 
@@ -38,16 +82,21 @@
 
 ## Tests
 
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Concurrency/stress tests added/updated
-- [ ] Fuzz tests added/updated
-- [ ] Boot smoke test performed, if kernel-facing
-- [ ] No regression in existing tests
+- Kernel safety review:
+- Capability/namespace checks enforced:
 
-## Shell safety review
+## Evidence
 
-- Shell safety review:
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or reason for exemption
+- [ ] QEMU boot evidence, if boot-affecting
+- [ ] Driver/hardware evidence, if driver-affecting
+- [ ] Security review requested, if applicable
 
 ## Verification
 
@@ -83,12 +132,17 @@ Paste relevant output below.
 - [ ] Installer/update path validated
 - [ ] Hardware tested
 
-## Reviewer checklist
+## Status updates
 
-- [ ] Scope is narrow
-- [ ] Public API documented
-- [ ] `unsafe` justified
-- [ ] Lock ordering documented
-- [ ] Error paths tested
-- [ ] Feature status updated
-- [ ] No unsupported compatibility claim
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Component documentation
+- [ ] Boot matrix, if applicable
+- [ ] Hardware matrix, if applicable
+
+## Risks and rollback
+
+- Risk:
+- Rollback:
+- Risks and rollback:
+- Recovery or downgrade procedure:

@@ -1,22 +1,11 @@
 # SigmaOS Security Test Plan
 
-## Continuous & Recurring Security Verification
+## Overview
 
-Security testing is divided into automated CI checks and recurring scheduled reviews:
+The Security Test Plan defines automated test requirements for validating kernel security boundaries.
 
-### 1. Automated Continuous Checks
-- **`cargo audit`**: Executed on PRs and weekly schedule to flag vulnerabilities in dependencies.
-- **Unsafe Code Audit**: Analyzes every `unsafe` block in the codebase, requiring matching `// SAFETY:` invariants documentation.
-- **Secret Scanning**: Scans for leaked keys, tokens, or plaintext credentials.
-- **Action Pinning Audit**: Verifies all GitHub Actions are pinned to full immutable 40-character commit SHAs.
+## Test Categories
 
----
-
-### 2. Scheduled Recurring Audits
-
-| Cadence | Security Operation | Focus Areas | Output Artifact |
-|---|---|---|---|
-| Weekly | Security Advisory Triage | Review RustSec, CVE databases, Linux/BSD advisories | `security(...)` PR or issue |
-| Monthly | Fuzzing & Regression Campaign | Syscall entry points, ELF parser, VFS path traversal, network headers | Crash reports & fix PRs |
-| Quarterly | Privilege Boundary Review | Audit capability escalation points and IPC channel isolation | Security audit checklist |
-| Semiannual | Supply Chain & SBOM Audit | Comprehensive software bill of materials and license validation | SBOM JSON artifact |
+1. **Syscall Negative Boundary Tests**: Assert rejection of invalid pointers, negative lengths, and unauthorized syscall IDs.
+2. **Capability Check Verification**: Assert `EPERM` when a process lacks required capability tokens.
+3. **Fuzzing & Input Sanitization**: Fuzz syscall parameters, network packet headers, and ELF binary structures.
