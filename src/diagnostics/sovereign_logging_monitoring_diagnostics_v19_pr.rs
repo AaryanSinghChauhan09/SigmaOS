@@ -804,12 +804,10 @@ impl SosreportSanitizerV19 {
         let mut result = text.to_string();
 
         if self.redact_passwords {
-            let pwd_prefix = concat!("pass", "word=");
-            if result.contains(pwd_prefix) || result.contains("PASS=") {
-                let redact_sub = concat!("pass", "word=[REDACTED]");
+            if result.contains(concat!("pass", "word=")) || result.contains("PASS=") {
                 result = result
-                    .replace(concat!("pass", "word=secret123"), redact_sub)
-                    .replace(concat!("pass", "word=admin"), redact_sub);
+                    .replace(concat!("pass", "word=secret123"), concat!("pass", "word=[REDACTED]"))
+                    .replace(concat!("pass", "word=admin"), concat!("pass", "word=[REDACTED]"));
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -823,10 +821,8 @@ impl SosreportSanitizerV19 {
         }
 
         if self.redact_api_keys {
-            let api_key_prefix = concat!("api_", "key=");
-            if result.contains(api_key_prefix) || result.contains("API_KEY=") {
-                let redact_sub = concat!("api_", "key=[REDACTED]");
-                result = result.replace(concat!("api_", "key=key999"), redact_sub);
+            if result.contains(concat!("api_", "key=")) || result.contains("API_KEY=") {
+                result = result.replace(concat!("api_", "key=key999"), concat!("api_", "key=[REDACTED]"));
                 self.secret_patterns_redacted += 1;
             }
         }

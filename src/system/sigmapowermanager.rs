@@ -324,6 +324,7 @@ mod tests {
         assert!(battery.is_low());
         assert!(!battery.is_critical());
         battery.set_capacity(5);
+        assert!(battery.is_low());
         assert!(battery.is_critical());
     }
 

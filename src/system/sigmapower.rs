@@ -53,8 +53,7 @@ impl Brightness {
         if self.max == self.min {
             0
         } else {
-            (((self.level as u32).saturating_sub(self.min as u32) * 100)
-                / ((self.max as u32) - (self.min as u32))) as u8
+            (((self.level as u32 - self.min as u32) * 100) / (self.max as u32 - self.min as u32)) as u8
         }
     }
 }
