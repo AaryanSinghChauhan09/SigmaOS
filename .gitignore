@@ -54,8 +54,11 @@ __pycache__/
 !docs/filesystem/
 !docs/filesystem/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
-!SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
-!docs/**/*.md
-!wiki/**/*.md
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
 !.jules/
 !.jules/*.md
+!docs/roadmap/
+!docs/roadmap/*.md
+!wiki/*.md
+!WIKI/*.md

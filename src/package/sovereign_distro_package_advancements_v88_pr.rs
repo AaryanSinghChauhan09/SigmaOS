@@ -104,7 +104,7 @@ mod tests {
     fn test_pr_gateway_v88() {
         let mut gateway = SovereignDistroPackagePrGatewayV88::new();
         gateway.submit_proposal(
-            8701,
+            8801,
             "Universal Interop for Debian DEB in Sigma-pkg V88",
             PackageFormat::Deb,
             "ripgrep",
@@ -112,7 +112,7 @@ mod tests {
         );
 
         assert_eq!(gateway.total_proposals(), 1);
-        let prop = gateway.get_proposal(8701).unwrap();
+        let prop = gateway.get_proposal(8801).unwrap();
         assert_eq!(prop.target_package, "ripgrep");
         assert_eq!(prop.source_format, PackageFormat::Deb);
         assert_eq!(prop.verified_slsa_level, 4);

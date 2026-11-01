@@ -7,7 +7,7 @@
 // FreeBSD pkg, ports; NetBSD pkgsrc, pkgin; OpenBSD pkg_add; App bundles Flatpak, Snap, AppImage,
 // .air, .bottle, .ipa, .aab, .hap, .eopkg, .nixpkg, .portage, .deb, .tar.gz, .xz, .rpm, .ebuild,
 // .pkg.tar.xz, .PiSi, .tgz, .superdeb, .lzm, .pup, .pet, etc.), this suite provides complete universal
-// multi-format package inspection, magic-byte zero-copy classification across 250+ package formats, Post-Quantum
+// multi-format package inspection, magic-byte zero-copy classification across 270+ package formats, Post-Quantum
 // Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4 provenance verification, Object-Oriented
 // Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 12+ hook
 // phases, SAT DPLL clause dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA
@@ -100,7 +100,7 @@ pub struct UniversalPackageFormatInspectorV88 {
 impl UniversalPackageFormatInspectorV88 {
     pub fn new() -> Self {
         Self {
-            total_formats_supported: 250,
+            total_formats_supported: 270,
             inspection_cache: BTreeMap::new(),
         }
     }

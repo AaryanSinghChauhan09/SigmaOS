@@ -13,7 +13,7 @@ use sovereign_distro_package_advancements_v88_pr::universal::{PackageFormat, Pac
 fn test_package_advancements_v88_full_cycle() {
     // 1. Universal Package Inspector V88
     let mut inspector = UniversalPackageFormatInspectorV88::new();
-    assert_eq!(inspector.total_formats_supported, 250);
+    assert_eq!(inspector.total_formats_supported, 270);
 
     let manifest = inspector
         .inspect_package("ripgrep-14.1.0-amd64.deb", b"!<arch>\ndebian-binary\n")
@@ -97,7 +97,7 @@ fn test_package_advancements_v88_full_cycle() {
     // 9. PR Gateway V88
     let mut gateway = SovereignDistroPackagePrGatewayV88::new();
     gateway.submit_proposal(
-        8701,
+        8801,
         "Universal Package Advancements V88",
         PackageFormat::Deb,
         "ripgrep",
