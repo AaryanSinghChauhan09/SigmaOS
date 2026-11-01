@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-ISO"
+description = "ISO image builder and configuration tooling for SigmaOS"
+category = "build-tools"
+license = "MIT"

@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-indicator-sound"
+description = "Sound indicator applet for the SigmaOS panel"
+category = "panel-applets"
+license = "MIT"

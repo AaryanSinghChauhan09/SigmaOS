@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-guide-installation"
+description = "Installation guide documentation for SigmaOS"
+category = "documentation"
+license = "MIT"

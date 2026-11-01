@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-live-session"
+description = "Live session management for SigmaOS"
+category = "system"
+license = "MIT"

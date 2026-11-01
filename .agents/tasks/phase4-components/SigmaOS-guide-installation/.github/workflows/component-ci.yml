@@ -1,0 +1,96 @@
+name: Component CI Template
+
+on:
+  workflow_call:
+    inputs:
+      component_name:
+        required: true
+        type: string
+        description: "Name of the component being tested"
+      rust_version:
+        required: false
+        type: string
+        default: stable
+        description: "Rust toolchain version"
+      cache_key:
+        required: false
+        type: string
+        default: ""
+        description: "Cache key suffix for cargo builds"
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  component-test:
+    name: Test Component (${{ matrix.target }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-latest
+      fail-fast: false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ inputs.rust_version }}
+          targets: ${{ matrix.target }}
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-registry-
+
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-git-
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}${{ inputs.cache_key }}
+          restore-keys: ${{ runner.os }}-cargo-build-${{ matrix.target }}-
+
+      - name: Run cargo check
+        run: cargo check --target ${{ matrix.target }} --all-features --verbose
+
+      - name: Run cargo test (no run)
+        run: cargo test --target ${{ matrix.target }} --all-features --no-run --verbose
+
+      - name: Run cargo test
+        run: cargo test --target ${{ matrix.target }} --all-features --verbose
+
+      - name: Run cargo clippy
+        run: cargo clippy --target ${{ matrix.target }} --all-features --all-targets -- -D warnings
+
+      - name: Check code formatting
+        run: cargo fmt -- --check
+
+  build-success:
+    name: Component CI Status
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [component-test]
+    steps:
+      - name: Verify test results
+        run: |
+          if [[ "${{ needs.component-test.result }}" != "success" ]]; then
+            echo "❌ Component CI failed: ${{ inputs.component_name }}"
+            exit 1
+          fi
+          echo "✅ Component CI passed: ${{ inputs.component_name }}"
