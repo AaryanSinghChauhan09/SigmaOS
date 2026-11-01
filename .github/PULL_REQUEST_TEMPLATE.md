@@ -1,41 +1,37 @@
 ## Summary
 
-<!-- What kernel behavior changed and why? -->
+<!-- What changed and why? -->
 
-## Kernel component
+## Task type
 
-- [ ] Boot / arch init
-- [ ] Interrupts / traps
-- [ ] Memory / paging / swap
-- [ ] Scheduler / processes
-- [ ] VFS / filesystems
-- [ ] Syscalls / ELF
-- [ ] Drivers
-- [ ] Networking / sockets
-- [ ] IPC / signals / timers
-- [ ] Security / capabilities
-- [ ] Diagnostics
-- [ ] Build / CI
-
-## Summary
-
-<!-- What secondary-memory behavior changed and why? -->
-
-## Summary
-
-<!-- What secondary-memory, kernel, IPC, shell, or system behavior changed and why? -->
-
-## Summary
-
-<!-- What component does this PR improve, add, or regulate? -->
-
-## Related issue
-
-Closes #<issue-id>
+- [ ] Daily CI maintenance
+- [ ] Weekly dependency/security review
+- [ ] Weekly open-source study
+- [ ] Biweekly component gap review
+- [ ] Monthly boot validation
+- [ ] Monthly installer/recovery rehearsal
+- [ ] Monthly package/update rehearsal
+- [ ] Quarterly release review
+- [ ] Quarterly architecture review
+- [ ] Quarterly hardware audit
 
 ## Component
 
-<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer/update, etc. -->
+- [ ] Boot / platform
+- [ ] Kernel
+- [ ] Memory
+- [ ] Scheduler
+- [ ] VFS / filesystems
+- [ ] Syscalls
+- [ ] Drivers
+- [ ] Networking
+- [ ] IPC
+- [ ] Security
+- [ ] Userspace
+- [ ] Desktop
+- [ ] Packaging / installer
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## Component impact
 
@@ -65,32 +61,35 @@ Closes #<issue-id>
 - What remains intentionally different:
 - Compatibility impact:
 
-## Component rules added or enforced
-
-- [ ] New rule
-- [ ] Existing rule enforced
-- [ ] Rule test added
-- [ ] CI gate added
-- [ ] Documentation updated
-
-## What SigmaOS adopts
-
-<!-- State the upstream principle or mechanism adopted. -->
-
-## What SigmaOS changes or rejects
-
-<!-- State simplifications, deviations, and rejected ideas. -->
-
 ## Changes
 
-- [ ] Source implementation
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+-
+-
+
+## Evidence
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New or updated tests
+- [ ] QEMU boot evidence, if applicable
+- [ ] Installer/recovery evidence, if applicable
+- [ ] Hardware evidence, if applicable
+- [ ] Security review requested, if applicable
+
+## Status updates
+
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Component documentation
+- [ ] Roadmap or release checklist
+
+## Risks and rollback
+
+- Risk:
+- Rollback:
+- Recovery or downgrade procedure:
 
 ## IPC handler
 
@@ -102,16 +101,15 @@ Closes #<issue-id>
 
 ## Evidence
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Storage benchmark, if performance-affecting
-- [ ] Security review requested, if applicable
+- Kernel safety review:
+- Capability/namespace checks enforced:
+- Shared-memory or descriptor implications:
+- Input validation and failure behavior:
+- Rollback or downgrade path:
+
+## Shell safety review
+
+- Shell safety review:
 
 ## Verification
 
@@ -153,44 +151,3 @@ make format
 - APIs, ABI, protocols, or file formats affected:
 - Cross-repository synchronization required:
 - Release or migration notes:
-
-## Safety and rollback
-
-- Risks and rollback:
-- Recovery or downgrade procedure:
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Package scripts sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
-
-## IPC handler
-
-- [ ] This change affects IPC handler behavior, or I confirm it does not.
-- IPC semantics:
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-
-## Security review
-
-- Kernel safety review:
-- Security review completed:
-
-## Shell safety review
-
-- Shell safety review:
-- Capability/namespace checks enforced:
-- Shared-memory or descriptor implications:
-- Input validation and failure behavior:
-- Rollback or downgrade path:
-
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] Component rules are enforceable
-- [ ] Tests cover the rules
-- [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported Linux/BSD parity claims
