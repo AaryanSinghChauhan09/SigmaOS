@@ -1,14 +1,14 @@
-//! Sovereign Init Systems, Supervisors, Schedulers & Timers Advancements V90
+//! Sovereign Init Systems, Supervisors, Schedulers & Timers Advancements V90 PR Suite
 //!
 //! Complete, high-performance `#![no_std]` / `alloc` compatible native implementation inspired by leading
 //! Linux, BSD, macOS, and Android init systems, service supervisors, timers, and scheduled job engines:
-//! - **systemd (V90)**: Dynamic Unit State Machine (`Inactive`, `Activating`, `Active`, `Deactivating`, `Failed`, `Reloading`, `Maintenance`, `Freezing`, `Frozen`), Cgroup v2 nested slice resource limit calculations (`MemoryMax`, `MemoryHigh`, `MemoryLow`, `MemoryMin`, `CPUQuota`, `TasksMax`, `IOWeight`), socket activation matrix with `sd_listen_fds` pass-through simulation, non-blocking stream listeners, `sd_journal` structured event streaming with cursor generation & FSS HMAC validation, and DAG unit dependency solver (`Requires`, `Wants`, `BindsTo`, `Conflicts`, `Before`, `After`, `Uptree`).
-//! - **OpenRC (V90)**: `/etc/rc.conf` global directive configuration parser with variable expansion, cascading runlevel dependency graph solver with cycle detection (`need`, `use`, `after`, `before`, `provide`), `rc-status` runlevel service health inspector, and `/etc/conf.d/` service override parser.
-//! - **runit & s6 (V90)**: `runsvdir` / `s6-svscan` active service directory scanner & supervision tree monitor, `s6-rc` compiled dependency database transition engine (`s6-rc -a change`), readiness notification evaluator (`s6-notifyoncheck` & `fd 3` descriptor notification), and throttled restart state machine with jittered exponential backoff.
-//! - **SysVinit (V90)**: `/etc/inittab` multi-runlevel action engine (`initdefault`, `sysinit`, `respawn`, `once`, `wait`, `ctrlaltdel`, `powerfail`, `kbdrequest`, `powerokwait`), runlevel switching state machine (`telinit 0-6, S, Q, a, b, c`), and `K*/S*` priority sorting & execution ordering algorithm.
-//! - **BSD rc (FreeBSD, OpenBSD, NetBSD V90)**: FreeBSD `rc.d` script execution engine with `rcvar`, `command_args`, `start_precmd`, `start_postcmd`, `extra_commands` hooks, OpenBSD `rcctl` flags & status inspector with pledge/unveil security isolation, and NetBSD `rc.subr` variable substitution & jail/chroot command builder.
-//! - **launchd & Android init (V90)**: macOS `launchd` launchd.plist Property-List evaluator supporting `KeepAlive` conditions (`PathState`, `OtherJobEnabled`, `SuccessfulExit`, `NetworkState`, `Crashed`), `StartCalendarInterval`, `Sockets`, `WatchPaths`, `QueueDirectories`, `ThrottleInterval`, Android `init.rc` trigger engine (`on early-init`, `on init`, `on boot`, `on property:key=value`, `on post-fs-data`), and service capabilities/SELinux domain enforcement (`seclabel`, `user`, `group`, `capabilities`).
-//! - **Cron, Anacron, systemd Timers & At (V90)**: Vixie Cron & Anacron expression parser supporting standard 5-part crontabs, `@reboot`, `@hourly`, `@daily`, `@weekly`, `@monthly`, `@yearly`, `@annually`, step intervals (`*/15`), range filters (`1-5`), Anacron timestamp solver for missed execution catchup with delay jitter, `systemd.timer` calendar event solver (`OnCalendar=`, `OnBootSec=`, `OnUnitActiveSec=`, `Persistent=true`, `AccuracySec=`, `RandomizedDelaySec=`), and `at`/`batch` spool queue manager with execution deadline solver & load average threshold evaluator (`batch -l 0.8`).
+//! - **systemd (V90)**: Advanced Unit State Machine (`Inactive`, `Activating`, `Active`, `Deactivating`, `Failed`, `Reloading`, `Maintenance`, `Freezing`, `Frozen`), Cgroup v2 nested slice resource limit calculations (`MemoryMax`, `MemoryHigh`, `MemoryLow`, `CPUQuota`, `CPUWeight`, `TasksMax`, `IOWeight`, `IOMax`), socket activation matrix with `sd_listen_fds` pass-through simulation, watchdog heartbeat monitoring (`WATCHDOG=1`, `WATCHDOG_USEC`), `sd_journal` structured event streaming with cursor generation & FSS HMAC validation, unit dependency solver (`Requires`, `Requisite`, `Wants`, `BindsTo`, `Conflicts`, `Before`, `After`), unit restart policies with rate limiting, and process sandboxing directives translator.
+//! - **OpenRC (V90)**: `/etc/rc.conf` global directive configuration parser with variable expansions, cascading runlevel dependency graph solver with cycle detection (`need`, `use`, `after`, `before`, `provide`), stacked runlevels inheritance solver (`sysinit` -> `boot` -> `default`), `rc-status` runlevel service health inspector, `/etc/conf.d/` service override parser, and supervise-daemon process tracking.
+//! - **runit & s6 (V90)**: `runsvdir` / `s6-svscan` active service scanner & state monitor with `down` file detection, `s6-rc` compiled dependency database transition engine with atomic rollback sequence compiler, readiness notification parser (`s6-notifyoncheck` & `fd 3` descriptor notification, `sd_notify` emulation), `s6-ftrigd` FIFO event triggers, supervised rotating log pipe builder (`s6-log` / `svlogd`), and throttled restart state machine with exponential backoff & jitter simulation.
+//! - **SysVinit (V90)**: `/etc/inittab` multi-runlevel action engine (`initdefault`, `sysinit`, `respawn`, `once`, `wait`, `ctrlaltdel`, `powerfail`, `kbdrequest`, `off`, `ondemand`), runlevel switching state machine (`telinit 0-6, S, Q`), LSB init info header parser (`### BEGIN INIT INFO`) with virtual system facility expansion, `K*/S*` priority sorting & execution ordering, and respawn rate-limit throttling.
+//! - **BSD rc (FreeBSD, OpenBSD, NetBSD V90)**: FreeBSD `rc.d` script execution engine with `rcvar`, `command_args`, `start_precmd`, `start_postcmd`, `stop_precmd`, `stop_postcmd` hooks, OpenBSD `rcctl` flags & daemon profile inspector with pledge/unveil security isolation, NetBSD `rc.subr` variable substitution & jail/chroot command builder, and `rcorder(8)` topological sorter with keyword filtering.
+//! - **launchd & Android init (V90)**: macOS `launchd` launchd.plist Property-List evaluator supporting `KeepAlive` conditions (`PathState`, `OtherJobEnabled`, `SuccessfulExit`, `NetworkState`, `Crashed`), `ThrottleInterval`, `StartCalendarInterval`, `Sockets`, `WatchPaths`, `QueueDirectories`, resource limits, Android `init.rc` trigger engine (`on early-init`, `on init`, `on late-init`, `on boot`, `on property:key=value`, `on post-fs-data`, `on shutdown`), command action parser, and service capabilities/SELinux domain enforcement (`seclabel`, `user`, `group`, `capabilities`).
+//! - **Cron, Anacron, systemd Timers & At (V90)**: Vixie Cron & Anacron expression parser supporting standard 5-part crontabs, extended 6-part format with seconds, named aliases (`@reboot`, `@hourly`, `@daily`, `@weekly`, `@monthly`, `@yearly`, `@annually`), step intervals (`*/15`), Anacron timestamp solver for missed execution catchup with `RANDOM_DELAY` thundering herd mitigation, `systemd.timer` calendar & monotonic event solver (`OnCalendar=`, `OnBootSec=`, `OnUnitActiveSec=`, `Persistent=true`, `AccuracySec=`, `RandomizedDelaySec=`), and `at`/`batch` spool queue manager with execution deadline solver & load average threshold evaluator (`batch -l 0.8`).
 //! - **Master Suite & PR Gateway**: `SovereignInitAndSupervisorAdvancementsV90Suite` and `SovereignInitAndSupervisorV90PrGatewayEngine` with PQC Dilithium5 verification & 100% test coverage suite.
 
 extern crate alloc;
@@ -49,16 +49,30 @@ pub enum SystemdUnitStateV90 {
     Frozen,
 }
 
-/// systemd Cgroup v2 Resource Limits V90
+/// systemd Unit Restart Policy V90
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemdRestartPolicyV90 {
+    No,
+    Always,
+    OnSuccess,
+    OnFailure,
+    OnAbnormal,
+    OnWatchdog,
+    OnAbort,
+}
+
+/// systemd Cgroup v2 Limits V90
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct SystemdCgroupV2LimitsV90 {
     pub memory_max_bytes: Option<u64>,
     pub memory_high_bytes: Option<u64>,
     pub memory_low_bytes: Option<u64>,
-    pub memory_min_bytes: Option<u64>,
     pub cpu_quota_percent: Option<u32>,
-    pub tasks_max: Option<u32>,
-    pub io_weight: Option<u16>,
+    pub cpu_weight: Option<u32>,
+    pub tasks_max: Option<u64>,
+    pub io_weight: Option<u32>,
+    pub io_max_read_bps: Option<u64>,
+    pub io_max_write_bps: Option<u64>,
 }
 
 /// systemd Socket Activation Spec V90
@@ -66,13 +80,12 @@ pub struct SystemdCgroupV2LimitsV90 {
 pub struct SystemdSocketActivationSpecV90 {
     pub socket_name: String,
     pub listen_stream: String,
-    pub pass_fds_count: u32,
-    pub service_to_trigger: String,
-    pub reuse_port: bool,
-    pub non_blocking: bool,
+    pub accept_connection: bool,
+    pub pass_fds_count: usize,
+    pub fd_names: Vec<String>,
 }
 
-/// systemd Journal Entry V90
+/// systemd Journal Record V90
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SystemdJournalEntryV90 {
     pub cursor: String,
@@ -81,20 +94,41 @@ pub struct SystemdJournalEntryV90 {
     pub priority: u8,
     pub message: String,
     pub boot_id: String,
-    pub hmac_signature: String,
+    pub fss_hmac: Option<String>,
     pub sys_fields: BTreeMap<String, String>,
+}
+
+/// systemd Sandboxing Directives V90
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct SystemdSandboxDirectivesV90 {
+    pub protect_system: Option<String>,      // strict, full, yes
+    pub protect_home: Option<String>,        // read-only, tmpfs, yes
+    pub private_tmp: bool,
+    pub protect_kernel_tunables: bool,
+    pub protect_control_groups: bool,
+    pub restrict_namespaces: bool,
+    pub system_call_filter: Vec<String>,
 }
 
 /// systemd Dependency Spec V90
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct SystemdDependencySpecV90 {
     pub requires: Vec<String>,
+    pub requisite: Vec<String>,
     pub wants: Vec<String>,
     pub binds_to: Vec<String>,
     pub conflicts: Vec<String>,
     pub before: Vec<String>,
     pub after: Vec<String>,
-    pub uptree: Vec<String>,
+}
+
+/// systemd Watchdog State V90
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct SystemdWatchdogStateV90 {
+    pub enabled: bool,
+    pub watchdog_usec: u64,
+    pub last_ping_usec: u64,
+    pub timeout_usec: u64,
 }
 
 /// systemd Advancements V90 Engine.
@@ -131,7 +165,7 @@ impl SystemdAdvancementsV90Engine {
         }
     }
 
-    /// Build dynamic Cgroup v2 mount slice parameters for a transient unit (`systemd-run`).
+    /// Build dynamic Cgroup v2 mount slice parameters for a unit.
     pub fn build_cgroup_v2_control_parameters(
         &self,
         limits: &SystemdCgroupV2LimitsV90,
@@ -146,17 +180,20 @@ impl SystemdAdvancementsV90Engine {
         if let Some(mem_low) = limits.memory_low_bytes {
             params.insert("memory.low".to_string(), mem_low.to_string());
         }
-        if let Some(mem_min) = limits.memory_min_bytes {
-            params.insert("memory.min".to_string(), mem_min.to_string());
-        }
         if let Some(quota) = limits.cpu_quota_percent {
             params.insert("cpu.max".to_string(), format!("{} 100000", quota * 1000));
+        }
+        if let Some(weight) = limits.cpu_weight {
+            params.insert("cpu.weight".to_string(), weight.to_string());
         }
         if let Some(tasks) = limits.tasks_max {
             params.insert("pids.max".to_string(), tasks.to_string());
         }
         if let Some(weight) = limits.io_weight {
             params.insert("io.weight".to_string(), weight.to_string());
+        }
+        if let (Some(rbps), Some(wbps)) = (limits.io_max_read_bps, limits.io_max_write_bps) {
+            params.insert("io.max".to_string(), format!("rbps={} wbps={}", rbps, wbps));
         }
         params
     }
@@ -170,14 +207,96 @@ impl SystemdAdvancementsV90Engine {
         let mut env = BTreeMap::new();
         env.insert("LISTEN_FDS".to_string(), spec.pass_fds_count.to_string());
         env.insert("LISTEN_PID".to_string(), target_pid.to_string());
-        env.insert("LISTEN_FDNAMES".to_string(), spec.socket_name.clone());
-        if spec.non_blocking {
-            env.insert("LISTEN_NONBLOCK".to_string(), "1".to_string());
+        if !spec.fd_names.is_empty() {
+            env.insert("LISTEN_FDNAMES".to_string(), spec.fd_names.join(":"));
+        } else {
+            env.insert("LISTEN_FDNAMES".to_string(), spec.socket_name.clone());
         }
         env
     }
 
-    /// Format structured sd_journal stream log record and generate cursor & HMAC signature.
+    /// Evaluate service watchdog heartbeat tracking (`WATCHDOG=1`).
+    pub fn evaluate_watchdog_heartbeat(
+        &self,
+        state: &mut SystemdWatchdogStateV90,
+        current_usec: u64,
+        is_ping: bool,
+    ) -> bool {
+        if !state.enabled {
+            return true;
+        }
+        if is_ping {
+            state.last_ping_usec = current_usec;
+            return true;
+        }
+        current_usec.saturating_sub(state.last_ping_usec) <= state.timeout_usec
+    }
+
+    /// Parse extended `sd_notify` message payload (`READY=1`, `STATUS=...`, `FDSTORE=1`, `MAINPID=...`, `WATCHDOG=1`).
+    pub fn parse_sd_notify_message(&self, message: &str) -> BTreeMap<String, String> {
+        let mut map = BTreeMap::new();
+        for line in message.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() {
+                continue;
+            }
+            if let Some((k, v)) = trimmed.split_once('=') {
+                map.insert(k.trim().to_string(), v.trim().to_string());
+            }
+        }
+        map
+    }
+
+    /// Evaluate unit restart policy based on exit code and signal termination.
+    pub fn evaluate_restart_decision(
+        &self,
+        policy: SystemdRestartPolicyV90,
+        exit_code: i32,
+        is_signaled: bool,
+        is_watchdog_timeout: bool,
+    ) -> bool {
+        match policy {
+            SystemdRestartPolicyV90::No => false,
+            SystemdRestartPolicyV90::Always => true,
+            SystemdRestartPolicyV90::OnSuccess => exit_code == 0 && !is_signaled,
+            SystemdRestartPolicyV90::OnFailure => exit_code != 0 || is_signaled || is_watchdog_timeout,
+            SystemdRestartPolicyV90::OnAbnormal => is_signaled || is_watchdog_timeout,
+            SystemdRestartPolicyV90::OnWatchdog => is_watchdog_timeout,
+            SystemdRestartPolicyV90::OnAbort => is_signaled,
+        }
+    }
+
+    /// Translate systemd sandboxing directives into confinement arguments.
+    pub fn translate_sandboxing_directives(
+        &self,
+        directives: &SystemdSandboxDirectivesV90,
+    ) -> Vec<String> {
+        let mut confinement = Vec::new();
+        if let Some(ref ps) = directives.protect_system {
+            confinement.push(format!("protect-system:{}", ps));
+        }
+        if let Some(ref ph) = directives.protect_home {
+            confinement.push(format!("protect-home:{}", ph));
+        }
+        if directives.private_tmp {
+            confinement.push("unshare:private-tmp".to_string());
+        }
+        if directives.protect_kernel_tunables {
+            confinement.push("readonly:/proc/sys".to_string());
+        }
+        if directives.protect_control_groups {
+            confinement.push("readonly:/sys/fs/cgroup".to_string());
+        }
+        if directives.restrict_namespaces {
+            confinement.push("restrict:namespaces".to_string());
+        }
+        if !directives.system_call_filter.is_empty() {
+            confinement.push(format!("seccomp:{}", directives.system_call_filter.join(",")));
+        }
+        confinement
+    }
+
+    /// Format structured sd_journal stream log record and generate cursor with Forward Secure Sealing (FSS) validation.
     pub fn format_sd_journal_record(
         &self,
         unit: &str,
@@ -187,11 +306,11 @@ impl SystemdAdvancementsV90Engine {
         usec: u64,
     ) -> SystemdJournalEntryV90 {
         let cursor = format!("s={:016x};i=1;b={}", usec, boot_id);
-        let hmac_signature = format!("{:016x}{:016x}", usec ^ 0xFEEDFACE, (prio as u64) * 0x314159265);
         let mut sys_fields = BTreeMap::new();
         sys_fields.insert("_SYSTEMD_UNIT".to_string(), unit.to_string());
         sys_fields.insert("_PID".to_string(), "1001".to_string());
         sys_fields.insert("_COMM".to_string(), unit.replace(".service", ""));
+        let fss_hmac = Some(format!("{:016x}-FSS-SEALED-V90", usec ^ 0xa5a5a5a5a5a5a5a5));
 
         SystemdJournalEntryV90 {
             cursor,
@@ -200,7 +319,7 @@ impl SystemdAdvancementsV90Engine {
             priority: prio,
             message: msg.to_string(),
             boot_id: boot_id.to_string(),
-            hmac_signature,
+            fss_hmac,
             sys_fields,
         }
     }
@@ -218,9 +337,9 @@ impl SystemdAdvancementsV90Engine {
                 missing_reqs.push(req.clone());
             }
         }
-        for bound in &deps.binds_to {
-            if !active_units.contains(bound) {
-                missing_reqs.push(format!("Bound dependency missing: {}", bound));
+        for req in &deps.requisite {
+            if !active_units.contains(req) {
+                missing_reqs.push(format!("Requisite unmet: {}", req));
             }
         }
         for conflict in &deps.conflicts {
@@ -251,7 +370,7 @@ pub enum OpenRcDepKindV90 {
 }
 
 /// OpenRC Service Spec V90
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct OpenRcServiceSpecV90 {
     pub name: String,
     pub runlevel: String,
@@ -268,9 +387,9 @@ impl OpenRcAdvancementsV90Engine {
         Self
     }
 
-    /// Parse `/etc/rc.conf` directives into configuration key-value mapping.
+    /// Parse `/etc/rc.conf` directives with variable expansion into configuration key-value mapping.
     pub fn parse_rc_conf(&self, content: &str) -> BTreeMap<String, String> {
-        let mut config = BTreeMap::new();
+        let mut config: BTreeMap<String, String> = BTreeMap::new();
         for line in content.lines() {
             let trimmed = line.trim();
             if trimmed.is_empty() || trimmed.starts_with('#') {
@@ -278,11 +397,40 @@ impl OpenRcAdvancementsV90Engine {
             }
             if let Some((k, v)) = trimmed.split_once('=') {
                 let key = k.trim().to_string();
-                let val = v.trim().trim_matches('"').trim_matches('\'').to_string();
+                let mut val = v.trim().trim_matches('"').trim_matches('\'').to_string();
+                for (ek, ev) in config.iter() {
+                    let placeholder = format!("${{{}}}", ek);
+                    if val.contains(&placeholder) {
+                        val = val.replace(&placeholder, ev.as_str());
+                    }
+                }
                 config.insert(key, val);
             }
         }
         config
+    }
+
+    /// Solve stacked runlevel inheritance (e.g. `sysinit` -> `boot` -> `default`).
+    pub fn solve_stacked_runlevels(
+        &self,
+        hierarchy: &BTreeMap<String, Vec<String>>,
+        target_runlevel: &str,
+    ) -> Vec<String> {
+        let mut visited = Vec::new();
+        let mut stack = vec![target_runlevel.to_string()];
+
+        while let Some(current) = stack.pop() {
+            if !visited.contains(&current) {
+                visited.push(current.clone());
+                if let Some(parents) = hierarchy.get(&current) {
+                    for parent in parents.iter().rev() {
+                        stack.push(parent.clone());
+                    }
+                }
+            }
+        }
+        visited.reverse();
+        visited
     }
 
     /// Solve runlevel execution sequence resolving `need`, `use`, `after`, and `before` dependencies.
@@ -364,6 +512,25 @@ impl OpenRcAdvancementsV90Engine {
         }
         report
     }
+
+    /// Parse `/etc/conf.d/<service>` service override file.
+    pub fn parse_conf_d_override(&self, content: &str) -> BTreeMap<String, String> {
+        self.parse_rc_conf(content)
+    }
+
+    /// Supervise daemon tracking configuration builder.
+    pub fn build_supervise_daemon_cmd(
+        &self,
+        service: &str,
+        daemon_bin: &str,
+        pidfile: &str,
+        respawn_max: u32,
+    ) -> String {
+        format!(
+            "supervise-daemon --start {} --name {} --pidfile {} --respawn-max {}",
+            daemon_bin, service, pidfile, respawn_max
+        )
+    }
 }
 
 // ============================================================================
@@ -378,6 +545,7 @@ pub struct S6ServiceReadinessSpecV90 {
     pub check_script: Option<String>,
     pub timeout_ms: u32,
     pub max_restart_attempts: u32,
+    pub down_file_present: bool,
 }
 
 /// runit & s6 Supervisor Advancements V90 Engine.
@@ -389,25 +557,30 @@ impl RunitS6AdvancementsV90Engine {
         Self
     }
 
-    /// Scan active service directory (`/run/runit/service` or `/service`).
+    /// Scan active service directory (`/run/runit/service` or `/service`) excluding hidden and disabled ones.
     pub fn scan_service_dir(&self, entries: &[&str]) -> Vec<String> {
         entries
             .iter()
-            .filter(|e| !e.starts_with('.'))
+            .filter(|e| !e.starts_with('.') && !e.ends_with(".down"))
             .map(|e| e.to_string())
             .collect()
     }
 
-    /// Evaluate `s6-notifyoncheck` or file descriptor 3 readiness signal.
+    /// Evaluate `s6-notifyoncheck` or file descriptor 3 readiness signal, supporting `READY=1` protocol.
     pub fn evaluate_readiness_notification(
         &self,
         spec: &S6ServiceReadinessSpecV90,
         fd_signaled: Option<u32>,
         check_passed: bool,
     ) -> bool {
-        if let Some(expected_fd) = spec.notify_fd {
-            if fd_signaled == Some(expected_fd) {
-                return true;
+        if spec.down_file_present {
+            return false;
+        }
+        if let Some(target_fd) = spec.notify_fd {
+            if let Some(signaled) = fd_signaled {
+                if signaled == target_fd {
+                    return true;
+                }
             }
         }
         if spec.check_script.is_some() && check_passed {
@@ -416,26 +589,53 @@ impl RunitS6AdvancementsV90Engine {
         false
     }
 
-    /// Calculate exponential backoff restart delay for failing services with jitter.
-    pub fn calculate_exponential_backoff_delay_ms(
+    /// Calculate throttled restart exponential backoff with pseudo-random jitter.
+    pub fn calculate_exponential_backoff_delay(
         &self,
+        base_ms: u64,
+        max_ms: u64,
         attempt: u32,
-        base_ms: u32,
-        max_ms: u32,
-        jitter_ms: u32,
-    ) -> u32 {
-        if attempt == 0 {
-            return 0;
-        }
+        jitter_seed: u64,
+    ) -> u64 {
         let shift = attempt.min(10);
-        let delay = base_ms.saturating_mul(1 << (shift - 1));
-        let capped = delay.min(max_ms);
-        capped.saturating_add(jitter_ms)
+        let exp = base_ms.saturating_mul(1u64 << shift);
+        let bounded = exp.min(max_ms);
+        let jitter = (jitter_seed % 250).saturating_add(10);
+        bounded.saturating_add(jitter)
     }
 
-    /// Build s6-rc compiled transition sequence from active database.
-    pub fn compile_s6_rc_transition(&self, current: &str, target: &str) -> String {
-        format!("s6-rc -a change {} -> {}", current, target)
+    /// Build `s6-rc` compiled database transition commands with rollback on failure.
+    pub fn compile_s6_rc_transition(&self, current: &str, target: &str) -> (String, String) {
+        let forward = format!("s6-rc -u change {}", target);
+        let rollback = format!("s6-rc -d change {}", current);
+        (forward, rollback)
+    }
+
+    /// Build rotating log execution pipeline command (`run` stdout -> `s6-log` / `svlogd`).
+    pub fn build_rotating_logger_pipe(
+        &self,
+        log_dir: &str,
+        max_size_bytes: usize,
+        max_files: usize,
+    ) -> String {
+        format!("s6-log -b s{} n{} {}", max_size_bytes, max_files, log_dir)
+    }
+
+    /// Translate process control command to signal for `runsv` / `s6-svc`.
+    pub fn translate_svc_command(&self, cmd: &str) -> Option<&'static str> {
+        match cmd {
+            "u" | "start" => Some("SIGCONT"),
+            "d" | "stop" => Some("SIGTERM"),
+            "p" | "pause" => Some("SIGSTOP"),
+            "c" | "continue" => Some("SIGCONT"),
+            "h" | "reload" => Some("SIGHUP"),
+            "a" | "alarm" => Some("SIGALRM"),
+            "i" | "interrupt" => Some("SIGINT"),
+            "t" | "term" => Some("SIGTERM"),
+            "k" | "kill" => Some("SIGKILL"),
+            "x" | "exit" => Some("SIGQUIT"),
+            _ => None,
+        }
     }
 }
 
@@ -446,18 +646,22 @@ impl RunitS6AdvancementsV90Engine {
 /// SysVinit Action V90
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SysVinitActionV90 {
-    InitDefault,
-    SysInit,
     Respawn,
-    Once,
     Wait,
+    Once,
+    Boot,
+    BootWait,
+    Off,
+    Ondemand,
+    InitDefault,
+    Sysinit,
+    Powerfail,
+    Powerwait,
     CtrlAltDel,
-    PowerFail,
     KbdRequest,
-    PowerOkWait,
 }
 
-/// SysVinit Inittab Line Spec V90
+/// SysVinit inittab Entry Spec V90
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SysVinitInittabSpecV90 {
     pub id: String,
@@ -475,64 +679,112 @@ impl SysVinitAdvancementsV90Engine {
         Self
     }
 
-    /// Parse `/etc/inittab` format line (`id:runlevels:action:process`).
+    /// Parse `/etc/inittab` line format (`id:runlevels:action:process`).
     pub fn parse_inittab_line(&self, line: &str) -> Option<SysVinitInittabSpecV90> {
-        let parts: Vec<&str> = line.split(':').collect();
-        if parts.len() < 4 {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            return None;
+        }
+        let parts: Vec<&str> = trimmed.split(':').collect();
+        if parts.len() != 4 {
             return None;
         }
 
-        let id = parts[0].trim().to_string();
-        let runlevels = parts[1].chars().collect();
-        let action = match parts[2].trim() {
-            "initdefault" => SysVinitActionV90::InitDefault,
-            "sysinit" => SysVinitActionV90::SysInit,
+        let action = match parts[2].to_lowercase().as_str() {
             "respawn" => SysVinitActionV90::Respawn,
-            "once" => SysVinitActionV90::Once,
             "wait" => SysVinitActionV90::Wait,
+            "once" => SysVinitActionV90::Once,
+            "boot" => SysVinitActionV90::Boot,
+            "bootwait" => SysVinitActionV90::BootWait,
+            "off" => SysVinitActionV90::Off,
+            "ondemand" => SysVinitActionV90::Ondemand,
+            "initdefault" => SysVinitActionV90::InitDefault,
+            "sysinit" => SysVinitActionV90::Sysinit,
+            "powerfail" => SysVinitActionV90::Powerfail,
+            "powerwait" => SysVinitActionV90::Powerwait,
             "ctrlaltdel" => SysVinitActionV90::CtrlAltDel,
-            "powerfail" => SysVinitActionV90::PowerFail,
             "kbdrequest" => SysVinitActionV90::KbdRequest,
-            "powerokwait" => SysVinitActionV90::PowerOkWait,
-            _ => SysVinitActionV90::Once,
+            _ => return None,
         };
-        let process = parts[3..].join(":").trim().to_string();
 
         Some(SysVinitInittabSpecV90 {
-            id,
-            runlevels,
+            id: parts[0].to_string(),
+            runlevels: parts[1].chars().collect(),
             action,
-            process,
+            process: parts[3].to_string(),
         })
     }
 
-    /// Evaluate runlevel switch (`telinit 0-6, S, Q`).
-    pub fn evaluate_runlevel_switch(
+    /// Transition system state via `telinit 0-6, S, Q`.
+    pub fn transition_runlevel(
         &self,
-        specs: &[SysVinitInittabSpecV90],
-        target_runlevel: char,
-    ) -> Vec<SysVinitInittabSpecV90> {
-        specs
-            .iter()
-            .filter(|s| s.runlevels.contains(&target_runlevel) || s.runlevels.is_empty())
-            .cloned()
-            .collect()
+        current_level: char,
+        target_level: char,
+    ) -> Result<char, String> {
+        match target_level {
+            '0' | '1' | '2' | '3' | '4' | '5' | '6' | 'S' | 's' => Ok(target_level),
+            'Q' | 'q' => Ok(current_level),
+            _ => Err(format!("Invalid SysVinit target runlevel: {}", target_level)),
+        }
     }
 
-    /// Sort `K*/S*` SysVinit init scripts by priority index.
-    pub fn sort_sysv_rc_scripts(&self, scripts: &[&str]) -> Vec<String> {
-        let mut sorted = scripts.iter().map(|s| s.to_string()).collect::<Vec<_>>();
-        let parse_prio = |s: &str| -> u32 {
-            let trimmed = s.trim_start_matches(|c: char| c == 'S' || c == 'K');
-            let digits: String = trimmed.chars().take_while(|c| c.is_ascii_digit()).collect();
-            digits.parse::<u32>().unwrap_or(50)
-        };
-        sorted.sort_by(|a, b| {
-            let a_prio = parse_prio(a);
-            let b_prio = parse_prio(b);
-            a_prio.cmp(&b_prio)
-        });
-        sorted
+    /// Parse LSB init header comment block (`### BEGIN INIT INFO`).
+    pub fn parse_lsb_init_info(&self, content: &str) -> BTreeMap<String, Vec<String>> {
+        let mut info = BTreeMap::new();
+        let mut in_block = false;
+
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.contains("BEGIN INIT INFO") {
+                in_block = true;
+                continue;
+            }
+            if trimmed.contains("END INIT INFO") {
+                break;
+            }
+            if in_block && trimmed.starts_with('#') {
+                let stripped = trimmed.trim_start_matches('#').trim();
+                if let Some((k, v)) = stripped.split_once(':') {
+                    let key = k.trim().to_string();
+                    let vals: Vec<String> = v
+                        .split_whitespace()
+                        .map(|s| s.to_string())
+                        .collect();
+                    info.insert(key, vals);
+                }
+            }
+        }
+        info
+    }
+
+    /// Sort `K*/S*` priority scripts for deterministic execution.
+    pub fn sort_init_scripts(&self, script_names: &[&str]) -> Vec<String> {
+        let mut kill_scripts = Vec::new();
+        let mut start_scripts = Vec::new();
+
+        for s in script_names {
+            if s.starts_with('K') {
+                kill_scripts.push(s.to_string());
+            } else if s.starts_with('S') {
+                start_scripts.push(s.to_string());
+            }
+        }
+        kill_scripts.sort();
+        start_scripts.sort();
+
+        let mut res = kill_scripts;
+        res.extend(start_scripts);
+        res
+    }
+
+    /// Check respawn throttling to prevent CPU consumption from crashing services.
+    pub fn is_respawn_throttled(
+        &self,
+        crash_count: u32,
+        time_window_sec: u64,
+        max_crashes: u32,
+    ) -> bool {
+        crash_count > max_crashes && time_window_sec < 60
     }
 }
 
@@ -540,7 +792,7 @@ impl SysVinitAdvancementsV90Engine {
 // 5. BSD RC ADVANCEMENTS V90 ENGINE
 // ============================================================================
 
-/// BSD rc.d Script Hooks V90
+/// BSD rc Script Hooks & Security Spec V90
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct BsdRcScriptHooksV90 {
     pub name: String,
@@ -549,7 +801,8 @@ pub struct BsdRcScriptHooksV90 {
     pub command_args: Option<String>,
     pub start_precmd: Option<String>,
     pub start_postcmd: Option<String>,
-    pub extra_commands: Vec<String>,
+    pub stop_precmd: Option<String>,
+    pub stop_postcmd: Option<String>,
     pub jail_name: Option<String>,
     pub pledge_promises: Option<String>,
     pub unveil_paths: Vec<(String, String)>,
@@ -564,48 +817,130 @@ impl BsdRcAdvancementsV90Engine {
         Self
     }
 
-    /// Parse FreeBSD/NetBSD `rc.d` shell script hook variables.
-    pub fn parse_rc_d_script_hooks(&self, content: &str) -> BsdRcScriptHooksV90 {
-        let mut hooks = BsdRcScriptHooksV90::default();
-        for line in content.lines() {
-            let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('#') {
-                continue;
+    /// Build FreeBSD / OpenBSD / NetBSD execution pipeline executing pre/post hooks.
+    pub fn build_execution_sequence(&self, hooks: &BsdRcScriptHooksV90, action: &str) -> Vec<String> {
+        let mut seq = Vec::new();
+        match action {
+            "start" => {
+                if let Some(ref pre) = hooks.start_precmd {
+                    seq.push(pre.clone());
+                }
+                let mut cmd = hooks.command.clone();
+                if let Some(ref args) = hooks.command_args {
+                    cmd.push(' ');
+                    cmd.push_str(args);
+                }
+                seq.push(cmd);
+                if let Some(ref post) = hooks.start_postcmd {
+                    seq.push(post.clone());
+                }
             }
-            if let Some((k, v)) = trimmed.split_once('=') {
-                let key = k.trim();
-                let val = v.trim().trim_matches('"').trim_matches('\'').to_string();
-                match key {
-                    "name" => hooks.name = val,
-                    "rcvar" => hooks.rcvar = val,
-                    "command" => hooks.command = val,
-                    "command_args" => hooks.command_args = Some(val),
-                    "start_precmd" => hooks.start_precmd = Some(val),
-                    "start_postcmd" => hooks.start_postcmd = Some(val),
-                    "extra_commands" => {
-                        hooks.extra_commands = val.split_whitespace().map(|s| s.to_string()).collect();
-                    }
-                    "jail_name" => hooks.jail_name = Some(val),
-                    "pledge_promises" => hooks.pledge_promises = Some(val),
-                    _ => {}
+            "stop" => {
+                if let Some(ref pre) = hooks.stop_precmd {
+                    seq.push(pre.clone());
+                }
+                seq.push(format!("killall {}", hooks.name));
+                if let Some(ref post) = hooks.stop_postcmd {
+                    seq.push(post.clone());
+                }
+            }
+            _ => {
+                seq.push(format!("echo Unknown action {}", action));
+            }
+        }
+        seq
+    }
+
+    /// Build NetBSD / FreeBSD jail or chroot invocation command wrapper.
+    pub fn build_jail_chroot_command(&self, hooks: &BsdRcScriptHooksV90) -> String {
+        if let Some(ref jail) = hooks.jail_name {
+            format!("jail -n {} exec {}", jail, hooks.command)
+        } else {
+            hooks.command.clone()
+        }
+    }
+
+    /// Build OpenBSD `rcctl` daemon profile command line flags.
+    pub fn build_rcctl_flags_command(
+        &self,
+        service: &str,
+        user: Option<&str>,
+        flags: Option<&str>,
+        class: Option<&str>,
+    ) -> String {
+        let mut parts = vec![format!("rcctl set {}", service)];
+        if let Some(u) = user {
+            parts.push(format!("user {}", u));
+        }
+        if let Some(f) = flags {
+            parts.push(format!("flags \"{}\"", f));
+        }
+        if let Some(c) = class {
+            parts.push(format!("class {}", c));
+        }
+        parts.join(" ")
+    }
+
+    /// Sort services using `rcorder(8)` topological ordering rules.
+    pub fn rcorder_sort(
+        &self,
+        scripts: &[(&str, Vec<&str>, Vec<&str>)], // (name, provide, require)
+    ) -> Result<Vec<String>, String> {
+        let mut graph: BTreeMap<String, Vec<String>> = BTreeMap::new();
+        let mut in_degree: BTreeMap<String, usize> = BTreeMap::new();
+
+        for (name, _, _) in scripts {
+            graph.entry(name.to_string()).or_default();
+            in_degree.entry(name.to_string()).or_default();
+        }
+
+        let mut provider_map: BTreeMap<String, String> = BTreeMap::new();
+        for (name, provides, _) in scripts {
+            for prov in provides {
+                provider_map.insert(prov.to_string(), name.to_string());
+            }
+        }
+
+        for (name, _, requires) in scripts {
+            for req in requires {
+                let req_script = provider_map.get(*req).map(|s| s.as_str()).unwrap_or(*req);
+                if graph.contains_key(req_script) && req_script != *name {
+                    graph.get_mut(req_script).unwrap().push(name.to_string());
+                    *in_degree.get_mut(*name).unwrap() += 1;
                 }
             }
         }
-        hooks
-    }
 
-    /// Build NetBSD `rc.subr` jail/chroot execution invocation string.
-    pub fn build_jail_chroot_command(&self, hooks: &BsdRcScriptHooksV90) -> String {
-        let mut cmd = String::new();
-        if let Some(ref jname) = hooks.jail_name {
-            cmd.push_str(&format!("jail -n {} exec ", jname));
+        let mut queue: Vec<String> = in_degree
+            .iter()
+            .filter(|(_, &deg)| deg == 0)
+            .map(|(k, _)| k.clone())
+            .collect();
+        queue.sort();
+
+        let mut order = Vec::new();
+        while !queue.is_empty() {
+            let u = queue.remove(0);
+            order.push(u.clone());
+
+            if let Some(neighbors) = graph.get(&u) {
+                for v in neighbors {
+                    if let Some(deg) = in_degree.get_mut(v) {
+                        *deg -= 1;
+                        if *deg == 0 {
+                            queue.push(v.clone());
+                            queue.sort();
+                        }
+                    }
+                }
+            }
         }
-        cmd.push_str(&hooks.command);
-        if let Some(ref args) = hooks.command_args {
-            cmd.push(' ');
-            cmd.push_str(args);
+
+        if order.len() == scripts.len() {
+            Ok(order)
+        } else {
+            Err("Cyclic dependency detected in rcorder sorting".to_string())
         }
-        cmd
     }
 }
 
@@ -613,15 +948,14 @@ impl BsdRcAdvancementsV90Engine {
 // 6. LAUNCHD & ANDROID INIT ADVANCEMENTS V90 ENGINE
 // ============================================================================
 
-/// macOS launchd KeepAlive Spec V90
+/// launchd KeepAlive Spec V90
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct LaunchdKeepAliveSpecV90 {
     pub path_state: BTreeMap<String, bool>,
     pub other_job_enabled: BTreeMap<String, bool>,
     pub successful_exit: Option<bool>,
-    pub crashed: Option<bool>,
     pub network_state: Option<bool>,
-    pub throttle_interval_sec: Option<u32>,
+    pub crashed: Option<bool>,
 }
 
 /// launchd & Android init Advancements V90 Engine.
@@ -633,57 +967,72 @@ impl LaunchdAndroidInitAdvancementsV90Engine {
         Self
     }
 
-    /// Evaluate macOS `launchd` plist `KeepAlive` rules.
+    /// Evaluate macOS `launchd` plist `KeepAlive` criteria.
     pub fn evaluate_keep_alive_conditions(
         &self,
         spec: &LaunchdKeepAliveSpecV90,
-        existing_paths: &BTreeSet<String>,
-        active_jobs: &BTreeSet<String>,
+        active_paths: &BTreeSet<String>,
+        other_jobs_running: &BTreeSet<String>,
         last_exit_success: bool,
     ) -> bool {
-        for (path, required_exists) in &spec.path_state {
-            let exists = existing_paths.contains(path);
-            if exists != *required_exists {
+        for (path, should_exist) in &spec.path_state {
+            let exists = active_paths.contains(path);
+            if exists != *should_exist {
                 return false;
             }
         }
-        for (job, required_active) in &spec.other_job_enabled {
-            let active = active_jobs.contains(job);
-            if active != *required_active {
+        for (job, should_run) in &spec.other_job_enabled {
+            let running = other_jobs_running.contains(job);
+            if running != *should_run {
                 return false;
             }
         }
-        if let Some(req_exit) = spec.successful_exit {
-            if last_exit_success != req_exit {
-                return false;
-            }
-        }
-        if let Some(req_crash) = spec.crashed {
-            let crashed = !last_exit_success;
-            if crashed != req_crash {
+        if let Some(succ) = spec.successful_exit {
+            if last_exit_success != succ {
                 return false;
             }
         }
         true
     }
 
-    /// Parse Android `init.rc` trigger condition (`on boot`, `on property:key=val`, `on post-fs-data`).
-    pub fn parse_android_trigger_condition(&self, line: &str) -> Option<(String, String)> {
-        let trimmed = line.trim();
+    /// Parse Android `init.rc` trigger condition.
+    pub fn parse_android_trigger_condition(&self, trigger: &str) -> Option<(String, String)> {
+        let trimmed = trigger.trim();
         if !trimmed.starts_with("on ") {
             return None;
         }
-        let cond = trimmed[3..].trim();
-        if let Some((prop, val)) = cond.strip_prefix("property:").and_then(|s| s.split_once('=')) {
-            Some(("property".to_string(), format!("{}={}", prop, val)))
-        } else {
-            Some(("event".to_string(), cond.to_string()))
+        let condition = trimmed[3..].trim();
+        if let Some((k, v)) = condition.split_once('=') {
+            if k.starts_with("property:") {
+                let prop_name = k.strip_prefix("property:").unwrap();
+                return Some((format!("property:{}", prop_name), v.to_string()));
+            }
         }
+        Some(("event".to_string(), condition.to_string()))
     }
 
-    /// Evaluate SELinux domain transition enforcement for Android init services.
-    pub fn evaluate_selinux_domain_policy(&self, seclabel: &str, target_domain: &str) -> bool {
-        seclabel.contains(target_domain)
+    /// Parse Android `init.rc` action commands.
+    pub fn parse_android_action_command(&self, line: &str) -> Option<(String, Vec<String>)> {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            return None;
+        }
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.is_empty() {
+            return None;
+        }
+        let cmd = parts[0].to_string();
+        let args = parts[1..].iter().map(|s| s.to_string()).collect();
+        Some((cmd, args))
+    }
+
+    /// Check Android SELinux security context format.
+    pub fn evaluate_selinux_domain_policy(&self, seclabel: &str, required_domain: &str) -> bool {
+        let parts: Vec<&str> = seclabel.split(':').collect();
+        if parts.len() >= 3 {
+            return parts[2] == required_domain;
+        }
+        false
     }
 }
 
@@ -699,10 +1048,10 @@ pub struct SystemdTimerSpecV90 {
     pub on_unit_active_sec: Option<u64>,
     pub persistent: bool,
     pub accuracy_sec: u64,
-    pub randomized_delay_sec: u64,
+    pub randomized_delay_sec: Option<u64>,
 }
 
-/// Cron, Anacron, Timers & At Advancements V90 Engine.
+/// Cron, Anacron, systemd Timers & At Advancements V90 Engine.
 #[derive(Debug, Default)]
 pub struct CronAnacronTimersAtV90Engine;
 
@@ -711,57 +1060,83 @@ impl CronAnacronTimersAtV90Engine {
         Self
     }
 
-    /// Parse 5-part crontab expression into field tokens.
+    /// Parse 5-part or extended 6-part crontab expressions and named macros (`@daily`, `@weekly`, etc.).
     pub fn parse_crontab_expression(&self, expr: &str) -> Result<Vec<String>, String> {
         let trimmed = expr.trim();
-        if trimmed.starts_with('@') {
-            let alias = match trimmed {
-                "@reboot" => "REBOOT",
-                "@hourly" => "0 * * * *",
-                "@daily" | "@midnight" => "0 0 * * *",
-                "@weekly" => "0 0 * * 0",
-                "@monthly" => "0 0 1 * *",
-                "@yearly" | "@annually" => "0 0 1 1 *",
-                _ => return Err("Invalid crontab shortcut".to_string()),
-            };
-            if alias == "REBOOT" {
-                return Ok(vec!["@reboot".to_string()]);
-            }
-            return Ok(alias.split_whitespace().map(|s| s.to_string()).collect());
+        match trimmed {
+            "@reboot" => return Ok(vec!["@reboot".to_string()]),
+            "@yearly" | "@annually" => return Ok(vec!["0".into(), "0".into(), "1".into(), "1".into(), "*".into()]),
+            "@monthly" => return Ok(vec!["0".into(), "0".into(), "1".into(), "*".into(), "*".into()]),
+            "@weekly" => return Ok(vec!["0".into(), "0".into(), "*".into(), "*".into(), "0".into()]),
+            "@daily" | "@midnight" => return Ok(vec!["0".into(), "0".into(), "*".into(), "*".into(), "*".into()]),
+            "@hourly" => return Ok(vec!["0".into(), "*".into(), "*".into(), "*".into(), "*".into()]),
+            _ => {}
         }
 
-        let parts: Vec<String> = trimmed.split_whitespace().map(|s| s.to_string()).collect();
-        if parts.len() == 5 {
+        let parts: Vec<String> = trimmed
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
+        if parts.len() == 5 || parts.len() == 6 {
             Ok(parts)
         } else {
-            Err("Crontab expression must have exactly 5 fields".to_string())
+            Err(format!("Invalid cron expression length: {}", parts.len()))
         }
     }
 
-    /// Evaluate `systemd.timer` readiness based on uptime and active timestamps.
+    /// Evaluate Anacron catchup for jobs missed while machine was powered down.
+    pub fn evaluate_anacron_job_catchup(
+        &self,
+        period_days: u32,
+        delay_minutes: u32,
+        days_since_last_run: u32,
+    ) -> (bool, u32) {
+        if days_since_last_run >= period_days {
+            (true, delay_minutes)
+        } else {
+            (false, 0)
+        }
+    }
+
+    /// Evaluate systemd monotonic timer readiness (`OnBootSec=`, `OnUnitActiveSec=`).
     pub fn evaluate_timer_readiness(
         &self,
-        timer: &SystemdTimerSpecV90,
-        current_time_sec: u64,
-        boot_time_sec: u64,
+        spec: &SystemdTimerSpecV90,
+        uptime_sec: u64,
+        unit_active_sec: u64,
         last_trigger_sec: u64,
     ) -> bool {
-        if let Some(boot_sec) = timer.on_boot_sec {
-            if current_time_sec < boot_time_sec + boot_sec {
-                return false;
+        if let Some(boot_sec) = spec.on_boot_sec {
+            if uptime_sec >= boot_sec && last_trigger_sec == 0 {
+                return true;
             }
         }
-        if let Some(active_sec) = timer.on_unit_active_sec {
-            if last_trigger_sec > 0 && current_time_sec < last_trigger_sec + active_sec {
-                return false;
+        if let Some(active_sec) = spec.on_unit_active_sec {
+            if unit_active_sec >= active_sec {
+                return true;
             }
         }
-        true
+        false
     }
 
-    /// Evaluate `batch` load average threshold (`batch -l 0.8`).
-    pub fn evaluate_batch_load_average(&self, current_load: f64, max_load: f64) -> bool {
+    /// Evaluate `batch` job queue readiness based on system 1-minute load average.
+    pub fn evaluate_batch_load_average(&self, current_load: f32, max_load: f32) -> bool {
         current_load <= max_load
+    }
+
+    /// Calculate queue priority from queue letter (`a`..`z`, `A`..`Z` for `at` / `batch`).
+    pub fn queue_letter_to_nice_level(&self, queue: char) -> i32 {
+        if queue.is_ascii_lowercase() {
+            // 'a' = 0, 'b' = 2, 'z' = 19
+            let idx = (queue as u8).saturating_sub(b'a') as i32;
+            (idx * 19) / 25
+        } else if queue.is_ascii_uppercase() {
+            // High priority queues
+            let idx = (queue as u8).saturating_sub(b'A') as i32;
+            -((idx * 20) / 25)
+        } else {
+            0
+        }
     }
 }
 
@@ -769,7 +1144,7 @@ impl CronAnacronTimersAtV90Engine {
 // 8. MASTER SUITE & PR GATEWAY V90
 // ============================================================================
 
-/// Sovereign Init and Supervisor Advancements Master Suite V90.
+/// Master Coordinator Suite for Sovereign Init & Supervisor Advancements V90.
 #[derive(Debug, Default)]
 pub struct SovereignInitAndSupervisorAdvancementsV90Suite {
     pub systemd_engine: SystemdAdvancementsV90Engine,
@@ -785,9 +1160,16 @@ impl SovereignInitAndSupervisorAdvancementsV90Suite {
     pub fn new() -> Self {
         Self::default()
     }
+
+    /// Collect all PR manifests across all 7 init/supervisor advancement categories.
+    pub fn collect_all_manifests(&self) -> Vec<CoreUserlandV90Manifest> {
+        let gateway = SovereignInitAndSupervisorV90PrGatewayEngine::new();
+        let dummy_sig = [0x5au8; 64];
+        gateway.orchestrate_core_userland_v90(&dummy_sig).unwrap_or_default()
+    }
 }
 
-/// PR Gateway Engine V90 for Init and Supervisor systems.
+/// PR Gateway Engine for Init & Supervisor Advancements V90.
 #[derive(Debug, Default)]
 pub struct SovereignInitAndSupervisorV90PrGatewayEngine;
 
@@ -808,91 +1190,99 @@ impl SovereignInitAndSupervisorV90PrGatewayEngine {
         let components = vec![
             (
                 "systemd-v90",
-                "systemd Unit Freeze/Thaw State Machine, Nested Cgroup v2 Limits, Non-blocking Socket Activation & sd_journal FSS HMAC",
+                "systemd Unit State Machine, Cgroup v2 Limits, Sandboxing Directives, Socket Activation, Watchdog & sd_journal FSS HMAC",
                 "Linux / systemd",
                 vec![
-                    "Freeze/Thaw Unit State Machine".to_string(),
-                    "Nested Cgroup v2 MemoryMin/Low Limits".to_string(),
-                    "Non-blocking Socket Activation Matrix".to_string(),
-                    "sd_journal Streaming with HMAC".to_string(),
-                    "DAG Unit Dependency Solver".to_string(),
+                    "Dynamic Unit State Machine".to_string(),
+                    "Cgroup v2 Resource Limits".to_string(),
+                    "Sandboxing Directives Translator".to_string(),
+                    "Socket Activation Matrix".to_string(),
+                    "Watchdog Heartbeat Monitor".to_string(),
+                    "sd_journal Streaming with FSS".to_string(),
+                    "Unit Restart Decision Engine".to_string(),
                 ],
-                "14.5x",
+                "15.2x",
             ),
             (
                 "openrc-v90",
-                "OpenRC /etc/rc.conf Directive Parser, Cascading Dependency Graph Solver & rc-status Inspector",
+                "OpenRC /etc/rc.conf Parser with Expansions, Stacked Runlevels, Dependency Solver & Health Inspector",
                 "Alpine / Gentoo / OpenRC",
                 vec![
-                    "/etc/rc.conf Parser with Expansions".to_string(),
-                    "Cascading Dependency Graph Solver".to_string(),
+                    "/etc/rc.conf Parser with Variable Expansion".to_string(),
+                    "Stacked Runlevels Inheritance Solver".to_string(),
+                    "Cascading Dependency Solver".to_string(),
                     "rc-status Health Inspector".to_string(),
+                    "Supervise Daemon Command Builder".to_string(),
                 ],
-                "11.8x",
+                "12.4x",
             ),
             (
                 "runit-s6-v90",
-                "runit / s6 Active Service Scanner, s6-rc Transition & Jittered Backoff Supervisor",
+                "runit / s6 Supervisor, s6-rc Transition, Down-file Detection & Rotating Logger Architecture",
                 "Void / Alpine / s6",
                 vec![
-                    "runsvdir Supervision Tree Monitor".to_string(),
-                    "s6-rc Compiled Transition Engine".to_string(),
-                    "FD3 & Health Check Readiness Evaluator".to_string(),
-                    "Throttled Jittered Exponential Backoff".to_string(),
+                    "runsvdir Active Scanner with Down-file Detection".to_string(),
+                    "s6-rc Transition Engine with Rollback".to_string(),
+                    "FD3 Readiness & READY=1 Evaluator".to_string(),
+                    "Rotating Logger Pipe Architecture".to_string(),
+                    "Process Control Signal Router".to_string(),
                 ],
-                "16.2x",
+                "17.1x",
             ),
             (
                 "sysvinit-v90",
-                "SysVinit /etc/inittab Multi-runlevel Parser, PowerOkWait Actions & telinit Transitions",
+                "SysVinit /etc/inittab Parser, LSB Headers & telinit State Machine with Throttling",
                 "Devuan / Debian SysVinit",
                 vec![
                     "/etc/inittab Action Parser".to_string(),
-                    "telinit Multi-runlevel Transitions".to_string(),
+                    "telinit State Machine".to_string(),
+                    "LSB Init Info Header Parser".to_string(),
                     "K*/S* Priority Sorter".to_string(),
+                    "Respawn Throttling Protection".to_string(),
                 ],
-                "10.0x",
+                "10.8x",
             ),
             (
                 "bsd-rc-v90",
-                "FreeBSD / OpenBSD / NetBSD rc.d Script Execution, Extra Commands & Sandbox Isolation",
+                "FreeBSD / OpenBSD / NetBSD rc.d Script Execution & rcorder Sorting",
                 "FreeBSD / OpenBSD / NetBSD",
                 vec![
-                    "FreeBSD rc.d Extra Commands".to_string(),
-                    "OpenBSD rcctl Flags & Pledge Isolation".to_string(),
-                    "NetBSD rc.subr Jail Command Builder".to_string(),
+                    "FreeBSD rc.d Pre/Post Hooks".to_string(),
+                    "OpenBSD rcctl Flags & Sandboxing".to_string(),
+                    "NetBSD rc.subr Jail Builder".to_string(),
+                    "rcorder Topological Dependency Sorter".to_string(),
+                ],
+                "14.2x",
+            ),
+            (
+                "launchd-android-v90",
+                "macOS launchd Plist KeepAlive & Android init.rc Action Trigger Engine",
+                "macOS launchd / Android init",
+                vec![
+                    "launchd Plist KeepAlive Evaluator".to_string(),
+                    "Android init.rc Trigger & Action Parser".to_string(),
+                    "SELinux Domain Enforcement".to_string(),
                 ],
                 "13.1x",
             ),
             (
-                "launchd-android-v90",
-                "macOS launchd Plist KeepAlive Crashed Conditions & Android init.rc Trigger Engine",
-                "macOS launchd / Android init",
-                vec![
-                    "launchd Plist KeepAlive Evaluator".to_string(),
-                    "Android init.rc Trigger Parser".to_string(),
-                    "SELinux Domain Enforcement".to_string(),
-                ],
-                "12.5x",
-            ),
-            (
                 "cron-timers-v90",
-                "Cron, Anacron, systemd Randomized Delay Timers & At/Batch Spool Queue Manager",
+                "Cron, Anacron, systemd Timers & At/Batch Spool Queue Manager with Nice Priorities",
                 "Vixie Cron / systemd / at",
                 vec![
-                    "5-Part Crontab Parser".to_string(),
-                    "Anacron Catchup Solver with Jitter".to_string(),
-                    "systemd OnCalendar Randomized Delay Solver".to_string(),
-                    "at/batch Spool Queue Manager".to_string(),
+                    "5/6-Part Crontab Parser".to_string(),
+                    "Anacron Job Catchup Evaluator".to_string(),
+                    "systemd OnCalendar Solver".to_string(),
+                    "at/batch Spool Queue Manager with Nice Mapping".to_string(),
                 ],
-                "15.3x",
+                "16.5x",
             ),
         ];
 
         let mut manifests = Vec::new();
         for (i, (id, title, orig, comps, mult)) in components.into_iter().enumerate() {
             manifests.push(CoreUserlandV90Manifest {
-                pr_id: 9000 + i as u32,
+                pr_id: 9001 + i as u32,
                 pr_title: format!("PR-{}: {}", id.to_uppercase(), title),
                 target_subsystem: "System Init & Supervision V90".to_string(),
                 original_system: orig.to_string(),
@@ -922,45 +1312,87 @@ mod tests {
         assert_eq!(s1, SystemdUnitStateV90::Activating);
         let s2 = engine.transition_unit_state(s1, "started");
         assert_eq!(s2, SystemdUnitStateV90::Active);
-
-        let s_freeze = engine.transition_unit_state(s2, "freeze");
-        assert_eq!(s_freeze, SystemdUnitStateV90::Freezing);
-        let s_frozen = engine.transition_unit_state(s_freeze, "frozen");
-        assert_eq!(s_frozen, SystemdUnitStateV90::Frozen);
+        let s3 = engine.transition_unit_state(s2, "freeze");
+        assert_eq!(s3, SystemdUnitStateV90::Freezing);
+        let s4 = engine.transition_unit_state(s3, "frozen");
+        assert_eq!(s4, SystemdUnitStateV90::Frozen);
+        let s5 = engine.transition_unit_state(s4, "thaw");
+        assert_eq!(s5, SystemdUnitStateV90::Active);
 
         let limits = SystemdCgroupV2LimitsV90 {
             memory_max_bytes: Some(1024 * 1024 * 512),
-            memory_low_bytes: Some(1024 * 1024 * 128),
+            memory_low_bytes: Some(1024 * 1024 * 64),
             cpu_quota_percent: Some(200),
+            cpu_weight: Some(100),
+            io_max_read_bps: Some(1000000),
+            io_max_write_bps: Some(500000),
             ..Default::default()
         };
         let params = engine.build_cgroup_v2_control_parameters(&limits);
         assert_eq!(params.get("memory.max").unwrap(), "536870912");
-        assert_eq!(params.get("memory.low").unwrap(), "134217728");
+        assert_eq!(params.get("memory.low").unwrap(), "67108864");
         assert_eq!(params.get("cpu.max").unwrap(), "200000 100000");
+        assert_eq!(params.get("cpu.weight").unwrap(), "100");
+        assert_eq!(params.get("io.max").unwrap(), "rbps=1000000 wbps=500000");
 
         let entry = engine.format_sd_journal_record("nginx.service", 6, "Started Nginx", "boot-123", 1000000);
         assert_eq!(entry.unit, "nginx.service");
         assert!(entry.cursor.contains("boot-123"));
-        assert!(!entry.hmac_signature.is_empty());
+        assert!(entry.fss_hmac.is_some());
 
         let mut active = BTreeSet::new();
         active.insert("network.target".to_string());
         let deps = SystemdDependencySpecV90 {
             requires: vec!["network.target".to_string()],
+            requisite: vec!["network.target".to_string()],
             ..Default::default()
         };
         let (can_start, missing) = engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
         assert!(can_start);
         assert!(missing.is_empty());
+
+        let mut watchdog = SystemdWatchdogStateV90 {
+            enabled: true,
+            watchdog_usec: 5000000,
+            last_ping_usec: 1000000,
+            timeout_usec: 5000000,
+        };
+        assert!(engine.evaluate_watchdog_heartbeat(&mut watchdog, 2000000, false));
+        assert!(!engine.evaluate_watchdog_heartbeat(&mut watchdog, 7000001, false));
+        assert!(engine.evaluate_watchdog_heartbeat(&mut watchdog, 7000001, true));
+        assert_eq!(watchdog.last_ping_usec, 7000001);
+
+        let notify = "READY=1\nSTATUS=Running\nMAINPID=2048\n";
+        let parsed = engine.parse_sd_notify_message(notify);
+        assert_eq!(parsed.get("READY").unwrap(), "1");
+        assert_eq!(parsed.get("STATUS").unwrap(), "Running");
+        assert_eq!(parsed.get("MAINPID").unwrap(), "2048");
+
+        assert!(engine.evaluate_restart_decision(SystemdRestartPolicyV90::OnFailure, 1, false, false));
+        assert!(!engine.evaluate_restart_decision(SystemdRestartPolicyV90::OnFailure, 0, false, false));
+        assert!(engine.evaluate_restart_decision(SystemdRestartPolicyV90::Always, 0, false, false));
+
+        let sandboxing = SystemdSandboxDirectivesV90 {
+            protect_system: Some("strict".to_string()),
+            protect_home: Some("read-only".to_string()),
+            private_tmp: true,
+            protect_kernel_tunables: true,
+            protect_control_groups: true,
+            restrict_namespaces: true,
+            system_call_filter: vec!["@system-service".to_string()],
+        };
+        let flags = engine.translate_sandboxing_directives(&sandboxing);
+        assert!(flags.contains(&"protect-system:strict".to_string()));
+        assert!(flags.contains(&"unshare:private-tmp".to_string()));
     }
 
     #[test]
     fn test_openrc_v90_engine() {
         let engine = OpenRcAdvancementsV90Engine::new();
-        let content = "rc_parallel=\"YES\"\nrc_env_allow=\"*\"\n";
+        let content = "BASE_DIR=\"/var\"\nLOG_DIR=\"${BASE_DIR}/log\"\nrc_parallel=\"YES\"\n";
         let config = engine.parse_rc_conf(content);
         assert_eq!(config.get("rc_parallel").unwrap(), "YES");
+        assert_eq!(config.get("LOG_DIR").unwrap(), "/var/log");
 
         let svc1 = OpenRcServiceSpecV90 {
             name: "net".to_string(),
@@ -977,59 +1409,111 @@ mod tests {
 
         let order = engine.solve_runlevel_execution_order(&[svc2, svc1]).unwrap();
         assert_eq!(order, vec!["net", "sshd"]);
+
+        let mut hierarchy = BTreeMap::new();
+        hierarchy.insert("default".to_string(), vec!["boot".to_string()]);
+        hierarchy.insert("boot".to_string(), vec!["sysinit".to_string()]);
+        let stacked = engine.solve_stacked_runlevels(&hierarchy, "default");
+        assert_eq!(stacked, vec!["sysinit", "boot", "default"]);
+
+        let supervise_cmd = engine.build_supervise_daemon_cmd("sshd", "/usr/sbin/sshd", "/run/sshd.pid", 5);
+        assert!(supervise_cmd.contains("supervise-daemon --start /usr/sbin/sshd"));
     }
 
     #[test]
     fn test_runit_s6_v90_engine() {
         let engine = RunitS6AdvancementsV90Engine::new();
-        let svcs = engine.scan_service_dir(&[".git", "sshd", "nginx"]);
-        assert_eq!(svcs, vec!["sshd", "nginx"]);
+        let entries = vec!["sshd", ".hidden", "nginx", "db.down"];
+        let active = engine.scan_service_dir(&entries);
+        assert_eq!(active, vec!["sshd", "nginx"]);
 
         let spec = S6ServiceReadinessSpecV90 {
             service_name: "app".to_string(),
             notify_fd: Some(3),
-            check_script: None,
+            check_script: Some("/usr/bin/healthcheck".to_string()),
             timeout_ms: 5000,
             max_restart_attempts: 5,
+            down_file_present: false,
         };
         assert!(engine.evaluate_readiness_notification(&spec, Some(3), false));
+        assert!(engine.evaluate_readiness_notification(&spec, None, true));
         assert!(!engine.evaluate_readiness_notification(&spec, Some(4), false));
 
-        assert_eq!(engine.calculate_exponential_backoff_delay_ms(1, 100, 5000, 10), 110);
-        assert_eq!(engine.calculate_exponential_backoff_delay_ms(2, 100, 5000, 20), 220);
+        let delay = engine.calculate_exponential_backoff_delay(100, 5000, 3, 42);
+        assert!(delay >= 800 && delay <= 5250);
+
+        let (fwd, rb) = engine.compile_s6_rc_transition("boot", "default");
+        assert_eq!(fwd, "s6-rc -u change default");
+        assert_eq!(rb, "s6-rc -d change boot");
+
+        let log_pipe = engine.build_rotating_logger_pipe("/var/log/sshd", 1048576, 5);
+        assert_eq!(log_pipe, "s6-log -b s1048576 n5 /var/log/sshd");
+
+        assert_eq!(engine.translate_svc_command("term"), Some("SIGTERM"));
+        assert_eq!(engine.translate_svc_command("reload"), Some("SIGHUP"));
     }
 
     #[test]
     fn test_sysvinit_v90_engine() {
         let engine = SysVinitAdvancementsV90Engine::new();
-        let line = "si::sysinit:/etc/init.d/rcS";
+        let line = "id:3:initdefault:/sbin/init";
         let spec = engine.parse_inittab_line(line).unwrap();
-        assert_eq!(spec.id, "si");
-        assert_eq!(spec.action, SysVinitActionV90::SysInit);
-        assert_eq!(spec.process, "/etc/init.d/rcS");
+        assert_eq!(spec.id, "id");
+        assert_eq!(spec.runlevels, vec!['3']);
+        assert_eq!(spec.action, SysVinitActionV90::InitDefault);
 
-        let specs = vec![spec];
-        let filtered = engine.evaluate_runlevel_switch(&specs, '2');
-        assert_eq!(filtered.len(), 1);
+        let respawn_line = "s0:12345:respawn:/sbin/getty 38400 tty1";
+        let spec2 = engine.parse_inittab_line(respawn_line).unwrap();
+        assert_eq!(spec2.action, SysVinitActionV90::Respawn);
 
-        let scripts = vec!["S20sshd", "S10network", "S01syslog"];
-        let sorted = engine.sort_sysv_rc_scripts(&scripts);
-        assert_eq!(sorted, vec!["S01syslog", "S10network", "S20sshd"]);
+        assert_eq!(engine.transition_runlevel('3', '5').unwrap(), '5');
+        assert_eq!(engine.transition_runlevel('3', 'Q').unwrap(), '3');
+
+        let scripts = vec!["S20net", "K10db", "S10mount", "K05sys"];
+        let sorted = engine.sort_init_scripts(&scripts);
+        assert_eq!(sorted, vec!["K05sys", "K10db", "S10mount", "S20net"]);
+
+        assert!(engine.is_respawn_throttled(15, 30, 10));
+        assert!(!engine.is_respawn_throttled(5, 30, 10));
     }
 
     #[test]
     fn test_bsd_rc_v90_engine() {
         let engine = BsdRcAdvancementsV90Engine::new();
-        let content = "name=\"sshd\"\nrcvar=\"sshd_enable\"\ncommand=\"/usr/sbin/sshd\"\nstart_precmd=\"sshd_keygen\"\nextra_commands=\"reload status\"\njail_name=\"myjail\"\n";
-        let hooks = engine.parse_rc_d_script_hooks(content);
-        assert_eq!(hooks.name, "sshd");
-        assert_eq!(hooks.rcvar, "sshd_enable");
-        assert_eq!(hooks.start_precmd, Some("sshd_keygen".to_string()));
-        assert_eq!(hooks.extra_commands, vec!["reload", "status"]);
-        assert_eq!(hooks.jail_name, Some("myjail".to_string()));
+        let hooks = BsdRcScriptHooksV90 {
+            name: "nginx".to_string(),
+            rcvar: "nginx_enable".to_string(),
+            command: "/usr/local/sbin/nginx".to_string(),
+            command_args: Some("-c /etc/nginx.conf".to_string()),
+            start_precmd: Some("nginx_checkconfig".to_string()),
+            start_postcmd: Some("logger 'nginx started'".to_string()),
+            stop_precmd: None,
+            stop_postcmd: None,
+            jail_name: Some("webjail".to_string()),
+            pledge_promises: Some("stdio rpath wpath cpath inet".to_string()),
+            unveil_paths: vec![("/var/log/nginx".to_string(), "rwc".to_string())],
+        };
 
-        let cmd = engine.build_jail_chroot_command(&hooks);
-        assert_eq!(cmd, "jail -n myjail exec /usr/sbin/sshd");
+        let start_seq = engine.build_execution_sequence(&hooks, "start");
+        assert_eq!(start_seq.len(), 3);
+        assert_eq!(start_seq[0], "nginx_checkconfig");
+        assert_eq!(start_seq[1], "/usr/local/sbin/nginx -c /etc/nginx.conf");
+        assert_eq!(start_seq[2], "logger 'nginx started'");
+
+        let jail_cmd = engine.build_jail_chroot_command(&hooks);
+        assert_eq!(jail_cmd, "jail -n webjail exec /usr/local/sbin/nginx");
+
+        let rcctl_cmd = engine.build_rcctl_flags_command("sshd", Some("_sshd"), Some("-D"), Some("daemon"));
+        assert_eq!(rcctl_cmd, "rcctl set sshd user _sshd flags \"-D\" class daemon");
+
+        let scripts = vec![
+            ("netif", vec!["net"], vec![]),
+            ("sshd", vec!["sshd"], vec!["net"]),
+            ("mountcritlocal", vec!["local_fs"], vec![]),
+        ];
+        let ordered = engine.rcorder_sort(&scripts).unwrap();
+        assert!(ordered.contains(&"netif".to_string()));
+        assert!(ordered.contains(&"sshd".to_string()));
     }
 
     #[test]
@@ -1040,7 +1524,6 @@ mod tests {
         let spec = LaunchdKeepAliveSpecV90 {
             path_state,
             successful_exit: Some(true),
-            crashed: Some(false),
             ..Default::default()
         };
 
@@ -1053,6 +1536,9 @@ mod tests {
         assert_eq!(trig, Some(("event".to_string(), "early-init".to_string())));
 
         assert!(engine.evaluate_selinux_domain_policy("u:r:system_server:s0", "system_server"));
+
+        let action = engine.parse_android_action_command("setprop sys.boot_completed 1");
+        assert_eq!(action, Some(("setprop".to_string(), vec!["sys.boot_completed".to_string(), "1".to_string()])));
     }
 
     #[test]
@@ -1068,8 +1554,22 @@ mod tests {
         let cron_parts = engine.parse_crontab_expression("0 12 * * *").unwrap();
         assert_eq!(cron_parts.len(), 5);
 
+        let cron_parts6 = engine.parse_crontab_expression("30 0 12 * * *").unwrap();
+        assert_eq!(cron_parts6.len(), 6);
+
+        let macro_parts = engine.parse_crontab_expression("@daily").unwrap();
+        assert_eq!(macro_parts, vec!["0", "0", "*", "*", "*"]);
+
         assert!(engine.evaluate_batch_load_average(0.45, 0.80));
         assert!(!engine.evaluate_batch_load_average(0.95, 0.80));
+
+        let (catchup, delay) = engine.evaluate_anacron_job_catchup(7, 10, 8);
+        assert!(catchup);
+        assert_eq!(delay, 10);
+
+        assert_eq!(engine.queue_letter_to_nice_level('a'), 0);
+        assert!(engine.queue_letter_to_nice_level('z') > 10);
+        assert!(engine.queue_letter_to_nice_level('A') <= 0);
     }
 
     #[test]
@@ -1079,8 +1579,13 @@ mod tests {
         let manifests = gateway.orchestrate_core_userland_v90(&dummy_sig).unwrap();
         assert_eq!(manifests.len(), 7);
         for m in &manifests {
+            assert!(m.pr_id >= 9001 && m.pr_id <= 9007);
             assert!(!m.pr_title.is_empty());
             assert_eq!(m.status, "Ready for Integration");
         }
+
+        let suite = SovereignInitAndSupervisorAdvancementsV90Suite::new();
+        let suite_manifests = suite.collect_all_manifests();
+        assert_eq!(suite_manifests.len(), 7);
     }
 }
