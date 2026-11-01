@@ -1,3 +1,7 @@
 [submodule "src_modules/SigmaOS-kernel"]
 	path = src_modules/SigmaOS-kernel
 	url = https://github.com/AaryanSinghChauhan09/SigmaOS-kernel.git
+
+[submodule "SigmaOS-filesystem"]
+	path = src_modules/SigmaOS-filesystem
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem
