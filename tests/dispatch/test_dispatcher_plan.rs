@@ -4,10 +4,10 @@ use std::fs;
 
 #[test]
 fn test_dispatcher_documentation_plan_verification() {
-    let docs_plan = fs::read_to_string("docs/DISPATCHER_PLAN.md")
-        .expect("docs/DISPATCHER_PLAN.md must exist");
-    let wiki_plan = fs::read_to_string("wiki/DISPATCHER_PLAN.md")
-        .expect("wiki/DISPATCHER_PLAN.md must exist");
+    let docs_plan =
+        fs::read_to_string("docs/DISPATCHER_PLAN.md").expect("docs/DISPATCHER_PLAN.md must exist");
+    let wiki_plan =
+        fs::read_to_string("wiki/DISPATCHER_PLAN.md").expect("wiki/DISPATCHER_PLAN.md must exist");
 
     assert!(docs_plan.contains("SigmaOS Dispatcher Master Architecture & Support Matrix Plan"));
     assert!(docs_plan.contains("Invariants and scope"));
@@ -127,8 +127,8 @@ fn test_dispatcher_plan_cadence_and_rules() {
 
 #[test]
 fn test_feature_status_toml_dispatcher_registration() {
-    let content = fs::read_to_string("FEATURE_STATUS.toml")
-        .expect("Failed to read FEATURE_STATUS.toml");
+    let content =
+        fs::read_to_string("FEATURE_STATUS.toml").expect("Failed to read FEATURE_STATUS.toml");
 
     assert!(
         content.contains("[kernel.dispatcher]"),
@@ -263,7 +263,10 @@ fn test_deferred_work_queue_invariants() {
             }
             // Enqueued work runs in thread context so it CAN block later,
             // but hard-IRQ top half itself does not block during enqueue.
-            self.items.push(DeferredWorkItem { id, can_block: true });
+            self.items.push(DeferredWorkItem {
+                id,
+                can_block: true,
+            });
             Ok(())
         }
 
