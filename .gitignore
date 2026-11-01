@@ -30,6 +30,9 @@ __pycache__/
 !docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
 !wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
 !wiki/26-System-Utilities-Development-Plan.md
+!docs/net/
+!docs/net/*.md
+!wiki/28-Network-Development-And-Maintenance-Plan.md
 !docs/process/
 !docs/process/*.md
 !docs/ipc-handler.md
