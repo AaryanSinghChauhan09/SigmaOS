@@ -2,9 +2,9 @@
 // (`src/graphics/sovereign_graphics_display_v88_pr.rs`)
 //
 // Comprehensive Linux & BSD Distro-Inspired Graphics and Display Subsystem Engine in Pull Request format:
-// 1. X11 (Xorg) DRI3 v1.4, Present, Damage, XRandR 1.6 & XInput2 Multipointer Protocol Engine (`SovereignX11V88Engine`)
+// 1. X11 (Xorg) DRI3, Present, Damage, XRandR 1.5 & XInput2 Multipointer Protocol Engine (`SovereignX11V88Engine`)
 // 2. Wayland Core Wire Protocol, xdg_shell, Subsurfaces, Tearing Control & Color Management v4 Engine (`SovereignWaylandV88Engine`)
-// 3. Mesa Gallium3D Pipeline, NIR Optimization, ACO Wave64/Wave32 Compiler & Zink Vulkan Translation Engine (`SovereignMesaV88Engine`)
+// 3. Mesa Gallium3D Pipeline, NIR Optimization, ACO Wave64 Compiler & Zink Vulkan Translation Engine (`SovereignMesaV88Engine`)
 // 4. DRM/KMS Atomic Modesetting, GEM/PRIME Handle Exchange, VRR Sync & CTM Color Matrix Engine (`SovereignDrmKmsV88Engine`)
 // 5. libdrm Userland Ioctl Dispatcher, Dumb Buffer Allocation & Capability Probe Engine (`SovereignLibdrmV88Engine`)
 // 6. Vulkan 1.3/1.4 Core, Task/Mesh Shading, Timeline Semaphores & Ray Tracing Engine (`SovereignVulkanV88Engine`)
@@ -152,8 +152,6 @@ pub struct SovereignX11V88Engine {
     pub randr_leases: BTreeMap<u32, u32>,
     pub multipointer_master_devices: Vec<u32>,
     pub damage_regions: Vec<(i32, i32, i32, i32)>,
-    pub dri3_major_version: u32,
-    pub dri3_minor_version: u32,
 }
 
 impl SovereignX11V88Engine {
@@ -163,16 +161,13 @@ impl SovereignX11V88Engine {
         atoms.insert("UTF8_STRING".to_string(), 2);
         atoms.insert("_NET_WM_STATE_FULLSCREEN".to_string(), 3);
         atoms.insert("_NET_WM_WINDOW_TYPE_DIALOG".to_string(), 4);
-        atoms.insert("_NET_WM_WINDOW_TYPE_DOCK".to_string(), 5);
 
         Self {
             atoms,
-            dri3_open_fds: vec![3, 4, 5, 6, 7, 8],
+            dri3_open_fds: vec![3, 4, 5, 6, 7],
             randr_leases: BTreeMap::new(),
-            multipointer_master_devices: vec![2, 3, 4, 5],
+            multipointer_master_devices: vec![2, 3, 4],
             damage_regions: Vec::new(),
-            dri3_major_version: 1,
-            dri3_minor_version: 4,
         }
     }
 
@@ -187,7 +182,7 @@ impl SovereignX11V88Engine {
     }
 
     pub fn lease_randr_output_for_vr(&mut self, crtc_id: u32) -> u32 {
-        let lease_fd = crtc_id + 200;
+        let lease_fd = crtc_id + 100;
         self.randr_leases.insert(crtc_id, lease_fd);
         lease_fd
     }
@@ -205,7 +200,6 @@ pub struct SovereignWaylandV88Engine {
     pub tearing_enabled: bool,
     pub color_management_v4_active: bool,
     pub hdr10_icc_profile_blob: Vec<u8>,
-    pub fractional_scale_v1_active: bool,
 }
 
 impl SovereignWaylandV88Engine {
@@ -215,8 +209,7 @@ impl SovereignWaylandV88Engine {
             subsurfaces: BTreeMap::new(),
             tearing_enabled: true,
             color_management_v4_active: true,
-            hdr10_icc_profile_blob: vec![0x00, 0x00, 0x02, 0x00, 0x6d, 0x66, 0x74, 0x72, 0x56, 0x38, 0x38],
-            fractional_scale_v1_active: true,
+            hdr10_icc_profile_blob: vec![0x00, 0x00, 0x02, 0x00, 0x6d, 0x66, 0x74, 0x72, 0x56, 0x38, 0x36],
         }
     }
 
@@ -260,9 +253,9 @@ impl SovereignMesaV88Engine {
     }
 
     pub fn compile_nir_shader(&mut self, _nir_bc: &str) -> Vec<u8> {
-        self.nir_opt_passes_run += 24;
+        self.nir_opt_passes_run += 20;
         self.aco_wave64_compiled += 1;
-        vec![0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00, 0x56, 0x38, 0x38]
+        vec![0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00, 0x56, 0x38, 0x36]
     }
 
     pub fn zink_draw_arrays(&mut self, count: u32) {
@@ -293,7 +286,7 @@ impl SovereignDrmKmsV88Engine {
     pub fn alloc_gem_export_prime(&mut self, width: u32, height: u32) -> Result<i32, String> {
         if width > 0 && height > 0 {
             self.atomic_commits += 1;
-            Ok(88)
+            Ok(86)
         } else {
             Err("Invalid GEM buffer dimensions".to_string())
         }
@@ -335,11 +328,11 @@ pub struct SovereignVulkanV88Engine {
 
 impl SovereignVulkanV88Engine {
     pub fn new() -> Self {
-        let vk = VulkanInstance::new(0x00403000);
+        let vk = VulkanInstance::new(0x00402000);
         Self {
             mesh_shading_supported: true,
             raytracing_pipeline_supported: true,
-            timeline_semaphore_value: 300,
+            timeline_semaphore_value: 200,
             native_vulkan: vk,
         }
     }
@@ -436,7 +429,7 @@ impl SovereignWlrootsV88Engine {
         Self {
             damage_rects: Vec::new(),
             seats: vec!["seat0".to_string(), "seat1".to_string()],
-            output_layout_count: 4,
+            output_layout_count: 3,
         }
     }
 
@@ -455,7 +448,7 @@ pub struct SovereignMutterV88Engine {
 impl SovereignMutterV88Engine {
     pub fn new() -> Self {
         Self {
-            cogl_offscreen_pipelines: 12,
+            cogl_offscreen_pipelines: 8,
             fractional_scale_num: 150,
         }
     }
@@ -475,7 +468,7 @@ pub struct SovereignKWinV88Engine {
 impl SovereignKWinV88Engine {
     pub fn new() -> Self {
         Self {
-            gaussian_blur_radius: 28,
+            gaussian_blur_radius: 24,
             window_decorations_enabled: true,
         }
     }
@@ -500,7 +493,7 @@ impl SovereignCompizV88Engine {
     pub fn new() -> Self {
         Self {
             cube_angle_rad: 0.0,
-            wobbly_spring_k: 0.22,
+            wobbly_spring_k: 0.20,
         }
     }
 
@@ -521,8 +514,8 @@ impl SovereignPicomV88Engine {
     pub fn new() -> Self {
         Self {
             vsync_backend: "opengl-swc".to_string(),
-            dual_kawase_passes: 8,
-            corner_radius: 18,
+            dual_kawase_passes: 7,
+            corner_radius: 16,
         }
     }
 
@@ -554,7 +547,7 @@ impl SovereignXwaylandV88Engine {
     pub fn new() -> Self {
         Self {
             glamor_2d_accel: true,
-            rootless_mapped_windows: vec![0x00400001, 0x00400002, 0x00400003, 0x00400004],
+            rootless_mapped_windows: vec![0x00400001, 0x00400002, 0x00400003],
             clipboard_text: String::new(),
         }
     }
@@ -683,7 +676,6 @@ impl SovereignCosmicSmithayV88Engine {
                 "time".to_string(),
                 "battery".to_string(),
                 "network".to_string(),
-                "audio".to_string(),
             ],
             workspace_overview_active: false,
         }
@@ -853,7 +845,7 @@ impl SovereignGraphicsDisplayV88PrGatewayEngine {
 
     fn bootstrap_v88_prs(&mut self) {
         let prs = vec![
-            (1, "X11 DRI3/XRandR 1.6 Protocol Enhancements V88", GraphicsDisplayV88PrCategory::X11ServerExtensionsAndMultipointer),
+            (1, "X11 DRI3/XRandR 1.5 Protocol Enhancements V88", GraphicsDisplayV88PrCategory::X11ServerExtensionsAndMultipointer),
             (2, "Wayland Color Management v4 and Tearing Protocol V88", GraphicsDisplayV88PrCategory::WaylandCoreSubsurfacesAndColorManagement),
             (3, "Mesa Gallium3D ACO Wave64 Optimization Pass V88", GraphicsDisplayV88PrCategory::MesaEglGallium3dAcoAndZinkTranslation),
             (4, "DRM/KMS Atomic Modesetting and VRR Sync Matrix V88", GraphicsDisplayV88PrCategory::DrmKmsAtomicModesettingVrrAndCtm),
