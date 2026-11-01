@@ -716,6 +716,7 @@ pub use virtualization::{
     SovereignVirtualizationAndContainersParityV80Gateway,
     SovereignVirtualizationAndContainersParityV81Gateway,
     SovereignVirtualizationAndContainersParityV88Gateway,
+    SovereignVirtualizationAndContainersParityV89Gateway,
     SovereignVirtualizationAndContainersV80PrGatewayEngine,
     SovereignVirtualizationAndContainersV81PrGatewayEngine, VirtualBoxBhyveVmmV61Engine,
     VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualBoxBhyveVmmV68Engine,
@@ -724,6 +725,7 @@ pub use virtualization::{
     XenHypervisorV67Engine, XenHypervisorV68Engine, XenHypervisorV80Engine,
 };
 pub use virtualization::sovereign_virtualization_and_containers_v88_pr::*;
+pub use virtualization::sovereign_virtualization_and_containers_v89_pr::*;
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
 
