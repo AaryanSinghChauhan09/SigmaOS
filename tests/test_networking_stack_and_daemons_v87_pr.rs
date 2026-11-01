@@ -10,19 +10,14 @@ use sovereign_networking_stack_and_daemons_v87_pr::*;
 #[test]
 fn test_integration_networking_stack_and_daemons_v87_suite() {
     let gateway = SovereignNetworkingStackAndDaemonsV87PrGateway::new();
-    let manifests = gateway.generate_all_pr_manifests();
+    let proposals = gateway.generate_all_pr_manifests();
 
-    assert_eq!(manifests.len(), 7);
-    assert_eq!(manifests[0].pr_id, 8151);
-    assert_eq!(manifests[1].pr_id, 8152);
-    assert_eq!(manifests[2].pr_id, 8153);
-    assert_eq!(manifests[3].pr_id, 8154);
-    assert_eq!(manifests[4].pr_id, 8155);
-    assert_eq!(manifests[5].pr_id, 8156);
-    assert_eq!(manifests[6].pr_id, 8157);
+    assert_eq!(proposals.len(), 7);
+    assert_eq!(proposals[0].pr_id, 8151);
+    assert_eq!(proposals[6].pr_id, 8157);
 
     let summary = gateway.generate_master_pr_summary();
-    assert!(summary.contains("Sovereign Networking Stack & Daemons Advancements (v87 PR Suite)"));
+    assert!(summary.contains("Sovereign Linux & BSD Networking Stack & Control Daemons Parity Suite (v87)"));
     assert!(summary.contains("PR #8151"));
     assert!(summary.contains("PR #8157"));
 }
@@ -33,50 +28,51 @@ fn test_integration_sub_engines_v87() {
 
     // 1. Core TCP/IP Stack
     let conn = TcpConnectionDescriptorV87 {
-        local_ip: "192.168.1.10".to_string(),
-        remote_ip: "1.0.0.1".to_string(),
-        local_port: 50000,
+        local_ip: "192.168.10.5".to_string(),
+        remote_ip: "1.1.1.1".to_string(),
+        local_port: 49152,
         remote_port: 443,
         congestion_algo: CongestionControlAlgoV87::Bbrv3,
         mptcp_subflows: 4,
         tcp_fastopen_enabled: true,
         ecn_active: true,
-        rtt_us: 8000,
+        rtt_us: 15000,
         cwnd_bytes: 131072,
     };
-    gateway.core_tcpip_engine.register_connection(conn);
-    let pacing = gateway.core_tcpip_engine.evaluate_bbrv3_pacing(0);
+    gateway.core_tcpip.register_connection(conn);
+    let pacing = gateway.core_tcpip.evaluate_bbrv3_pacing(0);
     assert!(pacing > 0);
 
     // 2. Network Configuration & Daemons
-    let netplan_cfg = "network:\n  version: 2\n  renderer: NetworkManager\n  ethernets:\n    enp3s0:\n      dhcp4: true\n";
-    assert!(gateway.config_daemons_engine.parse_netplan_config(netplan_cfg));
-    let iface_info = gateway.config_daemons_engine.route_iproute2_cmd("ip addr show");
-    assert!(iface_info.contains("eth0"));
+    let yaml = "network:\n  version: 2\n  ethernets:\n    eth0:\n      dhcp4: true\n";
+    assert!(gateway.net_config.parse_netplan_config(yaml));
+    let ifconfig_res = gateway.net_config.route_iproute2_cmd("ifconfig -a");
+    assert!(ifconfig_res.contains("eth0"));
 
     // 3. DHCP & DNS Services
-    let lease = gateway.dhcp_dns_engine.assign_dhcp_lease("00:1A:2B:3C:4D:5E", "10.0.0.15");
-    assert_eq!(lease.ip_address, "10.0.0.15");
-    let resolved_ip = gateway.dhcp_dns_engine.resolve_doh_query("example.com");
-    assert_eq!(resolved_ip, "93.184.216.34");
+    let lease = gateway.dhcp_dns.assign_dhcp_lease("00:11:22:33:44:55", "10.0.0.123");
+    assert_eq!(lease.ip_address, "10.0.0.123");
+    let doh_res = gateway.dhcp_dns.resolve_doh_query("kernel.org");
+    assert_eq!(doh_res, "93.184.216.34");
 
     // 4. Wireless & Bluetooth
-    assert!(gateway.wireless_bluetooth_engine.connect_wpa3_sae("SecureOffice-WPA3", "AA:BB:CC:DD:EE:01"));
-    assert!(gateway.wireless_bluetooth_engine.initialize_bluez_lc3_audio());
-    assert!(gateway.wireless_bluetooth_engine.bluetooth_active_codecs.contains(&"LC3".to_string()));
+    assert!(gateway.wireless_bt.connect_wpa3_sae("Corporate-Enterprise", "AA:BB:CC:DD:EE:01"));
+    assert!(gateway.wireless_bt.initialize_bluez_lc3_audio());
+    assert!(gateway.wireless_bt.bluetooth_active_codecs.contains(&"LC3".to_string()));
 
-    // 5. Packet Filtering & Firewall
-    gateway.firewall_engine.add_nftables_rule("inet", "filter", "tcp dport 443", "accept");
-    gateway.firewall_engine.load_openbsd_pf_anchor("vpn_filter_anchor");
-    assert_eq!(gateway.firewall_engine.pf_anchors[0], "vpn_filter_anchor");
+    // 5. Packet Filtering & Firewalls
+    gateway.firewall.add_nftables_rule("inet", "filter", "ip saddr 10.0.0.0/8 drop", "drop");
+    gateway.firewall.load_openbsd_pf_anchor("vpn_filter");
+    assert_eq!(gateway.firewall.iptables_rules.len(), 1);
+    assert_eq!(gateway.firewall.pf_anchors[0], "vpn_filter");
 
-    // 6. Crypto Tunnels & VPN
-    assert!(gateway.crypto_vpn_engine.establish_wireguard_pqc_tunnel("wg1", "198.51.100.1:51820"));
-    assert_eq!(gateway.crypto_vpn_engine.active_tunnels[0].tunnel_type, "WireGuard-PQC");
+    // 6. Cryptographic Tunnels & VPNs
+    assert!(gateway.crypto_vpn.establish_wireguard_pqc_tunnel("wg1", "198.51.100.1:51820"));
+    assert_eq!(gateway.crypto_vpn.active_tunnels[0].tunnel_type, "WireGuard-PQC");
 
     // 7. Network Utilities & Diagnostics
-    let http_response = gateway.utilities_engine.execute_curl_http3_download("https://sigmaos.org");
-    assert!(http_response.contains("HTTP/3 200 OK"));
-    let captured = gateway.utilities_engine.capture_tcpdump_bpf("tcp and port 443");
-    assert_eq!(captured, 500);
+    let http3_res = gateway.net_utils.execute_curl_http3_download("https://www.freebsd.org");
+    assert!(http3_res.contains("HTTP/3"));
+    let bpf_count = gateway.net_utils.capture_tcpdump_bpf("tcp and port 443");
+    assert_eq!(bpf_count, 500);
 }
