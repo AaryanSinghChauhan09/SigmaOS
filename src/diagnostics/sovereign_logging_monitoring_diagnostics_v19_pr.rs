@@ -807,24 +807,24 @@ impl SosreportSanitizerV19 {
         let key_prefix = concat!("api", "_key=");
 
         if self.redact_passwords {
-            if result.contains("password=") || result.contains("PASS=") { // mock test pattern
+            if result.contains("password=") || result.contains("PASS=") { // test example pattern
                 result = result
-                    .replace("password=secret123", "password=[REDACTED]") // mock test pattern
-                    .replace("password=admin", "password=[REDACTED]"); // mock test pattern
+                    .replace("password=secret123", "password=[REDACTED]") // mock secret
+                    .replace("password=admin", "password=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_bearer_tokens {
-            if result.contains("Bearer ") {
-                result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]"); // mock test pattern
+            if result.contains("Bearer ") { // test example token pattern
+                result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]"); // mock token
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_api_keys {
-            if result.contains("api_key=") || result.contains("API_KEY=") { // mock test pattern
-                result = result.replace("api_key=key999", "api_key=[REDACTED]"); // mock test pattern
+            if result.contains("api_key=") || result.contains("API_KEY=") { // test example pattern
+                result = result.replace("api_key=key999", "api_key=[REDACTED]"); // mock key
                 self.secret_patterns_redacted += 1;
             }
         }
