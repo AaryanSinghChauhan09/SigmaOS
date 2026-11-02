@@ -80,3 +80,12 @@
 
 - Risk:
 - Rollback:
+
+## I/O Subsystem Verification
+- [ ] I/O component specification and lifecycle complete
+- [ ] I/O policy compliance validated
+- [ ] Interrupt manager registration and dispatch verified
+- [ ] DMA manager and scatter-gather queue bounds checked
+- [ ] Buffer manager eviction semantics verified
+- [ ] I/O scheduler multi-stage queue validated
+- [ ] I/O safety review completed
