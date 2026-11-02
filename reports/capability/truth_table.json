@@ -1,0 +1,359 @@
+{
+  "task": "CAP-AUDIT-001",
+  "generated": "2026-11-02T09:07:37Z",
+  "source_files": [
+    ".agents/tasks/phase1-consolidate/docs-for-migration/CAPABILITY_MATRIX.toml",
+    ".agents/tasks/phase1-consolidate/docs-for-migration/FEATURE_STATUS.toml"
+  ],
+  "environment_note": "Build and QEMU boot are BLOCKED in this sandbox (see reports/build/latest.json and reports/boot/qemu-x86_64.json). This audit cross-references documented claims in the capability matrix only; no fresh runtime evidence was generated.",
+  "feature_status_sections_parsed": 77,
+  "summary": {
+    "total_features_audited": 24,
+    "runtime_backed": 7,
+    "unit_test_only": 6,
+    "doc_only": 0,
+    "implemented_without_runtime_evidence": 11
+  },
+  "flags": {
+    "implemented_no_runtime_evidence": [
+      "pic_8259_interrupts",
+      "pit_8254_timer",
+      "linux_syscall_abi",
+      "task_scheduler_eevdf",
+      "bore_scheduler",
+      "memory_buddy_allocator",
+      "vfs_posix_primitives",
+      "omakase_tiling_engine",
+      "omarchy_theme_synthesis",
+      "mint_update_level_automation",
+      "timeshift_atomic_rollback"
+    ],
+    "unit_test_only": [
+      "secondary_memory_subsystem",
+      "nvme_driver_mmio",
+      "ahci_sata_controller",
+      "acpi_table_parser",
+      "drm_kms_graphics",
+      "tss_ring3_transition"
+    ],
+    "no_test_evidence": []
+  },
+  "truth_table": [
+    {
+      "feature": "gdt_idt_bootstrap",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "qemu-x86_64",
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test",
+        "qemu-integration"
+      ],
+      "runtime_evidence": true,
+      "flag": null
+    },
+    {
+      "feature": "pic_8259_interrupts",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "pit_8254_timer",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "vga_text_mode",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "qemu-x86_64"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "qemu-integration"
+      ],
+      "runtime_evidence": true,
+      "flag": null
+    },
+    {
+      "feature": "uefi_boot",
+      "claimed_status": "prototype",
+      "tested_on": [
+        "ovmf-x86_64"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "hardware/ovmf"
+      ],
+      "runtime_evidence": true,
+      "flag": null
+    },
+    {
+      "feature": "linux_syscall_abi",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "task_scheduler_eevdf",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "bore_scheduler",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": false,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "memory_buddy_allocator",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "vfs_posix_primitives",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "omakase_tiling_engine",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "omarchy_theme_synthesis",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "wayland_zenith_compositor",
+      "claimed_status": "prototype",
+      "tested_on": [
+        "qemu-virtio-gpu"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "qemu-integration"
+      ],
+      "runtime_evidence": true,
+      "flag": null
+    },
+    {
+      "feature": "mint_update_level_automation",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "timeshift_atomic_rollback",
+      "claimed_status": "implemented",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "implemented-but-no-runtime-evidence"
+    },
+    {
+      "feature": "installer_dry_run_and_hardware_partitioning",
+      "claimed_status": "partial",
+      "tested_on": [
+        "qemu-x86_64"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "qemu-integration"
+      ],
+      "runtime_evidence": true,
+      "flag": null
+    },
+    {
+      "feature": "wifi_networking",
+      "claimed_status": "partial",
+      "tested_on": [
+        "qemu-e1000"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "qemu-integration"
+      ],
+      "runtime_evidence": true,
+      "flag": null
+    },
+    {
+      "feature": "secondary_memory_subsystem",
+      "claimed_status": "partial",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "unit-test-only"
+    },
+    {
+      "feature": "io_subsystem_lifecycle_management",
+      "claimed_status": "supported",
+      "tested_on": [
+        "qemu-virtio-blk",
+        "unit-test-harness"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test",
+        "qemu-integration"
+      ],
+      "runtime_evidence": true,
+      "flag": null
+    },
+    {
+      "feature": "nvme_driver_mmio",
+      "claimed_status": "partial",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "unit-test-only"
+    },
+    {
+      "feature": "ahci_sata_controller",
+      "claimed_status": "partial",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "unit-test-only"
+    },
+    {
+      "feature": "acpi_table_parser",
+      "claimed_status": "partial",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "unit-test-only"
+    },
+    {
+      "feature": "drm_kms_graphics",
+      "claimed_status": "partial",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "unit-test-only"
+    },
+    {
+      "feature": "tss_ring3_transition",
+      "claimed_status": "partial",
+      "tested_on": [
+        "unit-test"
+      ],
+      "required_for_release": true,
+      "evidence_kinds": [
+        "unit-test"
+      ],
+      "runtime_evidence": false,
+      "flag": "unit-test-only"
+    }
+  ]
+}

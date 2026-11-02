@@ -1,0 +1,17 @@
+id = "BOOT-X86-001-BLOCKED"
+parent = "BOOT-X86-001"
+title = "QEMU not available in sandbox environment"
+created = "2026-11-02T08:22:38Z"
+priority = "P0"
+blocker = "environment"
+
+[details]
+failing_stage = "boot QEMU with serial logging"
+log_excerpt = "QEMU binary not present in sandbox. No KVM/virtualization hardware available."
+
+[dependencies]
+also_blocked_on = "BUILD-SENTINEL-001"
+note = "ISO artifact cannot be built until cargo check --lib passes; both tasks require a full CI runner."
+
+[resolution]
+recommended = "Provision a GitHub Actions runner or self-hosted server with QEMU+KVM. See .agents/tasks/phase5-finalize/GITHUB-DEPLOY-PLAN.md."

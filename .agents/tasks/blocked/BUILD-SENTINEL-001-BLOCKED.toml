@@ -1,0 +1,20 @@
+id = "BUILD-SENTINEL-001-BLOCKED"
+parent = "BUILD-SENTINEL-001"
+title = "cargo check --lib times out in sandbox: needs CI runner"
+created = "2026-11-02T08:22:38Z"
+priority = "P0"
+blocker = "environment"
+
+[details]
+failing_stage = "cargo check --lib"
+log_excerpt = """
+Command timed out after 120000ms (2 minutes).
+193 source modules require more CPU budget than the sandbox provides.
+Toolchain confirmed functional: rustc 1.97.0 stable, correct diagnostics on
+partial file compilation.
+"""
+
+[resolution]
+recommended = "Run on a GitHub Actions runner with ubuntu-latest (8 vCPU) or self-hosted runner with KVM."
+ci_template = ".agents/tasks/phase4-components/_ci-template.yml"
+deploy_plan = ".agents/tasks/phase5-finalize/GITHUB-DEPLOY-PLAN.md"
