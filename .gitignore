@@ -50,7 +50,12 @@ __pycache__/
 !docs/studies/*.md
 !docs/component-rules/
 !docs/component-rules/*.md
+!docs/io/
+!docs/io/*.md
+!docs/filesystem/
+!docs/filesystem/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
+!IO_RULES.toml
 !ImprovementPlan.md
 !NEXT_STEPS_GUIDELINES.md
 !.jules/
