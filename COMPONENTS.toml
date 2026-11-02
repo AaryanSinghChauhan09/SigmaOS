@@ -17996,3 +17996,69 @@ language = "rust"
 visibility = "public"
 canonical_branch = "main"
 depends_on = ["SigmaOS-system"]
+[[component]]
+name = "SigmaOS-window-manager"
+description = "Tiling and stacking window manager for SigmaOS managing workspaces, focus, layouts, and keybindings"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-window-manager"
+engine = "window_manager"
+category = "Desktop/UI"
+language = "rust"
+inspirations = ["https://github.com/swaywm/sway", "https://github.com/i3/i3"]
+visibility = "public"
+depends_on = ["SigmaOS-compositor"]
+[[component]]
+name = "SigmaOS-settings"
+description = "System settings UI for SigmaOS with panels for display, sound, network, privacy, and accessibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-settings"
+engine = "settings"
+category = "Desktop/UI"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/cinnamon-control-center", "https://github.com/linuxmint/cinnamon-settings-daemon"]
+visibility = "public"
+depends_on = ["SigmaOS-desktop", "SigmaOS-system"]
+[[component]]
+name = "SigmaOS-app-framework"
+description = "Shared library for SigmaOS desktop applications providing widgets, layout primitives, theming, accessibility, and IPC"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-app-framework"
+engine = "app_framework"
+category = "Desktop/UI"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/gtk", "https://github.com/linuxmint/cinnamon-desktop"]
+visibility = "public"
+depends_on = ["SigmaOS-theme-engine", "SigmaOS-compositor"]
+[[component]]
+name = "SigmaOS-github-action"
+description = "Reusable GitHub Actions workflows for SigmaOS repositories"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-github-action"
+engine = "unknown"
+category = "Developer Tools"
+language = "rust"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-GTK-plus"
+description = "GTK+ application suite integration for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-GTK-plus"
+engine = "unknown"
+category = "Desktop/UI"
+language = "rust"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-herdr-runtime"
+description = "Runtime agent and live coding environment for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-herdr-runtime"
+engine = "unknown"
+category = "Developer Tools"
+language = "unknown"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nodejs-binary"
+description = "Pre-built Node.js binary distribution with version management for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nodejs-binary"
+engine = "unknown"
+category = "Developer Tools"
+language = "unknown"
+visibility = "public"
+depends_on = []
