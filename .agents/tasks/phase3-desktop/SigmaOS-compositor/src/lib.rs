@@ -4,8 +4,9 @@
 //! management for the SigmaOS desktop layer.
 //!
 //! Upstream inspiration:
-//! - wlroots: <https://gitlab.freedesktop.org/wlroots/wlroots>
-//! - smithay: <https://github.com/Smithay/smithay>
+//! - Hyprland:  <https://github.com/hyprwm/Hyprland> (dynamic output layout binding)
+//! - wlroots:   <https://gitlab.freedesktop.org/wlroots/wlroots>
+//! - smithay:   <https://github.com/Smithay/smithay>
 
 pub mod buffer;
 pub mod output;
@@ -136,6 +137,32 @@ impl OutputManager {
 // Wayland server
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Output layout binding (Hyprland-inspired)
+// ---------------------------------------------------------------------------
+
+/// The available layout algorithms that can be bound to an output.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OutputLayoutKind {
+    /// Hyprland dwindle (recursive BSP spiral).
+    Dwindle,
+    /// Hyprland master-stack (one main + subordinates).
+    MasterStack,
+    /// Classic stacking / floating.
+    Stacking,
+}
+
+/// Binds an output (by connector name) to a specific layout algorithm.
+///
+/// Mirrors Hyprland's `monitor = <name>, ..., <layout>` configuration.
+#[derive(Debug, Clone)]
+pub struct OutputLayoutBinding {
+    /// Connector name, matching [`Output::name`].
+    pub output_name: String,
+    /// The layout to use on this output.
+    pub layout_kind: OutputLayoutKind,
+}
+
 /// Top-level Wayland server state.
 ///
 /// Holds references to all compositor subsystems. Constructed via
@@ -147,6 +174,8 @@ pub struct WaylandServer {
     /// Output configuration tracker.
     pub output_manager: OutputManager,
     clients: Vec<ClientConnection>,
+    /// Per-output layout bindings (Hyprland-inspired).
+    layout_bindings: Vec<OutputLayoutBinding>,
 }
 
 impl WaylandServer {
@@ -155,6 +184,7 @@ impl WaylandServer {
             surface_manager: SurfaceManager::default(),
             output_manager: OutputManager::default(),
             clients: Vec::new(),
+            layout_bindings: Vec::new(),
         }
     }
 
@@ -176,6 +206,36 @@ impl WaylandServer {
     /// Run a single event-loop iteration (placeholder for real dispatch).
     pub fn dispatch(&mut self) -> Result<(), CompositorError> {
         Ok(())
+    }
+
+    // -----------------------------------------------------------------------
+    // Hyprland-inspired dynamic output layout binding
+    // -----------------------------------------------------------------------
+
+    /// Bind a layout kind to the named output, replacing any existing binding.
+    ///
+    /// Inspired by Hyprland's per-monitor layout overrides (e.g.
+    /// `monitor = HDMI-A-1, ..., dwindle`).
+    pub fn switch_layout(&mut self, output: &str, kind: OutputLayoutKind) {
+        // Remove any existing binding for this output, then insert the new one.
+        self.layout_bindings.retain(|b| b.output_name != output);
+        self.layout_bindings.push(OutputLayoutBinding {
+            output_name: output.to_string(),
+            layout_kind: kind,
+        });
+    }
+
+    /// Retrieve the current layout binding for a named output, if any.
+    pub fn layout_for(&self, output: &str) -> Option<OutputLayoutKind> {
+        self.layout_bindings
+            .iter()
+            .find(|b| b.output_name == output)
+            .map(|b| b.layout_kind)
+    }
+
+    /// All current output layout bindings.
+    pub fn layout_bindings(&self) -> &[OutputLayoutBinding] {
+        &self.layout_bindings
     }
 }
 
@@ -229,5 +289,29 @@ mod tests {
         assert_eq!(om.outputs().len(), 1);
         om.remove("HDMI-A-1");
         assert!(om.outputs().is_empty());
+    }
+
+    #[test]
+    fn switch_layout_binds_output() {
+        let mut server = init_compositor().unwrap();
+        server.switch_layout("HDMI-A-1", OutputLayoutKind::Dwindle);
+        assert_eq!(server.layout_for("HDMI-A-1"), Some(OutputLayoutKind::Dwindle));
+    }
+
+    #[test]
+    fn switch_layout_replaces_existing_binding() {
+        let mut server = init_compositor().unwrap();
+        server.switch_layout("DP-1", OutputLayoutKind::MasterStack);
+        server.switch_layout("DP-1", OutputLayoutKind::Stacking);
+        assert_eq!(server.layout_for("DP-1"), Some(OutputLayoutKind::Stacking));
+        // Only one binding for this output.
+        let count = server.layout_bindings().iter().filter(|b| b.output_name == "DP-1").count();
+        assert_eq!(count, 1);
+    }
+
+    #[test]
+    fn layout_for_unknown_output_returns_none() {
+        let server = init_compositor().unwrap();
+        assert_eq!(server.layout_for("eDP-1"), None);
     }
 }

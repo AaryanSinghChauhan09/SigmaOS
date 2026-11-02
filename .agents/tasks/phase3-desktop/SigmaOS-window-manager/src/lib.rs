@@ -1,8 +1,12 @@
 //! SigmaOS Window Manager — tiling and stacking layout engine.
 //!
 //! Upstream inspiration:
-//! - sway: <https://github.com/swaywm/sway>
-//! - i3:   <https://github.com/i3/i3>
+//! - Hyprland: <https://github.com/hyprwm/Hyprland> (dwindle/master-stack layouts)
+//! - sway:     <https://github.com/swaywm/sway>
+//! - i3:       <https://github.com/i3/i3>
+
+pub mod layout;
+pub use layout::{LayoutConfig, LayoutKind};
 
 use std::fmt;
 
@@ -189,6 +193,11 @@ pub fn create_window_manager(mode: WmMode) -> WindowManager {
         WmMode::Tiling => WindowManager::Tiling(TilingLayout::default()),
         WmMode::Stacking => WindowManager::Stacking(StackingLayout::default()),
     }
+}
+
+/// Construct a Hyprland-style layout by kind (dwindle or master-stack).
+pub fn create_hyprland_layout(kind: layout::LayoutKind) -> layout::Layout {
+    layout::layout_of(kind)
 }
 
 // ---------------------------------------------------------------------------
