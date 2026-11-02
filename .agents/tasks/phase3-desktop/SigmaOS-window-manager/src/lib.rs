@@ -197,7 +197,7 @@ pub fn create_window_manager(mode: WmMode) -> WindowManager {
 
 /// Construct a Hyprland-style layout by kind (dwindle or master-stack).
 pub fn create_hyprland_layout(kind: layout::LayoutKind) -> layout::Layout {
-    layout::layout_of(kind)
+    layout::make_layout(kind)
 }
 
 // ---------------------------------------------------------------------------

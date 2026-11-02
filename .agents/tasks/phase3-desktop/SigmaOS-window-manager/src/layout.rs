@@ -244,10 +244,10 @@ pub enum LayoutKind {
     Stacking,
 }
 
-/// Select a layout description string for a [`WmMode`] or an explicit kind.
+/// Select a layout description string for a [`LayoutKind`].
 ///
 /// Returns the layout display name.
-pub fn layout_of_name(kind: LayoutKind) -> &'static str {
+pub fn layout_of(kind: LayoutKind) -> &'static str {
     match kind {
         LayoutKind::Dwindle => "dwindle",
         LayoutKind::Master => "master-stack",
@@ -288,10 +288,12 @@ impl Layout {
 }
 
 /// Construct a [`Layout`] of the requested kind.
-pub fn layout_of(kind: LayoutKind) -> Layout {
+pub fn make_layout(kind: LayoutKind) -> Layout {
     match kind {
         LayoutKind::Dwindle => Layout::Dwindle(DwindleLayout::new(LayoutConfig::default())),
-        LayoutKind::Master | LayoutKind::Stacking => Layout::MasterStack(MasterStackLayout::new(LayoutConfig::default())),
+        LayoutKind::Master | LayoutKind::Stacking => {
+            Layout::MasterStack(MasterStackLayout::new(LayoutConfig::default()))
+        }
     }
 }
 
