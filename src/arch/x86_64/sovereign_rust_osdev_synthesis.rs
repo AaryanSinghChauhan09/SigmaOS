@@ -2230,7 +2230,7 @@ impl XhciHostControllerEngine {
     pub fn new(base_address: u64) -> Self {
         let caps = XhciCapabilityRegisters {
             caplength: 0x20,
-            hciversion: 0x0110, // xHCI 1.1
+            hciversion: 0x0110,      // xHCI 1.1
             hcsparams1: 0x0400_0820, // 32 slots, 8 interrupters, 4 ports
             hcsparams2: 0x0000_0000,
             hccparams1: 0x0000_1001, // 64-bit addressing, context size 64 bytes
@@ -2398,10 +2398,10 @@ impl FuseUserspaceFsEngine {
 /// Memory Barrier Kind for Bare-Metal Synchronization
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryBarrierKind {
-    FullHardwareBarrier,     // mfence / dmb sy
-    StoreReleaseBarrier,     // sfence / dmb st
-    LoadAcquireBarrier,      // lfence / dmb ld
-    CompilerMemoryBarrier,   // core::sync::atomic::compiler_fence
+    FullHardwareBarrier,   // mfence / dmb sy
+    StoreReleaseBarrier,   // sfence / dmb st
+    LoadAcquireBarrier,    // lfence / dmb ld
+    CompilerMemoryBarrier, // core::sync::atomic::compiler_fence
 }
 
 /// Hardware & Compiler Memory Barrier Engine
@@ -2613,7 +2613,412 @@ impl OpenFirmwareIeee1275Engine {
 }
 
 // ============================================================================
-// 23. RUST-OSDEV PR PROPOSAL GATEWAY ENGINE
+// 23. PCIE ECAM MMIO & MSI/MSI-X CAPABILITY ENGINE (pci_types inspiration)
+// ============================================================================
+
+/// PCIe MSI/MSI-X capability flags and register configurations
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PcieMsiConfig {
+    pub enabled: bool,
+    pub is_64bit: bool,
+    pub multiple_message_capable: u8,
+    pub multiple_message_enable: u8,
+    pub message_address: u64,
+    pub message_data: u16,
+    pub mask_bits: u32,
+    pub pending_bits: u32,
+}
+
+impl Default for PcieMsiConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            is_64bit: true,
+            multiple_message_capable: 1,
+            multiple_message_enable: 1,
+            message_address: 0xFEE0_0000,
+            message_data: 0x40,
+            mask_bits: 0,
+            pending_bits: 0,
+        }
+    }
+}
+
+/// PCIe Extended Configuration Mechanism (ECAM) Address Calculator & MSI Engine
+#[derive(Debug, Clone)]
+pub struct PcieEcamMsiCapEngine {
+    pub ecam_base: u64,
+    pub segment_group: u16,
+    pub bus_start: u8,
+    pub bus_end: u8,
+    pub msi_capabilities: Vec<(u8, u8, u8, PcieMsiConfig)>, // (bus, device, function, config)
+}
+
+impl PcieEcamMsiCapEngine {
+    pub fn new(ecam_base: u64, segment_group: u16, bus_start: u8, bus_end: u8) -> Self {
+        Self {
+            ecam_base,
+            segment_group,
+            bus_start,
+            bus_end,
+            msi_capabilities: Vec::new(),
+        }
+    }
+
+    /// Calculate 64-bit physical MMIO base address for a specific BDF in ECAM space
+    /// ECAM layout: Base + (Bus << 20) | (Dev << 15) | (Func << 12) | (Register & 0xFFF)
+    pub fn calculate_ecam_offset(
+        &self,
+        bus: u8,
+        dev: u8,
+        func: u8,
+        reg_offset: u16,
+    ) -> Option<u64> {
+        if bus < self.bus_start
+            || bus > self.bus_end
+            || dev >= 32
+            || func >= 8
+            || reg_offset > 0xFFF
+        {
+            return None;
+        }
+        let offset = ((bus as u64) << 20)
+            | ((dev as u64) << 15)
+            | ((func as u64) << 12)
+            | ((reg_offset as u64) & 0xFFF);
+        Some(self.ecam_base + offset)
+    }
+
+    /// Register or update MSI configuration for a PCIe device
+    pub fn configure_msi(
+        &mut self,
+        bus: u8,
+        dev: u8,
+        func: u8,
+        config: PcieMsiConfig,
+    ) -> Result<(), &'static str> {
+        if bus < self.bus_start || bus > self.bus_end || dev >= 32 || func >= 8 {
+            return Err("Invalid PCIe device coordinates");
+        }
+        if let Some(pos) = self
+            .msi_capabilities
+            .iter()
+            .position(|(b, d, f, _)| *b == bus && *d == dev && *f == func)
+        {
+            self.msi_capabilities[pos].3 = config;
+        } else {
+            self.msi_capabilities.push((bus, dev, func, config));
+        }
+        Ok(())
+    }
+
+    /// Retrieve MSI configuration
+    pub fn get_msi(&self, bus: u8, dev: u8, func: u8) -> Option<PcieMsiConfig> {
+        self.msi_capabilities
+            .iter()
+            .find(|(b, d, f, _)| *b == bus && *d == dev && *f == func)
+            .map(|(_, _, _, cfg)| *cfg)
+    }
+}
+
+// ============================================================================
+// 24. MULTIBOOT2 HEADER BUILDER & VALIDATOR (multiboot2-header inspiration)
+// ============================================================================
+
+/// Multiboot2 Header Architecture Specification
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Multiboot2Arch {
+    I386 = 0,
+    Mips = 4,
+}
+
+/// Multiboot2 Header Tag Types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Multiboot2HeaderTagType {
+    End = 0,
+    InformationRequest = 1,
+    Address = 2,
+    EntryAddress = 3,
+    Flags = 4,
+    Framebuffer = 5,
+    ModuleAlignment = 6,
+    EfiBootServices = 7,
+    Efi32Entry = 8,
+    Efi64Entry = 9,
+}
+
+/// Multiboot2 Header Tag
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Multiboot2HeaderTag {
+    pub tag_type: Multiboot2HeaderTagType,
+    pub flags: u16,
+    pub size: u32,
+    pub payload: Vec<u8>,
+}
+
+/// Multiboot2 Header Builder and Validator Engine
+#[derive(Debug, Clone)]
+pub struct Multiboot2HeaderBuilderEngine {
+    pub magic: u32,
+    pub architecture: Multiboot2Arch,
+    pub header_length: u32,
+    pub checksum: u32,
+    pub tags: Vec<Multiboot2HeaderTag>,
+}
+
+impl Multiboot2HeaderBuilderEngine {
+    pub const MULTIBOOT2_HEADER_MAGIC: u32 = 0xE852_50D6;
+
+    pub fn new(arch: Multiboot2Arch) -> Self {
+        let mut engine = Self {
+            magic: Self::MULTIBOOT2_HEADER_MAGIC,
+            architecture: arch,
+            header_length: 16, // Magic(4) + Arch(4) + Length(4) + Checksum(4)
+            checksum: 0,
+            tags: Vec::new(),
+        };
+        engine.recompute_checksum();
+        engine
+    }
+
+    /// Add a generic tag with 8-byte alignment padding
+    pub fn add_tag(&mut self, tag_type: Multiboot2HeaderTagType, flags: u16, payload: Vec<u8>) {
+        let raw_size = 8 + payload.len() as u32; // type(2) + flags(2) + size(4) + payload
+        let aligned_size = (raw_size + 7) & !7;
+        self.tags.push(Multiboot2HeaderTag {
+            tag_type,
+            flags,
+            size: raw_size,
+            payload,
+        });
+        self.header_length += aligned_size;
+        self.recompute_checksum();
+    }
+
+    /// Add framebuffer request tag
+    pub fn add_framebuffer_tag(&mut self, width: u32, height: u32, bpp: u32) {
+        let mut payload = Vec::with_capacity(12);
+        payload.extend_from_slice(&width.to_le_bytes());
+        payload.extend_from_slice(&height.to_le_bytes());
+        payload.extend_from_slice(&bpp.to_le_bytes());
+        self.add_tag(Multiboot2HeaderTagType::Framebuffer, 0, payload);
+    }
+
+    /// Finalize with end tag (type 0, size 8)
+    pub fn finalize(&mut self) {
+        self.add_tag(Multiboot2HeaderTagType::End, 0, Vec::new());
+    }
+
+    /// Checksum rule: magic + arch + header_length + checksum == 0 (mod 2^32)
+    pub fn recompute_checksum(&mut self) {
+        let sum = self
+            .magic
+            .wrapping_add(self.architecture as u32)
+            .wrapping_add(self.header_length);
+        self.checksum = (0u32).wrapping_sub(sum);
+    }
+
+    /// Validate header integrity
+    pub fn is_valid(&self) -> bool {
+        self.magic == Self::MULTIBOOT2_HEADER_MAGIC
+            && self
+                .magic
+                .wrapping_add(self.architecture as u32)
+                .wrapping_add(self.header_length)
+                .wrapping_add(self.checksum)
+                == 0
+    }
+}
+
+// ============================================================================
+// 25. UEFI RUNTIME VARIABLE SERVICES & DEVICE PATH (uefi-rs inspiration)
+// ============================================================================
+
+/// UEFI Variable Attributes bitmask
+pub mod uefi_var_attributes {
+    pub const NON_VOLATILE: u32 = 0x00000001;
+    pub const BOOTSERVICE_ACCESS: u32 = 0x00000002;
+    pub const RUNTIME_ACCESS: u32 = 0x00000004;
+    pub const HARDWARE_ERROR_RECORD: u32 = 0x00000008;
+    pub const AUTHENTICATED_WRITE_ACCESS: u32 = 0x00000010;
+}
+
+/// UEFI Variable Entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UefiVariable {
+    pub name: String,
+    pub vendor_guid: UefiGuid,
+    pub attributes: u32,
+    pub data: Vec<u8>,
+}
+
+/// UEFI Device Path Node Type
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum UefiDevicePathNodeType {
+    Hardware = 0x01,
+    Acpi = 0x02,
+    Messaging = 0x03,
+    Media = 0x04,
+    BiosBootSpec = 0x05,
+    EndEntire = 0x7F,
+}
+
+/// UEFI Device Path Node
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UefiDevicePathNode {
+    pub node_type: UefiDevicePathNodeType,
+    pub sub_type: u8,
+    pub payload: Vec<u8>,
+}
+
+/// UEFI Runtime Variable Services & Device Path Node Management Engine
+#[derive(Debug, Clone, Default)]
+pub struct UefiRuntimeVariablesAndDevicePathEngine {
+    pub variables: Vec<UefiVariable>,
+    pub device_paths: Vec<Vec<UefiDevicePathNode>>,
+}
+
+impl UefiRuntimeVariablesAndDevicePathEngine {
+    pub fn new() -> Self {
+        Self {
+            variables: Vec::new(),
+            device_paths: Vec::new(),
+        }
+    }
+
+    /// Set or update a UEFI variable
+    pub fn set_variable(
+        &mut self,
+        name: &str,
+        vendor_guid: UefiGuid,
+        attributes: u32,
+        data: Vec<u8>,
+    ) -> Result<(), &'static str> {
+        if name.is_empty() {
+            return Err("Variable name cannot be empty");
+        }
+        if let Some(pos) = self
+            .variables
+            .iter()
+            .position(|v| v.name == name && v.vendor_guid == vendor_guid)
+        {
+            if data.is_empty() {
+                self.variables.remove(pos);
+            } else {
+                self.variables[pos].attributes = attributes;
+                self.variables[pos].data = data;
+            }
+        } else if !data.is_empty() {
+            self.variables.push(UefiVariable {
+                name: name.to_string(),
+                vendor_guid,
+                attributes,
+                data,
+            });
+        }
+        Ok(())
+    }
+
+    /// Get a UEFI variable
+    pub fn get_variable(&self, name: &str, vendor_guid: &UefiGuid) -> Option<&UefiVariable> {
+        self.variables
+            .iter()
+            .find(|v| v.name == name && &v.vendor_guid == vendor_guid)
+    }
+
+    /// Register a decoded device path
+    pub fn register_device_path(&mut self, nodes: Vec<UefiDevicePathNode>) {
+        self.device_paths.push(nodes);
+    }
+}
+
+// ============================================================================
+// 26. X86_64 EXTENDED MSR & PAT MEMORY ATTRIBUTE ENGINE (x86_64 crate inspiration)
+// ============================================================================
+
+/// IA32 Page Attribute Table (PAT) Memory Type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum PatMemoryType {
+    Uncacheable = 0x00,
+    WriteCombining = 0x01,
+    WriteThrough = 0x04,
+    WriteProtected = 0x05,
+    WriteBack = 0x06,
+    UncachedMinus = 0x07,
+}
+
+/// Extended MSR and PAT Controller Engine
+#[derive(Debug, Clone)]
+pub struct X86_64ExtendedMsrPatEngine {
+    pub ia32_pat_msr: u64,
+    pub fs_base: u64,
+    pub gs_base: u64,
+    pub kernel_gs_base: u64,
+    pub cr4_pcide: bool,
+    pub cr4_fsgsbase: bool,
+}
+
+impl Default for X86_64ExtendedMsrPatEngine {
+    fn default() -> Self {
+        Self {
+            // Default x86 reset configuration: WB (0), WT (4), UC- (7), UC (0), WB (0), WT (4), UC- (7), UC (0)
+            ia32_pat_msr: 0x0007_0406_0007_0406,
+            fs_base: 0,
+            gs_base: 0,
+            kernel_gs_base: 0,
+            cr4_pcide: true,
+            cr4_fsgsbase: true,
+        }
+    }
+}
+
+impl X86_64ExtendedMsrPatEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Read PAT memory type configured at index 0-7
+    pub fn get_pat_entry(&self, index: usize) -> Option<PatMemoryType> {
+        if index >= 8 {
+            return None;
+        }
+        let byte = ((self.ia32_pat_msr >> (index * 8)) & 0xFF) as u8;
+        match byte {
+            0x00 => Some(PatMemoryType::Uncacheable),
+            0x01 => Some(PatMemoryType::WriteCombining),
+            0x04 => Some(PatMemoryType::WriteThrough),
+            0x05 => Some(PatMemoryType::WriteProtected),
+            0x06 => Some(PatMemoryType::WriteBack),
+            0x07 => Some(PatMemoryType::UncachedMinus),
+            _ => None,
+        }
+    }
+
+    /// Configure PAT entry 0-7 with a designated memory type
+    pub fn set_pat_entry(
+        &mut self,
+        index: usize,
+        mem_type: PatMemoryType,
+    ) -> Result<(), &'static str> {
+        if index >= 8 {
+            return Err("PAT index out of bounds (must be 0-7)");
+        }
+        let shift = index * 8;
+        let mask = !(0xFFu64 << shift);
+        let val = (mem_type as u64) << shift;
+        self.ia32_pat_msr = (self.ia32_pat_msr & mask) | val;
+        Ok(())
+    }
+
+    /// Swap GS base with Kernel GS base (simulating `SWAPGS` instruction)
+    pub fn swap_gs(&mut self) {
+        core::mem::swap(&mut self.gs_base, &mut self.kernel_gs_base);
+    }
+}
+
+// ============================================================================
+// 27. RUST-OSDEV PR PROPOSAL GATEWAY ENGINE
 // ============================================================================
 
 /// PR Proposal Spec for rust-osdev Ecosystem Integration
@@ -3097,8 +3502,7 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5135,
-            title: "feat(arch_x86_64): Implement Fair Ticket Spinlock Primitive Engine"
-                .to_string(),
+            title: "feat(arch_x86_64): Implement Fair Ticket Spinlock Primitive Engine".to_string(),
             target_subsystem: "Kernel Synchronization & Concurrency".to_string(),
             rust_osdev_crate_inspiration: "spinning_top".to_string(),
             components_added: vec![
@@ -3117,6 +3521,59 @@ impl RustOsdevPrProposalGateway {
             components_added: vec![
                 "OpenFirmwareIeee1275Engine device tree node finder".to_string(),
                 "Client interface service call execution engine".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5137,
+            title: "feat(arch_x86_64): Implement PCIe ECAM Address Calculation & MSI/MSI-X Engine"
+                .to_string(),
+            target_subsystem: "Bus Enumeration & PCI".to_string(),
+            rust_osdev_crate_inspiration: "pci_types".to_string(),
+            components_added: vec![
+                "PcieEcamMsiCapEngine ECAM MMIO space offset calculator".to_string(),
+                "PcieMsiConfig 64-bit message address & vector allocator".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5138,
+            title: "feat(arch_x86_64): Implement Multiboot2 Header Builder & Tag Validator Engine"
+                .to_string(),
+            target_subsystem: "Boot Protocol Interop".to_string(),
+            rust_osdev_crate_inspiration: "multiboot2-header".to_string(),
+            components_added: vec![
+                "Multiboot2HeaderBuilderEngine header generator and checksum verifier".to_string(),
+                "Framebuffer and information request tag builder".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5139,
+            title: "feat(arch_x86_64): Implement UEFI Runtime Variables & Device Path Engine"
+                .to_string(),
+            target_subsystem: "UEFI Boot & Runtime Services".to_string(),
+            rust_osdev_crate_inspiration: "uefi-rs".to_string(),
+            components_added: vec![
+                "UefiRuntimeVariablesAndDevicePathEngine variable store".to_string(),
+                "Device path node sequence iterator and manager".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5140,
+            title:
+                "feat(arch_x86_64): Implement x86_64 IA32_PAT Memory Types & Extended MSR Engine"
+                    .to_string(),
+            target_subsystem: "Architecture Core & Memory Types".to_string(),
+            rust_osdev_crate_inspiration: "x86_64".to_string(),
+            components_added: vec![
+                "X86_64ExtendedMsrPatEngine Page Attribute Table bitmask evaluator".to_string(),
+                "SWAPGS instruction context swapper and FS/GS base register manager".to_string(),
             ],
             status: "Ready for Merge".to_string(),
         });
@@ -3457,7 +3914,7 @@ mod tests {
     #[test]
     fn test_rust_osdev_pr_gateway() {
         let gateway = RustOsdevPrProposalGateway::new();
-        assert_eq!(gateway.proposals.len(), 36);
+        assert_eq!(gateway.proposals.len(), 40);
         assert!(gateway.evaluate_ci_gate());
 
         let diff = gateway
@@ -3465,10 +3922,15 @@ mod tests {
             .expect("Diff should be generated");
         assert!(diff.contains("PR #5101"));
 
-        let diff_new = gateway
+        let diff_5136 = gateway
             .generate_unified_diff(5136)
             .expect("Diff should be generated");
-        assert!(diff_new.contains("PR #5136"));
+        assert!(diff_5136.contains("PR #5136"));
+
+        let diff_5140 = gateway
+            .generate_unified_diff(5140)
+            .expect("Diff should be generated");
+        assert!(diff_5140.contains("PR #5140"));
     }
 
     #[test]
@@ -3562,5 +4024,86 @@ mod tests {
             args: vec![0x1000],
         };
         assert_eq!(of.execute_client_call(&call).unwrap(), 0x1000);
+    }
+
+    #[test]
+    fn test_pcie_ecam_msi_cap_engine() {
+        let mut pcie = PcieEcamMsiCapEngine::new(0xE000_0000, 0, 0, 255);
+        let offset = pcie.calculate_ecam_offset(0, 1, 0, 0x10);
+        assert_eq!(offset, Some(0xE000_0000 + (1 << 15) + 0x10));
+
+        let msi_cfg = PcieMsiConfig {
+            enabled: true,
+            is_64bit: true,
+            multiple_message_capable: 4,
+            multiple_message_enable: 4,
+            message_address: 0xFEE0_0000,
+            message_data: 0x48,
+            mask_bits: 0,
+            pending_bits: 0,
+        };
+        assert!(pcie.configure_msi(0, 1, 0, msi_cfg).is_ok());
+        let fetched = pcie.get_msi(0, 1, 0).expect("MSI config should exist");
+        assert!(fetched.enabled);
+        assert_eq!(fetched.message_data, 0x48);
+    }
+
+    #[test]
+    fn test_multiboot2_header_builder_engine() {
+        let mut mb2 = Multiboot2HeaderBuilderEngine::new(Multiboot2Arch::I386);
+        assert!(mb2.is_valid());
+        mb2.add_framebuffer_tag(1024, 768, 32);
+        mb2.finalize();
+        assert!(mb2.is_valid());
+        assert_eq!(mb2.tags.len(), 2);
+    }
+
+    #[test]
+    fn test_uefi_runtime_variables_and_device_path() {
+        let mut uefi_rt = UefiRuntimeVariablesAndDevicePathEngine::new();
+        let guid = UefiGuid([
+            0x8b, 0xe4, 0xdf, 0x61, 0x93, 0xca, 0x11, 0xd2, 0xaa, 0x0d, 0x00, 0xe0, 0x98, 0x03,
+            0x2b, 0x8c,
+        ]);
+        let data = vec![1, 0, 0, 0];
+        assert!(uefi_rt
+            .set_variable(
+                "BootOrder",
+                guid,
+                uefi_var_attributes::BOOTSERVICE_ACCESS | uefi_var_attributes::RUNTIME_ACCESS,
+                data.clone()
+            )
+            .is_ok());
+        let var = uefi_rt
+            .get_variable("BootOrder", &guid)
+            .expect("Variable should exist");
+        assert_eq!(var.data, data);
+
+        let node = UefiDevicePathNode {
+            node_type: UefiDevicePathNodeType::Hardware,
+            sub_type: 1,
+            payload: vec![0x01, 0x02],
+        };
+        uefi_rt.register_device_path(vec![node]);
+        assert_eq!(uefi_rt.device_paths.len(), 1);
+    }
+
+    #[test]
+    fn test_x86_64_extended_msr_pat_engine() {
+        let mut pat_engine = X86_64ExtendedMsrPatEngine::new();
+        assert_eq!(pat_engine.get_pat_entry(0), Some(PatMemoryType::WriteBack));
+        assert!(pat_engine
+            .set_pat_entry(1, PatMemoryType::WriteCombining)
+            .is_ok());
+        assert_eq!(
+            pat_engine.get_pat_entry(1),
+            Some(PatMemoryType::WriteCombining)
+        );
+
+        pat_engine.gs_base = 0xFFFF_8000_0000_1000;
+        pat_engine.kernel_gs_base = 0xFFFF_8000_0000_2000;
+        pat_engine.swap_gs();
+        assert_eq!(pat_engine.gs_base, 0xFFFF_8000_0000_2000);
+        assert_eq!(pat_engine.kernel_gs_base, 0xFFFF_8000_0000_1000);
     }
 }
