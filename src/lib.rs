@@ -643,16 +643,19 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    AnonSurfShunt, AntivirusAndCryptoEngineV80Engine, AppSandboxEngine,
-    ArithmeticSubstitutionDeobfuscator, AuditAndIntrusionPreventionV80Engine,
-    BsdHardeningAndIsolationV80Engine, CapabilityGate, CapabilityToken, ForensicStorageFilter,
-    IdentityAndEnterpriseAuthV80Engine, LinuxAccessControlAndSandboxingV80Engine, Permission,
+    AnonSurfShunt, AntivirusAndCryptoEngineV80Engine, AntivirusAndCryptoEngineV89Engine,
+    AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, AuditAndIntrusionPreventionV80Engine,
+    AuditAndIntrusionPreventionV89Engine, BsdHardeningAndIsolationV80Engine,
+    BsdHardeningAndIsolationV89Engine, CapabilityGate, CapabilityToken, ForensicStorageFilter,
+    IdentityAndEnterpriseAuthV80Engine, IdentityAndEnterpriseAuthV89Engine,
+    LinuxAccessControlAndSandboxingV80Engine, LinuxAccessControlAndSandboxingV89Engine, Permission,
     PledgeManager, PledgePromise, RoutingMode, SandboxPolicy,
-    SecurityV80PrProposalManifest, SovereignSecurityAndHardeningParityPrGateway,
+    SecurityV80PrProposalManifest, SecurityV89PrProposalManifest,
+    SovereignSecurityAndHardeningParityPrGateway,
     SovereignSecurityAndHardeningParityV61Gateway, SovereignSecurityAndHardeningParityV64Gateway,
     SovereignSecurityAndHardeningParityV68Gateway, SovereignSecurityAndHardeningParityV70Gateway,
     SovereignSecurityAndHardeningParityV76Gateway, SovereignSecurityAndHardeningParityV77Gateway,
-    SovereignSecurityAndHardeningParityV80Gateway,
+    SovereignSecurityAndHardeningParityV80Gateway, SovereignSecurityAndHardeningParityV89Gateway,
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
