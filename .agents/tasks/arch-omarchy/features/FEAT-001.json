@@ -1,0 +1,23 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Umbrella-repo OS core: add a consolidated, tested Arch+Omarchy design-philosophy module that ties together the project's existing scattered inspiration code into a single in-code source of truth for the wiki. This is KISS-aligned (consolidation, not yet another parallel implementation) and safe (additive only). The umbrella already absorbs Arch/Omarchy ideas across src/arch_kernel_inspirations.rs, src/package/{alpm_engine,arch_aur,aur_integration}.rs, src/distro/omarchy_inspiration.rs, and pkgbuild/*.PKGBUILD; this FEAT adds the missing consolidated design-philosophy entry point.",
+  "status": "pending",
+  "steps": [
+    "Create src/arch_omarchy_design.rs mirroring the src/arch_kernel_inspirations.rs pattern (self-contained structs + inline #[cfg(test)] mod tests, std-only deps: std::collections::BTreeMap, std::format, std::string::String, std::vec::Vec). Include: (a) ArchOmarchyDesignPhilosophy struct + a catalog of principles covering The Arch Way (KISS, user-centricity, code-correctness-over-features, rolling release, minimal base, user choice) and Omarchy (curated opinionated defaults, batteries-included but simple); (b) KissSimplificationChecklist - a reviewable manifest of over-engineering patterns to simplify, citing the duplicated file-manager modules src/desktop/{file_manager,filemanager,desktop_file_manager,file_manager_extensions}.rs as the first entry; (c) CuratedDefaultsManifest - declarative opinionated desktop defaults mirroring the depends=(...) list in pkgbuild/sigmaos.PKGBUILD (hyprland, hyprlock, hypridle, foot, ghostty, wofi, waybar, mako, pipewire, wireplumber, grim, slurp, nautilus, fastfetch, btop, networkmanager, bluez, ...); (d) InspirationMap - the exact mapping this task applies (pacman->SigmaOS-packages-kit/tools, AUR->SigmaOS-plugin-marketplace/registry, PKGBUILD/makepkg->SigmaOS-ISO, archiso->SigmaOS-ISO, Hyprland->SigmaOS-compositor/window-manager/quickshell, omadots->SigmaOS-dots-configuration, omafind->SigmaOS-file-manager/file-manager-system, omareel->SigmaOS-reel/screen-recorder, omarchy-mac->SigmaOS-mac-run, Arch Wiki->SigmaOS-docs/wiki), each entry holding the upstream name, the target SigmaOS component, and a one-line rationale; (e) #[cfg(test)] mod tests asserting each catalog is non-empty, CuratedDefaultsManifest enumerates the curated set, and InspirationMap contains every named target component.",
+    "Wire the module into src/lib.rs by adding 'pub mod arch_omarchy_design;' immediately after the existing 'pub mod arch_kernel_inspirations;' line (line ~7). Do not reorder or remove other declarations."
+  ],
+  "acceptance_criteria": [
+    "cargo check --lib on the umbrella crate exits 0 (no new errors).",
+    "cargo test --lib arch_omarchy_design compiles and all inline tests pass.",
+    "cargo fmt --check passes (the new file is rustfmt-clean).",
+    "src/lib.rs declares 'pub mod arch_omarchy_design;' exactly once."
+  ],
+  "verification": [
+    "From /home/aaryansinghchauhan/SigmaOS run: cargo check --lib  -> must finish with 'Finished' and exit 0.",
+    "From /home/aaryansinghchauhan/SigmaOS run: cargo test --lib arch_omarchy_design  -> tests pass.",
+    "From /home/aaryansinghchauhan/SigmaOS run: cargo fmt --check  -> exit 0."
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}

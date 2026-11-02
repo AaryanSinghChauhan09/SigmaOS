@@ -1,0 +1,39 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Desktop/package component scaffolds: elevate the empty print-statement stubs (and thin layouts) in the most relevant component scaffolds to coherent Arch/Omarchy-inspired functionality. Same change pattern across many files = one feature, one step per scaffold. Each step also extends that scaffold's README.md 'Upstream Reference' section to document the new behaviour (Phase-4 READMEs already carry that section). No new external dependencies; stdlib only for Python/Bash, zero-dep Rust matching each scaffold's existing style. FEAT-002 is independent of FEAT-001 (different files), so it may be done in either order, but execution is sequential per the workflow.",
+  "status": "pending",
+  "steps": [
+    "Phase-3 SigmaOS-window-manager (own Cargo.toml): add src/layout.rs with DwindleLayout (recursive spiral split) and MasterStackLayout (master + stack) structs + a configurable LayoutConfig { gaps: u32, border_px: u32 }; add a 'layout_of(WmMode, &str)' selector; wire a 'pub mod layout;' into src/lib.rs and a layout-kind enum alongside the existing WmMode. Add inline tests for dwindle/master split geometry. Update README.md.",
+    "Phase-3 SigmaOS-compositor (own Cargo.toml): in src/lib.rs add an OutputLayoutBinding { output_name: String, kind: LayoutKind } (kinds: Dwindle, Master, Stacking) and a 'switch_layout(&mut self, output: &str, kind: LayoutKind)' method on WaylandServer; add inline tests. Update README.md.",
+    "Phase-3 SigmaOS-file-manager (own Cargo.toml; gtk4 optional/default-off): in src/search.rs add 'fuzzy_score(query: &str, name: &str) -> usize' (subsequence match + recency bonus, zero deps) and 'FileSearch::fuzzy_search(root: &Path, query: &SearchQuery) -> Vec<(PathBuf, usize)>' returning ranked results; add inline tests. Update README.md.",
+    "Phase-4 SigmaOS-packages-kit (Python, src/main.py): replace the single print line with an argparse CLI implementing a pacman-inspired Transaction model: install/remove/sync/resolve (topological dependency resolution over an in-memory package graph) and verify (checksum) subcommands, stdlib only (argparse, collections, json). Update README.md.",
+    "Phase-4 SigmaOS-packages-tools (Python, src/main.py): replace the stub with an argparse CLI for package install/upgrade/verify-sig subcommands with an in-memory package record, stdlib only. Update README.md.",
+    "Phase-4 SigmaOS-quickshell (Python, src/main.py): replace the stub with an argparse CLI for a keyboard-driven fuzzy launcher: query/launch/list over a list of .desktop-style entries with a fuzzy score, stdlib only. Update README.md.",
+    "Phase-4 SigmaOS-reel (Python, src/main.py): replace the stub with an argparse CLI for omareel-style screen recording: 'record {region|display}' with output config (container/fps) and 'list', an in-memory recording record, stdlib only. Update README.md.",
+    "Phase-4 SigmaOS-plugin-marketplace (Python, src/main.py): replace the stub with an argparse CLI for an AUR-inspired trusted community marketplace: search/install with a trust_score and votes model over an in-memory catalogue, stdlib only. Update README.md.",
+    "Phase-4 SigmaOS-plugin-registry (Python, src/main.py): replace the stub with an argparse CLI for an AUR-inspired registry: register/list/resolve (name->version->source) over an in-memory registry, stdlib only. Update README.md.",
+    "Phase-4 SigmaOS-ISO (Shell, src/main.sh): extend the existing 'set -euo pipefail' script with archiso-inspired declarative ISO/profile building: 'build <profile>', 'profile list', and a 'makepkg-check' subcommand that validates the bundled pkgbuild/*.PKGBUILD shape (pkgname/pkgver/pkgrel present). Keep the existing usage/case structure. Update README.md (already references omarchy-iso).",
+    "Phase-4 SigmaOS-dots-configuration (Shell, src/main.sh): extend the existing omadots/chezmoi-inspired script with a declarative dotfile manifest (source->target map) and install/apply/backup/diff subcommands replacing the placeholder echoes; keep 'set -euo pipefail' and the DEST/usage scaffolding. Update README.md.",
+    "Phase-4 SigmaOS-mac-run (Shell, src/main.sh): replace the single echo with an omarchy-mac-inspired shims CLI: 'run <app>' (launch shim + env translation table), 'shim list', 'env list'; keep 'set -euo pipefail'. Update README.md.",
+    "Phase-4 SigmaOS-file-manager-system (Rust, has its own Cargo.toml): in src/lib.rs add a 'fuzzy_score(query: &str, name: &str) -> usize' and a 'FuzzyFinder' struct with find(name)->Vec<(String, usize)> ranked results, zero deps, matching the existing Mount/FileOp/FileManagerBackend style; add inline tests. Update README.md.",
+    "Phase-4 SigmaOS-screen-recorder (Rust, currently has NO Cargo.toml so 'cargo check' resolves up to the umbrella): extend src/lib.rs with CaptureRegion, RecorderConfig, and a Recorder state machine with start/stop; ADD a Cargo.toml mirroring SigmaOS-file-manager-system/Cargo.toml exactly: [package] name = \"sigmaos-screen-recorder\", version = \"0.1.0\", edition = \"2021\"; [lib] path = \"src/lib.rs\"; [dependencies] empty. Add inline tests. Update README.md."
+  ],
+  "acceptance_criteria": [
+    "Phase-3 Rust scaffolds (window-manager, compositor, file-manager): 'cargo check' in each scaffold dir builds that scaffold's own package (NOT the umbrella 'sigmaos') with exit 0; 'cargo test' in each dir passes all inline tests.",
+    "Phase-4 Python scaffolds (packages-kit, packages-tools, quickshell, reel, plugin-marketplace, plugin-registry): 'python3 -m py_compile src/main.py' in each scaffold dir exits 0.",
+    "Phase-4 Shell scaffolds (ISO, dots-configuration, mac-run): 'bash -n src/main.sh' in each scaffold dir exits 0.",
+    "Phase-4 Rust scaffolds (file-manager-system, screen-recorder): 'cargo check' in each scaffold dir builds that scaffold's own package (file-manager-system and sigmaos-screen-recorder respectively, NOT the umbrella) with exit 0.",
+    "Each edited scaffold README.md retains and extends its 'Upstream Reference' section.",
+    "No new external dependencies are added anywhere (zero-dep Rust, stdlib-only Python/Bash)."
+  ],
+  "verification": [
+    "Phase-3 Rust: for d in SigmaOS-window-manager SigmaOS-compositor SigmaOS-file-manager; do (cd .agents/tasks/phase3-desktop/$d && cargo check && cargo test); done  -> all build and tests pass.",
+    "Phase-4 Python: for d in SigmaOS-packages-kit SigmaOS-packages-tools SigmaOS-quickshell SigmaOS-reel SigmaOS-plugin-marketplace SigmaOS-plugin-registry; do (cd .agents/tasks/phase4-components/$d && python3 -m py_compile src/main.py); done  -> all exit 0.",
+    "Phase-4 Shell: for d in SigmaOS-ISO SigmaOS-dots-configuration SigmaOS-mac-run; do (cd .agents/tasks/phase4-components/$d && bash -n src/main.sh); done  -> all exit 0.",
+    "Phase-4 Rust: for d in SigmaOS-file-manager-system SigmaOS-screen-recorder; do (cd .agents/tasks/phase4-components/$d && cargo check); done  -> both build their OWN package (not 'sigmaos') with exit 0. After verification, remove any Cargo.lock produced by 'cargo check' in those dirs so only source is committed.",
+    "Confirm umbrella still green after all scaffold edits: cargo check --lib  -> exit 0 (scaffold edits do not touch the umbrella crate)."
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
