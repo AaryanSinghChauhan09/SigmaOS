@@ -80,3 +80,19 @@
 
 - Risk:
 - Rollback:
+
+## I/O component
+
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] Callback manager
+- [ ] I/O policy
+
+## I/O safety review
+
+- [ ] Interrupt priority levels validated
+- [ ] Buffer in-use protection enforced
+- [ ] DMA memory mapped cleanly without leaks
+- [ ] Zero-copy boundaries verified
