@@ -1,0 +1,20 @@
+[rule.io_completeness]
+description = "Completeness"
+
+[rule.no_leak]
+description = "No leak"
+
+[rule.oom_metric]
+description = "OOM metric"
+
+[rule.interrupt_integrity]
+description = "Interrupt integrity"
+
+[rule.buffer_semantics]
+description = "Buffer semantics"
+
+[rule.no_model_only_status]
+description = "No model only status"
+
+[rule.runtime_evidence]
+description = "Runtime evidence"

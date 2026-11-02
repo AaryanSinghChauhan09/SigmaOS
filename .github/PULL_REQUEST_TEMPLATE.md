@@ -80,3 +80,11 @@
 
 - Risk:
 - Rollback:
+
+- [ ] I/O component specification validated
+- [ ] I/O policy compliance confirmed
+- [ ] Interrupt manager registered and bounded
+- [ ] DMA manager mapped and completed
+- [ ] Buffer manager dirty cache flushing verified
+- [ ] I/O scheduler prioritizes real-time requests
+- [ ] I/O safety review signed off
