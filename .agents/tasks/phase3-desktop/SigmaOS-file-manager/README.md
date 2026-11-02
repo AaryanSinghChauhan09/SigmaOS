@@ -33,3 +33,10 @@ cargo test
 - `FileSearch` — search engine (name + content)
 - `ThumbnailCache` — async thumbnail manager
 - `Bookmark` — sidebar bookmark entry
+
+## Upstream Reference
+
+| Upstream | Concept absorbed |
+|----------|-----------------|
+| [omafind (Omarchy)](https://github.com/basecamp/omarchy) | `fuzzy_score(query, name) -> usize` — subsequence match with consecutive-char bonus; `FileSearch::fuzzy_search(root, query) -> Vec<FuzzyResult>` ranked results |
+| [fzf](https://github.com/junegunn/fzf) | Fuzzy scoring heuristic: exact-prefix > consecutive chars > scattered subsequence |

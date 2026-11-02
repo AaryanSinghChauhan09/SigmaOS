@@ -256,6 +256,7 @@ pub fn layout_of_name(kind: LayoutKind) -> &'static str {
 }
 
 /// A unified layout container (Hyprland-inspired).
+#[derive(Debug)]
 pub enum Layout {
     Dwindle(DwindleLayout),
     MasterStack(MasterStackLayout),

@@ -19,3 +19,10 @@ python3 src/main.py
 ```
 
 Dependencies: `python3 >= 3.10`, `python3-dbus`, `python3-gi`
+
+## Upstream Reference
+
+| Upstream | Concept absorbed |
+|----------|-----------------|
+| [pacman](https://archlinux.org/pacman/) | Transactional install model; topological dependency resolution (Kahn's algorithm); sync/install/remove/verify subcommands |
+| [Arch Linux packaging](https://wiki.archlinux.org/title/Pacman) | Package graph with checksum verification |

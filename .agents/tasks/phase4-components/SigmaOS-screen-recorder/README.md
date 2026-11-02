@@ -15,3 +15,10 @@ cargo build --release
 
 ## License
 MIT — See LICENSE file for details.
+
+## Upstream Reference
+
+| Upstream | Concept absorbed |
+|----------|-----------------|
+| [omareel (Omarchy)](https://github.com/basecamp/omarchy) | `CaptureRegion`, `RecorderConfig`, `Recorder` state machine with `start`/`stop` transitions |
+| [wf-recorder](https://github.com/ammen99/wf-recorder) | Region/display capture model; container + fps configuration |

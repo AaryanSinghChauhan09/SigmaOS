@@ -53,3 +53,11 @@ let config = CompositorConfig::default();
 let compositor = Compositor::new(config)?;
 compositor.run()?;
 ```
+
+## Upstream Reference
+
+| Upstream | Concept absorbed |
+|----------|-----------------|
+| [Hyprland](https://github.com/hyprwm/Hyprland) | `OutputLayoutBinding` — per-output layout kind (Dwindle/MasterStack/Stacking); `switch_layout(&mut self, output, kind)` on `WaylandServer` |
+| [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots) | Output management model; `OutputManager`, `SurfaceManager` |
+| [smithay](https://github.com/Smithay/smithay) | Wayland server state machine; `WaylandServer`, `ClientConnection` |

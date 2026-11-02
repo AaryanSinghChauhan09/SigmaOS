@@ -19,3 +19,9 @@ python3 src/main.py
 ```
 
 Dependencies: `python3 >= 3.10`, `python3-apt`, `python3-gi`, `libgtk-4-dev`
+
+## Upstream Reference
+
+| Upstream | Concept absorbed |
+|----------|-----------------|
+| [pacman](https://archlinux.org/pacman/) | Low-level install/upgrade/verify-sig operations; in-memory package record tracking installed vs available versions |

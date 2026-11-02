@@ -44,3 +44,13 @@ let mut wm = WorkspaceManager::new();
 let ws = wm.create_workspace("main");
 wm.focus_workspace(ws);
 ```
+
+## Upstream Reference
+
+| Upstream | Concept absorbed |
+|----------|-----------------|
+| [Hyprland dwindle layout](https://wiki.hyprland.org/Configuring/Dwindle-Layout/) | `DwindleLayout` — recursive spiral split with alternating axis |
+| [dwm master+stack](https://dwm.suckless.org/) | `MasterStackLayout` — primary master pane + vertical slave stack |
+| [Hyprland](https://github.com/hyprwm/Hyprland) | `LayoutKind` enum (Dwindle/Master/Stacking), `LayoutConfig` (gaps, border_px) |
+
+`src/layout.rs` adds `DwindleLayout`, `MasterStackLayout`, `LayoutConfig`, `LayoutKind`, `Rect`, and `layout_of()`. Wire `pub mod layout;` + `pub use layout::{LayoutConfig, LayoutKind};` are in `src/lib.rs`.

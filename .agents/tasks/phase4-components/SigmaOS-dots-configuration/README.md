@@ -10,3 +10,10 @@ Dotfiles configuration management system providing version-controlled user dotfi
 ```
 sudo ./src/main.sh install
 ```
+
+## Upstream Reference
+
+| Upstream | Concept absorbed |
+|----------|-----------------|
+| [omadots (Omarchy)](https://github.com/basecamp/omarchy) | Declarative dotfile manifest (source->target map); install/apply/backup/diff subcommands |
+| [chezmoi](https://www.chezmoi.io/) | Idempotent re-apply; diff subcommand showing what would change |

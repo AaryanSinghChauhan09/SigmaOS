@@ -19,3 +19,10 @@ python3 src/main.py
 ```
 
 Dependencies: `python3 >= 3.10`, `python3-gi`, `python3-requests`, `libgtk-4-dev`
+
+## Upstream Reference
+
+| Upstream | Concept absorbed |
+|----------|-----------------|
+| [Arch User Repository (AUR)](https://aur.archlinux.org/) | Trusted community catalogue with trust_score and votes; search/install model |
+| [Omarchy Plugin Marketplace](https://github.com/basecamp/omarchy) | Decentralised community widget/extension discovery |
