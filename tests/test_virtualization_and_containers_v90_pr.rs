@@ -29,20 +29,36 @@ fn test_integration_sub_engines_v90() {
     let mut gateway = SovereignVirtualizationAndContainersParityV90Gateway::new();
 
     // 1. KVM/QEMU
-    let vm = gateway.kvm_qemu.launch_kvm_vm("vm_integration", 4, 4096, ConfidentialModeV90::IntelTdx);
+    let vm =
+        gateway
+            .kvm_qemu
+            .launch_kvm_vm("vm_integration", 4, 4096, ConfidentialModeV90::IntelTdx);
     assert_eq!(vm.confidential_mode, ConfidentialModeV90::IntelTdx);
-    let attestation = gateway.kvm_qemu.generate_confidential_attestation_report("vm_integration").unwrap();
+    let attestation = gateway
+        .kvm_qemu
+        .generate_confidential_attestation_report("vm_integration")
+        .unwrap();
     assert!(attestation.contains("INTEL_TDX_QUOTE"));
 
     // 2. Libvirt Domain
-    let dom = gateway.libvirt.parse_domain_xml("<domain type='kvm'><name>dom_integration</name></domain>");
+    let dom = gateway
+        .libvirt
+        .parse_domain_xml("<domain type='kvm'><name>dom_integration</name></domain>");
     assert_eq!(dom.domain_name, "dom_integration");
-    assert!(gateway.libvirt.transition_domain_state("dom_integration", LibvirtDomainStateV90::Suspended).is_ok());
+    assert!(gateway
+        .libvirt
+        .transition_domain_state("dom_integration", LibvirtDomainStateV90::Suspended)
+        .is_ok());
 
     // 3. Xen Hypervisor
-    let guest = gateway.xen.create_domu_guest(10, "xen_domu", XenGuestModeV90::Pv, 512);
+    let guest = gateway
+        .xen
+        .create_domu_guest(10, "xen_domu", XenGuestModeV90::Pv, 512);
     assert_eq!(guest.domid, 10);
-    assert!(gateway.xen.write_xenstore_key(10, "ip", "10.0.0.10").is_ok());
+    assert!(gateway
+        .xen
+        .write_xenstore_key(10, "ip", "10.0.0.10")
+        .is_ok());
 
     // 4. VirtualBox / bhyve / OpenBSD vmd
     let bhyve = gateway.vbox_bhyve_vmm.spawn_bhyve_vm("bhyve1", 2, 1024);
@@ -56,18 +72,26 @@ fn test_integration_sub_engines_v90() {
     assert!(sec_eval.contains("SECCOMP_DEFAULT_STRICT_PASSED"));
 
     // 6. LXC / LXD / systemd-nspawn
-    let incus = gateway.system_containers.create_incus_instance("incus1", "ovn-net-main");
+    let incus = gateway
+        .system_containers
+        .create_incus_instance("incus1", "ovn-net-main");
     assert_eq!(incus.engine_type, "incus");
     assert!(incus.idmapped_mounts);
 
     // 7. FreeBSD Jails & Illumos Zones
-    let jail = gateway.freebsd_illumos.create_vnet_jail("jail_v90", "/jails/v90", "epair0a");
+    let jail = gateway
+        .freebsd_illumos
+        .create_vnet_jail("jail_v90", "/jails/v90", "epair0a");
     assert_eq!(jail.vnet_interface, "epair0a");
 
     // 8. K8s / K3s / Rancher Harvester
-    let pod = gateway.k8s_rancher.deploy_pod("kube-system", "coredns", "containerd");
+    let pod = gateway
+        .k8s_rancher
+        .deploy_pod("kube-system", "coredns", "containerd");
     assert_eq!(pod.pod_name, "coredns");
-    assert!(gateway.k8s_rancher.verify_pod_ebpf_policy("kube-system", "coredns"));
+    assert!(gateway
+        .k8s_rancher
+        .verify_pod_ebpf_policy("kube-system", "coredns"));
 
     // 9. Firecracker / Cloud-Hypervisor
     let mvm = gateway.microvms.spawn_firecracker_microvm("fvm1", 1, 64);

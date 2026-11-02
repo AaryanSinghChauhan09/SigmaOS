@@ -109,7 +109,10 @@ impl KvmQemuV90Engine {
     pub fn trigger_live_migration(&mut self, name: &str, target_host: &str) -> String {
         if let Some(vm) = self.active_vms.get_mut(name) {
             vm.state = KvmVmStateV90::Migrating;
-            format!("Live migration for VM '{}' to host '{}' initiated via QMP/io_uring ring stream", name, target_host)
+            format!(
+                "Live migration for VM '{}' to host '{}' initiated via QMP/io_uring ring stream",
+                name, target_host
+            )
         } else {
             format!("VM '{}' not found", name)
         }
@@ -118,10 +121,21 @@ impl KvmQemuV90Engine {
     pub fn generate_confidential_attestation_report(&self, name: &str) -> Result<String, String> {
         match self.active_vms.get(name) {
             Some(vm) => match vm.confidential_mode {
-                ConfidentialModeV90::AmdSevSnp => Ok(format!("AMD_SEV_SNP_REPORT[vm={},vcpus={},measurement=0xbeef42]", vm.vm_name, vm.vcpus)),
-                ConfidentialModeV90::IntelTdx => Ok(format!("INTEL_TDX_QUOTE[vm={},vcpus={},mrtd=0xdeadbeef]", vm.vm_name, vm.vcpus)),
-                ConfidentialModeV90::ArmRealm => Ok(format!("ARM_CCA_REALM_TOKEN[vm={},vcpus={},rem=0xcafe1234]", vm.vm_name, vm.vcpus)),
-                ConfidentialModeV90::None => Err(format!("VM '{}' is not running in confidential mode", name)),
+                ConfidentialModeV90::AmdSevSnp => Ok(format!(
+                    "AMD_SEV_SNP_REPORT[vm={},vcpus={},measurement=0xbeef42]",
+                    vm.vm_name, vm.vcpus
+                )),
+                ConfidentialModeV90::IntelTdx => Ok(format!(
+                    "INTEL_TDX_QUOTE[vm={},vcpus={},mrtd=0xdeadbeef]",
+                    vm.vm_name, vm.vcpus
+                )),
+                ConfidentialModeV90::ArmRealm => Ok(format!(
+                    "ARM_CCA_REALM_TOKEN[vm={},vcpus={},rem=0xcafe1234]",
+                    vm.vm_name, vm.vcpus
+                )),
+                ConfidentialModeV90::None => {
+                    Err(format!("VM '{}' is not running in confidential mode", name))
+                }
             },
             None => Err(format!("VM '{}' not found", name)),
         }
@@ -172,7 +186,13 @@ impl LibvirtDomainV90Engine {
 
     pub fn parse_domain_xml(&mut self, xml_data: &str) -> LibvirtDomainSpecV90 {
         let name = if xml_data.contains("<name>") {
-            xml_data.split("<name>").nth(1).unwrap_or("default").split("</name>").next().unwrap_or("default")
+            xml_data
+                .split("<name>")
+                .nth(1)
+                .unwrap_or("default")
+                .split("</name>")
+                .next()
+                .unwrap_or("default")
         } else {
             "default-domain"
         };
@@ -199,7 +219,11 @@ impl LibvirtDomainV90Engine {
         }
     }
 
-    pub fn transition_domain_state(&mut self, name: &str, new_state: LibvirtDomainStateV90) -> Result<(), String> {
+    pub fn transition_domain_state(
+        &mut self,
+        name: &str,
+        new_state: LibvirtDomainStateV90,
+    ) -> Result<(), String> {
         if let Some(dom) = self.domains.get_mut(name) {
             dom.state = new_state;
             Ok(())
@@ -241,7 +265,13 @@ impl XenHypervisorV90Engine {
         }
     }
 
-    pub fn create_domu_guest(&mut self, domid: u32, name: &str, mode: XenGuestModeV90, grant_frames: u32) -> XenGuestSpecV90 {
+    pub fn create_domu_guest(
+        &mut self,
+        domid: u32,
+        name: &str,
+        mode: XenGuestModeV90,
+        grant_frames: u32,
+    ) -> XenGuestSpecV90 {
         let mut xs = BTreeMap::new();
         xs.insert("name".to_string(), name.to_string());
         xs.insert("domid".to_string(), domid.to_string());
@@ -265,7 +295,9 @@ impl XenHypervisorV90Engine {
 
     pub fn write_xenstore_key(&mut self, domid: u32, key: &str, value: &str) -> Result<(), String> {
         if let Some(guest) = self.guests.get_mut(&domid) {
-            guest.xenstore_entries.insert(key.to_string(), value.to_string());
+            guest
+                .xenstore_entries
+                .insert(key.to_string(), value.to_string());
             Ok(())
         } else {
             Err(format!("Guest DomID {} not found", domid))
@@ -365,7 +397,12 @@ impl OciDockerPodmanRuncV90Engine {
         }
     }
 
-    pub fn run_podman_rootless(&mut self, container_id: &str, image: &str, mem_mb: u64) -> OciContainerSpecV90 {
+    pub fn run_podman_rootless(
+        &mut self,
+        container_id: &str,
+        image: &str,
+        mem_mb: u64,
+    ) -> OciContainerSpecV90 {
         let spec = OciContainerSpecV90 {
             container_id: container_id.to_string(),
             image: image.to_string(),
@@ -379,7 +416,8 @@ impl OciDockerPodmanRuncV90Engine {
                 "CAP_SYS_PTRACE".to_string(),
             ],
         };
-        self.containers.insert(container_id.to_string(), spec.clone());
+        self.containers
+            .insert(container_id.to_string(), spec.clone());
         spec
     }
 
@@ -425,7 +463,11 @@ impl LxcLxdNspawnV90Engine {
         }
     }
 
-    pub fn spawn_nspawn_chroot(&mut self, instance_name: &str, rootfs: &str) -> SystemContainerSpecV90 {
+    pub fn spawn_nspawn_chroot(
+        &mut self,
+        instance_name: &str,
+        rootfs: &str,
+    ) -> SystemContainerSpecV90 {
         let spec = SystemContainerSpecV90 {
             instance_name: instance_name.to_string(),
             engine_type: "nspawn".to_string(),
@@ -434,11 +476,16 @@ impl LxcLxdNspawnV90Engine {
             machinectl_registered: true,
             idmapped_mounts: true,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 
-    pub fn create_incus_instance(&mut self, instance_name: &str, ovn_net: &str) -> SystemContainerSpecV90 {
+    pub fn create_incus_instance(
+        &mut self,
+        instance_name: &str,
+        ovn_net: &str,
+    ) -> SystemContainerSpecV90 {
         let spec = SystemContainerSpecV90 {
             instance_name: instance_name.to_string(),
             engine_type: "incus".to_string(),
@@ -447,7 +494,8 @@ impl LxcLxdNspawnV90Engine {
             machinectl_registered: false,
             idmapped_mounts: true,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 }
@@ -502,7 +550,12 @@ impl FreeBsdJailsZonesV90Engine {
         jail
     }
 
-    pub fn create_illumos_zone(&mut self, name: &str, brand: &str, mem_mb: u64) -> IllumosZoneSpecV90 {
+    pub fn create_illumos_zone(
+        &mut self,
+        name: &str,
+        brand: &str,
+        mem_mb: u64,
+    ) -> IllumosZoneSpecV90 {
         let zone = IllumosZoneSpecV90 {
             name: name.to_string(),
             brand: brand.to_string(),
@@ -555,12 +608,16 @@ impl KubernetesK3sRancherV90Engine {
     }
 
     pub fn map_harvester_vm(&mut self, vm_name: &str, pod_name: &str) {
-        self.harvester_vm_mappings.insert(vm_name.to_string(), pod_name.to_string());
+        self.harvester_vm_mappings
+            .insert(vm_name.to_string(), pod_name.to_string());
     }
 
     pub fn verify_pod_ebpf_policy(&self, namespace: &str, name: &str) -> bool {
         let key = format!("{}/{}", namespace, name);
-        self.pods.get(&key).map(|p| p.ebpf_cni_enabled).unwrap_or(false)
+        self.pods
+            .get(&key)
+            .map(|p| p.ebpf_cni_enabled)
+            .unwrap_or(false)
     }
 }
 
@@ -590,7 +647,12 @@ impl FirecrackerCloudHypervisorV90Engine {
         }
     }
 
-    pub fn spawn_firecracker_microvm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV90 {
+    pub fn spawn_firecracker_microvm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV90 {
         let mvm = MicroVmSpecV90 {
             microvm_id: id.to_string(),
             vcpus,
@@ -604,7 +666,12 @@ impl FirecrackerCloudHypervisorV90Engine {
         mvm
     }
 
-    pub fn spawn_cloud_hypervisor_vm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV90 {
+    pub fn spawn_cloud_hypervisor_vm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV90 {
         let mvm = MicroVmSpecV90 {
             microvm_id: id.to_string(),
             vcpus,
@@ -667,7 +734,12 @@ impl GvisorKataAppleHvV90Engine {
         spec
     }
 
-    pub fn launch_apple_hv_guest(&mut self, id: &str, _mem_mb: u64, rosetta: bool) -> SecureSandboxSpecV90 {
+    pub fn launch_apple_hv_guest(
+        &mut self,
+        id: &str,
+        _mem_mb: u64,
+        rosetta: bool,
+    ) -> SecureSandboxSpecV90 {
         let spec = SecureSandboxSpecV90 {
             sandbox_id: id.to_string(),
             technology: "apple_hypervisor".to_string(),
@@ -698,7 +770,8 @@ pub struct SovereignVirtualizationAndContainersParityV90Gateway {
 }
 
 pub type VirtualBoxBhyveVmmV90EngineAlias = VirtualBoxBhyveVmmV90Engine;
-pub type SovereignVirtualizationAndContainersV90PrGatewayEngine = SovereignVirtualizationAndContainersParityV90Gateway;
+pub type SovereignVirtualizationAndContainersV90PrGatewayEngine =
+    SovereignVirtualizationAndContainersParityV90Gateway;
 
 impl SovereignVirtualizationAndContainersParityV90Gateway {
     pub fn new() -> Self {
@@ -853,12 +926,21 @@ impl SovereignVirtualizationAndContainersParityV90Gateway {
 
     pub fn generate_pr_markdown_summary(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut out = String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v90)\n\n");
+        let mut out =
+            String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v90)\n\n");
         out.push_str("| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier | PQC Signature |\n");
         out.push_str("|-------|-------|----------|--------------|-------------------|----------------|---------------|\n");
         for p in &proposals {
-            out.push_str(&format!("| PR #{} | {} | {} | {}ms | {}% | {} | {} |\n",
-                p.pr_id, p.title, p.category, p.boot_latency_ms, p.overhead_reduction_pct, p.isolation_tier, p.pqc_dilithium5_signature));
+            out.push_str(&format!(
+                "| PR #{} | {} | {} | {}ms | {}% | {} | {} |\n",
+                p.pr_id,
+                p.title,
+                p.category,
+                p.boot_latency_ms,
+                p.overhead_reduction_pct,
+                p.isolation_tier,
+                p.pqc_dilithium5_signature
+            ));
         }
         out
     }
@@ -881,7 +963,9 @@ mod tests {
         assert_eq!(vm.confidential_mode, ConfidentialModeV90::AmdSevSnp);
         let mig = engine.trigger_live_migration("vm1", "node-b");
         assert!(mig.contains("node-b"));
-        let report = engine.generate_confidential_attestation_report("vm1").unwrap();
+        let report = engine
+            .generate_confidential_attestation_report("vm1")
+            .unwrap();
         assert!(report.contains("AMD_SEV_SNP_REPORT"));
     }
 
@@ -893,7 +977,9 @@ mod tests {
         let summary = engine.generate_domain_summary("test-dom");
         assert!(summary.contains("test-dom"));
         assert!(summary.contains("Running"));
-        assert!(engine.transition_domain_state("test-dom", LibvirtDomainStateV90::Paused).is_ok());
+        assert!(engine
+            .transition_domain_state("test-dom", LibvirtDomainStateV90::Paused)
+            .is_ok());
     }
 
     #[test]
