@@ -1,14 +1,6 @@
-# SigmaOS pull request
-
 ## Summary
 
-<!-- What behavior changed and why? -->
-
-## Component impact
-
-- Component/repository:
-- User-visible behavior:
-- Related issue or plan:
+<!-- What shell behavior changed and why? -->
 
 ## Shell component
 
@@ -42,33 +34,20 @@
 - [ ] Monthly security review
 - [ ] Quarterly release/UX/performance review
 
-## Upstream study and reference behavior
+## Reference behavior
 
-- Reference study:
-- Upstream project, document, or behavior reviewed:
+<!-- Required for compatibility or grammar changes -->
+
 - POSIX section:
 - Bash/dash/Zsh/BusyBox reference:
 - SigmaOS current behavior:
-- What SigmaOS adopts:
-- What remains intentionally different:
+- New behavior:
 - Compatibility impact:
 
-## Risks and rollback
+## Changes
 
-- Risks and rollback:
-- Recovery or downgrade procedure:
-
-## IPC handler
-
-- [ ] This change affects IPC handler behavior, or I confirm it does not.
-- IPC semantics:
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-
-## Security review
-
-- Kernel safety review:
+-
+-
 
 ## Shell safety review
 
@@ -80,35 +59,27 @@
 - [ ] No unbounded recursion or allocation
 - [ ] Interactive terminal state is restored
 - [ ] Script mode does not execute invalid partial input
-- Capability/namespace checks enforced:
-- Shared-memory or descriptor implications:
-- Input validation and failure behavior:
-- Rollback or downgrade path:
 
-## Verification
+## Evidence
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] Focused unit tests pass.
 - [ ] New/updated shell tests
 - [ ] POSIX/conformance test evidence
 - [ ] Fuzz target or documented exemption
 - [ ] Boot-to-shell evidence, if boot-affecting
 - [ ] Security review requested, if applicable
-- [ ] Documentation and wiki mirrors updated where applicable.
-- Test/evidence commands:
-- Results:
 
-## Capability status
+## Status updates
 
-- Current status:
-- Evidence supporting the status:
-- Claims intentionally left partial:
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Shell documentation
+- [ ] Boot matrix, if applicable
 
-## Integration impact
+## Risks and rollback
 
-- APIs, ABI, protocols, or file formats affected:
-- Cross-repository synchronization required:
-- Release or migration notes:
+- Risk:
+- Rollback:
