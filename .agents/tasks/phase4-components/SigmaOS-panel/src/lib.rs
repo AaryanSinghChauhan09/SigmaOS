@@ -1,202 +1,177 @@
-//! SigmaOS Panel — desktop status bar with applets, indicators, and tray support.
+//! SigmaOS Panel
 //!
-//! Wayland layer-shell-based panel providing system info widgets, workspace
-//! indicators, notification badge, and an extensible applet plugin API.
+//! Desktop status bar / panel with an applet registry and IPC-ready
+//! message bus stub. Mirrors the Waybar / GNOME Shell panel model.
+//! Upstream: Waybar (https://github.com/Alexays/Waybar),
+//!           GNOME Shell panel (https://gitlab.gnome.org/GNOME/gnome-shell)
 
-#![allow(dead_code)]
+use std::collections::HashMap;
 
-use std::collections::BTreeMap;
-use std::fmt;
+/// Position of the panel on screen.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PanelPosition { Top, Bottom }
 
-// ---------------------------------------------------------------------------
-// Applet position
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum PanelEdge {
-    Top,
-    Bottom,
-    Left,
-    Right,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AppletZone {
-    Start,   // left / top
-    Center,
-    End,     // right / bottom
-}
-
-// ---------------------------------------------------------------------------
-// Applet
-// ---------------------------------------------------------------------------
-
+/// A panel applet with a rendered label / icon string.
 #[derive(Debug, Clone)]
-pub struct AppletInfo {
-    pub id: String,
-    pub label: String,
-    pub zone: AppletZone,
-    pub visible: bool,
-    pub priority: u32,   // lower = earlier in zone
+pub struct Applet {
+    pub id:       String,
+    pub label:    String,
+    pub tooltip:  String,
+    pub visible:  bool,
+    pub priority: u8,   // lower = displayed first (left-to-right)
 }
 
-impl AppletInfo {
-    pub fn new(id: impl Into<String>, label: impl Into<String>, zone: AppletZone) -> Self {
-        Self { id: id.into(), label: label.into(), zone, visible: true, priority: 50 }
+impl Applet {
+    pub fn new(id: &str, label: &str, priority: u8) -> Self {
+        Self {
+            id:      id.to_owned(),
+            label:   label.to_owned(),
+            tooltip: String::new(),
+            visible: true,
+            priority,
+        }
     }
+    pub fn tooltip(mut self, t: &str) -> Self { self.tooltip = t.to_owned(); self }
+    pub fn hidden(mut self) -> Self { self.visible = false; self }
 }
 
-// ---------------------------------------------------------------------------
-// Built-in applets
-// ---------------------------------------------------------------------------
-
-fn default_applets() -> Vec<AppletInfo> {
-    vec![
-        AppletInfo { id: "launcher".into(), label: "⊞ SigmaOS".into(), zone: AppletZone::Start, visible: true, priority: 10 },
-        AppletInfo { id: "workspace-switcher".into(), label: "Workspaces".into(), zone: AppletZone::Start, visible: true, priority: 20 },
-        AppletInfo { id: "app-list".into(), label: "Windows".into(), zone: AppletZone::Center, visible: true, priority: 50 },
-        AppletInfo { id: "notification-bell".into(), label: "🔔".into(), zone: AppletZone::End, visible: true, priority: 10 },
-        AppletInfo { id: "network".into(), label: "📶".into(), zone: AppletZone::End, visible: true, priority: 20 },
-        AppletInfo { id: "audio".into(), label: "🔊".into(), zone: AppletZone::End, visible: true, priority: 30 },
-        AppletInfo { id: "battery".into(), label: "🔋".into(), zone: AppletZone::End, visible: true, priority: 40 },
-        AppletInfo { id: "clock".into(), label: "00:00".into(), zone: AppletZone::End, visible: true, priority: 50 },
-        AppletInfo { id: "systray".into(), label: "Tray".into(), zone: AppletZone::End, visible: true, priority: 60 },
-    ]
+/// Panel message passed over IPC.
+#[derive(Debug, Clone)]
+pub struct PanelMessage {
+    pub applet_id: String,
+    pub payload:   String,
 }
 
-// ---------------------------------------------------------------------------
-// Panel
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PanelState {
-    Initializing,
-    Running,
-    Hidden,
-    Stopped,
-}
-
+/// The panel itself: holds the applet registry and IPC queue.
 pub struct Panel {
-    pub edge: PanelEdge,
+    pub position:  PanelPosition,
     pub height_px: u32,
-    pub state: PanelState,
-    applets: Vec<AppletInfo>,
+    applets:       HashMap<String, Applet>,
+    messages:      Vec<PanelMessage>,
 }
 
 impl Panel {
-    pub fn new(edge: PanelEdge) -> Self {
+    pub fn new(position: PanelPosition, height_px: u32) -> Self {
         Self {
-            edge,
-            height_px: 36,
-            state: PanelState::Initializing,
-            applets: default_applets(),
+            position,
+            height_px,
+            applets:  HashMap::new(),
+            messages: Vec::new(),
         }
     }
 
-    pub fn start(&mut self) {
-        self.state = PanelState::Running;
+    /// Register an applet with the panel.
+    pub fn register(&mut self, applet: Applet) -> bool {
+        if self.applets.contains_key(&applet.id) {
+            return false;  // already registered
+        }
+        self.applets.insert(applet.id.clone(), applet);
+        true
     }
 
-    pub fn hide(&mut self) {
-        self.state = PanelState::Hidden;
+    /// Unregister an applet by ID.
+    pub fn unregister(&mut self, id: &str) -> bool {
+        self.applets.remove(id).is_some()
     }
 
-    pub fn stop(&mut self) {
-        self.state = PanelState::Stopped;
-    }
-
-    /// Add a custom applet.
-    pub fn add_applet(&mut self, applet: AppletInfo) {
-        self.applets.retain(|a| a.id != applet.id);
-        self.applets.push(applet);
-    }
-
-    /// Remove an applet by id.
-    pub fn remove_applet(&mut self, id: &str) -> bool {
-        let before = self.applets.len();
-        self.applets.retain(|a| a.id != id);
-        self.applets.len() < before
-    }
-
-    /// Get applets in a zone, sorted by priority.
-    pub fn applets_in(&self, zone: AppletZone) -> Vec<&AppletInfo> {
-        let mut v: Vec<&AppletInfo> = self.applets.iter()
-            .filter(|a| a.zone == zone && a.visible)
+    /// Return visible applets ordered by priority.
+    pub fn visible_applets(&self) -> Vec<&Applet> {
+        let mut v: Vec<&Applet> = self.applets.values()
+            .filter(|a| a.visible)
             .collect();
         v.sort_by_key(|a| a.priority);
         v
     }
 
-    pub fn applet_count(&self) -> usize {
-        self.applets.len()
+    /// Post a message from an applet (IPC stub).
+    pub fn post(&mut self, applet_id: &str, payload: &str) -> bool {
+        if !self.applets.contains_key(applet_id) {
+            return false;
+        }
+        self.messages.push(PanelMessage {
+            applet_id: applet_id.to_owned(),
+            payload:   payload.to_owned(),
+        });
+        true
     }
 
-    /// Render a simple text layout of the panel (for testing without Wayland).
-    pub fn render_text(&self) -> String {
-        let start: Vec<_> = self.applets_in(AppletZone::Start).iter().map(|a| a.label.as_str()).collect();
-        let center: Vec<_> = self.applets_in(AppletZone::Center).iter().map(|a| a.label.as_str()).collect();
-        let end: Vec<_> = self.applets_in(AppletZone::End).iter().map(|a| a.label.as_str()).collect();
-        format!("[{}] | [{}] | [{}]",
-            start.join(" "), center.join(" "), end.join(" "))
+    pub fn applet_count(&self) -> usize { self.applets.len() }
+    pub fn message_count(&self) -> usize { self.messages.len() }
+
+    /// Render the panel as a simple string (for headless/debug use).
+    pub fn render(&self) -> String {
+        self.visible_applets()
+            .iter()
+            .map(|a| format!("[{}]", a.label))
+            .collect::<Vec<_>>()
+            .join(" | ")
     }
 }
 
-// ---------------------------------------------------------------------------
-// Entry point
-// ---------------------------------------------------------------------------
-
-pub fn init_panel(edge: PanelEdge) -> Panel {
-    let mut p = Panel::new(edge);
-    p.start();
-    p
+pub fn init() {
+    let mut panel = Panel::new(PanelPosition::Top, 30);
+    panel.register(Applet::new("clock",      "12:00",   10));
+    panel.register(Applet::new("workspaces", "1 2 3",    1));
+    panel.register(Applet::new("battery",    "🔋 80%", 20));
+    println!("[panel] {}", panel.render());
 }
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn panel_starts_with_default_applets() {
-        let p = init_panel(PanelEdge::Top);
-        assert!(p.applet_count() > 0);
-        assert_eq!(p.state, PanelState::Running);
+    fn register_and_count() {
+        let mut p = Panel::new(PanelPosition::Top, 30);
+        assert!(p.register(Applet::new("clock", "12:00", 10)));
+        assert_eq!(p.applet_count(), 1);
+        // Duplicate rejected
+        assert!(!p.register(Applet::new("clock", "13:00", 10)));
+        assert_eq!(p.applet_count(), 1);
     }
 
     #[test]
-    fn applets_in_zone_sorted_by_priority() {
-        let p = init_panel(PanelEdge::Top);
-        let end = p.applets_in(AppletZone::End);
-        assert!(!end.is_empty());
-        // priority ascending
-        assert!(end.windows(2).all(|w| w[0].priority <= w[1].priority));
+    fn unregister() {
+        let mut p = Panel::new(PanelPosition::Top, 30);
+        p.register(Applet::new("tray", "🖥", 5));
+        assert!(p.unregister("tray"));
+        assert!(!p.unregister("tray"));
     }
 
     #[test]
-    fn add_and_remove_applet() {
-        let mut p = init_panel(PanelEdge::Bottom);
-        let initial = p.applet_count();
-        p.add_applet(AppletInfo::new("test-applet", "Test", AppletZone::Center));
-        assert_eq!(p.applet_count(), initial + 1);
-        assert!(p.remove_applet("test-applet"));
-        assert_eq!(p.applet_count(), initial);
+    fn visible_ordering() {
+        let mut p = Panel::new(PanelPosition::Top, 30);
+        p.register(Applet::new("z-last",  "Z", 99));
+        p.register(Applet::new("a-first", "A",  1));
+        p.register(Applet::new("m-mid",   "M", 50));
+        let ids: Vec<&str> = p.visible_applets().iter().map(|a| a.id.as_str()).collect();
+        assert_eq!(ids, ["a-first", "m-mid", "z-last"]);
     }
 
     #[test]
-    fn render_text_contains_applet_labels() {
-        let p = init_panel(PanelEdge::Top);
-        let rendered = p.render_text();
-        assert!(rendered.contains("SigmaOS") || rendered.contains("⊞"));
+    fn hidden_applet_excluded() {
+        let mut p = Panel::new(PanelPosition::Bottom, 24);
+        p.register(Applet::new("visible", "V", 1));
+        p.register(Applet::new("hidden", "H", 2).hidden());
+        assert_eq!(p.visible_applets().len(), 1);
     }
 
     #[test]
-    fn panel_edge_variants() {
-        for edge in [PanelEdge::Top, PanelEdge::Bottom, PanelEdge::Left, PanelEdge::Right] {
-            let p = Panel::new(edge);
-            assert_eq!(p.edge, edge);
-        }
+    fn post_message() {
+        let mut p = Panel::new(PanelPosition::Top, 30);
+        p.register(Applet::new("battery", "🔋", 20));
+        assert!(p.post("battery", r#"{"level":80}"#));
+        assert!(!p.post("unknown", "data"));
+        assert_eq!(p.message_count(), 1);
+    }
+
+    #[test]
+    fn render_output() {
+        let mut p = Panel::new(PanelPosition::Top, 30);
+        p.register(Applet::new("ws",    "1 2",  1));
+        p.register(Applet::new("clock", "9:00", 2));
+        let rendered = p.render();
+        assert!(rendered.contains("1 2"));
+        assert!(rendered.contains("9:00"));
     }
 }
