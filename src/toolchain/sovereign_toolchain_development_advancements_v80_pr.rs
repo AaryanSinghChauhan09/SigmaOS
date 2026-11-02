@@ -55,16 +55,16 @@ pub struct ToolchainDevelopmentPrProposalManifestV80 {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainOptModeV80 {
     ClearLinuxO3,  // Clear Linux AVX-512/FMV auto-tuning (-O3 -march=x86-64-v4 -ffast-math)
-    CachyOsBore,   // CachyOS BORE scheduler & LTO/PGO profile optimization (-O3 -flto=thin -fprofile-use)
+    CachyOsBore, // CachyOS BORE scheduler & LTO/PGO profile optimization (-O3 -flto=thin -fprofile-use)
     GentooUseFlag, // Gentoo Portage USE flag conditioned optimization (-march=native -pipe)
-    StandardO2,    // Standard distro optimization (-O2 -mtune=generic)
+    StandardO2,  // Standard distro optimization (-O2 -mtune=generic)
 }
 
 /// Hardening profile inspired by Linux & BSD security posture (V80).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainHardeningModeV80 {
-    FedoraFortifyLevel3,   // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection -fcf-protection=full)
-    OpenBsdRetguardIbt,    // OpenBSD RETGUARD shadow stack & Intel CET / IBT indirect branch tracking
+    FedoraFortifyLevel3, // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection -fcf-protection=full)
+    OpenBsdRetguardIbt,  // OpenBSD RETGUARD shadow stack & Intel CET / IBT indirect branch tracking
     StandardFortifyLevel2, // Standard Ubuntu/Debian hardening (-D_FORTIFY_SOURCE=2 -fstack-protector-strong)
     None,
 }
@@ -177,8 +177,15 @@ impl GccClangLlvmToolchainV80Engine {
         ]
     }
 
-    pub fn generate_mold_response_file(&self, output_elf: &str, objects: &[&str], shared_libs: &[&str]) -> String {
-        let mut rsp = format!("-o {output_elf}\n--threads\n--icf=safe\n--pack-dyn-relocs=relr\n-z now\n-z relro\n");
+    pub fn generate_mold_response_file(
+        &self,
+        output_elf: &str,
+        objects: &[&str],
+        shared_libs: &[&str],
+    ) -> String {
+        let mut rsp = format!(
+            "-o {output_elf}\n--threads\n--icf=safe\n--pack-dyn-relocs=relr\n-z now\n-z relro\n"
+        );
         for obj in objects {
             rsp.push_str(&format!("{obj}\n"));
         }
@@ -193,7 +200,9 @@ impl GccClangLlvmToolchainV80Engine {
             return 0;
         }
         // CTF magic check: 0xf2 0xd9 or 0xd9 0xf2
-        if (ctf_data[0] == 0xf2 && ctf_data[1] == 0xd9) || (ctf_data[0] == 0xd9 && ctf_data[1] == 0xf2) {
+        if (ctf_data[0] == 0xf2 && ctf_data[1] == 0xd9)
+            || (ctf_data[0] == 0xd9 && ctf_data[1] == 0xf2)
+        {
             ctf_data.len() / 16
         } else {
             0
@@ -216,21 +225,32 @@ impl GccClangLlvmToolchainV80Engine {
     ) -> CompilerProfileResultV80 {
         let (opt_flags, speedup): (Vec<String>, u32) = match opt {
             ToolchainOptModeV80::ClearLinuxO3 => (
-                vec!["-O3".to_string(), "-march=x86-64-v4".to_string(), "-ffast-math".to_string()],
+                vec![
+                    "-O3".to_string(),
+                    "-march=x86-64-v4".to_string(),
+                    "-ffast-math".to_string(),
+                ],
                 42,
             ),
             ToolchainOptModeV80::CachyOsBore => (
-                vec!["-O3".to_string(), "-flto=thin".to_string(), "-fprofile-use".to_string()],
+                vec![
+                    "-O3".to_string(),
+                    "-flto=thin".to_string(),
+                    "-fprofile-use".to_string(),
+                ],
                 38,
             ),
             ToolchainOptModeV80::GentooUseFlag => (
-                vec!["-O2".to_string(), "-march=native".to_string(), "-pipe".to_string()],
+                vec![
+                    "-O2".to_string(),
+                    "-march=native".to_string(),
+                    "-pipe".to_string(),
+                ],
                 25,
             ),
-            ToolchainOptModeV80::StandardO2 => (
-                vec!["-O2".to_string(), "-mtune=generic".to_string()],
-                15,
-            ),
+            ToolchainOptModeV80::StandardO2 => {
+                (vec!["-O2".to_string(), "-mtune=generic".to_string()], 15)
+            }
         };
 
         let (hardening_flags, penalty): (Vec<String>, u32) = match hardening {
@@ -251,16 +271,25 @@ impl GccClangLlvmToolchainV80Engine {
                 3,
             ),
             ToolchainHardeningModeV80::StandardFortifyLevel2 => (
-                vec!["-D_FORTIFY_SOURCE=2".to_string(), "-fstack-protector-strong".to_string()],
+                vec![
+                    "-D_FORTIFY_SOURCE=2".to_string(),
+                    "-fstack-protector-strong".to_string(),
+                ],
                 1,
             ),
             ToolchainHardeningModeV80::None => (vec![], 0),
         };
 
         let linker_flags = match self.default_linker {
-            LinkerSelectionV80::Mold => vec!["-fuse-ld=mold".to_string(), "-Wl,--threads".to_string()],
-            LinkerSelectionV80::Lld => vec!["-fuse-ld=lld".to_string(), "-Wl,--icf=all".to_string()],
-            LinkerSelectionV80::Gold => vec!["-fuse-ld=gold".to_string(), "-Wl,--threads".to_string()],
+            LinkerSelectionV80::Mold => {
+                vec!["-fuse-ld=mold".to_string(), "-Wl,--threads".to_string()]
+            }
+            LinkerSelectionV80::Lld => {
+                vec!["-fuse-ld=lld".to_string(), "-Wl,--icf=all".to_string()]
+            }
+            LinkerSelectionV80::Gold => {
+                vec!["-fuse-ld=gold".to_string(), "-Wl,--threads".to_string()]
+            }
             LinkerSelectionV80::Bfd => vec!["-fuse-ld=bfd".to_string()],
         };
 
@@ -357,7 +386,10 @@ impl BuildSystemsAndPkgConfigV80Engine {
             }
         } else if expr.starts_with("$<BOOL:") && expr.ends_with('>') {
             let inner = &expr[7..expr.len() - 1];
-            if inner == "1" || inner.eq_ignore_ascii_case("TRUE") || inner.eq_ignore_ascii_case("ON") {
+            if inner == "1"
+                || inner.eq_ignore_ascii_case("TRUE")
+                || inner.eq_ignore_ascii_case("ON")
+            {
                 "1".to_string()
             } else {
                 "0".to_string()
@@ -400,11 +432,23 @@ impl BuildSystemsAndPkgConfigV80Engine {
         false
     }
 
-    pub fn ninja_generate_compilation_db(&self, nodes: &[NinjaBuildGraphNodeV80], directory: &str) -> String {
+    pub fn ninja_generate_compilation_db(
+        &self,
+        nodes: &[NinjaBuildGraphNodeV80],
+        directory: &str,
+    ) -> String {
         let mut json = String::from("[\n");
         for (i, node) in nodes.iter().enumerate() {
-            let file = node.inputs.first().map(|s| s.as_str()).unwrap_or("source.c");
-            let output = node.outputs.first().map(|s| s.as_str()).unwrap_or("output.o");
+            let file = node
+                .inputs
+                .first()
+                .map(|s| s.as_str())
+                .unwrap_or("source.c");
+            let output = node
+                .outputs
+                .first()
+                .map(|s| s.as_str())
+                .unwrap_or("output.o");
             json.push_str(&format!(
                 "  {{\n    \"directory\": \"{directory}\",\n    \"command\": \"{cmd}\",\n    \"file\": \"{file}\",\n    \"output\": \"{output}\"\n  }}",
                 cmd = node.command
@@ -435,12 +479,19 @@ impl BuildSystemsAndPkgConfigV80Engine {
         ]
     }
 
-    pub fn pkgconf_multiarch_resolver(&self, package: &str, sysroot_triple: &str) -> PkgConfigQueryResultV80 {
+    pub fn pkgconf_multiarch_resolver(
+        &self,
+        package: &str,
+        sysroot_triple: &str,
+    ) -> PkgConfigQueryResultV80 {
         PkgConfigQueryResultV80 {
             package_name: package.to_string(),
             version: "1.0.0".to_string(),
             cflags: vec![format!("-I/usr/include/{sysroot_triple}/{package}")],
-            libs: vec![format!("-L/usr/lib/{sysroot_triple}"), format!("-l{package}")],
+            libs: vec![
+                format!("-L/usr/lib/{sysroot_triple}"),
+                format!("-l{package}"),
+            ],
             sysroot: format!("/usr/{sysroot_triple}"),
         }
     }
@@ -581,7 +632,13 @@ impl DebuggerTracerProfilerV80Engine {
         }
     }
 
-    pub fn perf_topdown_v5_metrics(&self, slots: u64, retiring: u64, bad_spec: u64, fe_bound: u64) -> (f32, f32, f32, f32) {
+    pub fn perf_topdown_v5_metrics(
+        &self,
+        slots: u64,
+        retiring: u64,
+        bad_spec: u64,
+        fe_bound: u64,
+    ) -> (f32, f32, f32, f32) {
         if slots == 0 {
             return (0.0, 0.0, 0.0, 0.0);
         }
@@ -595,7 +652,13 @@ impl DebuggerTracerProfilerV80Engine {
         (p_retiring, p_bad_spec, p_fe_bound, p_be_bound)
     }
 
-    pub fn format_dtrace_usdt_probe(&self, provider: &str, module: &str, func: &str, name: &str) -> String {
+    pub fn format_dtrace_usdt_probe(
+        &self,
+        provider: &str,
+        module: &str,
+        func: &str,
+        name: &str,
+    ) -> String {
         format!("{provider}:{module}:{func}:{name}")
     }
 
@@ -654,7 +717,12 @@ impl VcsGitTopologyV80Engine {
         Self
     }
 
-    pub fn format_git_reftable_record(&self, ref_name: &str, oid: &[u8; 20], update_index: u64) -> String {
+    pub fn format_git_reftable_record(
+        &self,
+        ref_name: &str,
+        oid: &[u8; 20],
+        update_index: u64,
+    ) -> String {
         let hex_oid: String = oid.iter().map(|b| format!("{b:02x}")).collect();
         format!("ref={ref_name} update_index={update_index} target={hex_oid}")
     }
@@ -669,7 +737,12 @@ impl VcsGitTopologyV80Engine {
         }
     }
 
-    pub fn evaluate_partial_clone_filter(&self, filter_spec: &str, object_type: &str, size_bytes: u64) -> bool {
+    pub fn evaluate_partial_clone_filter(
+        &self,
+        filter_spec: &str,
+        object_type: &str,
+        size_bytes: u64,
+    ) -> bool {
         if filter_spec.starts_with("blob:none") {
             object_type != "blob"
         } else if filter_spec.starts_with("blob:limit=") {
@@ -768,7 +841,12 @@ impl LanguageRuntimesPolyglotV80Engine {
         Self
     }
 
-    pub fn cargo_vendor_mirror_verify(&self, crate_name: &str, expected_hash: &str, payload: &[u8]) -> CargoVendorVerifyResultV80 {
+    pub fn cargo_vendor_mirror_verify(
+        &self,
+        crate_name: &str,
+        expected_hash: &str,
+        payload: &[u8],
+    ) -> CargoVendorVerifyResultV80 {
         // FNV-1a 64-bit hash
         let mut hash: u64 = 0xcbf29ce484222325;
         for byte in payload {
@@ -796,14 +874,22 @@ impl LanguageRuntimesPolyglotV80Engine {
         format!("go build -pgo={pprof_file} -ldflags=\"-s -w\" ./...")
     }
 
-    pub fn go_cgo_zero_copy_bridge_dispatch(&self, ptr: usize, length: usize) -> Result<usize, &'static str> {
+    pub fn go_cgo_zero_copy_bridge_dispatch(
+        &self,
+        ptr: usize,
+        length: usize,
+    ) -> Result<usize, &'static str> {
         if ptr == 0 {
             return Err("Null pointer in CGO bridge");
         }
         Ok(length)
     }
 
-    pub fn python_freethreaded_evaluator(&self, gil_disabled: bool, worker_threads: usize) -> String {
+    pub fn python_freethreaded_evaluator(
+        &self,
+        gil_disabled: bool,
+        worker_threads: usize,
+    ) -> String {
         if gil_disabled {
             format!("Python 3.14 free-threaded: GIL disabled, mimalloc enabled with {worker_threads} workers")
         } else {
@@ -844,7 +930,10 @@ impl LanguageRuntimesPolyglotV80Engine {
         ]
     }
 
-    pub fn openjdk_graalvm_native_image_optimize(&self, app_bytecode_len: usize) -> GraalVmNativeImageResultV80 {
+    pub fn openjdk_graalvm_native_image_optimize(
+        &self,
+        app_bytecode_len: usize,
+    ) -> GraalVmNativeImageResultV80 {
         GraalVmNativeImageResultV80 {
             native_elf_size_bytes: (app_bytecode_len / 2) + 1000,
             estimated_startup_ms: 6,
@@ -984,7 +1073,10 @@ impl SovereignToolchainDevelopmentParityV80Gateway {
             md.push_str(&format!("## PR #{}: {}\n\n", p.pr_number, p.pr_title));
             md.push_str(&format!("- **Target Subsystem:** {}\n", p.target_subsystem));
             md.push_str(&format!("- **Status:** {}\n", p.status));
-            md.push_str(&format!("- **Performance Impact:** {}\n\n", p.performance_multiplier));
+            md.push_str(&format!(
+                "- **Performance Impact:** {}\n\n",
+                p.performance_multiplier
+            ));
 
             md.push_str("### Distro Inspirations\n");
             for distro in &p.distro_inspirations {
@@ -1065,13 +1157,16 @@ mod tests {
         let cmake_query = engine.cmake_file_api_query_spec();
         assert!(cmake_query.contains("codemodel"));
 
-        let gen_expr_val = engine.evaluate_cmake_generator_expression("$<CONFIG:Release>", "Release");
+        let gen_expr_val =
+            engine.evaluate_cmake_generator_expression("$<CONFIG:Release>", "Release");
         assert_eq!(gen_expr_val, "1");
 
         let gen_expr_bool = engine.evaluate_cmake_generator_expression("$<BOOL:TRUE>", "Debug");
         assert_eq!(gen_expr_bool, "1");
 
-        let presets = engine.parse_cmake_presets_v10("{\"configurePresets\": [{\"name\": \"x64-debug\"}, {\"name\": \"x64-release\"}]}");
+        let presets = engine.parse_cmake_presets_v10(
+            "{\"configurePresets\": [{\"name\": \"x64-debug\"}, {\"name\": \"x64-release\"}]}",
+        );
         assert_eq!(presets, vec!["x64-debug", "x64-release"]);
 
         let node1 = NinjaBuildGraphNodeV80 {
@@ -1096,7 +1191,9 @@ mod tests {
         assert!(wrap.contains("[wrap-file]"));
 
         let preseed = engine.autoconf_preseed_cache("x86_64-sigma-linux");
-        assert!(preseed.iter().any(|s| s.contains("ac_cv_host=x86_64-sigma-linux")));
+        assert!(preseed
+            .iter()
+            .any(|s| s.contains("ac_cv_host=x86_64-sigma-linux")));
 
         let pkg = engine.pkgconf_multiarch_resolver("libssl", "x86_64-linux-gnu");
         assert_eq!(pkg.package_name, "libssl");
@@ -1131,7 +1228,8 @@ mod tests {
         let valgrind_res = engine.valgrind_categorize_error("<error>Leak_DefinitelyLost</error>");
         assert_eq!(valgrind_res, "Definitely Lost (Memory Leak)");
 
-        let (retiring, bad_spec, fe_bound, be_bound) = engine.perf_topdown_v5_metrics(100, 40, 10, 20);
+        let (retiring, bad_spec, fe_bound, be_bound) =
+            engine.perf_topdown_v5_metrics(100, 40, 10, 20);
         assert!((retiring - 40.0).abs() < 0.001);
         assert!((bad_spec - 10.0).abs() < 0.001);
         assert!((fe_bound - 20.0).abs() < 0.001);
@@ -1240,11 +1338,14 @@ mod tests {
         assert_eq!(proposals.len(), 5);
 
         let summary = gateway.generate_master_summary();
-        assert!(summary.contains("SIGMAOS TOOLCHAIN & DEVELOPMENT PARITY PR PROPOSAL SUMMARY (V80)"));
+        assert!(
+            summary.contains("SIGMAOS TOOLCHAIN & DEVELOPMENT PARITY PR PROPOSAL SUMMARY (V80)")
+        );
         assert!(summary.contains("Total PR Proposals: 5"));
 
         let md = gateway.generate_pr_proposal_markdown();
-        assert!(md.contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V80)"));
+        assert!(md
+            .contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V80)"));
         assert!(md.contains("PR #6031"));
         assert!(md.contains("PR #6035"));
     }
