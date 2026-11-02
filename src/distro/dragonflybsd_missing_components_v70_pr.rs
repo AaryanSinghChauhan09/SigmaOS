@@ -170,9 +170,15 @@ impl DragonFlyLwktAffinityAwareStealingSchedulerV70PrEngine {
         // Work stealing: first look at CPUs in same NUMA node
         let current_numa = self.numa_mapping[cpu];
         for other_cpu in 0..self.cpu_count {
-            if other_cpu != cpu && self.numa_mapping[other_cpu] == current_numa && self.runqueues[other_cpu].len() > 1 {
+            if other_cpu != cpu
+                && self.numa_mapping[other_cpu] == current_numa
+                && self.runqueues[other_cpu].len() > 1
+            {
                 // Find unpinned candidate
-                if let Some(pos) = self.runqueues[other_cpu].iter().rposition(|t| t.pinned_cpu.is_none()) {
+                if let Some(pos) = self.runqueues[other_cpu]
+                    .iter()
+                    .rposition(|t| t.pinned_cpu.is_none())
+                {
                     return Some(self.runqueues[other_cpu].remove(pos));
                 }
             }
@@ -180,7 +186,10 @@ impl DragonFlyLwktAffinityAwareStealingSchedulerV70PrEngine {
         // Cross-NUMA stealing
         for other_cpu in 0..self.cpu_count {
             if other_cpu != cpu && self.runqueues[other_cpu].len() > 1 {
-                if let Some(pos) = self.runqueues[other_cpu].iter().rposition(|t| t.pinned_cpu.is_none()) {
+                if let Some(pos) = self.runqueues[other_cpu]
+                    .iter()
+                    .rposition(|t| t.pinned_cpu.is_none())
+                {
                     return Some(self.runqueues[other_cpu].remove(pos));
                 }
             }
@@ -222,7 +231,8 @@ impl DragonFlyVKernelNumaDirectIovHypercallVfsV70PrEngine {
     }
 
     pub fn create_instance(&mut self, slot: usize, numa_node: u32) -> bool {
-        if self.vkernel_slots.len() >= self.max_instances || self.vkernel_slots.contains_key(&slot) {
+        if self.vkernel_slots.len() >= self.max_instances || self.vkernel_slots.contains_key(&slot)
+        {
             return false;
         }
         self.vkernel_slots.insert(slot, numa_node);
@@ -231,7 +241,8 @@ impl DragonFlyVKernelNumaDirectIovHypercallVfsV70PrEngine {
 
     pub fn map_iov_buffer(&mut self, guest_addr: u64, length: usize) -> VKernelIovSegmentV70 {
         let host_addr = guest_addr ^ 0xFFFF_0000_0000;
-        self.zero_copy_pages.insert(guest_addr, alloc::vec![0u8; length]);
+        self.zero_copy_pages
+            .insert(guest_addr, alloc::vec![0u8; length]);
         VKernelIovSegmentV70 {
             guest_addr,
             host_addr,
@@ -239,7 +250,12 @@ impl DragonFlyVKernelNumaDirectIovHypercallVfsV70PrEngine {
         }
     }
 
-    pub fn execute_hypercall(&mut self, slot: usize, call_nr: u32, payload: &[u8]) -> Result<u64, &'static str> {
+    pub fn execute_hypercall(
+        &mut self,
+        slot: usize,
+        call_nr: u32,
+        payload: &[u8],
+    ) -> Result<u64, &'static str> {
         if !self.vkernel_slots.contains_key(&slot) {
             return Err("Invalid VKernel slot");
         }
@@ -296,7 +312,7 @@ impl DragonFlyDsynthPqcDilithium5DeterministicBuilderV70PrEngine {
             build_hash[i % 32] ^= b;
         }
 
-        // Mock Dilithium-5 signature (64 bytes deterministic synthetic signature)
+        // Dilithium-5 mock signature (64 bytes deterministic synthetic signature)
         let mut sig = Vec::with_capacity(64);
         for i in 0..64 {
             sig.push((build_hash[i % 32]).wrapping_add(i as u8 ^ 0x5D));
@@ -310,7 +326,8 @@ impl DragonFlyDsynthPqcDilithium5DeterministicBuilderV70PrEngine {
             is_deterministic: true,
         };
 
-        self.artifacts.insert(package_name.to_string(), artifact.clone());
+        self.artifacts
+            .insert(package_name.to_string(), artifact.clone());
         artifact
     }
 
@@ -360,12 +377,15 @@ impl DragonFlyVarsymsHierarchicalProcessGroupScopeV70PrEngine {
     }
 
     pub fn set_scoped(&mut self, pgroup_id: u32, jail_id: u32, uid: u32, key: &str, val: &str) {
-        let entry = self.scopes.entry(pgroup_id).or_insert_with(|| VarsymScopeV70 {
-            pgroup_id,
-            jail_id,
-            uid,
-            variables: BTreeMap::new(),
-        });
+        let entry = self
+            .scopes
+            .entry(pgroup_id)
+            .or_insert_with(|| VarsymScopeV70 {
+                pgroup_id,
+                jail_id,
+                uid,
+                variables: BTreeMap::new(),
+            });
         entry.variables.insert(key.to_string(), val.to_string());
     }
 
@@ -549,7 +569,14 @@ impl DragonFlyDevctlMultiQueueKqueuePriorityRouterV70PrEngine {
         }
     }
 
-    pub fn post_event(&mut self, subsystem: &str, device_node: &str, event_type: &str, priority: u8, ts: u64) {
+    pub fn post_event(
+        &mut self,
+        subsystem: &str,
+        device_node: &str,
+        event_type: &str,
+        priority: u8,
+        ts: u64,
+    ) {
         let ev = DevctlEventV70 {
             subsystem: subsystem.to_string(),
             device_node: device_node.to_string(),
@@ -557,7 +584,10 @@ impl DragonFlyDevctlMultiQueueKqueuePriorityRouterV70PrEngine {
             priority,
             timestamp_ns: ts,
         };
-        self.event_queues.entry(priority).or_insert_with(Vec::new).push(ev);
+        self.event_queues
+            .entry(priority)
+            .or_insert_with(Vec::new)
+            .push(ev);
     }
 
     pub fn poll_highest_priority_event(&mut self) -> Option<DevctlEventV70> {
@@ -630,19 +660,25 @@ impl DragonFlyFirmlinkSecurityAuditedCrossMountQuotaGuardV70PrEngine {
         for policy in self.policies.values_mut() {
             if src.starts_with(&policy.source_prefix) && dst.starts_with(&policy.target_prefix) {
                 if is_cross_mount && !policy.allow_cross_mount {
-                    self.audit_log.push(format!("REJECTED: cross-mount violation {} -> {}", src, dst));
+                    self.audit_log.push(format!(
+                        "REJECTED: cross-mount violation {} -> {}",
+                        src, dst
+                    ));
                     return false;
                 }
                 if policy.current_inodes >= policy.max_inodes {
-                    self.audit_log.push(format!("REJECTED: quota exceeded {} -> {}", src, dst));
+                    self.audit_log
+                        .push(format!("REJECTED: quota exceeded {} -> {}", src, dst));
                     return false;
                 }
                 policy.current_inodes += 1;
-                self.audit_log.push(format!("APPROVED: firmlink {} -> {}", src, dst));
+                self.audit_log
+                    .push(format!("APPROVED: firmlink {} -> {}", src, dst));
                 return true;
             }
         }
-        self.audit_log.push(format!("REJECTED: no matching policy {} -> {}", src, dst));
+        self.audit_log
+            .push(format!("REJECTED: no matching policy {} -> {}", src, dst));
         false
     }
 }
@@ -714,7 +750,9 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             vkernel_numa: DragonFlyVKernelNumaDirectIovHypercallVfsV70PrEngine::new(8),
             dsynth_builder: DragonFlyDsynthPqcDilithium5DeterministicBuilderV70PrEngine::new(),
             varsyms_scope: DragonFlyVarsymsHierarchicalProcessGroupScopeV70PrEngine::new(),
-            swapcache_nvmeof: DragonFlySwapcacheNvmeOverFabricsAdaptiveCompressionV70PrEngine::new(0.65),
+            swapcache_nvmeof: DragonFlySwapcacheNvmeOverFabricsAdaptiveCompressionV70PrEngine::new(
+                0.65,
+            ),
             namecache_lockfree: DragonFlyPerCpuGenerationNamecacheLockfreeV70PrEngine::new(8),
             devctl_router: DragonFlyDevctlMultiQueueKqueuePriorityRouterV70PrEngine::new(),
             firmlink_guard: DragonFlyFirmlinkSecurityAuditedCrossMountQuotaGuardV70PrEngine::new(),
@@ -731,10 +769,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "fs/hammer2".to_string(),
             description: "High performance cryptographic block dedup with multi-master consensus txg synchronization.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/vfs/hammer2/hammer2_dedup.c
-+++ b/sys/vfs/hammer2/hammer2_dedup.c
-@@ -0,0 +1,50 @@
-+/* HAMMER2 distributed dedup */".to_string(),
+            unified_diff: "--- a/sys/vfs/hammer2/hammer2_dedup.c\n+++ b/sys/vfs/hammer2/hammer2_dedup.c\n@@ -0,0 +1,50 @@\n+/* HAMMER2 distributed dedup */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -743,10 +778,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "kern/lwkt".to_string(),
             description: "Light Weight Kernel Threads scheduler with intra-NUMA prioritization and lock-free thread stealing.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/kern/lwkt_thread.c
-+++ b/sys/kern/lwkt_thread.c
-@@ -0,0 +1,48 @@
-+/* LWKT work-stealing queues */".to_string(),
+            unified_diff: "--- a/sys/kern/lwkt_thread.c\n+++ b/sys/kern/lwkt_thread.c\n@@ -0,0 +1,48 @@\n+/* LWKT work-stealing queues */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -755,10 +787,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "vfs/vkernel".to_string(),
             description: "Direct memory-mapped IOV segments and ultra-low latency host VFS hypercalls for virtual kernels.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/platform/vkernel/platform/init.c
-+++ b/sys/platform/vkernel/platform/init.c
-@@ -0,0 +1,52 @@
-+/* VKernel direct hypercalls */".to_string(),
+            unified_diff: "--- a/sys/platform/vkernel/platform/init.c\n+++ b/sys/platform/vkernel/platform/init.c\n@@ -0,0 +1,52 @@\n+/* VKernel direct hypercalls */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -767,10 +796,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "usr.bin/dsynth".to_string(),
             description: "Hermetic cleanroom containerized builder with Post-Quantum Dilithium-5 package artifact signing.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/usr.bin/dsynth/dsynth.c
-+++ b/usr.bin/dsynth/dsynth.c
-@@ -0,0 +1,45 @@
-+/* Dilithium-5 package signature */".to_string(),
+            unified_diff: "--- a/usr.bin/dsynth/dsynth.c\n+++ b/usr.bin/dsynth/dsynth.c\n@@ -0,0 +1,45 @@\n+/* Dilithium-5 package signature */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -779,10 +805,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "sys/kern/kern_varsym.c".to_string(),
             description: "Hierarchical variable symlink path substitution scoped to process groups, jails, and per-user namespaces.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/kern/kern_varsym.c
-+++ b/sys/kern/kern_varsym.c
-@@ -0,0 +1,42 @@
-+/* Scoped varsym evaluation */".to_string(),
+            unified_diff: "--- a/sys/kern/kern_varsym.c\n+++ b/sys/kern/kern_varsym.c\n@@ -0,0 +1,42 @@\n+/* Scoped varsym evaluation */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -791,10 +814,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "vm/swapcache".to_string(),
             description: "Real-time entropy-based adaptive Zstandard compression for NVMe-over-Fabrics swap caching.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/vm/vm_swapcache.c
-+++ b/sys/vm/vm_swapcache.c
-@@ -0,0 +1,46 @@
-+/* Adaptive compression tiering */".to_string(),
+            unified_diff: "--- a/sys/vm/vm_swapcache.c\n+++ b/sys/vm/vm_swapcache.c\n@@ -0,0 +1,46 @@\n+/* Adaptive compression tiering */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -803,10 +823,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "kern/vfs_namecache".to_string(),
             description: "Scalable atomic per-CPU VFS namecache with instant global generational invalidation.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/kern/vfs_cache.c
-+++ b/sys/kern/vfs_cache.c
-@@ -0,0 +1,40 @@
-+/* Generational namecache lookup */".to_string(),
+            unified_diff: "--- a/sys/kern/vfs_cache.c\n+++ b/sys/kern/vfs_cache.c\n@@ -0,0 +1,40 @@\n+/* Generational namecache lookup */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -815,10 +832,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "sys/devctl".to_string(),
             description: "High throughput device status and bus hotplug router with priority-tiered kqueue notifications.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/kern/subr_devctl.c
-+++ b/sys/kern/subr_devctl.c
-@@ -0,0 +1,45 @@
-+/* Priority devctl queue */".to_string(),
+            unified_diff: "--- a/sys/kern/subr_devctl.c\n+++ b/sys/kern/subr_devctl.c\n@@ -0,0 +1,45 @@\n+/* Priority devctl queue */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -827,10 +841,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "sys/firmlink".to_string(),
             description: "Cross-mount filesystem firmlink enforcement ensuring strict inode quota and security isolation.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/vfs/firmlink/firmlink.c
-+++ b/sys/vfs/firmlink/firmlink.c
-@@ -0,0 +1,40 @@
-+/* Quota and cross-mount audit */".to_string(),
+            unified_diff: "--- a/sys/vfs/firmlink/firmlink.c\n+++ b/sys/vfs/firmlink/firmlink.c\n@@ -0,0 +1,40 @@\n+/* Quota and cross-mount audit */".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV70 {
@@ -839,10 +850,7 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
             target_component: "x86_64/tsc".to_string(),
             description: "Multi-socket symmetric multiprocessing invariant TSC phase-lock drift calibration governor.".to_string(),
             status: PrProposalStatusV70::Approved,
-            unified_diff: "--- a/sys/platform/pc64/x86_64/tsc.c
-+++ b/sys/platform/pc64/x86_64/tsc.c
-@@ -0,0 +1,50 @@
-+/* TSC phase-lock equalizer */".to_string(),
+            unified_diff: "--- a/sys/platform/pc64/x86_64/tsc.c\n+++ b/sys/platform/pc64/x86_64/tsc.c\n@@ -0,0 +1,50 @@\n+/* TSC phase-lock equalizer */".to_string(),
         });
 
         prs
@@ -850,8 +858,12 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
 
     pub fn run_parity_checks(&mut self) -> bool {
         // 1. Hammer2 dedup check
-        let (deduped1, off1) = self.hammer2_dedup.register_or_dedup_block(b"kernel_block_data", 0x10000);
-        let (deduped2, off2) = self.hammer2_dedup.register_or_dedup_block(b"kernel_block_data", 0x20000);
+        let (deduped1, off1) = self
+            .hammer2_dedup
+            .register_or_dedup_block(b"kernel_block_data", 0x10000);
+        let (deduped2, off2) = self
+            .hammer2_dedup
+            .register_or_dedup_block(b"kernel_block_data", 0x20000);
         if deduped1 || !deduped2 || off1 != off2 {
             return false;
         }
@@ -877,7 +889,9 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
         }
 
         // 4. Dsynth builder check
-        let _art = self.dsynth_builder.build_deterministic("zsh", "5.9", &[0x42; 32]);
+        let _art = self
+            .dsynth_builder
+            .build_deterministic("zsh", "5.9", &[0x42; 32]);
         if !self.dsynth_builder.verify_package_signature("zsh") {
             return false;
         }
@@ -907,15 +921,20 @@ impl DragonFlyBsdMissingComponentsV70PrSuite {
         }
 
         // 8. Devctl router check
-        self.devctl_router.post_event("pci", "/dev/nvme0", "attach", 10, 1000);
+        self.devctl_router
+            .post_event("pci", "/dev/nvme0", "attach", 10, 1000);
         let ev = self.devctl_router.poll_highest_priority_event();
         if ev.is_none() || ev.unwrap().priority != 10 {
             return false;
         }
 
         // 9. Firmlink guard check
-        self.firmlink_guard.register_policy(1, "/home", "/sandbox/home", 5, true);
-        if !self.firmlink_guard.request_link_creation("/home/user", "/sandbox/home/user", true) {
+        self.firmlink_guard
+            .register_policy(1, "/home", "/sandbox/home", 5, true);
+        if !self
+            .firmlink_guard
+            .request_link_creation("/home/user", "/sandbox/home/user", true)
+        {
             return false;
         }
 
@@ -946,7 +965,9 @@ mod tests {
         assert!(dedup2);
         assert_eq!(off2, 0x4000);
 
-        let hash = DragonFlyHammer2DistributedDeduplicationConsensusV70PrEngine::compute_block_hash(block_data);
+        let hash = DragonFlyHammer2DistributedDeduplicationConsensusV70PrEngine::compute_block_hash(
+            block_data,
+        );
         assert_eq!(engine.get_block_refcount(&hash), Some(2));
         assert!(engine.reach_consensus(2, 1005));
         assert!(!engine.reach_consensus(1, 1006));
