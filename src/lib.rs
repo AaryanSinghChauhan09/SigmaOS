@@ -838,6 +838,7 @@ pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;
 pub use crate::desktop::sovereign_de_wm_advancements_v74_pr::*;
 pub use crate::desktop::sovereign_de_wm_advancements_v88_pr::*;
 pub use crate::desktop::sovereign_de_wm_advancements_v90_pr::*;
+pub use crate::desktop::sovereign_de_wm_advancements_v92_pr::*;
 pub use crate::distro::arch_linux_missing_components_v71_pr::*;
 pub use crate::distro::arch_linux_missing_components_v73_pr::*;
 pub use crate::distro::arch_linux_missing_components_v74_pr::*;
