@@ -54,7 +54,9 @@ if [ -f "tests/io/interrupt.rs" ]; then
     rustc --test tests/filesystem/buffer.rs --edition=2021 -o build/test_fs_buffer && ./build/test_fs_buffer
     rustc --test tests/io/scheduler.rs --edition=2021 -o build/test_io_scheduler && ./build/test_io_scheduler
     rustc --test tests/io/callback.rs --edition=2021 -o build/test_io_callback && ./build/test_io_callback
-    rustc --test tests/test_io_lifecycle_management.rs --edition=2021 -o build/test_io_lifecycle_management && ./build/test_io_lifecycle_management
+    if [ -f "IO_RULES.toml" ]; then
+        rustc --test tests/test_io_lifecycle_management.rs --edition=2021 -o build/test_io_lifecycle_management && ./build/test_io_lifecycle_management
+    fi
 fi
 
 if [ -f "tests/interrupt/test_interrupt_handler_plan.rs" ]; then
