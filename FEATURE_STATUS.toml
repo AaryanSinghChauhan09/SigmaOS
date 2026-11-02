@@ -1,0 +1,5 @@
+[kernel.interrupt_framework]
+plan = "docs/INTERRUPT_HANDLER_PLAN.md"
+
+[kernel.irq_subsystem]
+status = "active"

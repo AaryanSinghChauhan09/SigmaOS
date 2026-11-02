@@ -24,6 +24,30 @@
 ### Smoke Tests
 Boot → Install → Package install → Update → Login → Desktop → Audio → Network → Security validation.
 
+### Progress (scaffolds verified ✅)
+- ✅ Bootloader (Rust, 12 tests) — SystemdBootBackend + BsdLoaderBackend
+- ✅ Installer (Python) — 10-step guided install CLI, archinstall-inspired
+- ✅ Live session (Shell) — start/stop/status/shell CLI
+- ✅ Mirror (Shell) — list/add/rank/health-check
+- ✅ Update (Rust) — transactional update lifecycle with rollback + smoke hook
+- ✅ Upgrade (Rust) — OS release upgrade with compatibility check + rollback
+- ✅ Package kit (Python) — pacman-style Transaction model
+- ✅ Package tools (Python) — install/upgrade/verify-sig
+- ✅ Repo manager (Python) — multi-backend repo registry
+- ✅ Panel (Rust, 5 tests) — applet system + zone rendering
+- ✅ Power manager (Rust, 4 tests) — battery monitoring + profile switching
+- ✅ Setup wizard (Rust, 3 tests) — 10-step first-run configuration
+- ✅ Session manager (Rust, 4 tests) — login/lock/suspend/logout lifecycle
+- ✅ Security (Rust, 4 tests) — trust verification + audit log + hardening
+- ✅ Domain blocker (Python) — hosts-based blocklist with hagezi/oisd/stevenblack
+- ✅ Network discovery (Python) — mDNS/UPnP device scanner
+- ✅ Drivers (Python) — hardware detection + driver recommendations
+- ✅ System (Rust, 5 tests) — ServiceManager with topological start order + dep graph
+- ✅ Display manager (Rust, 6 tests) — Wayland/X11/TTY session types + greeter state machine
+- ✅ Bluetooth (Rust, 5 tests) — adapter power/scan, pair/connect/disconnect, audio filter
+- ⬜ QEMU smoke test — boot validation
+- ⬜ End-to-end integration testing
+
 ### Target Repos (30 canonical + 12 performance)
 Core: kernel, core, boot, initramfs, installer, live-iso, system, package-manager, repo-manager, update, security, config, desktop, panel, launcher, control-center, theme, network, drivers, hardware, docs, release.
 
