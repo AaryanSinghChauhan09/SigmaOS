@@ -1,19 +1,30 @@
+# SigmaOS pull request
+
 ## Summary
 
-<!-- What file-management behavior changed and why? -->
+<!-- What behavior changed and why? -->
 
-## File component
+## Component impact
 
-- [ ] File descriptor manager
-- [ ] Inode and directory manager
-- [ ] Permission manager
-- [ ] Lock manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
+- Component/repository:
+- User-visible behavior:
+- Related issue or plan:
+
+## Shell component
+
+- [ ] Lexer
+- [ ] Parser
+- [ ] Expansion
+- [ ] Executor
+- [ ] Pipelines
+- [ ] Redirection
+- [ ] Job control
+- [ ] Signals
+- [ ] Built-ins
+- [ ] Interactive line editor
+- [ ] Script runner
+- [ ] Diagnostics
+- [ ] Security / sandboxing
 - [ ] Documentation
 - [ ] CI / tooling
 
@@ -21,62 +32,83 @@
 
 - [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly memory audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
 
-## Reference behavior
+## Upstream study and reference behavior
 
-<!-- Required for lifecycle, ABI, or file changes -->
-
+- Reference study:
+- Upstream project, document, or behavior reviewed:
 - POSIX section:
-- Linux/BSD/Redox/xv6 reference:
+- Bash/dash/Zsh/BusyBox reference:
 - SigmaOS current behavior:
-- New behavior:
+- What SigmaOS adopts:
+- What remains intentionally different:
 - Compatibility impact:
 
-## Changes
+## Risks and rollback
 
--
--
+- Risks and rollback:
+- Recovery or downgrade procedure:
 
-## File safety review
+## IPC handler
 
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-unlink prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
+- [ ] This change affects IPC handler behavior, or I confirm it does not.
+- IPC semantics:
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
 
-## Evidence
+## Security review
+
+- Kernel safety review:
+
+## Shell safety review
+
+- [ ] Expansion order is correct
+- [ ] Quoting behavior is preserved
+- [ ] Redirection failures are handled
+- [ ] Exit codes are explicit
+- [ ] Signal behavior is defined
+- [ ] No unbounded recursion or allocation
+- [ ] Interactive terminal state is restored
+- [ ] Script mode does not execute invalid partial input
+- Capability/namespace checks enforced:
+- Shared-memory or descriptor implications:
+- Input validation and failure behavior:
+- Rollback or downgrade path:
+
+## Verification
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
+- [ ] Focused unit tests pass.
+- [ ] New/updated shell tests
+- [ ] POSIX/conformance test evidence
 - [ ] Fuzz target or documented exemption
-- [ ] Boot-to-boot evidence, if boot-affecting
-- [ ] File benchmark, if performance-affecting
+- [ ] Boot-to-shell evidence, if boot-affecting
 - [ ] Security review requested, if applicable
+- [ ] Documentation and wiki mirrors updated where applicable.
+- Test/evidence commands:
+- Results:
 
-## Status updates
+## Capability status
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] File documentation
-- [ ] Boot matrix, if applicable
+- Current status:
+- Evidence supporting the status:
+- Claims intentionally left partial:
 
-## Risks and rollback
+## Integration impact
 
-- Risk:
-- Rollback:
+- APIs, ABI, protocols, or file formats affected:
+- Cross-repository synchronization required:
+- Release or migration notes:
