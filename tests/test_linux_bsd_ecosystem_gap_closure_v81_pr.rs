@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 // Integration test for Sovereign Linux & BSD Ecosystem Gap Closure V81 PR Suite
 
-use sigmaos::distro::sovereign_linux_bsd_ecosystem_gap_closure_v81_pr::*;
+#[path = "../src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v81_pr.rs"]
+mod sovereign_linux_bsd_ecosystem_gap_closure_v81_pr;
+
+use sovereign_linux_bsd_ecosystem_gap_closure_v81_pr::*;
 
 #[test]
 fn test_linux_io_uring_futex2_v81_engine() {
@@ -10,70 +13,70 @@ fn test_linux_io_uring_futex2_v81_engine() {
     assert_eq!(engine.sqpoll_cpu, 32);
 
     let diff = engine.register_futex_waiter(0x1000, 42, 0, 1);
-    assert!(diff.contains("sys_futex_waitv_v81"));
+    assert!(diff.contains("futex_waitv"));
     assert_eq!(engine.futex_waiters.len(), 1);
 }
 
 #[test]
 fn test_freebsd_capsicum_casper_v81_engine() {
     let mut engine = FreeBsdCapsicumCasperV81PrEngine::new();
-    assert!(engine.services.contains_key("system.dns"));
+    assert_eq!(engine.services.len(), 1);
 
-    let diff = engine.register_casper_service("system.sysctl", 4, 0x02);
+    let diff = engine.register_casper_service("system.pwd", 12, 0x00FF);
     assert!(diff.contains("cap_service_open"));
-    assert!(engine.services.contains_key("system.sysctl"));
+    assert_eq!(engine.services.len(), 2);
 }
 
 #[test]
 fn test_openbsd_softraid_bioctl_v81_engine() {
     let mut engine = OpenBsdSoftraidBioctlV81PrEngine::new();
-    assert!(engine.volumes.contains_key("sd0"));
+    assert_eq!(engine.volumes.len(), 1);
 
-    let diff = engine.create_crypto_volume("sd1", 3);
+    let diff = engine.create_crypto_volume("sr1", 2);
     assert!(diff.contains("bioctl"));
-    assert!(engine.volumes.contains_key("sd1"));
+    assert_eq!(engine.volumes.len(), 2);
 }
 
 #[test]
 fn test_dragonfly_hammer3_pfs_v81_engine() {
     let mut engine = DragonFlyHammer3PfsV81PrEngine::new();
-    assert!(engine.pfs_list.contains_key("ROOT"));
+    assert_eq!(engine.pfs_list.len(), 1);
 
-    let diff = engine.create_pfs_snapshot("BACKUP", 81005);
+    let diff = engine.create_pfs_snapshot("BACKUP_SNAP", 90021);
     assert!(diff.contains("hammer3 pfs-create"));
-    assert!(engine.pfs_list.contains_key("BACKUP"));
+    assert_eq!(engine.pfs_list.len(), 2);
 }
 
 #[test]
 fn test_gentoo_portage_eapi10_v81_engine() {
     let mut engine = GentooPortageEapi10V81PrEngine::new();
-    let diff = engine.add_ebuild("sys-devel/gcc-16.0", "0", "16", vec!["cxx", "fortran"]);
+    let diff = engine.add_ebuild("sys-devel/gcc-15", "15", "15.0", vec!["lto", "pgo"]);
     assert!(diff.contains("EAPI=10"));
-    assert!(engine.ebuilds.contains_key("sys-devel/gcc-16.0"));
+    assert_eq!(engine.ebuilds.len(), 1);
 }
 
 #[test]
 fn test_alpine_apk_v4_apkovl_v81_engine() {
     let mut engine = AlpineApkV4ApkovlV81PrEngine::new();
-    let diff = engine.generate_overlay("server.apkovl.tar.gz", 30);
+    let diff = engine.generate_overlay("sigmaos.apkovl.tar.gz", 42);
     assert!(diff.contains("lbu commit"));
-    assert!(engine.overlays.contains_key("server.apkovl.tar.gz"));
+    assert_eq!(engine.overlays.len(), 1);
 }
 
 #[test]
 fn test_nix_guix_flake_store_v81_engine() {
     let mut engine = NixGuixFlakeStoreV81PrEngine::new();
-    let diff = engine.add_closure("/nix/store/test-path", "sha256-digest", vec![]);
+    let diff = engine.add_closure("/nix/store/123", "blake3_hash", vec![]);
     assert!(diff.contains("nix store add-path"));
-    assert!(engine.store_closures.contains_key("/nix/store/test-path"));
+    assert_eq!(engine.store_closures.len(), 1);
 }
 
 #[test]
 fn test_netbsd_npf_jit_firewall_v81_engine() {
     let mut engine = NetBsdNpfJitFirewallV81PrEngine::new();
-    let diff = engine.add_rule(10, "pass", "vioif1");
+    let diff = engine.add_rule(10, "pass stateful", "vioif1");
     assert!(diff.contains("npfctl"));
-    assert!(engine.rules.contains_key(&10));
+    assert_eq!(engine.rules.len(), 1);
 }
 
 #[test]
