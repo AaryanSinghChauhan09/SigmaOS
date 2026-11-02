@@ -135,23 +135,18 @@ pub mod acyclic_graph_directory;
 pub mod btrfs_inspired;
 pub mod devfs;
 pub mod erofs;
-pub mod fhs_engine;
 pub mod geom;
 pub mod inode;
 pub mod legacy_fs;
-pub mod linux_package_parity;
 pub mod modern_fs;
 pub mod nextgen_filesystem_suite;
-pub mod proc;
-pub mod procfs;
-pub mod schemes;
 pub mod self_healing_fs;
 pub mod s_fs;
 pub mod sigmafs;
 pub mod sovereign_file_descriptor;
-pub mod sqlite;
-pub mod sysfs;
 pub mod vdbe_doom;
-pub mod xfs;
-pub mod zfs_compat;
 pub mod zfs_inspired;
+
+// Modules excluded due to monorepo source bugs (see extraction-log.md):
+//   schemes, proc, procfs, fhs_engine, linux_package_parity,
+//   sqlite, sysfs, xfs, zfs_compat

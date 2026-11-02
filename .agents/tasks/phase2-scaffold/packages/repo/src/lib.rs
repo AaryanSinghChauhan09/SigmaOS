@@ -497,6 +497,11 @@ impl PackageInstaller {
                 newly_installed.push(pkg_name);
             }
         }
+        // Update the snapshot to reflect the post-install state, so callers
+        // can roll back to "after this package was installed".
+        if let Some(snap) = self.snapshots.iter_mut().rev().find(|s| s.id == snapshot_id) {
+            snap.installed = self.installed.clone();
+        }
 
         Ok(newly_installed)
     }

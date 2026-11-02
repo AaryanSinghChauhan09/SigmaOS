@@ -11,6 +11,10 @@ name = "sigmaos_security"
 path = "src/lib.rs"
 
 [dependencies]
+sigmaos-kernel = { path = "../../kernel/repo", version = "0.1.0", optional = true }
 thiserror = "1.0"
+log = "0.4"
+parking_lot = "0.12"
+bytes = "1.0"
 
 [dev-dependencies]
