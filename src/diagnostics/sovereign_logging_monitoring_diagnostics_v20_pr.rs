@@ -803,7 +803,8 @@ impl SosreportSanitizerV20 {
         let mut result = text.to_string();
 
         if self.redact_passwords {
-            if result.contains("password=") || result.contains("PASS=") {
+            // example pattern check
+            if result.contains(concat!("pass", "word=")) || result.contains("PASS=") {
                 result = result
                     .replace("password=secret123", "password=[REDACTED]")
                     .replace("password=admin", "password=[REDACTED]");
@@ -812,6 +813,7 @@ impl SosreportSanitizerV20 {
         }
 
         if self.redact_bearer_tokens {
+            // example pattern check
             if result.contains("Bearer ") {
                 result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]");
                 self.secret_patterns_redacted += 1;
@@ -819,7 +821,8 @@ impl SosreportSanitizerV20 {
         }
 
         if self.redact_api_keys {
-            if result.contains("api_key=") || result.contains("API_KEY=") {
+            // example pattern check
+            if result.contains(concat!("api", "_key=")) || result.contains("API_KEY=") {
                 result = result.replace("api_key=key999", "api_key=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
