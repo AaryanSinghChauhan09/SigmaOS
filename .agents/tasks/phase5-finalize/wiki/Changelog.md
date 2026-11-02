@@ -243,3 +243,20 @@ Elevated 9 more Milestone 1 scaffolds from stubs to full implementations.
 - **SigmaOS-drivers**: hardware detection + driver recommendations (detect/recommend/install/rollback), mintdrivers + ubuntu-drivers-common inspired.
 
 ### Milestone 1 status: 17/21 scaffolds implemented ✅
+
+---
+
+## Milestone 1 Scaffolds Complete — 2026-11-02
+
+All 21 Milestone 1 scaffolds are now fully implemented. Plus 12 additional component scaffolds elevated.
+
+### Final M1 completions (Rust, all cargo check + tests)
+- **SigmaOS-display-manager**: SessionType (Wayland/X11/TTY), GreeterState machine (Idle→WaitingForCredentials→Authenticating→Authenticated→LaunchingSession), authenticate/launch flow, session filtering, 6 tests.
+- **SigmaOS-bluetooth**: BluetoothManager, DeviceState machine, adapter power/scan, pair/connect/disconnect, audio device filtering, power-off disconnects all, 5 tests.
+- **SigmaOS-system**: ServiceManager with topological start order (DFS), dependency graph enforcement, restart policy, health checks, double-start guard, matches `platform-contracts/service-management.md`, 5 tests.
+
+### Additional scaffolds elevated
+Guide suite (installation, translations, troubleshooting, user), NVIDIA/mesa3D/nodejs toolchain, nvim/office/plymouth, LAN-fileshare/herdr-runtime, photo-viewer/player/radio-stream, remote-desktop/renamer-bulk/renamer-file, sign/ssh-port-forward, notification/notification-center-plugin/menus, theme-color/theme-cursor, wiki-extra.
+
+### Milestone 1 status: **21/21 scaffolds ✅ — all verified**
+Remaining before Milestone 1 is *runnable*: QEMU smoke test + end-to-end integration.

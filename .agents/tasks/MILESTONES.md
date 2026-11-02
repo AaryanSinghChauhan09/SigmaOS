@@ -42,9 +42,9 @@ Boot → Install → Package install → Update → Login → Desktop → Audio 
 - ✅ Domain blocker (Python) — hosts-based blocklist with hagezi/oisd/stevenblack
 - ✅ Network discovery (Python) — mDNS/UPnP device scanner
 - ✅ Drivers (Python) — hardware detection + driver recommendations
-- ⬜ System (Rust) — service orchestration (phase2 scaffold exists)
-- ⬜ Display manager (Rust) — greeter + session launch
-- ⬜ Bluetooth (Rust) — pairing + audio routing
+- ✅ System (Rust, 5 tests) — ServiceManager with topological start order + dep graph
+- ✅ Display manager (Rust, 6 tests) — Wayland/X11/TTY session types + greeter state machine
+- ✅ Bluetooth (Rust, 5 tests) — adapter power/scan, pair/connect/disconnect, audio filter
 - ⬜ QEMU smoke test — boot validation
 - ⬜ End-to-end integration testing
 
