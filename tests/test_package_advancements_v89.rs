@@ -6,8 +6,8 @@
 mod sovereign_distro_package_advancements_v89_pr;
 
 use sovereign_distro_package_advancements_v89_pr::sovereign_distro_package_advancements_v89::*;
-use sovereign_distro_package_advancements_v89_pr::SovereignDistroPackagePrGatewayV89;
 use sovereign_distro_package_advancements_v89_pr::universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v89_pr::SovereignDistroPackagePrGatewayV89;
 
 #[test]
 fn test_package_advancements_v89_full_cycle() {
@@ -65,7 +65,8 @@ fn test_package_advancements_v89_full_cycle() {
     let manifest_targz = inspector.inspect_package("archive.tar.gz", &[0x1f, 0x8b, 0x08, 0x00]);
     assert_eq!(manifest_targz.detected_format, PackageFormat::TarGz);
 
-    let manifest_xz = inspector.inspect_package("archive.xz", &[0xfd, b'7', b'z', b'X', b'Z', 0x00]);
+    let manifest_xz =
+        inspector.inspect_package("archive.xz", &[0xfd, b'7', b'z', b'X', b'Z', 0x00]);
     assert_eq!(manifest_xz.detected_format, PackageFormat::Pacman);
 
     let manifest_rpm = inspector.inspect_package("fedora.rpm", &[0xed, 0xab, 0xee, 0xdb]);
@@ -74,7 +75,8 @@ fn test_package_advancements_v89_full_cycle() {
     let manifest_ebuild = inspector.inspect_package("gentoo.ebuild", b"ebuild_content");
     assert_eq!(manifest_ebuild.detected_format, PackageFormat::Ebuild);
 
-    let manifest_pkgtarxz = inspector.inspect_package("arch.pkg.tar.xz", &[0xfd, b'7', b'z', b'X', b'Z', 0x00]);
+    let manifest_pkgtarxz =
+        inspector.inspect_package("arch.pkg.tar.xz", &[0xfd, b'7', b'z', b'X', b'Z', 0x00]);
     assert_eq!(manifest_pkgtarxz.detected_format, PackageFormat::Pacman);
 
     let manifest_flatpak = inspector.inspect_package("app.flatpak", &[0x50, 0x4b, 0x03, 0x04]);
@@ -182,7 +184,10 @@ fn test_package_advancements_v89_full_cycle() {
     let solved = solver
         .solve_dependencies("ripgrep", &raw_deps)
         .expect("SAT solver failed");
-    assert_eq!(solved, vec!["sovereign-libc", "sovereign-openssl", "sovereign-base-v89"]);
+    assert_eq!(
+        solved,
+        vec!["sovereign-libc", "sovereign-openssl", "sovereign-base-v89"]
+    );
 
     // 5. Multi-Sandbox Security Governor V89
     let sandbox_gov = UniversalMultiSandboxGovernorV89::new();

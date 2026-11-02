@@ -80,3 +80,14 @@
 
 - Risk:
 - Rollback:
+
+<!-- Subsystem Parity & Compliance Verification -->
+<!--
+## I/O component
+- [ ] I/O policy and contract adherence
+- [ ] Interrupt manager top-half/bottom-half routing
+- [ ] DMA manager and scatter-gather lists
+- [ ] Buffer manager cache and pool limits
+- [ ] I/O scheduler multi-queue priorities
+- [ ] I/O safety review
+-->
