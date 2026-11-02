@@ -1,8 +1,7 @@
 name = "SigmaOS-desktop-configuration"
-description = "Desktop environment configuration tool for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "desktop"
+depends_on = ["SigmaOS-desktop-environment", "SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/cinnamon"]
+description = "Desktop configuration profiles managing themes, layouts, and workspace arrangements."
 license = "MIT"
-visibility = "public"
-depends_on = []

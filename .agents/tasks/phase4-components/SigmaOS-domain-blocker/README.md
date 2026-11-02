@@ -1,17 +1,14 @@
 # SigmaOS-domain-blocker
 
-## Overview
-Network domain blocking and filtering tool for SigmaOS.
+Network domain blocker applying DNS-based and hosts-file filtering to block ads, trackers, and malicious domains system-wide. Supports blocklist subscription and per-app rules.
 
-## Features
-- Core functionality for SigmaOS-domain-blocker
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/nicehash/NiceHashQuickMiner
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-domain-blocker /usr/sbin/sigma-domain-blocker
+sudo systemctl enable sigma-domain-blocker
+```

@@ -1,8 +1,7 @@
 name = "SigmaOS-GTK-plus"
-description = "GTK+ application suite integration for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+engine = "rust"
+category = "desktop"
+depends_on = ["SigmaOS-GTK", "SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/mint-themes"]
+description = "GTK+ extensions adding custom widgets, CSS variables, and themed dialog overrides."
+license = "GPL-2.0"

@@ -1,11 +1,22 @@
-//! SigmaOS-terminal-text-effects — Terminal text animation effects for SigmaOS
+//! SigmaOS Terminal Text Effects
 //!
-//! Part of the SigmaOS multi-repository ecosystem.
-//! See https://github.com/AaryanSinghChauhan09/SigmaOS for details.
+//! Terminal text animation effects library for SigmaOS. Renders rich text
+//! animations and effects in the terminal.
+//!
+//! # Modules
+//!
+//! - [`effects`]: Built-in effect definitions (matrix, rain, waves, etc.)
+//!   and the trait used to author new effects.
+//! - [`renderer`]: Terminal rendering abstraction that drives the animation
+//!   loop, cursor control, and color output.
 
-#![allow(dead_code)]
+pub mod effects;
+pub mod renderer;
 
-/// Module entry point for SigmaOS-terminal-text-effects
-pub fn version() -> &'static str {
-    env!("CARGO_PKG_VERSION")
+/// Initialize the terminal text effects subsystem.
+///
+/// Call once at startup to probe terminal capabilities (color depth, size,
+//! resize support) and prepare the renderer.
+pub fn init() {
+    // TODO: probe terminal capabilities, initialize renderer
 }

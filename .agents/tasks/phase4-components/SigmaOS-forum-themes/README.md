@@ -1,17 +1,12 @@
 # SigmaOS-forum-themes
 
-## Overview
-Community forum theme assets for SigmaOS.
+Forum and community website themes, CSS stylesheets, and template assets for the SigmaOS online community. Provides dark/light variants matching the SigmaOS brand.
 
-## Features
-- Core functionality for SigmaOS-forum-themes
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/linuxmint-website
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** none
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+sudo ./src/main.sh install
+```

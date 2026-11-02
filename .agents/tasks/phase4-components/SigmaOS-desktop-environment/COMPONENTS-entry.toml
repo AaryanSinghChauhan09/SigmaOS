@@ -1,8 +1,7 @@
 name = "SigmaOS-desktop-environment"
-description = "Full desktop environment stack for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+engine = "rust"
+category = "desktop"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/cinnamon"]
+description = "Core desktop environment providing compositor, window manager, panel, and session management."
+license = "GPL-2.0"

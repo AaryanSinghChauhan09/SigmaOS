@@ -1,8 +1,7 @@
 name = "SigmaOS-bluetooth"
-description = "Bluetooth system integration and applet for SigmaOS desktop"
-category = "System Services"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://git.kernel.org/pub/scm/bluetooth/bluez.git"]
+description = "Bluetooth stack integration providing BlueZ D-Bus bindings and profile management."
+license = "GPL-2.0"

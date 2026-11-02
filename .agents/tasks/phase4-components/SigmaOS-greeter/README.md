@@ -1,17 +1,13 @@
 # SigmaOS-greeter
 
-## Overview
-Graphical login greeter for SigmaOS display manager.
+Display manager greeter UI providing the login screen with user selection, password entry, session picker, and branding. Designed to work with sigma-display-manager.
 
-## Features
-- Core functionality for SigmaOS-greeter
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/Litarvan/lightdm-webkit-theme-litarvan
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `lightdm`, `webkit2gtk`, `SigmaOS-display-manager`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-greeter /usr/lib/sigma/greeter
+```

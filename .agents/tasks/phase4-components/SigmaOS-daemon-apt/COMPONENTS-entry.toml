@@ -1,8 +1,7 @@
 name = "SigmaOS-daemon-apt"
-description = "Component for SigmaOS"
-category = "Utilities"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+engine = "rust"
+category = "daemon"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/mintinstall"]
+description = "Background APT daemon handling package updates and transactions via D-Bus."
+license = "GPL-2.0"

@@ -1,8 +1,7 @@
 name = "SigmaOS-display-manager"
-description = "Graphical login and display manager for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-greeter", "SigmaOS-common"]
+upstream_urls = ["https://github.com/canonical/lightdm"]
+description = "Display and login manager handling session startup, authentication, and greeter orchestration."
+license = "GPL-2.0"

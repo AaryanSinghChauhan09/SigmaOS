@@ -1,17 +1,13 @@
 # SigmaOS-folder-color-switcher
 
-## Overview
-Folder icon color customizer for SigmaOS file manager.
+Folder color customizer that integrates with the file manager context menu, allowing users to tag directories with custom icon colors from the current theme.
 
-## Features
-- Core functionality for SigmaOS-folder-color-switcher
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/folder-color-switcher
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `python3-gi`, `SigmaOS-common`, `nemo`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+pip install -e .
+sudo install -m755 src/main.py /usr/lib/sigma/folder-color-switcher
+```

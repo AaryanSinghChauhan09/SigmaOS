@@ -1,17 +1,12 @@
 # SigmaOS-chromium
 
-## Overview
-Chromium browser integration and patches for SigmaOS.
+Chromium browser integration providing SigmaOS-specific preferences, policies, default profile, and launch wrappers. Installs browser configuration rather than building Chromium itself.
 
-## Features
-- Core functionality for SigmaOS-chromium
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://chromium.googlesource.com/chromium/src
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `chromium` or `chromium-browser`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+sudo ./src/main.sh install
+```

@@ -1,11 +1,20 @@
-//! SigmaOS-systemd — Systemd integration and management tools for SigmaOS
+//! SigmaOS Systemd
 //!
-//! Part of the SigmaOS multi-repository ecosystem.
-//! See https://github.com/AaryanSinghChauhan09/SigmaOS for details.
+//! Systemd integration and management tools for SigmaOS. Provides interfaces
+//! to inspect, enable, disable, and monitor systemd units and the journal.
+//!
+//! # Modules
+//!
+//! - [`units`]: Unit listing, filtering, state inspection, and lifecycle control.
+//! - [`journal`]: Structured journal reading, filtering, and streaming.
 
-#![allow(dead_code)]
+pub mod units;
+pub mod journal;
 
-/// Module entry point for SigmaOS-systemd
-pub fn version() -> &'static str {
-    env!("CARGO_PKG_VERSION")
+/// Initialize the systemd subsystem.
+///
+/// Call once at startup to establish the D-Bus connection to systemd
+/// and verify that the journal reader is available.
+pub fn init() {
+    // TODO: establish D-Bus connection, verify journal access
 }

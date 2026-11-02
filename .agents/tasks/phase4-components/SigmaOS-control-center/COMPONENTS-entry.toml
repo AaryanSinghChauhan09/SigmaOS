@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-control-center"
-description = "Unified system control center for SigmaOS, aggregating all system settings panels in a single interface."
-category    = "system"
-license     = "MIT"
-upstream    = ["cinnamon-control-center", "gnome-control-center"]
+name = "SigmaOS-control-center"
+engine = "rust"
+category = "desktop"
+depends_on = ["SigmaOS-configurator", "SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/cinnamon-control-center"]
+description = "Unified control panel aggregating all system configuration panels in a searchable interface."
+license = "MIT"

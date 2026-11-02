@@ -1,11 +1,20 @@
-//! SigmaOS-system-locale — System locale and language settings for SigmaOS
+//! SigmaOS System Locale
 //!
-//! Part of the SigmaOS multi-repository ecosystem.
-//! See https://github.com/AaryanSinghChauhan09/SigmaOS for details.
+//! System locale and language settings manager for SigmaOS. Configures the
+//! system language, regional formats, and input methods.
+//!
+//! # Modules
+//!
+//! - [`locale`]: Regional format settings (dates, numbers, currency) and locale data.
+//! - [`language`]: System language selection and input method configuration.
 
-#![allow(dead_code)]
+pub mod locale;
+pub mod language;
 
-/// Module entry point for SigmaOS-system-locale
-pub fn version() -> &'static str {
-    env!("CARGO_PKG_VERSION")
+/// Initialize the system-locale subsystem.
+///
+/// Call once at startup to enumerate installed locales, detect the active
+/// input method framework, and load the current language configuration.
+pub fn init() {
+    // TODO: enumerate locales, detect input method framework, load config
 }

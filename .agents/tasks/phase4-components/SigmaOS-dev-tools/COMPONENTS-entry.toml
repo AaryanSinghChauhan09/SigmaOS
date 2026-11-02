@@ -1,8 +1,7 @@
 name = "SigmaOS-dev-tools"
-description = "Developer tools and utilities for SigmaOS development"
-category = "Developer Tools"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
+engine = "shell"
+category = "tools"
 depends_on = []
+upstream_urls = ["https://github.com/linuxmint/mint-dev-tools"]
+description = "Developer tooling suite for building, packaging, testing, and releasing SigmaOS components."
+license = "MIT"

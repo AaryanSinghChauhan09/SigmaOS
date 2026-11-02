@@ -1,17 +1,13 @@
 # SigmaOS-bootloader
 
-## Overview
-System bootloader integration and configuration for SigmaOS.
+System bootloader integration managing GRUB configuration, kernel selection, boot entries, and multi-OS boot menus. Provides a Rust API for reading and updating bootloader state.
 
-## Features
-- Core functionality for SigmaOS-bootloader
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://www.gnu.org/software/grub/
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `grub2`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-bootloader /usr/sbin/sigma-bootloader
+```

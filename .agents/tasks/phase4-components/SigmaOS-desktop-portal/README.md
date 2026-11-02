@@ -1,17 +1,13 @@
 # SigmaOS-desktop-portal
 
-## Overview
-XDG desktop portal implementation for SigmaOS.
+XDG desktop portal implementation enabling sandboxed applications to request file access, camera, screenshots, and notifications through a standardized D-Bus API.
 
-## Features
-- Core functionality for SigmaOS-desktop-portal
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/flatpak/xdg-desktop-portal
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `dbus`, `pipewire`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-desktop-portal /usr/lib/sigma/xdg-desktop-portal-sigma
+```

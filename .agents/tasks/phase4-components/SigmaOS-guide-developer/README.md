@@ -1,17 +1,12 @@
 # SigmaOS-guide-developer
 
-## Overview
-Developer contribution guide for SigmaOS.
+Developer guide for SigmaOS covering architecture, contributing workflows, coding standards, component APIs, and build system documentation.
 
-## Features
-- Core functionality for SigmaOS-guide-developer
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/linuxmint-website
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** none
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+sudo ./src/main.sh install
+```

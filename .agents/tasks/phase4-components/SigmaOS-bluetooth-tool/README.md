@@ -1,17 +1,13 @@
 # SigmaOS-bluetooth-tool
 
-## Overview
-Bluetooth management GUI for pairing and device control.
+Bluetooth configuration and device management UI tool exposing pairing, audio, and file transfer features through a GTK interface. Built on the Blueman tool architecture.
 
-## Features
-- Core functionality for SigmaOS-bluetooth-tool
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/blueman-project/blueman
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `bluez`, `gtk4`, `SigmaOS-bluetooth`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-bluetooth-tool /usr/bin/sigma-bluetooth-tool
+```

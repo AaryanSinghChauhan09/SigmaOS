@@ -1,8 +1,7 @@
 name = "SigmaOS-folder-color-switcher"
-description = "Folder icon color customizer for SigmaOS file manager"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
+engine = "python"
+category = "tools"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/folder-color-switcher"]
+description = "Folder color customizer integrating with the file manager to tag directories with icon colors."
 license = "MIT"
-visibility = "public"
-depends_on = []

@@ -1,17 +1,13 @@
 # SigmaOS-automate
 
-## Overview
-Desktop automation and macro recording tool for SigmaOS.
+Task automation engine for SigmaOS that lets users define, schedule, and execute recurring system and application workflows. Inspired by NiceHash QuickMiner automation patterns.
 
-## Features
-- Core functionality for SigmaOS-automate
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/nicehash/NiceHashQuickMiner
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `SigmaOS-common`, `cron`, `dbus`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-automate /usr/bin/sigma-automate
+```

@@ -1,17 +1,13 @@
 # SigmaOS-desktop-configuration
 
-## Overview
-Desktop environment configuration tool for SigmaOS.
+Desktop configuration profiles managing themes, panel layouts, applet sets, and workspace arrangements. Allows saving and applying complete desktop configuration snapshots.
 
-## Features
-- Core functionality for SigmaOS-desktop-configuration
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/cinnamon
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `SigmaOS-desktop-environment`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-desktop-config /usr/bin/sigma-desktop-config
+```

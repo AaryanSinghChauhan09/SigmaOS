@@ -1,17 +1,13 @@
 # SigmaOS-audio-tuner
 
-## Overview
-System audio tuning and equalizer tool for SigmaOS desktop.
+Audio equalizer and tuner application providing per-application audio effects, filtering, and hardware tuning. Builds on the EasyEffects pipeline model with SigmaOS-native integration.
 
-## Features
-- Core functionality for SigmaOS-audio-tuner
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/wwmm/easyeffects
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `pipewire`, `gstreamer`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-audio-tuner /usr/bin/sigma-audio-tuner
+```

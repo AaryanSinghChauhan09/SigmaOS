@@ -1,17 +1,12 @@
 # SigmaOS-fish
 
-## Overview
-Fish shell configuration and plugins for SigmaOS.
+Fish shell integration providing SigmaOS-specific completions, prompt themes, function libraries, and default configuration. Adds sigma commands and environment setup to Fish.
 
-## Features
-- Core functionality for SigmaOS-fish
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/fish-shell/fish-shell
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `fish`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+sudo ./src/main.sh install
+```

@@ -1,8 +1,7 @@
 name = "SigmaOS-GTK"
-description = "GTK toolkit integration and patches for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+engine = "rust"
+category = "desktop"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/mint-themes"]
+description = "GTK theme and widget library providing SigmaOS visual identity across GTK3 and GTK4 apps."
+license = "GPL-2.0"

@@ -1,17 +1,13 @@
 # SigmaOS-GTK-plus
 
-## Overview
-GTK+ application suite integration for SigmaOS.
+GTK+ extensions and augmentation layer adding custom SigmaOS widgets, additional CSS variables, and themed dialog overrides on top of the base GTK theme.
 
-## Features
-- Core functionality for SigmaOS-GTK-plus
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/mint-themes
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `SigmaOS-GTK`, `gtk3`, `gtk4`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo ./target/release/sigma-gtk-plus --install
+```

@@ -1,8 +1,7 @@
 name = "SigmaOS-file-writer"
-description = "Text file editor and writer application for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "library"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/xapp"]
+description = "File writing utility library providing atomic write and metadata-preserving copy operations."
 license = "MIT"
-visibility = "public"
-depends_on = []

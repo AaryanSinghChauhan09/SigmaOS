@@ -1,8 +1,8 @@
-name = "SigmaOS-systemd"
-description = "Systemd integration and management tools for SigmaOS"
-category = "System Services"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+[component]
+name        = "SigmaOS-systemd"
+category    = "utilities"
+description = "Systemd integration and management tools for SigmaOS."
+upstream    = ["systemd"]
+language    = "rust"
+build       = "cargo build --release"
+license     = "MIT"

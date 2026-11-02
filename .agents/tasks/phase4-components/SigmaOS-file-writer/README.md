@@ -1,17 +1,12 @@
 # SigmaOS-file-writer
 
-## Overview
-Text file editor and writer application for SigmaOS.
+File writing utility library providing atomic write, buffered write, and metadata-preserving copy operations for use across SigmaOS components. Based on XApp's helper utilities.
 
-## Features
-- Core functionality for SigmaOS-file-writer
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/xapp
 
-## Build
-```bash
+**Dependencies:** `SigmaOS-common`
+
+**Build/Install:**
+```
 cargo build --release
 ```
-
-## License
-MIT — See LICENSE file for details.

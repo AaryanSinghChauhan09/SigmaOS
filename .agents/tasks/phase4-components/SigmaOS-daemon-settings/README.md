@@ -1,17 +1,13 @@
 # SigmaOS-daemon-settings
 
-## Overview
-Settings daemon for desktop services and preferences.
+Settings daemon that applies user preferences for keyboard, mouse, display, power, and accessibility at login and on change. Runs as a per-session service.
 
-## Features
-- Core functionality for SigmaOS-daemon-settings
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/cinnamon-settings-daemon
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `gtk4`, `dbus`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-daemon-settings /usr/lib/sigma/sigma-daemon-settings
+```

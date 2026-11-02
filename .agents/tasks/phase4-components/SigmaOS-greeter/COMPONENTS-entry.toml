@@ -1,8 +1,7 @@
 name = "SigmaOS-greeter"
-description = "Graphical login greeter for SigmaOS display manager"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-display-manager", "SigmaOS-common"]
+upstream_urls = ["https://github.com/Litarvan/lightdm-webkit-theme-litarvan"]
+description = "Display manager greeter UI providing login screen with user selection and session picker."
+license = "GPL-2.0"

@@ -1,17 +1,12 @@
 # SigmaOS-brand-logo
 
-## Overview
-Brand assets, logos, and visual identity for SigmaOS.
+Brand assets, logos, wallpapers, and visual identity artwork for SigmaOS. Installs icon sets, boot splashes, and distribution branding resources.
 
-## Features
-- Core functionality for SigmaOS-brand-logo
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/mint-artwork
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** none
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+sudo ./src/main.sh install
+```

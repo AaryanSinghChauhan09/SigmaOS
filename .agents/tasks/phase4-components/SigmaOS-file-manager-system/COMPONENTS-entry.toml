@@ -1,8 +1,7 @@
 name = "SigmaOS-file-manager-system"
-description = "Component for SigmaOS"
-category = "Utilities"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/nemo"]
+description = "System-level file management providing mount handling, file operation daemons, and indexing."
 license = "MIT"
-visibility = "public"
-depends_on = []

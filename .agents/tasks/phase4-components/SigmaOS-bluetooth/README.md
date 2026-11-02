@@ -1,17 +1,13 @@
 # SigmaOS-bluetooth
 
-## Overview
-Bluetooth system integration and applet for SigmaOS desktop.
+Bluetooth stack integration layer providing BlueZ D-Bus bindings, device pairing, audio routing, and profile management for SigmaOS. Wraps the kernel Bluetooth subsystem and BlueZ daemon.
 
-## Features
-- Core functionality for SigmaOS-bluetooth
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://git.kernel.org/pub/scm/bluetooth/bluez.git
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `bluez`, `dbus`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-bluetooth /usr/lib/sigma/bluetooth
+```

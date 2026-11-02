@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-accessibility"
-description = "Accessibility tools and AT-SPI bridge for SigmaOS, enabling assistive technology support for all desktop components."
-category    = "accessibility"
-license     = "MIT"
-upstream    = ["accerciser", "orca"]
+name = "SigmaOS-accessibility"
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://gitlab.gnome.org/GNOME/at-spi2-core"]
+description = "Accessibility layer providing AT-SPI2 interfaces for assistive technologies."
+license = "MIT"

@@ -1,17 +1,12 @@
 # SigmaOS-github-action
 
-## Overview
-Reusable GitHub Actions workflows for SigmaOS repositories.
+Reusable GitHub Actions workflows and composite actions for the SigmaOS project, including build matrix templates, release automation, and cross-component CI helpers.
 
-## Features
-- Core functionality for SigmaOS-github-action
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/actions/starter-workflows
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** none
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+sudo ./src/main.sh install
+```

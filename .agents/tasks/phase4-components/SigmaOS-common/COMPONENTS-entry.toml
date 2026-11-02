@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-common"
-description = "Shared common libraries and utility functions used across SigmaOS components for consistent behaviour."
-category    = "libraries"
-license     = "MIT"
-upstream    = ["mintcommon"]
+name = "SigmaOS-common"
+engine = "rust"
+category = "library"
+depends_on = []
+upstream_urls = ["https://github.com/linuxmint/cinnamon-common"]
+description = "Shared library and utilities providing common types, error handling, and helpers."
+license = "MIT"

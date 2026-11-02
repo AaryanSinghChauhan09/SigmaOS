@@ -1,11 +1,22 @@
-//! SigmaOS-term — Terminal emulator with multiple backend support for SigmaOS
+//! SigmaOS Term
 //!
-//! Part of the SigmaOS multi-repository ecosystem.
-//! See https://github.com/AaryanSinghChauhan09/SigmaOS for details.
+//! Terminal emulator with multiple backend support for SigmaOS. Supports Foot,
+//! Ghostty, Alacritty, and Kitty as interchangeable backends.
+//!
+//! # Modules
+//!
+//! - [`backend`]: Backend abstraction and implementations for Foot, Ghostty,
+//!   Alacritty, and Kitty.
+//! - [`config`]: Unified configuration model that translates to each backend's
+//!   native format.
 
-#![allow(dead_code)]
+pub mod backend;
+pub mod config;
 
-/// Module entry point for SigmaOS-term
-pub fn version() -> &'static str {
-    env!("CARGO_PKG_VERSION")
+/// Initialize the terminal emulator subsystem.
+///
+/// Call once at startup to detect available backends, load configuration,
+/// and select the active backend based on user preferences.
+pub fn init() {
+    // TODO: detect available backends, load config, select active backend
 }

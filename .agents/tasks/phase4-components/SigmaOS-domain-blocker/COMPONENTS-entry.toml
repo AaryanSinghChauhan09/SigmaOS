@@ -1,8 +1,7 @@
 name = "SigmaOS-domain-blocker"
-description = "Network domain blocking and filtering tool for SigmaOS"
-category = "Security"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/nicehash/NiceHashQuickMiner"]
+description = "Network domain blocker applying DNS-based filtering system-wide with blocklist subscriptions."
 license = "MIT"
-visibility = "public"
-depends_on = []

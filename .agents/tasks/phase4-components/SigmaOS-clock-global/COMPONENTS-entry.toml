@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-clock-global"
-description = "World clock and timezone management tool for SigmaOS, showing times across multiple configured timezones."
-category    = "utilities"
-license     = "MIT"
-upstream    = ["elsewhen", "gnome-clocks"]
+name = "SigmaOS-clock-global"
+engine = "rust"
+category = "desktop"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/cinnamon-screensaver"]
+description = "World clock widget displaying multiple time zones with notifications and alarms."
+license = "MIT"

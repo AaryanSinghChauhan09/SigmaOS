@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-actions"
-description = "File manager context menu actions and extensions for the SigmaOS file manager, allowing custom right-click actions."
-category    = "file-manager"
-license     = "MIT"
-upstream    = ["cinnamon-spices-actions"]
+name = "SigmaOS-actions"
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/nemo"]
+description = "System action dispatcher routing file and application actions to the appropriate handler."
+license = "MIT"

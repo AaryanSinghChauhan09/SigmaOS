@@ -7,9 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Lint / Build
-        run: echo "Build step — replace with actual build commands"
+      - run: echo "Color theme validation placeholder"

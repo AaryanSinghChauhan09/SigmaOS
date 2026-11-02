@@ -1,8 +1,7 @@
 name = "SigmaOS-guide-docs"
-description = "Documentation portal and guide index for SigmaOS"
-category = "Documentation"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
+engine = "shell"
+category = "docs"
 depends_on = []
+upstream_urls = ["https://github.com/linuxmint/linuxmint-website"]
+description = "Documentation hub containing user guides, release notes, FAQ, and component documentation."
+license = "MIT"

@@ -1,8 +1,8 @@
-name = "SigmaOS-system-admin"
-description = "Component for SigmaOS"
-category = "Utilities"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+[component]
+name        = "SigmaOS-system-admin"
+category    = "utilities"
+description = "System administration tools for SigmaOS."
+upstream    = ["mintsysadm"]
+language    = "rust"
+build       = "cargo build --release"
+license     = "MIT"

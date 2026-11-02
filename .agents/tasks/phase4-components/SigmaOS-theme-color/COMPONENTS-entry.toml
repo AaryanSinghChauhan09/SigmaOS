@@ -1,8 +1,8 @@
-name = "SigmaOS-theme-color"
-description = "Color theme definitions and palettes for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+[component]
+name        = "SigmaOS-theme-color"
+category    = "themes"
+description = "Color theme definitions and palettes for SigmaOS."
+upstream    = ["mint-y-colors"]
+language    = "bash"
+build       = "make install"
+license     = "MIT"

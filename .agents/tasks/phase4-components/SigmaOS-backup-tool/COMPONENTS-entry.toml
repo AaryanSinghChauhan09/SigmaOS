@@ -1,8 +1,7 @@
 name = "SigmaOS-backup-tool"
-description = "System backup and restore utility for SigmaOS"
-category = "System Services"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "tools"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/timeshift"]
+description = "System backup and restore utility using rsync/BTRFS incremental snapshots."
 license = "MIT"
-visibility = "public"
-depends_on = []

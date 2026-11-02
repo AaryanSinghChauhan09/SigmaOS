@@ -1,17 +1,12 @@
 # SigmaOS-guide-docs
 
-## Overview
-Documentation portal and guide index for SigmaOS.
+Documentation hub for SigmaOS, containing user guides, release notes, FAQ, and component documentation. Publishes to the SigmaOS website and offline help viewer.
 
-## Features
-- Core functionality for SigmaOS-guide-docs
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/linuxmint-website
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** none
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+sudo ./src/main.sh install
+```

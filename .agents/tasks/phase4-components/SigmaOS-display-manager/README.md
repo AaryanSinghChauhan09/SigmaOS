@@ -1,17 +1,14 @@
 # SigmaOS-display-manager
 
-## Overview
-Graphical login and display manager for SigmaOS.
+Display and login manager for SigmaOS handling X11/Wayland session startup, user authentication, and greeter orchestration. Built on the LightDM architecture.
 
-## Features
-- Core functionality for SigmaOS-display-manager
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/canonical/lightdm
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `pam`, `xorg`, `wayland`, `SigmaOS-greeter`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-display-manager /usr/sbin/sigma-display-manager
+sudo systemctl enable sigma-display-manager
+```

@@ -1,17 +1,13 @@
 # SigmaOS-calculator
 
-## Overview
-Desktop calculator application for SigmaOS.
+Calculator application supporting basic and scientific calculations with a GTK frontend and a headless computation engine. Inspired by GNOME Calculator.
 
-## Features
-- Core functionality for SigmaOS-calculator
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/gnome-calculator
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `gtk4`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-calculator /usr/bin/sigma-calculator
+```

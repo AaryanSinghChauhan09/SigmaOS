@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-dots-configuration"
-description = "Dotfiles and configuration management system for SigmaOS, enabling reproducible desktop environment setups."
-category    = "configuration"
-license     = "MIT"
-upstream    = ["omadots", "chezmoi"]
+name = "SigmaOS-dots-configuration"
+engine = "shell"
+category = "tools"
+depends_on = []
+upstream_urls = ["https://github.com/linuxmint/cinnamon"]
+description = "Dotfiles configuration management providing version-controlled templates and deployment scripts."
+license = "MIT"

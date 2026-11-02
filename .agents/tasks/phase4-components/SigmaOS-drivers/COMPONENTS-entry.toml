@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-drivers"
-description = "Hardware driver management tool for SigmaOS, detecting, installing, and updating proprietary and third-party drivers."
-category    = "system"
-license     = "MIT"
-upstream    = ["mintdrivers", "ubuntu-drivers"]
+name = "SigmaOS-drivers"
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/mintdrivers"]
+description = "Hardware driver management detecting hardware and handling driver installation and switching."
+license = "GPL-2.0"

@@ -1,8 +1,7 @@
 name = "SigmaOS-fish"
-description = "Fish shell configuration and plugins for SigmaOS"
-category = "Utilities"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
+engine = "shell"
+category = "tools"
 depends_on = []
+upstream_urls = ["https://github.com/fish-shell/fish-shell"]
+description = "Fish shell integration with SigmaOS-specific completions, prompt themes, and configuration."
+license = "MIT"

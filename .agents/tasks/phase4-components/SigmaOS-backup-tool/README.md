@@ -1,17 +1,13 @@
 # SigmaOS-backup-tool
 
-## Overview
-System backup and restore utility for SigmaOS.
+System backup and restore utility using rsync snapshots with incremental scheduling. Provides BTRFS and rsync-based snapshot management with a simple CLI and optional GTK frontend.
 
-## Features
-- Core functionality for SigmaOS-backup-tool
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/timeshift
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `rsync`, `btrfs-progs`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-backup /usr/bin/sigma-backup
+```

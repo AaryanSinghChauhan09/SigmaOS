@@ -1,8 +1,7 @@
 name = "SigmaOS-bluetooth-tool"
-description = "Bluetooth management GUI for pairing and device control"
-category = "Utilities"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "tools"
+depends_on = ["SigmaOS-bluetooth", "SigmaOS-common"]
+upstream_urls = ["https://github.com/blueman-project/blueman"]
+description = "Bluetooth configuration and device management UI for pairing, audio, and file transfer."
 license = "MIT"
-visibility = "public"
-depends_on = []

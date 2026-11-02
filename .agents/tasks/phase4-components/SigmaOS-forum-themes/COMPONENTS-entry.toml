@@ -1,8 +1,7 @@
 name = "SigmaOS-forum-themes"
-description = "Community forum theme assets for SigmaOS"
-category = "Documentation"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
+engine = "shell"
+category = "assets"
 depends_on = []
+upstream_urls = ["https://github.com/linuxmint/linuxmint-website"]
+description = "Forum and community website themes matching the SigmaOS brand with dark/light variants."
+license = "MIT"

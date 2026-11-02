@@ -1,8 +1,7 @@
 name = "SigmaOS-bootloader"
-description = "System bootloader integration and configuration for SigmaOS"
-category = "System Services"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://www.gnu.org/software/grub/"]
+description = "System bootloader integration managing GRUB configuration and boot entries."
+license = "GPL-2.0"

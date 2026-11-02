@@ -1,17 +1,12 @@
 # SigmaOS-dev-tools
 
-## Overview
-Developer tools and utilities for SigmaOS development.
+Developer tooling suite providing scripts for building, packaging, testing, and releasing SigmaOS components. Includes code-generation helpers and environment setup scripts.
 
-## Features
-- Core functionality for SigmaOS-dev-tools
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/mint-dev-tools
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `git`, `cargo`, `python3`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+sudo ./src/main.sh install
+```

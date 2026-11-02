@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-apturl"
-description = "URL handler that allows installing packages from apt:// URIs, integrating with the system package manager."
-category    = "package-management"
-license     = "MIT"
-upstream    = ["apturl"]
+name = "SigmaOS-apturl"
+engine = "python"
+category = "tools"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/apturl"]
+description = "APT URL handler for one-click package installation from web browsers."
+license = "MIT"

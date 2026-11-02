@@ -1,17 +1,13 @@
 # SigmaOS-GTK
 
-## Overview
-GTK toolkit integration and patches for SigmaOS.
+GTK theme and widget library providing SigmaOS's visual identity across GTK3 and GTK4 applications. Includes Sass sources, compiled CSS, and custom widget overrides.
 
-## Features
-- Core functionality for SigmaOS-GTK
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/mint-themes
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `gtk3`, `gtk4`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo ./target/release/sigma-gtk --install
+```

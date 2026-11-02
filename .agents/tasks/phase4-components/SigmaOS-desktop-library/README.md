@@ -1,17 +1,12 @@
 # SigmaOS-desktop-library
 
-## Overview
-Shared library for SigmaOS desktop environment components.
+Shared desktop library providing data types, GSettings schemas, and helper functions shared between the desktop environment, configurator, and applets.
 
-## Features
-- Core functionality for SigmaOS-desktop-library
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/cinnamon-desktop
 
-## Build
-```bash
+**Dependencies:** `glib`, `gio`, `SigmaOS-common`
+
+**Build/Install:**
+```
 cargo build --release
 ```
-
-## License
-MIT — See LICENSE file for details.

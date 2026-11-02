@@ -1,8 +1,7 @@
 name = "SigmaOS-desktop-portal"
-description = "XDG desktop portal implementation for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "system"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/flatpak/xdg-desktop-portal"]
+description = "XDG desktop portal enabling sandboxed applications to request file access and notifications."
 license = "MIT"
-visibility = "public"
-depends_on = []

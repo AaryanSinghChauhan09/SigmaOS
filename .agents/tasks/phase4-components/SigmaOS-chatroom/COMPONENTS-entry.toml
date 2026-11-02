@@ -1,8 +1,7 @@
 name = "SigmaOS-chatroom"
-description = "Community chat client for SigmaOS project communication"
-category = "Network"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "tools"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/hexchat/hexchat"]
+description = "Built-in IRC and chat client with multi-server connections and channel management."
 license = "MIT"
-visibility = "public"
-depends_on = []

@@ -1,8 +1,7 @@
 name = "SigmaOS-desktop-library"
-description = "Shared library for SigmaOS desktop environment components"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "library"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/cinnamon-desktop"]
+description = "Shared desktop library providing data types and helpers for desktop components."
 license = "MIT"
-visibility = "public"
-depends_on = []

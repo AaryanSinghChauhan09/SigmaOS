@@ -1,8 +1,7 @@
 name = "SigmaOS-calculator"
-description = "Desktop calculator application for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
+engine = "rust"
+category = "tools"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/gnome-calculator"]
+description = "Calculator application supporting basic and scientific calculations."
 license = "MIT"
-visibility = "public"
-depends_on = []

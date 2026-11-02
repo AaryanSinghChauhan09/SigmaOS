@@ -1,8 +1,8 @@
-name = "SigmaOS-term"
-description = "Terminal emulator with multiple backend support for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+[component]
+name        = "SigmaOS-term"
+category    = "utilities"
+description = "Terminal emulator with multiple backend support for SigmaOS."
+upstream    = ["ptyxis-minted", "omaterm", "foot", "ghostty", "alacritty", "kitty"]
+language    = "rust"
+build       = "cargo build --release"
+license     = "MIT"

@@ -1,8 +1,7 @@
 name = "SigmaOS-chromium"
-description = "Chromium browser integration and patches for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
+engine = "shell"
+category = "tools"
 depends_on = []
+upstream_urls = ["https://chromium.googlesource.com/chromium/src"]
+description = "Chromium browser integration providing SigmaOS-specific preferences and launch wrappers."
+license = "MIT"

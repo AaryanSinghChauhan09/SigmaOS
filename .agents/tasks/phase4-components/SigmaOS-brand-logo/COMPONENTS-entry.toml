@@ -1,8 +1,7 @@
 name = "SigmaOS-brand-logo"
-description = "Brand assets, logos, and visual identity for SigmaOS"
-category = "Documentation"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
+engine = "shell"
+category = "assets"
 depends_on = []
+upstream_urls = ["https://github.com/linuxmint/mint-artwork"]
+description = "Brand assets, logos, wallpapers, and visual identity artwork for SigmaOS."
+license = "MIT"

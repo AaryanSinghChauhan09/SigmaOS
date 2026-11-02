@@ -1,17 +1,13 @@
 # SigmaOS-desktop-environment
 
-## Overview
-Full desktop environment stack for SigmaOS.
+Core desktop environment for SigmaOS providing the compositor, window manager, panel, system tray, and session management. Inspired by the Cinnamon desktop architecture.
 
-## Features
-- Core functionality for SigmaOS-desktop-environment
-- Integration with SigmaOS desktop environment
-- Configurable settings and preferences
+**Upstream inspiration:** https://github.com/linuxmint/cinnamon
 
-## Build
-```bash
-cargo build --release
+**Dependencies:** `mutter`, `clutter`, `cogl`, `SigmaOS-common`
+
+**Build/Install:**
 ```
-
-## License
-MIT — See LICENSE file for details.
+cargo build --release
+sudo cp target/release/sigma-session /usr/bin/sigma-session
+```

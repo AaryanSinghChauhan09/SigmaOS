@@ -1,8 +1,8 @@
-name = "SigmaOS-theme-cursor"
-description = "Cursor theme collection for SigmaOS"
-category = "Desktop/UI"
-engine = "unknown"
-language = "rust"
-license = "MIT"
-visibility = "public"
-depends_on = []
+[component]
+name        = "SigmaOS-theme-cursor"
+category    = "themes"
+description = "Cursor theme collection for SigmaOS."
+upstream    = ["mint-cursor-themes", "bibata"]
+language    = "bash"
+build       = "make install"
+license     = "MIT"

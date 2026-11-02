@@ -1,6 +1,7 @@
-[component]
-name        = "SigmaOS-configurator"
-description = "System configurator and first-run setup wizard for SigmaOS, guiding users through initial system configuration."
-category    = "system"
-license     = "MIT"
-upstream    = ["mintconfiguration", "gnome-initial-setup"]
+name = "SigmaOS-configurator"
+engine = "rust"
+category = "desktop"
+depends_on = ["SigmaOS-common"]
+upstream_urls = ["https://github.com/linuxmint/cinnamon-control-center"]
+description = "System configuration UI for display, input, network, sound, and account settings."
+license = "MIT"
