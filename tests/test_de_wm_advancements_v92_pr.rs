@@ -61,7 +61,9 @@ fn test_xfce_and_mate_and_cinnamon_v92_integration() {
     assert!(action_output.contains("Batch Rename Files"));
     xfce.set_panel_preset("DockbarPreset");
     assert_eq!(xfce.panel_layout_preset, "DockbarPreset");
-    assert!(xfce.export_xfconf_channel_xml("xfce4-panel").contains("xfce4-panel"));
+    assert!(xfce
+        .export_xfconf_channel_xml("xfce4-panel")
+        .contains("xfce4-panel"));
 
     let mut mate = MateAdvancementsV92Engine::new();
     assert!(mate.marco_csd_toggle_enabled);
@@ -79,21 +81,31 @@ fn test_xfce_and_mate_and_cinnamon_v92_integration() {
 fn test_lxqt_and_lxde_and_budgie_and_moksha_v92_integration() {
     let mut lxqt = LxqtAdvancementsV92Engine::new();
     assert!(lxqt.toggle_qterminal_dropdown());
-    assert!(lxqt.generate_qterminal_color_scheme().contains("DarkPalette=true"));
+    assert!(lxqt
+        .generate_qterminal_color_scheme()
+        .contains("DarkPalette=true"));
 
     let mut lxde = LxdeAdvancementsV92Engine::new();
     lxde.apply_gtk_theme("Breeze-Dark");
     assert_eq!(lxde.lxappearance_gtk_theme, "Breeze-Dark");
-    assert!(lxde.generate_openbox_pipe_menu_xml().contains("Breeze-Dark"));
+    assert!(lxde
+        .generate_openbox_pipe_menu_xml()
+        .contains("Breeze-Dark"));
 
     let mut budgie = BudgieAdvancementsV92Engine::new();
     assert!(budgie.toggle_raven_sidebar());
-    assert_eq!(budgie.build_raven_widget("calendar"), "RavenWidget:calendar");
+    assert_eq!(
+        budgie.build_raven_widget("calendar"),
+        "RavenWidget:calendar"
+    );
 
     let mut moksha = EnlightenmentMokshaAdvancementsV92Engine::new();
     moksha.set_efl_scale(2.0);
     assert_eq!(moksha.efl_scale_factor, 2.0);
-    assert_eq!(moksha.compile_evas_theme("solarized"), "EvasCompiledTheme:solarized.edj");
+    assert_eq!(
+        moksha.compile_evas_theme("solarized"),
+        "EvasCompiledTheme:solarized.edj"
+    );
 }
 
 #[test]
@@ -146,7 +158,9 @@ fn test_tiling_wm_advancements_v92_integration() {
     let openbox = OpenboxAdvancementsV92Engine::new();
     assert!(openbox.generate_root_menu().contains("Openbox3"));
     let fluxbox = FluxboxAdvancementsV92Engine::new();
-    assert!(fluxbox.attach_window_tab("term1", "term2").contains("attached as tab"));
+    assert!(fluxbox
+        .attach_window_tab("term1", "term2")
+        .contains("attached as tab"));
 }
 
 #[test]
