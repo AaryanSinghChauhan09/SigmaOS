@@ -7,6 +7,10 @@
 //! - wlroots: <https://gitlab.freedesktop.org/wlroots/wlroots>
 //! - smithay: <https://github.com/Smithay/smithay>
 
+pub mod buffer;
+pub mod output;
+pub mod surface;
+
 use std::fmt;
 
 // ---------------------------------------------------------------------------

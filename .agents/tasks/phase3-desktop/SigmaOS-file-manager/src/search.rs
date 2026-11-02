@@ -13,11 +13,21 @@ pub struct SearchQuery {
 
 impl SearchQuery {
     pub fn by_name(pattern: impl Into<String>) -> Self {
-        Self { name_pattern: Some(pattern.into()), content_pattern: None, mime_filter: None, case_sensitive: false }
+        Self {
+            name_pattern: Some(pattern.into()),
+            content_pattern: None,
+            mime_filter: None,
+            case_sensitive: false,
+        }
     }
 
     pub fn by_content(pattern: impl Into<String>) -> Self {
-        Self { name_pattern: None, content_pattern: Some(pattern.into()), mime_filter: None, case_sensitive: false }
+        Self {
+            name_pattern: None,
+            content_pattern: Some(pattern.into()),
+            mime_filter: None,
+            case_sensitive: false,
+        }
     }
 }
 
@@ -32,7 +42,9 @@ impl FileSearch {
     }
 
     fn walk(dir: &Path, query: &SearchQuery, results: &mut Vec<PathBuf>) {
-        let Ok(entries) = std::fs::read_dir(dir) else { return };
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return;
+        };
         for entry in entries.flatten() {
             let path = entry.path();
             let name = entry.file_name().to_string_lossy().to_string();

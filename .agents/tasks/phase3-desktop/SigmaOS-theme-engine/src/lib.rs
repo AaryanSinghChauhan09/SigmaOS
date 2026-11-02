@@ -3,6 +3,10 @@
 //! Upstream inspiration:
 //! - Cinnamon themes: <https://github.com/linuxmint/cinnamon>
 
+pub mod css;
+pub mod icons;
+pub mod palette;
+
 use std::{collections::HashMap, fmt};
 
 // ---------------------------------------------------------------------------

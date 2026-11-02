@@ -4,6 +4,10 @@
 //! - cinnamon-control-center:   <https://github.com/linuxmint/cinnamon-control-center>
 //! - cinnamon-settings-daemon:  <https://github.com/linuxmint/cinnamon-settings-daemon>
 
+pub mod display;
+pub mod network;
+pub mod sound;
+
 use std::{collections::HashMap, fmt};
 
 // ---------------------------------------------------------------------------

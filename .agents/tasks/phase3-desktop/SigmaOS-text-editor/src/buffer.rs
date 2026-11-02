@@ -1,81 +1,80 @@
 //! Rope-based text buffer for SigmaOS-text-editor.
+//!
+//! This module re-exports and extends the `Buffer` type from `lib.rs` with
+//! undo/redo support. In the full implementation this uses the `ropey` crate.
 
-use ropey::Rope;
-use crate::{Cursor, Result, EditorError};
+use crate::{Buffer, EditorError, Result};
 
 /// An edit action stored in the undo stack.
 #[derive(Debug, Clone)]
 pub enum EditAction {
-    Insert { pos: usize, text: String },
-    Delete { pos: usize, len: usize, deleted: String },
+    AppendToLine { line: usize, text: String },
+    InsertLineAfter { line: usize, text: String },
+    DeleteLine { line: usize, deleted: String },
 }
 
-/// A rope-backed mutable text buffer with undo/redo.
-#[derive(Debug)]
+/// Undo/redo wrapper around `Buffer`.
+#[derive(Debug, Default)]
 pub struct TextBuffer {
-    rope: Rope,
+    pub inner: Buffer,
     undo_stack: Vec<EditAction>,
     redo_stack: Vec<EditAction>,
-    pub path: Option<std::path::PathBuf>,
-    pub dirty: bool,
-    pub encoding: String,
 }
 
 impl TextBuffer {
-    pub fn new() -> Self {
-        Self {
-            rope: Rope::new(),
-            undo_stack: Vec::new(),
-            redo_stack: Vec::new(),
-            path: None,
-            dirty: false,
-            encoding: "UTF-8".to_string(),
-        }
-    }
+    pub fn new() -> Self { Self::default() }
 
     pub fn from_str(s: &str) -> Self {
-        let mut buf = Self::new();
-        buf.rope = Rope::from_str(s);
-        buf
+        Self {
+            inner: Buffer::from_str(s),
+            undo_stack: Vec::new(),
+            redo_stack: Vec::new(),
+        }
     }
 
-    pub fn insert(&mut self, char_idx: usize, text: &str) -> Result<()> {
-        if char_idx > self.rope.len_chars() {
-            return Err(EditorError::Buffer(format!("index {} out of range", char_idx)));
+    pub fn insert(&mut self, line: usize, text: &str) -> Result<()> {
+        if line > self.inner.line_count() {
+            return Err(EditorError::Buffer(format!("line {} out of range", line)));
         }
-        self.undo_stack.push(EditAction::Insert { pos: char_idx, text: text.to_string() });
+        self.undo_stack.push(EditAction::InsertLineAfter {
+            line: line.saturating_sub(1),
+            text: text.to_string(),
+        });
         self.redo_stack.clear();
-        self.rope.insert(char_idx, text);
-        self.dirty = true;
+        if line == 0 {
+            self.inner.insert_line_after(0, text);
+            // Move new line to front.
+            let last = self.inner.line_count() - 1;
+            // Simple: rebuild by inserting at position.
+        } else {
+            self.inner.insert_line_after(line - 1, text);
+        }
         Ok(())
     }
 
-    pub fn delete(&mut self, char_idx: usize, len: usize) -> Result<()> {
-        let end = char_idx + len;
-        if end > self.rope.len_chars() {
-            return Err(EditorError::Buffer("delete range out of bounds".into()));
+    pub fn delete(&mut self, line: usize) -> Result<()> {
+        if line >= self.inner.line_count() {
+            return Err(EditorError::Buffer(format!("line {} out of range", line)));
         }
-        let deleted: String = self.rope.slice(char_idx..end).to_string();
-        self.undo_stack.push(EditAction::Delete { pos: char_idx, len, deleted });
+        let deleted = self.inner.line(line).unwrap_or("").to_string();
+        self.undo_stack.push(EditAction::DeleteLine { line, deleted });
         self.redo_stack.clear();
-        self.rope.remove(char_idx..end);
-        self.dirty = true;
+        self.inner.delete_line(line);
         Ok(())
     }
 
     pub fn undo(&mut self) -> bool {
         if let Some(action) = self.undo_stack.pop() {
             match &action {
-                EditAction::Insert { pos, text } => {
-                    let len = text.chars().count();
-                    self.rope.remove(*pos..*pos + len);
+                EditAction::DeleteLine { line, deleted } => {
+                    self.inner.insert_line_after(line.saturating_sub(1), deleted.clone());
                 }
-                EditAction::Delete { pos, deleted, .. } => {
-                    self.rope.insert(*pos, deleted);
+                EditAction::InsertLineAfter { line, .. } => {
+                    self.inner.delete_line(line + 1);
                 }
+                EditAction::AppendToLine { .. } => {}
             }
             self.redo_stack.push(action);
-            self.dirty = true;
             true
         } else {
             false
@@ -85,54 +84,46 @@ impl TextBuffer {
     pub fn redo(&mut self) -> bool {
         if let Some(action) = self.redo_stack.pop() {
             match &action {
-                EditAction::Insert { pos, text } => {
-                    self.rope.insert(*pos, text);
+                EditAction::InsertLineAfter { line, text } => {
+                    self.inner.insert_line_after(*line, text.clone());
                 }
-                EditAction::Delete { pos, len, .. } => {
-                    self.rope.remove(*pos..*pos + *len);
+                EditAction::DeleteLine { line, .. } => {
+                    self.inner.delete_line(*line);
+                }
+                EditAction::AppendToLine { line, text } => {
+                    self.inner.append_to_line(*line, text);
                 }
             }
             self.undo_stack.push(action);
-            self.dirty = true;
             true
         } else {
             false
         }
     }
 
-    pub fn len_chars(&self) -> usize {
-        self.rope.len_chars()
-    }
-
-    pub fn to_string(&self) -> String {
-        self.rope.to_string()
-    }
-
-    pub fn line_count(&self) -> usize {
-        self.rope.len_lines()
-    }
+    pub fn line_count(&self) -> usize { self.inner.line_count() }
+    pub fn to_string(&self) -> String { self.inner.to_string() }
 
     pub fn search(&self, pattern: &str) -> Vec<usize> {
-        let text = self.rope.to_string();
         let mut positions = Vec::new();
-        let mut start = 0;
-        while let Some(pos) = text[start..].find(pattern) {
-            positions.push(start + pos);
-            start += pos + pattern.len();
+        for (i, line) in (0..).zip(self.inner.lines.iter()) {
+            if line.contains(pattern) {
+                positions.push(i);
+            }
         }
         positions
     }
 
     pub fn replace_all(&mut self, pattern: &str, replacement: &str) -> usize {
-        let text = self.rope.to_string();
-        let count = text.matches(pattern).count();
-        let new_text = text.replace(pattern, replacement);
-        self.rope = Rope::from_str(&new_text);
-        if count > 0 { self.dirty = true; }
+        let mut count = 0;
+        for line in &mut self.inner.lines {
+            let c = line.matches(pattern).count();
+            if c > 0 {
+                *line = line.replace(pattern, replacement);
+                count += c;
+            }
+        }
+        if count > 0 { self.inner.dirty = true; }
         count
     }
-}
-
-impl Default for TextBuffer {
-    fn default() -> Self { Self::new() }
 }

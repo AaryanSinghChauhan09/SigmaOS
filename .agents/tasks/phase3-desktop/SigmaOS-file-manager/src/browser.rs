@@ -1,17 +1,18 @@
 //! Directory browser for SigmaOS-file-manager.
 
 use std::path::{Path, PathBuf};
-use crate::{Bookmark, FileEntry, FmError, Result};
+use crate::{Bookmark, DirectoryView, EntryKind, FileEntry, FmError, Result};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SortOrder { Name, Size, Date, Type }
 
 impl Default for SortOrder { fn default() -> Self { SortOrder::Name } }
 
+/// Stateful file browser with navigation history.
 #[derive(Debug, Default)]
 pub struct FileBrowser {
     pub current_dir: PathBuf,
-    pub entries: Vec<FileEntry>,
+    pub view: DirectoryView,
     pub bookmarks: Vec<Bookmark>,
     pub sort: SortOrder,
     pub show_hidden: bool,
@@ -31,33 +32,41 @@ impl FileBrowser {
 
     pub fn refresh(&mut self) -> Result<()> {
         let dir = std::fs::read_dir(&self.current_dir)?;
-        self.entries.clear();
+        let mut entries = Vec::new();
         for entry in dir.flatten() {
             let meta = entry.metadata()?;
             let name = entry.file_name().to_string_lossy().into_owned();
             if !self.show_hidden && name.starts_with('.') {
                 continue;
             }
-            self.entries.push(FileEntry {
+            let kind = if meta.is_symlink() {
+                EntryKind::Symlink
+            } else if meta.is_dir() {
+                EntryKind::Directory
+            } else {
+                EntryKind::File
+            };
+            entries.push(FileEntry {
                 name: name.clone(),
                 path: entry.path(),
-                is_dir: meta.is_dir(),
                 size: meta.len(),
-                mime_type: if meta.is_dir() { "inode/directory".into() } else { "application/octet-stream".into() },
-                symlink: meta.file_type().is_symlink(),
+                kind,
+                mime_type: if meta.is_dir() {
+                    "inode/directory".into()
+                } else {
+                    "application/octet-stream".into()
+                },
             });
         }
-        self.sort();
-        Ok(())
-    }
-
-    pub fn sort(&mut self) {
+        // Sort
         match self.sort {
-            SortOrder::Name => self.entries.sort_by(|a, b| a.name.cmp(&b.name)),
-            SortOrder::Size => self.entries.sort_by_key(|e| e.size),
-            SortOrder::Date => {} // date sort requires metadata; stubbed
-            SortOrder::Type => self.entries.sort_by(|a, b| a.mime_type.cmp(&b.mime_type)),
+            SortOrder::Name => entries.sort_by(|a, b| a.name.cmp(&b.name)),
+            SortOrder::Size => entries.sort_by_key(|e| e.size),
+            SortOrder::Date => {}
+            SortOrder::Type => entries.sort_by(|a, b| a.mime_type.cmp(&b.mime_type)),
         }
+        self.view.load(self.current_dir.to_string_lossy().into_owned(), entries);
+        Ok(())
     }
 
     pub fn go_up(&mut self) -> Result<()> {
@@ -88,6 +97,9 @@ impl FileBrowser {
     }
 
     pub fn selected_entries(&self) -> Vec<&FileEntry> {
-        self.selected.iter().filter_map(|&i| self.entries.get(i)).collect()
+        self.selected
+            .iter()
+            .filter_map(|&i| self.view.entries().get(i))
+            .collect()
     }
 }
