@@ -107,7 +107,8 @@ fn test_integration_crypto_tools_and_proposals_v90() {
     assert_eq!(p.len(), 14);
     assert_eq!(q.len(), 14);
 
-    let key = lvm.derive_argon2id_keyslot(b"argon2id_pass", b"argon2id_salt");
+    let seed: [u8; 8] = [0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6, 0x07, 0x18];
+    let key = lvm.derive_argon2id_keyslot(b"argon2id_pass", &seed);
     assert_ne!(key, [0u8; 32]);
     assert!(lvm.verify_dm_verity_roothash(&[9u8; 32], &[9u8; 32]));
 

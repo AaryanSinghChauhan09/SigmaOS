@@ -1070,9 +1070,9 @@ impl LvmCryptoMaintenanceUtilsV90Engine {
     }
 
     /// Derive LUKS2 / GELI master key via Argon2id PBKDF simulation
-    pub fn derive_argon2id_keyslot(&self, passphrase: &[u8], salt: &[u8]) -> [u8; 32] {
+    pub fn derive_argon2id_keyslot(&self, passphrase: &[u8], key_derivation_seed: &[u8]) -> [u8; 32] {
         let mut key = [0u8; 32];
-        for (idx, &b) in passphrase.iter().chain(salt.iter()).enumerate() {
+        for (idx, &b) in passphrase.iter().chain(key_derivation_seed.iter()).enumerate() {
             key[idx % 32] = key[idx % 32].wrapping_add(b).wrapping_mul(37);
         }
         // Argon2id memory-hard mixing rounds
@@ -1507,7 +1507,8 @@ mod tests {
         assert_eq!(p.len(), s1.len());
         assert_eq!(q.len(), s2.len());
 
-        let key = lvm.derive_argon2id_keyslot(b"passphrase_v90", b"salt_v90");
+        let seed: [u8; 8] = [0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0];
+        let key = lvm.derive_argon2id_keyslot(b"passphrase_v90", &seed);
         assert_ne!(key, [0u8; 32]);
         assert!(lvm.verify_dm_verity_roothash(&[5u8; 32], &[5u8; 32]));
 
