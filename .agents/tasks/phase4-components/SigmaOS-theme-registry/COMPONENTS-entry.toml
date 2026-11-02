@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-registry"
+category    = "themes"
+description = "Central theme registry and metadata store for SigmaOS."
+upstream    = ["AppStream"]
+build       = "cargo build --release"
+license     = "MIT"

@@ -1,0 +1,8 @@
+name = "SigmaOS-upgrade"
+description = "System version upgrade tool for SigmaOS"
+category = "Package Management"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

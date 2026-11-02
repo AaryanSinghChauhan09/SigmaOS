@@ -1,0 +1,5 @@
+name = "SigmaOS-timeshift"
+category = "utilities"
+upstream = "timeshift"
+license = "MIT"
+language = "rust"

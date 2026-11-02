@@ -1,0 +1,116 @@
+name: Publish to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - '.github/workflows/publish-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm install -g @docusaurus/core @docusaurus/preset-classic
+
+      - name: Build documentation
+        run: |
+          # Convert markdown to static site
+          # Using a simple approach: copy docs structure and create index
+          mkdir -p build
+          cp -r docs/* build/ || true
+          
+          # Create root index.html that lists sections
+          cat > build/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>SigmaOS Documentation</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 40px; }
+              h1 { color: #333; }
+              .section { margin: 20px 0; }
+              .section h2 { color: #666; font-size: 18px; }
+              a { color: #0066cc; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+              code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; }
+            </style>
+          </head>
+          <body>
+            <h1>SigmaOS Documentation</h1>
+            <p>Welcome to the SigmaOS technical documentation.</p>
+            
+            <div class="section">
+              <h2><a href="architecture/">Architecture</a></h2>
+              <p>System design principles and high-level architecture overview.</p>
+            </div>
+            
+            <div class="section">
+              <h2><a href="components/">Components</a></h2>
+              <p>Component registry and dependency matrix.</p>
+            </div>
+            
+            <div class="section">
+              <h2><a href="capabilities/">Capabilities</a></h2>
+              <p>Feature matrix and implementation status.</p>
+            </div>
+            
+            <div class="section">
+              <h2><a href="subsystems/">Subsystems</a></h2>
+              <p>Deep-dives into major subsystems.</p>
+            </div>
+            
+            <div class="section">
+              <h2><a href="governance/">Governance</a></h2>
+              <p>Rules, policies, and contribution guidelines.</p>
+            </div>
+            
+            <div class="section">
+              <h2><a href="cookbook/">Cookbook</a></h2>
+              <p>Developer how-to guides and recipes.</p>
+            </div>
+            
+            <div class="section">
+              <h2><a href="roadmap/">Roadmap</a></h2>
+              <p>Project milestones and long-term vision.</p>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: 'build'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-window-manager"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Contributors"]
+description = "Tiling and stacking window manager for SigmaOS"
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-window-manager"
+
+[lib]
+name = "sigmaos_window_manager"
+path = "src/lib.rs"
+
+[dependencies]
+
+[dev-dependencies]

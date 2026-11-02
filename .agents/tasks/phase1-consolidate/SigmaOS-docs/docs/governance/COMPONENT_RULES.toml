@@ -1,0 +1,46 @@
+# Component Definition and Registration Rules
+
+# Rules for defining and registering components in the SigmaOS ecosystem
+
+[component_definition]
+# Minimum fields required for component definition
+required_fields = ["name", "owner", "description", "status"]
+
+# Valid component statuses
+valid_statuses = ["stable", "beta", "alpha", "experimental", "deprecated"]
+
+# Component naming convention
+naming_pattern = "^[a-z][a-z0-9_-]*$"
+naming_min_length = 3
+naming_max_length = 50
+
+[component_classification]
+# Valid component categories
+categories = ["core", "network", "desktop", "package_manager", "utility"]
+
+# Valid component types
+types = ["library", "service", "tool", "plugin"]
+
+[dependencies]
+# Maximum allowed dependency depth
+max_depth = 4
+
+# Circular dependencies are prohibited
+allow_circular = false
+
+# External dependency restrictions
+external_dependency_policy = "minimal"
+
+[ownership]
+# Component must have at least one owner
+require_owner = true
+
+# Owner must be active contributor
+owner_active_requirement = true
+
+[versioning]
+# Semantic versioning required
+version_scheme = "semver"
+
+# API stability requirements
+api_stability_required = true

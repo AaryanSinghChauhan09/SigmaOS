@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-radio-stream"
+description = "Internet radio streaming client for SigmaOS with station discovery and panel integration"
+category = "media"
+license = "MIT"

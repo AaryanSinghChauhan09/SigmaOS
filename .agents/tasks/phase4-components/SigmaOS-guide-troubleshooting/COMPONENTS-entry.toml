@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-guide-troubleshooting"
+description = "Troubleshooting guide documentation for SigmaOS"
+category = "documentation"
+license = "MIT"

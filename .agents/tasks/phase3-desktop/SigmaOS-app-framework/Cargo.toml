@@ -1,0 +1,27 @@
+[package]
+name = "sigmaos-app-framework"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Contributors"]
+description = "Shared library for SigmaOS desktop apps (widgets, theming, accessibility)"
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-app-framework"
+
+[lib]
+name = "sigmaos_app_framework"
+path = "src/lib.rs"
+
+[dependencies]
+gtk4 = { version = "0.7", optional = true }
+libadwaita = { version = "0.5", optional = true }
+zbus = { version = "4", optional = true }
+thiserror = "1"
+tracing = "0.1"
+
+[dev-dependencies]
+tempfile = "3"
+
+[features]
+default = []
+gtk = ["gtk4", "libadwaita"]
+dbus = ["zbus"]

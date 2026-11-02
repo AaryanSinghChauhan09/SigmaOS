@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-dots-configuration"
+description = "Dotfiles and configuration management system for SigmaOS, enabling reproducible desktop environment setups."
+category    = "configuration"
+license     = "MIT"
+upstream    = ["omadots", "chezmoi"]

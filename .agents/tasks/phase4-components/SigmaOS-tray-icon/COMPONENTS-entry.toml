@@ -1,0 +1,5 @@
+name = "SigmaOS-tray-icon"
+category = "utilities"
+upstream = "rhythmbox-tray-icon, libappindicator"
+license = "MIT"
+language = "rust"

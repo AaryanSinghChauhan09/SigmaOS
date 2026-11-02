@@ -1,0 +1,8 @@
+name = "SigmaOS-try-windows"
+description = "Windows environment trial launcher for SigmaOS"
+category = "Utilities"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

@@ -1,0 +1,66 @@
+# Data Storage and Persistence Rules
+
+# Rules governing data storage, persistence, and backup
+
+[data_persistence]
+# Persistence strategy: immediate or delayed
+persistence_strategy = "immediate"
+
+# Fsync on critical writes required
+fsync_critical = true
+
+# Atomic transaction support required
+atomic_transactions = true
+
+[reliability]
+# Data integrity verification required
+integrity_verification = true
+
+# Checksum algorithm: CRC32, SHA256, or Blake3
+checksum_algorithm = "blake3"
+
+# Redundancy strategy: none, mirroring, or parity
+redundancy_strategy = "mirroring"
+
+# Data recovery capability required
+recovery_capability = true
+
+[storage_backend]
+# Primary storage backend: LSM or B-tree
+primary_backend = "lsm"
+
+# Storage compression enabled
+compression_enabled = true
+
+# Compression algorithm: deflate, snappy, or zstd
+compression_algorithm = "zstd"
+
+[quotas]
+# Storage quota support required
+quota_support = true
+
+# Per-user quota enforcement
+per_user_quota = true
+
+# Per-filesystem quota enforcement
+per_filesystem_quota = true
+
+[backups]
+# Automatic backup enabled
+auto_backup_enabled = true
+
+# Backup frequency (hours)
+backup_frequency = 24
+
+# Backup retention (days)
+backup_retention = 30
+
+[monitoring]
+# Storage usage monitoring enabled
+usage_monitoring = true
+
+# Alert on quota usage percentage
+quota_alert_threshold = 90
+
+# Storage fragmentation monitoring
+fragmentation_monitoring = true

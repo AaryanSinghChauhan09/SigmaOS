@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-plymouth"
+description = "Boot splash screen for SigmaOS with animated startup graphics and theme management"
+category = "system"
+license = "MIT"

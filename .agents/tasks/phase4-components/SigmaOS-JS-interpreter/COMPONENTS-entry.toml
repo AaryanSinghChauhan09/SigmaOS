@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-JS-interpreter"
+description = "JavaScript runtime interpreter for SigmaOS"
+category = "runtime"
+license = "MIT"

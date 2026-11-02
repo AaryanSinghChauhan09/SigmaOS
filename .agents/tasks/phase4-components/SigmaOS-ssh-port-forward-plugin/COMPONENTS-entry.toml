@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-ssh-port-forward-plugin"
+description = "SSH port forwarding panel plugin for SigmaOS"
+category = "panel-applets"
+license = "MIT"

@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-apturl"
+description = "URL handler that allows installing packages from apt:// URIs, integrating with the system package manager."
+category    = "package-management"
+license     = "MIT"
+upstream    = ["apturl"]

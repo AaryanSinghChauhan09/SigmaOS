@@ -1,0 +1,27 @@
+[submodule "src_modules/SigmaOS-kernel"]
+	path = src_modules/SigmaOS-kernel
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-kernel.git
+
+[submodule "src_modules/SigmaOS-filesystem"]
+	path = src_modules/SigmaOS-filesystem
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem.git
+
+[submodule "src_modules/SigmaOS-network"]
+	path = src_modules/SigmaOS-network
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-network.git
+
+[submodule "src_modules/SigmaOS-security"]
+	path = src_modules/SigmaOS-security
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-security.git
+
+[submodule "src_modules/SigmaOS-system"]
+	path = src_modules/SigmaOS-system
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-system.git
+
+[submodule "src_modules/SigmaOS-desktop"]
+	path = src_modules/SigmaOS-desktop
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-desktop.git
+
+[submodule "src_modules/SigmaOS-packages"]
+	path = src_modules/SigmaOS-packages
+	url = https://github.com/AaryanSinghChauhan09/SigmaOS-packages.git

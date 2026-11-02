@@ -1,0 +1,92 @@
+name: SigmaOS-filesystem CI
+
+on:
+  push:
+    branches: [main, dev, "release/**"]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  component-test:
+    name: Test sigmaos-filesystem (${{ matrix.target }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-latest
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools (aarch64)
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-registry-
+
+      - name: Cache cargo git
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-git-
+
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-build-${{ matrix.target }}-
+
+      - name: Run cargo check
+        run: cargo check --target ${{ matrix.target }} --verbose
+
+      - name: Build tests (no run)
+        run: cargo test --target ${{ matrix.target }} --no-run --verbose
+
+      - name: Run tests (native only)
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        run: |
+          cargo test --target ${{ matrix.target }} --test mount_unmount_tests -- --test-output immediate
+          cargo test --target ${{ matrix.target }} --test posix_ops_tests    -- --test-output immediate
+          cargo test --target ${{ matrix.target }} --test pipe_fifo_tests    -- --test-output immediate
+
+      - name: Run clippy
+        run: cargo clippy --target ${{ matrix.target }} --all-targets -- -D warnings
+
+      - name: Check formatting
+        run: cargo fmt -- --check
+
+  build-success:
+    name: CI Status
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [component-test]
+    steps:
+      - name: Verify results
+        run: |
+          if [[ "${{ needs.component-test.result }}" != "success" ]]; then
+            echo "❌ sigmaos-filesystem CI failed"
+            exit 1
+          fi
+          echo "✅ sigmaos-filesystem CI passed"

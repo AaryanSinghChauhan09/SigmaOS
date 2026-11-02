@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-nodejs-binary"
+description = "Pre-built Node.js binary distribution with version management for SigmaOS"
+category = "runtime"
+license = "MIT"

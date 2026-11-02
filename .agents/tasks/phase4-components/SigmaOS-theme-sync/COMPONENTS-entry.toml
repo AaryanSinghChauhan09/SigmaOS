@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-sync"
+category    = "themes"
+description = "Cross-application theme synchronization tool for SigmaOS."
+upstream    = ["Oomox"]
+build       = "cargo build --release"
+license     = "MIT"

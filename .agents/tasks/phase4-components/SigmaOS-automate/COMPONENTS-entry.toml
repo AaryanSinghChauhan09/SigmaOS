@@ -1,0 +1,8 @@
+name = "SigmaOS-automate"
+description = "Desktop automation and macro recording tool for SigmaOS"
+category = "Utilities"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

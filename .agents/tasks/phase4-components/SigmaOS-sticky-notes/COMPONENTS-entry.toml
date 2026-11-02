@@ -1,0 +1,8 @@
+name = "SigmaOS-sticky-notes"
+description = "Desktop sticky notes application for SigmaOS"
+category = "Desktop/UI"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

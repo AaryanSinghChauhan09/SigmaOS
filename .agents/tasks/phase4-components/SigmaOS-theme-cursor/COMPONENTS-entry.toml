@@ -1,0 +1,8 @@
+name = "SigmaOS-theme-cursor"
+description = "Cursor theme collection for SigmaOS"
+category = "Desktop/UI"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

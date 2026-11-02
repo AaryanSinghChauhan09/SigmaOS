@@ -1,0 +1,8 @@
+name = "SigmaOS-xorg-server"
+description = "Xorg display server integration for SigmaOS"
+category = "System Services"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

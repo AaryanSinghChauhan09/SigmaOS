@@ -1,0 +1,8 @@
+name = "SigmaOS-wine-installer"
+description = "Windows application compatibility installer for SigmaOS"
+category = "Package Management"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

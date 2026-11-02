@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-remote-desktop"
+description = "Remote desktop client and server for SigmaOS supporting VNC and RDP protocols"
+category = "networking"
+license = "MIT"

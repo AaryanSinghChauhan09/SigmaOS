@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-guide-translations"
+description = "Translation guide and locale files for SigmaOS"
+category = "documentation"
+license = "MIT"

@@ -1,0 +1,8 @@
+name = "SigmaOS-desktop-library"
+description = "Shared library for SigmaOS desktop environment components"
+category = "Desktop/UI"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

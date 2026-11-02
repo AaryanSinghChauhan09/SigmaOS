@@ -1,0 +1,8 @@
+name = "SigmaOS-system-locale"
+description = "System locale and language settings for SigmaOS"
+category = "System Services"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

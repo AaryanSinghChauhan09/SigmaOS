@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-filesystem"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR GPL-2.0"
+description = "SigmaOS Virtual Filesystem layer: VFS, ext4, tmpfs, devfs, mount manager"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem"
+
+[lib]
+name = "sigmaos_filesystem"
+path = "src/lib.rs"
+
+[dependencies]
+thiserror = "1.0"
+
+[dev-dependencies]

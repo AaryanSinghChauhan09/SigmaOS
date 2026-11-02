@@ -1,0 +1,11 @@
+[[component]]
+name = "SigmaOS-app-framework"
+tier = 2
+language = "Rust"
+status = "scaffolded"
+upstream = [
+  "https://github.com/linuxmint/gtk",
+  "https://github.com/linuxmint/cinnamon-desktop",
+]
+depends_on = ["sigmaos-theme-engine", "sigmaos-compositor"]
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-app-framework"

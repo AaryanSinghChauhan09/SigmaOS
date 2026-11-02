@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-icon"
+category    = "themes"
+description = "Icon theme collection for SigmaOS."
+upstream    = ["mint-l-icons", "mint-y-icons"]
+build       = "make install"
+license     = "MIT"

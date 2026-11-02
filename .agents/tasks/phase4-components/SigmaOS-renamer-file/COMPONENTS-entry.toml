@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-renamer-file"
+description = "Single file renaming utility for SigmaOS with conflict detection and undo support"
+category = "file-management"
+license = "MIT"

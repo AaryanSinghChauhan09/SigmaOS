@@ -1,0 +1,8 @@
+[component]
+name        = "SigmaOS-stream"
+category    = "tools"
+description = "IPTV and media streaming client for SigmaOS."
+upstream    = ["hypnotix"]
+language    = "rust"
+build       = "cargo build --release"
+license     = "MIT"

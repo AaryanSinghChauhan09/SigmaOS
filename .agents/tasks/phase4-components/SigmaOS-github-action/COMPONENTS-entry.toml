@@ -1,0 +1,8 @@
+name = "SigmaOS-github-action"
+description = "Reusable GitHub Actions workflows for SigmaOS repositories"
+category = "Developer Tools"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

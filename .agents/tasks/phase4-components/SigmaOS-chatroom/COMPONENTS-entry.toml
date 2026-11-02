@@ -1,0 +1,8 @@
+name = "SigmaOS-chatroom"
+description = "Community chat client for SigmaOS project communication"
+category = "Network"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

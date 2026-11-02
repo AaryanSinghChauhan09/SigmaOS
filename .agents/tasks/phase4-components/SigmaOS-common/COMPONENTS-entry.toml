@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-common"
+description = "Shared common libraries and utility functions used across SigmaOS components for consistent behaviour."
+category    = "libraries"
+license     = "MIT"
+upstream    = ["mintcommon"]

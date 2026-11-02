@@ -1,0 +1,8 @@
+name = "SigmaOS-update"
+description = "System package update manager for SigmaOS"
+category = "Package Management"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

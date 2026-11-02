@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-sign"
+description = "Digital document signing tool for SigmaOS using GPG and X.509 certificates"
+category = "security"
+license = "MIT"

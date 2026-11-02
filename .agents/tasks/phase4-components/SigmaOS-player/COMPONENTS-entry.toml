@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-player"
+description = "Media player application for SigmaOS with video and audio playback, playlist management, and subtitle handling"
+category = "media"
+license = "MIT"

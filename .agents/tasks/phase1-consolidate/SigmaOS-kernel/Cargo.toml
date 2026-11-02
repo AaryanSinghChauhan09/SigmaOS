@@ -1,0 +1,34 @@
+[package]
+name = "sigmaos-kernel"
+version = "0.1.0"
+edition = "2021"
+authors = ["Aaryan Singh Chauhan <aaryan@sigmaos.dev>"]
+license = "MIT"
+description = "SigmaOS microkernel: scheduler, VFS, syscall gate, memory management"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel"
+keywords = ["kernel", "scheduler", "vfs", "syscall", "sigmaos"]
+categories = ["os"]
+
+[dependencies]
+thiserror = "1.0"
+log = "0.4"
+parking_lot = "0.12"
+
+[target.'cfg(target_arch = "x86_64")'.dependencies]
+x86_64 = "0.14"
+
+[target.'cfg(target_arch = "aarch64")'.dependencies]
+aarch64-cpu = "0.7"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[features]
+default = ["eevdf-scheduler"]
+eevdf-scheduler = []
+bore-scheduler = []
+qemu-integration = []
+
+[[test]]
+name = "integration"
+path = "tests/integration.rs"

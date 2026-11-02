@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-plugin-marketplace"
+description = "Plugin and extension marketplace for SigmaOS with curated catalogue and one-click installation"
+category = "desktop"
+license = "MIT"

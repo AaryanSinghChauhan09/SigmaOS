@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-notification"
+description = "Desktop notification system implementing the freedesktop.org notification specification"
+category = "desktop"
+license = "MIT"

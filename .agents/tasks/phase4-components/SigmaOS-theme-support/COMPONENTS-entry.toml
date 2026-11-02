@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-support"
+category    = "themes"
+description = "Theme compatibility library for SigmaOS."
+upstream    = ["libadwaita"]
+build       = "cargo build --release"
+license     = "MIT"

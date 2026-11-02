@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-mesa3D"
+description = "Mesa 3D graphics library integration providing OpenGL, Vulkan, and OpenCL for SigmaOS"
+category = "graphics"
+license = "MIT"

@@ -1,0 +1,65 @@
+# Scheduler Rules and Constraints
+
+# Rules governing task scheduling, prioritization, and resource allocation
+
+[scheduling]
+# Scheduling algorithm: preemptive or cooperative
+scheduling_algorithm = "preemptive"
+
+# Context switch overhead budget (microseconds)
+context_switch_budget = 10
+
+[priorities]
+# Minimum priority level
+min_priority = 0
+
+# Maximum priority level
+max_priority = 255
+
+# Real-time priority range
+realtime_priority_min = 200
+realtime_priority_max = 255
+
+# Default priority for user tasks
+default_user_priority = 128
+
+[timeslice]
+# Default time slice quantum (milliseconds)
+default_timeslice = 10
+
+# Minimum time slice (milliseconds)
+min_timeslice = 1
+
+# Maximum time slice (milliseconds)
+max_timeslice = 100
+
+[cpu_affinity]
+# CPU affinity scheduling allowed
+allow_cpu_affinity = true
+
+# CPU binding preferred for real-time tasks
+realtime_cpu_binding = true
+
+[load_balancing]
+# Load balancing algorithm: round-robin or work-stealing
+load_balancing = "work-stealing"
+
+# Load balance interval (milliseconds)
+balance_interval = 100
+
+# Migration threshold (utilization percentage)
+migration_threshold = 20
+
+[fairness]
+# Fairness guarantees enabled
+fairness_enabled = true
+
+# Maximum starvation time (milliseconds)
+max_starvation_time = 1000
+
+[monitoring]
+# Scheduling statistics collection enabled
+collect_statistics = true
+
+# Scheduling tracepoint enabled
+tracepoint_enabled = true

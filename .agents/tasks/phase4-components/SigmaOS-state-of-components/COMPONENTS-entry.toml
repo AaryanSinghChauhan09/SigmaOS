@@ -1,0 +1,8 @@
+[component]
+name        = "SigmaOS-state-of-components"
+category    = "tools"
+description = "Component health dashboard for SigmaOS."
+upstream    = ["state-of-omarchy"]
+language    = "rust"
+build       = "cargo build --release"
+license     = "MIT"

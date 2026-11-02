@@ -1,0 +1,5 @@
+name = "SigmaOS-xapp-python"
+description = "Python bindings for the SigmaOS xapp library. Enables Python applications to use SigmaOS xapp widgets and APIs. Inspired by python3-xapp."
+category = "utilities"
+license = "MIT"
+upstream = ["python3-xapp"]

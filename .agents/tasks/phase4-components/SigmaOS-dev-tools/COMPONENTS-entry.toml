@@ -1,0 +1,8 @@
+name = "SigmaOS-dev-tools"
+description = "Developer tools and utilities for SigmaOS development"
+category = "Developer Tools"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

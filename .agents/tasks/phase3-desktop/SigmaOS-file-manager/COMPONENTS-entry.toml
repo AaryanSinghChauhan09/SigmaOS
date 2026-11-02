@@ -1,0 +1,11 @@
+[[component]]
+name = "SigmaOS-file-manager"
+tier = 2
+language = "Rust"
+status = "scaffolded"
+upstream = [
+  "https://github.com/linuxmint/nemo",
+  "https://github.com/omacom/omafind",
+]
+depends_on = ["sigmaos-filesystem", "sigmaos-compositor"]
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-manager"

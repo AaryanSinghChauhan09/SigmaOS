@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-menus"
+description = "Desktop application menus system implementing the freedesktop.org menu specification"
+category = "desktop"
+license = "MIT"

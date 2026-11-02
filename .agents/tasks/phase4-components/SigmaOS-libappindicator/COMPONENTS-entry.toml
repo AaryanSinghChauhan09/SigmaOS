@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-libappindicator"
+description = "Application indicator library for SigmaOS"
+category = "libraries"
+license = "MIT"

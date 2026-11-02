@@ -1,0 +1,11 @@
+[[component]]
+name = "SigmaOS-settings"
+tier = 2
+language = "Rust"
+status = "scaffolded"
+upstream = [
+  "https://github.com/linuxmint/cinnamon-control-center",
+  "https://github.com/linuxmint/cinnamon-settings-daemon",
+]
+depends_on = ["sigmaos-desktop", "sigmaos-system"]
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-settings"

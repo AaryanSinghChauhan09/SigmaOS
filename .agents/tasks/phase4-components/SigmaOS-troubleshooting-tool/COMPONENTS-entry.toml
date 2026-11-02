@@ -1,0 +1,5 @@
+name = "SigmaOS-troubleshooting-tool"
+category = "utilities"
+upstream = "mintreport"
+license = "MIT"
+language = "rust"

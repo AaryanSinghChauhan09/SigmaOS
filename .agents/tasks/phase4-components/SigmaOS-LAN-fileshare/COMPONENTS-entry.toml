@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-LAN-fileshare"
+description = "Local network file sharing for SigmaOS with drag-and-drop peer-to-peer transfer"
+category = "networking"
+license = "MIT"

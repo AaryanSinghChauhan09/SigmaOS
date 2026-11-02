@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-network-discovery"
+description = "Network device discovery tool scanning local networks via mDNS and UPnP"
+category = "networking"
+license = "MIT"

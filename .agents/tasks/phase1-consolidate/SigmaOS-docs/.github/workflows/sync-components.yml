@@ -1,0 +1,70 @@
+name: Sync Components Matrix
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/sync-components.yml'
+      - 'scripts/generate-components-md.py'
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-components:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SigmaOS-docs
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout SigmaOS main repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/SigmaOS
+          path: ./sigmaos-main
+          sparse-checkout: |
+            COMPONENTS.toml
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install toml
+
+      - name: Generate COMPONENTS.md
+        run: |
+          python3 scripts/generate-components-md.py \
+            ./sigmaos-main/COMPONENTS.toml \
+            ./docs/components/COMPONENTS.md
+
+      - name: Sync component-registry-snapshot.toml
+        run: |
+          cp ./sigmaos-main/COMPONENTS.toml \
+             ./docs/components/component-registry-snapshot.toml
+          
+          # Update sync timestamp in the file
+          sed -i "1s/^/# Last synced: $(date -u +'%Y-%m-%dT%H:%M:%SZ')\n/" \
+            ./docs/components/component-registry-snapshot.toml
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add docs/components/COMPONENTS.md docs/components/component-registry-snapshot.toml
+          
+          if git diff --cached --exit-code > /dev/null; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: sync component matrix from main repo"
+            git push
+          fi

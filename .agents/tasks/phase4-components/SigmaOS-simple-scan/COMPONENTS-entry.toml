@@ -1,0 +1,4 @@
+name = "SigmaOS-simple-scan"
+description = "Document scanner application for SigmaOS"
+category = "utilities"
+license = "MIT"

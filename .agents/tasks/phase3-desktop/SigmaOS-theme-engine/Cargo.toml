@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-theme-engine"
+version = "0.1.0"
+edition = "2021"
+authors = ["SigmaOS Contributors"]
+description = "Theme rendering and synthesis for SigmaOS"
+license = "MIT"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-engine"
+
+[lib]
+name = "sigmaos_theme_engine"
+path = "src/lib.rs"
+
+[dependencies]
+
+[dev-dependencies]

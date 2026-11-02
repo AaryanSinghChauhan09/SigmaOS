@@ -1,0 +1,6 @@
+name = "SigmaOS-upgrade-legacy"
+category = "utilities"
+description = "Legacy system upgrade support tool for SigmaOS. Enables upgrade paths from older or unsupported SigmaOS versions, handling compatibility and migration tasks."
+upstream = ["mintupgrade"]
+build = "cargo build --release"
+license = "MIT"

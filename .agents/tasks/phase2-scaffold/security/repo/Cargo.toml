@@ -1,0 +1,16 @@
+[package]
+name = "sigmaos-security"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR GPL-2.0"
+description = "SigmaOS security subsystem: LSM hooks, privilege separation, capabilities, crypto"
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-security"
+
+[lib]
+name = "sigmaos_security"
+path = "src/lib.rs"
+
+[dependencies]
+thiserror = "1.0"
+
+[dev-dependencies]

@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-configurator"
+description = "System configurator and first-run setup wizard for SigmaOS, guiding users through initial system configuration."
+category    = "system"
+license     = "MIT"
+upstream    = ["mintconfiguration", "gnome-initial-setup"]

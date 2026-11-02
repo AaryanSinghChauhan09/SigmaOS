@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-packages-kit"
+description = "Package management toolkit for SigmaOS providing a high-level DBus API across multiple package manager backends"
+category = "package-management"
+license = "MIT"

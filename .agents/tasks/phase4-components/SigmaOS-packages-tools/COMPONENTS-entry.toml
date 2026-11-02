@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-packages-tools"
+description = "Package installation tools for SigmaOS with GUI and CLI helpers, dependency resolution, and signature verification"
+category = "package-management"
+license = "MIT"

@@ -1,0 +1,5 @@
+name = "SigmaOS-wiki-extra"
+description = "Extended wiki content and additional documentation for SigmaOS. Provides supplementary articles, tutorials, and reference material for the SigmaOS wiki."
+category = "tools"
+license = "MIT"
+upstream = ["MediaWiki", "DokuWiki"]

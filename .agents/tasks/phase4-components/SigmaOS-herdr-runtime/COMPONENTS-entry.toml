@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-herdr-runtime"
+description = "Runtime agent and live coding environment for SigmaOS"
+category = "developer-tools"
+license = "MIT"

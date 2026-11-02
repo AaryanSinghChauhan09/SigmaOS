@@ -1,0 +1,6 @@
+[component]
+name        = "SigmaOS-control-center"
+description = "Unified system control center for SigmaOS, aggregating all system settings panels in a single interface."
+category    = "system"
+license     = "MIT"
+upstream    = ["cinnamon-control-center", "gnome-control-center"]

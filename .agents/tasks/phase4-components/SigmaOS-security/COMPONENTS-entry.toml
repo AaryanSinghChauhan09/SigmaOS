@@ -1,0 +1,8 @@
+name = "SigmaOS-security"
+description = "Security framework and hardening tools for SigmaOS"
+category = "Security"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

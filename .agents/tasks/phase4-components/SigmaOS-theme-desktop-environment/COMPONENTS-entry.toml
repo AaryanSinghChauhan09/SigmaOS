@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theme-desktop-environment"
+category    = "themes"
+description = "Desktop environment themes for SigmaOS."
+upstream    = ["cinnamon-themes"]
+build       = "make install"
+license     = "MIT"

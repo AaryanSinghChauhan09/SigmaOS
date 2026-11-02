@@ -1,0 +1,8 @@
+name = "SigmaOS-domain-blocker"
+description = "Network domain blocking and filtering tool for SigmaOS"
+category = "Security"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

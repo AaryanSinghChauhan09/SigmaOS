@@ -1,0 +1,7 @@
+[component]
+name        = "SigmaOS-theming-native"
+category    = "themes"
+description = "Native theming engine integration for SigmaOS."
+upstream    = ["aether"]
+build       = "cargo build --release"
+license     = "MIT"

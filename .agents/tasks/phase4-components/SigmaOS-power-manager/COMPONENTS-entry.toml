@@ -1,0 +1,8 @@
+name = "SigmaOS-power-manager"
+description = "Power management and battery tool for SigmaOS"
+category = "System Services"
+engine = "unknown"
+language = "rust"
+license = "MIT"
+visibility = "public"
+depends_on = []

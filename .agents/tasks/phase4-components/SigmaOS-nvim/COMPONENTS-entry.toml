@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-nvim"
+description = "Neovim configuration and plugin suite for SigmaOS with LSP and SigmaOS-themed colour schemes"
+category = "developer-tools"
+license = "MIT"

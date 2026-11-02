@@ -1,0 +1,22 @@
+[package]
+name = "SigmaOS_security"
+version = "0.1.0"
+edition = "2021"
+authors = ["Aaryan Singh Chauhan <aaryan@sigmaos.dev>"]
+license = "MIT"
+description = "Privilege separation, LSM hooks, capability-based security, and secure defaults."
+repository = "https://github.com/AaryanSinghChauhan09/SigmaOS-security"
+keywords = ["sigmaos", "system"]
+categories = ["os"]
+
+[dependencies]
+thiserror = "1.0"
+log = "0.4"
+parking_lot = "0.12"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[test]]
+name = "integration"
+path = "tests/integration.rs"

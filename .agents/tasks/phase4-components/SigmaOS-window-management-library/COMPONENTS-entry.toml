@@ -1,0 +1,5 @@
+name = "SigmaOS-window-management-library"
+description = "Window management shared library for SigmaOS. Provides core window management APIs, compositing support, and workspace handling. Inspired by muffin (Cinnamon's window manager)."
+category = "utilities"
+license = "MIT"
+upstream = ["muffin", "Mutter"]

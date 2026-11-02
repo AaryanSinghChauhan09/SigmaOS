@@ -1,0 +1,5 @@
+[component]
+name = "SigmaOS-NVIDIA"
+description = "NVIDIA GPU driver integration and PRIME switching support for SigmaOS"
+category = "hardware"
+license = "MIT"

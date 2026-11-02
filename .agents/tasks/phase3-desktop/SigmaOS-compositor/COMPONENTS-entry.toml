@@ -1,0 +1,11 @@
+[[component]]
+name = "SigmaOS-compositor"
+tier = 2
+language = "Rust"
+status = "scaffolded"
+upstream = [
+  "https://gitlab.freedesktop.org/wlroots/wlroots",
+  "https://github.com/Smithay/smithay",
+]
+depends_on = ["sigmaos-desktop"]
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-compositor"
