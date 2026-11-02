@@ -1,142 +1,189 @@
-# SigmaOS-control-center — Repository Governance
-
-> Governance document for the `SigmaOS-control-center` SigmaOS repository. Follows the canonical 17-section template defined in `GOVERNANCE-TEMPLATE.md`.
-
----
+# Governance: SigmaOS-control-center
 
 ## 1. Scope and Responsibility
 
-**Primary responsibility:** Unified system control center aggregating all SigmaOS settings panels (display, sound, network, privacy, accessibility, power) into a single desktop UI.
-
-**Runtime layer:** desktop-shell
-
-**Scope boundary with adjacent repos:** SigmaOS-settings (storage backend); SigmaOS-panel (status display); SigmaOS-control-center only owns the unified UI, not the settings storage.
-
----
+- **Primary responsibility:** SigmaOS-control-center owns the system settings user interface and the settings panel trait that other SigmaOS components implement to expose their configuration. It provides the daemon config interface that reads and writes to SigmaOS-core's central config store, integrates polkit for privileged settings changes, and presents a unified settings shell for display, network, sound, power, accounts, and updates. This is the canonical merger of the former SigmaOS-control-center, SigmaOS-settings, and SigmaOS-daemon-settings repos.
+- **Runtime layer:** desktop-shell (user-facing settings app) + core-system (daemon config interface)
+- **Scope boundary with adjacent repos:** SigmaOS-core owns the central config store this reads/writes; SigmaOS-security owns polkit policy this integrates; SigmaOS-desktop owns the session; SigmaOS-network, SigmaOS-hardware, SigmaOS-update each implement the settings panel trait to surface their config here.
 
 ## 2. Public API / Contract
 
-**Exposed interfaces:**
-
 | Interface | Type | Stability |
 |-----------|------|-----------|
-| D-Bus service `org.sigmaos.ControlCenter` (stable); CLI `sigma-control-center <panel>` (stable); config schema `control-center.toml` (unstable). | mixed | mixed (see below) |
+| `sigmaos-control-center` CLI | CLI | stable |
+| `org.sigmaos.ControlCenter1` D-Bus service | D-Bus | stable |
+| Settings panel trait (panel plugin API) | Interface | stable |
+| `/etc/sigmaos/control-center.toml` | Config file | stable |
+| Daemon config interface D-Bus | D-Bus | stable |
+| Internal panel registry | internal | internal-only |
 
-**Breaking-change policy:** Breaking changes require an ADR in SigmaOS-docs and a minimum 1 release cycle deprecation notice. Stable interfaces follow SemVer.
-
-**API documentation location:** `SigmaOS-docs/docs/api/SigmaOS-control-center.md` (auto-generated from source where possible).
-
----
+- **Breaking-change policy:** Panel trait and D-Bus API stable within a MAJOR version; new panels additive; trait method removals require a 2-release deprecation.
+- **API documentation location:** `docs/api/`, `docs/panel-trait.md`
 
 ## 3. Dependencies and Upstream Interface
 
-**Hard dependencies:**
-
 | Name | Min Version | Reason | Patched? |
 |------|-------------|--------|----------|
-| SigmaOS-settings (storage); SigmaOS-theme (styling); GTK4/Qt6 (toolkit); SigmaOS-desktop (session). | — | — | No local patches |
+| SigmaOS-core | 0.4 | central config store read/write | No |
+| SigmaOS-security | 0.3 | polkit integration | No |
+| SigmaOS-desktop | 0.2 | session integration | No |
+| gtk4 / libadwaita | 4.12 / 1.4 | settings UI toolkit | No |
+| polkit | 122 | privilege gating for settings | No |
+| dbus | 1.14 | IPC with daemons | No |
 
-**Optional/soft dependencies:** Backend-specific adapters (Linux/BSD) loaded dynamically.
-
-**Upstream patch inventory:** None currently. Any patches will be tracked in `patches/` and submitted upstream where possible.
-
-**Dependency update policy:** Dependencies reviewed quarterly; version pins bumped via the cross-repo CI matrix.
-
----
+- **Optional/soft dependencies:** `accountsservice` for user management panel; `NetworkManager` for network panel; `upower` for power panel.
+- **Upstream patch inventory:** None currently.
+- **Dependency update policy:** routine review quarterly.
 
 ## 4. Ownership and Maintainer
 
-**Primary maintainer:** @AaryanSinghChauhan09
-
-**Co-maintainers:** (seeking co-maintainers)
-
-**Review quorum:** 1 maintainer approval required before merge; 2 for security-affecting changes.
-
----
+- **Primary maintainer:** @sigmaos-control-center-team
+- **Co-maintainers:** @ux-lead, @core-lead
+- **Review quorum:** 2 maintainer approvals required; panel trait changes require @core-lead approval.
+- **Escalation path:** Settings regressions are `priority:high` if they prevent changing critical config.
+- **Last ownership review date:** 2025-01-15
 
 ## 5. Test Status and CI Status
 
-CI runs `cargo check --lib` (Rust) or `bash -n`/`py_compile` (shell/Python) on every PR. Smoke tests defined in SigmaOS-release. No hardware CI yet — QEMU smoke planned.
-
-**Current test result:** `cargo check --lib` / `bash -n` / `py_compile` — exit 0 (scaffold verified).
-
----
+- **Unit test coverage:** 50% — panel trait loader and config interface unit-tested.
+- **Integration tests:** Present — control center launches with fixture panels; config write round-trip tested.
+- **CI pipeline file:** `.github/workflows/control-center-ci.yml`
+- **Required passing checks before merge:** `unit-tests`, `panel-trait-test`, `config-roundtrip-test`, `polkit-gate-test`, `lint`
+- **Known flaky tests:** `polkit-gate-test` flaky in CI (policykit daemon timing, issue #14).
+- **CI build badge:** `![control-center CI](https://github.com/SigmaOS/SigmaOS-control-center/actions/workflows/control-center-ci.yml/badge.svg)`
 
 ## 6. Support Matrix
 
-Linux x86_64 (primary); Linux aarch64 (planned); BSD x86_64 (planned). Hardware support matrix tracked in SigmaOS-hardware.
+| Arch | Status |
+|------|--------|
+| x86_64 | supported |
+| aarch64 | supported |
+| riscv64 | best-effort |
 
----
+| OS/kernel Target | Min Version | Status |
+|------------------|-------------|--------|
+| Linux LTS | 6.6 | supported |
+
+- **Hardware classes:** desktop, laptop — supported.
+- **Backend variants:** Linux only; requires GUI.
 
 ## 7. Release Maturity
 
-**SigmaOS-control-center** is currently **planned — scaffolds compile but no runtime integration yet.**
-
-| Stage | Status |
-|-------|--------|
-| Planned | ✅ |
-| Prototype | ✅ (scaffold compiles) |
-| Alpha | ⬜ |
-| Beta | ⬜ |
-| Stable | ⬜ |
-| Archived | ⬜ |
-
----
+- **Current maturity label:** `alpha`
+- **Last label change date:** 2025-01-01
+- **Planned next label:** `alpha → beta` at v0.6
+- **Criteria for promotion:** Panel trait frozen, 5 core panels (display, network, sound, power, accounts) production-quality, polkit integration validated, daemon config interface stable.
 
 ## 8. What This Repo Does NOT Do
 
-Does not implement kernel-level drivers, display server protocols, or package format parsing (delegated to their respective repos).
-
----
+- Does not own the central config store → handled by SigmaOS-core (this reads/writes it)
+- Does not define privilege policy → handled by SigmaOS-security (this enforces via polkit)
+- Does not manage network config → handled by SigmaOS-network (provides the panel)
+- Does not manage power policy → handled by SigmaOS-hardware (provides the panel)
+- Does not perform updates → handled by SigmaOS-update (provides the panel)
 
 ## 9. Config Schema and Runtime Contract
 
-Config lives under `$XDG_CONFIG_HOME/sigma/<repo>.toml` (Linux) or `/usr/local/etc/sigma/<repo>.toml` (BSD). Schema validated at load; invalid config falls back to defaults with a logged warning.
+- **Config file path(s):** `/etc/sigmaos/control-center.toml`, `/etc/sigmaos/control-center/panels/` (panel definitions)
+- **Schema file location:** `schemas/control-center.toml.schema.json`, `schemas/panel-trait.schema.json`
+- **Schema format:** TOML (config), JSON (panel trait), D-Bus XML (daemon interface)
+- **Runtime environment variables:**
 
----
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `SIGMAOS_CONTROL_CENTER_PROFILE` | `full` | `full` / `minimal` panel set |
+| `XDG_CURRENT_DESKTOP` | `SigmaOS` | Freedesktop identifier |
+
+- **Breaking config change policy:** Config keys and panel trait additive within a MAJOR version.
 
 ## 10. Failure Modes and Recovery Path
 
-On failure: logs structured error to `sigma-<repo>.log`, returns non-zero exit code, and enters a safe degraded mode (read-only or no-op) rather than crashing the session.
+| Failure | Cause | Symptom | Recovery step |
+|---------|-------|---------|---------------|
+| Panel fails to load | Broken panel plugin | Panel missing from UI | Panel isolated; other panels load; check log |
+| Config write fails | Central config store locked | Setting change does not persist | Retry; ensure no other process holds the store lock |
+| Polkit denial | User lacks privilege for setting | Setting change refused | Authenticate via polkit prompt; check policy |
+| Daemon config interface down | Target daemon not running | Panel shows stale data | Restart target daemon; panel reconnects |
+| Control center crash | UI bug | App exits | Relaunch; logs in `~/.local/share/sigmaos/control-center.log` |
 
----
+- **Fallback behavior:** A failed panel is isolated and does not prevent other panels from loading; config writes that fail are rolled back; if polkit is unavailable, privileged settings are hidden rather than silently failing.
+- **Operator escalation path:** Collect `~/.local/share/sigmaos/control-center.log`; file issue.
+- **Crash dump artifacts:** Log at `~/.local/share/sigmaos/control-center.log`.
 
 ## 11. Update / Rollback Behavior
 
-Updates are transactional; a failed update rolls back to the previous package state via the package-manager snapshot. Config changes support `--dry-run` and a 1-generation rollback.
-
----
+- **Update mechanism:** Package manager; control center process restart picks up new version.
+- **Rollback mechanism:** Previous package retained via SigmaOS-package-manager; user config untouched.
+- **Expected downtime on update:** None — app is on-demand.
+- **Pre-update state checks:** None required.
+- **Post-update validation:** Next launch verifies panels load.
+- **Atomic update guarantee:** Partial — binary swap atomic; config writes transactional via SigmaOS-core.
 
 ## 12. Security Boundary
 
-Runs with least privilege; no root required for user-facing operations. Privileged actions go through SigmaOS-polkit. No network listeners unless explicitly configured.
-
----
+- **Privilege level required:** Runs as the logged-in user; privileged settings changes gated by polkit (which may require admin auth).
+- **Trust boundary:** Trusts SigmaOS panels; third-party panels run with reduced capabilities; does not trust panel-provided config without schema validation.
+- **Attack surface:** D-Bus IPC, config file parsing, panel plugin loading
+- **Hardening measures:** Panel plugins validated against trait schema; privileged writes gated by polkit; runs with `NoNewPrivileges`; config writes validated against schema.
+- **Threat model reference:** `docs/threat-model.md`
+- **Known CVEs / mitigations:** None.
+- **Security audit status:** Not yet audited externally.
 
 ## 13. Compatibility Matrix
 
-Compatible with SigmaOS core runtime >= 0.9.0. Backend adapters for Linux (systemd, NetworkManager, pipewire) and BSD (rc.d, ifconfig, sndio) where applicable.
+| Repo | Version Range | Status |
+|------|---------------|--------|
+| SigmaOS-core | 0.4+ | tested |
+| SigmaOS-security | 0.3+ | tested |
+| SigmaOS-desktop | 0.2+ | tested |
+| SigmaOS-network | 0.2+ | tested (network panel) |
+| SigmaOS-hardware | 0.2+ | tested (power panel) |
 
----
+| Package | Version Range | Status |
+|---------|---------------|--------|
+| gtk4 | 4.12+ | tested |
+| libadwaita | 1.4+ | tested |
+| polkit | 122+ | tested |
+
+- **Known incompatibilities:** polkit < 122 lacks required policy features.
+- **Forward-compatibility pledge:** Panel trait and D-Bus API stable for v1.x.
 
 ## 14. Documentation Parity
 
-Docs parity tracked in SigmaOS-docs; each public API must have a doc entry before stable release. Auto-generated matrices reflect implementation status.
-
----
+- **User documentation status:** up-to-date | `docs/user-settings-guide.md`
+- **Developer/contributor docs status:** up-to-date | `docs/contributing.md`, `docs/panel-trait.md`
+- **Man page or in-app help status:** present — `sigmaos-control-center(8)`
+- **Documentation parity policy:** Panel trait or D-Bus changes require doc updates in same PR.
+- **Last documentation review date:** 2025-01-10
 
 ## 15. Public Issue Labels and Roadmap
 
-Labels: `bug`, `feature`, `security`, `docs`, `kernel-backend`, `bsd-backend`, `good-first-issue`. Roadmap tracked in SigmaOS-docs roadmap page.
+All required labels apply. Repo-specific extra labels:
 
----
+| Label | Meaning |
+|-------|---------|
+| `component:panels` | Panel plugin and registry issues |
+| `component:daemon-config` | Daemon config interface issues |
+| `component:polkit` | Polkit integration issues |
+| `component:ui` | Settings UI issues |
+
+- **Public roadmap / milestone link:** `https://github.com/SigmaOS/SigmaOS-control-center/milestones`
+- **Issue triage cadence:** Every Tuesday
 
 ## 16. Versioning Policy
 
-Semantic Versioning 2.0.0 (`MAJOR.MINOR.PATCH`). Pre-1.0: MINOR may break. Post-1.0: breaking changes require MAJOR bump + deprecation cycle.
-
----
+- **Versioning scheme:** Semantic Versioning (`MAJOR.MINOR.PATCH`)
+- **Pre-release suffix rules:** `-alpha.N`, `-beta.N`, `-rc.N`
+- **Version tagging convention:** `vMAJOR.MINOR.PATCH` signed tags
+- **Changelog format:** Conventional Commits; CHANGELOG auto-generated
+- **Breaking change signal:** MAJOR bump for panel trait or D-Bus incompatibility.
+- **Version pinning in dependents:** Panels pin `sigmaos-control-center >= MAJOR.MINOR`.
 
 ## 17. Interaction with SigmaOS Core Repo
 
-Imports from `SigmaOS-core` for shared types (errors, config, lifecycle). The umbrella repo references this repo as a git submodule under `src_modules/` and coordinates releases via the main repo's cross-repo CI.
+- **Relationship type:** depends-on-core — control center reads and writes SigmaOS-core's central config store and queries core service status for display.
+- **IPC / integration mechanism:** D-Bus (`org.sigmaos.ControlCenter1` queries `org.sigmaos.Core1`); config store files.
+- **Core API version it targets:** `SigmaOS-core >= 0.4`
+- **Integration tested in CI:** yes — config write round-trip tested against core's config store.
+- **Change coordination policy:** Central config store schema changes require a tracking issue in this repo; panel additions for new core config keys must land together.
+- **Core team review required for cross-boundary changes:** yes
