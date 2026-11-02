@@ -52,10 +52,14 @@ __pycache__/
 !docs/component-rules/*.md
 !docs/io/
 !docs/io/*.md
+!docs/storage/
+!docs/storage/*.md
 !docs/filesystem/
 !docs/filesystem/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
 !IO_RULES.toml
+!STORAGE_RULES.toml
+!FEATURE_STATUS.toml
 !ImprovementPlan.md
 !NEXT_STEPS_GUIDELINES.md
 !.jules/
