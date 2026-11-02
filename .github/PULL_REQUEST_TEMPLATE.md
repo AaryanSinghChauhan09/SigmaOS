@@ -1,9 +1,16 @@
 ## Summary
 
-<!-- What file-management behavior changed and why? -->
+<!-- What file-management or system behavior changed and why? -->
 
-## File component
+## Motivation
 
+## Implementation notes
+
+## Component
+
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
 - [ ] File descriptor manager
 - [ ] Inode and directory manager
 - [ ] Permission manager
@@ -16,6 +23,26 @@
 - [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
+- [ ] I/O component
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] IPC handler
+- [ ] IPC semantics
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Shell component
+
+- [ ] Shell parser
+- [ ] Shell builtins
 
 ## Recurring task
 
@@ -37,6 +64,9 @@
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
 
 ## Changes
 
@@ -56,7 +86,29 @@
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Evidence
+## I/O safety review
+
+- [ ] Interrupt safety verified
+- [ ] DMA boundary checked
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## Shell safety review
+
+- [ ] Exit codes checked
+
+## Security review
+
+- [ ] Capability/namespace checks enforced
+
+## Tests
+
+- [ ] Unit tests added/updated
+
+## Verification
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
@@ -68,6 +120,15 @@
 - [ ] Boot-to-boot evidence, if boot-affecting
 - [ ] File benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
+
+## Capability status
+
+## Integration impact
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] `unsafe` justified
 
 ## Status updates
 
