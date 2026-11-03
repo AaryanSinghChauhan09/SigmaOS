@@ -2,22 +2,39 @@
 
 <!-- What file-management behavior changed and why? -->
 
-## File component / I/O component
+## I/O component
+
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O safety review
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## File component
 
 - [ ] File descriptor manager
 - [ ] Inode and directory manager
 - [ ] Permission manager
 - [ ] Lock manager
 - [ ] Mount / unmount
-- [ ] Cache / Buffer manager
+- [ ] Cache
 - [ ] Filesystem
 - [ ] Recovery
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
-- [ ] Interrupt manager
-- [ ] DMA manager / DMA / DMA queue
-- [ ] I/O scheduler
-- [ ] I/O policy
 - [ ] Documentation
 - [ ] CI / tooling
 
@@ -47,7 +64,7 @@
 -
 -
 
-## File safety review / I/O safety review
+## File safety review
 
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
