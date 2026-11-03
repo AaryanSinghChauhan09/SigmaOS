@@ -94,7 +94,11 @@ impl GlibcInspirationsV78Engine {
     }
 
     /// Generate malloc_info XML telemetry snapshot.
-    pub fn generate_malloc_info_xml(arena_bytes: usize, allocated_chunks: usize, free_chunks: usize) -> String {
+    pub fn generate_malloc_info_xml(
+        arena_bytes: usize,
+        allocated_chunks: usize,
+        free_chunks: usize,
+    ) -> String {
         format!(
             "<malloc version=\"1\"><heap nr=\"0\"><arena bytes=\"{}\"/><allocated chunks=\"{}\"/><free chunks=\"{}\"/></heap></malloc>",
             arena_bytes, allocated_chunks, free_chunks
@@ -181,7 +185,10 @@ impl UclibcInspirationsV78Engine {
     }
 
     /// Strip unsupported CPU target feature mask flags.
-    pub fn strip_unsupported_target_features(features: &[&str], supported_mask: u32) -> Vec<String> {
+    pub fn strip_unsupported_target_features(
+        features: &[&str],
+        supported_mask: u32,
+    ) -> Vec<String> {
         let mut active = Vec::new();
         for (idx, &feat) in features.iter().enumerate() {
             if (supported_mask & (1 << (idx % 32))) != 0 {
@@ -345,7 +352,10 @@ impl NewlibInspirationsV78Engine {
     }
 
     /// Perform nano-malloc split heap allocation for memory-constrained MCUs.
-    pub fn nano_malloc_split_alloc(heap_rem: usize, requested: usize) -> Result<usize, &'static str> {
+    pub fn nano_malloc_split_alloc(
+        heap_rem: usize,
+        requested: usize,
+    ) -> Result<usize, &'static str> {
         if requested + 16 <= heap_rem {
             Ok(heap_rem - (requested + 16))
         } else {
@@ -427,7 +437,10 @@ impl LibstdcxxInspirationsV78Engine {
     }
 
     /// Allocate buffer using PMR (Polymorphic Memory Resource).
-    pub fn pmr_allocate_buffer(buffer_capacity: usize, requested: usize) -> Result<usize, &'static str> {
+    pub fn pmr_allocate_buffer(
+        buffer_capacity: usize,
+        requested: usize,
+    ) -> Result<usize, &'static str> {
         if requested <= buffer_capacity {
             Ok(buffer_capacity - requested)
         } else {
@@ -690,7 +703,8 @@ impl SovereignCRuntimeAndLinkerParityV78Gateway {
             },
             CRuntimePrProposalManifestV78 {
                 pr_number: 5100,
-                pr_title: "Dynamic Linker ld.so LD_PRELOAD Interposition & RELRO Parity".to_string(),
+                pr_title: "Dynamic Linker ld.so LD_PRELOAD Interposition & RELRO Parity"
+                    .to_string(),
                 target_subsystem: "linker/ld.so".to_string(),
                 original_runtime: "Linux / BSD Dynamic Linker (ld.so)".to_string(),
                 components_added: vec![
@@ -709,14 +723,21 @@ impl SovereignCRuntimeAndLinkerParityV78Gateway {
     /// Generate comprehensive Markdown report of PR proposals.
     pub fn generate_pr_proposal_markdown(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut report = String::from("# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V78)\n\n");
+        let mut report = String::from(
+            "# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V78)\n\n",
+        );
         report.push_str("| PR # | Title | Subsystem | Original Runtime | Speedup | Status |\n");
         report.push_str("|------|-------|-----------|------------------|---------|--------|\n");
 
         for pr in &proposals {
             report.push_str(&format!(
                 "| #{} | {} | {} | {} | {} | {} |\n",
-                pr.pr_number, pr.pr_title, pr.target_subsystem, pr.original_runtime, pr.performance_multiplier, pr.status
+                pr.pr_number,
+                pr.pr_title,
+                pr.target_subsystem,
+                pr.original_runtime,
+                pr.performance_multiplier,
+                pr.status
             ));
         }
 
@@ -742,10 +763,13 @@ mod tests {
         let hash = GlibcInspirationsV78Engine::compute_gnu_hash("memcpy");
         assert_ne!(hash, 0);
 
-        let resolved = GlibcInspirationsV78Engine::resolve_ifunc_symbol(&["apx", "avx512f"], "memcpy");
+        let resolved =
+            GlibcInspirationsV78Engine::resolve_ifunc_symbol(&["apx", "avx512f"], "memcpy");
         assert_eq!(resolved, "memcpy_apx_avx512");
 
-        let tunables = GlibcInspirationsV78Engine::parse_glibc_tunables("glibc.malloc.arena_max=8:glibc.cpu.hwcap_mask=0x1");
+        let tunables = GlibcInspirationsV78Engine::parse_glibc_tunables(
+            "glibc.malloc.arena_max=8:glibc.cpu.hwcap_mask=0x1",
+        );
         assert_eq!(tunables.len(), 2);
         assert_eq!(tunables[0], ("glibc.malloc.arena_max", "8"));
 
@@ -755,7 +779,10 @@ mod tests {
         let xml = GlibcInspirationsV78Engine::generate_malloc_info_xml(1024, 10, 2);
         assert!(xml.contains("arena bytes=\"1024\""));
 
-        assert_eq!(GlibcInspirationsV78Engine::evaluate_malloc_trim(200_000), 200_000 - 131_072);
+        assert_eq!(
+            GlibcInspirationsV78Engine::evaluate_malloc_trim(200_000),
+            200_000 - 131_072
+        );
     }
 
     #[test]
@@ -764,8 +791,13 @@ mod tests {
         assert_eq!(sc, 1);
         assert!(q < 16);
 
-        assert!(MuslLibcInspirationsV78Engine::evaluate_pthread_cancellation("ENABLE", "ASYNCHRONOUS"));
-        assert_eq!(MuslLibcInspirationsV78Engine::simulate_synccall_broadcast(4, 32), 4);
+        assert!(
+            MuslLibcInspirationsV78Engine::evaluate_pthread_cancellation("ENABLE", "ASYNCHRONOUS")
+        );
+        assert_eq!(
+            MuslLibcInspirationsV78Engine::simulate_synccall_broadcast(4, 32),
+            4
+        );
 
         let unmap = MuslLibcInspirationsV78Engine::evaluate_unmapself_stack(0x7fff_0000, 8192);
         assert!(unmap.contains("unmap_range"));
@@ -779,7 +811,8 @@ mod tests {
         let got = UclibcInspirationsV78Engine::relocate_fdpic_got(0x8000_0000, 0x1000);
         assert_eq!(got, 0x8000_1000);
 
-        let stripped = UclibcInspirationsV78Engine::strip_unsupported_target_features(&["neon", "vfpv4"], 1);
+        let stripped =
+            UclibcInspirationsV78Engine::strip_unsupported_target_features(&["neon", "vfpv4"], 1);
         assert_eq!(stripped, alloc::vec!["neon"]);
 
         let sysv_hash = UclibcInspirationsV78Engine::compute_sysv_elf_hash("printf");
@@ -791,7 +824,8 @@ mod tests {
     #[test]
     fn test_bsd_libc_utilities_v78() {
         let seed = [0x5a; 32];
-        let stream = BsdLibcInspirationsV78Engine::generate_arc4random_chacha20_keystream(&seed, 16);
+        let stream =
+            BsdLibcInspirationsV78Engine::generate_arc4random_chacha20_keystream(&seed, 16);
         assert_eq!(stream.len(), 16);
 
         let mut buf = [0xffu8; 8];
@@ -806,46 +840,98 @@ mod tests {
         let realloc_res = BsdLibcInspirationsV78Engine::reallocarray_overflow_check(usize::MAX, 2);
         assert!(realloc_res.is_err());
 
-        assert!(BsdLibcInspirationsV78Engine::evaluate_pledge_unveil_policy("pledge", "/"));
-        assert!(!BsdLibcInspirationsV78Engine::evaluate_pledge_unveil_policy("open", "/etc/passwd"));
+        assert!(BsdLibcInspirationsV78Engine::evaluate_pledge_unveil_policy(
+            "pledge", "/"
+        ));
+        assert!(
+            !BsdLibcInspirationsV78Engine::evaluate_pledge_unveil_policy("open", "/etc/passwd")
+        );
     }
 
     #[test]
     fn test_bionic_and_newlib_and_cosmopolitan_v78() {
-        assert!(BionicInspirationsV78Engine::verify_scudo_chunk_header(0x1234, 0x1234 ^ 0xcafe));
-        assert!(BionicInspirationsV78Engine::verify_arm_pac_bti_tags(0x0000_7fff_1234_5000, 0xffff_0000_0000_0000));
-        assert_eq!(BionicInspirationsV78Engine::query_android_property("ro.build.version.release"), Some("15".to_string()));
-        assert!(BionicInspirationsV78Engine::fdsan_owner_tag_check(12345, 12345));
+        assert!(BionicInspirationsV78Engine::verify_scudo_chunk_header(
+            0x1234,
+            0x1234 ^ 0xcafe
+        ));
+        assert!(BionicInspirationsV78Engine::verify_arm_pac_bti_tags(
+            0x0000_7fff_1234_5000,
+            0xffff_0000_0000_0000
+        ));
+        assert_eq!(
+            BionicInspirationsV78Engine::query_android_property("ro.build.version.release"),
+            Some("15".to_string())
+        );
+        assert!(BionicInspirationsV78Engine::fdsan_owner_tag_check(
+            12345, 12345
+        ));
 
         let reent = NewlibInspirationsV78Engine::manage_reent_context(1, 0);
         assert_eq!(reent, "reent_thread_1_errno_0");
         assert!(NewlibInspirationsV78Engine::nano_malloc_split_alloc(1024, 128).is_ok());
 
-        assert!(CosmopolitanInspirationsV78Engine::validate_ape_binary(b"\x7fELF_header_test_data_extended_for_cosmopolitan_ape"));
-        assert_eq!(CosmopolitanInspirationsV78Engine::map_posix_to_win32_oflag(0), 0x8000_0000);
-        assert_eq!(CosmopolitanInspirationsV78Engine::dispatch_fat_elf_arch(&["x86_64", "aarch64"]), "x86_64_fat_section");
+        assert!(CosmopolitanInspirationsV78Engine::validate_ape_binary(
+            b"\x7fELF_header_test_data_extended_for_cosmopolitan_ape"
+        ));
+        assert_eq!(
+            CosmopolitanInspirationsV78Engine::map_posix_to_win32_oflag(0),
+            0x8000_0000
+        );
+        assert_eq!(
+            CosmopolitanInspirationsV78Engine::dispatch_fat_elf_arch(&["x86_64", "aarch64"]),
+            "x86_64_fat_section"
+        );
     }
 
     #[test]
     fn test_libstdcxx_demangle_and_sso_v78() {
-        assert_eq!(LibstdcxxInspirationsV78Engine::demangle_cxx_symbol("_Z1fPFiivE"), "f(int (*)())");
-        assert_eq!(LibstdcxxInspirationsV78Engine::determine_sso_layout(10), "inline_sso");
-        assert_eq!(LibstdcxxInspirationsV78Engine::determine_sso_layout(25), "heap_allocated");
-        assert_eq!(LibstdcxxInspirationsV78Engine::pmr_allocate_buffer(512, 100), Ok(412));
-        assert_eq!(LibstdcxxInspirationsV78Engine::lookup_dwarf_eh_frame_unwind(0x5000_0000), Some(0x5000_0000 ^ 0x1234));
+        assert_eq!(
+            LibstdcxxInspirationsV78Engine::demangle_cxx_symbol("_Z1fPFiivE"),
+            "f(int (*)())"
+        );
+        assert_eq!(
+            LibstdcxxInspirationsV78Engine::determine_sso_layout(10),
+            "inline_sso"
+        );
+        assert_eq!(
+            LibstdcxxInspirationsV78Engine::determine_sso_layout(25),
+            "heap_allocated"
+        );
+        assert_eq!(
+            LibstdcxxInspirationsV78Engine::pmr_allocate_buffer(512, 100),
+            Ok(412)
+        );
+        assert_eq!(
+            LibstdcxxInspirationsV78Engine::lookup_dwarf_eh_frame_unwind(0x5000_0000),
+            Some(0x5000_0000 ^ 0x1234)
+        );
     }
 
     #[test]
     fn test_libcxx_fast_to_chars_v78() {
-        assert_eq!(LibcxxInspirationsV78Engine::fast_to_chars_u64_sim(123456789), "123456789");
-        assert_eq!(LibcxxInspirationsV78Engine::fast_from_chars_u64_sim("987654321"), Ok(987654321));
-        assert_eq!(LibcxxInspirationsV78Engine::futex_atomic_wait(5, 5), "futex_wait_blocked");
-        assert_eq!(LibcxxInspirationsV78Engine::update_ref_count(1, 0, "inc_shared"), (2, 0));
+        assert_eq!(
+            LibcxxInspirationsV78Engine::fast_to_chars_u64_sim(123456789),
+            "123456789"
+        );
+        assert_eq!(
+            LibcxxInspirationsV78Engine::fast_from_chars_u64_sim("987654321"),
+            Ok(987654321)
+        );
+        assert_eq!(
+            LibcxxInspirationsV78Engine::futex_atomic_wait(5, 5),
+            "futex_wait_blocked"
+        );
+        assert_eq!(
+            LibcxxInspirationsV78Engine::update_ref_count(1, 0, "inc_shared"),
+            (2, 0)
+        );
     }
 
     #[test]
     fn test_ld_so_search_paths_v78() {
-        let paths = DynamicLinkerLdSoInspirationsV78Engine::resolve_search_path_order("ld/path", "run/path", "");
+        let paths = DynamicLinkerLdSoInspirationsV78Engine::resolve_search_path_order(
+            "ld/path", "run/path", "",
+        );
         assert_eq!(paths[0], "run/path");
         assert_eq!(paths[1], "ld/path");
 
@@ -853,7 +939,10 @@ mod tests {
         assert_eq!(flags, alloc::vec!["DF_1_NOW", "DF_1_PIE"]);
 
         assert_eq!(
-            DynamicLinkerLdSoInspirationsV78Engine::evaluate_ld_preload_interposition(&["libfaketime.so"], "malloc"),
+            DynamicLinkerLdSoInspirationsV78Engine::evaluate_ld_preload_interposition(
+                &["libfaketime.so"],
+                "malloc"
+            ),
             Some("interposed_by_preload")
         );
 
@@ -862,7 +951,12 @@ mod tests {
             "rtld_audit_la_version_handled"
         );
         assert!(DynamicLinkerLdSoInspirationsV78Engine::verify_gnu_relro_protection(0x01));
-        assert!(DynamicLinkerLdSoInspirationsV78Engine::match_elf_symbol_versions("GLIBC_2.34", &["GLIBC_2.2.5", "GLIBC_2.34"]));
+        assert!(
+            DynamicLinkerLdSoInspirationsV78Engine::match_elf_symbol_versions(
+                "GLIBC_2.34",
+                &["GLIBC_2.2.5", "GLIBC_2.34"]
+            )
+        );
     }
 
     #[test]
@@ -877,7 +971,9 @@ mod tests {
         }
 
         let markdown = gateway.generate_pr_proposal_markdown();
-        assert!(markdown.contains("# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V78)"));
+        assert!(markdown.contains(
+            "# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V78)"
+        ));
         assert!(markdown.contains("glibc"));
         assert!(markdown.contains("Bionic"));
     }

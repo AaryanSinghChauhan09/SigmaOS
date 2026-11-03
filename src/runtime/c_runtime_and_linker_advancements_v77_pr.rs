@@ -108,7 +108,12 @@ impl GlibcInspirationsV77Engine {
     }
 
     /// Calculate Thread-Local Storage (TLS) Variant I / Variant II DTV offsets.
-    pub fn calculate_tls_dtv_offset(variant: u8, module_id: usize, tls_size: usize, tls_align: usize) -> usize {
+    pub fn calculate_tls_dtv_offset(
+        variant: u8,
+        module_id: usize,
+        tls_size: usize,
+        tls_align: usize,
+    ) -> usize {
         let aligned_size = (tls_size + (tls_align - 1)) & !(tls_align - 1);
         if variant == 1 {
             // Variant I (ARM / RISC-V): TCB precedes TLS blocks
@@ -120,7 +125,11 @@ impl GlibcInspirationsV77Engine {
     }
 
     /// Generate simulated malloc_info XML telemetry output.
-    pub fn generate_malloc_info_xml(heap_size: usize, arena_count: usize, allocated_bytes: usize) -> String {
+    pub fn generate_malloc_info_xml(
+        heap_size: usize,
+        arena_count: usize,
+        allocated_bytes: usize,
+    ) -> String {
         format!(
             "<malloc version=\"1\"><heap size=\"{}\"><arena count=\"{}\"/><alloc bytes=\"{}\"/></heap></malloc>",
             heap_size, arena_count, allocated_bytes
@@ -277,7 +286,9 @@ impl BsdLibcInspirationsV77Engine {
         let mut out = Vec::with_capacity(len);
         let mut state = seed;
         for _ in 0..len {
-            state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             out.push((state >> 32) as u8);
         }
         out
@@ -356,7 +367,12 @@ impl BionicInspirationsV77Engine {
     }
 
     /// Scudo Hardened Allocator chunk header checksum verifier.
-    pub fn verify_scudo_chunk_checksum(cookie: u32, ptr_val: u64, header_word: u32, expected_checksum: u16) -> bool {
+    pub fn verify_scudo_chunk_checksum(
+        cookie: u32,
+        ptr_val: u64,
+        header_word: u32,
+        expected_checksum: u16,
+    ) -> bool {
         let mut crc = cookie as u64 ^ ptr_val ^ (header_word as u64);
         crc = (crc ^ (crc >> 16)) & 0xFFFF;
         (crc as u16) == expected_checksum
@@ -410,7 +426,10 @@ impl NewlibInspirationsV77Engine {
     }
 
     /// Newlib nano-malloc split chunk allocator calculation.
-    pub fn calculate_nano_malloc_split(chunk_size: usize, alloc_size: usize) -> Option<(usize, usize)> {
+    pub fn calculate_nano_malloc_split(
+        chunk_size: usize,
+        alloc_size: usize,
+    ) -> Option<(usize, usize)> {
         let min_chunk = 16;
         if chunk_size >= alloc_size + min_chunk {
             Some((alloc_size, chunk_size - alloc_size))
@@ -449,7 +468,9 @@ impl CosmopolitanInspirationsV77Engine {
             return false;
         }
         // Check for 'MZ' DOS header and 'APE:' magic signature at offset 0x3C
-        bytes[0] == b'M' && bytes[1] == b'Z' && (bytes.len() >= 0x40 && &bytes[0x38..0x3C] == b"APE!")
+        bytes[0] == b'M'
+            && bytes[1] == b'Z'
+            && (bytes.len() >= 0x40 && &bytes[0x38..0x3C] == b"APE!")
     }
 
     /// Map POSIX file opening flags to Win32 `CreateFile` access mode flags.
@@ -679,7 +700,9 @@ impl DynamicLinkerLdSoInspirationsV77Engine {
         preload_libs: &[&str],
         symbol_name: &str,
     ) -> Option<&'a str> {
-        if !preload_libs.is_empty() && (symbol_name == "malloc" || symbol_name == "free" || symbol_name == "open") {
+        if !preload_libs.is_empty()
+            && (symbol_name == "malloc" || symbol_name == "free" || symbol_name == "open")
+        {
             Some("interposed_by_preload")
         } else {
             None
@@ -791,7 +814,8 @@ impl SovereignCRuntimeAndLinkerParityV77Gateway {
             },
             CRuntimePrProposalManifestV77 {
                 pr_number: 5085,
-                pr_title: "Android Bionic Scudo Hardened Allocator & ARM PAC/BTI Parity".to_string(),
+                pr_title: "Android Bionic Scudo Hardened Allocator & ARM PAC/BTI Parity"
+                    .to_string(),
                 target_subsystem: "Runtime / Bionic".to_string(),
                 original_runtime: "Android Bionic".to_string(),
                 components_added: alloc::vec![
@@ -859,7 +883,8 @@ impl SovereignCRuntimeAndLinkerParityV77Gateway {
             },
             CRuntimePrProposalManifestV77 {
                 pr_number: 5090,
-                pr_title: "Linux / BSD Dynamic Linker (ld.so) Search Path & RELRO Parity".to_string(),
+                pr_title: "Linux / BSD Dynamic Linker (ld.so) Search Path & RELRO Parity"
+                    .to_string(),
                 target_subsystem: "Runtime / ld.so".to_string(),
                 original_runtime: "Linux / BSD Dynamic Linker".to_string(),
                 components_added: alloc::vec![
@@ -924,12 +949,18 @@ mod tests {
         let bloom = [0x0000_0000_0000_0001u64, 0x8000_0000_0000_0000u64];
         let _check = GlibcInspirationsV77Engine::check_gnu_bloom_filter(hash, &bloom, 5);
 
-        let resolved = GlibcInspirationsV77Engine::resolve_ifunc_symbol("memcpy", &["avx10.2", "avx512f"]);
+        let resolved =
+            GlibcInspirationsV77Engine::resolve_ifunc_symbol("memcpy", &["avx10.2", "avx512f"]);
         assert_eq!(resolved, "__memcpy_avx10_2_512");
 
-        let tunables = GlibcInspirationsV77Engine::parse_glibc_tunables("glibc.malloc.arena_max=4:glibc.cpu.hwcaps=-AVX2");
+        let tunables = GlibcInspirationsV77Engine::parse_glibc_tunables(
+            "glibc.malloc.arena_max=4:glibc.cpu.hwcaps=-AVX2",
+        );
         assert_eq!(tunables.len(), 2);
-        assert_eq!(tunables[0], ("glibc.malloc.arena_max".to_string(), "4".to_string()));
+        assert_eq!(
+            tunables[0],
+            ("glibc.malloc.arena_max".to_string(), "4".to_string())
+        );
 
         let dtv_off = GlibcInspirationsV77Engine::calculate_tls_dtv_offset(1, 2, 64, 16);
         assert_eq!(dtv_off, 144);
@@ -937,8 +968,14 @@ mod tests {
         let xml = GlibcInspirationsV77Engine::generate_malloc_info_xml(1024, 4, 512);
         assert!(xml.contains("<malloc version=\"1\">"));
 
-        assert!(GlibcInspirationsV77Engine::evaluate_mallopt("M_ARENA_MAX", 4));
-        assert_eq!(GlibcInspirationsV77Engine::execute_malloc_trim(100, 500), 400);
+        assert!(GlibcInspirationsV77Engine::evaluate_mallopt(
+            "M_ARENA_MAX",
+            4
+        ));
+        assert_eq!(
+            GlibcInspirationsV77Engine::execute_malloc_trim(100, 500),
+            400
+        );
     }
 
     #[test]
@@ -947,13 +984,21 @@ mod tests {
         assert_eq!(sc, 32);
         assert_eq!(q, 8);
 
-        assert!(MuslLibcInspirationsV77Engine::check_pthread_cancel(0, 0, true));
+        assert!(MuslLibcInspirationsV77Engine::check_pthread_cancel(
+            0, 0, true
+        ));
         let (acked, ok) = MuslLibcInspirationsV77Engine::broadcast_synccall(8, 1);
         assert_eq!(acked, 8);
         assert!(ok);
 
-        assert_eq!(MuslLibcInspirationsV77Engine::evaluate_stdio_buffer_space(1024, 100, 500), 400);
-        assert_eq!(MuslLibcInspirationsV77Engine::evaluate_syscall_cp(1, true), -125);
+        assert_eq!(
+            MuslLibcInspirationsV77Engine::evaluate_stdio_buffer_space(1024, 100, 500),
+            400
+        );
+        assert_eq!(
+            MuslLibcInspirationsV77Engine::evaluate_syscall_cp(1, true),
+            -125
+        );
 
         let (srv, dns_ok) = MuslLibcInspirationsV77Engine::dispatch_res_msend(32, 2);
         assert_eq!(srv, 2);
@@ -991,25 +1036,45 @@ mod tests {
         let cat_len = BsdLibcInspirationsV77Engine::strlcat_sim(&mut cat_dst, "BCDE", 12);
         assert_eq!(cat_len, 5);
 
-        assert_eq!(BsdLibcInspirationsV77Engine::reallocarray_check(10, 20), Some(200));
-        assert_eq!(BsdLibcInspirationsV77Engine::reallocarray_check(usize::MAX, 2), None);
+        assert_eq!(
+            BsdLibcInspirationsV77Engine::reallocarray_check(10, 20),
+            Some(200)
+        );
+        assert_eq!(
+            BsdLibcInspirationsV77Engine::reallocarray_check(usize::MAX, 2),
+            None
+        );
 
         let mib = BsdLibcInspirationsV77Engine::parse_sysctl_mib("kern.proc.pid");
         assert_eq!(mib, alloc::vec![1, 14, 1]);
 
-        assert!(BsdLibcInspirationsV77Engine::verify_pledge_permission(&["rpath", "wpath"], "rpath"));
+        assert!(BsdLibcInspirationsV77Engine::verify_pledge_permission(
+            &["rpath", "wpath"],
+            "rpath"
+        ));
     }
 
     #[test]
     fn test_bionic_and_newlib_and_cosmopolitan_v77() {
-        assert!(BionicInspirationsV77Engine::check_fdsan_owner_tag(3, 0x1234_5678, 0x1234_5678));
+        assert!(BionicInspirationsV77Engine::check_fdsan_owner_tag(
+            3,
+            0x1234_5678,
+            0x1234_5678
+        ));
         let log = BionicInspirationsV77Engine::async_safe_format_log("bionic", 3, "alloc_failed");
         assert!(log.contains("[P:3] <bionic>: alloc_failed"));
 
-        let prop = BionicInspirationsV77Engine::parse_android_property("[ro.build.version.sdk]: [34]");
-        assert_eq!(prop, Some(("ro.build.version.sdk".to_string(), "34".to_string())));
+        let prop =
+            BionicInspirationsV77Engine::parse_android_property("[ro.build.version.sdk]: [34]");
+        assert_eq!(
+            prop,
+            Some(("ro.build.version.sdk".to_string(), "34".to_string()))
+        );
 
-        assert_eq!(NewlibInspirationsV77Engine::resolve_impure_ptr(0, true), 0x2000_0000);
+        assert_eq!(
+            NewlibInspirationsV77Engine::resolve_impure_ptr(0, true),
+            0x2000_0000
+        );
         let split = NewlibInspirationsV77Engine::calculate_nano_malloc_split(64, 32);
         assert_eq!(split, Some((32, 32)));
 
@@ -1020,13 +1085,18 @@ mod tests {
         ape_bytes[0] = b'M';
         ape_bytes[1] = b'Z';
         ape_bytes[0x38..0x3C].copy_from_slice(b"APE!");
-        assert!(CosmopolitanInspirationsV77Engine::validate_ape_header(&ape_bytes));
+        assert!(CosmopolitanInspirationsV77Engine::validate_ape_header(
+            &ape_bytes
+        ));
 
         let (acc, share) = CosmopolitanInspirationsV77Engine::posix_to_win32_access_flags(2); // O_RDWR
         assert_eq!(acc, 0xC000_0000);
         assert_eq!(share, 0x0000_0003);
 
-        assert_eq!(CosmopolitanInspirationsV77Engine::dispatch_fat_elf("x86_64"), "fat_elf_x86_64_entry");
+        assert_eq!(
+            CosmopolitanInspirationsV77Engine::dispatch_fat_elf("x86_64"),
+            "fat_elf_x86_64_entry"
+        );
     }
 
     #[test]
@@ -1047,10 +1117,8 @@ mod tests {
         assert_eq!(sz, 24);
         assert_eq!(align, 8);
 
-        let lsda = LibstdcxxInspirationsV77Engine::lookup_eh_frame_ip(
-            0x1005,
-            &[(0x1000, 0x1010, 0x2000)],
-        );
+        let lsda =
+            LibstdcxxInspirationsV77Engine::lookup_eh_frame_ip(0x1005, &[(0x1000, 0x1010, 0x2000)]);
         assert_eq!(lsda, Some(0x2000));
     }
 
@@ -1062,8 +1130,14 @@ mod tests {
         let (s, w) = LibcxxInspirationsV77Engine::update_shared_ref_count(1, 0, "inc_strong");
         assert_eq!((s, w), (2, 0));
 
-        assert_eq!(LibcxxInspirationsV77Engine::futex_atomic_wait(5, 5), "futex_wait_blocked");
-        assert_eq!(LibcxxInspirationsV77Engine::futex_atomic_wait(6, 5), "value_changed_no_wait");
+        assert_eq!(
+            LibcxxInspirationsV77Engine::futex_atomic_wait(5, 5),
+            "futex_wait_blocked"
+        );
+        assert_eq!(
+            LibcxxInspirationsV77Engine::futex_atomic_wait(6, 5),
+            "value_changed_no_wait"
+        );
 
         let float_str = LibcxxInspirationsV77Engine::fast_to_chars_f64_sim(PI);
         assert_eq!(float_str, "3.14");
@@ -1082,13 +1156,22 @@ mod tests {
         assert_eq!(flags, alloc::vec!["DF_1_NOW", "DF_1_PIE"]);
 
         let _engine = DynamicLinkerLdSoInspirationsV77Engine::new();
-        assert_eq!(DynamicLinkerLdSoInspirationsV77Engine::execute_dlinfo(2), Ok("RTLD_DI_LINKMAP"));
         assert_eq!(
-            DynamicLinkerLdSoInspirationsV77Engine::evaluate_ld_preload_interposition(&["libfaketime.so"], "malloc"),
+            DynamicLinkerLdSoInspirationsV77Engine::execute_dlinfo(2),
+            Ok("RTLD_DI_LINKMAP")
+        );
+        assert_eq!(
+            DynamicLinkerLdSoInspirationsV77Engine::evaluate_ld_preload_interposition(
+                &["libfaketime.so"],
+                "malloc"
+            ),
             Some("interposed_by_preload")
         );
         assert_eq!(
-            DynamicLinkerLdSoInspirationsV77Engine::evaluate_ld_preload_interposition(&[], "malloc"),
+            DynamicLinkerLdSoInspirationsV77Engine::evaluate_ld_preload_interposition(
+                &[],
+                "malloc"
+            ),
             None
         );
 
@@ -1099,7 +1182,12 @@ mod tests {
         assert!(DynamicLinkerLdSoInspirationsV77Engine::verify_gnu_relro_protection(0x01 | 0x04));
         assert!(!DynamicLinkerLdSoInspirationsV77Engine::verify_gnu_relro_protection(0x00));
 
-        assert!(DynamicLinkerLdSoInspirationsV77Engine::match_elf_symbol_versions("GLIBC_2.34", &["GLIBC_2.2.5", "GLIBC_2.34"]));
+        assert!(
+            DynamicLinkerLdSoInspirationsV77Engine::match_elf_symbol_versions(
+                "GLIBC_2.34",
+                &["GLIBC_2.2.5", "GLIBC_2.34"]
+            )
+        );
     }
 
     #[test]
