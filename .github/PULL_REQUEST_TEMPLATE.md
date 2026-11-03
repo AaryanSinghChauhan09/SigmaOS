@@ -89,3 +89,15 @@
 - [ ] I/O scheduler
 - [ ] I/O policy
 - [ ] I/O safety review
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
