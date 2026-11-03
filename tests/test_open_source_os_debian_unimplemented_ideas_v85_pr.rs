@@ -156,7 +156,10 @@ fn test_v85_debian_apt_pqc_engine() {
 #[test]
 fn test_v85_debian_debconf_engine() {
     let mut engine = DebianDebconfStateDatabaseEngineV85Pr::new();
-    assert_eq!(engine.get_answer("debconf/frontend").unwrap(), "Noninteractive");
+    assert_eq!(
+        engine.get_answer("debconf/frontend").unwrap(),
+        "Noninteractive"
+    );
     engine.set_answer("debconf/frontend", "Readline");
     assert_eq!(engine.get_answer("debconf/frontend").unwrap(), "Readline");
 
@@ -220,7 +223,10 @@ fn test_v85_debian_piuparts_engine() {
 #[test]
 fn test_v85_debian_subiquity_engine() {
     let engine = DebianSubiquityInstallerAutoinstallEngineV85Pr::new();
-    assert_eq!(engine.parse_autoinstall_hostname().unwrap(), "sigma-node-v85");
+    assert_eq!(
+        engine.parse_autoinstall_hostname().unwrap(),
+        "sigma-node-v85"
+    );
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 8518);
