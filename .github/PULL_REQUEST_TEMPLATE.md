@@ -80,3 +80,17 @@
 
 - Risk:
 - Rollback:
+
+## I/O component
+
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O policy
+
+## I/O safety review
+
+- [ ] 10-stage lifecycle transitions are valid
+- [ ] Double DMA prevented
+- [ ] Buffer dirty eviction safe
