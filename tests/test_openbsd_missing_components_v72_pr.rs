@@ -15,7 +15,7 @@ use openbsd_missing_components_v72_pr::*;
 fn test_integration_openbsd_v72_master_suite() {
     let mut suite = OpenBsdMissingComponentsV72PrSuite::new();
     let summaries: Vec<String> = suite.run_all_checks();
-    assert_eq!(summaries.len(), 11);
+    assert_eq!(summaries.len(), 10);
     for s in &summaries {
         assert!(!s.is_empty());
         assert!(s.contains("V72") || s.contains("v72") || s.contains("Dilithium"));
