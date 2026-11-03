@@ -283,38 +283,3 @@ stick (USB writer), timeshift (BTRFS snapshots), try (live env), try-windows (du
 
 ### Coverage: **167/167 scaffolds — 100% complete** ✅
 All `cargo check`, `bash -n`, `py_compile` pass. Umbrella `cargo check --lib`: exit 0.
-
----
-
-## Platform Integration Layers — 2026-11-02
-
-Added three umbrella-repo integration modules that wire all 8 architecture layers together, completing the Milestone 1 scaffolding phase.
-
-### src/sigma_platform.rs — 8-Layer Platform Integration
-- **KernelBackend trait**: `kind()`, `init_system()`, `package_manager()`, `network_manager()`, `is_ready()`, `health_summary()` — the core adapter interface for Linux and BSD backends.
-- **LinuxBackend** (systemd/pacman/nmcli), **BsdBackend** (rc.d/pkg/ifconfig), **StubBackend** (no-op for CI).
-- **BootPipeline**: 9-stage state machine (Firmware→Bootloader→Kernel→Initramfs→Init→Services→Login→Desktop→Ready) with `advance()`, `fail()`, `advance_to_ready()`.
-- **SystemOrchestrator**: 6 core services (sigma-init, sigma-network, sigma-security, sigma-audio, sigma-bluetooth, sigma-update) with start/stop/health_report.
-- **PackageCoordinator**: install/remove with unsigned-package blocking enforced by default.
-- **DesktopSession**: Starting→Active→Locked→Suspending→Ending lifecycle.
-- **ConfigStore**: theme/language/timezone/profile defaults + validation.
-- **SecurityContext**: hardening profile, audit, signed-packages enforcement, `is_hardened()`.
-- **AppRegistry**: default app set (chromium, foot, nautilus, sigma-settings) + lookup.
-- **SigmaPlatform**: `boot(backend)` factory wires all 8 layers; `is_ready()` + `status_report()`.
-- 17 inline tests — all layers and full platform integration covered.
-
-### src/smoke_tests.rs — Milestone 1 Smoke Suite
-- `SmokeSuite::run_all(backend)`: 18 tests across boot/services/packages/config/security/apps/platform/qemu.
-- QEMU tests skip in Stub mode, execute in Linux/BSD mode.
-- `SmokeResult::Pass` / `Fail(msg)` / `Skip(msg)` — clear pass/fail/skip semantics.
-- 3 inline tests: full suite passes on Stub, counts correct, report has result line.
-
-### src/sigma_release.rs — Release Management
-- `SigmaVersion` semantic versioning with pre-release labels.
-- `ReleaseChannel`: Stable/Testing/Nightly with per-channel signing policies.
-- `ReleaseReadiness`: 7-check gate (boot/services/packages/config/security/apps/signing) — evaluates to READY on Stub backend.
-- `RollbackManager`: records rollback history (SmokeTestFailure/BootFailure/Manual triggers).
-- 5 inline tests covering all subsystems.
-
-### Milestone 1 status: **10/10 success criteria ✅**
-All Milestone 1 goals are scaffolded, integrated, and passing in the Stub backend smoke suite. Remaining before a *runnable* M1: QEMU end-to-end boot on real hardware.

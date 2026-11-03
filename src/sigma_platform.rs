@@ -33,15 +33,15 @@ pub enum BackendKind {
 impl BackendKind {
     pub fn from_env() -> Self {
         match std::env::var("SIGMA_KERNEL_BACKEND").as_deref() {
-            Ok("bsd")  => BackendKind::Bsd,
+            Ok("bsd") => BackendKind::Bsd,
             Ok("stub") => BackendKind::Stub,
-            _          => BackendKind::Linux, // Linux is the default
+            _ => BackendKind::Linux, // Linux is the default
         }
     }
     pub fn name(self) -> &'static str {
         match self {
             BackendKind::Linux => "linux",
-            BackendKind::Bsd  => "bsd",
+            BackendKind::Bsd => "bsd",
             BackendKind::Stub => "stub",
         }
     }
@@ -69,46 +69,86 @@ pub trait KernelBackend: Send + Sync {
 
 pub struct LinuxBackend;
 impl KernelBackend for LinuxBackend {
-    fn kind(&self) -> BackendKind { BackendKind::Linux }
-    fn init_system(&self) -> &str { "systemd" }
-    fn package_manager(&self) -> &str { "pacman" }
-    fn network_manager(&self) -> &str { "nmcli" }
-    fn is_ready(&self) -> bool { true }
+    fn kind(&self) -> BackendKind {
+        BackendKind::Linux
+    }
+    fn init_system(&self) -> &str {
+        "systemd"
+    }
+    fn package_manager(&self) -> &str {
+        "pacman"
+    }
+    fn network_manager(&self) -> &str {
+        "nmcli"
+    }
+    fn is_ready(&self) -> bool {
+        true
+    }
     fn health_summary(&self) -> String {
-        format!("Linux backend: init={} pkgmgr={} netmgr={}",
-            self.init_system(), self.package_manager(), self.network_manager())
+        format!(
+            "Linux backend: init={} pkgmgr={} netmgr={}",
+            self.init_system(),
+            self.package_manager(),
+            self.network_manager()
+        )
     }
 }
 
 pub struct BsdBackend;
 impl KernelBackend for BsdBackend {
-    fn kind(&self) -> BackendKind { BackendKind::Bsd }
-    fn init_system(&self) -> &str { "rc.d" }
-    fn package_manager(&self) -> &str { "pkg" }
-    fn network_manager(&self) -> &str { "ifconfig" }
-    fn is_ready(&self) -> bool { true }
+    fn kind(&self) -> BackendKind {
+        BackendKind::Bsd
+    }
+    fn init_system(&self) -> &str {
+        "rc.d"
+    }
+    fn package_manager(&self) -> &str {
+        "pkg"
+    }
+    fn network_manager(&self) -> &str {
+        "ifconfig"
+    }
+    fn is_ready(&self) -> bool {
+        true
+    }
     fn health_summary(&self) -> String {
-        format!("BSD backend: init={} pkgmgr={} netmgr={}",
-            self.init_system(), self.package_manager(), self.network_manager())
+        format!(
+            "BSD backend: init={} pkgmgr={} netmgr={}",
+            self.init_system(),
+            self.package_manager(),
+            self.network_manager()
+        )
     }
 }
 
 pub struct StubBackend;
 impl KernelBackend for StubBackend {
-    fn kind(&self) -> BackendKind { BackendKind::Stub }
-    fn init_system(&self) -> &str { "stub-init" }
-    fn package_manager(&self) -> &str { "stub-pkg" }
-    fn network_manager(&self) -> &str { "stub-net" }
-    fn is_ready(&self) -> bool { true }
-    fn health_summary(&self) -> String { "Stub backend: no-op (test/scaffold mode)".to_string() }
+    fn kind(&self) -> BackendKind {
+        BackendKind::Stub
+    }
+    fn init_system(&self) -> &str {
+        "stub-init"
+    }
+    fn package_manager(&self) -> &str {
+        "stub-pkg"
+    }
+    fn network_manager(&self) -> &str {
+        "stub-net"
+    }
+    fn is_ready(&self) -> bool {
+        true
+    }
+    fn health_summary(&self) -> String {
+        "Stub backend: no-op (test/scaffold mode)".to_string()
+    }
 }
 
 /// Construct the appropriate backend from the environment.
 pub fn create_backend(kind: BackendKind) -> Box<dyn KernelBackend> {
     match kind {
         BackendKind::Linux => Box::new(LinuxBackend),
-        BackendKind::Bsd   => Box::new(BsdBackend),
-        BackendKind::Stub  => Box::new(StubBackend),
+        BackendKind::Bsd => Box::new(BsdBackend),
+        BackendKind::Stub => Box::new(StubBackend),
     }
 }
 
@@ -132,28 +172,28 @@ pub enum BootStage {
 impl BootStage {
     pub fn next(self) -> Option<BootStage> {
         match self {
-            Self::Firmware   => Some(Self::Bootloader),
+            Self::Firmware => Some(Self::Bootloader),
             Self::Bootloader => Some(Self::Kernel),
-            Self::Kernel     => Some(Self::Initramfs),
-            Self::Initramfs  => Some(Self::Init),
-            Self::Init       => Some(Self::Services),
-            Self::Services   => Some(Self::Login),
-            Self::Login      => Some(Self::Desktop),
-            Self::Desktop    => Some(Self::Ready),
-            Self::Ready      => None,
+            Self::Kernel => Some(Self::Initramfs),
+            Self::Initramfs => Some(Self::Init),
+            Self::Init => Some(Self::Services),
+            Self::Services => Some(Self::Login),
+            Self::Login => Some(Self::Desktop),
+            Self::Desktop => Some(Self::Ready),
+            Self::Ready => None,
         }
     }
     pub fn label(self) -> &'static str {
         match self {
-            Self::Firmware   => "Firmware (UEFI/BIOS)",
+            Self::Firmware => "Firmware (UEFI/BIOS)",
             Self::Bootloader => "Bootloader (systemd-boot/GRUB/loader.conf)",
-            Self::Kernel     => "Kernel load and decompress",
-            Self::Initramfs  => "Early userspace (initramfs)",
-            Self::Init       => "Init system startup",
-            Self::Services   => "System services",
-            Self::Login      => "Display manager / login",
-            Self::Desktop    => "Desktop shell",
-            Self::Ready      => "System ready",
+            Self::Kernel => "Kernel load and decompress",
+            Self::Initramfs => "Early userspace (initramfs)",
+            Self::Init => "Init system startup",
+            Self::Services => "System services",
+            Self::Login => "Display manager / login",
+            Self::Desktop => "Desktop shell",
+            Self::Ready => "System ready",
         }
     }
 }
@@ -177,9 +217,13 @@ impl BootPipeline {
 
     /// Advance to the next stage. Returns `false` if already at Ready.
     pub fn advance(&mut self) -> bool {
-        self.log.push(format!("[boot] {} ✓", self.current_stage.label()));
+        self.log
+            .push(format!("[boot] {} ✓", self.current_stage.label()));
         match self.current_stage.next() {
-            Some(next) => { self.current_stage = next; true }
+            Some(next) => {
+                self.current_stage = next;
+                true
+            }
             None => false,
         }
     }
@@ -187,7 +231,8 @@ impl BootPipeline {
     /// Simulate a failed stage (for rollback testing).
     pub fn fail(&mut self) {
         self.failed_stage = Some(self.current_stage);
-        self.log.push(format!("[boot] FAILED at {}", self.current_stage.label()));
+        self.log
+            .push(format!("[boot] FAILED at {}", self.current_stage.label()));
     }
 
     pub fn is_ready(&self) -> bool {
@@ -204,7 +249,12 @@ impl BootPipeline {
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ServiceStatus { Running, Stopped, Failed, Unknown }
+pub enum ServiceStatus {
+    Running,
+    Stopped,
+    Failed,
+    Unknown,
+}
 
 #[derive(Debug, Clone)]
 pub struct ServiceInfo {
@@ -221,20 +271,23 @@ pub struct SystemOrchestrator {
 impl SystemOrchestrator {
     pub fn new(backend: BackendKind) -> Self {
         let core_services = vec![
-            ("sigma-init",     true),
-            ("sigma-network",  true),
+            ("sigma-init", true),
+            ("sigma-network", true),
             ("sigma-security", true),
-            ("sigma-audio",    false),
-            ("sigma-bluetooth",false),
-            ("sigma-update",   false),
+            ("sigma-audio", false),
+            ("sigma-bluetooth", false),
+            ("sigma-update", false),
         ];
         Self {
             backend,
-            services: core_services.into_iter().map(|(name, required)| ServiceInfo {
-                name: name.to_string(),
-                status: ServiceStatus::Stopped,
-                required,
-            }).collect(),
+            services: core_services
+                .into_iter()
+                .map(|(name, required)| ServiceInfo {
+                    name: name.to_string(),
+                    status: ServiceStatus::Stopped,
+                    required,
+                })
+                .collect(),
         }
     }
 
@@ -251,20 +304,31 @@ impl SystemOrchestrator {
     }
 
     pub fn all_required_running(&self) -> bool {
-        self.services.iter()
+        self.services
+            .iter()
             .filter(|s| s.required)
             .all(|s| s.status == ServiceStatus::Running)
     }
 
     pub fn running_count(&self) -> usize {
-        self.services.iter().filter(|s| s.status == ServiceStatus::Running).count()
+        self.services
+            .iter()
+            .filter(|s| s.status == ServiceStatus::Running)
+            .count()
     }
 
     pub fn health_report(&self) -> Vec<String> {
-        self.services.iter().map(|s| {
-            format!("  [{:?}] {} {}", s.status, s.name,
-                if s.required { "(required)" } else { "" })
-        }).collect()
+        self.services
+            .iter()
+            .map(|s| {
+                format!(
+                    "  [{:?}] {} {}",
+                    s.status,
+                    s.name,
+                    if s.required { "(required)" } else { "" }
+                )
+            })
+            .collect()
     }
 }
 
@@ -288,20 +352,23 @@ pub struct PackageCoordinator {
 impl PackageCoordinator {
     pub fn new(backend: BackendKind) -> Self {
         let base = vec![
-            ("sigmaos-core",   "0.9.0", true),
-            ("sigmaos-desktop","0.9.0", true),
-            ("hyprland",       "0.45.2",true),
-            ("pipewire",       "1.2.4", true),
-            ("networkmanager", "1.48.2",true),
+            ("sigmaos-core", "0.9.0", true),
+            ("sigmaos-desktop", "0.9.0", true),
+            ("hyprland", "0.45.2", true),
+            ("pipewire", "1.2.4", true),
+            ("networkmanager", "1.48.2", true),
         ];
         Self {
             backend,
-            packages: base.into_iter().map(|(name, ver, signed)| PackageRecord {
-                name: name.to_string(),
-                version: ver.to_string(),
-                installed: true,
-                signed,
-            }).collect(),
+            packages: base
+                .into_iter()
+                .map(|(name, ver, signed)| PackageRecord {
+                    name: name.to_string(),
+                    version: ver.to_string(),
+                    installed: true,
+                    signed,
+                })
+                .collect(),
         }
     }
 
@@ -335,7 +402,10 @@ impl PackageCoordinator {
     }
 
     pub fn all_signed(&self) -> bool {
-        self.packages.iter().filter(|p| p.installed).all(|p| p.signed)
+        self.packages
+            .iter()
+            .filter(|p| p.installed)
+            .all(|p| p.signed)
     }
 }
 
@@ -344,7 +414,13 @@ impl PackageCoordinator {
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SessionPhase { Starting, Active, Locked, Suspending, Ending }
+pub enum SessionPhase {
+    Starting,
+    Active,
+    Locked,
+    Suspending,
+    Ending,
+}
 
 pub struct DesktopSession {
     pub backend: BackendKind,
@@ -363,12 +439,24 @@ impl DesktopSession {
         }
     }
 
-    pub fn start(&mut self) { self.phase = SessionPhase::Active; }
-    pub fn lock(&mut self)  { self.phase = SessionPhase::Locked; }
-    pub fn unlock(&mut self){ self.phase = SessionPhase::Active; }
-    pub fn suspend(&mut self){ self.phase = SessionPhase::Suspending; }
-    pub fn end(&mut self)   { self.phase = SessionPhase::Ending; }
-    pub fn is_active(&self) -> bool { self.phase == SessionPhase::Active }
+    pub fn start(&mut self) {
+        self.phase = SessionPhase::Active;
+    }
+    pub fn lock(&mut self) {
+        self.phase = SessionPhase::Locked;
+    }
+    pub fn unlock(&mut self) {
+        self.phase = SessionPhase::Active;
+    }
+    pub fn suspend(&mut self) {
+        self.phase = SessionPhase::Suspending;
+    }
+    pub fn end(&mut self) {
+        self.phase = SessionPhase::Ending;
+    }
+    pub fn is_active(&self) -> bool {
+        self.phase == SessionPhase::Active
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -453,18 +541,21 @@ pub struct AppRegistry {
 impl AppRegistry {
     pub fn with_defaults() -> Self {
         let defaults = vec![
-            ("chromium",  "Chromium",        "chromium %U"),
-            ("foot",      "Terminal",         "foot"),
-            ("nautilus",  "Files",            "nautilus --new-window"),
-            ("sigma-settings","Settings",     "sigma-settings"),
+            ("chromium", "Chromium", "chromium %U"),
+            ("foot", "Terminal", "foot"),
+            ("nautilus", "Files", "nautilus --new-window"),
+            ("sigma-settings", "Settings", "sigma-settings"),
         ];
         Self {
-            apps: defaults.into_iter().map(|(id, name, exec)| AppEntry {
-                app_id: id.to_string(),
-                name: name.to_string(),
-                exec: exec.to_string(),
-                installed: true,
-            }).collect(),
+            apps: defaults
+                .into_iter()
+                .map(|(id, name, exec)| AppEntry {
+                    app_id: id.to_string(),
+                    name: name.to_string(),
+                    exec: exec.to_string(),
+                    installed: true,
+                })
+                .collect(),
         }
     }
 
@@ -488,13 +579,13 @@ impl AppRegistry {
 
 /// The top-level SigmaOS platform runtime, wiring all 8 layers.
 pub struct SigmaPlatform {
-    pub backend:     Box<dyn KernelBackend>,
-    pub boot:        BootPipeline,
-    pub system:      SystemOrchestrator,
-    pub packages:    PackageCoordinator,
-    pub config:      ConfigStore,
-    pub security:    SecurityContext,
-    pub apps:        AppRegistry,
+    pub backend: Box<dyn KernelBackend>,
+    pub boot: BootPipeline,
+    pub system: SystemOrchestrator,
+    pub packages: PackageCoordinator,
+    pub config: ConfigStore,
+    pub security: SecurityContext,
+    pub apps: AppRegistry,
 }
 
 impl SigmaPlatform {
@@ -507,13 +598,13 @@ impl SigmaPlatform {
         system.start_all();
 
         Self {
-            backend:  create_backend(backend_kind),
+            backend: create_backend(backend_kind),
             boot,
             system,
             packages: PackageCoordinator::new(backend_kind),
-            config:   ConfigStore::defaults(backend_kind),
+            config: ConfigStore::defaults(backend_kind),
             security: SecurityContext::default_workstation(backend_kind),
-            apps:     AppRegistry::with_defaults(),
+            apps: AppRegistry::with_defaults(),
         }
     }
 
@@ -529,11 +620,16 @@ impl SigmaPlatform {
             format!("SigmaOS Platform — backend={}", self.backend.kind().name()),
             format!("  Boot:     {:?}", self.boot.current_stage),
             format!("  Services: {}/{} running", self.system.running_count(), 6),
-            format!("  Packages: {} installed (all signed: {})",
-                self.packages.installed_count(), self.packages.all_signed()),
+            format!(
+                "  Packages: {} installed (all signed: {})",
+                self.packages.installed_count(),
+                self.packages.all_signed()
+            ),
             format!("  Theme:    {}", self.config.theme),
-            format!("  Security: profile={} audit={}",
-                self.security.hardening_profile, self.security.audit_enabled),
+            format!(
+                "  Security: profile={} audit={}",
+                self.security.hardening_profile, self.security.audit_enabled
+            ),
             format!("  Apps:     {} installed", self.apps.installed_count()),
             format!("  Ready:    {}", self.is_ready()),
         ];
@@ -553,7 +649,10 @@ mod tests {
     fn backend_from_env_defaults_linux() {
         // Without SIGMA_KERNEL_BACKEND set, defaults to Linux.
         let kind = BackendKind::from_env();
-        assert!(matches!(kind, BackendKind::Linux | BackendKind::Bsd | BackendKind::Stub));
+        assert!(matches!(
+            kind,
+            BackendKind::Linux | BackendKind::Bsd | BackendKind::Stub
+        ));
     }
 
     #[test]
