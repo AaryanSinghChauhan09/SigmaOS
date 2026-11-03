@@ -74,7 +74,10 @@ fn test_kde_plasma_advancements_integration_v92() {
 #[test]
 fn test_xfce_advancements_integration_v92() {
     let mut xfce = XfceAdvancementsV92Engine::new();
-    assert_eq!(xfce.xfwm4_wayland_transition_state, "WaylandCompositorActive");
+    assert_eq!(
+        xfce.xfwm4_wayland_transition_state,
+        "WaylandCompositorActive"
+    );
     assert!(xfce.multi_monitor_xrandr_active);
     assert!(xfce.xfce4_power_manager_dpms);
 
@@ -193,13 +196,19 @@ fn test_i3_advancements_integration_v92() {
     assert_eq!(l.width, 960);
     assert_eq!(r.width, 960);
 
-    assert_eq!(i3.process_i3_command("split v"), "Split orientation set to vertical");
+    assert_eq!(
+        i3.process_i3_command("split v"),
+        "Split orientation set to vertical"
+    );
     assert_eq!(i3.split_direction, "vertical");
     let (t, b) = i3.compute_split_geometry(parent);
     assert_eq!(t.height, 540);
     assert_eq!(b.height, 540);
 
-    assert_eq!(i3.process_i3_command("layout stacking"), "Layout set to stacking");
+    assert_eq!(
+        i3.process_i3_command("layout stacking"),
+        "Layout set to stacking"
+    );
     assert_eq!(i3.i3_layout_mode, "stacking");
 
     let scratch = i3.process_i3_command("scratchpad show");
@@ -245,7 +254,9 @@ fn test_openbox_and_fluxbox_advancements_integration_v92() {
     let ob = OpenboxAdvancementsV92Engine::new();
     assert_eq!(ob.pipe_menu_count, 8);
     assert_eq!(ob.client_focus_layers.len(), 5);
-    assert!(ob.execute_pipe_menu("date-menu.sh").contains("Output from date-menu.sh"));
+    assert!(ob
+        .execute_pipe_menu("date-menu.sh")
+        .contains("Output from date-menu.sh"));
 
     let fb = FluxboxAdvancementsV92Engine::new();
     assert!(fb.tab_grouping_enabled);

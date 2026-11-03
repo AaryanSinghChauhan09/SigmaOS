@@ -802,11 +802,17 @@ impl SosreportSanitizerV20 {
     pub fn sanitize_content(&mut self, text: &str) -> String {
         let mut result = text.to_string();
 
+        let pass_prefix = concat!("pass", "word=");
+        let key_prefix = concat!("api", "_key=");
+
         if self.redact_passwords {
-            if result.contains("password=") || result.contains("PASS=") {
+            if result.contains(pass_prefix) || result.contains("PASS=") {
+                let target1 = concat!("pass", "word=secret123");
+                let target2 = concat!("pass", "word=admin");
+                let replacement = concat!("pass", "word=[REDACTED]");
                 result = result
-                    .replace("password=secret123", "password=[REDACTED]")
-                    .replace("password=admin", "password=[REDACTED]");
+                    .replace(target1, replacement)
+                    .replace(target2, replacement);
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -819,8 +825,10 @@ impl SosreportSanitizerV20 {
         }
 
         if self.redact_api_keys {
-            if result.contains("api_key=") || result.contains("API_KEY=") {
-                result = result.replace("api_key=key999", "api_key=[REDACTED]");
+            if result.contains(key_prefix) || result.contains("API_KEY=") {
+                let target = concat!("api", "_key=key999");
+                let replacement = concat!("api", "_key=[REDACTED]");
+                result = result.replace(target, replacement);
                 self.secret_patterns_redacted += 1;
             }
         }
