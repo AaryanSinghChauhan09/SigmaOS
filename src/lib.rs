@@ -37,6 +37,7 @@ pub use creative::artcraft_advancements_pr::*;
 pub use creative::artcraft_advancements_v75_pr::*;
 pub use creative::artcraft_advancements_v80_pr::*;
 pub use creative::artcraft_advancements_v85_pr::*;
+pub use creative::artcraft_advancements_v86_pr::*;
 pub use creative::cadcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::cadcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::cadcraft_artcraft_missing_components_v68_pr::*;
