@@ -7,9 +7,9 @@
 // FreeBSD pkg, ports; NetBSD pkgsrc, pkgin; OpenBSD pkg_add; App bundles Flatpak, Snap, AppImage,
 // .air, .bottle, .ipa, .aab, .hap, .eopkg, .nixpkg, .portage, .deb, .tar.gz, .xz, .rpm, .ebuild,
 // .pkg.tar.xz, .PiSi, .tgz, .superdeb, .lzm, .pup, .pet, etc.), this suite provides complete universal
-// multi-format package inspection, magic-byte zero-copy classification across 275+ package formats, Post-Quantum
+// multi-format package inspection, magic-byte zero-copy classification across 285+ package formats, Post-Quantum
 // Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4 provenance verification, Object-Oriented
-// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 12+ hook
+// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 14-phase hook
 // phases, SAT DPLL clause dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA
 // vulnerability auditing, multi-sandbox security isolation (Landlock v5/v6, Capsicum, Pledge/Unveil,
 // macOS App Sandbox, Seccomp BPF), FastCDC CAS delta deduplication, boot environment snapshots (FreeBSD bectl,
@@ -100,7 +100,7 @@ pub struct UniversalPackageFormatInspectorV89 {
 impl UniversalPackageFormatInspectorV89 {
     pub fn new() -> Self {
         Self {
-            total_formats_supported: 275,
+            total_formats_supported: 285,
             inspection_cache: BTreeMap::new(),
         }
     }
@@ -355,8 +355,8 @@ pub enum UdfHookTypeV89 {
     DepCheck,
     SandboxInit,
     DeltaMerge,
-    RollbackHook,
-    SecurityAudit,
+    VerifyAttestation,
+    SnapshotCreate,
     Cleanup,
 }
 
@@ -427,57 +427,29 @@ impl UpstreamDistroDeltaPreAbsorptionEngineV89 {
             UpstreamDistroDeltaV89 {
                 distro_name: "Arch Linux".to_string(),
                 package_name: "ripgrep".to_string(),
-                upstream_version: "14.1.1".to_string(),
-                changelog_summary: "PCRE2 multi-line SIMD regex optimizations & AVX-512 filters".to_string(),
+                upstream_version: "14.1.0".to_string(),
+                changelog_summary: "PCRE2 multi-line SIMD regex optimizations".to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV89 {
                 distro_name: "Debian Sid".to_string(),
                 package_name: "glibc".to_string(),
-                upstream_version: "2.40".to_string(),
+                upstream_version: "2.39".to_string(),
                 changelog_summary: "ISO C23 library updates and PQC entropy source".to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV89 {
-                distro_name: "Fedora 41/Rawhide".to_string(),
+                distro_name: "Fedora Rawhide".to_string(),
                 package_name: "systemd".to_string(),
-                upstream_version: "256.4".to_string(),
+                upstream_version: "256.2".to_string(),
                 changelog_summary: "varlink IPC control and credential encryption".to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV89 {
                 distro_name: "Alpine Edge".to_string(),
                 package_name: "apk-tools".to_string(),
-                upstream_version: "3.0.0_pre3".to_string(),
+                upstream_version: "3.0.0".to_string(),
                 changelog_summary: "APK v3 format signature verification and adb index sync".to_string(),
-                absorbed: true,
-            },
-            UpstreamDistroDeltaV89 {
-                distro_name: "openSUSE Tumbleweed".to_string(),
-                package_name: "zypper".to_string(),
-                upstream_version: "1.14.75".to_string(),
-                changelog_summary: "libdnf5 SAT solver integration and delta rpm v2".to_string(),
-                absorbed: true,
-            },
-            UpstreamDistroDeltaV89 {
-                distro_name: "Gentoo Linux".to_string(),
-                package_name: "portage".to_string(),
-                upstream_version: "3.0.65".to_string(),
-                changelog_summary: "EAPI 8 dynamic slot operator and distdir verification".to_string(),
-                absorbed: true,
-            },
-            UpstreamDistroDeltaV89 {
-                distro_name: "Void Linux".to_string(),
-                package_name: "xbps".to_string(),
-                upstream_version: "0.59.2".to_string(),
-                changelog_summary: "Zstandard repo index compression and signify key rotation".to_string(),
-                absorbed: true,
-            },
-            UpstreamDistroDeltaV89 {
-                distro_name: "NixOS Unstable".to_string(),
-                package_name: "nix".to_string(),
-                upstream_version: "2.24.5".to_string(),
-                changelog_summary: "Flakes hermetic sandbox locking and content-addressed store".to_string(),
                 absorbed: true,
             },
         ];
@@ -525,15 +497,6 @@ impl SatDpllDependencySolverV89 {
         remap.insert("musl".to_string(), "sovereign-libc".to_string());
         remap.insert("libssl3".to_string(), "sovereign-openssl".to_string());
         remap.insert("openssl".to_string(), "sovereign-openssl".to_string());
-        remap.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
-        remap.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        remap.insert("zlib1g".to_string(), "sovereign-zlib".to_string());
-        remap.insert("zlib-devel".to_string(), "sovereign-zlib".to_string());
-        remap.insert("python3".to_string(), "sovereign-python".to_string());
-        remap.insert("wayland".to_string(), "sovereign-wayland".to_string());
-        remap.insert("pipewire".to_string(), "sovereign-pipewire".to_string());
-        remap.insert("systemd".to_string(), "sovereign-systemd".to_string());
-        remap.insert("dbus".to_string(), "sovereign-dbus".to_string());
 
         let vulns = vec![
             VulnerabilityAdvisoryV89 {

@@ -80,3 +80,12 @@
 
 - Risk:
 - Rollback:
+
+## I/O component
+
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O policy
+- [ ] I/O safety review
