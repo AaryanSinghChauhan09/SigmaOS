@@ -1,0 +1,20 @@
+[rule.io_completeness]
+enabled = true
+
+[rule.no_leak]
+enabled = true
+
+[rule.oom_metric]
+enabled = true
+
+[rule.interrupt_integrity]
+enabled = true
+
+[rule.buffer_semantics]
+enabled = true
+
+[rule.no_model_only_status]
+enabled = true
+
+[rule.runtime_evidence]
+enabled = true
