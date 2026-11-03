@@ -260,3 +260,26 @@ Guide suite (installation, translations, troubleshooting, user), NVIDIA/mesa3D/n
 
 ### Milestone 1 status: **21/21 scaffolds ✅ — all verified**
 Remaining before Milestone 1 is *runnable*: QEMU smoke test + end-to-end integration.
+
+---
+
+## All 167 Scaffolds Complete — 2026-11-02
+
+Every SigmaOS component scaffold now has a meaningful implementation. Final batch completes 100% scaffold coverage.
+
+### Final Rust scaffolds (cargo check + tests)
+- **screen-saver**: ScreenSaver mode/timeout/activate state machine
+- **screen-shot**: Screenshot with grim/slurp capture commands, 3 tests
+- **tray-icon**: SystemTray register/unregister/filter
+- **window-management-library**: Rect geometry (area/contains/split), 3 tests
+- **xapp**: XAppInfo with MIME-type support matching
+- **xapp-thumbnailers**: Thumbnailer trait, ImageThumbnailer, ThumbnailSize, 3 tests
+
+### Final Python scaffolds (py_compile ✅)
+meta-package (Sigma), simple-scan, slide-presenter, spreadsheet (formulas), sticky-notes, theme-registry, theme-marketplace, upgrade-info (release notes), vpn-pia, webcam-recorder, welcome-screen, webapp-manager, we-can-fix-everything (diagnostics)
+
+### Final Shell scaffolds (bash -n ✅)
+stick (USB writer), timeshift (BTRFS snapshots), try (live env), try-windows (dual-boot), wallpaper-engine, wine-installer, vim config, xorg-server/Xwayland, zsh config, tte-go, website build/preview, theme-support, theme-sync, theming-native, video-cut (ffmpeg), thingy (sysinfo/cleanup), troubleshooting-tool, JS-interpreter wrapper
+
+### Coverage: **167/167 scaffolds — 100% complete** ✅
+All `cargo check`, `bash -n`, `py_compile` pass. Umbrella `cargo check --lib`: exit 0.
