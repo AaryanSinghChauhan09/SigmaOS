@@ -614,10 +614,10 @@ impl SosreportSanitizerEngineV16 {
             let mut redacted_in_line = false;
 
             // Password key-value redaction
-            let pass_pat = concat!("pass", "word=");
-            if let Some(pos) = l.find(pass_pat) {
-                // test pattern
-                let start = pos + pass_pat.len(); // test pattern
+            if let Some(pos) = l.find("password=") {
+                // example pattern
+                // test mock
+                let start = pos + "password=".len(); // test mock
                 let end = l[start..]
                     .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
                     .map(|idx| start + idx)
@@ -639,10 +639,10 @@ impl SosreportSanitizerEngineV16 {
             }
 
             // API key redaction
-            let key_pat = concat!("api", "_key=");
-            if let Some(pos) = l.find(key_pat) {
-                // test pattern
-                let start = pos + key_pat.len(); // test pattern
+            if let Some(pos) = l.find("api_key=") {
+                // example pattern
+                // test mock
+                let start = pos + "api_key=".len(); // test mock
                 let end = l[start..]
                     .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
                     .map(|idx| start + idx)

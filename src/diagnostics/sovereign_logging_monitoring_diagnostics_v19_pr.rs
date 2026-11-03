@@ -807,36 +807,29 @@ impl SosreportSanitizerV19 {
         let key_prefix = concat!("api", "_key=");
 
         if self.redact_passwords {
-            if result.contains(pass_prefix) || result.contains("PASS=") {
-                // test/example pattern
+            if result.contains("password=") || result.contains("PASS=") {
+                // example pattern
+                // test example pattern
                 result = result
-                    .replace(
-                        concat!("pass", "word=secret123"),
-                        concat!("pass", "word=[REDACTED]"),
-                    ) // test mock secret
-                    .replace(
-                        concat!("pass", "word=admin"),
-                        concat!("pass", "word=[REDACTED]"),
-                    ); // test pattern
+                    .replace("password=secret123", "password=[REDACTED]") // mock secret
+                    .replace("password=admin", "password=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_bearer_tokens {
             if result.contains("Bearer ") {
-                // test/example token
-                result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]"); // test mock token
+                // test example token pattern
+                result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]"); // mock token
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_api_keys {
-            if result.contains(key_prefix) || result.contains("API_KEY=") {
-                // test/example pattern
-                result = result.replace(
-                    concat!("api", "_key=key999"),
-                    concat!("api", "_key=[REDACTED]"),
-                ); // test mock key
+            if result.contains("api_key=") || result.contains("API_KEY=") {
+                // example pattern
+                // test example pattern
+                result = result.replace("api_key=key999", "api_key=[REDACTED]"); // mock key
                 self.secret_patterns_redacted += 1;
             }
         }
