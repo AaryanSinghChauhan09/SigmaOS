@@ -126,3 +126,17 @@
 ## Storage safety review
 - [ ] Double-completion prevented
 - [ ] Resource limits enforced
+
+## IPC handler
+- [ ] IPC semantics
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+
+## Security review
+- [ ] Capability/namespace checks enforced
+
+## Verification
+- [ ] ./run_sigma_tests.sh
+- Capability status
+- Integration impact

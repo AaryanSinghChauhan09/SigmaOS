@@ -5,3 +5,38 @@ documentation = "docs/INTERRUPT_HANDLER_PLAN.md"
 [kernel.irq_subsystem]
 status = "supported"
 documentation = "docs/INTERRUPT_HANDLER_PLAN.md"
+
+[userspace.system_utilities]
+status = "supported"
+documentation = "docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"
+
+[kernel.physical_memory_manager]
+status = "supported"
+documentation = "docs/PHYSICAL_MEMORY_MANAGER_PLAN.md"
+wiki = "wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md"
+
+[scheduler.core]
+status = "supported"
+documentation = "docs/SCHEDULER_STATUS_AND_INVARIANTS.md"
+plan = "docs/SCHEDULER_DEVELOPMENT_PLAN.md"
+
+[scheduler.bore]
+status = "supported"
+documentation = "docs/SCHEDULER_STATUS_AND_INVARIANTS.md"
+
+[scheduler.cfs]
+status = "supported"
+documentation = "docs/SCHEDULER_STATUS_AND_INVARIANTS.md"
+
+[scheduler.realtime]
+status = "supported"
+documentation = "docs/SCHEDULER_STATUS_AND_INVARIANTS.md"
+
+[scheduler.eevdf]
+status = "supported"
+documentation = "docs/SCHEDULER_STATUS_AND_INVARIANTS.md"
+
+[kernel.dispatcher]
+status = "supported"
+documentation = "docs/DISPATCHER_PLAN.md"
+wiki = "wiki/DISPATCHER_PLAN.md"
