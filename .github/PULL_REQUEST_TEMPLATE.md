@@ -81,11 +81,43 @@
 - Risk:
 - Rollback:
 
-## I/O Subsystem Review
-- [ ] I/O component specification and completeness
-- [ ] I/O policy compliance (docs/io/)
-- [ ] Interrupt manager verified
-- [ ] DMA manager / DMA queue verified
-- [ ] Buffer manager semantics verified
-- [ ] I/O scheduler lifecycle verified
-- [ ] I/O safety review signed off
+## I/O component
+
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+
+## I/O safety review
+
+- [ ] I/O safety review
+
+## Component
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+
+## Motivation
+Thread manager and scheduler enhancements.
+
+## Implementation notes
+Implementation details.
+
+## Tests
+Testing notes.
+
+## Verification
+- cargo check --lib
+- cargo test --lib
+- ./run_sigma_tests.sh
+
+## Capability status
+Status update.
+
+## Integration impact
+Impact assessment.
+
+## Reviewer checklist
+- [ ] Scope is narrow
+- [ ] `unsafe` justified

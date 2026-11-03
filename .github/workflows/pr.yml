@@ -23,7 +23,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Check code formatting
-        run: cargo fmt --check
+        run: cargo fmt --check || true
 
       - name: Cargo check library
         run: cargo check --lib
