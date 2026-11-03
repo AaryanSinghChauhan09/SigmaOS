@@ -1,0 +1,20 @@
+[rule.io_completeness]
+description = "All I/O operations must be fully tracked and completed"
+
+[rule.no_leak]
+description = "No memory or descriptor leaks across the lifecycle"
+
+[rule.oom_metric]
+description = "Out-of-memory metrics must be tracked"
+
+[rule.interrupt_integrity]
+description = "Interrupt handler integrity must be maintained without double registration"
+
+[rule.buffer_semantics]
+description = "Buffer cache semantics and dirty flushing must be preserved"
+
+[rule.no_model_only_status]
+description = "Components must have concrete runtime implementations, not just model status"
+
+[rule.runtime_evidence]
+description = "Runtime evidence must validate every I/O transaction"

@@ -1,0 +1,20 @@
+[rule.storage_completeness]
+description = "Secondary memory and storage operations must be tracked"
+
+[rule.no_leak]
+description = "Zero leaks in block descriptors or file buffers"
+
+[rule.oom_metric]
+description = "Track cache eviction and buffer watermark"
+
+[rule.mount_integrity]
+description = "Mount and unmount integrity without double unmount"
+
+[rule.cache_semantics]
+description = "LRU cache semantics and writeback"
+
+[rule.no_model_only_status]
+description = "No model-only status without backing code"
+
+[rule.runtime_evidence]
+description = "Runtime evidence must support all storage operations"

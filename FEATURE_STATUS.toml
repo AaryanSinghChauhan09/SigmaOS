@@ -1,0 +1,7 @@
+[kernel.interrupt_framework]
+status = "supported"
+documentation = "docs/INTERRUPT_HANDLER_PLAN.md"
+
+[kernel.irq_subsystem]
+status = "supported"
+documentation = "docs/INTERRUPT_HANDLER_PLAN.md"
