@@ -80,3 +80,12 @@
 
 - Risk:
 - Rollback:
+
+## I/O Subsystem Review
+- [ ] I/O component specification and completeness
+- [ ] I/O policy compliance (docs/io/)
+- [ ] Interrupt manager verified
+- [ ] DMA manager / DMA queue verified
+- [ ] Buffer manager semantics verified
+- [ ] I/O scheduler lifecycle verified
+- [ ] I/O safety review signed off
