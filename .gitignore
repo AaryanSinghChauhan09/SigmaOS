@@ -44,6 +44,8 @@ __pycache__/
 !wiki/DISPATCHER_PLAN.md
 !docs/PROCESS_MANAGER_PLAN.md
 !wiki/PROCESS_MANAGER_PLAN.md
+!docs/PROCESS_SYNCHRONIZATION_PLAN.md
+!wiki/PROCESS_SYNCHRONIZATION_PLAN.md
 !docs/shell/
 !docs/shell/*.md
 !docs/studies/
