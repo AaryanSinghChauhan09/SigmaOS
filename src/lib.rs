@@ -728,6 +728,7 @@ pub use virtualization::{
     XenHypervisorV67Engine, XenHypervisorV68Engine, XenHypervisorV80Engine,
 };
 pub use virtualization::sovereign_virtualization_and_containers_v88_pr::*;
+pub use virtualization::sovereign_virtualization_and_containers_v89_pr::*;
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
 
