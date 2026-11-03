@@ -80,3 +80,14 @@
 
 - Risk:
 - Rollback:
+
+<!--
+## I/O Subsystem Verification Checklist
+- I/O component: Verification of registered I/O drivers and peripheral devices
+- I/O policy: Strict conformance to I/O safety guidelines
+- Interrupt manager: Top-half and bottom-half interrupt handling isolation
+- DMA manager / DMA queue: Memory safety in scatter-gather DMA mappings
+- Buffer manager: LRU cache eviction and lock safety
+- I/O scheduler: Deadline and priority queue validation
+- I/O safety review: Reentrancy and race condition audits
+-->

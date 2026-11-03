@@ -46,6 +46,10 @@ __pycache__/
 !wiki/PROCESS_MANAGER_PLAN.md
 !docs/PROCESS_SYNCHRONIZATION_PLAN.md
 !wiki/PROCESS_SYNCHRONIZATION_PLAN.md
+!docs/filesystem/BUFFER_POLICY.md
+!docs/io/
+!docs/io/*.md
+!IO_RULES.toml
 !docs/shell/
 !docs/shell/*.md
 !docs/studies/
