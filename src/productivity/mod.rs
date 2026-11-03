@@ -30,6 +30,7 @@ pub mod sovereign_office_suite_innovations_v5;
 pub mod sovereign_office_suite_innovations_v6;
 pub mod sovereign_office_suite_innovations_v7;
 pub mod sovereign_office_suite_innovations_v8;
+pub mod sovereign_office_suite_innovations_v9;
 pub mod subtitle_editor;
 pub mod system_settings;
 pub mod tasks;
@@ -42,6 +43,7 @@ pub use sovereign_office_suite_innovations_v5::*;
 pub use sovereign_office_suite_innovations_v6::*;
 pub use sovereign_office_suite_innovations_v7::*;
 pub use sovereign_office_suite_innovations_v8::*;
+pub use sovereign_office_suite_innovations_v9::*;
 
 pub use itsfoss_apps_synthesis::{
     IptvChannelNode, ItsFossBulkyBatchRenamerEngine, ItsFossHypnotixIptvEngine,
