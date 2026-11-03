@@ -2,6 +2,15 @@
 
 <!-- What file-management behavior changed and why? -->
 
+## I/O component
+
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O safety review
+
 ## File component
 
 - [ ] File descriptor manager
