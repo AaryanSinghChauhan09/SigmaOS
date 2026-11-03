@@ -2,18 +2,22 @@
 
 <!-- What file-management behavior changed and why? -->
 
-## File component
+## File component / I/O component
 
 - [ ] File descriptor manager
 - [ ] Inode and directory manager
 - [ ] Permission manager
 - [ ] Lock manager
 - [ ] Mount / unmount
-- [ ] Cache
+- [ ] Cache / Buffer manager
 - [ ] Filesystem
 - [ ] Recovery
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA / DMA queue
+- [ ] I/O scheduler
+- [ ] I/O policy
 - [ ] Documentation
 - [ ] CI / tooling
 
@@ -43,7 +47,7 @@
 -
 -
 
-## File safety review
+## File safety review / I/O safety review
 
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
