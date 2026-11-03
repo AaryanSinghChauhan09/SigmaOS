@@ -25,9 +25,9 @@ fn test_v85_linux638_sched_ext_engine() {
     assert!(engine.sched_ext_ebpf_v8_active);
     assert_eq!(engine.eevdf_bore_v8_latency_target_us, 90);
 
-    let msg = engine.tune_eevdf_bore_v8_latency(105);
-    assert!(msg.contains("105 us"));
-    assert_eq!(engine.eevdf_bore_v8_latency_target_us, 105);
+    let msg = engine.tune_eevdf_bore_v8_latency(110);
+    assert!(msg.contains("110 us"));
+    assert_eq!(engine.eevdf_bore_v8_latency_target_us, 110);
 
     let compact_msg = engine.trigger_folio_compaction();
     assert!(compact_msg.contains("Multi-MemCG folio page compaction completed"));
@@ -52,10 +52,10 @@ fn test_v85_freebsd168_openzfs_capsicum_engine() {
 #[test]
 fn test_v85_openbsd97_security_engine() {
     let engine = OpenBsd97PinsyscallFineIbtSecurityEngineV84::new();
-    let sec_msg = engine.enforce_pinsyscall_fine_ibt(64);
+    let sec_msg = engine.enforce_pinsyscall_fine_ibt(48);
     assert!(sec_msg.contains("FineIBT shadow call stack"));
-    assert!(engine.evaluate_unveil_wildcard_path("/usr/bin/git"));
-    assert!(!engine.evaluate_unveil_wildcard_path("/usr/bin/../etc/passwd"));
+    assert!(engine.evaluate_unveil_wildcard_path("/usr/bin/cargo"));
+    assert!(!engine.evaluate_unveil_wildcard_path("/usr/bin/../etc/shadow"));
 
     let manifest = engine.generate_manifest();
     assert_eq!(manifest.pr_id, "PR-SIGMA-V84-03-OPENBSD-97");
@@ -64,8 +64,8 @@ fn test_v85_openbsd97_security_engine() {
 #[test]
 fn test_v85_dragonfly_hammer3_engine() {
     let mut engine = DragonFlyBsdHAMMER3ReplicationEngineV84::new();
-    let sync_msg = engine.sync_replica_node(10);
-    assert!(sync_msg.contains("node #10"));
+    let sync_msg = engine.sync_replica_node(7);
+    assert!(sync_msg.contains("node #7"));
 
     let manifest = engine.generate_manifest();
     assert_eq!(manifest.pr_id, "PR-SIGMA-V84-04-DRAGONFLY-86");
@@ -74,7 +74,7 @@ fn test_v85_dragonfly_hammer3_engine() {
 #[test]
 fn test_v85_netbsd133_rump_virtio9p_engine() {
     let engine = NetBsd133RumpVirtio9pEngineV84::new();
-    let veriexec_msg = engine.verify_binary_integrity("/bin/ls");
+    let veriexec_msg = engine.verify_binary_integrity("/bin/cat");
     assert!(veriexec_msg.contains("Veriexec V10"));
 
     let manifest = engine.generate_manifest();
@@ -94,7 +94,7 @@ fn test_v85_illumos_dtrace_ebpf_engine() {
 #[test]
 fn test_v85_microkernel_scheme_engine() {
     let engine = HaikuPlan9RedoxMicrokernelSchemeEngineV84::new();
-    let routed = engine.route_plumber_message("type=text");
+    let routed = engine.route_plumber_message("type=image");
     assert!(routed.contains("Plumber router matched"));
 
     let manifest = engine.generate_manifest();
@@ -114,8 +114,8 @@ fn test_v85_tech_media_harvester_engine() {
 #[test]
 fn test_v85_omarchy_chord_navigator_engine() {
     let engine = OmarchyWallustChordNavigatorEngineV84::new();
-    let chord_res = engine.trigger_chord_action("SUPER+SHIFT+Q");
-    assert!(chord_res.contains("SUPER+SHIFT+Q"));
+    let chord_res = engine.trigger_chord_action("SUPER+RETURN");
+    assert!(chord_res.contains("SUPER+RETURN"));
 
     let manifest = engine.generate_manifest();
     assert_eq!(manifest.pr_id, "PR-SIGMA-V84-09-OMARCHY-NAVIGATOR");
@@ -135,7 +135,7 @@ fn test_v85_sovereign_unimplemented_ideas_suite() {
 #[test]
 fn test_v85_debian_dpkg_triggers_engine() {
     let mut engine = DebianDpkgTriggersOrderingEngineV85Pr::new();
-    assert!(engine.activate_trigger("/usr/share/doc"));
+    assert!(engine.activate_trigger("/usr/share/locale"));
     let processed = engine.process_deferred_queue();
     assert_eq!(processed.len(), 5);
 
@@ -147,7 +147,7 @@ fn test_v85_debian_dpkg_triggers_engine() {
 #[test]
 fn test_v85_debian_apt_pqc_engine() {
     let engine = DebianSecureAptPqcDilithiumInReleaseEngineV85Pr::new();
-    assert!(engine.verify_inrelease_signature("main", b"Release content", "DILITHIUM5-SIG"));
+    assert!(engine.verify_inrelease_signature("main", b"Release content", "DILITHIUM5-SIG-V85"));
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 8511);
@@ -156,9 +156,12 @@ fn test_v85_debian_apt_pqc_engine() {
 #[test]
 fn test_v85_debian_debconf_engine() {
     let mut engine = DebianDebconfStateDatabaseEngineV85Pr::new();
-    assert_eq!(engine.get_answer("debconf/frontend").unwrap(), "Noninteractive");
-    engine.set_answer("debconf/frontend", "Dialog");
-    assert_eq!(engine.get_answer("debconf/frontend").unwrap(), "Dialog");
+    assert_eq!(
+        engine.get_answer("debconf/frontend").unwrap(),
+        "Noninteractive"
+    );
+    engine.set_answer("debconf/frontend", "Readline");
+    assert_eq!(engine.get_answer("debconf/frontend").unwrap(), "Readline");
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 8512);
@@ -208,10 +211,10 @@ fn test_v85_debian_piuparts_engine() {
     let engine = DebianPiupartsLifecycleSanityEngineV85Pr::new();
     let mut orphan_files = BTreeSet::new();
     orphan_files.insert("/etc/debian_version".to_string());
-    orphan_files.insert("/tmp/leftover.tmp".to_string());
+    orphan_files.insert("/tmp/leftover_v85.tmp".to_string());
     let orphans = engine.verify_purge_cleanliness(&orphan_files);
     assert_eq!(orphans.len(), 1);
-    assert_eq!(orphans[0], "/tmp/leftover.tmp");
+    assert_eq!(orphans[0], "/tmp/leftover_v85.tmp");
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 8517);
@@ -220,7 +223,10 @@ fn test_v85_debian_piuparts_engine() {
 #[test]
 fn test_v85_debian_subiquity_engine() {
     let engine = DebianSubiquityInstallerAutoinstallEngineV85Pr::new();
-    assert_eq!(engine.parse_autoinstall_hostname().unwrap(), "sigma-node-v85");
+    assert_eq!(
+        engine.parse_autoinstall_hostname().unwrap(),
+        "sigma-node-v85"
+    );
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 8518);
@@ -229,7 +235,7 @@ fn test_v85_debian_subiquity_engine() {
 #[test]
 fn test_v85_debian_multiarch_engine() {
     let engine = DebianMultiarchAptResolverEngineV85Pr::new();
-    assert!(engine.resolve_coinstallation("libc6", "i386"));
+    assert!(engine.resolve_coinstallation("libc6", "riscv64"));
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 8519);
