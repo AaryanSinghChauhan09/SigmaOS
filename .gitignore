@@ -55,8 +55,3 @@ __pycache__/
 !NEXT_STEPS_GUIDELINES.md
 !.jules/
 !.jules/*.md
-!IO_RULES.toml
-!docs/io/
-!docs/io/*.md
-!docs/filesystem/
-!docs/filesystem/*.md

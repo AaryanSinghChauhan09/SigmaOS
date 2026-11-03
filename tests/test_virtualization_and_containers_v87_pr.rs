@@ -27,22 +27,15 @@ fn test_integration_sub_engines_v87() {
     let mut gateway = SovereignVirtualizationAndContainersParityV87Gateway::new();
 
     // 1. KVM/QEMU
-    let vm =
-        gateway
-            .kvm_qemu
-            .launch_kvm_vm("vm_integration", 4, 4096, ConfidentialModeV87::IntelTdx);
+    let vm = gateway.kvm_qemu.launch_kvm_vm("vm_integration", 4, 4096, ConfidentialModeV87::IntelTdx);
     assert_eq!(vm.confidential_mode, ConfidentialModeV87::IntelTdx);
 
     // 2. Libvirt Domain
-    let dom = gateway
-        .libvirt
-        .parse_domain_xml("<domain type='kvm'><name>dom_integration</name></domain>");
+    let dom = gateway.libvirt.parse_domain_xml("<domain type='kvm'><name>dom_integration</name></domain>");
     assert_eq!(dom.domain_name, "dom_integration");
 
     // 3. Xen Hypervisor
-    let guest = gateway
-        .xen
-        .create_domu_guest(10, "xen_domu", XenGuestModeV87::Pv, 512);
+    let guest = gateway.xen.create_domu_guest(10, "xen_domu", XenGuestModeV87::Pv, 512);
     assert_eq!(guest.domid, 10);
 
     // 4. VirtualBox / bhyve / OpenBSD vmd
@@ -54,21 +47,15 @@ fn test_integration_sub_engines_v87() {
     assert!(podman.rootless);
 
     // 6. LXC / LXD / systemd-nspawn
-    let incus = gateway
-        .system_containers
-        .create_incus_instance("incus1", "ovn-net-main");
+    let incus = gateway.system_containers.create_incus_instance("incus1", "ovn-net-main");
     assert_eq!(incus.engine_type, "incus");
 
     // 7. FreeBSD Jails & Illumos Zones
-    let jail = gateway
-        .freebsd_illumos
-        .create_vnet_jail("jail_v87", "/jails/v87", "epair0a");
+    let jail = gateway.freebsd_illumos.create_vnet_jail("jail_v87", "/jails/v87", "epair0a");
     assert_eq!(jail.vnet_interface, "epair0a");
 
     // 8. K8s / K3s / Rancher Harvester
-    let pod = gateway
-        .k8s_rancher
-        .deploy_pod("kube-system", "coredns", "containerd");
+    let pod = gateway.k8s_rancher.deploy_pod("kube-system", "coredns", "containerd");
     assert_eq!(pod.pod_name, "coredns");
 
     // 9. Firecracker / Cloud-Hypervisor

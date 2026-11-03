@@ -1054,13 +1054,7 @@ mod tests {
         assert!(engine.modules.contains_key("nvme"));
         assert!(engine.drivers.contains_key("pci:144d:a808"));
 
-        assert!(engine.load_module(
-            "wireguard",
-            "GPL",
-            "1.0.0",
-            vec!["wg_xmit".to_string()],
-            10
-        ));
+        assert!(engine.load_module("wireguard", "GPL", "1.0.0", vec!["wg_xmit".to_string()], 10));
         assert!(engine.modules.contains_key("wireguard"));
     }
 
