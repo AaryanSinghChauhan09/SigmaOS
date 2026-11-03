@@ -54,8 +54,11 @@ __pycache__/
 !docs/io/*.md
 !docs/filesystem/
 !docs/filesystem/*.md
+!docs/storage/
+!docs/storage/*.md
 !IO_RULES.toml
 !FEATURE_STATUS.toml
+!STORAGE_RULES.toml
 !.github/PULL_REQUEST_TEMPLATE.md
 !ImprovementPlan.md
 !NEXT_STEPS_GUIDELINES.md
