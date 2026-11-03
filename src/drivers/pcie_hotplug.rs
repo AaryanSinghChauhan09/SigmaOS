@@ -378,9 +378,8 @@ mod tests {
             crate::kernel::msi_routing::MsiVector {
                 device_id,
                 vector: vector as u8,
-                msg_addr: 0xFEE00000,
-                msg_data: vector as u32,
-                mask_bit: 0,
+                address: 0xFEE00000,
+                data: vector as u32,
                 allocated: true,
             },
         );
