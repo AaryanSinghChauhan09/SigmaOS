@@ -10,7 +10,6 @@ pub mod stubs;
 
 pub mod ai;
 pub mod arch_kernel_inspirations;
-pub mod arch_omarchy_design;
 pub mod auth;
 pub mod compositor;
 pub mod graphics;
