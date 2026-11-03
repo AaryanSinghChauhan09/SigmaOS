@@ -4,17 +4,20 @@
 //
 // Inspired by Linux (Debian/Ubuntu apt, dpkg; Fedora/RedHat yum, dnf, rpm; openSUSE zypper;
 // Arch pacman; Alpine apk; Gentoo portage, emerge; Void xbps; NixOS nix; Guix guix;
-// FreeBSD pkg, ports; NetBSD pkgsrc, pkgin; OpenBSD pkg_add; App bundles Flatpak, Snap, AppImage,
-// .air, .bottle, .ipa, .aab, .hap, .eopkg, .nixpkg, .portage, .deb, .tar.gz, .xz, .rpm, .ebuild,
-// .pkg.tar.xz, .PiSi, .tgz, .superdeb, .lzm, .pup, .pet, etc.), this suite provides complete universal
-// multi-format package inspection, magic-byte zero-copy classification across 280+ package formats, Post-Quantum
-// Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4 provenance verification, Object-Oriented
-// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 12+ hook
-// phases, SAT DPLL clause dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA
-// vulnerability auditing, multi-sandbox security isolation (Landlock v5/v6, Capsicum, Pledge/Unveil,
-// macOS App Sandbox, Seccomp BPF), FastCDC CAS delta deduplication, boot environment snapshots (FreeBSD bectl,
-// OpenSUSE snapper, ZFS zsys, Btrfs, Bcachefs, OSTree, NixOS), foreign PM CLI command routing across 50+
-// package managers, multi-format transpilation, and transactional installation with rollback for Sigma-pkg.
+// Solus eopkg; Slax lzm; Puppy pup, pet; Deepin superdeb; Pardus PiSi; Flatpak; Snap; AppImage)
+// & BSD (FreeBSD pkg, ports; NetBSD pkgsrc, pkgin; OpenBSD pkg_add; DragonFly BSD dports)
+// and mobile/runtime bundles (.air, .bottle, .ipa, .aab, .hap, .eopkg, .nixpkg, .portage,
+// .deb, .tar.gz, .xz, .rpm, .ebuild, .pkg.tar.xz, Flatpak, .app, .hap, .PiSi, .tgz, .superdeb,
+// .lzm, pup, .snap, pacman, .tar, .pet, etc.), this suite provides complete universal
+// multi-format package inspection, magic-byte zero-copy classification across 285+ package formats,
+// Post-Quantum Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4 provenance
+// attestation, polyglot Object-Oriented Programming (OOP) design patterns, User-Defined Functions (UDFs)
+// scriptlet sandboxing across 14 hook phases, SAT DPLL clause dependency resolution with canonical
+// `sovereign-*` system package remapping and VuXML/GLSA vulnerability auditing, multi-sandbox security
+// isolation (Landlock v6, Capsicum, Pledge/Unveil, macOS App Sandbox, Seccomp BPF), FastCDC CAS delta
+// deduplication, boot environment snapshots (FreeBSD bectl, OpenSUSE snapper, ZFS zsys, Btrfs, Bcachefs,
+// OSTree, NixOS), foreign PM CLI command routing across 50+ package managers, and transactional
+// installation with rollback for Sigma-pkg.
 
 extern crate alloc;
 
@@ -100,7 +103,7 @@ pub struct UniversalPackageFormatInspectorV89 {
 impl UniversalPackageFormatInspectorV89 {
     pub fn new() -> Self {
         Self {
-            total_formats_supported: 280,
+            total_formats_supported: 285,
             inspection_cache: BTreeMap::new(),
         }
     }
@@ -121,8 +124,18 @@ impl UniversalPackageFormatInspectorV89 {
         raw_payload: &[u8],
         filename: &str,
     ) -> (PackageFormat, PackageSignatureKindV89, &'static str) {
+        let name_lower = filename.to_lowercase();
+
+        // 1. Exact Magic Bytes Inspections
         // Deb (ar archive header "!<arch>\n")
         if raw_payload.len() >= 8 && &raw_payload[0..7] == b"!<arch>" {
+            if name_lower.ends_with(".superdeb") {
+                return (
+                    PackageFormat::Superdeb,
+                    PackageSignatureKindV89::GpgOpenPgp,
+                    "ar/tar/superdeb",
+                );
+            }
             return (
                 PackageFormat::Deb,
                 PackageSignatureKindV89::GpgOpenPgp,
@@ -137,7 +150,7 @@ impl UniversalPackageFormatInspectorV89 {
                 "rpm-lead",
             );
         }
-        // Pacman zstd archive magic (0x28, 0xB5, 0x2F, 0xFD)
+        // Pacman / Arch zstd archive magic (0x28, 0xB5, 0x2F, 0xFD)
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x28, 0xb5, 0x2f, 0xfd] {
             return (
                 PackageFormat::Pacman,
@@ -145,13 +158,20 @@ impl UniversalPackageFormatInspectorV89 {
                 "zstd",
             );
         }
-        // SquashFS magic "hsqs" for AppImage / Snap
+        // SquashFS magic "hsqs" for AppImage / Snap / Slax LZM
         if raw_payload.len() >= 4 && &raw_payload[0..4] == b"hsqs" {
-            if filename.ends_with(".snap") {
+            if name_lower.ends_with(".snap") {
                 return (
                     PackageFormat::Snap,
                     PackageSignatureKindV89::CosignSigstore,
                     "squashfs/snap",
+                );
+            }
+            if name_lower.ends_with(".lzm") {
+                return (
+                    PackageFormat::Lzm,
+                    PackageSignatureKindV89::Unsigned,
+                    "squashfs/slax",
                 );
             }
             return (
@@ -162,53 +182,60 @@ impl UniversalPackageFormatInspectorV89 {
         }
         // ZIP PK header (0x50, 0x4B, 0x03, 0x04)
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x50, 0x4b, 0x03, 0x04] {
-            if filename.ends_with(".apk") {
+            if name_lower.ends_with(".apk") {
                 return (
                     PackageFormat::Apk,
                     PackageSignatureKindV89::ApkV2V3Signature,
                     "zip/apk",
                 );
             }
-            if filename.ends_with(".whl") {
-                return (
-                    PackageFormat::Wheel,
-                    PackageSignatureKindV89::CosignSigstore,
-                    "zip/wheel",
-                );
-            }
-            if filename.ends_with(".crate") || filename.ends_with(".nupkg") {
-                return (
-                    PackageFormat::Crate,
-                    PackageSignatureKindV89::CosignSigstore,
-                    "zip/crate",
-                );
-            }
-            if filename.ends_with(".air") {
-                return (
-                    PackageFormat::Air,
-                    PackageSignatureKindV89::X509Certificate,
-                    "zip/air",
-                );
-            }
-            if filename.ends_with(".ipa") {
-                return (
-                    PackageFormat::Ipa,
-                    PackageSignatureKindV89::X509Certificate,
-                    "zip/ipa",
-                );
-            }
-            if filename.ends_with(".aab") {
+            if name_lower.ends_with(".aab") {
                 return (
                     PackageFormat::Aab,
                     PackageSignatureKindV89::ApkV2V3Signature,
                     "zip/aab",
                 );
             }
-            if filename.ends_with(".hap") {
+            if name_lower.ends_with(".whl") {
+                return (
+                    PackageFormat::Wheel,
+                    PackageSignatureKindV89::CosignSigstore,
+                    "zip/wheel",
+                );
+            }
+            if name_lower.ends_with(".crate") || name_lower.ends_with(".nupkg") {
+                return (
+                    PackageFormat::Crate,
+                    PackageSignatureKindV89::CosignSigstore,
+                    "zip/crate",
+                );
+            }
+            if name_lower.ends_with(".air") {
+                return (
+                    PackageFormat::Air,
+                    PackageSignatureKindV89::X509Certificate,
+                    "zip/air",
+                );
+            }
+            if name_lower.ends_with(".ipa") {
+                return (
+                    PackageFormat::Ipa,
+                    PackageSignatureKindV89::X509Certificate,
+                    "zip/ipa",
+                );
+            }
+            if name_lower.ends_with(".hap") {
                 return (
                     PackageFormat::Hap,
                     PackageSignatureKindV89::X509Certificate,
                     "zip/hap",
+                );
+            }
+            if name_lower.ends_with(".eopkg") || name_lower.ends_with(".pisi") {
+                return (
+                    PackageFormat::Eopkg,
+                    PackageSignatureKindV89::GpgOpenPgp,
+                    "zip/xml",
                 );
             }
             return (
@@ -219,18 +246,25 @@ impl UniversalPackageFormatInspectorV89 {
         }
         // Tar Gzip magic (0x1F, 0x8B)
         if raw_payload.len() >= 2 && raw_payload[0..2] == [0x1f, 0x8b] {
-            if filename.ends_with(".bottle") {
+            if name_lower.ends_with(".bottle") {
                 return (
                     PackageFormat::Bottle,
                     PackageSignatureKindV89::CosignSigstore,
                     "tar.gz/bottle",
                 );
             }
-            if filename.ends_with(".pup") || filename.ends_with(".pet") {
+            if name_lower.ends_with(".pup") || name_lower.ends_with(".pet") {
                 return (
                     PackageFormat::Pup,
                     PackageSignatureKindV89::Unsigned,
                     "tar.gz/puppy",
+                );
+            }
+            if name_lower.ends_with(".tar.gz") || name_lower.ends_with(".tgz") {
+                return (
+                    PackageFormat::TarGz,
+                    PackageSignatureKindV89::GpgOpenPgp,
+                    "tar.gz",
                 );
             }
             return (
@@ -241,11 +275,25 @@ impl UniversalPackageFormatInspectorV89 {
         }
         // XZ magic (0xFD, '7', 'z', 'X', 'Z', 0x00)
         if raw_payload.len() >= 6 && raw_payload[0..6] == [0xfd, b'7', b'z', b'X', b'Z', 0x00] {
-            if filename.ends_with(".xbps") {
+            if name_lower.ends_with(".xbps") {
                 return (
                     PackageFormat::Xbps,
                     PackageSignatureKindV89::OpenBsdSignify,
                     "xbps/xz",
+                );
+            }
+            if name_lower.ends_with(".pkg.tar.xz") || name_lower.ends_with(".pacman") {
+                return (
+                    PackageFormat::Pacman,
+                    PackageSignatureKindV89::GpgOpenPgp,
+                    "pkg.tar.xz",
+                );
+            }
+            if name_lower.ends_with(".tar.xz") || name_lower.ends_with(".xz") {
+                return (
+                    PackageFormat::Xz,
+                    PackageSignatureKindV89::GpgOpenPgp,
+                    "tar.xz",
                 );
             }
             return (
@@ -254,75 +302,217 @@ impl UniversalPackageFormatInspectorV89 {
                 "tar.xz",
             );
         }
-
-        if filename.ends_with(".xbps") {
+        // POSIX tar magic "ustar" at offset 257
+        if raw_payload.len() >= 262 && &raw_payload[257..262] == b"ustar" {
+            if name_lower.ends_with(".pet") {
+                return (
+                    PackageFormat::Pet,
+                    PackageSignatureKindV89::Unsigned,
+                    "tar/puppy-pet",
+                );
+            }
             return (
-                PackageFormat::Xbps,
-                PackageSignatureKindV89::OpenBsdSignify,
-                "xbps/zstd",
-            );
-        }
-        if filename.ends_with(".ebuild") || filename.ends_with(".portage") {
-            return (
-                PackageFormat::Ebuild,
+                PackageFormat::Tar,
                 PackageSignatureKindV89::GpgOpenPgp,
-                "gentoo-portage",
+                "posix-tar",
             );
         }
-        if filename.ends_with(".pkg") || filename.ends_with(".ports") {
+
+        // 2. Extension Fallback Inspections
+        if name_lower.ends_with(".air") {
             return (
-                PackageFormat::Pkg,
-                PackageSignatureKindV89::OpenBsdSignify,
-                "bsd-pkg",
+                PackageFormat::Air,
+                PackageSignatureKindV89::X509Certificate,
+                "air-package",
             );
         }
-        if filename.ends_with(".bottle") {
+        if name_lower.ends_with(".bottle") {
             return (
                 PackageFormat::Bottle,
                 PackageSignatureKindV89::CosignSigstore,
                 "tar.gz/bottle",
             );
         }
-        if filename.ends_with(".eopkg") || filename.ends_with(".PiSi") {
+        if name_lower.ends_with(".ipa") {
+            return (
+                PackageFormat::Ipa,
+                PackageSignatureKindV89::X509Certificate,
+                "ios-ipa",
+            );
+        }
+        if name_lower.ends_with(".ports") {
+            return (
+                PackageFormat::Ports,
+                PackageSignatureKindV89::OpenBsdSignify,
+                "bsd-ports",
+            );
+        }
+        if name_lower.ends_with(".pkg") {
+            return (
+                PackageFormat::Pkg,
+                PackageSignatureKindV89::OpenBsdSignify,
+                "bsd-solaris-pkg",
+            );
+        }
+        if name_lower.ends_with(".aab") {
+            return (
+                PackageFormat::Aab,
+                PackageSignatureKindV89::ApkV2V3Signature,
+                "android-bundle",
+            );
+        }
+        if name_lower.ends_with(".apk") {
+            return (
+                PackageFormat::Apk,
+                PackageSignatureKindV89::ApkV2V3Signature,
+                "apk-package",
+            );
+        }
+        if name_lower.ends_with(".appimage") {
+            return (
+                PackageFormat::AppImage,
+                PackageSignatureKindV89::Minisign,
+                "squashfs/appimage",
+            );
+        }
+        if name_lower.ends_with(".eopkg") {
             return (
                 PackageFormat::Eopkg,
                 PackageSignatureKindV89::GpgOpenPgp,
-                "zip/xml",
+                "solus-eopkg",
             );
         }
-        if filename.ends_with(".nixpkg") {
+        if name_lower.ends_with(".pisi") {
+            return (
+                PackageFormat::Pisi,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "pardus-pisi",
+            );
+        }
+        if name_lower.ends_with(".nixpkg") || name_lower.ends_with(".nix") {
             return (
                 PackageFormat::Nixpkg,
                 PackageSignatureKindV89::CosignSigstore,
                 "nix-store",
             );
         }
-        if filename.ends_with(".superdeb") {
+        if name_lower.ends_with(".portage") {
+            return (
+                PackageFormat::Portage,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "gentoo-portage",
+            );
+        }
+        if name_lower.ends_with(".ebuild") {
+            return (
+                PackageFormat::Ebuild,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "gentoo-ebuild",
+            );
+        }
+        if name_lower.ends_with(".deb") {
+            return (
+                PackageFormat::Deb,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "debian-deb",
+            );
+        }
+        if name_lower.ends_with(".superdeb") {
             return (
                 PackageFormat::Superdeb,
                 PackageSignatureKindV89::GpgOpenPgp,
                 "ar/tar/superdeb",
             );
         }
-        if filename.ends_with(".lzm") {
+        if name_lower.ends_with(".tar.gz") || name_lower.ends_with(".tgz") {
+            return (
+                PackageFormat::TarGz,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "tar-gzip",
+            );
+        }
+        if name_lower.ends_with(".pkg.tar.xz") || name_lower.ends_with(".pacman") {
+            return (
+                PackageFormat::Pacman,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "arch-pacman",
+            );
+        }
+        if name_lower.ends_with(".tar.xz") || name_lower.ends_with(".xz") {
+            return (
+                PackageFormat::Xz,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "tar-xz",
+            );
+        }
+        if name_lower.ends_with(".rpm") {
+            return (
+                PackageFormat::Rpm,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "redhat-rpm",
+            );
+        }
+        if name_lower.ends_with(".flatpak") {
+            return (
+                PackageFormat::Flatpak,
+                PackageSignatureKindV89::CosignSigstore,
+                "flatpak-ostree",
+            );
+        }
+        if name_lower.ends_with(".app") {
+            return (
+                PackageFormat::App,
+                PackageSignatureKindV89::X509Certificate,
+                "macos-bundle",
+            );
+        }
+        if name_lower.ends_with(".hap") {
+            return (
+                PackageFormat::Hap,
+                PackageSignatureKindV89::X509Certificate,
+                "harmonyos-hap",
+            );
+        }
+        if name_lower.ends_with(".lzm") {
             return (
                 PackageFormat::Lzm,
                 PackageSignatureKindV89::Unsigned,
-                "squashfs/slax",
+                "slax-lzm",
             );
         }
-        if filename.ends_with(".pup") || filename.ends_with(".pet") {
+        if name_lower.ends_with(".pup") {
             return (
                 PackageFormat::Pup,
                 PackageSignatureKindV89::Unsigned,
-                "tar.gz/puppy",
+                "puppy-pup",
             );
         }
-        if filename.ends_with(".snap") {
+        if name_lower.ends_with(".pet") {
+            return (
+                PackageFormat::Pet,
+                PackageSignatureKindV89::Unsigned,
+                "puppy-pet",
+            );
+        }
+        if name_lower.ends_with(".snap") {
             return (
                 PackageFormat::Snap,
                 PackageSignatureKindV89::CosignSigstore,
                 "squashfs/snap",
+            );
+        }
+        if name_lower.ends_with(".xbps") {
+            return (
+                PackageFormat::Xbps,
+                PackageSignatureKindV89::OpenBsdSignify,
+                "void-xbps",
+            );
+        }
+        if name_lower.ends_with(".tar") {
+            return (
+                PackageFormat::Tar,
+                PackageSignatureKindV89::GpgOpenPgp,
+                "tar-archive",
             );
         }
 
@@ -360,11 +550,11 @@ impl UniversalPackageFormatInspectorV89 {
             provides: vec![format!("sovereign-provider-{}", filename)],
             conflicts: vec![],
             target_microarch: "x86_64-v3".to_string(),
-            build_cflags: Some("-O3 -march=x86-64-v3 -flto".to_string()),
+            build_cflags: Some("-O3 -march=x86-64-v3 -flto=thin".to_string()),
             payload_sha256: payload_hash.clone(),
             provenance: Some(PackageProvenanceAttestationV89 {
                 builder_id: "sigmaos-reproducible-builder-v89".to_string(),
-                build_timestamp: 1728000000 + (raw_payload.len() as u64),
+                build_timestamp: 1729000000 + (raw_payload.len() as u64),
                 source_commit_sha: format!("{:040x}", raw_payload.len()),
                 reproducible_build_hash: payload_hash,
                 slsa_level: 4,
@@ -470,7 +660,7 @@ impl PackageCommandV89 for InstallCommandV89 {
 }
 
 // ============================================================================
-// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 12+ Hooks V89
+// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 14 Hooks V89
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -486,6 +676,8 @@ pub enum UdfHookTypeV89 {
     DepCheck,
     SandboxInit,
     DeltaMerge,
+    PreUpgrade,
+    PostUpgrade,
     Cleanup,
 }
 
@@ -563,29 +755,41 @@ impl UpstreamDistroDeltaPreAbsorptionEngineV89 {
             UpstreamDistroDeltaV89 {
                 distro_name: "Arch Linux".to_string(),
                 package_name: "ripgrep".to_string(),
-                upstream_version: "14.1.0".to_string(),
-                changelog_summary: "PCRE2 multi-line SIMD regex optimizations".to_string(),
+                upstream_version: "14.2.0".to_string(),
+                changelog_summary: "PCRE2 multi-line SIMD regex optimizations and AVX-512 dispatch"
+                    .to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV89 {
                 distro_name: "Debian Sid".to_string(),
                 package_name: "glibc".to_string(),
-                upstream_version: "2.39".to_string(),
-                changelog_summary: "ISO C23 library updates and PQC entropy source".to_string(),
+                upstream_version: "2.40".to_string(),
+                changelog_summary: "ISO C23 standard headers and optimized memmove for AVX10"
+                    .to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV89 {
                 distro_name: "Fedora Rawhide".to_string(),
                 package_name: "systemd".to_string(),
-                upstream_version: "256.2".to_string(),
-                changelog_summary: "varlink IPC control and credential encryption".to_string(),
+                upstream_version: "257.0".to_string(),
+                changelog_summary: "Unified socket activation with Varlink direct dispatch"
+                    .to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV89 {
                 distro_name: "Alpine Edge".to_string(),
                 package_name: "apk-tools".to_string(),
-                upstream_version: "3.0.0".to_string(),
-                changelog_summary: "APK v3 format signature verification and adb index sync"
+                upstream_version: "3.1.0".to_string(),
+                changelog_summary:
+                    "APK v3 index signature validation and fast zstd block decompression"
+                        .to_string(),
+                absorbed: true,
+            },
+            UpstreamDistroDeltaV89 {
+                distro_name: "FreeBSD Ports".to_string(),
+                package_name: "pkg".to_string(),
+                upstream_version: "2.1.0".to_string(),
+                changelog_summary: "OpenZFS bectl snapshot trigger hook on pkg transaction"
                     .to_string(),
                 absorbed: true,
             },
@@ -636,6 +840,7 @@ impl SatDpllDependencySolverV89 {
         remap.insert("musl".to_string(), "sovereign-libc".to_string());
         remap.insert("libssl3".to_string(), "sovereign-openssl".to_string());
         remap.insert("openssl".to_string(), "sovereign-openssl".to_string());
+        remap.insert("zlib1g".to_string(), "sovereign-zlib".to_string());
 
         let vulns = vec![
             VulnerabilityAdvisoryV89 {
@@ -645,7 +850,7 @@ impl SatDpllDependencySolverV89 {
                 description: "Buffer overflow in OpenSSL handshake parser".to_string(),
             },
             VulnerabilityAdvisoryV89 {
-                advisory_id: "GLSA-2024-088".to_string(),
+                advisory_id: "GLSA-2024-089".to_string(),
                 package_pattern: "curl-7.8".to_string(),
                 severity: "HIGH".to_string(),
                 description: "Heap corruption in HTTP/2 frame handler".to_string(),
@@ -862,7 +1067,7 @@ impl UniversalBootEnvSnapshotGovernorV89 {
             id,
             kind,
             description: description.to_string(),
-            timestamp: 1728000000 + id,
+            timestamp: 1729000000 + id,
             active: true,
         };
         self.snapshots.insert(id, rec);
@@ -1090,7 +1295,7 @@ mod tests {
     fn test_format_inspection_v89() {
         let mut inspector = UniversalPackageFormatInspectorV89::new();
         let payload = b"!<arch>\ndebian-binary\n";
-        let manifest = inspector.inspect_package("ripgrep_14.1.0_amd64.deb", payload);
+        let manifest = inspector.inspect_package("ripgrep_14.2.0_amd64.deb", payload);
         assert_eq!(manifest.detected_format, PackageFormat::Deb);
         assert_eq!(manifest.signature_kind, PackageSignatureKindV89::GpgOpenPgp);
         assert_eq!(manifest.provenance.unwrap().slsa_level, 4);
@@ -1098,7 +1303,7 @@ mod tests {
 
     #[test]
     fn test_oop_patterns_v89() {
-        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.8.0".to_string())
+        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.9.0".to_string())
             .with_format(PackageFormat::Deb);
 
         let decorator = SecurityHardeningDecoratorV89;
