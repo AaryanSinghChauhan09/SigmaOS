@@ -414,6 +414,7 @@ pub use distro::sovereign_lfs_bsd_nextgen_advancements_pr::*;
 pub use distro::sovereign_lfs_bsd_synthesis_v79_pr::*;
 pub use distro::sovereign_lfs_bsd_synthesis_v80_pr::*;
 pub use distro::sovereign_lfs_bsd_synthesis_v84_pr::*;
+pub use distro::sovereign_lfs_bsd_synthesis_v85_pr::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v51_pr::*;
