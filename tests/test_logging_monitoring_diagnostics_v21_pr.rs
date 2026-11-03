@@ -18,13 +18,19 @@ fn test_integration_journald_and_syslog_v21() {
     .with_filter("PRIORITY", "3");
 
     gateway_endpoint.set_cursor("s=12345abcdef;i=1");
-    assert_eq!(gateway_endpoint.cursor_pagination, Some("s=12345abcdef;i=1".to_string()));
+    assert_eq!(
+        gateway_endpoint.cursor_pagination,
+        Some("s=12345abcdef;i=1".to_string())
+    );
     assert_eq!(gateway_endpoint.field_filters.len(), 2);
 
     let sse_output = gateway_endpoint.render_sse_chunk(
         "s=12345abcdef;i=1",
         &[
-            ("MESSAGE", "Failed to bind to socket: address already in use"),
+            (
+                "MESSAGE",
+                "Failed to bind to socket: address already in use",
+            ),
             ("PRIORITY", "3"),
             ("_PID", "1024"),
         ],
@@ -42,8 +48,14 @@ fn test_integration_journald_and_syslog_v21() {
     assert_eq!(rsyslog.max_disk_space_mb, 4096);
     let frame1 = RsyslogRelpFrameV21::new(1, "open", "relp-session-v21");
     let frame2 = RsyslogRelpFrameV21::new(2, "syslog", "Kernel packet drop eth0");
-    assert_eq!(frame1.format_relp_wire_protocol(), "1 open 16 relp-session-v21\n");
-    assert_eq!(frame2.format_relp_wire_protocol(), "2 syslog 23 Kernel packet drop eth0\n");
+    assert_eq!(
+        frame1.format_relp_wire_protocol(),
+        "1 open 16 relp-session-v21\n"
+    );
+    assert_eq!(
+        frame2.format_relp_wire_protocol(),
+        "2 syslog 23 Kernel packet drop eth0\n"
+    );
     rsyslog.push_frame(frame1);
     rsyslog.push_frame(frame2);
     assert_eq!(rsyslog.active_frames.len(), 2);
@@ -63,10 +75,22 @@ fn test_integration_journald_and_syslog_v21() {
 
     // BSD Syslogd router
     let bsd = BsdSyslogdRouterV21::new();
-    assert_eq!(bsd.route_message("auth", "info"), Some("/var/log/secure".to_string()));
-    assert_eq!(bsd.route_message("cron", "info"), Some("/var/log/cron".to_string()));
-    assert_eq!(bsd.route_message("mail", "alert"), Some("/var/log/maillog".to_string()));
-    assert_eq!(bsd.route_message("daemon", "notice"), Some("/var/log/messages".to_string()));
+    assert_eq!(
+        bsd.route_message("auth", "info"),
+        Some("/var/log/secure".to_string())
+    );
+    assert_eq!(
+        bsd.route_message("cron", "info"),
+        Some("/var/log/cron".to_string())
+    );
+    assert_eq!(
+        bsd.route_message("mail", "alert"),
+        Some("/var/log/maillog".to_string())
+    );
+    assert_eq!(
+        bsd.route_message("daemon", "notice"),
+        Some("/var/log/messages".to_string())
+    );
     assert_eq!(bsd.route_message("local7", "none"), None);
 
     // Logrotate manager
@@ -113,11 +137,17 @@ fn test_integration_kernel_dmesg_kdump_ebpf_v21() {
     assert_eq!(vmcore_summary.pt_notes[0].note_type, 1);
 
     // eBPF tracepoint filtering
-    assert!(kernel_suite.ebpf_filter.evaluate_event("sys_enter_openat", 450));
+    assert!(kernel_suite
+        .ebpf_filter
+        .evaluate_event("sys_enter_openat", 450));
     assert!(kernel_suite.ebpf_filter.evaluate_event("sched_switch", 450));
     assert!(kernel_suite.ebpf_filter.evaluate_event("net_dev_xmit", 450));
-    assert!(!kernel_suite.ebpf_filter.evaluate_event("unknown_tracepoint", 450));
-    assert!(!kernel_suite.ebpf_filter.evaluate_event("sys_enter_openat", 0)); // PID 0 filtered
+    assert!(!kernel_suite
+        .ebpf_filter
+        .evaluate_event("unknown_tracepoint", 450));
+    assert!(!kernel_suite
+        .ebpf_filter
+        .evaluate_event("sys_enter_openat", 0)); // PID 0 filtered
 }
 
 #[test]
@@ -213,16 +243,26 @@ fn test_integration_prometheus_exporter_and_pr_gateway_v21() {
 
     // Prometheus Node Exporter output
     let expo = gateway.prometheus_node_exporter.render_exposition_text();
-    assert!(expo.contains("node_cpu_seconds_total{instance=\"sigma-node01.internal\",cpu=\"0\",mode=\"idle\"}"));
-    assert!(expo.contains("node_cpu_seconds_total{instance=\"sigma-node01.internal\",cpu=\"0\",mode=\"user\"}"));
-    assert!(expo.contains("node_memory_MemTotal_bytes{instance=\"sigma-node01.internal\"} 33738977280"));
+    assert!(expo.contains(
+        "node_cpu_seconds_total{instance=\"sigma-node01.internal\",cpu=\"0\",mode=\"idle\"}"
+    ));
+    assert!(expo.contains(
+        "node_cpu_seconds_total{instance=\"sigma-node01.internal\",cpu=\"0\",mode=\"user\"}"
+    ));
+    assert!(
+        expo.contains("node_memory_MemTotal_bytes{instance=\"sigma-node01.internal\"} 33738977280")
+    );
     assert!(expo.contains("node_load1{instance=\"sigma-node01.internal\"} 0.28"));
     assert!(expo.contains("node_uptime_seconds{instance=\"sigma-node01.internal\"} 954000.00"));
 
     // Unified diff generation
     let diff = gateway.generate_unified_diff();
-    assert!(diff.contains("Title: feat(diagnostics): V21 Linux & BSD Logging, Monitoring, Diagnostics Suite"));
-    assert!(diff.contains("+++ b/src/diagnostics/sovereign_logging_monitoring_diagnostics_v21_pr.rs"));
+    assert!(diff.contains(
+        "Title: feat(diagnostics): V21 Linux & BSD Logging, Monitoring, Diagnostics Suite"
+    ));
+    assert!(
+        diff.contains("+++ b/src/diagnostics/sovereign_logging_monitoring_diagnostics_v21_pr.rs")
+    );
     assert!(diff.contains("Journald Gateway SSE, Rsyslog RELP TLS1.3"));
 
     // 12-point system diagnostic audit

@@ -319,7 +319,9 @@ impl LogrotateManagerV21 {
                     max_size_mb: 100,
                     keep_count: 7,
                     compress: true,
-                    post_rotate_cmd: Some("/usr/bin/systemctl kill -s HUP rsyslog.service".to_string()),
+                    post_rotate_cmd: Some(
+                        "/usr/bin/systemctl kill -s HUP rsyslog.service".to_string(),
+                    ),
                 },
                 LogrotateEntryV21 {
                     log_path: "/var/log/nginx/access.log".to_string(),
@@ -404,9 +406,9 @@ impl DmesgFormatterV21 {
         if self.color_enabled {
             let color_code = match entry.level.as_str() {
                 "emerg" | "alert" | "crit" | "err" => "\x1b[31m", // Red
-                "warning" => "\x1b[33m",                         // Yellow
-                "notice" => "\x1b[32m",                          // Green
-                _ => "\x1b[0m",                                  // Default
+                "warning" => "\x1b[33m",                          // Yellow
+                "notice" => "\x1b[32m",                           // Green
+                _ => "\x1b[0m",                                   // Default
             };
             format!(
                 "{}{}{} {} {}\x1b[0m",
@@ -632,7 +634,8 @@ impl SarEngineV21 {
     }
 
     pub fn render_text_report(&self) -> String {
-        let mut report = String::from("Linux 6.12.0-sigma (sigma-node01)  2025-02-18  _x86_64_\n\n");
+        let mut report =
+            String::from("Linux 6.12.0-sigma (sigma-node01)  2025-02-18  _x86_64_\n\n");
         report.push_str("Time        CPU%    MEM%    IOPS      NET(Mbps)\n");
         for r in &self.records {
             report.push_str(&format!(
@@ -879,7 +882,9 @@ impl SosreportSanitizerV21 {
 
             if self.redact_private_keys {
                 if sanitized_line.contains("BEGIN PRIVATE KEY") {
-                    sanitized_line = "-----BEGIN PRIVATE KEY-----[REDACTED]-----END PRIVATE KEY-----".to_string();
+                    sanitized_line =
+                        "-----BEGIN PRIVATE KEY-----[REDACTED]-----END PRIVATE KEY-----"
+                            .to_string();
                     self.secret_patterns_redacted += 1;
                 }
             }
@@ -913,7 +918,10 @@ impl SovereignHardwareDiagnosticsSuiteV21 {
             "Manufacturer".to_string(),
             "Sigma High-Performance Systems".to_string(),
         );
-        sys_props.insert("Product Name".to_string(), "SigmaServer Engine X2".to_string());
+        sys_props.insert(
+            "Product Name".to_string(),
+            "SigmaServer Engine X2".to_string(),
+        );
 
         Self {
             open_handles: vec![
@@ -998,7 +1006,10 @@ impl SovereignHardwareDiagnosticsSuiteV21 {
         }
 
         if dmi.is_empty() {
-            dmi.insert("sys_vendor".to_string(), "SigmaOS Virtual Platform".to_string());
+            dmi.insert(
+                "sys_vendor".to_string(),
+                "SigmaOS Virtual Platform".to_string(),
+            );
             dmi.insert("product_name".to_string(), "SigmaOS-VM".to_string());
         }
 
@@ -1042,7 +1053,9 @@ impl PrometheusNodeExporterV21 {
             inst
         ));
 
-        out.push_str("# HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes.\n");
+        out.push_str(
+            "# HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes.\n",
+        );
         out.push_str("# TYPE node_memory_MemTotal_bytes gauge\n");
         out.push_str(&format!(
             "node_memory_MemTotal_bytes{{instance=\"{}\"}} 33738977280\n",
@@ -1079,7 +1092,8 @@ pub struct SovereignLoggingDiagnosticsV21PrGatewayEngine {
 impl SovereignLoggingDiagnosticsV21PrGatewayEngine {
     pub fn new() -> Self {
         Self {
-            pr_title: "feat(diagnostics): V21 Linux & BSD Logging, Monitoring, Diagnostics Suite".to_string(),
+            pr_title: "feat(diagnostics): V21 Linux & BSD Logging, Monitoring, Diagnostics Suite"
+                .to_string(),
             target_branch: "main".to_string(),
             logging_suite: SovereignLoggingSuiteV21::default_suite(),
             kernel_suite: SovereignKernelDiagnosticsSuiteV21::default_suite(),
@@ -1090,7 +1104,8 @@ impl SovereignLoggingDiagnosticsV21PrGatewayEngine {
     }
 
     pub fn generate_unified_diff(&self) -> String {
-        let mut diff = String::from("--- a/src/diagnostics/sovereign_logging_monitoring_diagnostics.rs\n");
+        let mut diff =
+            String::from("--- a/src/diagnostics/sovereign_logging_monitoring_diagnostics.rs\n");
         diff.push_str("+++ b/src/diagnostics/sovereign_logging_monitoring_diagnostics_v21_pr.rs\n");
         diff.push_str("@@ -0,0 +1,950 @@\n");
         diff.push_str(&format!("+ Title: {}\n", self.pr_title));
@@ -1107,7 +1122,10 @@ impl SovereignLoggingDiagnosticsV21PrGatewayEngine {
         );
         audit.insert(
             "journald_fss_sealing_ok".to_string(),
-            self.logging_suite.journald_gateway.fss_sealing.verified_intact,
+            self.logging_suite
+                .journald_gateway
+                .fss_sealing
+                .verified_intact,
         );
         audit.insert(
             "rsyslog_spool_fallback_ok".to_string(),
@@ -1187,14 +1205,14 @@ mod tests {
         assert!(sse.contains("data: _SYSTEMD_UNIT: sshd.service"));
 
         // FSS Verification
-        assert!(suite
-            .journald_gateway
-            .fss_sealing
-            .verify_integrity(1));
+        assert!(suite.journald_gateway.fss_sealing.verify_integrity(1));
 
         // Rsyslog RELP
         let frame = RsyslogRelpFrameV21::new(201, "syslog", "User logged in to session");
-        assert_eq!(frame.format_relp_wire_protocol(), "201 syslog 25 User logged in to session\n");
+        assert_eq!(
+            frame.format_relp_wire_protocol(),
+            "201 syslog 25 User logged in to session\n"
+        );
 
         // Syslog-ng Macro expansion
         let expanded = suite.syslog_ng.expand_macros(
@@ -1278,7 +1296,10 @@ mod tests {
 
         let pass_key = concat!("pass", "word=secret123");
         let api_key = concat!("api", "_key=token999");
-        let sample = format!("connect with {} and Bearer jwttoken and {}", pass_key, api_key);
+        let sample = format!(
+            "connect with {} and Bearer jwttoken and {}",
+            pass_key, api_key
+        );
         let redacted = suite.sosreport.sanitize_content(&sample);
         assert!(redacted.contains("password=[REDACTED]"));
         assert!(!redacted.contains("secret123"));
