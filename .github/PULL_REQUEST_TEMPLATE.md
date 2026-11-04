@@ -18,12 +18,32 @@ Why is this change necessary?
 ## Implementation notes
 Technical details and architecture impact.
 
+## Reference study
+Upstream study and reference behavior:
+- Upstream study: Linux/BSD/Redox/xv6 reference
+- What SigmaOS adopts
+
 ## Tests
 - Unit tests
 - Integration tests
 
 ## Verification
-- Verified with `./run_sigma_tests.sh`
+- cargo check --lib
+- cargo test --lib
+- ./run_sigma_tests.sh
+
+## Capability status
+- Prototype
+- Integrated
+- Supported
+
+## Integration impact
+- System integration notes
+
+## Reviewer checklist
+- [ ] Scope is narrow
+- [ ] `unsafe` justified
+- Kernel safety review / Reviewer checklist
 
 ## I/O component
 - [ ] I/O policy
@@ -55,3 +75,7 @@ Technical details and architecture impact.
 ## Shell component
 - Shell safety review
 - Safety and rollback
+- Risks and rollback
+
+## Shell safety review
+- Verified shell execution constraints and rollback safety.
