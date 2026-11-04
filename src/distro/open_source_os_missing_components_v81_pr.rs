@@ -204,7 +204,8 @@ impl FreeBsd165CapsicumCasperNetlinkMeshVnetEngineV81 {
             os_origin: "FreeBSD 16.5+".to_string(),
             status: OsPrStatusV81::Validated,
             impacted_subsystems: vec!["SecuritySandboxing".to_string(), "Networking".to_string()],
-            patch_diff: "+Capsicum Casper capability sandboxing with VNET mesh isolation".to_string(),
+            patch_diff: "+Capsicum Casper capability sandboxing with VNET mesh isolation"
+                .to_string(),
         }
     }
 }
@@ -247,7 +248,8 @@ impl OpenBsd94FineIbtPinsyscallPteGuardEngineV81 {
             os_origin: "OpenBSD 9.4+".to_string(),
             status: OsPrStatusV81::Validated,
             impacted_subsystems: vec!["SecuritySandboxing".to_string(), "SystemAudit".to_string()],
-            patch_diff: "+FineIBT indirect branch tracking with pinned syscall PTE protection".to_string(),
+            patch_diff: "+FineIBT indirect branch tracking with pinned syscall PTE protection"
+                .to_string(),
         }
     }
 }
@@ -385,7 +387,10 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV81 {
             component_name: "HaikuBfsRelationalLiveQueryMetadataEngineV81".to_string(),
             os_origin: "Haiku OS".to_string(),
             status: OsPrStatusV81::Validated,
-            impacted_subsystems: vec!["FilesystemStorage".to_string(), "DesktopCompositor".to_string()],
+            impacted_subsystems: vec![
+                "FilesystemStorage".to_string(),
+                "DesktopCompositor".to_string(),
+            ],
             patch_diff: "+BFS relational attribute live querying indexing".to_string(),
         }
     }
@@ -468,7 +473,10 @@ impl NixGuixHermeticCasMerkleClosureEngineV81 {
             component_name: "NixGuixHermeticCasMerkleClosureEngineV81".to_string(),
             os_origin: "NixOS / GNU Guix".to_string(),
             status: OsPrStatusV81::Validated,
-            impacted_subsystems: vec!["PackageManagement".to_string(), "CompilerToolchain".to_string()],
+            impacted_subsystems: vec![
+                "PackageManagement".to_string(),
+                "CompilerToolchain".to_string(),
+            ],
             patch_diff: "+Hermetic content-addressed Merkle tree dependency closure".to_string(),
         }
     }
@@ -513,8 +521,12 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV81 {
             component_name: "IllumosCrossbowVnicDtraceSwitchMeshEngineV81".to_string(),
             os_origin: "Illumos".to_string(),
             status: OsPrStatusV81::Validated,
-            impacted_subsystems: vec!["Networking".to_string(), "ObservabilityDiagnostics".to_string()],
-            patch_diff: "+Crossbow VNIC dynamic telemetry mesh via DTrace-to-eBPF router".to_string(),
+            impacted_subsystems: vec![
+                "Networking".to_string(),
+                "ObservabilityDiagnostics".to_string(),
+            ],
+            patch_diff: "+Crossbow VNIC dynamic telemetry mesh via DTrace-to-eBPF router"
+                .to_string(),
         }
     }
 }
@@ -555,8 +567,12 @@ impl OmarchyWallustThemeChordNavigatorEngineV81 {
             component_name: "OmarchyWallustThemeChordNavigatorEngineV81".to_string(),
             os_origin: "Omarchy Linux".to_string(),
             status: OsPrStatusV81::Validated,
-            impacted_subsystems: vec!["DesktopCompositor".to_string(), "UserlandPersona".to_string()],
-            patch_diff: "+Wallust dynamic palette generator with keybinding chord navigator".to_string(),
+            impacted_subsystems: vec![
+                "DesktopCompositor".to_string(),
+                "UserlandPersona".to_string(),
+            ],
+            patch_diff: "+Wallust dynamic palette generator with keybinding chord navigator"
+                .to_string(),
         }
     }
 }
@@ -600,7 +616,8 @@ impl GlobalTechMedia37PortalUnimplementedIdeasEngineV81 {
             os_origin: "37 Global Tech Media Portals".to_string(),
             status: OsPrStatusV81::Validated,
             impacted_subsystems: vec!["Governance".to_string(), "AiWorkflowAgent".to_string()],
-            patch_diff: "+Automated harvester for 37 tech media portals unimplemented OS ideas".to_string(),
+            patch_diff: "+Automated harvester for 37 tech media portals unimplemented OS ideas"
+                .to_string(),
         }
     }
 }

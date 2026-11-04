@@ -677,7 +677,10 @@ mod tests {
 
         let mut devctl = DragonFlyDevctlKqueueHotplugRouterV67PrEngine::new();
         devctl.register_binding("nvme", "nvme_driver");
-        assert_eq!(devctl.resolve_driver_for_event("nvme"), Some("nvme_driver".to_string()));
+        assert_eq!(
+            devctl.resolve_driver_for_event("nvme"),
+            Some("nvme_driver".to_string())
+        );
 
         let mut fl = DragonFlyFirmlinkMountNsGuardV67PrEngine::new();
         fl.register_ns_limit(10, 500);

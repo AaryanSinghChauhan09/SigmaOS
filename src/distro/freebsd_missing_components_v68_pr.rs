@@ -162,12 +162,7 @@ impl FreeBsdOpenZfsRaidzDraidDeclusteredPrEngine {
             rebuild_status: "Created".to_string(),
         };
         self.draid_pools.insert(pool.to_string(), spec);
-        format!(
-            "zpool create {} {} {}\n",
-            pool,
-            draid_type,
-            disks.join(" ")
-        )
+        format!("zpool create {} {} {}\n", pool, draid_type, disks.join(" "))
     }
 }
 
@@ -703,10 +698,9 @@ impl FreeBsdMissingComponentsV68PrSuite {
         );
         self.validate_and_merge_pr(pr2);
 
-        let be_diff = self.be_upgrade.execute_be_upgrade(
-            "be_15_0_p3",
-            &["FreeBSD-kernel-generic", "FreeBSD-world"],
-        );
+        let be_diff = self
+            .be_upgrade
+            .execute_be_upgrade("be_15_0_p3", &["FreeBSD-kernel-generic", "FreeBSD-world"]);
         let pr3 = self.submit_pr_proposal(
             "Enable pkgbase ZFS boot environment coordinated upgrade solver",
             "jules",

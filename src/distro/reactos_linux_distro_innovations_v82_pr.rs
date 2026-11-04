@@ -188,9 +188,9 @@ impl ReactOsKmdfDriverDispatcherEngineV82 {
         let mut drivers = BTreeMap::new();
         let mut major_funcs = BTreeMap::new();
         major_funcs.insert(0x00, "DriverCreate".to_string()); // IRP_MJ_CREATE
-        major_funcs.insert(0x02, "DriverClose".to_string());  // IRP_MJ_CLOSE
-        major_funcs.insert(0x03, "DriverRead".to_string());   // IRP_MJ_READ
-        major_funcs.insert(0x04, "DriverWrite".to_string());  // IRP_MJ_WRITE
+        major_funcs.insert(0x02, "DriverClose".to_string()); // IRP_MJ_CLOSE
+        major_funcs.insert(0x03, "DriverRead".to_string()); // IRP_MJ_READ
+        major_funcs.insert(0x04, "DriverWrite".to_string()); // IRP_MJ_WRITE
         major_funcs.insert(0x0E, "DriverDeviceControl".to_string()); // IRP_MJ_DEVICE_CONTROL
 
         let driver = KmdfDriverObjectV82 {
@@ -206,10 +206,17 @@ impl ReactOsKmdfDriverDispatcherEngineV82 {
         };
         drivers.insert("\\Driver\\Null".to_string(), driver);
 
-        Self { loaded_drivers: drivers }
+        Self {
+            loaded_drivers: drivers,
+        }
     }
 
-    pub fn register_driver(&mut self, driver_name: &str, device_name: &str, dev_type: u32) -> Result<String, String> {
+    pub fn register_driver(
+        &mut self,
+        driver_name: &str,
+        device_name: &str,
+        dev_type: u32,
+    ) -> Result<String, String> {
         let mut major_funcs = BTreeMap::new();
         major_funcs.insert(0x00, "KmdfGenericCreate".to_string());
         major_funcs.insert(0x02, "KmdfGenericClose".to_string());
@@ -227,15 +234,24 @@ impl ReactOsKmdfDriverDispatcherEngineV82 {
             }],
         };
         self.loaded_drivers.insert(driver_name.to_string(), driver);
-        Ok(format!("Registered KMDF driver '{}' with device '{}'", driver_name, device_name))
+        Ok(format!(
+            "Registered KMDF driver '{}' with device '{}'",
+            driver_name, device_name
+        ))
     }
 
     pub fn dispatch_irp(&self, driver_name: &str, major_fn: u8) -> Result<String, String> {
         if let Some(drv) = self.loaded_drivers.get(driver_name) {
             if let Some(handler) = drv.major_functions.get(&major_fn) {
-                Ok(format!("Dispatched IRP 0x{:02X} to handler '{}' in driver '{}'", major_fn, handler, driver_name))
+                Ok(format!(
+                    "Dispatched IRP 0x{:02X} to handler '{}' in driver '{}'",
+                    major_fn, handler, driver_name
+                ))
             } else {
-                Err(format!("Major function 0x{:02X} not implemented in driver '{}'", major_fn, driver_name))
+                Err(format!(
+                    "Major function 0x{:02X} not implemented in driver '{}'",
+                    major_fn, driver_name
+                ))
             }
         } else {
             Err(format!("Driver '{}' not loaded", driver_name))
@@ -369,7 +385,7 @@ impl ReactOsShellTrayExplorerEngineV82 {
             ShellTrayNotifyIconDataV82 {
                 hwnd: 0x00010010,
                 icon_id: 1,
-                flags: 0x07, // NIF_MESSAGE | NIF_ICON | NIF_TIP
+                flags: 0x07,              // NIF_MESSAGE | NIF_ICON | NIF_TIP
                 callback_msg: 0x0400 + 1, // WM_USER + 1
                 tooltip_text: "Sovereign Network Manager".to_string(),
             },
@@ -389,13 +405,15 @@ impl ReactOsShellTrayExplorerEngineV82 {
             tooltip_text: tooltip.to_string(),
         };
         self.active_icons.insert(icon_id, data);
-        self.shell_message_pump.push(format!("NIM_ADD icon_id={}", icon_id));
+        self.shell_message_pump
+            .push(format!("NIM_ADD icon_id={}", icon_id));
         true
     }
 
     pub fn remove_tray_icon(&mut self, icon_id: u32) -> bool {
         if self.active_icons.remove(&icon_id).is_some() {
-            self.shell_message_pump.push(format!("NIM_DELETE icon_id={}", icon_id));
+            self.shell_message_pump
+                .push(format!("NIM_DELETE icon_id={}", icon_id));
             true
         } else {
             false
@@ -405,7 +423,9 @@ impl ReactOsShellTrayExplorerEngineV82 {
     pub fn generate_manifest(&self) -> ReactOsLinuxV82Manifest {
         ReactOsLinuxV82Manifest {
             pr_id: 4094,
-            pr_title: "PR #4094: ReactOS USER32/SHELL32 Shell Tray Notification Area & Message Pump".to_string(),
+            pr_title:
+                "PR #4094: ReactOS USER32/SHELL32 Shell Tray Notification Area & Message Pump"
+                    .to_string(),
             target_subsystem: "Desktop Shell & User Interaction".to_string(),
             original_system: "ReactOS Explorer / SHELL32".to_string(),
             components_added: vec![
@@ -623,12 +643,22 @@ impl SovereignReactOsLinuxInnovationsV82PrGateway {
     }
 
     pub fn execute_reactos_v82_evaluation(&mut self) -> bool {
-        let lpc_handle = self.lpc_engine.create_port("\\LpcPort\\TestPort", 128).unwrap_or(0);
-        let kmdf_reg = self.kmdf_engine.register_driver("\\Driver\\Net", "\\Device\\Net0", 0x00000007).is_ok();
-        self.pe_tls_engine.bind_iat_function("NtCreateFile", 0x80401000);
+        let lpc_handle = self
+            .lpc_engine
+            .create_port("\\LpcPort\\TestPort", 128)
+            .unwrap_or(0);
+        let kmdf_reg = self
+            .kmdf_engine
+            .register_driver("\\Driver\\Net", "\\Device\\Net0", 0x00000007)
+            .is_ok();
+        self.pe_tls_engine
+            .bind_iat_function("NtCreateFile", 0x80401000);
         let tray_add = self.shell_engine.add_tray_icon(0x100, 2, "Test Tray Icon");
         let font_handle = self.gdi_font_engine.create_font("Segoe UI", 12, 700, false);
-        let irq = self.hal_pci_engine.hal_get_interrupt_vector(0, 1).unwrap_or(255);
+        let irq = self
+            .hal_pci_engine
+            .hal_get_interrupt_vector(0, 1)
+            .unwrap_or(255);
 
         lpc_handle >= 0x2000 && kmdf_reg && tray_add && font_handle >= 0x1000 && irq == 11
     }
@@ -663,7 +693,10 @@ mod tests {
     fn test_reactos_pe_tls_relocation_engine() {
         let mut engine = ReactOsPeTlsRelocationEngineV82::new();
         engine.bind_iat_function("Kernel32.dll!GetTickCount", 0x77001000);
-        assert_eq!(engine.iat_bindings.get("Kernel32.dll!GetTickCount"), Some(&0x77001000));
+        assert_eq!(
+            engine.iat_bindings.get("Kernel32.dll!GetTickCount"),
+            Some(&0x77001000)
+        );
 
         let count = engine.execute_tls_callbacks(1);
         assert_eq!(count, 1);

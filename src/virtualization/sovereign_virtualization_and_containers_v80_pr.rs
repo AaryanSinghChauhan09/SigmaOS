@@ -343,7 +343,8 @@ impl OciDockerPodmanRuncV80Engine {
             cgroups_version: "v2".to_string(),
             memory_limit_mb: mem_mb,
         };
-        self.containers.insert(container_id.to_string(), spec.clone());
+        self.containers
+            .insert(container_id.to_string(), spec.clone());
         spec
     }
 
@@ -398,7 +399,8 @@ impl LxcLxdNspawnV80Engine {
             ovn_network_id: None,
             machinectl_registered: true,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 
@@ -414,7 +416,8 @@ impl LxcLxdNspawnV80Engine {
             ovn_network_id: Some(ovn_net.to_string()),
             machinectl_registered: false,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 }
@@ -453,12 +456,7 @@ impl FreeBsdJailsZonesV80Engine {
         }
     }
 
-    pub fn create_vnet_jail(
-        &mut self,
-        name: &str,
-        path: &str,
-        epair: &str,
-    ) -> FreeBsdJailSpecV80 {
+    pub fn create_vnet_jail(&mut self, name: &str, path: &str, epair: &str) -> FreeBsdJailSpecV80 {
         let jail = FreeBsdJailSpecV80 {
             name: name.to_string(),
             path: path.to_string(),
@@ -813,9 +811,8 @@ impl SovereignVirtualizationAndContainersParityV80Gateway {
 
     pub fn generate_pr_markdown_summary(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut out = String::from(
-            "# Sovereign Virtualization & Container Ecosystem Parity Suite (v80)\n\n",
-        );
+        let mut out =
+            String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v80)\n\n");
         out.push_str(
             "| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier |\n",
         );

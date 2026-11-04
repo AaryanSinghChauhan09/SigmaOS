@@ -98,4 +98,5 @@ pub use sovereign_video_editor::{
 };
 pub mod codecs;
 pub use codecs::{CodecManager, HwDecodeBackend, MediaCodec, V1_CODECS};
-pub mod sovereign_audio_video_advancements_v92_pr;
+pub mod sovereign_audio_video_advancements_v90_pr;
+pub use sovereign_audio_video_advancements_v90_pr::*;

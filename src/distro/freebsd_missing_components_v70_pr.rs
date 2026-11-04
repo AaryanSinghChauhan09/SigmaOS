@@ -211,12 +211,7 @@ impl FreeBsdIpsecWireguardKernelKmodPrEngine {
         Self { wg_interfaces }
     }
 
-    pub fn configure_wireguard_interface(
-        &mut self,
-        ifname: &str,
-        port: u16,
-        kem: &str,
-    ) -> String {
+    pub fn configure_wireguard_interface(&mut self, ifname: &str, port: u16, kem: &str) -> String {
         let spec = WireguardKmodSpec {
             interface_name: ifname.to_string(),
             listen_port: port,
@@ -272,12 +267,7 @@ impl FreeBsdCapsicumCasperCapDnsPrEngine {
         Self { dns_delegates }
     }
 
-    pub fn configure_cap_dns(
-        &mut self,
-        sandbox: &str,
-        dnssec: bool,
-        doh: bool,
-    ) -> String {
+    pub fn configure_cap_dns(&mut self, sandbox: &str, dnssec: bool, doh: bool) -> String {
         let spec = CasperDnsSpec {
             sandbox_name: sandbox.to_string(),
             allowed_family: "AF_INET_AND_INET6".to_string(),
@@ -400,12 +390,7 @@ impl FreeBsdAuditdistdSpoolZstdCompressedPrEngine {
         Self { zstd_streams }
     }
 
-    pub fn attach_zstd_stream(
-        &mut self,
-        stream_id: &str,
-        level: i32,
-        host: &str,
-    ) -> String {
+    pub fn attach_zstd_stream(&mut self, stream_id: &str, level: i32, host: &str) -> String {
         let spec = AuditdistdZstdSpec {
             stream_id: stream_id.to_string(),
             zstd_compression_level: level,
@@ -628,7 +613,8 @@ impl FreeBsdFreebsdUpdateDilithium5PqcPackageSignerEngine {
             "16.0-CURRENT-2026".to_string(),
             Dilithium5UpdateSpec {
                 release_tag: "16.0-CURRENT-2026".to_string(),
-                manifest_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+                manifest_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                    .to_string(),
                 dilithium5_pubkey_hash: "dilithium5:fb9a72b10cd8324e65".to_string(),
                 signature_authenticated: true,
                 timestamp_sec: 1775000000,
@@ -737,11 +723,9 @@ impl FreeBsdMissingComponentsV70PrSuite {
     }
 
     pub fn evaluate_freebsd_v70_parity(&mut self) -> bool {
-        let gpu_diff = self.virtio_gpu_vulkan.attach_vulkan_compute(
-            "vm_ai_runner",
-            7,
-            "1.3.280",
-        );
+        let gpu_diff = self
+            .virtio_gpu_vulkan
+            .attach_vulkan_compute("vm_ai_runner", 7, "1.3.280");
         let pr1 = self.submit_pr_proposal(
             "Virtio-GPU Vulkan compute passthrough and virglrenderer acceleration",
             "jules",
@@ -751,12 +735,9 @@ impl FreeBsdMissingComponentsV70PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let direct_io_diff = self.arc_direct_io.configure_direct_io(
-            "zroot",
-            "zroot/postgresql",
-            2097152,
-            "zstd-3",
-        );
+        let direct_io_diff =
+            self.arc_direct_io
+                .configure_direct_io("zroot", "zroot/postgresql", 2097152, "zstd-3");
         let pr2 = self.submit_pr_proposal(
             "OpenZFS 2.4+ Compressed ARC Direct-IO Bypass with Persistent L2ARC",
             "jules",
@@ -766,11 +747,9 @@ impl FreeBsdMissingComponentsV70PrSuite {
         );
         self.validate_and_merge_pr(pr2);
 
-        let wg_diff = self.wireguard_kmod.configure_wireguard_interface(
-            "wg1",
-            51821,
-            "ml-kem-1024",
-        );
+        let wg_diff =
+            self.wireguard_kmod
+                .configure_wireguard_interface("wg1", 51821, "ml-kem-1024");
         let pr3 = self.submit_pr_proposal(
             "In-kernel Wireguard wg(4) hardware crypto-offload with ML-KEM-1024",
             "jules",
@@ -780,7 +759,9 @@ impl FreeBsdMissingComponentsV70PrSuite {
         );
         self.validate_and_merge_pr(pr3);
 
-        let chk_diff = self.zfs_checkpoint.create_upgrade_checkpoint("zroot", "pre_upgrade");
+        let chk_diff = self
+            .zfs_checkpoint
+            .create_upgrade_checkpoint("zroot", "pre_upgrade");
         let pr4 = self.submit_pr_proposal(
             "ZFS Checkpoint Disaster Recovery Rollback for pkgbase upgrades",
             "jules",
@@ -862,10 +843,13 @@ mod tests {
         let mut kinst = FreeBsdDtraceKinstBranchTracingPrEngine::new();
         let diff4 = kinst.trace_kernel_branches("sched_switch", "branch_taken");
         assert!(diff4.contains("kinst::sched_switch:branch"));
-        assert!(kinst.branch_probes.contains_key("kinst::sched_switch:branch"));
+        assert!(kinst
+            .branch_probes
+            .contains_key("kinst::sched_switch:branch"));
 
         let mut updater = FreeBsdFreebsdUpdateDilithium5PqcPackageSignerEngine::new();
-        let diff5 = updater.sign_and_verify_package_manifest("16.0-CURRENT", "hash_abc", "pubkey_xyz");
+        let diff5 =
+            updater.sign_and_verify_package_manifest("16.0-CURRENT", "hash_abc", "pubkey_xyz");
         assert!(diff5.contains("--verify-dilithium5"));
         assert!(updater.signature_registry.contains_key("16.0-CURRENT"));
     }

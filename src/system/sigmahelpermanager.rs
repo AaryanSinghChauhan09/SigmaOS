@@ -45,7 +45,10 @@ impl SigmaHelperManager {
         let q_lower = query.to_lowercase();
         self.helpers
             .iter()
-            .filter(|h| h.name.to_lowercase().contains(&q_lower) || h.description.to_lowercase().contains(&q_lower))
+            .filter(|h| {
+                h.name.to_lowercase().contains(&q_lower)
+                    || h.description.to_lowercase().contains(&q_lower)
+            })
             .collect()
     }
 }

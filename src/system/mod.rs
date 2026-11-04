@@ -561,8 +561,8 @@ pub use sigmalight::{
     LightType, LightingScene, SigmaLight,
 };
 pub use sigmalogrotate::{
-    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig as SigmaLogFileConfig,
-    SigmaLogRotate,
+    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod,
+    LogFileConfig as SigmaLogFileConfig, SigmaLogRotate,
 };
 pub use sigmalvm::{
     create_volume_group, get_sigmalvm, init_sigmalvm, LVState, LogicalVolume, PVState,
@@ -925,6 +925,10 @@ pub mod sovereign_init_and_supervisor_advancements_v88_pr;
 pub use sovereign_init_and_supervisor_advancements_v88_pr::*;
 pub mod sovereign_init_and_supervisor_advancements_v89_pr;
 pub use sovereign_init_and_supervisor_advancements_v89_pr::*;
+pub mod sovereign_init_and_supervisor_advancements_v90_pr;
+pub use sovereign_init_and_supervisor_advancements_v90_pr::*;
+pub mod sovereign_init_and_supervisor_advancements_v92_pr;
+pub use sovereign_init_and_supervisor_advancements_v92_pr::*;
 
 pub mod sovereign_init_and_supervisor_advancements_v67;
 pub use sovereign_init_and_supervisor_advancements_v67::*;

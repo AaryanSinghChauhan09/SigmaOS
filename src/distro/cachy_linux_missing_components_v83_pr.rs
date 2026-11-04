@@ -95,8 +95,11 @@ impl CachyOsScxCentralLavdV9SchedulerPrEngine {
             title: "feat(cachyos): SCX_CENTRAL LAVD v9 Real-Time eBPF Scheduler".to_string(),
             component_id: "cachyos-scx-central-lavd-v9-scheduler".to_string(),
             status: CachyOsPrStatusV83::Active,
-            patch_description: "SCX_CENTRAL LAVD v9 scheduler optimizing L3 cache and core topology v83.".to_string(),
-            diff_summary: "diff --git a/kernel/sched/scx_lavd_v9.c b/kernel/sched/scx_lavd_v9.c".to_string(),
+            patch_description:
+                "SCX_CENTRAL LAVD v9 scheduler optimizing L3 cache and core topology v83."
+                    .to_string(),
+            diff_summary: "diff --git a/kernel/sched/scx_lavd_v9.c b/kernel/sched/scx_lavd_v9.c"
+                .to_string(),
         }
     }
 }
@@ -130,11 +133,14 @@ impl CachyOsKernelAutoBoltPgoV9PipelinePrEngine {
     pub fn generate_manifest(&self) -> CachyOsPrManifestV83 {
         CachyOsPrManifestV83 {
             pr_number: 8302,
-            title: "feat(cachyos): LLVM BOLT v9 + PGO Tri-Stage Kernel Optimization Pipeline".to_string(),
+            title: "feat(cachyos): LLVM BOLT v9 + PGO Tri-Stage Kernel Optimization Pipeline"
+                .to_string(),
             component_id: "cachyos-kernel-autobolt-pgo-v9-pipeline".to_string(),
             status: CachyOsPrStatusV83::Active,
-            patch_description: "Automated BOLT v9 profile-guided optimization pipeline.".to_string(),
-            diff_summary: "diff --git a/scripts/bolt_pgo_v9.sh b/scripts/bolt_pgo_v9.sh".to_string(),
+            patch_description: "Automated BOLT v9 profile-guided optimization pipeline."
+                .to_string(),
+            diff_summary: "diff --git a/scripts/bolt_pgo_v9.sh b/scripts/bolt_pgo_v9.sh"
+                .to_string(),
         }
     }
 }
@@ -162,17 +168,24 @@ impl CachyOsChwdVulkanWaylandDirectScanoutV9Engine {
 
     pub fn bypass_compositor(&mut self, surface_id: u32) -> String {
         self.direct_scanout_active = true;
-        format!("CHWD v9: Direct KMS scanout active for Wayland surface {}", surface_id)
+        format!(
+            "CHWD v9: Direct KMS scanout active for Wayland surface {}",
+            surface_id
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV83 {
         CachyOsPrManifestV83 {
             pr_number: 8303,
-            title: "feat(cachyos): CHWD Wayland Explicit Sync v9 Direct Scanout Manager".to_string(),
+            title: "feat(cachyos): CHWD Wayland Explicit Sync v9 Direct Scanout Manager"
+                .to_string(),
             component_id: "cachyos-chwd-vulkan-wayland-direct-scanout-v9".to_string(),
             status: CachyOsPrStatusV83::Active,
-            patch_description: "KMS overlay bypass for zero-latency Vulkan presentation on Wayland v9.".to_string(),
-            diff_summary: "diff --git a/drivers/gpu/drm/chwd_scanout_v9.c b/drivers/gpu/drm/chwd_scanout_v9.c".to_string(),
+            patch_description:
+                "KMS overlay bypass for zero-latency Vulkan presentation on Wayland v9.".to_string(),
+            diff_summary:
+                "diff --git a/drivers/gpu/drm/chwd_scanout_v9.c b/drivers/gpu/drm/chwd_scanout_v9.c"
+                    .to_string(),
         }
     }
 }
@@ -205,11 +218,14 @@ impl CachyOsPacmanV9PqcDilithiumVerifierEngine {
     pub fn generate_manifest(&self) -> CachyOsPrManifestV83 {
         CachyOsPrManifestV83 {
             pr_number: 8304,
-            title: "feat(cachyos): Pacman x86-64-v4 PQC ML-DSA-87/Dilithium5 Verifier v9".to_string(),
+            title: "feat(cachyos): Pacman x86-64-v4 PQC ML-DSA-87/Dilithium5 Verifier v9"
+                .to_string(),
             component_id: "cachyos-pacman-v9-pqc-dilithium-verifier".to_string(),
             status: CachyOsPrStatusV83::Active,
-            patch_description: "Post-quantum cryptographic package verification using AVX-512 v83.".to_string(),
-            diff_summary: "diff --git a/libalpm/pqc_dilithium_v9.c b/libalpm/pqc_dilithium_v9.c".to_string(),
+            patch_description: "Post-quantum cryptographic package verification using AVX-512 v83."
+                .to_string(),
+            diff_summary: "diff --git a/libalpm/pqc_dilithium_v9.c b/libalpm/pqc_dilithium_v9.c"
+                .to_string(),
         }
     }
 }
@@ -236,7 +252,10 @@ impl CachyOsProtonWineNtsyncFsync9GovernorEngine {
     }
 
     pub fn synchronize_win32_handles(&mut self, count: u32) -> String {
-        format!("Fsync9/NTSync v9: Synchronized {} Win32 handles in kernelspace", count)
+        format!(
+            "Fsync9/NTSync v9: Synchronized {} Win32 handles in kernelspace",
+            count
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV83 {
@@ -246,7 +265,8 @@ impl CachyOsProtonWineNtsyncFsync9GovernorEngine {
             component_id: "cachyos-proton-wine-ntsync-fsync9-governor".to_string(),
             status: CachyOsPrStatusV83::Active,
             patch_description: "In-kernel Win32 synchronization primitive governor v9.".to_string(),
-            diff_summary: "diff --git a/drivers/misc/ntsync_v9.c b/drivers/misc/ntsync_v9.c".to_string(),
+            diff_summary: "diff --git a/drivers/misc/ntsync_v9.c b/drivers/misc/ntsync_v9.c"
+                .to_string(),
         }
     }
 }
@@ -274,17 +294,24 @@ impl CachyOsAnanicyRealtimeEbpfV9GovernorEngine {
 
     pub fn classify_process(&mut self, comm: &str, pid: u32) -> String {
         self.cgroups_v2_classified += 1;
-        format!("Ananicy-cpp v9: Process {} (PID {}) granted SCHED_RR priority", comm, pid)
+        format!(
+            "Ananicy-cpp v9: Process {} (PID {}) granted SCHED_RR priority",
+            comm, pid
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV83 {
         CachyOsPrManifestV83 {
             pr_number: 8306,
-            title: "feat(cachyos): Ananicy-cpp Real-Time eBPF v9 Process Classifier Governor".to_string(),
+            title: "feat(cachyos): Ananicy-cpp Real-Time eBPF v9 Process Classifier Governor"
+                .to_string(),
             component_id: "cachyos-ananicy-realtime-ebpf-v9-governor".to_string(),
             status: CachyOsPrStatusV83::Active,
-            patch_description: "eBPF process rules classifier adjusting cgroups v2 weights v9.".to_string(),
-            diff_summary: "diff --git a/ananicy/ebpf_classifier_v9.c b/ananicy/ebpf_classifier_v9.c".to_string(),
+            patch_description: "eBPF process rules classifier adjusting cgroups v2 weights v9."
+                .to_string(),
+            diff_summary:
+                "diff --git a/ananicy/ebpf_classifier_v9.c b/ananicy/ebpf_classifier_v9.c"
+                    .to_string(),
         }
     }
 }
@@ -325,8 +352,10 @@ impl CachyOsBtrfsZstdEbpfCompressorV9TunerEngine {
             title: "feat(cachyos): Btrfs eBPF Adaptive ZSTD Compression Tuner v9".to_string(),
             component_id: "cachyos-btrfs-zstd-ebpf-compressor-v9-tuner".to_string(),
             status: CachyOsPrStatusV83::Active,
-            patch_description: "Adaptive ZSTD compression tuner guided by live IOPS telemetry v9.".to_string(),
-            diff_summary: "diff --git a/fs/btrfs/zstd_ebpf_v9.c b/fs/btrfs/zstd_ebpf_v9.c".to_string(),
+            patch_description: "Adaptive ZSTD compression tuner guided by live IOPS telemetry v9."
+                .to_string(),
+            diff_summary: "diff --git a/fs/btrfs/zstd_ebpf_v9.c b/fs/btrfs/zstd_ebpf_v9.c"
+                .to_string(),
         }
     }
 }
@@ -365,8 +394,11 @@ impl CachyOsGamescopeHdr10VrrPassthroughPacerV9Engine {
             title: "feat(cachyos): Gamescope HDR10/VRR Frame Presentation Pacer v9".to_string(),
             component_id: "cachyos-gamescope-hdr10-vrr-passthrough-pacer-v9".to_string(),
             status: CachyOsPrStatusV83::Active,
-            patch_description: "Sub-millisecond frame pacing with wide color gamut HDR10 passthrough v9.".to_string(),
-            diff_summary: "diff --git a/src/gamescope_pacer_v9.cpp b/src/gamescope_pacer_v9.cpp".to_string(),
+            patch_description:
+                "Sub-millisecond frame pacing with wide color gamut HDR10 passthrough v9."
+                    .to_string(),
+            diff_summary: "diff --git a/src/gamescope_pacer_v9.cpp b/src/gamescope_pacer_v9.cpp"
+                .to_string(),
         }
     }
 }
@@ -402,8 +434,11 @@ impl CachyOsZramLz4ZstdDynamicPoolV9Engine {
             title: "feat(cachyos): ZRAM Dual-Tier LZ4/ZSTD Dynamic Pool v9".to_string(),
             component_id: "cachyos-zram-lz4-zstd-dynamic-pool-v9".to_string(),
             status: CachyOsPrStatusV83::Active,
-            patch_description: "Tiered ZRAM swap pool dynamically switching between LZ4 and ZSTD v9.".to_string(),
-            diff_summary: "diff --git a/drivers/block/zram/zram_pool_v9.c b/drivers/block/zram/zram_pool_v9.c".to_string(),
+            patch_description:
+                "Tiered ZRAM swap pool dynamically switching between LZ4 and ZSTD v9.".to_string(),
+            diff_summary:
+                "diff --git a/drivers/block/zram/zram_pool_v9.c b/drivers/block/zram/zram_pool_v9.c"
+                    .to_string(),
         }
     }
 }
@@ -431,7 +466,10 @@ impl CachyOsHandheldPowerCapThermalV9GovernorEngine {
 
     pub fn set_tdp_cap(&mut self, watts: u32) -> String {
         self.tdp_watts = watts;
-        format!("Handheld Governor v9: Hardware TDP capped at {} Watts", watts)
+        format!(
+            "Handheld Governor v9: Hardware TDP capped at {} Watts",
+            watts
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV83 {
@@ -500,7 +538,10 @@ impl CachyLinuxMissingComponentsV83PrSuite {
 
     pub fn generate_suite_summary(&self) -> BTreeMap<String, String> {
         let mut summary = BTreeMap::new();
-        summary.insert("suite".to_string(), "CachyLinuxMissingComponentsV83PrSuite".to_string());
+        summary.insert(
+            "suite".to_string(),
+            "CachyLinuxMissingComponentsV83PrSuite".to_string(),
+        );
         summary.insert("total_components".to_string(), "10".to_string());
         summary.insert("release_parity".to_string(), "v83.0".to_string());
         summary.insert("gaming_optimizations".to_string(), "Active".to_string());

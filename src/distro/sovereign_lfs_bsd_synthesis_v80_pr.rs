@@ -119,15 +119,21 @@ impl Lfs122ToolchainCrossCompilerEngineV80 {
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV80 {
         LfsBsdPrProposalV80 {
             pr_id: 4071,
-            title: "feat(lfs): LFS 12.2 Cross-Toolchain Bootstrapping & Headers Engine V80".to_string(),
+            title: "feat(lfs): LFS 12.2 Cross-Toolchain Bootstrapping & Headers Engine V80"
+                .to_string(),
             component_name: "sigmaos-lfs122-cross-toolchain-v80".to_string(),
             distro_origin: "Linux From Scratch 12.2".to_string(),
             status: LfsBsdPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::CompilerToolchain.as_str().to_string(),
-                UniversalSubsystemCategory::PackageManagement.as_str().to_string(),
+                UniversalSubsystemCategory::CompilerToolchain
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::PackageManagement
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/lfs/toolchain_v80.rs b/sys/lfs/toolchain_v80.rs".to_string(),
+            patch_diff: "diff --git a/sys/lfs/toolchain_v80.rs b/sys/lfs/toolchain_v80.rs"
+                .to_string(),
         }
     }
 }
@@ -236,15 +242,21 @@ impl Blfs122BuildDependencySchedulerEngineV80 {
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV80 {
         LfsBsdPrProposalV80 {
             pr_id: 4072,
-            title: "feat(blfs): BLFS 12.2 Build Dependency DAG Scheduler & DESTDIR Staging V80".to_string(),
+            title: "feat(blfs): BLFS 12.2 Build Dependency DAG Scheduler & DESTDIR Staging V80"
+                .to_string(),
             component_name: "sigmaos-blfs122-dag-scheduler-v80".to_string(),
             distro_origin: "Beyond Linux From Scratch 12.2".to_string(),
             status: LfsBsdPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::AutomationProvisioning.as_str().to_string(),
-                UniversalSubsystemCategory::PackageManagement.as_str().to_string(),
+                UniversalSubsystemCategory::AutomationProvisioning
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::PackageManagement
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/blfs/scheduler_v80.rs b/sys/blfs/scheduler_v80.rs".to_string(),
+            patch_diff: "diff --git a/sys/blfs/scheduler_v80.rs b/sys/blfs/scheduler_v80.rs"
+                .to_string(),
         }
     }
 }
@@ -318,7 +330,12 @@ impl OpenBsd77PledgeUnveilFineIbtSentinelEngineV80 {
         Self {
             pinsyscall_active: true,
             fine_ibt_cfi_enabled: true,
-            pledge_promises: vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string(), "inet".to_string()],
+            pledge_promises: vec![
+                "stdio".to_string(),
+                "rpath".to_string(),
+                "wpath".to_string(),
+                "inet".to_string(),
+            ],
         }
     }
 
@@ -329,15 +346,23 @@ impl OpenBsd77PledgeUnveilFineIbtSentinelEngineV80 {
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV80 {
         LfsBsdPrProposalV80 {
             pr_id: 4074,
-            title: "feat(openbsd): OpenBSD 7.7+ Pinsyscall, FineIBT Callsite CFI & Pledge/Unveil V80".to_string(),
+            title:
+                "feat(openbsd): OpenBSD 7.7+ Pinsyscall, FineIBT Callsite CFI & Pledge/Unveil V80"
+                    .to_string(),
             component_name: "sigmaos-openbsd77-fineibt-pledge-v80".to_string(),
             distro_origin: "OpenBSD 7.7+".to_string(),
             status: LfsBsdPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::SecuritySandboxing.as_str().to_string(),
-                UniversalSubsystemCategory::KernelScheduling.as_str().to_string(),
+                UniversalSubsystemCategory::SecuritySandboxing
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::KernelScheduling
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/openbsd/fineibt_pledge_v80.rs b/sys/openbsd/fineibt_pledge_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/openbsd/fineibt_pledge_v80.rs b/sys/openbsd/fineibt_pledge_v80.rs"
+                    .to_string(),
         }
     }
 }
@@ -363,7 +388,11 @@ impl DragonFly70Hammer2MultiMasterReplicationEngineV80 {
     pub fn new() -> Self {
         Self {
             hammer2_pfs_active: true,
-            multi_master_peers: vec!["node-alpha".to_string(), "node-beta".to_string(), "node-gamma".to_string()],
+            multi_master_peers: vec![
+                "node-alpha".to_string(),
+                "node-beta".to_string(),
+                "node-gamma".to_string(),
+            ],
             snapshot_txg_count: 2048,
         }
     }
@@ -418,21 +447,30 @@ impl NetBsd100RumpVeriexecDriverEngineV80 {
     }
 
     pub fn verify_and_dispatch_rump_driver(&self, driver_id: u32) -> bool {
-        self.rump_hypercall_active && self.veriexec_signature_audited && driver_id <= self.driver_count
+        self.rump_hypercall_active
+            && self.veriexec_signature_audited
+            && driver_id <= self.driver_count
     }
 
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV80 {
         LfsBsdPrProposalV80 {
             pr_id: 4076,
-            title: "feat(netbsd): NetBSD 10.0+ Rump Kernel Userland Drivers & Veriexec V80".to_string(),
+            title: "feat(netbsd): NetBSD 10.0+ Rump Kernel Userland Drivers & Veriexec V80"
+                .to_string(),
             component_name: "sigmaos-netbsd100-rump-veriexec-v80".to_string(),
             distro_origin: "NetBSD 10.0+".to_string(),
             status: LfsBsdPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::DriversHardware.as_str().to_string(),
-                UniversalSubsystemCategory::VirtualizationHypervisor.as_str().to_string(),
+                UniversalSubsystemCategory::DriversHardware
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::VirtualizationHypervisor
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/netbsd/rump_veriexec_v80.rs b/sys/netbsd/rump_veriexec_v80.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/netbsd/rump_veriexec_v80.rs b/sys/netbsd/rump_veriexec_v80.rs"
+                    .to_string(),
         }
     }
 }
@@ -521,15 +559,21 @@ impl BsdLinuxCrossAbiSyscallTranslatorEngineV80 {
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV80 {
         LfsBsdPrProposalV80 {
             pr_id: 4077,
-            title: "feat(abi): Universal Linux & BSD Cross-ABI Syscall & VFS Path Translator V80".to_string(),
+            title: "feat(abi): Universal Linux & BSD Cross-ABI Syscall & VFS Path Translator V80"
+                .to_string(),
             component_name: "sigmaos-cross-abi-translator-v80".to_string(),
             distro_origin: "Universal Linux & BSD Ecosystem".to_string(),
             status: LfsBsdPrStatusV80::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::ProcessActivity.as_str().to_string(),
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
+                UniversalSubsystemCategory::ProcessActivity
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::FilesystemStorage
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/abi/cross_abi_v80.rs b/sys/abi/cross_abi_v80.rs".to_string(),
+            patch_diff: "diff --git a/sys/abi/cross_abi_v80.rs b/sys/abi/cross_abi_v80.rs"
+                .to_string(),
         }
     }
 }
@@ -579,15 +623,20 @@ impl SovereignLfsBsdV80PrGateway {
             self.cross_abi.generate_manifest(),
             LfsBsdPrProposalV80 {
                 pr_id: 4078,
-                title: "feat(gateway): Sovereign LFS & BSD Master Synthesis V80 Gateway Orchestrator".to_string(),
+                title:
+                    "feat(gateway): Sovereign LFS & BSD Master Synthesis V80 Gateway Orchestrator"
+                        .to_string(),
                 component_name: "sigmaos-lfs-bsd-master-gateway-v80".to_string(),
                 distro_origin: "Sovereign OS Core".to_string(),
                 status: LfsBsdPrStatusV80::Validated,
                 impacted_subsystems: vec![
                     UniversalSubsystemCategory::SystemAudit.as_str().to_string(),
-                    UniversalSubsystemCategory::ObservabilityDiagnostics.as_str().to_string(),
+                    UniversalSubsystemCategory::ObservabilityDiagnostics
+                        .as_str()
+                        .to_string(),
                 ],
-                patch_diff: "diff --git a/sys/gateway/lfs_bsd_v80.rs b/sys/gateway/lfs_bsd_v80.rs".to_string(),
+                patch_diff: "diff --git a/sys/gateway/lfs_bsd_v80.rs b/sys/gateway/lfs_bsd_v80.rs"
+                    .to_string(),
             },
         ]
     }

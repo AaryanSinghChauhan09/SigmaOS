@@ -174,7 +174,11 @@ impl LibvirtDomainV66Engine {
     }
 
     pub fn create_snapshot(&mut self, domain_name: &str, snapshot_name: &str) -> String {
-        if let Some(dom) = self.domains.iter_mut().find(|d| d.domain_name == domain_name) {
+        if let Some(dom) = self
+            .domains
+            .iter_mut()
+            .find(|d| d.domain_name == domain_name)
+        {
             dom.snapshots_count += 1;
             format!("virsh snapshot-create-as {} {}", domain_name, snapshot_name)
         } else {
@@ -936,7 +940,8 @@ mod tests {
         assert_eq!(spec.vcpus, 4);
         assert_eq!(spec.confidential_mode, ConfidentialModeV66::AmdSevSnp);
         assert_eq!(spec.vfio_iommu_group, 12);
-        let backing_cmd = engine.format_qemu_img_backing_cmd("/tmp/base.qcow2", "/tmp/disk.qcow2", 20);
+        let backing_cmd =
+            engine.format_qemu_img_backing_cmd("/tmp/base.qcow2", "/tmp/disk.qcow2", 20);
         assert!(backing_cmd.contains("qemu-img create -f qcow2 -b"));
         let manifest = engine.generate_pr_manifest();
         assert_eq!(manifest.pr_id, 4060);

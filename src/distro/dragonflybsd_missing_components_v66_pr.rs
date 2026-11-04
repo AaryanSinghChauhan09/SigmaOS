@@ -555,9 +555,12 @@ impl DragonFlyBsdMissingComponentsV66PrSuite {
             pr_id: 6605,
             title: "VFS Variant Symlinks Per-Jail Namespace Isolation Governor V66".to_string(),
             target_component: "vfs/varsyms".to_string(),
-            description: "Jail-isolated variant symlink pattern expansion and path resolution.".to_string(),
+            description: "Jail-isolated variant symlink pattern expansion and path resolution."
+                .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/varsyms_ns.rs\n+++ b/vfs/varsyms_ns.rs\n+ pub fn expand_symlink_path()".to_string(),
+            unified_diff:
+                "--- a/vfs/varsyms_ns.rs\n+++ b/vfs/varsyms_ns.rs\n+ pub fn expand_symlink_path()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV66 {
@@ -573,9 +576,12 @@ impl DragonFlyBsdMissingComponentsV66PrSuite {
             pr_id: 6607,
             title: "Lockless Per-CPU Hash Namecache Concurrent Lookup Engine V66".to_string(),
             target_component: "vfs/namecache".to_string(),
-            description: "Per-CPU lockless bucket lookups for high-throughput VFS path evaluation.".to_string(),
+            description: "Per-CPU lockless bucket lookups for high-throughput VFS path evaluation."
+                .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/namecache_cpu.rs\n+++ b/vfs/namecache_cpu.rs\n+ pub fn lookup_vnode()".to_string(),
+            unified_diff:
+                "--- a/vfs/namecache_cpu.rs\n+++ b/vfs/namecache_cpu.rs\n+ pub fn lookup_vnode()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV66 {
@@ -677,7 +683,10 @@ mod tests {
 
         let mut devctl = DragonFlyDevctlKqueueHotplugRouterV66PrEngine::new();
         devctl.register_binding("nvme", "nvme_driver");
-        assert_eq!(devctl.resolve_driver_for_event("nvme"), Some("nvme_driver".to_string()));
+        assert_eq!(
+            devctl.resolve_driver_for_event("nvme"),
+            Some("nvme_driver".to_string())
+        );
 
         let mut fl = DragonFlyFirmlinkMountNsGuardV66PrEngine::new();
         fl.register_ns_limit(10, 500);

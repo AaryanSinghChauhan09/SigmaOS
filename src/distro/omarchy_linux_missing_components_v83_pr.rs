@@ -79,16 +79,21 @@ impl OmarchyHyprlandCompositorLayoutEngineV83 {
 
     pub fn set_layout(&mut self, mode: &str) -> String {
         self.layout_mode = mode.to_string();
-        format!("Omarchy Hyprland V83: Switched tiling layout mode to '{}'", mode)
+        format!(
+            "Omarchy Hyprland V83: Switched tiling layout mode to '{}'",
+            mode
+        )
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8301,
-            title: "feat(desktop): Hyprland Dynamic Tiling Layouts & Touch Gesture Router V83".to_string(),
+            title: "feat(desktop): Hyprland Dynamic Tiling Layouts & Touch Gesture Router V83"
+                .to_string(),
             target_component: "hyprland-compositor".to_string(),
             status: OmarchyPrStatusV83::Validated,
-            diff_patch: "diff --git a/desktop/hyprland_v83.rs b/desktop/hyprland_v83.rs".to_string(),
+            diff_patch: "diff --git a/desktop/hyprland_v83.rs b/desktop/hyprland_v83.rs"
+                .to_string(),
         }
     }
 }
@@ -118,7 +123,10 @@ impl OmarchyWaybarStatusHudEngineV83 {
     }
 
     pub fn reload_theme_css(&self, css_path: &str) -> String {
-        format!("Omarchy Waybar V83: Reloaded style sheet from '{}' across {} modules", css_path, self.module_count)
+        format!(
+            "Omarchy Waybar V83: Reloaded style sheet from '{}' across {} modules",
+            css_path, self.module_count
+        )
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
@@ -161,16 +169,21 @@ impl OmarchyGhosttyPtyTerminalEngineV83 {
     pub fn tune_font(&mut self, family: &str, size_pt: f32) -> String {
         self.font_family = family.to_string();
         self.font_size_pt = size_pt;
-        format!("Omarchy Ghostty V83: Set terminal font to '{}' at {:.1}pt", family, size_pt)
+        format!(
+            "Omarchy Ghostty V83: Set terminal font to '{}' at {:.1}pt",
+            family, size_pt
+        )
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8303,
-            title: "feat(terminal): Ghostty PTY GPU Terminal Tuner & Profile Switcher V83".to_string(),
+            title: "feat(terminal): Ghostty PTY GPU Terminal Tuner & Profile Switcher V83"
+                .to_string(),
             target_component: "ghostty-pty".to_string(),
             status: OmarchyPrStatusV83::Validated,
-            diff_patch: "diff --git a/terminal/ghostty_v83.rs b/terminal/ghostty_v83.rs".to_string(),
+            diff_patch: "diff --git a/terminal/ghostty_v83.rs b/terminal/ghostty_v83.rs"
+                .to_string(),
         }
     }
 }
@@ -200,13 +213,18 @@ impl OmarchyWalkerLauncherEngineV83 {
     }
 
     pub fn search_query(&self, query: &str) -> String {
-        format!("Omarchy Walker V83: Fuzzy query '{}' returned results across {} cliphist entries", query, self.cliphist_clipboard_indexed_items)
+        format!(
+            "Omarchy Walker V83: Fuzzy query '{}' returned results across {} cliphist entries",
+            query, self.cliphist_clipboard_indexed_items
+        )
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8304,
-            title: "feat(launcher): Walker Application Launcher & Cliphist Clipboard Integrator V83".to_string(),
+            title:
+                "feat(launcher): Walker Application Launcher & Cliphist Clipboard Integrator V83"
+                    .to_string(),
             target_component: "walker-launcher".to_string(),
             status: OmarchyPrStatusV83::Validated,
             diff_patch: "diff --git a/launcher/walker_v83.rs b/launcher/walker_v83.rs".to_string(),
@@ -241,13 +259,17 @@ impl OmarchyWallustThemeSyncEngineV83 {
     pub fn sync_wallpaper_and_palette(&mut self, wallpaper: &str, palette: &str) -> String {
         self.swww_wallpaper_path = wallpaper.to_string();
         self.current_palette_name = palette.to_string();
-        format!("Omarchy Wallust V83: Applied palette '{}' with SWWW wallpaper '{}'", palette, wallpaper)
+        format!(
+            "Omarchy Wallust V83: Applied palette '{}' with SWWW wallpaper '{}'",
+            palette, wallpaper
+        )
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8305,
-            title: "feat(theme): Wallust Palette Swapper & SWWW Live Theme Generator V83".to_string(),
+            title: "feat(theme): Wallust Palette Swapper & SWWW Live Theme Generator V83"
+                .to_string(),
             target_component: "wallust-theme-sync".to_string(),
             status: OmarchyPrStatusV83::Validated,
             diff_patch: "diff --git a/theme/wallust_v83.rs b/theme/wallust_v83.rs".to_string(),
@@ -281,16 +303,21 @@ impl OmarchyHyprlockPamSecurityEngineV83 {
 
     pub fn set_idle_timeout(&mut self, seconds: u32) -> String {
         self.hypridle_timeout_seconds = seconds;
-        format!("Omarchy Hyprlock V83: Configured Hypridle lock timeout to {}s", seconds)
+        format!(
+            "Omarchy Hyprlock V83: Configured Hypridle lock timeout to {}s",
+            seconds
+        )
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8306,
-            title: "feat(security): Hyprlock PAM Biometric Lock & Hypridle Power Governor V83".to_string(),
+            title: "feat(security): Hyprlock PAM Biometric Lock & Hypridle Power Governor V83"
+                .to_string(),
             target_component: "hyprlock-security".to_string(),
             status: OmarchyPrStatusV83::Validated,
-            diff_patch: "diff --git a/security/hyprlock_v83.rs b/security/hyprlock_v83.rs".to_string(),
+            diff_patch: "diff --git a/security/hyprlock_v83.rs b/security/hyprlock_v83.rs"
+                .to_string(),
         }
     }
 }
@@ -327,10 +354,12 @@ impl OmarchyAnanicyGameModeEngineV83 {
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8307,
-            title: "feat(performance): Ananicy-cpp eBPF Auto-Nice & GameMode Governor V83".to_string(),
+            title: "feat(performance): Ananicy-cpp eBPF Auto-Nice & GameMode Governor V83"
+                .to_string(),
             target_component: "ananicy-gamemode".to_string(),
             status: OmarchyPrStatusV83::Validated,
-            diff_patch: "diff --git a/performance/ananicy_v83.rs b/performance/ananicy_v83.rs".to_string(),
+            diff_patch: "diff --git a/performance/ananicy_v83.rs b/performance/ananicy_v83.rs"
+                .to_string(),
         }
     }
 }
@@ -360,13 +389,17 @@ impl OmarchyHerdrAiSchedulerEngineV83 {
     }
 
     pub fn trigger_ai_agent_workflow(&self, prompt: &str) -> String {
-        format!("Omarchy Herdr AI V83: Executed workflow for prompt ('{}') with Quickshell HUD overlay", prompt)
+        format!(
+            "Omarchy Herdr AI V83: Executed workflow for prompt ('{}') with Quickshell HUD overlay",
+            prompt
+        )
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8308,
-            title: "feat(ai): Herdr AI Workflow Scheduler & Quickshell QML HUD Overlay V83".to_string(),
+            title: "feat(ai): Herdr AI Workflow Scheduler & Quickshell QML HUD Overlay V83"
+                .to_string(),
             target_component: "herdr-ai-scheduler".to_string(),
             status: OmarchyPrStatusV83::Validated,
             diff_patch: "diff --git a/ai/herdr_v83.rs b/ai/herdr_v83.rs".to_string(),
@@ -405,10 +438,12 @@ impl OmarchyFailClosedSudoPrivilegeShieldEngineV83 {
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8309,
-            title: "feat(privilege): Fail-Closed Privilege Elevation Shield & Sudo Gate V83".to_string(),
+            title: "feat(privilege): Fail-Closed Privilege Elevation Shield & Sudo Gate V83"
+                .to_string(),
             target_component: "sudo-privilege-shield".to_string(),
             status: OmarchyPrStatusV83::Validated,
-            diff_patch: "diff --git a/security/sudo_shield_v83.rs b/security/sudo_shield_v83.rs".to_string(),
+            diff_patch: "diff --git a/security/sudo_shield_v83.rs b/security/sudo_shield_v83.rs"
+                .to_string(),
         }
     }
 }
@@ -440,16 +475,21 @@ impl OmarchyWallustChordThemeNavigatorEngineV83 {
     }
 
     pub fn trigger_chord_action(&self, chord: &str) -> String {
-        format!("Omarchy Wallust Chord Navigator V83: Triggered action for chord ('{}')", chord)
+        format!(
+            "Omarchy Wallust Chord Navigator V83: Triggered action for chord ('{}')",
+            chord
+        )
     }
 
     pub fn generate_pr(&self) -> OmarchyPrRecordV83 {
         OmarchyPrRecordV83 {
             pr_id: 8310,
-            title: "feat(desktop): Wallust Chord Shortcuts & SWWW Dynamic Theme Switcher V83".to_string(),
+            title: "feat(desktop): Wallust Chord Shortcuts & SWWW Dynamic Theme Switcher V83"
+                .to_string(),
             target_component: "wallust-chord-navigator".to_string(),
             status: OmarchyPrStatusV83::Validated,
-            diff_patch: "diff --git a/desktop/wallust_chord_v83.rs b/desktop/wallust_chord_v83.rs".to_string(),
+            diff_patch: "diff --git a/desktop/wallust_chord_v83.rs b/desktop/wallust_chord_v83.rs"
+                .to_string(),
         }
     }
 }
@@ -538,7 +578,9 @@ mod tests {
         assert!(hyprland.set_layout("master").contains("master"));
 
         let waybar = OmarchyWaybarStatusHudEngineV83::new();
-        assert!(waybar.reload_theme_css("/etc/waybar/style.css").contains("style.css"));
+        assert!(waybar
+            .reload_theme_css("/etc/waybar/style.css")
+            .contains("style.css"));
 
         let mut ghostty = OmarchyGhosttyPtyTerminalEngineV83::new();
         assert!(ghostty.tune_font("Fira Code", 12.0).contains("Fira Code"));
@@ -547,7 +589,9 @@ mod tests {
         assert!(walker.search_query("firefox").contains("firefox"));
 
         let mut wallust = OmarchyWallustThemeSyncEngineV83::new();
-        assert!(wallust.sync_wallpaper_and_palette("/path/wall.png", "nord").contains("nord"));
+        assert!(wallust
+            .sync_wallpaper_and_palette("/path/wall.png", "nord")
+            .contains("nord"));
 
         let mut hyprlock = OmarchyHyprlockPamSecurityEngineV83::new();
         assert!(hyprlock.set_idle_timeout(600).contains("600s"));
@@ -556,12 +600,16 @@ mod tests {
         assert!(ananicy.toggle_gamemode(true).contains("true"));
 
         let herdr = OmarchyHerdrAiSchedulerEngineV83::new();
-        assert!(herdr.trigger_ai_agent_workflow("summarize system status").contains("summarize"));
+        assert!(herdr
+            .trigger_ai_agent_workflow("summarize system status")
+            .contains("summarize"));
 
         let shield = OmarchyFailClosedSudoPrivilegeShieldEngineV83::new();
         assert!(shield.verify_sudo_request("root", "apt update"));
 
         let chord = OmarchyWallustChordThemeNavigatorEngineV83::new();
-        assert!(chord.trigger_chord_action("SUPER+SHIFT+T").contains("SUPER+SHIFT+T"));
+        assert!(chord
+            .trigger_chord_action("SUPER+SHIFT+T")
+            .contains("SUPER+SHIFT+T"));
     }
 }

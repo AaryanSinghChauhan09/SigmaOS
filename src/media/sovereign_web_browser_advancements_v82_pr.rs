@@ -27,7 +27,10 @@ impl FirefoxGeckoQuantumWebRenderV82Engine {
     pub fn new() -> Self {
         Self {
             jit_tier: "WarpMonkey".to_string(),
-            subgrid_tracks: vec!["repeat(auto-fit, minmax(200px, 1fr))".to_string(), "subgrid".to_string()],
+            subgrid_tracks: vec![
+                "repeat(auto-fit, minmax(200px, 1fr))".to_string(),
+                "subgrid".to_string(),
+            ],
             display_list_items: 1024,
             container_jar_isolated: true,
         }
@@ -63,7 +66,10 @@ impl ChromiumBlinkV8PartitionAllocV82Engine {
         Self {
             compressed_pointer_mask: 0x0000_7FFF_FFFF_FFFF,
             partition_alloc_slots: 65536,
-            mojo_ipc_channels: vec!["mojo.service.WorkerDispatcher".to_string(), "mojo.gpu.Compositor".to_string()],
+            mojo_ipc_channels: vec![
+                "mojo.service.WorkerDispatcher".to_string(),
+                "mojo.gpu.Compositor".to_string(),
+            ],
             site_isolation_active: true,
         }
     }
@@ -139,7 +145,10 @@ impl BraveTorLadybirdV82Engine {
             deamp_unwrap_enabled: true,
             onion_circuit_hops: 6, // 6-hop onion rendezvous handshake
             ladybird_css_parser_active: true,
-            workspace_tree_nodes: vec!["Workspace 1: Work".to_string(), "Workspace 2: Personal".to_string()],
+            workspace_tree_nodes: vec![
+                "Workspace 1: Work".to_string(),
+                "Workspace 2: Personal".to_string(),
+            ],
         }
     }
 
@@ -185,13 +194,34 @@ impl SovereignWebBrowserAdvancementsV82PrGatewayEngine {
     /// Performs full audit across open-source web browser features
     pub fn audit_browser_innovations(&mut self) -> (BTreeMap<String, bool>, u32) {
         let mut map = BTreeMap::new();
-        map.insert("Firefox WarpMonkey JIT & Quantum WebRender".to_string(), self.gecko_engine.container_jar_isolated);
-        map.insert("Chromium V8 Pointer Auditor & PartitionAlloc".to_string(), self.blink_engine.site_isolation_active);
-        map.insert("LibreWolf RFP Timer Quantization".to_string(), self.privacy_engine.rfp_timer_quantization_ms > 0);
-        map.insert("Mullvad Ephemeral SOCKS5 Isolation".to_string(), !self.privacy_engine.ephemeral_socks5_proxy.is_empty());
-        map.insert("Brave DeAMP & CNAME Uncloaking".to_string(), self.suite_engine.deamp_unwrap_enabled);
-        map.insert("Tor 6-Hop Rendezvous Handshake".to_string(), self.suite_engine.onion_circuit_hops == 6);
-        map.insert("Ladybird LibWeb CSS3 Parser".to_string(), self.suite_engine.ladybird_css_parser_active);
+        map.insert(
+            "Firefox WarpMonkey JIT & Quantum WebRender".to_string(),
+            self.gecko_engine.container_jar_isolated,
+        );
+        map.insert(
+            "Chromium V8 Pointer Auditor & PartitionAlloc".to_string(),
+            self.blink_engine.site_isolation_active,
+        );
+        map.insert(
+            "LibreWolf RFP Timer Quantization".to_string(),
+            self.privacy_engine.rfp_timer_quantization_ms > 0,
+        );
+        map.insert(
+            "Mullvad Ephemeral SOCKS5 Isolation".to_string(),
+            !self.privacy_engine.ephemeral_socks5_proxy.is_empty(),
+        );
+        map.insert(
+            "Brave DeAMP & CNAME Uncloaking".to_string(),
+            self.suite_engine.deamp_unwrap_enabled,
+        );
+        map.insert(
+            "Tor 6-Hop Rendezvous Handshake".to_string(),
+            self.suite_engine.onion_circuit_hops == 6,
+        );
+        map.insert(
+            "Ladybird LibWeb CSS3 Parser".to_string(),
+            self.suite_engine.ladybird_css_parser_active,
+        );
 
         (map, self.audit_score)
     }

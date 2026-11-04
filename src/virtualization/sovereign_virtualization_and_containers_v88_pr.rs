@@ -32,6 +32,7 @@ pub struct VirtualizationV88PrProposalManifest {
     pub overhead_reduction_pct: u32,
     pub isolation_tier: String,
     pub pr_markdown_summary: String,
+    pub pqc_dilithium5_signature: String,
 }
 
 // ============================================================================
@@ -700,6 +701,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 42,
                 isolation_tier: "Hardware Confidential VM".to_string(),
                 pr_markdown_summary: "Enables low-overhead KVM dirty ring page tracking and confidential memory domain isolation.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8801_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8802,
@@ -711,6 +713,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 32,
                 isolation_tier: "Libvirt Daemon Isolation".to_string(),
                 pr_markdown_summary: "Provides declarative XML parsing and network filter security profiles for virtual domains.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8802_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8803,
@@ -722,6 +725,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 38,
                 isolation_tier: "Type-1 Hypervisor Grant Table Isolation".to_string(),
                 pr_markdown_summary: "Integrates XenStore inter-domain messaging and Qubes-style disposable VM network routing.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8803_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8804,
@@ -733,6 +737,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 48,
                 isolation_tier: "BSD Kernel Process Sandbox".to_string(),
                 pr_markdown_summary: "Implements FreeBSD capsicum sandbox restrictions and OpenBSD vmd process unveil guarantees.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8804_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8805,
@@ -744,6 +749,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 60,
                 isolation_tier: "User Namespace & Cgroup v2".to_string(),
                 pr_markdown_summary: "Renders rootless container workloads directly into systemd Quadlet service units.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8805_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8806,
@@ -755,6 +761,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 68,
                 isolation_tier: "System Container Namespace".to_string(),
                 pr_markdown_summary: "Bridges systemd-nspawn machinectl image tracking with Incus dynamic OVN virtual networking.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8806_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8807,
@@ -766,6 +773,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 72,
                 isolation_tier: "BSD Jail & ZFS Dataset Sandbox".to_string(),
                 pr_markdown_summary: "Delegates ZFS datasets directly into VNET-isolated jails and Illumos Linux-branded zones.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8807_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8808,
@@ -777,6 +785,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 52,
                 isolation_tier: "eBPF Network & CRI Sandbox".to_string(),
                 pr_markdown_summary: "Runs lightweight K3s orchestration clusters with direct VM-to-pod Harvester CRD translation.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8808_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8809,
@@ -788,6 +797,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 88,
                 isolation_tier: "KVM MicroVM Hardware Sandbox".to_string(),
                 pr_markdown_summary: "Achieves sub-5ms boot times for serverless workloads using virtio-vsock and virtio-mem ballooning.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8809_OK".to_string(),
             },
             VirtualizationV88PrProposalManifest {
                 pr_id: 8810,
@@ -799,6 +809,7 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 overhead_reduction_pct: 44,
                 isolation_tier: "Syscall Interception & MicroVM Gate".to_string(),
                 pr_markdown_summary: "Protects untrusted host boundaries through gVisor syscall virtualization and Rosetta 2 translation.".to_string(),
+                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8810_OK".to_string(),
             },
         ]
     }

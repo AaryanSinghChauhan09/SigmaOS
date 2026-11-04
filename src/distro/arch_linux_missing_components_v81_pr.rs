@@ -341,8 +341,12 @@ impl ArchSecurityTrackerCveScannerEngineV81 {
             subsystem: "Security/Tracker".to_string(),
             target_repo: "archlinux/arch-security-tracker".to_string(),
             status: ArchV81PrStatus::Validated,
-            summary: "Real-time security advisory query client and package vulnerability audit engine.".to_string(),
-            patch_diff: "diff --git a/sys/arch/security_tracker_v81.rs b/sys/arch/security_tracker_v81.rs".to_string(),
+            summary:
+                "Real-time security advisory query client and package vulnerability audit engine."
+                    .to_string(),
+            patch_diff:
+                "diff --git a/sys/arch/security_tracker_v81.rs b/sys/arch/security_tracker_v81.rs"
+                    .to_string(),
         }
     }
 }
@@ -378,8 +382,10 @@ impl ArchModprobedDbTrimmerEngineV81 {
             subsystem: "Kernel/ModprobedDb".to_string(),
             target_repo: "archlinux/modprobed-db".to_string(),
             status: ArchV81PrStatus::Validated,
-            summary: "Hardware module database generator for lean custom kernel builds.".to_string(),
-            patch_diff: "diff --git a/sys/arch/modprobed_db_v81.rs b/sys/arch/modprobed_db_v81.rs".to_string(),
+            summary: "Hardware module database generator for lean custom kernel builds."
+                .to_string(),
+            patch_diff: "diff --git a/sys/arch/modprobed_db_v81.rs b/sys/arch/modprobed_db_v81.rs"
+                .to_string(),
         }
     }
 }
@@ -415,8 +421,12 @@ impl ArchPacmanFileConflictResolverEngineV81 {
             subsystem: "Package/ConflictResolver".to_string(),
             target_repo: "archlinux/pacman".to_string(),
             status: ArchV81PrStatus::Validated,
-            summary: "Analyzes overlapping file paths across packages and generates resolution actions.".to_string(),
-            patch_diff: "diff --git a/sys/arch/conflict_resolver_v81.rs b/sys/arch/conflict_resolver_v81.rs".to_string(),
+            summary:
+                "Analyzes overlapping file paths across packages and generates resolution actions."
+                    .to_string(),
+            patch_diff:
+                "diff --git a/sys/arch/conflict_resolver_v81.rs b/sys/arch/conflict_resolver_v81.rs"
+                    .to_string(),
         }
     }
 }
@@ -489,8 +499,10 @@ impl ArchYayAstDependencySolverEngineV81 {
             subsystem: "Package/YayHelper".to_string(),
             target_repo: "Jguer/yay".to_string(),
             status: ArchV81PrStatus::Validated,
-            summary: "Concurrent AUR dependency tree solver with PKGBUILD AST validation.".to_string(),
-            patch_diff: "diff --git a/sys/arch/yay_ast_v81.rs b/sys/arch/yay_ast_v81.rs".to_string(),
+            summary: "Concurrent AUR dependency tree solver with PKGBUILD AST validation."
+                .to_string(),
+            patch_diff: "diff --git a/sys/arch/yay_ast_v81.rs b/sys/arch/yay_ast_v81.rs"
+                .to_string(),
         }
     }
 }

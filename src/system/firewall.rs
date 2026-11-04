@@ -303,16 +303,10 @@ mod tests {
         );
 
         manager.disable_rule(id).unwrap();
-        assert!(!manager
-            .get_rule(id)
-            .unwrap()
-            .enabled);
+        assert!(!manager.get_rule(id).unwrap().enabled);
 
         manager.enable_rule(id).unwrap();
-        assert!(manager
-            .get_rule(id)
-            .unwrap()
-            .enabled);
+        assert!(manager.get_rule(id).unwrap().enabled);
     }
 
     #[test]
