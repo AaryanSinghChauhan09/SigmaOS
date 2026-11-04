@@ -1,3 +1,2 @@
-# SigmaOS I/O Scheduler Policy
-
-Policy specification for I/O request scheduling.
+# I/O Scheduler Policy
+I/O scheduling policies and queue dispatch rules.

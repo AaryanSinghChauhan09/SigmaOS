@@ -1,3 +1,2 @@
-# SigmaOS I/O Management ADR
-
-Architecture Decision Record for I/O management.
+# I/O Management Architecture Decision Record
+Architectural decisions for I/O subsystem management.

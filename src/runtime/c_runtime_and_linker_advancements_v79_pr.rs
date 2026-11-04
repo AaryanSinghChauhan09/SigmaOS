@@ -244,7 +244,10 @@ impl UclibcInspirationsV79Engine {
     }
 
     /// Strip unsupported CPU target feature mask flags.
-    pub fn strip_unsupported_target_features(features: &[&str], supported_mask: u32) -> Vec<String> {
+    pub fn strip_unsupported_target_features(
+        features: &[&str],
+        supported_mask: u32,
+    ) -> Vec<String> {
         let mut active = Vec::new();
         for (idx, &feat) in features.iter().enumerate() {
             if (supported_mask & (1 << (idx % 32))) != 0 {
@@ -270,7 +273,11 @@ impl UclibcInspirationsV79Engine {
     }
 
     /// Validate bFLT (binary flat format) executable header magic and version.
-    pub fn validate_bflt_header(magic: &[u8; 4], version: u32, flags: u32) -> Result<String, &'static str> {
+    pub fn validate_bflt_header(
+        magic: &[u8; 4],
+        version: u32,
+        flags: u32,
+    ) -> Result<String, &'static str> {
         if magic == b"bFLT" {
             Ok(format!("bFLT_v{version}_flags_0x{flags:x}"))
         } else {
@@ -359,7 +366,9 @@ impl BsdLibcInspirationsV79Engine {
 
     /// OpenBSD pledge/unveil security restriction policy evaluator.
     pub fn evaluate_pledge_unveil_policy(syscall: &str, filepath: &str) -> bool {
-        if syscall == "open" && (filepath.starts_with("/etc/shadow") || filepath.starts_with("/etc/master.passwd")) {
+        if syscall == "open"
+            && (filepath.starts_with("/etc/shadow") || filepath.starts_with("/etc/master.passwd"))
+        {
             false
         } else if syscall == "pledge" || syscall == "unveil" {
             true
@@ -558,7 +567,10 @@ impl LibstdcxxInspirationsV79Engine {
     }
 
     /// Allocate buffer using PMR (Polymorphic Memory Resource).
-    pub fn pmr_allocate_buffer(buffer_capacity: usize, requested: usize) -> Result<usize, &'static str> {
+    pub fn pmr_allocate_buffer(
+        buffer_capacity: usize,
+        requested: usize,
+    ) -> Result<usize, &'static str> {
         if requested <= buffer_capacity {
             Ok(buffer_capacity - requested)
         } else {
@@ -717,7 +729,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
         vec![
             CRuntimePrProposalManifestV79 {
                 pr_number: 5101,
-                pr_title: "glibc 2.44+ Dynamic IFUNC AVX10.2 Resolver & 64-bit Bloom Parity".to_string(),
+                pr_title: "glibc 2.44+ Dynamic IFUNC AVX10.2 Resolver & 64-bit Bloom Parity"
+                    .to_string(),
                 target_subsystem: "libc/glibc".to_string(),
                 original_runtime: "GNU C Library (glibc)".to_string(),
                 components_added: vec![
@@ -731,7 +744,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
             },
             CRuntimePrProposalManifestV79 {
                 pr_number: 5102,
-                pr_title: "musl libc 1.2.8+ malloc-ng Slab Group Header & Signal-Safe snprintf".to_string(),
+                pr_title: "musl libc 1.2.8+ malloc-ng Slab Group Header & Signal-Safe snprintf"
+                    .to_string(),
                 target_subsystem: "libc/musl".to_string(),
                 original_runtime: "musl libc".to_string(),
                 components_added: vec![
@@ -745,7 +759,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
             },
             CRuntimePrProposalManifestV79 {
                 pr_number: 5103,
-                pr_title: "uClibc-ng 1.0.53+ FD-PIC Function Descriptor & SysV Chain Parity".to_string(),
+                pr_title: "uClibc-ng 1.0.53+ FD-PIC Function Descriptor & SysV Chain Parity"
+                    .to_string(),
                 target_subsystem: "libc/uclibc".to_string(),
                 original_runtime: "uClibc-ng".to_string(),
                 components_added: vec![
@@ -758,7 +773,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
             },
             CRuntimePrProposalManifestV79 {
                 pr_number: 5104,
-                pr_title: "BSD libc ChaCha20 arc4random Stir Interval & freezero Parity".to_string(),
+                pr_title: "BSD libc ChaCha20 arc4random Stir Interval & freezero Parity"
+                    .to_string(),
                 target_subsystem: "libc/bsd_libc".to_string(),
                 original_runtime: "FreeBSD / OpenBSD / NetBSD libc".to_string(),
                 components_added: vec![
@@ -772,7 +788,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
             },
             CRuntimePrProposalManifestV79 {
                 pr_number: 5105,
-                pr_title: "Android Bionic Scudo Chunk Cookie & android_dlopen_ext Parity".to_string(),
+                pr_title: "Android Bionic Scudo Chunk Cookie & android_dlopen_ext Parity"
+                    .to_string(),
                 target_subsystem: "libc/bionic".to_string(),
                 original_runtime: "Android Bionic".to_string(),
                 components_added: vec![
@@ -786,7 +803,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
             },
             CRuntimePrProposalManifestV79 {
                 pr_number: 5106,
-                pr_title: "Newlib 4.5+ struct _reent & soft-float MCU Polynomial Parity".to_string(),
+                pr_title: "Newlib 4.5+ struct _reent & soft-float MCU Polynomial Parity"
+                    .to_string(),
                 target_subsystem: "libc/newlib".to_string(),
                 original_runtime: "Newlib C Library".to_string(),
                 components_added: vec![
@@ -800,7 +818,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
             },
             CRuntimePrProposalManifestV79 {
                 pr_number: 5107,
-                pr_title: "Cosmopolitan Libc APE 3.0 Polyglot & Multi-Arch Fat ELF Parity".to_string(),
+                pr_title: "Cosmopolitan Libc APE 3.0 Polyglot & Multi-Arch Fat ELF Parity"
+                    .to_string(),
                 target_subsystem: "libc/cosmopolitan".to_string(),
                 original_runtime: "Cosmopolitan Libc".to_string(),
                 components_added: vec![
@@ -813,7 +832,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
             },
             CRuntimePrProposalManifestV79 {
                 pr_number: 5108,
-                pr_title: "GNU libstdc++ 14+ ABI Demangler & PMR Monotonic Buffer Parity".to_string(),
+                pr_title: "GNU libstdc++ 14+ ABI Demangler & PMR Monotonic Buffer Parity"
+                    .to_string(),
                 target_subsystem: "cxx/libstdc++".to_string(),
                 original_runtime: "GNU libstdc++".to_string(),
                 components_added: vec![
@@ -827,7 +847,8 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
             },
             CRuntimePrProposalManifestV79 {
                 pr_number: 5109,
-                pr_title: "LLVM libc++ 19+ Fast <charconv> & std::format Tokenizer Parity".to_string(),
+                pr_title: "LLVM libc++ 19+ Fast <charconv> & std::format Tokenizer Parity"
+                    .to_string(),
                 target_subsystem: "cxx/libc++".to_string(),
                 original_runtime: "LLVM libc++".to_string(),
                 components_added: vec![
@@ -860,14 +881,21 @@ impl SovereignCRuntimeAndLinkerParityV79Gateway {
     /// Generate comprehensive Markdown report of PR proposals.
     pub fn generate_pr_proposal_markdown(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut report = String::from("# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V79)\n\n");
+        let mut report = String::from(
+            "# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V79)\n\n",
+        );
         report.push_str("| PR # | Title | Subsystem | Original Runtime | Speedup | Status |\n");
         report.push_str("|------|-------|-----------|------------------|---------|--------|\n");
 
         for pr in &proposals {
             report.push_str(&format!(
                 "| #{} | {} | {} | {} | {} | {} |\n",
-                pr.pr_number, pr.pr_title, pr.target_subsystem, pr.original_runtime, pr.performance_multiplier, pr.status
+                pr.pr_number,
+                pr.pr_title,
+                pr.target_subsystem,
+                pr.original_runtime,
+                pr.performance_multiplier,
+                pr.status
             ));
         }
 
@@ -897,10 +925,13 @@ mod tests {
         assert_ne!(b1, 0);
         assert_ne!(b2, 0);
 
-        let resolved = GlibcInspirationsV79Engine::resolve_ifunc_symbol(&["apx", "avx10_2"], "memcpy");
+        let resolved =
+            GlibcInspirationsV79Engine::resolve_ifunc_symbol(&["apx", "avx10_2"], "memcpy");
         assert_eq!(resolved, "memcpy_apx_avx10_2");
 
-        let tunables = GlibcInspirationsV79Engine::parse_glibc_tunables("glibc.malloc.trim_threshold=128:glibc.cpu.hwcap=avx512");
+        let tunables = GlibcInspirationsV79Engine::parse_glibc_tunables(
+            "glibc.malloc.trim_threshold=128:glibc.cpu.hwcap=avx512",
+        );
         assert_eq!(tunables.len(), 2);
         assert_eq!(tunables[0], ("glibc.malloc.trim_threshold", "128"));
 
@@ -912,7 +943,10 @@ mod tests {
         assert!(xml.contains("version=\"2\""));
         assert!(xml.contains("mmap chunks=\"1\""));
 
-        assert_eq!(GlibcInspirationsV79Engine::evaluate_malloc_trim(200_000, 128_000), 72_000);
+        assert_eq!(
+            GlibcInspirationsV79Engine::evaluate_malloc_trim(200_000, 128_000),
+            72_000
+        );
     }
 
     #[test]
@@ -922,7 +956,11 @@ mod tests {
         assert!(slot < 16);
         assert_eq!(units, 3);
 
-        assert!(MuslLibcInspirationsV79Engine::verify_malloc_ng_header(0x1234_5678, 0x1000, 0x1234_5678 ^ 0x1000));
+        assert!(MuslLibcInspirationsV79Engine::verify_malloc_ng_header(
+            0x1234_5678,
+            0x1000,
+            0x1234_5678 ^ 0x1000
+        ));
 
         let mut buf = [0u8; 32];
         let written = MuslLibcInspirationsV79Engine::signal_safe_snprintf(&mut buf, "errno=", -4);
@@ -933,18 +971,25 @@ mod tests {
         assert_eq!(cnt, 8);
         assert!(barrier);
 
-        assert_eq!(MuslLibcInspirationsV79Engine::evaluate_unmapself_stack(0x7000_0000, 8192), "unmap_range(0x70000000, 8192)");
+        assert_eq!(
+            MuslLibcInspirationsV79Engine::evaluate_unmapself_stack(0x7000_0000, 8192),
+            "unmap_range(0x70000000, 8192)"
+        );
         let queries = MuslLibcInspirationsV79Engine::res_msend_query(&["local", "corp"], "node");
         assert_eq!(queries.len(), 2);
     }
 
     #[test]
     fn test_uclibc_mmu_less_v79() {
-        let (got, entry) = UclibcInspirationsV79Engine::relocate_fdpic_descriptor(0x2000_0000, 0x100, 0x200);
+        let (got, entry) =
+            UclibcInspirationsV79Engine::relocate_fdpic_descriptor(0x2000_0000, 0x100, 0x200);
         assert_eq!(got, 0x2000_0100);
         assert_eq!(entry, 0x2000_0200);
 
-        let active = UclibcInspirationsV79Engine::strip_unsupported_target_features(&["fpu", "mmu", "neon"], 0b001);
+        let active = UclibcInspirationsV79Engine::strip_unsupported_target_features(
+            &["fpu", "mmu", "neon"],
+            0b001,
+        );
         assert_eq!(active, vec!["fpu"]);
 
         let (hash, chain) = UclibcInspirationsV79Engine::compute_sysv_elf_hash("malloc");
@@ -958,7 +1003,8 @@ mod tests {
     #[test]
     fn test_bsd_libc_utilities_v79() {
         let seed = [7u8; 32];
-        let (keystream, stir) = BsdLibcInspirationsV79Engine::generate_arc4random_chacha20_keystream(&seed, 16, 50);
+        let (keystream, stir) =
+            BsdLibcInspirationsV79Engine::generate_arc4random_chacha20_keystream(&seed, 16, 50);
         assert_eq!(keystream.len(), 16);
         assert_eq!(stir, 66);
 
@@ -973,9 +1019,17 @@ mod tests {
         assert_eq!(&dst[..7], b"abcdefg");
         assert_eq!(dst[7], 0);
 
-        assert_eq!(BsdLibcInspirationsV79Engine::reallocarray_overflow_check(10, 20), Ok(200));
-        assert!(BsdLibcInspirationsV79Engine::evaluate_pledge_unveil_policy("open", "/etc/hosts"));
-        assert!(!BsdLibcInspirationsV79Engine::evaluate_pledge_unveil_policy("open", "/etc/shadow"));
+        assert_eq!(
+            BsdLibcInspirationsV79Engine::reallocarray_overflow_check(10, 20),
+            Ok(200)
+        );
+        assert!(BsdLibcInspirationsV79Engine::evaluate_pledge_unveil_policy(
+            "open",
+            "/etc/hosts"
+        ));
+        assert!(
+            !BsdLibcInspirationsV79Engine::evaluate_pledge_unveil_policy("open", "/etc/shadow")
+        );
 
         let mib = BsdLibcInspirationsV79Engine::parse_sysctl_mib("kern.securelevel");
         assert_eq!(mib, vec![1, 9]);
@@ -983,48 +1037,115 @@ mod tests {
 
     #[test]
     fn test_bionic_and_newlib_and_cosmopolitan_v79() {
-        assert!(BionicInspirationsV79Engine::verify_scudo_chunk_header(0x1234, 0xabcd, 0x1234 ^ 0xabcd));
-        assert!(BionicInspirationsV79Engine::verify_arm_pac_bti_tags(0x0000_7fff_1234_5678, 0xffff_0000_0000_0000));
-        assert_eq!(BionicInspirationsV79Engine::query_android_property("ro.build.version.release"), Some("16".to_string()));
-        assert!(BionicInspirationsV79Engine::fdsan_owner_tag_check(0x100, 0x100));
-        assert_eq!(BionicInspirationsV79Engine::async_safe_format_log("E", "audit", "fault"), "[E][audit] fault");
+        assert!(BionicInspirationsV79Engine::verify_scudo_chunk_header(
+            0x1234,
+            0xabcd,
+            0x1234 ^ 0xabcd
+        ));
+        assert!(BionicInspirationsV79Engine::verify_arm_pac_bti_tags(
+            0x0000_7fff_1234_5678,
+            0xffff_0000_0000_0000
+        ));
+        assert_eq!(
+            BionicInspirationsV79Engine::query_android_property("ro.build.version.release"),
+            Some("16".to_string())
+        );
+        assert!(BionicInspirationsV79Engine::fdsan_owner_tag_check(
+            0x100, 0x100
+        ));
+        assert_eq!(
+            BionicInspirationsV79Engine::async_safe_format_log("E", "audit", "fault"),
+            "[E][audit] fault"
+        );
         assert_eq!(
             BionicInspirationsV79Engine::parse_android_dlopen_flags(0x05),
-            vec!["ANDROID_DLEXT_USE_NAMESPACE", "ANDROID_DLEXT_RESERVED_ADDRESS"]
+            vec![
+                "ANDROID_DLEXT_USE_NAMESPACE",
+                "ANDROID_DLEXT_RESERVED_ADDRESS"
+            ]
         );
 
-        assert_eq!(NewlibInspirationsV79Engine::manage_reent_context(1, 22), "reent_thread_1_errno_22");
-        assert_eq!(NewlibInspirationsV79Engine::nano_malloc_split_alloc(1024, 100, 16), Ok((908, 116)));
-        assert_eq!(NewlibInspirationsV79Engine::low_power_syscall_bridge(15), 0x8000_000f);
+        assert_eq!(
+            NewlibInspirationsV79Engine::manage_reent_context(1, 22),
+            "reent_thread_1_errno_22"
+        );
+        assert_eq!(
+            NewlibInspirationsV79Engine::nano_malloc_split_alloc(1024, 100, 16),
+            Ok((908, 116))
+        );
+        assert_eq!(
+            NewlibInspirationsV79Engine::low_power_syscall_bridge(15),
+            0x8000_000f
+        );
         let sin_val = NewlibInspirationsV79Engine::soft_float_sin_approx(512); // ~pi/6
         assert!(sin_val > 0);
 
-        assert!(CosmopolitanInspirationsV79Engine::validate_ape_binary(b"MZ.............."));
-        assert_eq!(CosmopolitanInspirationsV79Engine::map_posix_to_win32_oflag(0), 0x8000_0000);
-        assert_eq!(CosmopolitanInspirationsV79Engine::dispatch_fat_elf_arch(&["riscv64"]), "riscv64_fat_section");
+        assert!(CosmopolitanInspirationsV79Engine::validate_ape_binary(
+            b"MZ.............."
+        ));
+        assert_eq!(
+            CosmopolitanInspirationsV79Engine::map_posix_to_win32_oflag(0),
+            0x8000_0000
+        );
+        assert_eq!(
+            CosmopolitanInspirationsV79Engine::dispatch_fat_elf_arch(&["riscv64"]),
+            "riscv64_fat_section"
+        );
     }
 
     #[test]
     fn test_libstdcxx_demangle_and_sso_v79() {
-        assert_eq!(LibstdcxxInspirationsV79Engine::demangle_cxx_symbol("_Z1fPFiivE"), "f(int (*)())");
-        assert_eq!(LibstdcxxInspirationsV79Engine::determine_sso_layout(10), "inline_sso");
-        assert_eq!(LibstdcxxInspirationsV79Engine::determine_sso_layout(25), "heap_allocated");
-        assert_eq!(LibstdcxxInspirationsV79Engine::pmr_allocate_buffer(512, 100), Ok(412));
-        assert_eq!(LibstdcxxInspirationsV79Engine::lookup_dwarf_eh_frame_unwind(0x5000_0000), Some(0x5000_0000 ^ 0x1234));
+        assert_eq!(
+            LibstdcxxInspirationsV79Engine::demangle_cxx_symbol("_Z1fPFiivE"),
+            "f(int (*)())"
+        );
+        assert_eq!(
+            LibstdcxxInspirationsV79Engine::determine_sso_layout(10),
+            "inline_sso"
+        );
+        assert_eq!(
+            LibstdcxxInspirationsV79Engine::determine_sso_layout(25),
+            "heap_allocated"
+        );
+        assert_eq!(
+            LibstdcxxInspirationsV79Engine::pmr_allocate_buffer(512, 100),
+            Ok(412)
+        );
+        assert_eq!(
+            LibstdcxxInspirationsV79Engine::lookup_dwarf_eh_frame_unwind(0x5000_0000),
+            Some(0x5000_0000 ^ 0x1234)
+        );
     }
 
     #[test]
     fn test_libcxx_fast_to_chars_v79() {
-        assert_eq!(LibcxxInspirationsV79Engine::fast_to_chars_u64_sim(123456789), "123456789");
-        assert_eq!(LibcxxInspirationsV79Engine::fast_from_chars_u64_sim("987654321"), Ok(987654321));
-        assert_eq!(LibcxxInspirationsV79Engine::futex_atomic_wait(5, 5), "futex_wait_blocked");
-        assert_eq!(LibcxxInspirationsV79Engine::update_ref_count(1, 0, "inc_shared"), (2, 0));
-        assert_eq!(LibcxxInspirationsV79Engine::parse_format_replacements("Hello {}, value is {}!"), 2);
+        assert_eq!(
+            LibcxxInspirationsV79Engine::fast_to_chars_u64_sim(123456789),
+            "123456789"
+        );
+        assert_eq!(
+            LibcxxInspirationsV79Engine::fast_from_chars_u64_sim("987654321"),
+            Ok(987654321)
+        );
+        assert_eq!(
+            LibcxxInspirationsV79Engine::futex_atomic_wait(5, 5),
+            "futex_wait_blocked"
+        );
+        assert_eq!(
+            LibcxxInspirationsV79Engine::update_ref_count(1, 0, "inc_shared"),
+            (2, 0)
+        );
+        assert_eq!(
+            LibcxxInspirationsV79Engine::parse_format_replacements("Hello {}, value is {}!"),
+            2
+        );
     }
 
     #[test]
     fn test_ld_so_search_paths_v79() {
-        let paths = DynamicLinkerLdSoInspirationsV79Engine::resolve_search_path_order("ld/path", "run/path", "");
+        let paths = DynamicLinkerLdSoInspirationsV79Engine::resolve_search_path_order(
+            "ld/path", "run/path", "",
+        );
         assert_eq!(paths[0], "run/path");
         assert_eq!(paths[1], "ld/path");
 
@@ -1032,7 +1153,10 @@ mod tests {
         assert_eq!(flags, vec!["DF_1_NOW", "DF_1_PIE"]);
 
         assert_eq!(
-            DynamicLinkerLdSoInspirationsV79Engine::evaluate_ld_preload_interposition(&["libfaketime.so"], "malloc"),
+            DynamicLinkerLdSoInspirationsV79Engine::evaluate_ld_preload_interposition(
+                &["libfaketime.so"],
+                "malloc"
+            ),
             Some("interposed_by_preload")
         );
 
@@ -1041,7 +1165,12 @@ mod tests {
             "rtld_audit_la_version_handled"
         );
         assert!(DynamicLinkerLdSoInspirationsV79Engine::verify_gnu_relro_protection(0x01));
-        assert!(DynamicLinkerLdSoInspirationsV79Engine::match_elf_symbol_versions("GLIBC_2.34", &["GLIBC_2.2.5", "GLIBC_2.34"]));
+        assert!(
+            DynamicLinkerLdSoInspirationsV79Engine::match_elf_symbol_versions(
+                "GLIBC_2.34",
+                &["GLIBC_2.2.5", "GLIBC_2.34"]
+            )
+        );
     }
 
     #[test]
@@ -1056,7 +1185,9 @@ mod tests {
         }
 
         let markdown = gateway.generate_pr_proposal_markdown();
-        assert!(markdown.contains("# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V79)"));
+        assert!(markdown.contains(
+            "# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V79)"
+        ));
         assert!(markdown.contains("glibc"));
         assert!(markdown.contains("Bionic"));
     }
