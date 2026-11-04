@@ -139,7 +139,13 @@ impl LibvirtDomainV77Engine {
 
     pub fn parse_domain_xml(&mut self, xml_data: &str) -> LibvirtDomainSpecV77 {
         let name = if xml_data.contains("<name>") {
-            xml_data.split("<name>").nth(1).unwrap_or("default").split("</name>").next().unwrap_or("default")
+            xml_data
+                .split("<name>")
+                .nth(1)
+                .unwrap_or("default")
+                .split("</name>")
+                .next()
+                .unwrap_or("default")
         } else {
             "default-domain"
         };
@@ -158,8 +164,10 @@ impl LibvirtDomainV77Engine {
 
     pub fn generate_domain_summary(&self, name: &str) -> String {
         if let Some(dom) = self.domains.get(name) {
-            format!("<domain type='{}'><name>{}</name><memory>{}</memory><bridge>{}</bridge></domain>",
-                dom.virt_type, dom.domain_name, dom.memory_kb, dom.bridge_interface)
+            format!(
+                "<domain type='{}'><name>{}</name><memory>{}</memory><bridge>{}</bridge></domain>",
+                dom.virt_type, dom.domain_name, dom.memory_kb, dom.bridge_interface
+            )
         } else {
             "<domain>Unknown</domain>".to_string()
         }
@@ -198,7 +206,13 @@ impl XenHypervisorV77Engine {
         }
     }
 
-    pub fn create_domu_guest(&mut self, domid: u32, name: &str, mode: XenGuestModeV77, grant_frames: u32) -> XenGuestSpecV77 {
+    pub fn create_domu_guest(
+        &mut self,
+        domid: u32,
+        name: &str,
+        mode: XenGuestModeV77,
+        grant_frames: u32,
+    ) -> XenGuestSpecV77 {
         let mut xs = BTreeMap::new();
         xs.insert("name".to_string(), name.to_string());
         xs.insert("domid".to_string(), domid.to_string());
@@ -306,7 +320,12 @@ impl OciDockerPodmanRuncV77Engine {
         }
     }
 
-    pub fn run_podman_rootless(&mut self, container_id: &str, image: &str, mem_mb: u64) -> OciContainerSpecV77 {
+    pub fn run_podman_rootless(
+        &mut self,
+        container_id: &str,
+        image: &str,
+        mem_mb: u64,
+    ) -> OciContainerSpecV77 {
         let spec = OciContainerSpecV77 {
             container_id: container_id.to_string(),
             image: image.to_string(),
@@ -315,7 +334,8 @@ impl OciDockerPodmanRuncV77Engine {
             cgroups_version: "v2".to_string(),
             memory_limit_mb: mem_mb,
         };
-        self.containers.insert(container_id.to_string(), spec.clone());
+        self.containers
+            .insert(container_id.to_string(), spec.clone());
         spec
     }
 
@@ -352,7 +372,11 @@ impl LxcLxdNspawnV77Engine {
         }
     }
 
-    pub fn spawn_nspawn_chroot(&mut self, instance_name: &str, rootfs: &str) -> SystemContainerSpecV77 {
+    pub fn spawn_nspawn_chroot(
+        &mut self,
+        instance_name: &str,
+        rootfs: &str,
+    ) -> SystemContainerSpecV77 {
         let spec = SystemContainerSpecV77 {
             instance_name: instance_name.to_string(),
             engine_type: "nspawn".to_string(),
@@ -360,11 +384,16 @@ impl LxcLxdNspawnV77Engine {
             ovn_network_id: None,
             machinectl_registered: true,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 
-    pub fn create_incus_instance(&mut self, instance_name: &str, ovn_net: &str) -> SystemContainerSpecV77 {
+    pub fn create_incus_instance(
+        &mut self,
+        instance_name: &str,
+        ovn_net: &str,
+    ) -> SystemContainerSpecV77 {
         let spec = SystemContainerSpecV77 {
             instance_name: instance_name.to_string(),
             engine_type: "incus".to_string(),
@@ -372,7 +401,8 @@ impl LxcLxdNspawnV77Engine {
             ovn_network_id: Some(ovn_net.to_string()),
             machinectl_registered: false,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 }
@@ -423,7 +453,12 @@ impl FreeBsdJailsZonesV77Engine {
         jail
     }
 
-    pub fn create_illumos_zone(&mut self, name: &str, brand: &str, mem_mb: u64) -> IllumosZoneSpecV77 {
+    pub fn create_illumos_zone(
+        &mut self,
+        name: &str,
+        brand: &str,
+        mem_mb: u64,
+    ) -> IllumosZoneSpecV77 {
         let zone = IllumosZoneSpecV77 {
             name: name.to_string(),
             brand: brand.to_string(),
@@ -475,7 +510,8 @@ impl KubernetesK3sRancherV77Engine {
     }
 
     pub fn map_harvester_vm(&mut self, vm_name: &str, pod_name: &str) {
-        self.harvester_vm_mappings.insert(vm_name.to_string(), pod_name.to_string());
+        self.harvester_vm_mappings
+            .insert(vm_name.to_string(), pod_name.to_string());
     }
 }
 
@@ -504,7 +540,12 @@ impl FirecrackerCloudHypervisorV77Engine {
         }
     }
 
-    pub fn spawn_firecracker_microvm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV77 {
+    pub fn spawn_firecracker_microvm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV77 {
         let mvm = MicroVmSpecV77 {
             microvm_id: id.to_string(),
             vcpus,
@@ -517,7 +558,12 @@ impl FirecrackerCloudHypervisorV77Engine {
         mvm
     }
 
-    pub fn spawn_cloud_hypervisor_vm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV77 {
+    pub fn spawn_cloud_hypervisor_vm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV77 {
         let mvm = MicroVmSpecV77 {
             microvm_id: id.to_string(),
             vcpus,
@@ -579,7 +625,12 @@ impl GvisorKataAppleHvV77Engine {
         spec
     }
 
-    pub fn launch_apple_hv_guest(&mut self, id: &str, _mem_mb: u64, rosetta: bool) -> SecureSandboxSpecV77 {
+    pub fn launch_apple_hv_guest(
+        &mut self,
+        id: &str,
+        _mem_mb: u64,
+        rosetta: bool,
+    ) -> SecureSandboxSpecV77 {
         let spec = SecureSandboxSpecV77 {
             sandbox_id: id.to_string(),
             technology: "apple_hypervisor".to_string(),
@@ -609,7 +660,8 @@ pub struct SovereignVirtualizationAndContainersParityV77Gateway {
     pub secure_sandboxes: GvisorKataAppleHvV77Engine,
 }
 
-pub type SovereignVirtualizationAndContainersV77PrGatewayEngine = SovereignVirtualizationAndContainersParityV77Gateway;
+pub type SovereignVirtualizationAndContainersV77PrGatewayEngine =
+    SovereignVirtualizationAndContainersParityV77Gateway;
 
 impl SovereignVirtualizationAndContainersParityV77Gateway {
     pub fn new() -> Self {
@@ -744,12 +796,24 @@ impl SovereignVirtualizationAndContainersParityV77Gateway {
 
     pub fn generate_pr_markdown_summary(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut out = String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v77)\n\n");
-        out.push_str("| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier |\n");
-        out.push_str("|-------|-------|----------|--------------|-------------------|----------------|\n");
+        let mut out =
+            String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v77)\n\n");
+        out.push_str(
+            "| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier |\n",
+        );
+        out.push_str(
+            "|-------|-------|----------|--------------|-------------------|----------------|\n",
+        );
         for p in &proposals {
-            out.push_str(&format!("| PR #{} | {} | {} | {}ms | {}% | {} |\n",
-                p.pr_id, p.title, p.category, p.boot_latency_ms, p.overhead_reduction_pct, p.isolation_tier));
+            out.push_str(&format!(
+                "| PR #{} | {} | {} | {}ms | {}% | {} |\n",
+                p.pr_id,
+                p.title,
+                p.category,
+                p.boot_latency_ms,
+                p.overhead_reduction_pct,
+                p.isolation_tier
+            ));
         }
         out
     }

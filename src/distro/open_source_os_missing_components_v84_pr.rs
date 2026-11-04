@@ -269,7 +269,8 @@ impl OpenBsd97FineIbtPinsyscallPteGuardEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-003".to_string(),
-            title: "OpenBSD 9.7 FineIBT Pinsyscall Shadow Call Stack & PTE Guard Protection".to_string(),
+            title: "OpenBSD 9.7 FineIBT Pinsyscall Shadow Call Stack & PTE Guard Protection"
+                .to_string(),
             component_name: "OpenBsd97FineIbtPinsyscallPteGuardEngineV84".to_string(),
             os_origin: "OpenBSD 9.7+".to_string(),
             status: OsPrStatusV84::Validated,

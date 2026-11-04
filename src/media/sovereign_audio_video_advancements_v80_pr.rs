@@ -162,8 +162,8 @@ impl SovereignOss4EngineV80 {
 
         Self {
             dsp_device_path: dsp_path.to_string(),
-            sndstat_summary:
-                "FreeBSD Audio Driver (newpcm) pcm0: <Realtek ALC1220-VB> default".to_string(),
+            sndstat_summary: "FreeBSD Audio Driver (newpcm) pcm0: <Realtek ALC1220-VB> default"
+                .to_string(),
             virtual_channels: vec![
                 "vchan0".to_string(),
                 "vchan1".to_string(),
@@ -829,14 +829,29 @@ impl SovereignAudioVideoV80PrGatewayEngine {
     pub fn register_v80_prs(&mut self) {
         let prs = [
             ("ALSA UCM2 Profile Switcher & Xrun Recovery", "ALSA"),
-            ("OSSv4 Virtual Matrix Multiplexer & /dev/sndstat Parser", "OSS"),
-            ("PulseAudio Native Stream Protocol & WebRTC AEC", "PulseAudio"),
+            (
+                "OSSv4 Virtual Matrix Multiplexer & /dev/sndstat Parser",
+                "OSS",
+            ),
+            (
+                "PulseAudio Native Stream Protocol & WebRTC AEC",
+                "PulseAudio",
+            ),
             ("PipeWire SPA POD Buffer & Spatial Convolver", "PipeWire"),
-            ("JACK Zero-Copy Execution Graph & NSM Session Protocol", "JACK"),
+            (
+                "JACK Zero-Copy Execution Graph & NSM Session Protocol",
+                "JACK",
+            ),
             ("sndio BSD sioctl Controls & Raw MTC Clock Sync", "sndio"),
-            ("GStreamer SplitMuxSink Recorder & RTSP Server Bin", "GStreamer"),
+            (
+                "GStreamer SplitMuxSink Recorder & RTSP Server Bin",
+                "GStreamer",
+            ),
             ("FFmpeg DRM PRIME Surface Allocator & Custom AVIO", "FFmpeg"),
-            ("V4L2 Multi-Planar DMABUF Exporter & PTZ ISP Controls", "V4L2"),
+            (
+                "V4L2 Multi-Planar DMABUF Exporter & PTZ ISP Controls",
+                "V4L2",
+            ),
             ("VLC libVLC Core Module Loader & ASS Subtitle Engine", "VLC"),
             ("mpv JSON-RPC Output Bridge & GPU-Next Shader Stack", "mpv"),
         ];

@@ -153,7 +153,12 @@ impl SystemdAdvancementsV82Engine {
     pub fn format_journal_stream_frame(&self, entry: &SystemdJournalEntryV82) -> String {
         format!(
             "s={};_TIMESTAMP={};_SYSTEMD_UNIT={};PRIORITY={};_BOOT_ID={};MESSAGE={}",
-            entry.cursor, entry.timestamp_usec, entry.unit, entry.priority, entry.boot_id, entry.message
+            entry.cursor,
+            entry.timestamp_usec,
+            entry.unit,
+            entry.priority,
+            entry.boot_id,
+            entry.message
         )
     }
 
@@ -245,7 +250,10 @@ impl OpenRcAdvancementsV82Engine {
                     OpenRcDependencyTypeV82::Need | OpenRcDependencyTypeV82::After
                 ) {
                     if graph.contains_key(target) {
-                        graph.entry(target.clone()).or_default().push(s.name.clone());
+                        graph
+                            .entry(target.clone())
+                            .or_default()
+                            .push(s.name.clone());
                         *in_degree.entry(s.name.clone()).or_insert(0) += 1;
                     }
                 }
@@ -450,9 +458,7 @@ impl SysVinitAdvancementsV82Engine {
     ) -> Vec<SysVinitSpecV82> {
         specs
             .iter()
-            .filter(|s| {
-                s.runlevels.contains(target_runlevel) || s.runlevels.is_empty()
-            })
+            .filter(|s| s.runlevels.contains(target_runlevel) || s.runlevels.is_empty())
             .cloned()
             .collect()
     }
@@ -746,7 +752,10 @@ impl SovereignInitAndSupervisorAdvancementsV82Suite {
 
     pub fn run_master_verification(&self) -> bool {
         let manifests = self.collect_all_manifests();
-        manifests.len() == 7 && manifests.iter().all(|m| m.status == "Ready for Integration")
+        manifests.len() == 7
+            && manifests
+                .iter()
+                .all(|m| m.status == "Ready for Integration")
     }
 }
 
@@ -877,7 +886,8 @@ mod tests {
         assert!(engine.evaluate_readiness_notification("STATUS=OK\nREADY=1\n", &spec));
         assert!(!engine.evaluate_readiness_notification("STATUS=WAITING\n", &spec));
 
-        let (to_down, to_up) = engine.plan_s6_rc_transition(&["sshd", "old_app"], &["sshd", "new_app"]);
+        let (to_down, to_up) =
+            engine.plan_s6_rc_transition(&["sshd", "old_app"], &["sshd", "new_app"]);
         assert_eq!(to_down, vec!["old_app".to_string()]);
         assert_eq!(to_up, vec!["new_app".to_string()]);
     }

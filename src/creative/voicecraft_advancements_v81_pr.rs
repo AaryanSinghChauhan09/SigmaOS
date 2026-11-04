@@ -557,14 +557,12 @@ impl SovereignVoicecraftAdvancementsV81MasterSuite {
         if manifests.is_empty() {
             0.0
         } else {
-            let ready_count = manifests.iter().filter(|m| m.status == "Ready for Merge").count();
+            let ready_count = manifests
+                .iter()
+                .filter(|m| m.status == "Ready for Merge")
+                .count();
             (ready_count as f64 / manifests.len() as f64) * 100.0
         }
-        let ready = manifests
-            .iter()
-            .filter(|m| m.status == "Ready for Merge")
-            .count();
-        (ready as f64 / manifests.len() as f64) * 100.0
     }
 
     /// Export complete Markdown PR proposal manifest summary

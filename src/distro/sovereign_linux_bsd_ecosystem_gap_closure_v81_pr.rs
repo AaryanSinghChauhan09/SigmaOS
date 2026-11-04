@@ -90,7 +90,13 @@ impl LinuxIoUringFutex2V81PrEngine {
         }
     }
 
-    pub fn register_futex_waiter(&mut self, addr: u64, val: u64, flags: u32, bitset: u32) -> String {
+    pub fn register_futex_waiter(
+        &mut self,
+        addr: u64,
+        val: u64,
+        flags: u32,
+        bitset: u32,
+    ) -> String {
         let waiter = FutexWaiterSpecV81 {
             uaddr: addr,
             val,
@@ -279,7 +285,13 @@ impl GentooPortageEapi10V81PrEngine {
         }
     }
 
-    pub fn add_ebuild(&mut self, cpv: &str, slot: &str, subslot: &str, use_flags: Vec<&str>) -> String {
+    pub fn add_ebuild(
+        &mut self,
+        cpv: &str,
+        slot: &str,
+        subslot: &str,
+        use_flags: Vec<&str>,
+    ) -> String {
         let flags = use_flags.into_iter().map(|s| s.to_string()).collect();
         let spec = EbuildSpecV81 {
             cpv: cpv.to_string(),

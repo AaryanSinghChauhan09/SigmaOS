@@ -491,7 +491,10 @@ mod tests {
     fn test_v86_suite_integration() {
         let supervisor = SovereignInitSupervisor::new();
         let sig = [0u8; 64];
-        let manifests = supervisor.pr_gateway_v86.orchestrate_core_userland_v86(&sig).unwrap();
+        let manifests = supervisor
+            .pr_gateway_v86
+            .orchestrate_core_userland_v86(&sig)
+            .unwrap();
         assert_eq!(manifests.len(), 7);
     }
 
@@ -499,7 +502,10 @@ mod tests {
     fn test_v88_suite_integration() {
         let supervisor = SovereignInitSupervisor::new();
         let sig = [0u8; 64];
-        let manifests = supervisor.pr_gateway_v88.orchestrate_core_userland_v88(&sig).unwrap();
+        let manifests = supervisor
+            .pr_gateway_v88
+            .orchestrate_core_userland_v88(&sig)
+            .unwrap();
         assert_eq!(manifests.len(), 7);
     }
 
@@ -507,7 +513,10 @@ mod tests {
     fn test_v90_suite_integration() {
         let supervisor = SovereignInitSupervisor::new();
         let sig = [0u8; 64];
-        let manifests = supervisor.pr_gateway_v90.orchestrate_core_userland_v90(&sig).unwrap();
+        let manifests = supervisor
+            .pr_gateway_v90
+            .orchestrate_core_userland_v90(&sig)
+            .unwrap();
         assert_eq!(manifests.len(), 7);
     }
 
@@ -515,7 +524,10 @@ mod tests {
     fn test_v92_suite_integration() {
         let supervisor = SovereignInitSupervisor::new();
         let sig = [0u8; 64];
-        let manifests = supervisor.pr_gateway_v92.orchestrate_core_userland_v92(&sig).unwrap();
+        let manifests = supervisor
+            .pr_gateway_v92
+            .orchestrate_core_userland_v92(&sig)
+            .unwrap();
         assert_eq!(manifests.len(), 7);
         let all_manifests = supervisor.suite_v92.collect_all_manifests();
         assert_eq!(all_manifests.len(), 7);

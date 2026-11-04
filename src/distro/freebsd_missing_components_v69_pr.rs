@@ -94,12 +94,7 @@ impl FreeBsdBhyveNvramUefiSecureBootPrEngine {
         Self { vm_configs }
     }
 
-    pub fn configure_nvram_secure_boot(
-        &mut self,
-        vm: &str,
-        rom_vars: &str,
-        cert: &str,
-    ) -> String {
+    pub fn configure_nvram_secure_boot(&mut self, vm: &str, rom_vars: &str, cert: &str) -> String {
         let spec = BhyveNvramSecureBootSpec {
             vm_name: vm.to_string(),
             rom_vars_path: rom_vars.to_string(),
@@ -391,12 +386,7 @@ impl FreeBsdAuditdistdZstdTlsStreamPipelinePrEngine {
         Self { receivers }
     }
 
-    pub fn configure_stream_pipeline(
-        &mut self,
-        host: &str,
-        level: i32,
-        threads: u32,
-    ) -> String {
+    pub fn configure_stream_pipeline(&mut self, host: &str, level: i32, threads: u32) -> String {
         let spec = AuditdistdZstdSpec {
             receiver_host: host.to_string(),
             zstd_compression_level: level,
@@ -506,7 +496,9 @@ impl FreeBsdPkgBaseZfsRollbackRescueBootEnvPrEngine {
                 watchdog_timeout_seconds: 60,
             },
         );
-        Self { rescue_environments }
+        Self {
+            rescue_environments,
+        }
     }
 
     pub fn setup_rescue_be(&mut self, active: &str, rescue: &str, timeout: u32) -> String {
@@ -569,7 +561,8 @@ impl FreeBsdDtraceKinstSyscallLatencyMatrixPrEngine {
             latency_histogram_quantiles: vec![0.50, 0.90, 0.99],
             callgate_overhead_nanos: 15,
         };
-        self.matrix_probes.insert(format!("kinst_{}", syscall), spec);
+        self.matrix_probes
+            .insert(format!("kinst_{}", syscall), spec);
         format!(
             "dtrace -n 'kinst::{}:entry {{ self->ts = timestamp; }} kinst::{}:return {{ @lat = quantize(timestamp - self->ts); }}'\n",
             syscall, syscall
@@ -607,20 +600,18 @@ impl FreeBsdFreebsdUpdatePqcDilithium5VerificationEngine {
             "15.0-RELEASE-p1".to_string(),
             Dilithium5VerifierSpec {
                 release_tag: "15.0-RELEASE-p1".to_string(),
-                sha256_root_hash: "a38f37bc5594e9f733182cdb441f92e21b79e195e263d59e355c7a40b95570bb".to_string(),
+                sha256_root_hash:
+                    "a38f37bc5594e9f733182cdb441f92e21b79e195e263d59e355c7a40b95570bb".to_string(),
                 dilithium5_pubkey_fingerprint: "PQC_DILITHIUM5_FREEBSD_SEC_TEAM_2025".to_string(),
                 verified: true,
             },
         );
-        Self { release_verifications }
+        Self {
+            release_verifications,
+        }
     }
 
-    pub fn verify_release_update(
-        &mut self,
-        tag: &str,
-        hash: &str,
-        fingerprint: &str,
-    ) -> String {
+    pub fn verify_release_update(&mut self, tag: &str, hash: &str, fingerprint: &str) -> String {
         let spec = Dilithium5VerifierSpec {
             release_tag: tag.to_string(),
             sha256_root_hash: hash.to_string(),
@@ -737,11 +728,9 @@ impl FreeBsdMissingComponentsV69PrSuite {
         );
         self.validate_and_merge_pr(pr2);
 
-        let pkg_rescue_diff = self.pkgbase_rescue.setup_rescue_be(
-            "be_15_1_release",
-            "be_pre_15_1_snapshot",
-            120,
-        );
+        let pkg_rescue_diff =
+            self.pkgbase_rescue
+                .setup_rescue_be("be_15_1_release", "be_pre_15_1_snapshot", 120);
         let pr3 = self.submit_pr_proposal(
             "Enable pkgbase automatic failover boot environment & ZFS atomic recovery governor",
             "jules",

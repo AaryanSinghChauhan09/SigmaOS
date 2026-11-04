@@ -236,15 +236,21 @@ impl Blfs122BuildDependencySchedulerEngineV79 {
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV79 {
         LfsBsdPrProposalV79 {
             pr_id: 4062,
-            title: "feat(blfs): BLFS 12.2 Build Dependency DAG Scheduler & DESTDIR Staging Engine".to_string(),
+            title: "feat(blfs): BLFS 12.2 Build Dependency DAG Scheduler & DESTDIR Staging Engine"
+                .to_string(),
             component_name: "sigmaos-blfs122-dag-scheduler-v79".to_string(),
             distro_origin: "Beyond Linux From Scratch 12.2".to_string(),
             status: LfsBsdPrStatusV79::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::AutomationProvisioning.as_str().to_string(),
-                UniversalSubsystemCategory::PackageManagement.as_str().to_string(),
+                UniversalSubsystemCategory::AutomationProvisioning
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::PackageManagement
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/blfs/scheduler_v79.rs b/sys/blfs/scheduler_v79.rs".to_string(),
+            patch_diff: "diff --git a/sys/blfs/scheduler_v79.rs b/sys/blfs/scheduler_v79.rs"
+                .to_string(),
         }
     }
 }
@@ -282,16 +288,24 @@ impl FreeBsd142VnetCapsicumCasperJailEngineV79 {
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV79 {
         LfsBsdPrProposalV79 {
             pr_id: 4063,
-            title: "feat(freebsd): FreeBSD 14.2+ VNET Virtual Network Stack & Casper Sandboxed Jails".to_string(),
+            title:
+                "feat(freebsd): FreeBSD 14.2+ VNET Virtual Network Stack & Casper Sandboxed Jails"
+                    .to_string(),
             component_name: "sigmaos-freebsd142-vnet-casper-v79".to_string(),
             distro_origin: "FreeBSD 14.2+".to_string(),
             status: LfsBsdPrStatusV79::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::ContainerVirt.as_str().to_string(),
+                UniversalSubsystemCategory::ContainerVirt
+                    .as_str()
+                    .to_string(),
                 UniversalSubsystemCategory::Networking.as_str().to_string(),
-                UniversalSubsystemCategory::SecuritySandboxing.as_str().to_string(),
+                UniversalSubsystemCategory::SecuritySandboxing
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/freebsd/vnet_casper_v79.rs b/sys/freebsd/vnet_casper_v79.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/freebsd/vnet_casper_v79.rs b/sys/freebsd/vnet_casper_v79.rs"
+                    .to_string(),
         }
     }
 }
@@ -318,7 +332,12 @@ impl OpenBsd77PledgeUnveilFineIbtSentinelEngineV79 {
         Self {
             pinsyscall_active: true,
             fine_ibt_cfi_enabled: true,
-            pledge_promises: vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string(), "inet".to_string()],
+            pledge_promises: vec![
+                "stdio".to_string(),
+                "rpath".to_string(),
+                "wpath".to_string(),
+                "inet".to_string(),
+            ],
         }
     }
 
@@ -418,7 +437,9 @@ impl NetBsd100RumpVeriexecDriverEngineV79 {
     }
 
     pub fn verify_and_dispatch_rump_driver(&self, driver_id: u32) -> bool {
-        self.rump_hypercall_active && self.veriexec_signature_audited && driver_id <= self.driver_count
+        self.rump_hypercall_active
+            && self.veriexec_signature_audited
+            && driver_id <= self.driver_count
     }
 
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV79 {
@@ -521,15 +542,21 @@ impl BsdLinuxCrossAbiSyscallTranslatorEngineV79 {
     pub fn generate_manifest(&self) -> LfsBsdPrProposalV79 {
         LfsBsdPrProposalV79 {
             pr_id: 4067,
-            title: "feat(abi): Universal Linux & BSD Cross-ABI Syscall & VFS Path Translator".to_string(),
+            title: "feat(abi): Universal Linux & BSD Cross-ABI Syscall & VFS Path Translator"
+                .to_string(),
             component_name: "sigmaos-cross-abi-translator-v79".to_string(),
             distro_origin: "Universal Linux & BSD Ecosystem".to_string(),
             status: LfsBsdPrStatusV79::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::ProcessActivity.as_str().to_string(),
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
+                UniversalSubsystemCategory::ProcessActivity
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::FilesystemStorage
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/abi/cross_abi_v79.rs b/sys/abi/cross_abi_v79.rs".to_string(),
+            patch_diff: "diff --git a/sys/abi/cross_abi_v79.rs b/sys/abi/cross_abi_v79.rs"
+                .to_string(),
         }
     }
 }
@@ -579,15 +606,20 @@ impl SovereignLfsBsdV79PrGateway {
             self.cross_abi.generate_manifest(),
             LfsBsdPrProposalV79 {
                 pr_id: 4068,
-                title: "feat(gateway): Sovereign LFS & BSD Master Synthesis V79 Gateway Orchestrator".to_string(),
+                title:
+                    "feat(gateway): Sovereign LFS & BSD Master Synthesis V79 Gateway Orchestrator"
+                        .to_string(),
                 component_name: "sigmaos-lfs-bsd-master-gateway-v79".to_string(),
                 distro_origin: "Sovereign OS Core".to_string(),
                 status: LfsBsdPrStatusV79::Validated,
                 impacted_subsystems: vec![
                     UniversalSubsystemCategory::SystemAudit.as_str().to_string(),
-                    UniversalSubsystemCategory::ObservabilityDiagnostics.as_str().to_string(),
+                    UniversalSubsystemCategory::ObservabilityDiagnostics
+                        .as_str()
+                        .to_string(),
                 ],
-                patch_diff: "diff --git a/sys/gateway/lfs_bsd_v79.rs b/sys/gateway/lfs_bsd_v79.rs".to_string(),
+                patch_diff: "diff --git a/sys/gateway/lfs_bsd_v79.rs b/sys/gateway/lfs_bsd_v79.rs"
+                    .to_string(),
             },
         ]
     }

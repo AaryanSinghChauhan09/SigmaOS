@@ -1,24 +1,24 @@
-use std::vec;
 use std::boxed::Box;
 use std::format;
+use std::vec;
 // SigmaOS Container Runtime
 // OOP-based container management with Docker and Podman support
 // Incorporating FreeBSD Jails (jail networking & IPC sandboxing) and Podman (rootless user namespaces) compatibility
 
-use std::string::{String, ToString};
-use std::vec::Vec;
 #[cfg(not(test))]
 use crate::klib::collections::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 /// FreeBSD VNET virtual network interface pair configuration (FreeBSD VNET/jails parity)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VnetEpairConfig {
     pub epair_id: u32,
-    pub host_interface: String,    // e.g. epair0a
+    pub host_interface: String,      // e.g. epair0a
     pub container_interface: String, // e.g. epair0b
-    pub bridge_name: String,       // e.g. bridge0
+    pub bridge_name: String,         // e.g. bridge0
     pub ipv4_address: String,
     pub mac_address: [u8; 6],
 }
@@ -31,7 +31,14 @@ impl VnetEpairConfig {
             container_interface: format!("epair{}b", epair_id),
             bridge_name: bridge_name.to_string(),
             ipv4_address: ipv4_address.to_string(),
-            mac_address: [0x02, 0x00, 0x00, 0x42, (epair_id >> 8) as u8, epair_id as u8],
+            mac_address: [
+                0x02,
+                0x00,
+                0x00,
+                0x42,
+                (epair_id >> 8) as u8,
+                epair_id as u8,
+            ],
         }
     }
 }
@@ -40,12 +47,12 @@ impl VnetEpairConfig {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CgroupV2Controller {
     pub cgroup_path: String,
-    pub cpu_weight: u32,         // 1-10000 (default 100)
-    pub memory_high_bytes: u64,  // Throttle limit
-    pub memory_max_bytes: u64,   // OOM killer limit
-    pub io_max_rbps: u64,        // Max read bytes per second
-    pub io_max_wbps: u64,        // Max write bytes per second
-    pub pids_max: u32,           // Maximum process count
+    pub cpu_weight: u32,        // 1-10000 (default 100)
+    pub memory_high_bytes: u64, // Throttle limit
+    pub memory_max_bytes: u64,  // OOM killer limit
+    pub io_max_rbps: u64,       // Max read bytes per second
+    pub io_max_wbps: u64,       // Max write bytes per second
+    pub pids_max: u32,          // Maximum process count
 }
 
 impl CgroupV2Controller {
@@ -853,7 +860,12 @@ pub struct SovereignPod {
 }
 
 impl SovereignPod {
-    pub fn new(id: String, name: String, infra_container_id: String, shared_network_mode: NetworkMode) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        infra_container_id: String,
+        shared_network_mode: NetworkMode,
+    ) -> Self {
         Self {
             id,
             name,
@@ -893,7 +905,11 @@ impl PodManager {
         }
     }
 
-    pub fn create_pod(&mut self, name: &str, shared_net: NetworkMode) -> Result<String, ContainerError> {
+    pub fn create_pod(
+        &mut self,
+        name: &str,
+        shared_net: NetworkMode,
+    ) -> Result<String, ContainerError> {
         let pod_id = format!("pod_{}", self.pods.len() + 1);
         let infra_id = format!("infra_{}", pod_id);
         let pod = SovereignPod::new(pod_id.clone(), name.to_string(), infra_id, shared_net);
@@ -913,7 +929,11 @@ impl PodManager {
             .ok_or_else(|| ContainerError::ContainerNotFound(format!("Pod '{}' not found", pod_id)))
     }
 
-    pub fn add_container_to_pod(&mut self, pod_id: &str, container_id: String) -> Result<(), ContainerError> {
+    pub fn add_container_to_pod(
+        &mut self,
+        pod_id: &str,
+        container_id: String,
+    ) -> Result<(), ContainerError> {
         let pod = self.get_pod_mut(pod_id)?;
         pod.add_container(container_id);
         Ok(())
@@ -927,7 +947,10 @@ impl PodManager {
         if self.pods.remove(pod_id).is_some() {
             Ok(())
         } else {
-            Err(ContainerError::ContainerNotFound(format!("Pod '{}' not found", pod_id)))
+            Err(ContainerError::ContainerNotFound(format!(
+                "Pod '{}' not found",
+                pod_id
+            )))
         }
     }
 }
@@ -1181,7 +1204,8 @@ mod tests {
 
     #[test]
     fn test_container_healthcheck_probes() {
-        let hc = HealthcheckConfig::new(&["CMD-SHELL", "curl -f https://localhost/health || exit 1"]);
+        let hc =
+            HealthcheckConfig::new(&["CMD-SHELL", "curl -f https://localhost/health || exit 1"]);
         assert_eq!(hc.interval_secs, 30);
         assert_eq!(hc.retries, 3);
 
@@ -1207,7 +1231,10 @@ mod tests {
 
         assert!(config.healthcheck.is_some());
         let probe = config.healthcheck.unwrap();
-        assert_eq!(probe.test_cmd[1], "curl -f https://localhost/health || exit 1");
+        assert_eq!(
+            probe.test_cmd[1],
+            "curl -f https://localhost/health || exit 1"
+        );
     }
 
     #[test]
@@ -1241,7 +1268,10 @@ mod tests {
         assert_eq!(overlay.calculate_image_size("ubuntu:latest"), 15728640);
 
         let diff_dir = overlay.prepare_rw_overlay_dir("ctr_123");
-        assert_eq!(diff_dir, String::from("/var/lib/sigmaos/overlay2/containers/ctr_123/diff"));
+        assert_eq!(
+            diff_dir,
+            String::from("/var/lib/sigmaos/overlay2/containers/ctr_123/diff")
+        );
 
         let subuid_map = RootlessUidMap::new(0, 100000, 65536);
         assert_eq!(subuid_map.translate_container_to_host(0), Some(100000));

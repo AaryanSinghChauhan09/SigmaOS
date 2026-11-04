@@ -807,9 +807,14 @@ impl DragonFlyBsdMissingComponentsV69PrSuite {
         self.lwkt_scheduler.spawn_thread(102, 0, 8, true);
         let steal_ok = self.lwkt_scheduler.attempt_work_steal(1).is_some();
 
-        let vkernel_ok = self.vkernel_numa.allocate_vkernel_instance(0, 1024).is_some();
+        let vkernel_ok = self
+            .vkernel_numa
+            .allocate_vkernel_instance(0, 1024)
+            .is_some();
 
-        let dsynth_ok = self.dsynth_signer.build_and_sign_package(1, "libc", "1.0", b"binarydata");
+        let dsynth_ok = self
+            .dsynth_signer
+            .build_and_sign_package(1, "libc", "1.0", b"binarydata");
 
         q_ok && steal_ok && vkernel_ok && dsynth_ok
     }

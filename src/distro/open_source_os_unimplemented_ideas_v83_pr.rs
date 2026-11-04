@@ -591,7 +591,10 @@ impl SovereignUnimplementedIdeasSuiteV83 {
         let mut summary = BTreeMap::new();
         summary.insert("suite_version".to_string(), "v83.0".to_string());
         summary.insert("total_proposals".to_string(), "9".to_string());
-        summary.insert("pqc_signature_algorithm".to_string(), "Dilithium-5".to_string());
+        summary.insert(
+            "pqc_signature_algorithm".to_string(),
+            "Dilithium-5".to_string(),
+        );
         summary.insert("interoperability_score".to_string(), "100.0%".to_string());
         summary.insert("linux637_status".to_string(), "Active".to_string());
         summary.insert("freebsd167_status".to_string(), "Active".to_string());
@@ -624,7 +627,10 @@ mod tests {
 
         let summary = suite.generate_suite_summary();
         assert_eq!(summary.get("total_proposals").unwrap(), "9");
-        assert_eq!(summary.get("pqc_signature_algorithm").unwrap(), "Dilithium-5");
+        assert_eq!(
+            summary.get("pqc_signature_algorithm").unwrap(),
+            "Dilithium-5"
+        );
     }
 
     #[test]
@@ -652,7 +658,8 @@ mod tests {
         assert!(veriexec_msg.contains("Veriexec V9"));
 
         let illumos_engine = IllumosOpenZfsDTraceEBPFEngineV83::new();
-        let dtrace_msg = illumos_engine.translate_dtrace_script("sysinfo:::syscall-entry { @[probefunc] = count(); }");
+        let dtrace_msg = illumos_engine
+            .translate_dtrace_script("sysinfo:::syscall-entry { @[probefunc] = count(); }");
         assert!(dtrace_msg.contains("eBPF bytecode"));
 
         let microkernel_engine = HaikuPlan9RedoxMicrokernelSchemeEngineV83::new();

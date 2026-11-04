@@ -106,8 +106,13 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV82 {
             component_name: "SigmaOsVsOpenSourceOsComparisonMatrixEngineV82".to_string(),
             os_origin: "Global Open Source OS Ecosystem".to_string(),
             status: OsPrStatusV82::Validated,
-            impacted_subsystems: vec!["KernelScheduling".to_string(), "FilesystemStorage".to_string()],
-            patch_diff: "--- a/matrix_v82.rs\n+++ b/matrix_v82.rs\n@@ -1,3 +1,3 @@\n+pub struct MatrixV82;".to_string(),
+            impacted_subsystems: vec![
+                "KernelScheduling".to_string(),
+                "FilesystemStorage".to_string(),
+            ],
+            patch_diff:
+                "--- a/matrix_v82.rs\n+++ b/matrix_v82.rs\n@@ -1,3 +1,3 @@\n+pub struct MatrixV82;"
+                    .to_string(),
         }
     }
 }
@@ -236,8 +241,12 @@ impl OpenBsd95FineIbtPinsyscallPteGuardEngineV82 {
             component_name: "OpenBsd95FineIbtPinsyscallPteGuardEngineV82".to_string(),
             os_origin: "OpenBSD 9.5+".to_string(),
             status: OsPrStatusV82::Validated,
-            impacted_subsystems: vec!["SecuritySandboxing".to_string(), "MemoryVirtualization".to_string()],
-            patch_diff: "--- a/sys/arch/amd64/amd64/trap.c\n+++ b/sys/arch/amd64/amd64/trap.c".to_string(),
+            impacted_subsystems: vec![
+                "SecuritySandboxing".to_string(),
+                "MemoryVirtualization".to_string(),
+            ],
+            patch_diff: "--- a/sys/arch/amd64/amd64/trap.c\n+++ b/sys/arch/amd64/amd64/trap.c"
+                .to_string(),
         }
     }
 }
@@ -290,7 +299,9 @@ impl DragonFly84Hammer3DirectIoErasureEngineV82 {
             os_origin: "DragonFly BSD 8.4+".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "StorageDrive".to_string()],
-            patch_diff: "--- a/sys/vfs/hammer3/hammer3_vnops.c\n+++ b/sys/vfs/hammer3/hammer3_vnops.c".to_string(),
+            patch_diff:
+                "--- a/sys/vfs/hammer3/hammer3_vnops.c\n+++ b/sys/vfs/hammer3/hammer3_vnops.c"
+                    .to_string(),
         }
     }
 }
@@ -413,8 +424,12 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV82 {
             component_name: "Plan9Synthetic9P2000VfsRforkMultiplexerEngineV82".to_string(),
             os_origin: "Plan 9".to_string(),
             status: OsPrStatusV82::Validated,
-            impacted_subsystems: vec!["FilesystemStorage".to_string(), "ProcessActivity".to_string()],
-            patch_diff: "--- a/sys/src/9/port/sysproc.c\n+++ b/sys/src/9/port/sysproc.c".to_string(),
+            impacted_subsystems: vec![
+                "FilesystemStorage".to_string(),
+                "ProcessActivity".to_string(),
+            ],
+            patch_diff: "--- a/sys/src/9/port/sysproc.c\n+++ b/sys/src/9/port/sysproc.c"
+                .to_string(),
         }
     }
 }
@@ -452,8 +467,12 @@ impl NixGuixHermeticCasMerkleClosureEngineV82 {
             component_name: "NixGuixHermeticCasMerkleClosureEngineV82".to_string(),
             os_origin: "NixOS / Guix".to_string(),
             status: OsPrStatusV82::Validated,
-            impacted_subsystems: vec!["PackageManagement".to_string(), "AutomationProvisioning".to_string()],
-            patch_diff: "--- a/src/libstore/store-api.cc\n+++ b/src/libstore/store-api.cc".to_string(),
+            impacted_subsystems: vec![
+                "PackageManagement".to_string(),
+                "AutomationProvisioning".to_string(),
+            ],
+            patch_diff: "--- a/src/libstore/store-api.cc\n+++ b/src/libstore/store-api.cc"
+                .to_string(),
         }
     }
 }
@@ -483,7 +502,11 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV82 {
     }
 
     pub fn probe_vnic_latency(&self, port_id: u32) -> u32 {
-        if port_id < self.vnic_ports { 2 } else { 0 }
+        if port_id < self.vnic_ports {
+            2
+        } else {
+            0
+        }
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV82 {
@@ -493,8 +516,13 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV82 {
             component_name: "IllumosCrossbowVnicDtraceSwitchMeshEngineV82".to_string(),
             os_origin: "Illumos".to_string(),
             status: OsPrStatusV82::Validated,
-            impacted_subsystems: vec!["Networking".to_string(), "ObservabilityDiagnostics".to_string()],
-            patch_diff: "--- a/usr/src/uts/common/io/mac/mac.c\n+++ b/usr/src/uts/common/io/mac/mac.c".to_string(),
+            impacted_subsystems: vec![
+                "Networking".to_string(),
+                "ObservabilityDiagnostics".to_string(),
+            ],
+            patch_diff:
+                "--- a/usr/src/uts/common/io/mac/mac.c\n+++ b/usr/src/uts/common/io/mac/mac.c"
+                    .to_string(),
         }
     }
 }
@@ -536,7 +564,8 @@ impl OmarchyWallustThemeChordNavigatorEngineV82 {
             os_origin: "Omarchy Linux".to_string(),
             status: OsPrStatusV82::Validated,
             impacted_subsystems: vec!["DesktopCompositor".to_string(), "ShellTerminal".to_string()],
-            patch_diff: "--- a/config/omarchy/theme.toml\n+++ b/config/omarchy/theme.toml".to_string(),
+            patch_diff: "--- a/config/omarchy/theme.toml\n+++ b/config/omarchy/theme.toml"
+                .to_string(),
         }
     }
 }
@@ -580,7 +609,10 @@ impl GlobalTechMedia38PortalUnimplementedIdeasEngineV82 {
             component_name: "GlobalTechMedia38PortalUnimplementedIdeasEngineV82".to_string(),
             os_origin: "Global Tech Media".to_string(),
             status: OsPrStatusV82::Validated,
-            impacted_subsystems: vec!["AiWorkflowAgent".to_string(), "ObservabilityDiagnostics".to_string()],
+            impacted_subsystems: vec![
+                "AiWorkflowAgent".to_string(),
+                "ObservabilityDiagnostics".to_string(),
+            ],
             patch_diff: "--- a/docs/harvest_v82.md\n+++ b/docs/harvest_v82.md".to_string(),
         }
     }

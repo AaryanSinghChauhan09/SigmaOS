@@ -253,7 +253,10 @@ impl SystemdAdvancementsV89Engine {
         }
         for conflict in &deps.conflicts {
             if active_units.contains(conflict) {
-                return (false, vec![format!("Conflicting unit active: {}", conflict)]);
+                return (
+                    false,
+                    vec![format!("Conflicting unit active: {}", conflict)],
+                );
             }
         }
         if missing_reqs.is_empty() {
@@ -742,7 +745,10 @@ impl LaunchdAndroidInitAdvancementsV89Engine {
             return None;
         }
         let cond = trimmed[3..].trim();
-        if let Some((prop, val)) = cond.strip_prefix("property:").and_then(|s| s.split_once('=')) {
+        if let Some((prop, val)) = cond
+            .strip_prefix("property:")
+            .and_then(|s| s.split_once('='))
+        {
             Some(("property".to_string(), format!("{}={}", prop, val)))
         } else {
             Some(("event".to_string(), cond.to_string()))
@@ -882,7 +888,9 @@ impl SovereignInitAndSupervisorAdvancementsV89Suite {
     pub fn collect_all_manifests(&self) -> Vec<CoreUserlandV89Manifest> {
         let gateway = SovereignInitAndSupervisorV89PrGatewayEngine::new();
         let dummy_sig = [0x42u8; 64];
-        gateway.orchestrate_core_userland_v89(&dummy_sig).unwrap_or_default()
+        gateway
+            .orchestrate_core_userland_v89(&dummy_sig)
+            .unwrap_or_default()
     }
 }
 
@@ -1047,7 +1055,13 @@ mod tests {
         assert_eq!(params.get("cpu.weight").unwrap(), "100");
         assert_eq!(params.get("io.max").unwrap(), "rbps=1000000 wbps=500000");
 
-        let entry = engine.format_sd_journal_record("nginx.service", 6, "Started Nginx", "boot-123", 1000000);
+        let entry = engine.format_sd_journal_record(
+            "nginx.service",
+            6,
+            "Started Nginx",
+            "boot-123",
+            1000000,
+        );
         assert_eq!(entry.unit, "nginx.service");
         assert!(entry.cursor.contains("boot-123"));
         assert!(entry.fss_hmac.is_some());
@@ -1059,7 +1073,8 @@ mod tests {
             requisite: vec!["network.target".to_string()],
             ..Default::default()
         };
-        let (can_start, missing) = engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
+        let (can_start, missing) =
+            engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
         assert!(can_start);
         assert!(missing.is_empty());
 
@@ -1096,7 +1111,9 @@ mod tests {
             conf_overrides: BTreeMap::new(),
         };
 
-        let order = engine.solve_runlevel_execution_order(&[svc2, svc1]).unwrap();
+        let order = engine
+            .solve_runlevel_execution_order(&[svc2, svc1])
+            .unwrap();
         assert_eq!(order, vec!["net", "sshd"]);
 
         let mut active = BTreeMap::new();
@@ -1131,8 +1148,14 @@ mod tests {
         };
         assert!(!engine.evaluate_readiness_notification(&spec_down, Some(3), false));
 
-        assert_eq!(engine.calculate_exponential_backoff_delay_ms(1, 100, 5000), 101);
-        assert_eq!(engine.calculate_exponential_backoff_delay_ms(2, 100, 5000), 204);
+        assert_eq!(
+            engine.calculate_exponential_backoff_delay_ms(1, 100, 5000),
+            101
+        );
+        assert_eq!(
+            engine.calculate_exponential_backoff_delay_ms(2, 100, 5000),
+            204
+        );
     }
 
     #[test]
@@ -1197,7 +1220,13 @@ mod tests {
         assert!(engine.evaluate_selinux_domain_policy("u:r:system_server:s0", "system_server"));
 
         let action = engine.parse_android_action_command("setprop sys.boot_completed 1");
-        assert_eq!(action, Some(("setprop".to_string(), vec!["sys.boot_completed".to_string(), "1".to_string()])));
+        assert_eq!(
+            action,
+            Some((
+                "setprop".to_string(),
+                vec!["sys.boot_completed".to_string(), "1".to_string()]
+            ))
+        );
     }
 
     #[test]

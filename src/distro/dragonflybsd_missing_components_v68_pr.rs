@@ -521,7 +521,9 @@ impl DragonFlyBsdMissingComponentsV68PrSuite {
             target_component: "kernel/scheduler/lwkt".to_string(),
             description: "Dynamic per-core light-weight kernel thread rebalancing.".to_string(),
             status: PrProposalStatusV68::Approved,
-            unified_diff: "--- a/kernel/lwkt_v68.rs\n+++ b/kernel/lwkt_v68.rs\n+ pub fn rebalance_cpu_load()".to_string(),
+            unified_diff:
+                "--- a/kernel/lwkt_v68.rs\n+++ b/kernel/lwkt_v68.rs\n+ pub fn rebalance_cpu_load()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV68 {
@@ -566,7 +568,9 @@ impl DragonFlyBsdMissingComponentsV68PrSuite {
             target_component: "vfs/namecache".to_string(),
             description: "Per-CPU lockfree namecache bucket lookup engine.".to_string(),
             status: PrProposalStatusV68::Approved,
-            unified_diff: "--- a/vfs/namecache_v68.rs\n+++ b/vfs/namecache_v68.rs\n+ pub fn lookup()".to_string(),
+            unified_diff:
+                "--- a/vfs/namecache_v68.rs\n+++ b/vfs/namecache_v68.rs\n+ pub fn lookup()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV68 {
@@ -575,7 +579,9 @@ impl DragonFlyBsdMissingComponentsV68PrSuite {
             target_component: "dev/devctl".to_string(),
             description: "Async kqueue hotplug event queue and routing subsystem.".to_string(),
             status: PrProposalStatusV68::Approved,
-            unified_diff: "--- a/dev/devctl_v68.rs\n+++ b/dev/devctl_v68.rs\n+ pub fn dispatch_next()".to_string(),
+            unified_diff:
+                "--- a/dev/devctl_v68.rs\n+++ b/dev/devctl_v68.rs\n+ pub fn dispatch_next()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV68 {
@@ -584,7 +590,9 @@ impl DragonFlyBsdMissingComponentsV68PrSuite {
             target_component: "vfs/firmlink".to_string(),
             description: "Policy guard for cross-mount firmlink soft/hard link safety.".to_string(),
             status: PrProposalStatusV68::Approved,
-            unified_diff: "--- a/vfs/firmlink_v68.rs\n+++ b/vfs/firmlink_v68.rs\n+ pub fn validate_firmlink()".to_string(),
+            unified_diff:
+                "--- a/vfs/firmlink_v68.rs\n+++ b/vfs/firmlink_v68.rs\n+ pub fn validate_firmlink()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpecV68 {
@@ -593,7 +601,9 @@ impl DragonFlyBsdMissingComponentsV68PrSuite {
             target_component: "kernel/smp".to_string(),
             description: "High-precision core TSC drift tracking and compensation.".to_string(),
             status: PrProposalStatusV68::Approved,
-            unified_diff: "--- a/kernel/smp_v68.rs\n+++ b/kernel/smp_v68.rs\n+ pub fn equalize_all_cores()".to_string(),
+            unified_diff:
+                "--- a/kernel/smp_v68.rs\n+++ b/kernel/smp_v68.rs\n+ pub fn equalize_all_cores()"
+                    .to_string(),
         });
 
         prs

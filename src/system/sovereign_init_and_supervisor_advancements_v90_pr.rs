@@ -101,8 +101,8 @@ pub struct SystemdJournalEntryV90 {
 /// systemd Sandboxing Directives V90
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct SystemdSandboxDirectivesV90 {
-    pub protect_system: Option<String>,      // strict, full, yes
-    pub protect_home: Option<String>,        // read-only, tmpfs, yes
+    pub protect_system: Option<String>, // strict, full, yes
+    pub protect_home: Option<String>,   // read-only, tmpfs, yes
     pub private_tmp: bool,
     pub protect_kernel_tunables: bool,
     pub protect_control_groups: bool,
@@ -259,7 +259,9 @@ impl SystemdAdvancementsV90Engine {
             SystemdRestartPolicyV90::No => false,
             SystemdRestartPolicyV90::Always => true,
             SystemdRestartPolicyV90::OnSuccess => exit_code == 0 && !is_signaled,
-            SystemdRestartPolicyV90::OnFailure => exit_code != 0 || is_signaled || is_watchdog_timeout,
+            SystemdRestartPolicyV90::OnFailure => {
+                exit_code != 0 || is_signaled || is_watchdog_timeout
+            }
             SystemdRestartPolicyV90::OnAbnormal => is_signaled || is_watchdog_timeout,
             SystemdRestartPolicyV90::OnWatchdog => is_watchdog_timeout,
             SystemdRestartPolicyV90::OnAbort => is_signaled,
@@ -291,7 +293,10 @@ impl SystemdAdvancementsV90Engine {
             confinement.push("restrict:namespaces".to_string());
         }
         if !directives.system_call_filter.is_empty() {
-            confinement.push(format!("seccomp:{}", directives.system_call_filter.join(",")));
+            confinement.push(format!(
+                "seccomp:{}",
+                directives.system_call_filter.join(",")
+            ));
         }
         confinement
     }
@@ -344,7 +349,10 @@ impl SystemdAdvancementsV90Engine {
         }
         for conflict in &deps.conflicts {
             if active_units.contains(conflict) {
-                return (false, vec![format!("Conflicting unit active: {}", conflict)]);
+                return (
+                    false,
+                    vec![format!("Conflicting unit active: {}", conflict)],
+                );
             }
         }
         if missing_reqs.is_empty() {
@@ -724,7 +732,10 @@ impl SysVinitAdvancementsV90Engine {
         match target_level {
             '0' | '1' | '2' | '3' | '4' | '5' | '6' | 'S' | 's' => Ok(target_level),
             'Q' | 'q' => Ok(current_level),
-            _ => Err(format!("Invalid SysVinit target runlevel: {}", target_level)),
+            _ => Err(format!(
+                "Invalid SysVinit target runlevel: {}",
+                target_level
+            )),
         }
     }
 
@@ -746,10 +757,7 @@ impl SysVinitAdvancementsV90Engine {
                 let stripped = trimmed.trim_start_matches('#').trim();
                 if let Some((k, v)) = stripped.split_once(':') {
                     let key = k.trim().to_string();
-                    let vals: Vec<String> = v
-                        .split_whitespace()
-                        .map(|s| s.to_string())
-                        .collect();
+                    let vals: Vec<String> = v.split_whitespace().map(|s| s.to_string()).collect();
                     info.insert(key, vals);
                 }
             }
@@ -818,7 +826,11 @@ impl BsdRcAdvancementsV90Engine {
     }
 
     /// Build FreeBSD / OpenBSD / NetBSD execution pipeline executing pre/post hooks.
-    pub fn build_execution_sequence(&self, hooks: &BsdRcScriptHooksV90, action: &str) -> Vec<String> {
+    pub fn build_execution_sequence(
+        &self,
+        hooks: &BsdRcScriptHooksV90,
+        action: &str,
+    ) -> Vec<String> {
         let mut seq = Vec::new();
         match action {
             "start" => {
@@ -1065,18 +1077,55 @@ impl CronAnacronTimersAtV90Engine {
         let trimmed = expr.trim();
         match trimmed {
             "@reboot" => return Ok(vec!["@reboot".to_string()]),
-            "@yearly" | "@annually" => return Ok(vec!["0".into(), "0".into(), "1".into(), "1".into(), "*".into()]),
-            "@monthly" => return Ok(vec!["0".into(), "0".into(), "1".into(), "*".into(), "*".into()]),
-            "@weekly" => return Ok(vec!["0".into(), "0".into(), "*".into(), "*".into(), "0".into()]),
-            "@daily" | "@midnight" => return Ok(vec!["0".into(), "0".into(), "*".into(), "*".into(), "*".into()]),
-            "@hourly" => return Ok(vec!["0".into(), "*".into(), "*".into(), "*".into(), "*".into()]),
+            "@yearly" | "@annually" => {
+                return Ok(vec![
+                    "0".into(),
+                    "0".into(),
+                    "1".into(),
+                    "1".into(),
+                    "*".into(),
+                ])
+            }
+            "@monthly" => {
+                return Ok(vec![
+                    "0".into(),
+                    "0".into(),
+                    "1".into(),
+                    "*".into(),
+                    "*".into(),
+                ])
+            }
+            "@weekly" => {
+                return Ok(vec![
+                    "0".into(),
+                    "0".into(),
+                    "*".into(),
+                    "*".into(),
+                    "0".into(),
+                ])
+            }
+            "@daily" | "@midnight" => {
+                return Ok(vec![
+                    "0".into(),
+                    "0".into(),
+                    "*".into(),
+                    "*".into(),
+                    "*".into(),
+                ])
+            }
+            "@hourly" => {
+                return Ok(vec![
+                    "0".into(),
+                    "*".into(),
+                    "*".into(),
+                    "*".into(),
+                    "*".into(),
+                ])
+            }
             _ => {}
         }
 
-        let parts: Vec<String> = trimmed
-            .split_whitespace()
-            .map(|s| s.to_string())
-            .collect();
+        let parts: Vec<String> = trimmed.split_whitespace().map(|s| s.to_string()).collect();
         if parts.len() == 5 || parts.len() == 6 {
             Ok(parts)
         } else {
@@ -1165,7 +1214,9 @@ impl SovereignInitAndSupervisorAdvancementsV90Suite {
     pub fn collect_all_manifests(&self) -> Vec<CoreUserlandV90Manifest> {
         let gateway = SovereignInitAndSupervisorV90PrGatewayEngine::new();
         let dummy_sig = [0x5au8; 64];
-        gateway.orchestrate_core_userland_v90(&dummy_sig).unwrap_or_default()
+        gateway
+            .orchestrate_core_userland_v90(&dummy_sig)
+            .unwrap_or_default()
     }
 }
 
@@ -1335,7 +1386,13 @@ mod tests {
         assert_eq!(params.get("cpu.weight").unwrap(), "100");
         assert_eq!(params.get("io.max").unwrap(), "rbps=1000000 wbps=500000");
 
-        let entry = engine.format_sd_journal_record("nginx.service", 6, "Started Nginx", "boot-123", 1000000);
+        let entry = engine.format_sd_journal_record(
+            "nginx.service",
+            6,
+            "Started Nginx",
+            "boot-123",
+            1000000,
+        );
         assert_eq!(entry.unit, "nginx.service");
         assert!(entry.cursor.contains("boot-123"));
         assert!(entry.fss_hmac.is_some());
@@ -1347,7 +1404,8 @@ mod tests {
             requisite: vec!["network.target".to_string()],
             ..Default::default()
         };
-        let (can_start, missing) = engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
+        let (can_start, missing) =
+            engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
         assert!(can_start);
         assert!(missing.is_empty());
 
@@ -1368,8 +1426,18 @@ mod tests {
         assert_eq!(parsed.get("STATUS").unwrap(), "Running");
         assert_eq!(parsed.get("MAINPID").unwrap(), "2048");
 
-        assert!(engine.evaluate_restart_decision(SystemdRestartPolicyV90::OnFailure, 1, false, false));
-        assert!(!engine.evaluate_restart_decision(SystemdRestartPolicyV90::OnFailure, 0, false, false));
+        assert!(engine.evaluate_restart_decision(
+            SystemdRestartPolicyV90::OnFailure,
+            1,
+            false,
+            false
+        ));
+        assert!(!engine.evaluate_restart_decision(
+            SystemdRestartPolicyV90::OnFailure,
+            0,
+            false,
+            false
+        ));
         assert!(engine.evaluate_restart_decision(SystemdRestartPolicyV90::Always, 0, false, false));
 
         let sandboxing = SystemdSandboxDirectivesV90 {
@@ -1407,7 +1475,9 @@ mod tests {
             conf_overrides: BTreeMap::new(),
         };
 
-        let order = engine.solve_runlevel_execution_order(&[svc2, svc1]).unwrap();
+        let order = engine
+            .solve_runlevel_execution_order(&[svc2, svc1])
+            .unwrap();
         assert_eq!(order, vec!["net", "sshd"]);
 
         let mut hierarchy = BTreeMap::new();
@@ -1416,7 +1486,8 @@ mod tests {
         let stacked = engine.solve_stacked_runlevels(&hierarchy, "default");
         assert_eq!(stacked, vec!["sysinit", "boot", "default"]);
 
-        let supervise_cmd = engine.build_supervise_daemon_cmd("sshd", "/usr/sbin/sshd", "/run/sshd.pid", 5);
+        let supervise_cmd =
+            engine.build_supervise_daemon_cmd("sshd", "/usr/sbin/sshd", "/run/sshd.pid", 5);
         assert!(supervise_cmd.contains("supervise-daemon --start /usr/sbin/sshd"));
     }
 
@@ -1503,8 +1574,12 @@ mod tests {
         let jail_cmd = engine.build_jail_chroot_command(&hooks);
         assert_eq!(jail_cmd, "jail -n webjail exec /usr/local/sbin/nginx");
 
-        let rcctl_cmd = engine.build_rcctl_flags_command("sshd", Some("_sshd"), Some("-D"), Some("daemon"));
-        assert_eq!(rcctl_cmd, "rcctl set sshd user _sshd flags \"-D\" class daemon");
+        let rcctl_cmd =
+            engine.build_rcctl_flags_command("sshd", Some("_sshd"), Some("-D"), Some("daemon"));
+        assert_eq!(
+            rcctl_cmd,
+            "rcctl set sshd user _sshd flags \"-D\" class daemon"
+        );
 
         let scripts = vec![
             ("netif", vec!["net"], vec![]),
@@ -1538,7 +1613,13 @@ mod tests {
         assert!(engine.evaluate_selinux_domain_policy("u:r:system_server:s0", "system_server"));
 
         let action = engine.parse_android_action_command("setprop sys.boot_completed 1");
-        assert_eq!(action, Some(("setprop".to_string(), vec!["sys.boot_completed".to_string(), "1".to_string()])));
+        assert_eq!(
+            action,
+            Some((
+                "setprop".to_string(),
+                vec!["sys.boot_completed".to_string(), "1".to_string()]
+            ))
+        );
     }
 
     #[test]
