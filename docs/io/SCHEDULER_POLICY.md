@@ -1,2 +1,2 @@
 # Scheduler Policy
-Subsystem scheduling and priority management.
+Policy for scheduling in SigmaOS.

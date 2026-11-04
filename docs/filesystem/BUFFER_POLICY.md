@@ -1,2 +1,2 @@
 # Buffer Policy
-Buffer management, caching, and eviction semantics.
+Policy for buffer pool and buffer cache in SigmaOS.

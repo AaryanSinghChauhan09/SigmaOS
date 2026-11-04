@@ -1,2 +1,2 @@
 # DMA Policy
-DMA operations and safety rules.
+Policy for direct memory access (DMA) operations in SigmaOS.

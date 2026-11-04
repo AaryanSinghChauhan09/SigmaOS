@@ -1,2 +1,2 @@
 # Callback Policy
-Callback registration, execution, and error handling.
+Policy for asynchronous callbacks in SigmaOS.
