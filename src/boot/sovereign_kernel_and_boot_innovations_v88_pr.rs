@@ -76,7 +76,7 @@ impl LinuxBsdKernelInnovationsV88Engine {
         self.configs.push(KernelFeatureConfigV88 {
             flavor: KernelFlavorV88::LinuxEevdfSchedExt,
             name: "Linux 6.40+ Sovereign Core".to_string(),
-            latency_target_ns: 950_000, // 0.95ms EEVDF dynamic slice target
+            latency_target_ns: 1_000_000, // 1.0ms EEVDF target
             ebpfsched_policy: "scx_optical_interactive_v88".to_string(),
             io_uring_sqpoll_active: true,
             bcachefs_cow_tiering: true,
@@ -92,11 +92,11 @@ impl LinuxBsdKernelInnovationsV88Engine {
             varsyms_bindings: BTreeMap::new(),
         });
 
-        // 2. FreeBSD Capsicum + VNET + GELI + ZFS bectl
+        // 2. FreeBSD Capsicum + VNET + GELI
         self.configs.push(KernelFeatureConfigV88 {
             flavor: KernelFlavorV88::FreeBsdCapsicumVnetGeli,
             name: "FreeBSD 17.0+ Sovereign Core".to_string(),
-            latency_target_ns: 3_200_000,
+            latency_target_ns: 3_500_000,
             ebpfsched_policy: String::new(),
             io_uring_sqpoll_active: false,
             bcachefs_cow_tiering: false,
@@ -119,7 +119,7 @@ impl LinuxBsdKernelInnovationsV88Engine {
         self.configs.push(KernelFeatureConfigV88 {
             flavor: KernelFlavorV88::OpenBsdPledgeKarlSoftraid,
             name: "OpenBSD 9.8+ Sovereign Security Core".to_string(),
-            latency_target_ns: 6_800_000,
+            latency_target_ns: 7_000_000,
             ebpfsched_policy: String::new(),
             io_uring_sqpoll_active: false,
             bcachefs_cow_tiering: false,
@@ -133,7 +133,7 @@ impl LinuxBsdKernelInnovationsV88Engine {
                 "inet".to_string(),
             ],
             unveil_paths: unveil,
-            karl_seed: 0xCAFE_BABE_DEAD_BEEF,
+            karl_seed: 0xCAFE_F00D_DEAD_FEED,
             softraid_crypto_algo: "softraid-CRYPTO-AES-256".to_string(),
             rump_driver_server: String::new(),
             npf_jit_bytecode_rules: 0,
@@ -145,7 +145,7 @@ impl LinuxBsdKernelInnovationsV88Engine {
         self.configs.push(KernelFeatureConfigV88 {
             flavor: KernelFlavorV88::NetBsdRumpNpfJit,
             name: "NetBSD 13.3+ Sovereign Rump Core".to_string(),
-            latency_target_ns: 4_800_000,
+            latency_target_ns: 5_000_000,
             ebpfsched_policy: String::new(),
             io_uring_sqpoll_active: false,
             bcachefs_cow_tiering: false,
@@ -155,8 +155,8 @@ impl LinuxBsdKernelInnovationsV88Engine {
             unveil_paths: Vec::new(),
             karl_seed: 0,
             softraid_crypto_algo: String::new(),
-            rump_driver_server: "rump_pci_pnet_nvme_virtio".to_string(),
-            npf_jit_bytecode_rules: 4096,
+            rump_driver_server: "rump_pci_pnet_nvme".to_string(),
+            npf_jit_bytecode_rules: 2048,
             hammer3_pfs_replicas: 0,
             varsyms_bindings: BTreeMap::new(),
         });
@@ -168,7 +168,7 @@ impl LinuxBsdKernelInnovationsV88Engine {
         self.configs.push(KernelFeatureConfigV88 {
             flavor: KernelFlavorV88::DragonFlyHammer3Varsyms,
             name: "DragonFly BSD 8.7+ HAMMER3 Cluster Core".to_string(),
-            latency_target_ns: 2_900_000,
+            latency_target_ns: 3_000_000,
             ebpfsched_policy: String::new(),
             io_uring_sqpoll_active: false,
             bcachefs_cow_tiering: false,
@@ -180,7 +180,7 @@ impl LinuxBsdKernelInnovationsV88Engine {
             softraid_crypto_algo: String::new(),
             rump_driver_server: String::new(),
             npf_jit_bytecode_rules: 0,
-            hammer3_pfs_replicas: 12,
+            hammer3_pfs_replicas: 9,
             varsyms_bindings: varsyms,
         });
 
@@ -243,19 +243,18 @@ impl KernelModuleAndDriverRuntimeV88Engine {
     }
 
     fn seed_builtin_modules_and_drivers(&mut self) {
-        // Module 1: NVMe storage driver module
+        // Module 1: NVMe storage
         self.modules.insert(
             "nvme".to_string(),
             KernelModuleV88 {
                 name: "nvme".to_string(),
                 license: "GPL".to_string(),
-                version: "2.9.0".to_string(),
+                version: "2.8.0".to_string(),
                 exported_symbols: vec![
                     "nvme_alloc_request".to_string(),
                     "nvme_submit_cmd".to_string(),
-                    "nvme_setup_sqpoll".to_string(),
                 ],
-                relocations_resolved: 144,
+                relocations_resolved: 128,
                 is_loaded: true,
             },
         );
@@ -267,11 +266,8 @@ impl KernelModuleAndDriverRuntimeV88Engine {
                 name: "i915kms".to_string(),
                 license: "Dual BSD/GPL".to_string(),
                 version: "6.40.0".to_string(),
-                exported_symbols: vec![
-                    "i915_driver_modeset_probe".to_string(),
-                    "i915_gem_alloc_memory".to_string(),
-                ],
-                relocations_resolved: 288,
+                exported_symbols: vec!["i915_driver_modeset_probe".to_string()],
+                relocations_resolved: 256,
                 is_loaded: true,
             },
         );
@@ -289,7 +285,7 @@ impl KernelModuleAndDriverRuntimeV88Engine {
             },
         );
 
-        // Driver 2: FDT Serial PL011
+        // Driver 2: FDT Serial
         self.drivers.insert(
             "fdt:arm,pl011".to_string(),
             DeviceDriverV88 {
@@ -488,17 +484,17 @@ impl InitramfsInitrdStagingV88Engine {
         self.files.push(InitramfsFileV88 {
             path: "init".to_string(),
             permissions: 0o755,
-            size_bytes: 2_150_000,
+            size_bytes: 2_100_000,
         });
         self.files.push(InitramfsFileV88 {
             path: "bin/busybox".to_string(),
             permissions: 0o755,
-            size_bytes: 1_120_000,
+            size_bytes: 1_100_000,
         });
         self.files.push(InitramfsFileV88 {
             path: "sbin/cryptsetup".to_string(),
             permissions: 0o755,
-            size_bytes: 1_380_000,
+            size_bytes: 1_350_000,
         });
         self.files.push(InitramfsFileV88 {
             path: "etc/fstab".to_string(),

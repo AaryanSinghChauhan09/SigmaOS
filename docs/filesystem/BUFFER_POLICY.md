@@ -1,3 +1,2 @@
-# SigmaOS Buffer Policy
-
-Policy specification for filesystem buffer management.
+# Buffer Policy
+Policy for buffer pool and buffer cache in SigmaOS.

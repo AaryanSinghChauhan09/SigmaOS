@@ -28,13 +28,13 @@ fn test_kernel_innovations_v88_flavors() {
     // Test OpenBSD flavor
     assert!(engine.activate_flavor(KernelFlavorV88::OpenBsdPledgeKarlSoftraid));
     let openbsd = engine.get_active_config().unwrap();
-    assert_eq!(openbsd.karl_seed, 0xCAFE_BABE_DEAD_BEEF);
+    assert_eq!(openbsd.karl_seed, 0xCAFE_F00D_DEAD_FEED);
     assert_eq!(openbsd.pledge_promises.len(), 5);
 
     // Test DragonFly BSD flavor
     assert!(engine.activate_flavor(KernelFlavorV88::DragonFlyHammer3Varsyms));
     let dragonfly = engine.get_active_config().unwrap();
-    assert_eq!(dragonfly.hammer3_pfs_replicas, 12);
+    assert_eq!(dragonfly.hammer3_pfs_replicas, 9);
     assert_eq!(dragonfly.varsyms_bindings.get("sys").unwrap(), "DragonFly");
 
     // Test FreeBSD flavor
@@ -46,8 +46,8 @@ fn test_kernel_innovations_v88_flavors() {
     // Test NetBSD flavor
     assert!(engine.activate_flavor(KernelFlavorV88::NetBsdRumpNpfJit));
     let netbsd = engine.get_active_config().unwrap();
-    assert_eq!(netbsd.rump_driver_server, "rump_pci_pnet_nvme_virtio");
-    assert_eq!(netbsd.npf_jit_bytecode_rules, 4096);
+    assert_eq!(netbsd.rump_driver_server, "rump_pci_pnet_nvme");
+    assert_eq!(netbsd.npf_jit_bytecode_rules, 2048);
 }
 
 #[test]

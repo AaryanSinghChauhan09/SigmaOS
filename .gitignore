@@ -76,14 +76,8 @@ __pycache__/
 !NEXT_STEPS_GUIDELINES.md
 !.jules/
 !.jules/*.md
-!IO_RULES.toml
-!docs/io/
-!docs/io/*.md
+!docs/storage/
+!docs/storage/*.md
 !docs/filesystem/
 !docs/filesystem/*.md
 !STORAGE_RULES.toml
-!FEATURE_STATUS.toml
-!docs/INTERRUPT_HANDLER_PLAN.md
-!docs/storage/
-!docs/storage/*.md
-!wiki/INTERRUPT_HANDLER_PLAN.md

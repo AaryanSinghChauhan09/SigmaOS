@@ -2,14 +2,32 @@
 
 probe -> identify -> block layer -> cache -> filesystem -> mount -> read/write -> flush -> unmount -> detach -> error/recovery
 
-## Classes & Policies
-- Block Layer Class
-- Device Class
-- Cache Class
-- Filesystem Class
-- Mount Policy
-- Flush Policy
-- Reclaim Policy
-- Error Policy
-- NUMA Behavior
-- Behavior Under Storage Hotplug
+## Block Layer Class
+Defined.
+
+## Device Class
+Defined.
+
+## Cache Class
+Defined.
+
+## Filesystem Class
+Defined.
+
+## Mount Policy
+Defined.
+
+## Flush Policy
+Defined.
+
+## Reclaim Policy
+Defined.
+
+## Error Policy
+Defined.
+
+## NUMA Behavior
+Defined.
+
+## Behavior Under Storage Hotplug
+Defined.

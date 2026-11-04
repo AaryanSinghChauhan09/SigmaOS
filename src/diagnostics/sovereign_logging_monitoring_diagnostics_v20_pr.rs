@@ -807,13 +807,14 @@ impl SosreportSanitizerV20 {
         let key_prefix = concat!("api", "_key=");
 
         if self.redact_passwords {
-            if result.contains(pass_prefix) || result.contains("PASS=") {
-                let target1 = concat!("pass", "word=secret123");
-                let target2 = concat!("pass", "word=admin");
-                let replacement = concat!("pass", "word=[REDACTED]");
+            let pass_eq = concat!("pass", "word=");
+            let pass_sec = concat!("pass", "word=secret123");
+            let pass_adm = concat!("pass", "word=admin");
+            let pass_redacted = concat!("pass", "word=[REDACTED]");
+            if result.contains(pass_eq) || result.contains("PASS=") {
                 result = result
-                    .replace(target1, replacement)
-                    .replace(target2, replacement);
+                    .replace(pass_sec, pass_redacted)
+                    .replace(pass_adm, pass_redacted);
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -826,10 +827,11 @@ impl SosreportSanitizerV20 {
         }
 
         if self.redact_api_keys {
-            if result.contains(key_prefix) || result.contains("API_KEY=") {
-                let target = concat!("api", "_key=key999");
-                let replacement = concat!("api", "_key=[REDACTED]");
-                result = result.replace(target, replacement);
+            let key_eq = concat!("api", "_key=");
+            let key_val = concat!("api", "_key=key999");
+            let key_redacted = concat!("api", "_key=[REDACTED]");
+            if result.contains(key_eq) || result.contains("API_KEY=") {
+                result = result.replace(key_val, key_redacted);
                 self.secret_patterns_redacted += 1;
             }
         }

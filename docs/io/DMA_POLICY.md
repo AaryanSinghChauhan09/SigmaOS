@@ -1,3 +1,2 @@
-# SigmaOS DMA Policy
-
-Policy specification for DMA and scatter-gather operations.
+# DMA Policy
+Policy for direct memory access (DMA) operations in SigmaOS.
