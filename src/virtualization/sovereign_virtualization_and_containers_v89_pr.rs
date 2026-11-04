@@ -358,7 +358,8 @@ impl OciDockerPodmanRuncV89Engine {
             cgroups_version: "v2".to_string(),
             memory_limit_mb: mem_mb,
         };
-        self.containers.insert(container_id.to_string(), spec.clone());
+        self.containers
+            .insert(container_id.to_string(), spec.clone());
         spec
     }
 
@@ -906,9 +907,8 @@ impl SovereignVirtualizationAndContainersParityV89Gateway {
 
     pub fn generate_pr_markdown_summary(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut out = String::from(
-            "# Sovereign Virtualization & Container Ecosystem Parity Suite (v89)\n\n",
-        );
+        let mut out =
+            String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v89)\n\n");
         out.push_str(
             "| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier | PQC Signature |\n",
         );

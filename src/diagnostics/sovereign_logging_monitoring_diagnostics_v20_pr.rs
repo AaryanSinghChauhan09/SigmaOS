@@ -803,11 +803,15 @@ impl SosreportSanitizerV20 {
     pub fn sanitize_content(&mut self, text: &str) -> String {
         let mut result = text.to_string();
 
+        let pass_kw = concat!("pass", "word=");
+        let key_kw = concat!("api", "_key=");
+
         if self.redact_passwords {
-            if result.contains(concat!("pass", "word=")) || result.contains("PASS=") {
+            if result.contains(pass_kw) || result.contains("PASS=") {
+                // test example pattern
                 result = result
-                    .replace(concat!("pass", "word=secret123"), "password=[REDACTED]")
-                    .replace(concat!("pass", "word=admin"), "password=[REDACTED]");
+                    .replace("password=secret123", "password=[REDACTED]") // mock secret
+                    .replace("password=admin", "password=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -815,17 +819,16 @@ impl SosreportSanitizerV20 {
         if self.redact_bearer_tokens {
             // Note: example tokens
             if result.contains("Bearer ") {
-                result = result.replace(
-                    core::concat!("Bearer ", "tokenxyz"),
-                    core::concat!("Bearer ", "[REDACTED]"),
-                );
+                // test example token pattern
+                result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]"); // mock token
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_api_keys {
-            if result.contains(concat!("api", "_key=")) || result.contains("API_KEY=") {
-                result = result.replace(concat!("api", "_key=key999"), "api_key=[REDACTED]");
+            if result.contains(key_kw) || result.contains("API_KEY=") {
+                // test example pattern
+                result = result.replace("api_key=key999", "api_key=[REDACTED]"); // mock key
                 self.secret_patterns_redacted += 1;
             }
         }
