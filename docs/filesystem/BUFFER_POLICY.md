@@ -1,3 +1,3 @@
 # SigmaOS Buffer Policy
 
-LRU buffer cache eviction semantics and dirty block writeback protocols.
+Policy specification for filesystem buffer management.

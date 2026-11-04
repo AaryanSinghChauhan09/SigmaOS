@@ -11,10 +11,10 @@ fn test_dispatcher_documentation_plan_verification() {
     assert!(docs_path.exists(), "docs/DISPATCHER_PLAN.md must exist");
     assert!(wiki_path.exists(), "wiki/DISPATCHER_PLAN.md must exist");
 
-    let docs_plan = fs::read_to_string(docs_path)
-        .expect("docs/DISPATCHER_PLAN.md must be readable");
-    let wiki_plan = fs::read_to_string(wiki_path)
-        .expect("wiki/DISPATCHER_PLAN.md must be readable");
+    let docs_plan =
+        fs::read_to_string(docs_path).expect("docs/DISPATCHER_PLAN.md must be readable");
+    let wiki_plan =
+        fs::read_to_string(wiki_path).expect("wiki/DISPATCHER_PLAN.md must be readable");
 
     // Exact mirror assertion
     assert_eq!(
@@ -61,26 +61,68 @@ fn test_dispatcher_documentation_plan_verification() {
 
 #[test]
 fn test_dispatcher_pr_sequence_roadmap() {
-    let docs_plan = fs::read_to_string("docs/DISPATCHER_PLAN.md")
-        .expect("docs/DISPATCHER_PLAN.md must exist");
+    let docs_plan =
+        fs::read_to_string("docs/DISPATCHER_PLAN.md").expect("docs/DISPATCHER_PLAN.md must exist");
 
     let expected_prs = [
-        (1, "`docs(dispatch): define scheduler-dispatcher-IRQ boundaries`"),
-        (2, "`test(dispatch): add context-frame layout and invariant tests`"),
-        (3, "`refactor(dispatch): define architecture context-switch interface`"),
-        (4, "`feat(dispatch): connect scheduler selection to x86_64 context switch`"),
-        (5, "`feat(dispatch): add safe first-task and idle-task handoff`"),
-        (6, "`feat(dispatch): connect timer interrupt return to reschedule path`"),
-        (7, "`feat(dispatch): connect syscall and exception return-to-user hooks`"),
-        (8, "`feat(dispatch): add wakeup and yield handoff semantics`"),
-        (9, "`feat(dispatch): add run-queue locking and SMP switch protocol`"),
-        (10, "`feat(dispatch): implement interrupt controller flow interface`"),
+        (
+            1,
+            "`docs(dispatch): define scheduler-dispatcher-IRQ boundaries`",
+        ),
+        (
+            2,
+            "`test(dispatch): add context-frame layout and invariant tests`",
+        ),
+        (
+            3,
+            "`refactor(dispatch): define architecture context-switch interface`",
+        ),
+        (
+            4,
+            "`feat(dispatch): connect scheduler selection to x86_64 context switch`",
+        ),
+        (
+            5,
+            "`feat(dispatch): add safe first-task and idle-task handoff`",
+        ),
+        (
+            6,
+            "`feat(dispatch): connect timer interrupt return to reschedule path`",
+        ),
+        (
+            7,
+            "`feat(dispatch): connect syscall and exception return-to-user hooks`",
+        ),
+        (
+            8,
+            "`feat(dispatch): add wakeup and yield handoff semantics`",
+        ),
+        (
+            9,
+            "`feat(dispatch): add run-queue locking and SMP switch protocol`",
+        ),
+        (
+            10,
+            "`feat(dispatch): implement interrupt controller flow interface`",
+        ),
         (11, "`feat(dispatch): add bounded deferred-work executor`"),
-        (12, "`feat(dispatch): define deferred-work priority and forward-progress rules`"),
+        (
+            12,
+            "`feat(dispatch): define deferred-work priority and forward-progress rules`",
+        ),
         (13, "`feat(dispatch): add dispatcher tracing and counters`"),
-        (14, "`test(dispatch): add timer, interrupt, and workqueue fault injection`"),
-        (15, "`test(dispatch): add QEMU end-to-end and architecture matrix`"),
-        (16, "`docs(dispatch): publish support matrix and recovery guide`"),
+        (
+            14,
+            "`test(dispatch): add timer, interrupt, and workqueue fault injection`",
+        ),
+        (
+            15,
+            "`test(dispatch): add QEMU end-to-end and architecture matrix`",
+        ),
+        (
+            16,
+            "`docs(dispatch): publish support matrix and recovery guide`",
+        ),
     ];
 
     for (pr_num, title) in &expected_prs {
@@ -96,8 +138,8 @@ fn test_dispatcher_pr_sequence_roadmap() {
 
 #[test]
 fn test_dispatcher_cadences_and_component_rules() {
-    let docs_plan = fs::read_to_string("docs/DISPATCHER_PLAN.md")
-        .expect("docs/DISPATCHER_PLAN.md must exist");
+    let docs_plan =
+        fs::read_to_string("docs/DISPATCHER_PLAN.md").expect("docs/DISPATCHER_PLAN.md must exist");
 
     let cadences = [
         "Every PR",
@@ -136,13 +178,14 @@ fn test_dispatcher_cadences_and_component_rules() {
     }
 
     // Merge gate rules
-    assert!(docs_plan.contains("Require one maintainer approval for tests/docs and two qualified reviews"));
+    assert!(docs_plan
+        .contains("Require one maintainer approval for tests/docs and two qualified reviews"));
 }
 
 #[test]
 fn test_feature_status_toml_dispatcher_registration() {
-    let feature_status = fs::read_to_string("FEATURE_STATUS.toml")
-        .expect("FEATURE_STATUS.toml must exist");
+    let feature_status =
+        fs::read_to_string("FEATURE_STATUS.toml").expect("FEATURE_STATUS.toml must exist");
 
     assert!(
         feature_status.contains("[kernel.dispatcher]"),
