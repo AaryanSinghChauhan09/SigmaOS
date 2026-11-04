@@ -3930,3 +3930,10 @@ if [ -f "tests/test_c_runtime_and_linker_advancements_v80_pr.rs" ]; then
     rustc --test tests/test_c_runtime_and_linker_advancements_v80_pr.rs --edition=2021 -o build/test_c_runtime_v80_pr
     ./build/test_c_runtime_v80_pr
 fi
+
+if [ -f "tests/test_c_runtime_and_linker_advancements_v91_pr.rs" ]; then
+    echo "Running Sovereign C Runtime & Linker Advancements V91 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_c_runtime_and_linker_advancements_v91_pr.rs --edition=2021 -o build/test_c_runtime_v91_pr
+    ./build/test_c_runtime_v91_pr
+fi
