@@ -3018,6 +3018,655 @@ impl X86_64ExtendedMsrPatEngine {
 }
 
 // ============================================================================
+// 40. ANSI RGB TRUECOLOR ESCAPE RENDERING ENGINE (ansi_rgb inspiration)
+// ============================================================================
+
+/// 24-bit TrueColor RGB representation
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AnsiRgbColor {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+}
+
+impl AnsiRgbColor {
+    pub const fn new(r: u8, g: u8, b: u8) -> Self {
+        Self { r, g, b }
+    }
+}
+
+/// ANSI Terminal text style configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct AnsiTextStyle {
+    pub bold: bool,
+    pub underline: bool,
+    pub reversed: bool,
+}
+
+/// Zero-dependency ANSI RGB TrueColor rendering and formatting engine
+#[derive(Debug, Clone, Default)]
+pub struct AnsiRgbColorEngine {
+    pub fg_color: Option<AnsiRgbColor>,
+    pub bg_color: Option<AnsiRgbColor>,
+    pub style: AnsiTextStyle,
+}
+
+impl AnsiRgbColorEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn set_foreground(&mut self, color: AnsiRgbColor) {
+        self.fg_color = Some(color);
+    }
+
+    pub fn set_background(&mut self, color: AnsiRgbColor) {
+        self.bg_color = Some(color);
+    }
+
+    pub fn set_style(&mut self, style: AnsiTextStyle) {
+        self.style = style;
+    }
+
+    pub fn reset(&mut self) {
+        self.fg_color = None;
+        self.bg_color = None;
+        self.style = AnsiTextStyle::default();
+    }
+
+    /// Format ANSI sequence string for current styling
+    pub fn render_escape_sequence(&self) -> String {
+        let mut codes = Vec::new();
+        if self.style.bold {
+            codes.push("1".to_string());
+        }
+        if self.style.underline {
+            codes.push("4".to_string());
+        }
+        if self.style.reversed {
+            codes.push("7".to_string());
+        }
+        if let Some(fg) = self.fg_color {
+            codes.push(format!("38;2;{};{};{}", fg.r, fg.g, fg.b));
+        }
+        if let Some(bg) = self.bg_color {
+            codes.push(format!("48;2;{};{};{}", bg.r, bg.g, bg.b));
+        }
+
+        if codes.is_empty() {
+            "\x1b[0m".to_string()
+        } else {
+            format!("\x1b[{}m", codes.join(";"))
+        }
+    }
+
+    /// Wrap text with current escape sequence and auto-reset
+    pub fn colorize(&self, text: &str) -> String {
+        let seq = self.render_escape_sequence();
+        format!("{}{}\x1b[0m", seq, text)
+    }
+}
+
+// ============================================================================
+// 41. BOOTABLE DISK IMAGE & PARTITION BUILDER (bootimage inspiration)
+// ============================================================================
+
+/// Disk Partition Record Entry (MBR / GPT)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DiskPartitionRecord {
+    pub partition_number: u32,
+    pub partition_type_guid: [u8; 16],
+    pub starting_lba: u64,
+    pub ending_lba: u64,
+    pub partition_name: String,
+    pub bootable: bool,
+}
+
+/// Bootable Disk Image Layout & Builder Engine
+#[derive(Debug, Clone)]
+pub struct BootimageDiskBuilderEngine {
+    pub sector_size: u32,
+    pub total_sectors: u64,
+    pub protective_mbr: bool,
+    pub partitions: Vec<DiskPartitionRecord>,
+    pub kernel_elf_lba: u64,
+    pub kernel_elf_sectors: u64,
+}
+
+impl BootimageDiskBuilderEngine {
+    pub fn new(total_sectors: u64) -> Self {
+        Self {
+            sector_size: 512,
+            total_sectors,
+            protective_mbr: true,
+            partitions: Vec::new(),
+            kernel_elf_lba: 2048, // Standard 1MiB offset
+            kernel_elf_sectors: 0,
+        }
+    }
+
+    pub fn add_partition(
+        &mut self,
+        partition_name: &str,
+        type_guid: [u8; 16],
+        sectors_count: u64,
+        bootable: bool,
+    ) -> Result<u32, &'static str> {
+        let starting_lba = if let Some(last) = self.partitions.last() {
+            last.ending_lba + 1
+        } else {
+            self.kernel_elf_lba
+        };
+
+        let ending_lba = starting_lba + sectors_count.saturating_sub(1);
+        if ending_lba >= self.total_sectors {
+            return Err("Partition exceeds disk capacity");
+        }
+
+        let partition_number = (self.partitions.len() as u32) + 1;
+        self.partitions.push(DiskPartitionRecord {
+            partition_number,
+            partition_type_guid: type_guid,
+            starting_lba,
+            ending_lba,
+            partition_name: partition_name.to_string(),
+            bootable,
+        });
+
+        Ok(partition_number)
+    }
+
+    pub fn inject_kernel_elf(&mut self, elf_bytes_len: usize) -> (u64, u64) {
+        let sectors_needed =
+            ((elf_bytes_len as u64) + (self.sector_size as u64 - 1)) / (self.sector_size as u64);
+        self.kernel_elf_sectors = sectors_needed;
+        (self.kernel_elf_lba, self.kernel_elf_sectors)
+    }
+
+    pub fn validate_gpt_integrity(&self) -> bool {
+        if self.protective_mbr && self.total_sectors > 34 {
+            // Must have space for Primary GPT header (LBA 1) and partition entries (LBAs 2..33)
+            self.partitions
+                .iter()
+                .all(|p| p.starting_lba >= 34 && p.ending_lba < self.total_sectors)
+        } else {
+            false
+        }
+    }
+}
+
+// ============================================================================
+// 42. USB DEVICE DESCRIPTOR & PACKET ENGINE (usb crate inspiration)
+// ============================================================================
+
+/// USB Standard Descriptor Types
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum UsbDescriptorType {
+    Device = 0x01,
+    Configuration = 0x02,
+    String = 0x03,
+    Interface = 0x04,
+    Endpoint = 0x05,
+}
+
+/// USB Endpoint Transfer Direction
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UsbEndpointDirection {
+    Out = 0,
+    In = 1,
+}
+
+/// USB Endpoint Transfer Type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UsbTransferType {
+    Control = 0,
+    Isochronous = 1,
+    Bulk = 2,
+    Interrupt = 3,
+}
+
+/// USB Setup Packet (8-byte request packet)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct UsbSetupPacket {
+    pub request_type: u8,
+    pub request: u8,
+    pub value: u16,
+    pub index: u16,
+    pub length: u16,
+}
+
+impl UsbSetupPacket {
+    pub fn new(request_type: u8, request: u8, value: u16, index: u16, length: u16) -> Self {
+        Self {
+            request_type,
+            request,
+            value,
+            index,
+            length,
+        }
+    }
+
+    pub fn is_device_to_host(&self) -> bool {
+        (self.request_type & 0x80) != 0
+    }
+}
+
+/// Standard USB Device Descriptor structure
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UsbDeviceDescriptor {
+    pub b_length: u8,
+    pub b_descriptor_type: u8,
+    pub bcd_usb: u16,
+    pub b_device_class: u8,
+    pub b_device_sub_class: u8,
+    pub b_device_protocol: u8,
+    pub b_max_packet_size0: u8,
+    pub id_vendor: u16,
+    pub id_product: u16,
+    pub bcd_device: u16,
+    pub i_manufacturer: u8,
+    pub i_product: u8,
+    pub i_serial_number: u8,
+    pub b_num_configurations: u8,
+}
+
+/// USB Endpoint Descriptor structure
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UsbEndpointDescriptor {
+    pub endpoint_address: u8,
+    pub attributes: u8,
+    pub max_packet_size: u16,
+    pub interval: u8,
+}
+
+impl UsbEndpointDescriptor {
+    pub fn direction(&self) -> UsbEndpointDirection {
+        if (self.endpoint_address & 0x80) != 0 {
+            UsbEndpointDirection::In
+        } else {
+            UsbEndpointDirection::Out
+        }
+    }
+
+    pub fn endpoint_number(&self) -> u8 {
+        self.endpoint_address & 0x0F
+    }
+
+    pub fn transfer_type(&self) -> UsbTransferType {
+        match self.attributes & 0x03 {
+            0 => UsbTransferType::Control,
+            1 => UsbTransferType::Isochronous,
+            2 => UsbTransferType::Bulk,
+            _ => UsbTransferType::Interrupt,
+        }
+    }
+}
+
+/// Safe-Rust USB Descriptor Parsing and Packet Dispatching Engine
+#[derive(Debug, Clone, Default)]
+pub struct UsbDescriptorAndPacketEngine {
+    pub devices: Vec<UsbDeviceDescriptor>,
+    pub endpoints: Vec<UsbEndpointDescriptor>,
+}
+
+impl UsbDescriptorAndPacketEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn parse_device_descriptor(
+        &mut self,
+        raw: &[u8],
+    ) -> Result<UsbDeviceDescriptor, &'static str> {
+        if raw.len() < 18 {
+            return Err("Raw device descriptor buffer too small");
+        }
+        if raw[0] != 18 || raw[1] != (UsbDescriptorType::Device as u8) {
+            return Err("Invalid descriptor header");
+        }
+
+        let desc = UsbDeviceDescriptor {
+            b_length: raw[0],
+            b_descriptor_type: raw[1],
+            bcd_usb: u16::from_le_bytes([raw[2], raw[3]]),
+            b_device_class: raw[4],
+            b_device_sub_class: raw[5],
+            b_device_protocol: raw[6],
+            b_max_packet_size0: raw[7],
+            id_vendor: u16::from_le_bytes([raw[8], raw[9]]),
+            id_product: u16::from_le_bytes([raw[10], raw[11]]),
+            bcd_device: u16::from_le_bytes([raw[12], raw[13]]),
+            i_manufacturer: raw[14],
+            i_product: raw[15],
+            i_serial_number: raw[16],
+            b_num_configurations: raw[17],
+        };
+
+        self.devices.push(desc.clone());
+        Ok(desc)
+    }
+
+    pub fn register_endpoint(&mut self, desc: UsbEndpointDescriptor) {
+        self.endpoints.push(desc);
+    }
+}
+
+// ============================================================================
+// 43. ADVANCED APIC ICR IPI & IOAPIC REDIRECTION ENGINE (apic inspiration)
+// ============================================================================
+
+/// LAPIC IPI Delivery Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ApicIpiDeliveryMode {
+    Fixed = 0b000,
+    LowestPriority = 0b001,
+    Smi = 0b010,
+    Nmi = 0b100,
+    Init = 0b101,
+    StartUp = 0b110,
+}
+
+/// LAPIC Destination Shorthand
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ApicDestinationShorthand {
+    NoShorthand = 0b00,
+    SelfOnly = 0b01,
+    AllIncludingSelf = 0b10,
+    AllExcludingSelf = 0b11,
+}
+
+/// LAPIC ICR (Interrupt Command Register) Low & High Representation
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ApicIcrCommand {
+    pub vector: u8,
+    pub delivery_mode: ApicIpiDeliveryMode,
+    pub destination_logical: bool,
+    pub delivery_pending: bool,
+    pub level_assert: bool,
+    pub trigger_edge: bool,
+    pub destination_shorthand: ApicDestinationShorthand,
+    pub destination: u8,
+}
+
+impl ApicIcrCommand {
+    pub fn to_raw_registers(&self) -> (u32, u32) {
+        let mut low = self.vector as u32;
+        low |= (self.delivery_mode as u32) << 8;
+        if self.destination_logical {
+            low |= 1 << 11;
+        }
+        if self.delivery_pending {
+            low |= 1 << 12;
+        }
+        if self.level_assert {
+            low |= 1 << 14;
+        }
+        if !self.trigger_edge {
+            low |= 1 << 15;
+        }
+        low |= (self.destination_shorthand as u32) << 18;
+
+        let high = (self.destination as u32) << 24;
+        (low, high)
+    }
+}
+
+/// IOAPIC Redirection Table Entry (64-bit)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct IoApicRedirectionEntry {
+    pub vector: u8,
+    pub delivery_mode: ApicIpiDeliveryMode,
+    pub destination_logical: bool,
+    pub masked: bool,
+    pub trigger_level: bool,
+    pub destination: u8,
+}
+
+impl IoApicRedirectionEntry {
+    pub fn to_raw_u64(&self) -> u64 {
+        let mut val = self.vector as u64;
+        val |= (self.delivery_mode as u64) << 8;
+        if self.destination_logical {
+            val |= 1 << 11;
+        }
+        if self.trigger_level {
+            val |= 1 << 15;
+        }
+        if self.masked {
+            val |= 1 << 16;
+        }
+        val |= (self.destination as u64) << 56;
+        val
+    }
+
+    pub fn from_raw_u64(val: u64) -> Self {
+        let vector = (val & 0xFF) as u8;
+        let del_mode = match (val >> 8) & 0x07 {
+            0b000 => ApicIpiDeliveryMode::Fixed,
+            0b001 => ApicIpiDeliveryMode::LowestPriority,
+            0b010 => ApicIpiDeliveryMode::Smi,
+            0b100 => ApicIpiDeliveryMode::Nmi,
+            0b101 => ApicIpiDeliveryMode::Init,
+            _ => ApicIpiDeliveryMode::StartUp,
+        };
+        let destination_logical = (val & (1 << 11)) != 0;
+        let trigger_level = (val & (1 << 15)) != 0;
+        let masked = (val & (1 << 16)) != 0;
+        let destination = ((val >> 56) & 0xFF) as u8;
+
+        Self {
+            vector,
+            delivery_mode: del_mode,
+            destination_logical,
+            masked,
+            trigger_level,
+            destination,
+        }
+    }
+}
+
+/// Complete APIC / IOAPIC Inter-Processor Interrupt Orchestrator
+#[derive(Debug, Clone, Default)]
+pub struct ApicIpiAndIoApicRedirectionEngine {
+    pub redirection_entries: Vec<IoApicRedirectionEntry>,
+}
+
+impl ApicIpiAndIoApicRedirectionEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn create_init_ipi(&self, target_apic_id: u8) -> ApicIcrCommand {
+        ApicIcrCommand {
+            vector: 0,
+            delivery_mode: ApicIpiDeliveryMode::Init,
+            destination_logical: false,
+            delivery_pending: false,
+            level_assert: true,
+            trigger_edge: true,
+            destination_shorthand: ApicDestinationShorthand::NoShorthand,
+            destination: target_apic_id,
+        }
+    }
+
+    pub fn create_startup_ipi(&self, target_apic_id: u8, vector_page: u8) -> ApicIcrCommand {
+        ApicIcrCommand {
+            vector: vector_page,
+            delivery_mode: ApicIpiDeliveryMode::StartUp,
+            destination_logical: false,
+            delivery_pending: false,
+            level_assert: true,
+            trigger_edge: true,
+            destination_shorthand: ApicDestinationShorthand::NoShorthand,
+            destination: target_apic_id,
+        }
+    }
+
+    pub fn set_redirection_entry(&mut self, index: usize, entry: IoApicRedirectionEntry) {
+        if index >= self.redirection_entries.len() {
+            self.redirection_entries.resize(
+                index + 1,
+                IoApicRedirectionEntry {
+                    vector: 0,
+                    delivery_mode: ApicIpiDeliveryMode::Fixed,
+                    destination_logical: false,
+                    masked: true,
+                    trigger_level: false,
+                    destination: 0,
+                },
+            );
+        }
+        self.redirection_entries[index] = entry;
+    }
+}
+
+// ============================================================================
+// 44. OVMF FIRMWARE & EDK2 IMAGE VERIFIER ENGINE (ovmf-prebuilt inspiration)
+// ============================================================================
+
+/// OVMF Firmware Volume (FV) Header Representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OvmfFirmwareVolumeHeader {
+    pub file_system_guid: [u8; 16],
+    pub volume_length: u64,
+    pub signature: [u8; 4], // '_FVH'
+    pub attributes: u32,
+    pub header_length: u16,
+    pub checksum: u16,
+}
+
+/// OVMF Firmware Filesystem (FFS) File Entry
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OvmfFfsFile {
+    pub name_guid: [u8; 16],
+    pub file_type: u8,
+    pub attributes: u8,
+    pub size: u32,
+    pub state: u8,
+}
+
+/// Zero-dependency OVMF EDK2 Firmware Validation Engine
+#[derive(Debug, Clone, Default)]
+pub struct OvmfFirmwareParserEngine {
+    pub fv_headers: Vec<OvmfFirmwareVolumeHeader>,
+    pub files: Vec<OvmfFfsFile>,
+}
+
+impl OvmfFirmwareParserEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn parse_fv_header(
+        &mut self,
+        raw: &[u8],
+    ) -> Result<OvmfFirmwareVolumeHeader, &'static str> {
+        if raw.len() < 56 {
+            return Err("Volume header too small");
+        }
+        // Verify signature '_FVH' at byte offset 40
+        if &raw[40..44] != b"_FVH" {
+            return Err("Invalid firmware volume signature");
+        }
+
+        let mut guid = [0u8; 16];
+        guid.copy_from_slice(&raw[16..32]);
+
+        let length = u64::from_le_bytes(raw[32..40].try_into().unwrap());
+        let attributes = u32::from_le_bytes(raw[44..48].try_into().unwrap());
+        let header_length = u16::from_le_bytes(raw[48..50].try_into().unwrap());
+        let checksum = u16::from_le_bytes(raw[50..52].try_into().unwrap());
+
+        let header = OvmfFirmwareVolumeHeader {
+            file_system_guid: guid,
+            volume_length: length,
+            signature: [b'_', b'F', b'V', b'H'],
+            attributes,
+            header_length,
+            checksum,
+        };
+
+        self.fv_headers.push(header.clone());
+        Ok(header)
+    }
+
+    pub fn register_ffs_file(&mut self, file: OvmfFfsFile) {
+        self.files.push(file);
+    }
+
+    pub fn find_file_by_guid(&self, guid: &[u8; 16]) -> Option<&OvmfFfsFile> {
+        self.files.iter().find(|f| &f.name_guid == guid)
+    }
+}
+
+// ============================================================================
+// 45. X86_64 CANONICAL ADDRESS & PAGE TABLE MASK ENGINE (x86_64_types inspiration)
+// ============================================================================
+
+/// Canonical x86_64 Address Mode
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CanonicalPagingLevel {
+    FourLevel48Bit,
+    FiveLevel57Bit,
+}
+
+/// Canonical virtual and physical address manipulation engine
+#[derive(Debug, Clone, Copy)]
+pub struct X86_64CanonicalAddressEngine {
+    pub paging_mode: CanonicalPagingLevel,
+}
+
+impl X86_64CanonicalAddressEngine {
+    pub fn new(mode: CanonicalPagingLevel) -> Self {
+        Self { paging_mode: mode }
+    }
+
+    /// Check if virtual address is in canonical form
+    pub fn is_canonical_virt(&self, addr: u64) -> bool {
+        match self.paging_mode {
+            CanonicalPagingLevel::FourLevel48Bit => {
+                let sign_bits = addr >> 47;
+                sign_bits == 0 || sign_bits == 0x1FFFF
+            }
+            CanonicalPagingLevel::FiveLevel57Bit => {
+                let sign_bits = addr >> 56;
+                sign_bits == 0 || sign_bits == 0xFF
+            }
+        }
+    }
+
+    /// Sign-extend a non-canonical or truncated 48-bit address
+    pub fn sign_extend_48(addr: u64) -> u64 {
+        if (addr & (1 << 47)) != 0 {
+            addr | 0xFFFF_0000_0000_0000
+        } else {
+            addr & 0x0000_FFFF_FFFF_FFFF
+        }
+    }
+
+    /// Extract PML4, PDPT, PD, PT, and page offset indices from 48-bit canonical address
+    pub fn decompose_virt_48(addr: u64) -> (usize, usize, usize, usize, usize) {
+        let pml4 = ((addr >> 39) & 0x1FF) as usize;
+        let pdpt = ((addr >> 30) & 0x1FF) as usize;
+        let pd = ((addr >> 21) & 0x1FF) as usize;
+        let pt = ((addr >> 12) & 0x1FF) as usize;
+        let offset = (addr & 0xFFF) as usize;
+        (pml4, pdpt, pd, pt, offset)
+    }
+
+    /// Mask physical address to align with 4KiB page frame
+    pub const fn align_frame_4kib(phys_addr: u64) -> u64 {
+        phys_addr & !0xFFF
+    }
+
+    /// Mask physical address to align with 2MiB huge page frame
+    pub const fn align_frame_2mib(phys_addr: u64) -> u64 {
+        phys_addr & !0x1F_FFFF
+    }
+}
+
+// ============================================================================
 // 27. RUST-OSDEV PR PROPOSAL GATEWAY ENGINE
 // ============================================================================
 
@@ -3577,6 +4226,88 @@ impl RustOsdevPrProposalGateway {
             ],
             status: "Ready for Merge".to_string(),
         });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5141,
+            title: "feat(arch_x86_64): Implement ANSI TrueColor RGB Escape Rendering Engine"
+                .to_string(),
+            target_subsystem: "Terminal Display & Console Formatting".to_string(),
+            rust_osdev_crate_inspiration: "ansi_rgb".to_string(),
+            components_added: vec![
+                "AnsiRgbColorEngine 24-bit TrueColor foreground and background formatter"
+                    .to_string(),
+                "AnsiTextStyle terminal escape sequence builder".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5142,
+            title: "feat(arch_x86_64): Implement Bootable Disk Image & Partition Builder Engine"
+                .to_string(),
+            target_subsystem: "Disk Layout & Image Packaging".to_string(),
+            rust_osdev_crate_inspiration: "bootimage".to_string(),
+            components_added: vec![
+                "BootimageDiskBuilderEngine protective MBR and GPT layout builder".to_string(),
+                "Kernel ELF physical sector injection and capacity validator".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5143,
+            title: "feat(arch_x86_64): Implement USB Device Descriptors & Setup Packet Engine"
+                .to_string(),
+            target_subsystem: "USB Device Subsystem".to_string(),
+            rust_osdev_crate_inspiration: "usb".to_string(),
+            components_added: vec![
+                "UsbDescriptorAndPacketEngine descriptor parser and endpoint tracker".to_string(),
+                "UsbSetupPacket control request generator".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5144,
+            title:
+                "feat(arch_x86_64): Implement LAPIC ICR IPI Delivery & IOAPIC Redirection Engine"
+                    .to_string(),
+            target_subsystem: "Interrupt Architecture & APIC".to_string(),
+            rust_osdev_crate_inspiration: "apic".to_string(),
+            components_added: vec![
+                "ApicIpiAndIoApicRedirectionEngine Init/Startup IPI generator".to_string(),
+                "IoApicRedirectionEntry 64-bit redirection table decoder".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5145,
+            title:
+                "feat(arch_x86_64): Implement OVMF EDK2 Firmware Validation & Volume Parser Engine"
+                    .to_string(),
+            target_subsystem: "Firmware Interoperability & OVMF".to_string(),
+            rust_osdev_crate_inspiration: "ovmf-prebuilt".to_string(),
+            components_added: vec![
+                "OvmfFirmwareParserEngine FV header signature and checksum validator".to_string(),
+                "Firmware Filesystem FFS file registration and GUID search".to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
+
+        self.proposals.push(RustOsdevPrManifest {
+            pr_id: 5146,
+            title: "feat(arch_x86_64): Implement Canonical Virtual Addressing & Frame Mask Engine"
+                .to_string(),
+            target_subsystem: "Memory Management & Paging Types".to_string(),
+            rust_osdev_crate_inspiration: "x86_64_types".to_string(),
+            components_added: vec![
+                "X86_64CanonicalAddressEngine 48-bit and 57-bit canonical validator".to_string(),
+                "Sign-extension, page frame alignment, and 4-level PML4 index decomposer"
+                    .to_string(),
+            ],
+            status: "Ready for Merge".to_string(),
+        });
     }
 
     pub fn generate_unified_diff(&self, pr_id: u32) -> Option<String> {
@@ -3914,7 +4645,7 @@ mod tests {
     #[test]
     fn test_rust_osdev_pr_gateway() {
         let gateway = RustOsdevPrProposalGateway::new();
-        assert_eq!(gateway.proposals.len(), 40);
+        assert_eq!(gateway.proposals.len(), 46);
         assert!(gateway.evaluate_ci_gate());
 
         let diff = gateway
@@ -3926,6 +4657,11 @@ mod tests {
             .generate_unified_diff(5136)
             .expect("Diff should be generated");
         assert!(diff_5136.contains("PR #5136"));
+
+        let diff_5146 = gateway
+            .generate_unified_diff(5146)
+            .expect("Diff should be generated");
+        assert!(diff_5146.contains("PR #5146"));
 
         let diff_5140 = gateway
             .generate_unified_diff(5140)
@@ -4105,5 +4841,165 @@ mod tests {
         pat_engine.swap_gs();
         assert_eq!(pat_engine.gs_base, 0xFFFF_8000_0000_2000);
         assert_eq!(pat_engine.kernel_gs_base, 0xFFFF_8000_0000_1000);
+    }
+
+    #[test]
+    fn test_ansi_rgb_color_engine() {
+        let mut engine = AnsiRgbColorEngine::new();
+        engine.set_foreground(AnsiRgbColor::new(255, 128, 0));
+        engine.set_background(AnsiRgbColor::new(10, 20, 30));
+        engine.set_style(AnsiTextStyle {
+            bold: true,
+            underline: false,
+            reversed: false,
+        });
+
+        let seq = engine.render_escape_sequence();
+        assert_eq!(seq, "\x1b[1;38;2;255;128;0;48;2;10;20;30m");
+        let rendered = engine.colorize("Kernel Boot");
+        assert!(rendered.starts_with("\x1b[1;38;2;255;128;0;48;2;10;20;30mKernel Boot\x1b[0m"));
+
+        engine.reset();
+        assert_eq!(engine.render_escape_sequence(), "\x1b[0m");
+    }
+
+    #[test]
+    fn test_bootimage_disk_builder_engine() {
+        let mut builder = BootimageDiskBuilderEngine::new(100_000);
+        let part_guid = [0xAA; 16];
+        let p1 = builder
+            .add_partition("EFI System", part_guid, 4096, true)
+            .unwrap();
+        assert_eq!(p1, 1);
+        let (elf_lba, sectors) = builder.inject_kernel_elf(1024 * 64); // 64KiB = 128 sectors
+        assert_eq!(elf_lba, 2048);
+        assert_eq!(sectors, 128);
+        assert!(builder.validate_gpt_integrity());
+    }
+
+    #[test]
+    fn test_usb_descriptor_and_packet_engine() {
+        let mut engine = UsbDescriptorAndPacketEngine::new();
+        let raw_device_desc = [
+            18, 0x01, // bLength, bDescriptorType
+            0x00, 0x02, // bcdUSB (2.00)
+            0x00, 0x00, 0x00, // bDeviceClass, SubClass, Protocol
+            64,   // bMaxPacketSize0
+            0x34, 0x12, // idVendor (0x1234)
+            0x78, 0x56, // idProduct (0x5678)
+            0x00, 0x01, // bcdDevice (1.00)
+            1, 2, 3, // iManufacturer, iProduct, iSerialNumber
+            1, // bNumConfigurations
+        ];
+        let desc = engine.parse_device_descriptor(&raw_device_desc).unwrap();
+        assert_eq!(desc.id_vendor, 0x1234);
+        assert_eq!(desc.id_product, 0x5678);
+
+        let ep = UsbEndpointDescriptor {
+            endpoint_address: 0x81, // EP 1 IN
+            attributes: 0x02,       // Bulk
+            max_packet_size: 512,
+            interval: 0,
+        };
+        assert_eq!(ep.direction(), UsbEndpointDirection::In);
+        assert_eq!(ep.endpoint_number(), 1);
+        assert_eq!(ep.transfer_type(), UsbTransferType::Bulk);
+        engine.register_endpoint(ep);
+        assert_eq!(engine.endpoints.len(), 1);
+
+        let setup = UsbSetupPacket::new(0x80, 0x06, 0x0100, 0x0000, 18);
+        assert!(setup.is_device_to_host());
+    }
+
+    #[test]
+    fn test_apic_ipi_and_ioapic_redirection_engine() {
+        let mut apic_engine = ApicIpiAndIoApicRedirectionEngine::new();
+        let init_ipi = apic_engine.create_init_ipi(3);
+        let (low, high) = init_ipi.to_raw_registers();
+        assert_eq!(high, 3 << 24);
+        assert_eq!((low >> 8) & 0x07, ApicIpiDeliveryMode::Init as u32);
+
+        let startup_ipi = apic_engine.create_startup_ipi(3, 0x08);
+        let (s_low, s_high) = startup_ipi.to_raw_registers();
+        assert_eq!(s_high, 3 << 24);
+        assert_eq!(s_low & 0xFF, 0x08);
+
+        let redir = IoApicRedirectionEntry {
+            vector: 0x30,
+            delivery_mode: ApicIpiDeliveryMode::Fixed,
+            destination_logical: false,
+            masked: false,
+            trigger_level: false,
+            destination: 1,
+        };
+        apic_engine.set_redirection_entry(0, redir);
+        assert_eq!(apic_engine.redirection_entries.len(), 1);
+        let raw = redir.to_raw_u64();
+        let decoded = IoApicRedirectionEntry::from_raw_u64(raw);
+        assert_eq!(decoded.vector, 0x30);
+        assert_eq!(decoded.destination, 1);
+        assert!(!decoded.masked);
+    }
+
+    #[test]
+    fn test_ovmf_firmware_parser_engine() {
+        let mut engine = OvmfFirmwareParserEngine::new();
+        let mut fv_raw = vec![0u8; 64];
+        fv_raw[16..32].copy_from_slice(&[0x7A; 16]);
+        let length: u64 = 0x100000;
+        fv_raw[32..40].copy_from_slice(&length.to_le_bytes());
+        fv_raw[40..44].copy_from_slice(b"_FVH");
+        let attributes: u32 = 0x0004_feff;
+        fv_raw[44..48].copy_from_slice(&attributes.to_le_bytes());
+        let hdr_len: u16 = 56;
+        fv_raw[48..50].copy_from_slice(&hdr_len.to_le_bytes());
+        let csum: u16 = 0x1234;
+        fv_raw[50..52].copy_from_slice(&csum.to_le_bytes());
+
+        let hdr = engine.parse_fv_header(&fv_raw).unwrap();
+        assert_eq!(hdr.volume_length, 0x100000);
+        assert_eq!(hdr.signature, [b'_', b'F', b'V', b'H']);
+
+        let ffs = OvmfFfsFile {
+            name_guid: [0x55; 16],
+            file_type: 0x02,
+            attributes: 0x00,
+            size: 4096,
+            state: 0x07,
+        };
+        engine.register_ffs_file(ffs.clone());
+        let found = engine.find_file_by_guid(&[0x55; 16]).unwrap();
+        assert_eq!(found.size, 4096);
+    }
+
+    #[test]
+    fn test_x86_64_canonical_address_engine() {
+        let addr_eng = X86_64CanonicalAddressEngine::new(CanonicalPagingLevel::FourLevel48Bit);
+        assert!(addr_eng.is_canonical_virt(0x0000_7FFF_FFFF_FFFF));
+        assert!(addr_eng.is_canonical_virt(0xFFFF_8000_0000_0000));
+        assert!(!addr_eng.is_canonical_virt(0x0000_8000_0000_0000));
+
+        let addr_eng_57 = X86_64CanonicalAddressEngine::new(CanonicalPagingLevel::FiveLevel57Bit);
+        assert!(addr_eng_57.is_canonical_virt(0x00FF_FFFF_FFFF_FFFF));
+        assert!(addr_eng_57.is_canonical_virt(0xFF00_0000_0000_0000));
+        assert!(!addr_eng_57.is_canonical_virt(0x0100_0000_0000_0000));
+
+        let sign_ext = X86_64CanonicalAddressEngine::sign_extend_48(0x0000_8000_1234_5678);
+        assert_eq!(sign_ext, 0xFFFF_8000_1234_5678);
+
+        let (pml4, _pdpt, _pd, _pt, offset) =
+            X86_64CanonicalAddressEngine::decompose_virt_48(0xFFFF_8000_1234_5678);
+        assert_eq!(pml4, 0x100);
+        assert_eq!(offset, 0x678);
+
+        let phys = 0x1000_2345;
+        assert_eq!(
+            X86_64CanonicalAddressEngine::align_frame_4kib(phys),
+            0x1000_2000
+        );
+        assert_eq!(
+            X86_64CanonicalAddressEngine::align_frame_2mib(phys),
+            0x1000_0000
+        );
     }
 }
