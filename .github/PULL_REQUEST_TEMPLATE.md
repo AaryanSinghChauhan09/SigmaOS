@@ -1,75 +1,75 @@
 ## Summary
 
-<!-- What subsystem behavior changed and why? -->
+<!-- What component does this PR improve, add, or regulate? -->
 
-## I/O component
+## Related issue
 
-- [ ] I/O policy
-- [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] I/O safety review
-
-## Storage component
-
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## I/O component
-
-- [ ] I/O policy
-- [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] I/O safety review
-
-## Storage component
-
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## File component
-
-<!-- Why was this change made? -->
-
-## Implementation notes
-
-<!-- Key implementation details -->
+Closes #<issue-id>
 
 ## Component
 
+<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer_update, etc. -->
+
+- [ ] Kernel
+- [ ] Memory component
+- [ ] VFS / filesystem
+- [ ] IPC handler
+- [ ] Security
+- [ ] Drivers
+- [ ] Packaging
+- [ ] Desktop
+- [ ] Installer / update
 - [ ] Thread manager
 - [ ] Scheduler
 - [ ] Process management
-- [ ] IPC handler
-- [ ] File descriptor manager
-- [ ] Inode and directory manager
-- [ ] Permission manager
-- [ ] Lock manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
+- [ ] I/O component
+- [ ] Storage component
+
+## Upstream study
+
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
+
+## Component rules added or enforced
+
+- [ ] New rule
+- [ ] Existing rule enforced
+- [ ] Rule test added
+- [ ] CI gate added
+- [ ] Documentation updated
+
+## What SigmaOS adopts
+
+<!-- State the upstream principle or mechanism adopted. -->
+
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
+
+## Changes
+
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
 - [ ] Documentation
-- [ ] CI / tooling
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
+
+## Motivation
+
+<!-- Detailed motivation behind the component rule or capability enhancement -->
+
+## Implementation notes
+
+<!-- Architecture decisions, safety invariants, and data structures -->
+
+## Tests
+
+<!-- Description of unit, integration, and fuzz testing added -->
 
 ## Component impact
 
@@ -168,107 +168,75 @@
 - [ ] `unsafe` justified
 - [ ] Classified panic diagnostics
 
-## Tests
+### IPC semantics and safety
+- [ ] IPC handler
+- [ ] Blocking behavior:
+- [ ] Non-blocking behavior:
+- [ ] EOF / closure behavior:
+- [ ] Capability/namespace checks enforced
 
-- Unit tests
-- Integration tests
+### I/O policy and safety
+- [ ] I/O component
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O safety review
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+### File safety review
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-unlink prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Verification
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-boot evidence, if boot-affecting
-- [ ] File benchmark, if performance-affecting
-- [ ] Security review requested, if applicable
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
 
-## Security review
+## Runtime evidence
 
-- [ ] Capability/namespace checks enforced
-
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] `unsafe` justified
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
 
 ## Safety and rollback
 
-- Double-completion prevented
-- Resource limits enforced
-
-## File safety review
-
-- Unit tests
-- Integration tests
-
-## I/O safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## Storage safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## Capability status
-
-- [ ] Updated in matrix
-
-## Integration impact
-
-- [ ] Subsystem integration verified
-
-## Security review
-
-- [ ] Capability/namespace checks enforced
-
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] `unsafe` justified
-
-## Safety and rollback
-
-- Double-completion prevented
-- Resource limits enforced
-
-## File safety review
-
-- [ ] Expansion order is correct
-- [ ] Quoting behavior is preserved
-- [ ] Redirection failures are handled
-- [ ] Exit codes are explicit
-- [ ] Signal behavior is defined
-- [ ] No unbounded recursion or allocation
-- [ ] Interactive terminal state is restored
-- [ ] Script mode does not execute invalid partial input
-- Capability/namespace checks enforced:
-- Shared-memory or descriptor implications:
-- Input validation and failure behavior:
-- Rollback or downgrade path:
-
-## I/O safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## Storage safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## Capability status
-
-- [ ] Updated in matrix
-
-## Integration impact
-
-- [ ] Subsystem integration verified
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input validated
+- [ ] Package scripts sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
 
 ## Capability status
 
@@ -276,20 +244,17 @@
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Shell documentation
+- [ ] Documentation updated
 - [ ] Boot matrix, if applicable
 - [ ] Integration impact documented
 
 ## Reviewer checklist
 
-- Risk:
-- Rollback:
-
-## I/O component
-
-- [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] I/O policy
-- [ ] I/O safety review
+- [ ] Scope is narrow
+- [ ] `unsafe` justified
+- [ ] Component rules are enforceable
+- [ ] Tests cover the rules
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported Linux/BSD parity claims

@@ -220,6 +220,26 @@ if [ -f "src/system/sovereign_init_and_supervisor_advancements_v89_pr.rs" ]; the
     ./build/test_init_v89_integration
 fi
 
+if [ -f "src/system/sovereign_init_and_supervisor_advancements_v90_pr.rs" ]; then
+    echo "Running Sovereign Init & Supervisor Advancements V90 test suite..."
+    mkdir -p build
+    rustc --test src/system/sovereign_init_and_supervisor_advancements_v90_pr.rs --edition=2021 -o build/test_init_advancements_v90
+    ./build/test_init_advancements_v90
+
+    rustc --test tests/test_init_and_supervisor_v90_pr.rs --edition=2021 -o build/test_init_v90_integration
+    ./build/test_init_v90_integration
+fi
+
+if [ -f "src/system/sovereign_init_and_supervisor_advancements_v92_pr.rs" ]; then
+    echo "Running Sovereign Init & Supervisor Advancements V92 test suite..."
+    mkdir -p build
+    rustc --test src/system/sovereign_init_and_supervisor_advancements_v92_pr.rs --edition=2021 -o build/test_init_advancements_v92
+    ./build/test_init_advancements_v92
+
+    rustc --test tests/test_init_and_supervisor_v92_pr.rs --edition=2021 -o build/test_init_v92_integration
+    ./build/test_init_v92_integration
+fi
+
 if [ -f "src/memory/huge_pages.rs" ]; then
     echo "Running huge pages & transparent huge pages (THP) test suite..."
     mkdir -p build
@@ -1773,24 +1793,10 @@ if [ -f "tests/test_package_advancements_v88.rs" ]; then
     ./build/test_package_advancements_v88
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v89.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V89 test suite..."
-    mkdir -p build
-    TMPDIR=$(pwd)/build rustc --test src/package/sovereign_distro_package_advancements_v89.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v89_test
-    ./build/sovereign_advancements_v89_test
-fi
-
-if [ -f "src/package/sovereign_distro_package_advancements_v89_pr.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V89 PR test suite..."
-    mkdir -p build
-    TMPDIR=$(pwd)/build rustc --test src/package/sovereign_distro_package_advancements_v89_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v89_pr_test
-    ./build/sovereign_advancements_v89_pr_test
-fi
-
 if [ -f "tests/test_package_advancements_v89.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V89 Integration test suite..."
     mkdir -p build
-    TMPDIR=$(pwd)/build rustc --test tests/test_package_advancements_v89.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v89
+    TMPDIR=/tmp rustc --test tests/test_package_advancements_v89.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v89
     ./build/test_package_advancements_v89
 fi
 
@@ -3229,6 +3235,13 @@ if [ -f "src/device/sovereign_device_management_inspirations_pr.rs" ]; then
     mkdir -p build
     rustc --test src/device/sovereign_device_management_inspirations_pr.rs --edition=2021 -o build/test_device_pr
     ./build/test_device_pr
+fi
+
+if [ -f "tests/test_device_management_advancements_v80_pr.rs" ]; then
+    echo "Running Sovereign Device Management Advancements V80 PR Suite..."
+    mkdir -p build
+    rustc --test tests/test_device_management_advancements_v80_pr.rs --edition=2021 -o build/test_device_advancements_v80_pr
+    ./build/test_device_advancements_v80_pr
 fi
 
 if [ -f "src/userland/coreutils_pr_gateway.rs" ]; then

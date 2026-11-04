@@ -1,1 +1,3 @@
-# Interrupt Policy
+# SigmaOS Interrupt Policy
+
+Policy specification for interrupt management.

@@ -427,7 +427,7 @@ impl OpenBsdSmtpdSpamTrapDkimPqcSignerV73PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD OpenSMTPD Spam Trap DKIM PQC Signer V73"),
-            spam_traps: Vec::from([String::from("trap72@sigmaos.org")]),
+            spam_traps: Vec::from([String::from("trap73@sigmaos.org")]),
             dkim_selector: String::from("sig2026v73"),
         }
     }
@@ -718,14 +718,14 @@ mod tests {
     fn test_softraid_kryptex_dilithium5_v73() {
         let mut engine = OpenBsdSoftraidKryptexPqcDilithium5KeyringV73PrEngine::new();
         engine.register_keyring(SoftraidPqcDilithium5SpecV73 {
-            volume_id: String::from("vol-sec-72"),
+            volume_id: String::from("vol-sec-73"),
             pqc_algorithm: String::from("Dilithium5"),
             master_key_unlocked: false,
             chunk_drives: Vec::from([String::from("sd0a"), String::from("sd1a")]),
             dilithium5_sig_valid: true,
         });
 
-        let unlock = engine.unlock_volume("vol-sec-72", "master_key_phrase");
+        let unlock = engine.unlock_volume("vol-sec-73", "master_key_phrase");
         assert!(unlock.is_ok());
         assert!(unlock.unwrap());
     }
@@ -765,7 +765,7 @@ mod tests {
     #[test]
     fn test_smtpd_spamtrap_dkim_pqc_v73() {
         let engine = OpenBsdSmtpdSpamTrapDkimPqcSignerV73PrEngine::new();
-        let res = engine.process_outgoing_mail("msg-72", "user@sigmaos.org", "sigmaos.org");
+        let res = engine.process_outgoing_mail("msg-73", "user@sigmaos.org", "sigmaos.org");
         assert!(!res.is_spam_trap);
         assert!(res.dkim_signature.contains("d=sigmaos.org"));
         assert_eq!(res.pqc_scheme, "CRYSTALS-Dilithium5");

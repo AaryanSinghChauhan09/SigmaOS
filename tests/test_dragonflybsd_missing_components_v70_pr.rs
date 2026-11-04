@@ -7,97 +7,111 @@ extern crate alloc;
 #[path = "../src/distro/dragonflybsd_missing_components_v70_pr.rs"]
 mod dragonflybsd_missing_components_v70_pr;
 
+use alloc::vec::Vec;
 use dragonflybsd_missing_components_v70_pr::*;
 
 #[test]
 fn test_integration_dragonflybsd_v70_master_suite() {
     let mut suite = DragonFlyBsdMissingComponentsV70PrSuite::new();
     assert!(suite.run_parity_checks());
-    let manifest = suite.generate_manifest();
+    let manifest: Vec<DragonFlyComponentPrSpecV70> = suite.generate_manifest();
     assert_eq!(manifest.len(), 10);
     for pr in &manifest {
-        assert_eq!(pr.status, PrProposalStatusV70::Approved);
         assert!(pr.pr_id >= 7001 && pr.pr_id <= 7010);
-        assert!(!pr.title.is_empty());
+        assert_eq!(pr.status, PrProposalStatusV70::Approved);
         assert!(!pr.unified_diff.is_empty());
     }
 }
 
 #[test]
 fn test_integration_dragonflybsd_v70_engines() {
-    // 1. HAMMER2 Dedup & Quorum
-    let mut h2 = DragonFlyHammer2DistributedDeduplicationConsensusV70PrEngine::new(4);
-    h2.register_pfs_node(1, "pfs-alpha", 2);
-    h2.register_pfs_node(2, "pfs-beta", 2);
-    let hash = [0x77; 32];
-    assert!(!h2.store_or_dedup_block(1, hash, 1000));
-    assert!(h2.store_or_dedup_block(2, hash, 1001));
-    assert!(h2.propose_txg_commit(7050));
-    assert_eq!(h2.current_txg, 7050);
+    // 1. HAMMER2 Deduplication
+    let mut hammer2 = DragonFlyHammer2DistributedDeduplicationConsensusV70PrEngine::new(2);
+    let block_data = b"sigmaos_hammer2_integration_test_block";
+    let (dedup1, off1) = hammer2.register_or_dedup_block(block_data, 0x1000);
+    assert!(!dedup1);
+    assert_eq!(off1, 0x1000);
+    let (dedup2, off2) = hammer2.register_or_dedup_block(block_data, 0x2000);
+    assert!(dedup2);
+    assert_eq!(off2, 0x1000);
 
-    // 2. LWKT Affinity Scheduler
-    let mut lwkt = DragonFlyLwktAffinityAwareStealingSchedulerV70PrEngine::new(4);
-    lwkt.enqueue_thread(11, 0, 10, true);
-    lwkt.enqueue_thread(12, 0, 20, true);
-    let stolen = lwkt.steal_work_for_cpu(2);
-    assert_eq!(stolen, Some(11));
-    assert!(lwkt.tick_cpu(2));
+    // 2. LWKT Scheduler
+    let mut lwkt = DragonFlyLwktAffinityAwareStealingSchedulerV70PrEngine::new(4, 2);
+    sched_test_helper(&mut lwkt);
 
-    // 3. VKernel NUMA IOV Hypercall
-    let mut vkernel = DragonFlyVKernelNumaDirectIovHypercallVfsV70PrEngine::new(4, 4096);
-    assert!(vkernel.map_iov_buffer(100, 1, 0x8000_0000, 2 * 1024 * 1024));
-    assert!(vkernel.dispatch_vfs_hypercall(1, 0xFE, 100));
+    // 3. VKernel Hypercall
+    let mut vkernel = DragonFlyVKernelNumaDirectIovHypercallVfsV70PrEngine::new(2);
+    assert!(vkernel.create_instance(0, 0));
+    let seg = vkernel.map_iov_buffer(0x2000, 512);
+    assert_eq!(seg.guest_addr, 0x2000);
+    let res = vkernel.execute_hypercall(0, 2, &[5, 15]).unwrap();
+    assert_eq!(res, 20);
 
     // 4. Dsynth PQC Builder
     let mut dsynth = DragonFlyDsynthPqcDilithium5DeterministicBuilderV70PrEngine::new();
-    assert!(dsynth.build_and_sign_reproducible_package(42, "compiler-rt", "18.1.0", [0xCC; 32]));
-    assert!(dsynth.verify_package(42));
+    let digest = [0x7C; 32];
+    let art = dsynth.build_deterministic("pkg-tools", "2.1", &digest);
+    assert_eq!(art.package_name, "pkg-tools");
+    assert!(dsynth.verify_package_signature("pkg-tools"));
 
-    // 5. Varsyms Hierarchical Scope
+    // 5. Varsyms
     let mut varsyms = DragonFlyVarsymsHierarchicalProcessGroupScopeV70PrEngine::new();
-    varsyms.set_sys_default("MACHINE", "x86_64");
-    varsyms.register_group(100, None);
-    varsyms.register_group(101, Some(100));
-    varsyms.set_group_var(100, "ZONE", "eu-central");
-    varsyms.set_group_var(101, "POD", "frontend-1");
+    varsyms.set_global("OS", "DragonFly");
+    varsyms.set_scoped(10, 1, 100, "TARGET", "x86_64");
     assert_eq!(
-        varsyms.expand_path(101, "/cluster/$ZONE/$MACHINE/$POD/state"),
-        "/cluster/eu-central/x86_64/frontend-1/state"
+        varsyms.resolve_path(10, "/usr/${OS}/${TARGET}/bin"),
+        "/usr/DragonFly/x86_64/bin"
     );
 
-    // 6. Swapcache NVMe-oF
-    let mut swap = DragonFlySwapcacheNvmeOverFabricsAdaptiveCompressionV70PrEngine::new(0.5);
-    swap.stage_block(200, 8192);
-    assert!(swap.flush_to_nvme_over_fabrics(200));
-    assert_eq!(swap.get_tier(200), Some(1));
+    // 6. Swapcache
+    let mut swapcache = DragonFlySwapcacheNvmeOverFabricsAdaptiveCompressionV70PrEngine::new(0.8);
+    let sample_data = [0x22; 256];
+    assert!(swapcache.ingest_block(200, &sample_data));
+    assert!(swapcache.flush_to_nvme_over_fabrics(200));
 
     // 7. Per-CPU Namecache
     let mut nc = DragonFlyPerCpuGenerationNamecacheLockfreeV70PrEngine::new(4);
-    nc.insert_entry(1, 0xDEADBEEF, 999);
-    assert_eq!(nc.resolve(1, 0xDEADBEEF), Some(999));
-    nc.advance_epoch_invalidate_all();
-    assert_eq!(nc.resolve(1, 0xDEADBEEF), None);
+    nc.insert_entry(0, 10, 0xABCD, 1234);
+    assert_eq!(nc.lookup(0, 10, 0xABCD), Some(1234));
+    nc.bump_generation_invalidate_all();
+    assert_eq!(nc.lookup(0, 10, 0xABCD), None);
 
-    // 8. Devctl Multi-Queue
+    // 8. Devctl
     let mut devctl = DragonFlyDevctlMultiQueueKqueuePriorityRouterV70PrEngine::new();
-    devctl.enqueue_event("nvme", "online", "/dev/nvme0", 5);
-    devctl.enqueue_event("kernel", "panic_trap", "/dev/kmem", 20);
-    let top = devctl.dequeue_event().unwrap();
-    assert_eq!(top.subsystem, "kernel");
-    assert_eq!(top.priority, 20);
+    devctl.post_event("nvme", "/dev/nvme0", "alert", 25, 100);
+    let ev = devctl.poll_highest_priority_event().unwrap();
+    assert_eq!(ev.priority, 25);
+    assert_eq!(ev.subsystem, "nvme");
 
-    // 9. Firmlink Quota Guard
+    // 9. Firmlink
     let mut firmlink = DragonFlyFirmlinkSecurityAuditedCrossMountQuotaGuardV70PrEngine::new();
-    firmlink.register_rule(10, "/export/data", "/jail/data", 2, true);
-    assert!(firmlink.request_firmlink("/export/data/file1", "/jail/data/file1", false));
-    assert!(firmlink.request_firmlink("/export/data/file2", "/jail/data/file2", false));
-    assert!(!firmlink.request_firmlink("/export/data/file3", "/jail/data/file3", false)); // Quota reached
-    assert!(!firmlink.request_firmlink("/export/data/file4", "/jail/data/file4", true)); // RO enforced
+    firmlink.register_policy(1, "/mnt/data", "/jail/data", 1, false);
+    assert!(firmlink.request_link_creation("/mnt/data/a", "/jail/data/a", false));
+    assert!(!firmlink.request_link_creation("/mnt/data/b", "/jail/data/b", false)); // Quota reached
 
-    // 10. SMP TSC Governor
-    let mut tsc = DragonFlySmpTscPhaseLockEqualizerDriftGovernorV70PrEngine::new(8, 20);
-    tsc.record_core_skew(2, 45);
-    assert!(!tsc.is_all_phase_locked());
-    assert!(tsc.run_drift_equalization());
-    assert!(tsc.is_all_phase_locked());
+    // 10. TSC Governor
+    let mut tsc = DragonFlySmpTscPhaseLockEqualizerDriftGovernorV70PrEngine::new(2, 8);
+    tsc.record_core_offset(0, 2);
+    tsc.record_core_offset(1, 4);
+    assert!(tsc.is_drift_acceptable());
+}
+
+fn sched_test_helper(sched: &mut DragonFlyLwktAffinityAwareStealingSchedulerV70PrEngine) {
+    sched.enqueue_thread(LwktThreadV70 {
+        tid: 10,
+        priority: 5,
+        preferred_numa_node: 0,
+        pinned_cpu: Some(0),
+        run_ticks: 0,
+    });
+    sched.enqueue_thread(LwktThreadV70 {
+        tid: 20,
+        priority: 8,
+        preferred_numa_node: 0,
+        pinned_cpu: None,
+        run_ticks: 0,
+    });
+    // CPU 2 is in NUMA node 0 (2 % 2 = 0) and will steal unpinned thread from CPU 0
+    let stolen = sched.pop_next_thread(2);
+    assert_eq!(stolen.map(|t| t.tid), Some(20));
 }

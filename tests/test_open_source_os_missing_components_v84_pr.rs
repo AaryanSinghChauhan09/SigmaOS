@@ -30,19 +30,24 @@ fn test_integration_individual_v84_engines() {
 
     let sched = Linux638SchedExtAiPredictivePowerGovernorEngineV84::new();
     assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 6000);
+    assert!(sched.balance_folio_numa_tiering(2));
 
-    let freebsd = FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new();
+    let mut freebsd = FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new();
     assert!(freebsd.verify_jail_vnet_isolation(10));
+    assert_eq!(freebsd.trim_openzfs_arc_cache(40000), 40000 - 32768);
 
     let openbsd = OpenBsd97FineIbtPinsyscallPteGuardEngineV84::new();
     assert!(openbsd.validate_syscall_entry_point(0x0000_1000));
+    assert!(openbsd.verify_shadow_stack_frame(20));
 
-    let dfbsd = DragonFly86Hammer3DirectIoErasureEngineV84::new();
+    let mut dfbsd = DragonFly86Hammer3DirectIoErasureEngineV84::new();
     let parity = dfbsd.compute_erasure_parity(&[&[1, 2], &[3, 4]]);
     assert_eq!(parity, vec![1 ^ 3, 2 ^ 4]);
+    assert_eq!(dfbsd.advance_cow_generation(), 2);
 
     let netbsd = NetBsd133RumpUserlandAudioPciRouterEngineV84::new();
     assert!(netbsd.route_pci_hypercall(1));
+    assert!(netbsd.dispatch_virtio_9p_queue(10));
 
     let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV84::new();
     assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
@@ -60,9 +65,9 @@ fn test_integration_individual_v84_engines() {
     assert!(omarchy.reload_theme("Dark-V84"));
     assert_eq!(omarchy.active_theme, "Dark-V84");
 
-    let media = GlobalTechMedia40PortalUnimplementedIdeasEngineV84::new();
+    let media = GlobalTechMedia46PortalUnimplementedIdeasEngineV84::new();
     let page = media.generate_wiki_documentation_page("V84 Test");
-    assert!(page.contains("40 Tech Media Portals"));
+    assert!(page.contains("46 Tech Media Portals"));
 
     let adapter = UniversalSubsystemCrossDistroAdapterEngineV84::new();
     assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));

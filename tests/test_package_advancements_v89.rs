@@ -97,7 +97,7 @@ fn test_package_advancements_v89_full_cycle() {
     // 9. PR Gateway V89
     let mut gateway = SovereignDistroPackagePrGatewayV89::new();
     gateway.submit_proposal(
-        8801,
+        8901,
         "Universal Package Advancements V89",
         PackageFormat::Deb,
         "ripgrep",

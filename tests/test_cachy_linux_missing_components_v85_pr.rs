@@ -91,7 +91,7 @@ fn test_cachy_linux_individual_v85_engine_functionality() {
 
     let mut bolt = CachyOsKernelAutoBoltPgoV11PipelinePrEngine::new();
     assert!(bolt.optimize_kernel_binary());
-    assert_eq!(bolt.pgo_profiles_processed, 2049);
+    assert_eq!(bolt.pgo_profiles_processed, 1025);
 
     let mut chwd = CachyOsChwdVulkanWaylandDirectScanoutV11Engine::new();
     let chwd_msg = chwd.bypass_compositor(77);

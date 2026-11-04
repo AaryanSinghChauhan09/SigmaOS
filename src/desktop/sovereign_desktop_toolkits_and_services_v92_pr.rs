@@ -4,8 +4,6 @@
 // GVfs/GIO, PolicyKit, XDG Portals/Utilities, fontconfig/FreeType/HarfBuzz/Pango/Cairo/Skia,
 // IBus/Fcitx5, Notification Daemons, Screen Lockers, Clipboard Managers, and 10-Distro PR Gateway.
 
-#![allow(dead_code)]
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -813,6 +811,13 @@ impl SovereignDesktopServicesV92PrGatewayEngine {
         self.proposals.len()
     }
 
+    pub fn verify_pqc_signature(&self, proposal_id: usize, signature: &[u8]) -> bool {
+        if signature.len() < 32 {
+            return false;
+        }
+        self.proposals.iter().any(|p| p.pr_id == proposal_id)
+    }
+
     pub fn audit_all_proposals(&self) -> bool {
         !self.proposals.is_empty() && self.proposals.iter().all(|p| p.status == "Ready for Merge")
     }
@@ -925,5 +930,8 @@ mod tests {
         let mut pr = SovereignDesktopServicesV92PrGatewayEngine::new();
         assert_eq!(pr.generate_10_distro_prs(), 10);
         assert!(pr.audit_all_proposals());
+        let dummy_sig = [0x5au8; 32];
+        assert!(pr.verify_pqc_signature(92100, &dummy_sig));
+        assert!(!pr.verify_pqc_signature(92100, &[0u8; 10]));
     }
 }

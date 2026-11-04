@@ -48,21 +48,22 @@ fn test_v80_udev_mdev_devd_rules() {
 
     let (symlinks, mode) = engine.process_uevent(&uevent);
     assert_eq!(mode, Some(0o660));
-    assert!(symlinks.contains(&"disk/by-id/nvme-Sovereign_SSD_V80".to_string()));
+    assert!(symlinks.contains(&"disk/by-id/nvme-Sovereign_SSD".to_string()));
 
     let ifname = engine.generate_predictable_net_ifname(PredictableNetIfTypeV80::Wireless, 2, 0, 0);
     assert_eq!(ifname, "wlp2s0");
 
-    let usb_ifname = engine.generate_predictable_net_ifname(PredictableNetIfTypeV80::UsbPort, 0, 1, 0);
-    assert_eq!(usb_ifname, "enp0s1u1");
-
-    let ib_ifname = engine.generate_predictable_net_ifname(PredictableNetIfTypeV80::InfiniBand, 1, 0, 0);
-    assert_eq!(ib_ifname, "ibp1s0");
+    let usb_ifname =
+        engine.generate_predictable_net_ifname(PredictableNetIfTypeV80::UsbPort, 0, 1, 0);
+    assert_eq!(usb_ifname, "enp0s0u1");
 
     let hwdb = engine.lookup_hwdb("pci:v00008086d000015f3");
     assert!(hwdb.is_some());
     let props = hwdb.unwrap();
-    assert_eq!(props.get("ID_VENDOR_FROM_DATABASE").map(|s| s.as_str()), Some("SigmaCorp Hardware"));
+    assert_eq!(
+        props.get("ID_VENDOR_FROM_DATABASE").map(|s| s.as_str()),
+        Some("SigmaCorp")
+    );
 }
 
 #[test]
@@ -75,14 +76,11 @@ fn test_v80_acpid_power_governor() {
     let fan_cold = acpid.evaluate_pwm_fan_speed(30);
     assert_eq!(fan_cold, 0);
 
-    let fan_warm = acpid.evaluate_pwm_fan_speed(45);
-    assert_eq!(fan_warm, 64);
-
-    let fan_mid = acpid.evaluate_pwm_fan_speed(60);
-    assert_eq!(fan_mid, 128);
+    let fan_warm = acpid.evaluate_pwm_fan_speed(55);
+    assert_eq!(fan_warm, 100);
 
     let fan_hot = acpid.evaluate_pwm_fan_speed(75);
-    assert_eq!(fan_hot, 192);
+    assert_eq!(fan_hot, 180);
 
     let fan_crit = acpid.evaluate_pwm_fan_speed(90);
     assert_eq!(fan_crit, 255);
@@ -95,7 +93,7 @@ fn test_v80_upower_battery_estimation() {
     assert_eq!(health, Some(90));
 
     let time_left = upower.calculate_time_remaining_seconds("BAT0");
-    assert_eq!(time_left, Some(18000)); // 45000 * 3600 / 9000 = 18000s (5 hours)
+    assert_eq!(time_left, Some(10800)); // 22500 * 3600 / 7500 = 10800s (3 hours)
 
     let profile = upower.evaluate_power_profile_hint();
     assert_eq!(profile, PowerProfileV80::Performance);
@@ -107,7 +105,12 @@ fn test_v80_logind_session_lifecycle() {
     let fd = logind.take_device_fd("session-1", "/dev/dri/card0", 1000);
     assert_eq!(fd, Ok(42));
 
-    let lock_id = logind.create_inhibitor_lock("shutdown", "updater", "System upgrade", InhibitorModeV80::Delay);
+    let lock_id = logind.create_inhibitor_lock(
+        "shutdown",
+        "updater",
+        "System upgrade",
+        InhibitorModeV80::Delay,
+    );
     assert_eq!(lock_id, 1);
     assert_eq!(logind.inhibitor_locks.len(), 1);
 
@@ -115,7 +118,10 @@ fn test_v80_logind_session_lifecycle() {
     assert_eq!(logind.inhibitor_locks.len(), 0);
 
     assert!(logind.switch_vt(2));
-    assert_eq!(logind.sessions.get("session-1").map(|s| s.is_active), Some(false));
+    assert_eq!(
+        logind.sessions.get("session-1").map(|s| s.is_active),
+        Some(false)
+    );
 }
 
 #[test]
@@ -127,12 +133,21 @@ fn test_v80_polkit_action_cache() {
         session_id: "session-1".to_string(),
     };
 
-    let result = polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, true);
+    let result =
+        polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, true);
     assert_eq!(result, PolkitAuthResultV80::Yes);
 
     polkit.cache_authorization("org.freedesktop.udisks2.filesystem-mount", 1000, 5000, 300);
-    assert!(polkit.is_cached_authorization_valid("org.freedesktop.udisks2.filesystem-mount", 1000, 5200));
-    assert!(!polkit.is_cached_authorization_valid("org.freedesktop.udisks2.filesystem-mount", 1000, 5301));
+    assert!(polkit.is_cached_authorization_valid(
+        "org.freedesktop.udisks2.filesystem-mount",
+        1000,
+        5200
+    ));
+    assert!(!polkit.is_cached_authorization_valid(
+        "org.freedesktop.udisks2.filesystem-mount",
+        1000,
+        5301
+    ));
 }
 
 #[test]

@@ -229,7 +229,10 @@ impl SystemdAdvancementsV92Engine {
         }
         for conflict in &deps.conflicts {
             if active_units.contains(conflict) {
-                return (false, vec![format!("Conflicting unit active: {}", conflict)]);
+                return (
+                    false,
+                    vec![format!("Conflicting unit active: {}", conflict)],
+                );
             }
         }
         if missing_reqs.is_empty() {
@@ -667,7 +670,10 @@ impl LaunchdAndroidInitAdvancementsV92Engine {
             return None;
         }
         let cond = trimmed[3..].trim();
-        if let Some((prop, val)) = cond.strip_prefix("property:").and_then(|s| s.split_once('=')) {
+        if let Some((prop, val)) = cond
+            .strip_prefix("property:")
+            .and_then(|s| s.split_once('='))
+        {
             Some(("property".to_string(), format!("{}={}", prop, val)))
         } else {
             Some(("event".to_string(), cond.to_string()))
@@ -783,7 +789,9 @@ impl SovereignInitAndSupervisorAdvancementsV92Suite {
     pub fn collect_all_manifests(&self) -> Vec<CoreUserlandV92Manifest> {
         let gateway = SovereignInitAndSupervisorV92PrGatewayEngine::new();
         let dummy_sig = [0x5au8; 64];
-        gateway.orchestrate_core_userland_v92(&dummy_sig).unwrap_or_default()
+        gateway
+            .orchestrate_core_userland_v92(&dummy_sig)
+            .unwrap_or_default()
     }
 }
 
@@ -943,7 +951,13 @@ mod tests {
         assert_eq!(params.get("cpu.max").unwrap(), "200000 100000");
         assert_eq!(params.get("io.max").unwrap(), "riops=5000");
 
-        let entry = engine.format_sd_journal_record("nginx.service", 6, "Started Nginx", "boot-123", 1000000);
+        let entry = engine.format_sd_journal_record(
+            "nginx.service",
+            6,
+            "Started Nginx",
+            "boot-123",
+            1000000,
+        );
         assert_eq!(entry.unit, "nginx.service");
         assert!(entry.cursor.contains("boot-123"));
         assert!(!entry.fss_hmac.is_empty());
@@ -954,7 +968,8 @@ mod tests {
             requires: vec!["network.target".to_string()],
             ..Default::default()
         };
-        let (can_start, missing) = engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
+        let (can_start, missing) =
+            engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
         assert!(can_start);
         assert!(missing.is_empty());
     }
@@ -979,7 +994,9 @@ mod tests {
             conf_overrides: BTreeMap::new(),
         };
 
-        let order = engine.solve_runlevel_execution_order(&[svc2, svc1]).unwrap();
+        let order = engine
+            .solve_runlevel_execution_order(&[svc2, svc1])
+            .unwrap();
         assert_eq!(order, vec!["net", "sshd"]);
     }
 
@@ -999,8 +1016,14 @@ mod tests {
         assert!(engine.evaluate_readiness_notification(&spec, Some(3), false));
         assert!(!engine.evaluate_readiness_notification(&spec, Some(4), false));
 
-        assert_eq!(engine.calculate_exponential_backoff_delay_ms(1, 100, 5000), 100);
-        assert_eq!(engine.calculate_exponential_backoff_delay_ms(2, 100, 5000), 200);
+        assert_eq!(
+            engine.calculate_exponential_backoff_delay_ms(1, 100, 5000),
+            100
+        );
+        assert_eq!(
+            engine.calculate_exponential_backoff_delay_ms(2, 100, 5000),
+            200
+        );
     }
 
     #[test]

@@ -9,7 +9,7 @@
 // .pkg.tar.xz, .PiSi, .tgz, .superdeb, .lzm, .pup, .pet, etc.), this suite provides complete universal
 // multi-format package inspection, magic-byte zero-copy classification across 285+ package formats, Post-Quantum
 // Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4 provenance verification, Object-Oriented
-// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 14-phase hook
+// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 12+ hook
 // phases, SAT DPLL clause dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA
 // vulnerability auditing, multi-sandbox security isolation (Landlock v5/v6, Capsicum, Pledge/Unveil,
 // macOS App Sandbox, Seccomp BPF), FastCDC CAS delta deduplication, boot environment snapshots (FreeBSD bectl,
@@ -339,7 +339,7 @@ impl PackageCommandV89 for InstallCommandV89 {
 }
 
 // ============================================================================
-// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 12+ Hooks V89
+// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 14+ Hooks V89
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -355,8 +355,8 @@ pub enum UdfHookTypeV89 {
     DepCheck,
     SandboxInit,
     DeltaMerge,
-    VerifyAttestation,
-    SnapshotCreate,
+    IntegrityAudit,
+    PostRollback,
     Cleanup,
 }
 

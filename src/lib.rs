@@ -177,6 +177,8 @@ pub use system::sovereign_init_and_supervisor_advancements_v79_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v82_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v88_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v89_pr::*;
+pub use system::sovereign_init_and_supervisor_advancements_v90_pr::*;
+pub use system::sovereign_init_and_supervisor_advancements_v92_pr::*;
 pub use system::*;
 pub mod driver;
 pub mod drivers;
@@ -254,6 +256,7 @@ pub use desktop::sovereign_desktop_toolkits_and_services_v76_pr::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v82_pr::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v88_pr::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v90_pr::*;
+pub use desktop::sovereign_desktop_toolkits_and_services_v92_pr::*;
 pub use desktop::{
     CachyosGamescopeHandheldOverlay, Gnome46MutterEngine, ItsFossQuickShareAndBackupHud,
     KdePlasma6Engine, LuminaBsdDesktopEngine, PhoronixPerformanceBenchmarkWidget,

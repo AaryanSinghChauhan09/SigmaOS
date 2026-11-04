@@ -752,7 +752,7 @@ impl SovereignPrintScanV88PrGatewayEngine {
 
 impl Default for SovereignPrintScanV88PrGatewayEngine {
     fn default() -> Self {
-        Self::new(86001, "Sovereign Printing & Scanning V88 Innovations", "Sovereign Core Team")
+        Self::new(88001, "Sovereign Printing & Scanning V88 Innovations", "Sovereign Core Team")
     }
 }
 

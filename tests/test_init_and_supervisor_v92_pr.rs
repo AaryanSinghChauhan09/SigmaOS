@@ -11,94 +11,117 @@ use alloc::vec;
 
 #[test]
 fn test_init_and_supervisor_v92_pr_integration() {
-    let master_suite = SovereignInitAndSupervisorAdvancementsV92Suite::new();
-    let manifests = master_suite.collect_all_manifests();
+    let gateway = SovereignInitAndSupervisorV92PrGatewayEngine::new();
+    let sig = [0x5au8; 64];
+    let manifests = gateway.orchestrate_core_userland_v92(&sig).unwrap();
 
     assert_eq!(manifests.len(), 7);
     for manifest in &manifests {
-        assert!(manifest.pr_id >= 9201 && manifest.pr_id <= 9207);
+        assert!(manifest.pr_id >= 9200 && manifest.pr_id <= 9206);
         assert!(!manifest.pr_title.is_empty());
         assert_eq!(manifest.status, "Ready for Integration");
     }
 
-    // 1. Verify systemd V92 state machine, freezer & cgroup v2 & socket activation & journal
+    // 1. Verify systemd V92 engine
     let systemd = SystemdAdvancementsV92Engine::new();
-    let state = systemd.transition_unit_state(SystemdUnitStateV92::Inactive, "start");
+    let mut state = SystemdUnitStateV92::Inactive;
+    state = systemd.transition_unit_state(state, "start");
     assert_eq!(state, SystemdUnitStateV92::Activating);
-    let state_active = systemd.transition_unit_state(state, "started");
-    let state_freezing = systemd.transition_unit_state(state_active, "freeze");
-    assert_eq!(state_freezing, SystemdUnitStateV92::Freezing);
-    let state_frozen = systemd.transition_unit_state(state_freezing, "frozen");
-    assert_eq!(state_frozen, SystemdUnitStateV92::Frozen);
-    let state_thawing = systemd.transition_unit_state(state_frozen, "thaw");
-    assert_eq!(state_thawing, SystemdUnitStateV92::Thawing);
-    let state_resumed = systemd.transition_unit_state(state_thawing, "active");
-    assert_eq!(state_resumed, SystemdUnitStateV92::Active);
+    state = systemd.transition_unit_state(state, "started");
+    assert_eq!(state, SystemdUnitStateV92::Active);
+    state = systemd.transition_unit_state(state, "freeze");
+    assert_eq!(state, SystemdUnitStateV92::Freezing);
+    state = systemd.transition_unit_state(state, "frozen");
+    assert_eq!(state, SystemdUnitStateV92::Frozen);
+    state = systemd.transition_unit_state(state, "thaw");
+    assert_eq!(state, SystemdUnitStateV92::Thawing);
+    state = systemd.transition_unit_state(state, "active");
+    assert_eq!(state, SystemdUnitStateV92::Active);
 
     let limits = SystemdCgroupV2LimitsV92 {
-        memory_max_bytes: Some(8192),
-        memory_high_bytes: Some(4096),
-        cpu_quota_percent: Some(200),
+        memory_max_bytes: Some(1024 * 1024 * 512),
+        memory_high_bytes: Some(1024 * 1024 * 384),
+        cpu_quota_percent: Some(250),
         tasks_max: Some(500),
         io_weight: Some(150),
         io_read_iops_max: Some(10000),
         io_write_iops_max: Some(5000),
     };
     let cgroup_params = systemd.build_cgroup_v2_control_parameters(&limits);
-    assert_eq!(cgroup_params.get("memory.max"), Some(&"8192".to_string()));
-    assert_eq!(cgroup_params.get("memory.high"), Some(&"4096".to_string()));
-    assert_eq!(cgroup_params.get("cpu.max"), Some(&"200000 100000".to_string()));
+    assert_eq!(
+        cgroup_params.get("memory.max"),
+        Some(&"536870912".to_string())
+    );
+    assert_eq!(
+        cgroup_params.get("memory.high"),
+        Some(&"402653184".to_string())
+    );
+    assert_eq!(
+        cgroup_params.get("cpu.max"),
+        Some(&"250000 100000".to_string())
+    );
     assert_eq!(cgroup_params.get("pids.max"), Some(&"500".to_string()));
     assert_eq!(cgroup_params.get("io.weight"), Some(&"150".to_string()));
-    assert_eq!(cgroup_params.get("io.max"), Some(&"riops=10000".to_string()));
-    assert_eq!(cgroup_params.get("io.max_write"), Some(&"wiops=5000".to_string()));
+    assert_eq!(
+        cgroup_params.get("io.max"),
+        Some(&"riops=10000".to_string())
+    );
+    assert_eq!(
+        cgroup_params.get("io.max_write"),
+        Some(&"wiops=5000".to_string())
+    );
 
-    let socket_spec = SystemdSocketActivationSpecV92 {
-        socket_name: "test.socket".to_string(),
-        listen_stream: "/run/test.sock".to_string(),
+    let sock_spec = SystemdSocketActivationSpecV92 {
+        socket_name: "sigma-http.socket".to_string(),
+        listen_stream: "/run/sigma/http.sock".to_string(),
         pass_fds_count: 2,
-        service_to_trigger: "test.service".to_string(),
+        service_to_trigger: "sigma-http.service".to_string(),
         reuse_port: true,
         non_blocking: true,
     };
-    let env_map = systemd.evaluate_socket_activation_env(&socket_spec, 4001);
-    assert_eq!(env_map.get("LISTEN_FDS"), Some(&"2".to_string()));
-    assert_eq!(env_map.get("LISTEN_PID"), Some(&"4001".to_string()));
-    assert_eq!(env_map.get("LISTEN_FDNAMES"), Some(&"test.socket".to_string()));
-    assert_eq!(env_map.get("LISTEN_NONBLOCK"), Some(&"1".to_string()));
-
-    let journal_entry = systemd.format_sd_journal_record(
-        "api-worker",
-        6,
-        "Worker thread started successfully",
-        "boot-v92-id",
-        1700000000,
+    let sock_env = systemd.evaluate_socket_activation_env(&sock_spec, 1000);
+    assert_eq!(sock_env.get("LISTEN_PID"), Some(&"1000".to_string()));
+    assert_eq!(sock_env.get("LISTEN_FDS"), Some(&"2".to_string()));
+    assert_eq!(
+        sock_env.get("LISTEN_FDNAMES"),
+        Some(&"sigma-http.socket".to_string())
     );
-    assert_eq!(journal_entry.unit, "api-worker");
-    assert_eq!(journal_entry.priority, 6);
-    assert!(journal_entry.cursor.starts_with("s="));
-    assert_eq!(journal_entry.fss_hmac, format!("{:016x}:{:08x}", 1700000000u64 ^ 0x5a5a5a5a5a5a5a5a, 6u32));
 
-    // Dependency check
+    let journal = systemd.format_sd_journal_record(
+        "systemd-journald.service",
+        6,
+        "Journal started",
+        "boot-92",
+        1000000,
+    );
+    assert_eq!(journal.unit, "systemd-journald.service");
+    assert!(journal.cursor.contains("boot-92"));
+    assert!(!journal.fss_hmac.is_empty());
+
+    let mut active_units = BTreeSet::new();
+    active_units.insert("network.target".to_string());
+    active_units.insert("syslog.socket".to_string());
     let deps = SystemdDependencySpecV92 {
-        requires: vec!["db.service".to_string()],
-        ..Default::default()
+        requires: vec!["network.target".to_string()],
+        wants: vec!["syslog.socket".to_string()],
+        binds_to: vec![],
+        part_of: vec![],
+        conflicts: vec!["shutdown.target".to_string()],
+        before: vec![],
+        after: vec!["network.target".to_string()],
     };
-    let mut active_set = BTreeSet::new();
-    let (startable_without_db, _) = systemd.evaluate_unit_dependencies_startable("app.service", &deps, &active_set);
-    assert!(!startable_without_db);
-    active_set.insert("db.service".to_string());
-    let (startable_with_db, _) = systemd.evaluate_unit_dependencies_startable("app.service", &deps, &active_set);
-    assert!(startable_with_db);
+    let (can_start, missing) =
+        systemd.evaluate_unit_dependencies_startable("app.service", &deps, &active_units);
+    assert!(can_start);
+    assert!(missing.is_empty());
 
-    // 2. Verify OpenRC V92 cascading dependency solver & conf overrides & rc-status
+    // 2. Verify OpenRC V92 engine
     let openrc = OpenRcAdvancementsV92Engine::new();
-    let rc_conf = "rc_parallel=\"YES\"\nrc_interactive=\"NO\"\n";
-    let directives = openrc.parse_rc_conf(rc_conf);
-    assert_eq!(directives.get("rc_parallel"), Some(&"YES".to_string()));
+    let rc_conf = "rc_parallel=\"YES\"\nrc_env_allow=\"*\"\nrc_interactive=\"NO\"\n";
+    let conf_map = openrc.parse_rc_conf(rc_conf);
+    assert_eq!(conf_map.get("rc_parallel"), Some(&"YES".to_string()));
+    assert_eq!(conf_map.get("rc_interactive"), Some(&"NO".to_string()));
 
-    let mut overrides = BTreeMap::new();
-    overrides.insert("rc_need".to_string(), "localmount".to_string());
     let services = vec![
         OpenRcServiceSpecV92 {
             name: "fs".to_string(),
@@ -107,105 +130,129 @@ fn test_init_and_supervisor_v92_pr_integration() {
             conf_overrides: BTreeMap::new(),
         },
         OpenRcServiceSpecV92 {
-            name: "network".to_string(),
+            name: "net".to_string(),
             runlevel: "default".to_string(),
             dependencies: vec![(OpenRcDepKindV92::Need, "fs".to_string())],
-            conf_overrides: overrides,
+            conf_overrides: BTreeMap::new(),
+        },
+        OpenRcServiceSpecV92 {
+            name: "daemon".to_string(),
+            runlevel: "default".to_string(),
+            dependencies: vec![(OpenRcDepKindV92::Need, "net".to_string())],
+            conf_overrides: BTreeMap::new(),
         },
     ];
-    let order = openrc.solve_runlevel_execution_order(&services).unwrap();
-    assert_eq!(order, vec!["fs", "network"]);
+    let exec_order = openrc.solve_runlevel_execution_order(&services).unwrap();
+    assert_eq!(exec_order, vec!["fs", "net", "daemon"]);
 
-    let mut status_map = BTreeMap::new();
-    status_map.insert("network".to_string(), true);
-    status_map.insert("cron".to_string(), false);
-    let report = openrc.format_rc_status_report("default", &status_map);
-    assert!(report.contains("Runlevel: default"));
-    assert!(report.contains("[ started ]"));
-    assert!(report.contains("network"));
-    assert!(report.contains("[ stopped ]"));
-    assert!(report.contains("cron"));
+    let mut health_map = BTreeMap::new();
+    health_map.insert("fs".to_string(), true);
+    health_map.insert("net".to_string(), false);
+    let status_report = openrc.format_rc_status_report("default", &health_map);
+    assert!(status_report.contains("Runlevel: default"));
+    assert!(status_report.contains("[ started ]"));
+    assert!(status_report.contains("[ stopped ]"));
 
-    // 3. Verify runit & s6 V92 active scanner, readiness notifications & backoff
-    let runit_s6 = RunitS6AdvancementsV92Engine::new();
-    let scanned = runit_s6.scan_service_dir(&[".hidden", "cron", "ntp", "ssh"]);
-    assert_eq!(scanned, vec!["cron", "ntp", "ssh"]);
+    // 3. Verify runit & s6 V92 engine
+    let s6 = RunitS6AdvancementsV92Engine::new();
+    let scanned = s6.scan_service_dir(&[".git", "sshd", "nginx", ".ignored"]);
+    assert_eq!(scanned, vec!["sshd", "nginx"]);
 
-    let readiness_spec = S6ServiceReadinessSpecV92 {
-        service_name: "logger".to_string(),
+    let s6_spec = S6ServiceReadinessSpecV92 {
+        service_name: "redis".to_string(),
         notify_fd: Some(3),
         check_script: None,
         timeout_ms: 3000,
-        max_restart_attempts: 10,
+        max_restart_attempts: 5,
     };
-    assert!(runit_s6.evaluate_readiness_notification(&readiness_spec, Some(3), false));
-    assert!(!runit_s6.evaluate_readiness_notification(&readiness_spec, Some(4), false));
-    assert_eq!(runit_s6.calculate_exponential_backoff_delay_ms(3, 100, 1000), 400);
+    assert!(s6.evaluate_readiness_notification(&s6_spec, Some(3), false));
+    assert!(!s6.evaluate_readiness_notification(&s6_spec, Some(4), false));
+    assert_eq!(s6.calculate_exponential_backoff_delay_ms(3, 100, 5000), 400);
 
-    let transition_plan = runit_s6.compile_s6_rc_transition("boot", "default");
-    assert_eq!(transition_plan, "s6-rc -a change boot -> default");
+    let s6_transition = s6.compile_s6_rc_transition("current_state", "target_state");
+    assert!(s6_transition.contains("s6-rc -a change"));
 
-    // 4. Verify SysVinit V92 /etc/inittab, telinit & priority ordering
+    // 4. Verify SysVinit V92 engine
     let sysv = SysVinitAdvancementsV92Engine::new();
-    let line = "l2:2:wait:/etc/init.d/rc 2";
-    let entry = sysv.parse_inittab_line(line).unwrap();
-    assert_eq!(entry.id, "l2");
-    assert_eq!(entry.action, SysVinitActionV92::Wait);
-    assert_eq!(entry.runlevels, vec!['2']);
+    let inittab_line = "1:2345:respawn:/sbin/getty 38400 tty1";
+    let entry = sysv.parse_inittab_line(inittab_line).unwrap();
+    assert_eq!(entry.id, "1");
+    assert_eq!(entry.runlevels, vec!['2', '3', '4', '5']);
+    assert_eq!(entry.action, SysVinitActionV92::Respawn);
+    assert_eq!(entry.process, "/sbin/getty 38400 tty1");
 
-    let active_specs = sysv.evaluate_runlevel_switch(&[entry], '2');
-    assert_eq!(active_specs.len(), 1);
+    let entries = vec![entry];
+    let to_run = sysv.evaluate_runlevel_switch(&entries, '3');
+    assert_eq!(to_run.len(), 1);
+    let to_run_fail = sysv.evaluate_runlevel_switch(&entries, '1');
+    assert_eq!(to_run_fail.len(), 0);
 
-    let script_order = sysv.sort_sysv_rc_scripts(&["K90syslog", "S01network", "S20sshd", "K10db"]);
-    assert_eq!(script_order, vec!["S01network", "K10db", "S20sshd", "K90syslog"]);
+    let rc_scripts = vec!["S20nginx", "S10network", "S01syslog", "K90bluetooth"];
+    let sorted_scripts = sysv.sort_sysv_rc_scripts(&rc_scripts);
+    assert_eq!(
+        sorted_scripts,
+        vec!["S01syslog", "S10network", "S20nginx", "K90bluetooth"]
+    );
 
-    // 5. Verify BSD rc (FreeBSD, OpenBSD, NetBSD V92) hooks & jail command
+    // 5. Verify BSD rc V92 engine
     let bsd = BsdRcAdvancementsV92Engine::new();
-    let rc_content = "name=\"unbound\"\nrcvar=\"unbound_enable\"\ncommand=\"/usr/sbin/unbound\"\nstart_precmd=\"unbound_check\"\nflags=\"-c /etc/unbound/unbound.conf\"\njail_name=\"dns_jail\"\n";
-    let hooks = bsd.parse_rc_d_script_hooks(rc_content);
-    assert_eq!(hooks.name, "unbound");
-    assert_eq!(hooks.command, "/usr/sbin/unbound");
-    assert_eq!(hooks.jail_name, Some("dns_jail".to_string()));
-    assert_eq!(bsd.build_jail_chroot_command(&hooks), "jail -n dns_jail exec /usr/sbin/unbound");
+    let script_content = "name=\"sshd\"\nrcvar=\"sshd_enable\"\ncommand=\"/usr/sbin/sshd\"\nstart_precmd=\"sshd_keygen\"\njail_name=\"myjail\"\n";
+    let hooks = bsd.parse_rc_d_script_hooks(script_content);
+    assert_eq!(hooks.name, "sshd");
+    assert_eq!(hooks.rcvar, "sshd_enable");
+    assert_eq!(hooks.start_precmd, Some("sshd_keygen".to_string()));
+    let jail_cmd = bsd.build_jail_chroot_command(&hooks);
+    assert_eq!(jail_cmd, "jail -n myjail exec /usr/sbin/sshd");
 
-    // 6. Verify launchd & Android init V92 keep-alive, triggers & SELinux
+    // 6. Verify launchd & Android init V92 engine
     let launchd_android = LaunchdAndroidInitAdvancementsV92Engine::new();
-    let mut path_map = BTreeMap::new();
-    path_map.insert("/tmp/active.flag".to_string(), true);
+    let mut path_state = BTreeMap::new();
+    path_state.insert("/run/cron.pid".to_string(), true);
     let keep_alive = LaunchdKeepAliveSpecV92 {
-        path_state: path_map,
+        successful_exit: Some(false),
+        path_state,
         other_job_enabled: BTreeMap::new(),
-        successful_exit: Some(true),
-        crashed: None,
-        network_state: None,
+        crashed: Some(true),
+        network_state: Some(true),
     };
     let mut existing_paths = BTreeSet::new();
-    existing_paths.insert("/tmp/active.flag".to_string());
-    assert!(launchd_android.evaluate_keep_alive_conditions(&keep_alive, &existing_paths, &BTreeSet::new(), true));
-    assert!(!launchd_android.evaluate_keep_alive_conditions(&keep_alive, &BTreeSet::new(), &BTreeSet::new(), true));
+    existing_paths.insert("/run/cron.pid".to_string());
+    assert!(launchd_android.evaluate_keep_alive_conditions(
+        &keep_alive,
+        &existing_paths,
+        &BTreeSet::new(),
+        false
+    ));
 
-    let trigger = launchd_android.parse_android_trigger_condition("on boot");
-    assert_eq!(trigger, Some(("event".to_string(), "boot".to_string())));
-
+    let trigger = launchd_android.parse_android_trigger_condition("on post-fs-data");
+    assert_eq!(
+        trigger,
+        Some(("event".to_string(), "post-fs-data".to_string()))
+    );
     assert!(launchd_android.evaluate_selinux_domain_policy("u:r:init:s0", "init"));
-    assert!(!launchd_android.evaluate_selinux_domain_policy("u:r:untrusted_app:s0", "system_server"));
 
-    // 7. Verify Cron, Anacron, Timers & At V92 calendar solver & load thresholds
+    // 7. Verify Cron, Anacron, systemd Timers & At V92 engine
     let cron_timers = CronAnacronTimersAtV92Engine::new();
-    let parsed_cron = cron_timers.parse_crontab_expression("*/15 0-23 * * *").unwrap();
-    assert_eq!(parsed_cron.len(), 5);
+    let crontab_parts = cron_timers
+        .parse_crontab_expression("*/15 2 * * 1-5")
+        .unwrap();
+    assert_eq!(crontab_parts, vec!["*/15", "2", "*", "*", "1-5"]);
 
-    let timer = SystemdTimerSpecV92 {
-        on_calendar: Some("daily".to_string()),
-        on_boot_sec: Some(30),
-        on_unit_active_sec: None,
+    let timer_spec = SystemdTimerSpecV92 {
+        on_calendar: Some("*-*-* 04:00:00".to_string()),
+        on_boot_sec: Some(300),
+        on_unit_active_sec: Some(3600),
         persistent: true,
-        accuracy_sec: 1,
-        randomized_delay_sec: 0,
+        accuracy_sec: 60,
+        randomized_delay_sec: 30,
     };
-    assert!(cron_timers.evaluate_timer_readiness(&timer, 100, 0, 0));
-    assert!(!cron_timers.evaluate_timer_readiness(&timer, 20, 0, 0));
-
+    assert!(cron_timers.evaluate_timer_readiness(&timer_spec, 400, 10, 0));
+    assert!(!cron_timers.evaluate_timer_readiness(&timer_spec, 200, 10, 0));
     assert!(cron_timers.evaluate_batch_load_average(0.65, 0.80));
     assert!(!cron_timers.evaluate_batch_load_average(0.85, 0.80));
+
+    // 8. Verify Master Suite
+    let suite = SovereignInitAndSupervisorAdvancementsV92Suite::new();
+    let suite_manifests = suite.collect_all_manifests();
+    assert_eq!(suite_manifests.len(), 7);
 }

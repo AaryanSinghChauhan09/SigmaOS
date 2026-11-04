@@ -1,1 +1,3 @@
-# IO Scheduler Policy
+# SigmaOS I/O Scheduler Policy
+
+Policy specification for I/O request scheduling.
