@@ -2,7 +2,28 @@
 
 <!-- What subsystem behavior changed and why? -->
 
-## Motivation
+## I/O component
+
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O safety review
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## File component
 
 <!-- Why was this change made? -->
 
@@ -208,41 +229,19 @@
 
 ## I/O component
 
-- [ ] I/O policy
 - [ ] Interrupt manager
-- [ ] DMA manager
+- [ ] DMA manager / DMA queue
 - [ ] Buffer manager
 - [ ] I/O scheduler
-
-## I/O safety review
-
+- [ ] I/O policy
 - [ ] I/O safety review
 
-## Component
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
+## Storage component
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
 
-## Motivation
-Thread manager and scheduler enhancements.
-
-## Implementation notes
-Implementation details.
-
-## Tests
-Testing notes.
-
-## Verification
-- cargo check --lib
-- cargo test --lib
-- ./run_sigma_tests.sh
-
-## Capability status
-Status update.
-
-## Integration impact
-Impact assessment.
-
-## Reviewer checklist
-- [ ] Scope is narrow
-- [ ] `unsafe` justified
+## Storage safety review
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced

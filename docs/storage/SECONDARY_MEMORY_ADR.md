@@ -1,7 +1,10 @@
-# Secondary Memory Lifecycle Subsystem
+# Secondary Memory Lifecycle Subsystem ADR
+
+## Context
+Architecture Decision Record for the Secondary Memory Lifecycle Subsystem.
 
 ## Decision
-Architecture adopted.
+Establish unified block, cache, and filesystem layer lifecycle management.
 
 ## Consequences
-Robust storage.
+Deterministic memory management and zero leaks across storage operations.

@@ -3806,3 +3806,10 @@ if [ -f "tests/test_storage_filesystem_innovations_v90_pr.rs" ]; then
     rustc --test tests/test_storage_filesystem_innovations_v90_pr.rs --edition=2021 -o build/test_storage_v90_integration
     ./build/test_storage_v90_integration
 fi
+
+if [ -f "tests/test_virtualization_and_containers_v89_pr.rs" ]; then
+    echo "Running Sovereign Virtualization & Containers V89 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_virtualization_and_containers_v89_pr.rs --edition=2021 -o build/test_virtualization_v89_pr
+    ./build/test_virtualization_v89_pr
+fi
