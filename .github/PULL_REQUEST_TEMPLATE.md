@@ -285,12 +285,11 @@
 - Risk:
 - Rollback:
 
+## I/O component
 
-## I/O Subsystem Verification
-- I/O component verified: Yes
-- I/O policy verified: Yes
-- Interrupt manager verified: Yes
-- DMA manager verified: Yes
-- Buffer manager verified: Yes
-- I/O scheduler verified: Yes
-- I/O safety review verified: Yes
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O policy
+- [ ] I/O safety review
