@@ -46,6 +46,7 @@ __pycache__/
 !wiki/PROCESS_MANAGER_PLAN.md
 !docs/shell/
 !docs/shell/*.md
+!wiki/34-SigmaOS-Command-Interpreter-Plan.md
 !docs/studies/
 !docs/studies/*.md
 !docs/component-rules/
