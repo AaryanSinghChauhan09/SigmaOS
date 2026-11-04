@@ -2,28 +2,7 @@
 
 <!-- What subsystem behavior changed and why? -->
 
-## I/O component
-
-- [ ] I/O policy
-- [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] I/O safety review
-
-## Storage component
-
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## File component
+## Motivation
 
 <!-- Why was this change made? -->
 
@@ -164,6 +143,43 @@
 - [ ] Boot-to-boot evidence, if boot-affecting
 - [ ] File benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
+
+## Security review
+
+- [ ] Capability/namespace checks enforced
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] `unsafe` justified
+
+## Safety and rollback
+
+- Double-completion prevented
+- Resource limits enforced
+
+## File safety review
+
+- Unit tests
+- Integration tests
+
+## I/O safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## Capability status
+
+- [ ] Updated in matrix
+
+## Integration impact
+
+- [ ] Subsystem integration verified
 
 ## Security review
 
