@@ -184,14 +184,17 @@ impl ProcessTaskManager {
         self.processes.values().filter(|p| p.user == user).collect()
     }
 
-    /// Search processes
+    /// Search processes using zero-allocation case-insensitive ASCII matching.
+    ///
+    /// Performance optimization (Bolt ⚡):
+    /// Avoids per-entry heap allocations (`p.name.to_lowercase()` and
+    /// `p.command.to_lowercase()`) by performing slice-window comparisons for
+    /// ASCII strings.
     pub fn search(&self, query: &str) -> Vec<&TaskProcessEntry> {
-        let query_lower = query.to_lowercase();
         self.processes
             .values()
             .filter(|p| {
-                p.name.to_lowercase().contains(&query_lower)
-                    || p.command.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&p.name, query) || contains_ignore_case(&p.command, query)
             })
             .collect()
     }
@@ -280,6 +283,33 @@ pub struct ProcessTaskStatistics {
     pub total_memory: f32,
 }
 
+/// Zero-allocation case-insensitive substring search helper for ASCII strings.
+///
+/// Performance optimization (Bolt ⚡):
+/// In task management, searching across process tables happens frequently.
+/// Comparing byte windows with `to_ascii_lowercase()` eliminates heap-allocated
+/// intermediate `String` instances created by `.to_lowercase()`.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if needle.is_ascii() && haystack.is_ascii() {
+        let h_bytes = haystack.as_bytes();
+        let n_bytes = needle.as_bytes();
+        if n_bytes.len() > h_bytes.len() {
+            return false;
+        }
+        h_bytes.windows(n_bytes.len()).any(|window| {
+            window
+                .iter()
+                .zip(n_bytes.iter())
+                .all(|(h, n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -335,6 +365,21 @@ mod tests {
         let manager = ProcessTaskManager::new();
         let results = manager.search("sigma");
         assert!(results.len() > 0);
+        let results_upper = manager.search("SIGMA");
+        assert_eq!(results.len(), results_upper.len());
+        let results_cmd = manager.search("sbin");
+        assert_eq!(results_cmd.len(), 1);
+        assert_eq!(results_cmd[0].name, "init");
+    }
+
+    #[test]
+    fn test_contains_ignore_case() {
+        assert!(contains_ignore_case("ProcessTaskManager", "task"));
+        assert!(contains_ignore_case("ProcessTaskManager", "PROCESS"));
+        assert!(contains_ignore_case("ProcessTaskManager", "manager"));
+        assert!(contains_ignore_case("ProcessTaskManager", ""));
+        assert!(!contains_ignore_case("ProcessTaskManager", "nomatch"));
+        assert!(!contains_ignore_case("short", "longer_needle"));
     }
 
     #[test]
