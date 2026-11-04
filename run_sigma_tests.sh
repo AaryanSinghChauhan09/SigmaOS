@@ -124,6 +124,13 @@ if [ -f "tests/test_security_and_hardening_advancements_v80_pr.rs" ]; then
     ./build/test_security_v80_pr
 fi
 
+if [ -f "tests/test_security_and_hardening_advancements_v89_pr.rs" ]; then
+    echo "Running Sovereign Security and Hardening Advancements V89 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_security_and_hardening_advancements_v89_pr.rs --edition=2021 -o build/test_security_v89_pr
+    ./build/test_security_v89_pr
+fi
+
 if [ -f "src/init/systemd_init.rs" ]; then
     echo "Running systemd init & service manager test suite..."
     mkdir -p build
