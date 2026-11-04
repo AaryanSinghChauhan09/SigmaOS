@@ -1909,6 +1909,18 @@ if [ -f "tests/test_tech_media_component_advancements_v77_pr.rs" ]; then
     ./build/test_tech_media_v77_integration
 fi
 
+if [ -f "src/distro/tech_media_component_advancements_v78_pr.rs" ]; then
+    echo "Running Sovereign Tech Media Component Advancements V78 test suite..."
+    rustc --test src/distro/tech_media_component_advancements_v78_pr.rs --edition=2021 -o build/tech_media_v78_test
+    ./build/tech_media_v78_test
+fi
+
+if [ -f "tests/test_tech_media_component_advancements_v78_pr.rs" ]; then
+    echo "Running Sovereign Tech Media Component Advancements V78 Integration test suite..."
+    rustc --test tests/test_tech_media_component_advancements_v78_pr.rs --edition=2021 -o build/test_tech_media_v78_integration
+    ./build/test_tech_media_v78_integration
+fi
+
 if [ -f "src/open_source_os_gap_closure.rs" ]; then
     echo "Running Open Source OS Gap Closure test suite..."
     mkdir -p build

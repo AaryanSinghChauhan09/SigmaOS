@@ -440,6 +440,7 @@ pub use distro::tech_media_component_advancements_v73_pr::*;
 pub use distro::tech_media_component_advancements_v74_pr::*;
 pub use distro::tech_media_component_advancements_v76_pr::*;
 pub use distro::tech_media_component_advancements_v77_pr::*;
+pub use distro::tech_media_component_advancements_v78_pr::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
