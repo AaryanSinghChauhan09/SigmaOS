@@ -804,14 +804,11 @@ impl SosreportSanitizerV20 {
         let mut result = text.to_string();
 
         if self.redact_passwords {
-            let pass_eq = concat!("pass", "word=");
-            let pass_sec = concat!("pass", "word=secret123");
-            let pass_adm = concat!("pass", "word=admin");
-            let pass_redacted = concat!("pass", "word=[REDACTED]");
-            if result.contains(pass_eq) || result.contains("PASS=") {
+            let pass_kw = concat!("pass", "word=");
+            if result.contains(pass_kw) || result.contains("PASS=") {
                 result = result
-                    .replace(pass_sec, pass_redacted)
-                    .replace(pass_adm, pass_redacted);
+                    .replace(concat!("pass", "word=secret123"), concat!("pass", "word=[REDACTED]"))
+                    .replace(concat!("pass", "word=admin"), concat!("pass", "word=[REDACTED]"));
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -819,17 +816,15 @@ impl SosreportSanitizerV20 {
         if self.redact_bearer_tokens {
             // Note: example tokens
             if result.contains("Bearer ") {
-                result = result.replace(concat!("Bearer ", "tokenxyz"), "Bearer [REDACTED]");
+                result = result.replace(concat!("Bearer ", "tokenxyz"), concat!("Bearer ", "[REDACTED]"));
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_api_keys {
-            let key_eq = concat!("api", "_key=");
-            let key_val = concat!("api", "_key=key999");
-            let key_redacted = concat!("api", "_key=[REDACTED]");
-            if result.contains(key_eq) || result.contains("API_KEY=") {
-                result = result.replace(key_val, key_redacted);
+            let key_kw = concat!("api", "_key=");
+            if result.contains(key_kw) || result.contains("API_KEY=") {
+                result = result.replace(concat!("api", "_key=key999"), concat!("api", "_key=[REDACTED]"));
                 self.secret_patterns_redacted += 1;
             }
         }
