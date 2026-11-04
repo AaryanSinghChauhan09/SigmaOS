@@ -2753,6 +2753,31 @@ if [ -f "src/distro/cachy_linux_missing_components_v83_pr.rs" ]; then
     ./build/test_open_source_os_and_cachy_v83_integration
 fi
 
+if [ -f "src/distro/cachy_linux_missing_components_v84_pr.rs" ]; then
+    echo "Running Cachy Linux V84 PR test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test src/distro/cachy_linux_missing_components_v84_pr.rs --edition=2021 -o build/test_cachy_v84_pr
+    ./build/test_cachy_v84_pr
+
+    TMPDIR=$(pwd)/build rustc --test tests/test_cachy_linux_missing_components_v84_pr.rs --edition=2021 -o build/test_cachy_v84_pr_integration
+    ./build/test_cachy_v84_pr_integration
+
+    if [ -f "tests/test_open_source_os_and_cachy_linux_v84_pr.rs" ]; then
+        TMPDIR=$(pwd)/build rustc --test tests/test_open_source_os_and_cachy_linux_v84_pr.rs --edition=2021 -o build/test_open_source_os_and_cachy_v84_integration
+        ./build/test_open_source_os_and_cachy_v84_integration
+    fi
+fi
+
+if [ -f "src/distro/cachy_linux_missing_components_v85_pr.rs" ]; then
+    echo "Running Cachy Linux V85 PR test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test src/distro/cachy_linux_missing_components_v85_pr.rs --edition=2021 -o build/test_cachy_v85_pr
+    ./build/test_cachy_v85_pr
+
+    TMPDIR=$(pwd)/build rustc --test tests/test_cachy_linux_missing_components_v85_pr.rs --edition=2021 -o build/test_cachy_v85_pr_integration
+    ./build/test_cachy_v85_pr_integration
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_v84_pr.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas V84 PR test suite..."
     mkdir -p build
