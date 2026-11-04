@@ -163,62 +163,10 @@
 - Risk:
 - Rollback:
 
-## Component
-- Core subsystem component
-
-## Study document
-- Periodic research study document
-
-## Safety and rollback
-- Safety and rollback verification
-
-## Kernel safety review
-- Kernel safety verification
-
-## Shell component
-- Shell component review
-
-## Shell safety review
-- Shell safety review
-
-## I/O component
-- [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
-- [ ] Buffer manager
-- [ ] I/O scheduler
-
-## I/O policy
-- [ ] I/O policy contract verified
-
-## I/O safety review
-- [ ] Interrupt integrity and zero leak verified
-
-## Storage component
-- [ ] Block manager
-- [ ] Cache manager
-- [ ] Filesystem core
-- [ ] Mount manager
-
-## Storage component
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## IPC handler
-- [ ] IPC semantics
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-
-## Security review
-- [ ] Capability/namespace checks enforced
-
-## Verification
-- [ ] ./run_sigma_tests.sh
-- Capability status
-- Integration impact
+- [ ] I/O component specification validated
+- [ ] I/O policy compliance confirmed
+- [ ] Interrupt manager registered and bounded
+- [ ] DMA manager mapped and completed
+- [ ] Buffer manager dirty cache flushing verified
+- [ ] I/O scheduler prioritizes real-time requests
+- [ ] I/O safety review signed off
