@@ -2,10 +2,10 @@
 // Sovereign Open Source OS & Arch Linux Ecosystem Parity V84 Master Gateway
 // (`src/distro/open_source_os_and_arch_missing_components_v84_pr.rs`)
 //
-// Synthesizes missing, visionary, and unimplemented ideas across Linux 6.37+ BPF SchedExt,
-// FreeBSD 16.7+ OpenZFS ARC & Capsicum, OpenBSD 9.6+ Pinsyscall FineIBT, DragonFly BSD 8.5+ HAMMER3,
-// NetBSD 13.2 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
-// NixOS / GNU Guix Merkle CAS, Omarchy Wallust Theme Chord Navigator, Global Tech Media 39 Portals Harvester,
+// Synthesizes missing, visionary, and unimplemented ideas across Linux 6.38+ BPF SchedExt,
+// FreeBSD 16.8+ OpenZFS ARC & Capsicum, OpenBSD 9.7+ Pinsyscall FineIBT, DragonFly BSD 8.6+ HAMMER3,
+// NetBSD 13.3 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
+// NixOS / GNU Guix Merkle CAS, Omarchy Wallust Theme Chord Navigator, Global Tech Media 40 Portals Harvester,
 // and 12 Arch Linux GitHub Ecosystem PR Engines (pacman keyring PQC rotation, AUR web RPC v5 auditor, devtools
 // clean chroot nspawn, reflector speed ranker, archiso customizer, snapper auto-snapshots, security tracker
 // CVE scanner, modprobed-db trimmer, pacman conflict resolver, systemd service supervisor, yay AST dependency

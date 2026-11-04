@@ -66,7 +66,7 @@ pub struct ArchPacmanKeyringPqcRotationEngineV84 {
 impl ArchPacmanKeyringPqcRotationEngineV84 {
     pub fn new() -> Self {
         Self {
-            pqc_algorithm: "ML-DSA-87 / Dilithium-5 / Kyber-1024".to_string(),
+            pqc_algorithm: "Dilithium-5 / Kyber-1024".to_string(),
             key_trust_level: "MarginalTrustSigned".to_string(),
             auto_rotation_days: 30,
         }
@@ -83,7 +83,7 @@ impl ArchPacmanKeyringPqcRotationEngineV84 {
             subsystem: "Security/PacmanKeyring".to_string(),
             target_repo: "archlinux/archlinux-keyring".to_string(),
             status: ArchV84PrStatus::Validated,
-            summary: "Enforces ML-DSA-87 / Dilithium-5 post-quantum signature verification and automated WKD keyring rotation.".to_string(),
+            summary: "Enforces Dilithium-5 post-quantum signature verification and automated WKD keyring rotation.".to_string(),
             patch_diff: "diff --git a/sys/arch/keyring_pqc_v84.rs b/sys/arch/keyring_pqc_v84.rs".to_string(),
         }
     }
@@ -195,8 +195,8 @@ pub struct ArchReflectorSpeedRankerEngineV84 {
 impl ArchReflectorSpeedRankerEngineV84 {
     pub fn new() -> Self {
         Self {
-            max_mirrors: 25,
-            protocol_filter: "https,http2,http3".to_string(),
+            max_mirrors: 20,
+            protocol_filter: "https,http2".to_string(),
             timeout_ms: 1500,
         }
     }
@@ -214,7 +214,7 @@ impl ArchReflectorSpeedRankerEngineV84 {
             subsystem: "Network/Reflector".to_string(),
             target_repo: "archlinux/reflector".to_string(),
             status: ArchV84PrStatus::Validated,
-            summary: "Async parallel HTTP/2 and HTTP/3 mirror latency and bandwidth benchmark engine for mirrorlist generation.".to_string(),
+            summary: "Async parallel HTTP/2 mirror latency and bandwidth benchmark engine for mirrorlist generation.".to_string(),
             patch_diff: "diff --git a/sys/arch/reflector_v84.rs b/sys/arch/reflector_v84.rs".to_string(),
         }
     }
