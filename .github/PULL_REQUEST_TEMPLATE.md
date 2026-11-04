@@ -63,3 +63,6 @@ Technical details and architecture impact.
 - Linux/BSD/Redox/xv6 reference
 - Risks and rollback / Safety and rollback
 - Kernel safety review / Reviewer checklist / Memory safety review
+
+## Shell safety review
+- Safety and rollback
