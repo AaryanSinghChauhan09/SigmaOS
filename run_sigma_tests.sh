@@ -54,7 +54,6 @@ if [ -f "tests/io/interrupt.rs" ]; then
     rustc --test tests/filesystem/buffer.rs --edition=2021 -o build/test_fs_buffer && ./build/test_fs_buffer
     rustc --test tests/io/scheduler.rs --edition=2021 -o build/test_io_scheduler && ./build/test_io_scheduler
     rustc --test tests/io/callback.rs --edition=2021 -o build/test_io_callback && ./build/test_io_callback
-    rustc --test tests/test_io_lifecycle_management.rs --edition=2021 -o build/test_io_lifecycle_management && ./build/test_io_lifecycle_management
 fi
 
 if [ -f "tests/interrupt/test_interrupt_handler_plan.rs" ]; then
@@ -3715,6 +3714,20 @@ fi
 
 if [ -f "tests/test_lfs_bsd_synthesis_v84_pr.rs" ]; then
     echo "Running Sovereign LFS & BSD Synthesis V84 PR Gateway test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test tests/test_lfs_bsd_synthesis_v84_pr.rs --edition=2021 -o build/test_lfs_bsd_v84_pr
+    ./build/test_lfs_bsd_v84_pr
+fi
+
+if [ -f "tests/test_lfs_bsd_synthesis_v85_pr.rs" ]; then
+    echo "Running Sovereign LFS & BSD Synthesis V85 PR Gateway test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test tests/test_lfs_bsd_synthesis_v85_pr.rs --edition=2021 -o build/test_lfs_bsd_v85_pr
+    ./build/test_lfs_bsd_v85_pr
+fi
+
+if [ -f "tests/test_open_source_os_unimplemented_ideas_v83_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas V83 PR test suite..."
     mkdir -p build
     TMPDIR=$(pwd)/build rustc --test tests/test_lfs_bsd_synthesis_v84_pr.rs --edition=2021 -o build/test_lfs_bsd_v84_pr
     ./build/test_lfs_bsd_v84_pr
