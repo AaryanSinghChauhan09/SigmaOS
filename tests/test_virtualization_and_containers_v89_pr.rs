@@ -21,6 +21,7 @@ fn test_integration_virtualization_and_containers_v89_suite() {
     assert!(summary.contains("KVM/QEMU Dirty Ring"));
     assert!(summary.contains("gVisor Sentry"));
     assert!(summary.contains("DILITHIUM5_SIG_V89_8901_OK"));
+    assert!(summary.contains("DILITHIUM5_SIG_V89_8910_OK"));
 }
 
 #[test]
@@ -28,23 +29,27 @@ fn test_integration_sub_engines_v89() {
     let mut gateway = SovereignVirtualizationAndContainersParityV89Gateway::new();
 
     // 1. KVM/QEMU
-    let vm =
-        gateway
-            .kvm_qemu
-            .launch_kvm_vm("vm_integration", 4, 4096, ConfidentialModeV89::IntelTdx);
+    let vm = gateway.kvm_qemu.launch_kvm_vm(
+        "vm_integration_v89",
+        4,
+        4096,
+        ConfidentialModeV89::IntelTdx,
+    );
     assert_eq!(vm.confidential_mode, ConfidentialModeV89::IntelTdx);
 
     // 2. Libvirt Domain
     let dom = gateway
         .libvirt
-        .parse_domain_xml("<domain type='kvm'><name>dom_integration</name></domain>");
-    assert_eq!(dom.domain_name, "dom_integration");
+        .parse_domain_xml("<domain type='kvm'><name>dom_integration_v89</name></domain>");
+    assert_eq!(dom.domain_name, "dom_integration_v89");
+    assert!(dom.snapshots_supported);
 
     // 3. Xen Hypervisor
     let guest = gateway
         .xen
-        .create_domu_guest(10, "xen_domu", XenGuestModeV89::Pv, 512);
+        .create_domu_guest(10, "xen_domu_v89", XenGuestModeV89::Pv, 512);
     assert_eq!(guest.domid, 10);
+    assert_eq!(guest.argo_ring_size, 262144);
 
     // 4. VirtualBox / bhyve / OpenBSD vmd
     let bhyve = gateway.vbox_bhyve_vmm.spawn_bhyve_vm("bhyve1", 2, 1024);

@@ -3813,3 +3813,10 @@ if [ -f "tests/test_virtualization_and_containers_v89_pr.rs" ]; then
     rustc --test tests/test_virtualization_and_containers_v89_pr.rs --edition=2021 -o build/test_virtualization_v89_pr
     ./build/test_virtualization_v89_pr
 fi
+
+if [ -f "tests/test_virtualization_and_containers_v89_pr.rs" ]; then
+    echo "Running Sovereign Virtualization and Containers V89 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_virtualization_and_containers_v89_pr.rs --edition=2021 -o build/test_virt_v89_pr
+    ./build/test_virt_v89_pr
+fi
