@@ -512,7 +512,10 @@ impl PeriodicPrComponentRulesEngine {
     pub fn validate_pr(&mut self, record: PrValidationRecord) -> Result<(), String> {
         // Rule 1: Everything is a pull request - branch must not be main
         if record.branch_name == "main" || record.branch_name == "master" {
-            return Err("Rule 1 Violation: No direct commits to main. All work must arrive through PRs.".into());
+            return Err(
+                "Rule 1 Violation: No direct commits to main. All work must arrive through PRs."
+                    .into(),
+            );
         }
 
         // Rule 3: Study before implementation (must have ADR)

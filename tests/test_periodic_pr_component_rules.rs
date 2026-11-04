@@ -98,7 +98,10 @@ fn test_component_domain_mapping_and_gates() {
     let packaging = ComponentDomain::Packaging;
     assert_eq!(packaging.name(), "Packaging");
     assert_eq!(packaging.rules_file(), "docs/component-rules/packaging.md");
-    assert_eq!(packaging.additional_gate(), "Metadata corpus and dry-run tests");
+    assert_eq!(
+        packaging.additional_gate(),
+        "Metadata corpus and dry-run tests"
+    );
     assert_eq!(packaging.component_owner(), "packaging-agent");
 
     let desktop = ComponentDomain::Desktop;
@@ -109,8 +112,14 @@ fn test_component_domain_mapping_and_gates() {
 
     let installer = ComponentDomain::InstallerUpdate;
     assert_eq!(installer.name(), "Installer/update");
-    assert_eq!(installer.rules_file(), "docs/component-rules/installer_update.md");
-    assert_eq!(installer.additional_gate(), "Clean install and rollback test");
+    assert_eq!(
+        installer.rules_file(),
+        "docs/component-rules/installer_update.md"
+    );
+    assert_eq!(
+        installer.additional_gate(),
+        "Clean install and rollback test"
+    );
     assert_eq!(installer.component_owner(), "installer-agent");
 }
 
@@ -190,17 +199,32 @@ fn test_study_schedule_and_milestones() {
 
 #[test]
 fn test_promotion_levels() {
-    assert_eq!(PromotionLevel::Proposed.requirement(), "ADR and gap analysis");
+    assert_eq!(
+        PromotionLevel::Proposed.requirement(),
+        "ADR and gap analysis"
+    );
     assert_eq!(PromotionLevel::Prototype.requirement(), "Unit tests");
-    assert_eq!(PromotionLevel::Integrated.requirement(), "Runtime path plus integration tests");
-    assert_eq!(PromotionLevel::Hardened.requirement(), "Fuzzing, negative tests, security review");
-    assert_eq!(PromotionLevel::Supported.requirement(), "Reproducible boot/install/update evidence");
+    assert_eq!(
+        PromotionLevel::Integrated.requirement(),
+        "Runtime path plus integration tests"
+    );
+    assert_eq!(
+        PromotionLevel::Hardened.requirement(),
+        "Fuzzing, negative tests, security review"
+    );
+    assert_eq!(
+        PromotionLevel::Supported.requirement(),
+        "Reproducible boot/install/update evidence"
+    );
 }
 
 #[test]
 fn test_component_rule_files_exist_and_conform() {
     let readme_path = Path::new("docs/component-rules/README.md");
-    assert!(readme_path.exists(), "README.md must exist in docs/component-rules/");
+    assert!(
+        readme_path.exists(),
+        "README.md must exist in docs/component-rules/"
+    );
     let readme_content = fs::read_to_string(readme_path).unwrap();
     assert!(readme_content.contains("Periodic Governance Model"));
     assert!(readme_content.contains("Component Rule Lifecycle"));
@@ -211,7 +235,11 @@ fn test_component_rule_files_exist_and_conform() {
 
     for domain in ComponentDomain::all() {
         let path = Path::new(domain.rules_file());
-        assert!(path.exists(), "Rules file must exist: {}", domain.rules_file());
+        assert!(
+            path.exists(),
+            "Rules file must exist: {}",
+            domain.rules_file()
+        );
         let content = fs::read_to_string(path).expect("Failed to read rules file");
         assert!(content.contains("## Component owner"));
         assert!(content.contains(domain.component_owner()));

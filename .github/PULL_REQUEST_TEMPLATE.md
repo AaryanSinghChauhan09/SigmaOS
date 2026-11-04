@@ -107,6 +107,8 @@ Closes #<issue-id>
 - [ ] Capability/namespace checks enforced
 
 ### I/O policy and safety
+- [ ] I/O component
+- [ ] I/O policy
 - [ ] Interrupt manager
 - [ ] DMA manager
 - [ ] Buffer manager
