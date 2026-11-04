@@ -1,9 +1,10 @@
-#![allow(dead_code)]
 // Sovereign Desktop Services & Toolkits Advancements (V92 PR)
 // Clean-Room Rust PR Format Engines for Linux & BSD Desktop Ecosystems
 // Covers GTK4/GTK5, Qt6/Kvantum, Display Managers (GDM, SDDM, LightDM, XDMCP, SlickGreeter, xdm),
 // GVfs/GIO, PolicyKit, XDG Portals/Utilities, fontconfig/FreeType/HarfBuzz/Pango/Cairo/Skia,
 // IBus/Fcitx5, Notification Daemons, Screen Lockers, Clipboard Managers, and 10-Distro PR Gateway.
+
+#![allow(dead_code)]
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
@@ -78,9 +79,9 @@ impl SovereignGtkQtToolkitEngineV92 {
                 blur_background: true,
                 translucent_windows: true,
                 svg_path: "/usr/share/Kvantum/SovereignDarkV92/SovereignDarkV92.svg".to_string(),
-                shadow_size_px: 14,
-                corner_radius_px: 10,
-                window_margin_px: 6,
+                shadow_size_px: 12,
+                corner_radius_px: 8,
+                window_margin_px: 4,
             }),
             css_custom_rules: Vec::new(),
         }
@@ -200,7 +201,7 @@ impl SovereignDisplayManagerSuiteEngineV92 {
             registered_sessions: sessions,
             auto_login_user: None,
             xdmcp_enabled: false,
-            custom_greeter_logo: "/usr/share/pixmaps/sigma-logo.svg".to_string(),
+            custom_greeter_logo: "/usr/share/pixmaps/sigmaos_badge.png".to_string(),
             allowed_users: allowed,
         }
     }
@@ -344,7 +345,7 @@ impl SovereignGvfsGioFileSystemEngineV92 {
             remote_host: host.to_string(),
             mount_path: format!("/run/user/1000/gvfs/{}", mount_id),
             is_mounted: true,
-            bytes_free: 1024 * 1024 * 1024 * 150, // 150 GB
+            bytes_free: 1024 * 1024 * 1024 * 100, // 100 GB
         };
         self.active_mounts.insert(mount_id.clone(), mount);
         mount_id

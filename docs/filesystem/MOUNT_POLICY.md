@@ -1,4 +1,4 @@
-# Filesystem Mount Policy
+# Mount Policy
 
 - Race-Free Mount Operations
 - Bounded Filesystem Capacity
