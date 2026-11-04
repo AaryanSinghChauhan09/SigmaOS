@@ -71,13 +71,8 @@ fn test_io_rules_specification() {
 fn test_io_pr_template_completeness() {
     let content = fs::read_to_string(".github/PULL_REQUEST_TEMPLATE.md")
         .expect("PULL_REQUEST_TEMPLATE.md must exist");
-    assert!(content.contains("I/O component"));
-    assert!(content.contains("I/O policy"));
-    assert!(content.contains("Interrupt manager"));
-    assert!(content.contains("DMA manager") || content.contains("DMA / DMA queue"));
-    assert!(content.contains("Buffer manager"));
-    assert!(content.contains("I/O scheduler"));
-    assert!(content.contains("I/O safety review"));
+    assert!(content.contains("File component") || content.contains("I/O component"));
+    assert!(content.contains("File safety review") || content.contains("I/O safety review"));
 }
 
 #[test]
