@@ -2797,6 +2797,16 @@ if [ -f "src/distro/omarchy_linux_missing_components_v84_pr.rs" ]; then
     ./build/test_omarchy_v84_integration
 fi
 
+if [ -f "src/distro/omarchy_linux_missing_components_v85_pr.rs" ]; then
+    echo "Running Omarchy Linux Missing Components V85 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_linux_missing_components_v85_pr.rs --edition=2021 -o build/test_omarchy_v85_pr
+    ./build/test_omarchy_v85_pr
+
+    rustc --test tests/test_omarchy_linux_v85_pr.rs --edition=2021 -o build/test_omarchy_v85_integration
+    ./build/test_omarchy_v85_integration
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
     mkdir -p build

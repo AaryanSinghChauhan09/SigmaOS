@@ -71,7 +71,7 @@ impl OmarchyHyprlandCompositorLayoutEngineV85 {
         Self {
             layout_mode: "dwindle".to_string(),
             gesture_routing_active: true,
-            active_workspaces: 20,
+            active_workspaces: 16,
         }
     }
 
@@ -116,7 +116,7 @@ impl OmarchyWaybarStatusHudEngineV85 {
     pub fn new() -> Self {
         Self {
             css_live_reload_active: true,
-            module_count: 28,
+            module_count: 24,
         }
     }
 
@@ -160,7 +160,7 @@ impl OmarchyGhosttyPtyTerminalEngineV85 {
         Self {
             gpu_acceleration_active: true,
             font_family: "JetBrains Mono".to_string(),
-            font_size_pt: 13.5,
+            font_size_pt: 13.0,
         }
     }
 
@@ -206,7 +206,7 @@ impl OmarchyWalkerLauncherEngineV85 {
     pub fn new() -> Self {
         Self {
             fuzzy_solver_active: true,
-            cliphist_clipboard_indexed_items: 10240,
+            cliphist_clipboard_indexed_items: 16384,
         }
     }
 
@@ -581,7 +581,7 @@ mod tests {
             .contains("style.css"));
 
         let mut ghostty = OmarchyGhosttyPtyTerminalEngineV85::new();
-        assert!(ghostty.tune_font("Fira Code", 14.0).contains("Fira Code"));
+        assert!(ghostty.tune_font("Fira Code", 13.0).contains("Fira Code"));
 
         let walker = OmarchyWalkerLauncherEngineV85::new();
         assert!(walker.search_query("firefox").contains("firefox"));

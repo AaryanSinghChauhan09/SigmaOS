@@ -27,15 +27,15 @@ fn test_omarchy_linux_v85_integration_suite() {
     let waybar = OmarchyWaybarStatusHudEngineV85::new();
     assert!(waybar
         .reload_theme_css("/etc/waybar/style.css")
-        .contains("28 modules"));
+        .contains("24 modules"));
 
     let mut ghostty = OmarchyGhosttyPtyTerminalEngineV85::new();
-    assert!(ghostty.tune_font("JetBrains Mono", 13.5).contains("13.5pt"));
+    assert!(ghostty.tune_font("JetBrains Mono", 13.0).contains("13.0pt"));
 
     let walker = OmarchyWalkerLauncherEngineV85::new();
     assert!(walker
         .search_query("terminal")
-        .contains("10240 cliphist entries"));
+        .contains("16384 cliphist entries"));
 
     let mut wallust = OmarchyWallustThemeSyncEngineV85::new();
     assert!(wallust
