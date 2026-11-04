@@ -375,6 +375,10 @@ mod tests {
         let _ = manager
             .interrupt_controller
             .register_irq(vector, crate::kernel::interrupt::IrqTriggerType::Edge);
+        let _ = manager
+            .msi_routing
+            .interrupt_controller
+            .register_irq(vector, crate::kernel::interrupt::IrqTriggerType::Edge);
         manager.msi_routing.msi_vectors.insert(
             device_id,
             crate::kernel::msi_routing::MsiVector {
