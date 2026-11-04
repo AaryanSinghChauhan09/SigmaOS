@@ -1,59 +1,22 @@
 ## Summary
 
-<!-- What component does this PR improve, add, or regulate? -->
+<!-- What shell behavior changed and why? -->
 
-## Related issue
+## Shell component
 
-Closes #<issue-id>
-
-## Component
-
-<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer_update, etc. -->
-
-- [ ] Kernel
-- [ ] Memory component
-- [ ] VFS / filesystem
-- [ ] IPC handler
-- [ ] Security
-- [ ] Drivers
-- [ ] Packaging
-- [ ] Desktop
-- [ ] Installer / update
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] I/O component
-- [ ] Storage component
-
-## Upstream study
-
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
-
-## Component rules added or enforced
-
-- [ ] New rule
-- [ ] Existing rule enforced
-- [ ] Rule test added
-- [ ] CI gate added
-- [ ] Documentation updated
-
-## What SigmaOS adopts
-
-<!-- State the upstream principle or mechanism adopted. -->
-
-## What SigmaOS changes or rejects
-
-<!-- State simplifications, deviations, and rejected ideas. -->
-
-## Changes
-
-- [ ] Source implementation
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] QEMU/runtime test
+- [ ] Lexer
+- [ ] Parser
+- [ ] Expansion
+- [ ] Executor
+- [ ] Pipelines
+- [ ] Redirection
+- [ ] Job control
+- [ ] Signals
+- [ ] Built-ins
+- [ ] Interactive line editor
+- [ ] Script runner
+- [ ] Diagnostics
+- [ ] Security / sandboxing
 - [ ] Documentation
 - [ ] Capability/status update
 - [ ] Regression protection
@@ -75,19 +38,22 @@ Closes #<issue-id>
 
 - [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly memory audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
 
 ## Reference behavior
 
-<!-- Required for lifecycle, ABI, or file changes -->
+<!-- Required for compatibility or grammar changes -->
 
 - POSIX section:
-- Linux/BSD/Redox/xv6 reference:
+- Bash/dash/Zsh/BusyBox reference:
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
@@ -102,59 +68,28 @@ Closes #<issue-id>
 - [ ] `unsafe` justified
 - [ ] Classified panic diagnostics
 
-### IPC semantics and safety
-- [ ] IPC handler
-- [ ] Blocking behavior:
-- [ ] Non-blocking behavior:
-- [ ] EOF / closure behavior:
-- [ ] Capability/namespace checks enforced
+## Shell safety review
 
-### I/O policy and safety
-- [ ] I/O component
-- [ ] I/O policy
-- [ ] Interrupt manager
-- [ ] DMA manager
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] I/O safety review
-
-## Storage component
-
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-### File safety review
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-unlink prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Expansion order is correct
+- [ ] Quoting behavior is preserved
+- [ ] Redirection failures are handled
+- [ ] Exit codes are explicit
+- [ ] Signal behavior is defined
+- [ ] No unbounded recursion or allocation
+- [ ] Interactive terminal state is restored
+- [ ] Script mode does not execute invalid partial input
 
 ## Verification
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-make check
-make test
-make format
-```
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated shell tests
+- [ ] POSIX/conformance test evidence
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Security review requested, if applicable
 
 ## Runtime evidence
 
@@ -178,7 +113,7 @@ make format
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Documentation updated
+- [ ] Shell documentation
 - [ ] Boot matrix, if applicable
 - [ ] Integration impact documented
 
