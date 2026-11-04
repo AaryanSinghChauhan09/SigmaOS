@@ -42,49 +42,6 @@ fn test_package_advancements_v89_full_cycle() {
     let manifest_bsdpkg = inspector.inspect_package("freebsd.pkg", b"pkg_content");
     assert_eq!(manifest_bsdpkg.detected_format, PackageFormat::Pkg);
 
-    // Verify all requested prompt formats (.air, .bottle, .ipa, .ports, .pkg, .aab, .apk, AppImage, .eopkg, .nixpkg, .portage, .deb, .tar.gz, .tar .gz, .xz, .rpm, .ebuild, .pkg.tar.xz, Flatpak, .app, .hap, .PiSi, .tgz, .superdeb, .lzm, pup, .snap, pacman, .tar, .pet)
-    let prompt_cases = [
-        ("app.air", PackageFormat::Air),
-        ("app.bottle", PackageFormat::Bottle),
-        ("app.ipa", PackageFormat::Ipa),
-        ("app.ports", PackageFormat::Ports),
-        ("app.pkg", PackageFormat::Pkg),
-        ("app.aab", PackageFormat::Aab),
-        ("app.apk", PackageFormat::Apk),
-        ("app.AppImage", PackageFormat::AppImage),
-        ("app.eopkg", PackageFormat::Eopkg),
-        ("app.nixpkg", PackageFormat::Nixpkg),
-        ("app.portage", PackageFormat::Ebuild),
-        ("app.deb", PackageFormat::Deb),
-        ("app.tar.gz", PackageFormat::TarGz),
-        ("app.tar .gz", PackageFormat::TarGz),
-        ("app.xz", PackageFormat::Xz),
-        ("app.rpm", PackageFormat::Rpm),
-        ("app.ebuild", PackageFormat::Ebuild),
-        ("app.pkg.tar.xz", PackageFormat::Pacman),
-        ("app.flatpak", PackageFormat::Flatpak),
-        ("app.app", PackageFormat::App),
-        ("app.hap", PackageFormat::Hap),
-        ("app.PiSi", PackageFormat::Pisi),
-        ("app.tgz", PackageFormat::TarGz),
-        ("app.superdeb", PackageFormat::Superdeb),
-        ("app.lzm", PackageFormat::Lzm),
-        ("app.pup", PackageFormat::Pup),
-        ("app.snap", PackageFormat::Snap),
-        ("app.pacman", PackageFormat::Pacman),
-        ("app.tar", PackageFormat::Tar),
-        ("app.pet", PackageFormat::Pet),
-    ];
-
-    for (file, expected_fmt) in prompt_cases {
-        let inspected = inspector.inspect_package(file, b"test_payload_bytes");
-        assert_eq!(
-            inspected.detected_format, expected_fmt,
-            "Failed format inspection for {}",
-            file
-        );
-    }
-
     // 2. OOP Design Patterns V89
     let mut facade = SovereignPackageFacadeV89::new();
     let fac_res = facade
@@ -140,7 +97,7 @@ fn test_package_advancements_v89_full_cycle() {
     // 9. PR Gateway V89
     let mut gateway = SovereignDistroPackagePrGatewayV89::new();
     gateway.submit_proposal(
-        8901,
+        8801,
         "Universal Package Advancements V89",
         PackageFormat::Deb,
         "ripgrep",

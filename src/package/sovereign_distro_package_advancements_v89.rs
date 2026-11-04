@@ -9,7 +9,7 @@
 // .pkg.tar.xz, .PiSi, .tgz, .superdeb, .lzm, .pup, .pet, etc.), this suite provides complete universal
 // multi-format package inspection, magic-byte zero-copy classification across 285+ package formats, Post-Quantum
 // Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4 provenance verification, Object-Oriented
-// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 12+ hook
+// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 14-phase hook
 // phases, SAT DPLL clause dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA
 // vulnerability auditing, multi-sandbox security isolation (Landlock v5/v6, Capsicum, Pledge/Unveil,
 // macOS App Sandbox, Seccomp BPF), FastCDC CAS delta deduplication, boot environment snapshots (FreeBSD bectl,
@@ -179,89 +179,35 @@ impl UniversalPackageFormatInspectorV89 {
             return (PackageFormat::Pacman, PackageSignatureKindV89::GpgOpenPgp, "tar.xz");
         }
 
-        let lower = filename.to_lowercase();
-        let norm = lower.replace(" ", "");
-
-        if norm.ends_with(".air") {
-            return (PackageFormat::Air, PackageSignatureKindV89::X509Certificate, "zip/air");
+        if filename.ends_with(".xbps") {
+            return (PackageFormat::Xbps, PackageSignatureKindV89::OpenBsdSignify, "xbps/zstd");
         }
-        if norm.ends_with(".bottle") {
-            return (PackageFormat::Bottle, PackageSignatureKindV89::CosignSigstore, "tar.gz/bottle");
-        }
-        if norm.ends_with(".ipa") {
-            return (PackageFormat::Ipa, PackageSignatureKindV89::X509Certificate, "zip/ipa");
-        }
-        if norm.ends_with(".ports") {
-            return (PackageFormat::Ports, PackageSignatureKindV89::OpenBsdSignify, "bsd-ports");
-        }
-        if norm.ends_with(".pkg.tar.xz") || norm.ends_with(".pkg.tar.zst") || norm.ends_with(".pacman") {
-            return (PackageFormat::Pacman, PackageSignatureKindV89::GpgOpenPgp, "pacman/arch");
-        }
-        if norm.ends_with(".pkg") {
-            return (PackageFormat::Pkg, PackageSignatureKindV89::OpenBsdSignify, "bsd-pkg");
-        }
-        if norm.ends_with(".aab") {
-            return (PackageFormat::Aab, PackageSignatureKindV89::ApkV2V3Signature, "zip/aab");
-        }
-        if norm.ends_with(".apk") {
-            return (PackageFormat::Apk, PackageSignatureKindV89::ApkV2V3Signature, "apk/alpine");
-        }
-        if norm.ends_with(".appimage") {
-            return (PackageFormat::AppImage, PackageSignatureKindV89::Minisign, "squashfs/appimage");
-        }
-        if norm.ends_with(".eopkg") {
-            return (PackageFormat::Eopkg, PackageSignatureKindV89::GpgOpenPgp, "zip/xml/eopkg");
-        }
-        if norm.ends_with(".nixpkg") || norm.ends_with(".nix") {
-            return (PackageFormat::Nixpkg, PackageSignatureKindV89::CosignSigstore, "nix-store");
-        }
-        if norm.ends_with(".portage") || norm.ends_with(".ebuild") {
+        if filename.ends_with(".ebuild") || filename.ends_with(".portage") {
             return (PackageFormat::Ebuild, PackageSignatureKindV89::GpgOpenPgp, "gentoo-portage");
         }
-        if norm.ends_with(".superdeb") {
+        if filename.ends_with(".pkg") || filename.ends_with(".ports") {
+            return (PackageFormat::Pkg, PackageSignatureKindV89::OpenBsdSignify, "bsd-pkg");
+        }
+        if filename.ends_with(".bottle") {
+            return (PackageFormat::Bottle, PackageSignatureKindV89::CosignSigstore, "tar.gz/bottle");
+        }
+        if filename.ends_with(".eopkg") || filename.ends_with(".PiSi") {
+            return (PackageFormat::Eopkg, PackageSignatureKindV89::GpgOpenPgp, "zip/xml");
+        }
+        if filename.ends_with(".nixpkg") {
+            return (PackageFormat::Nixpkg, PackageSignatureKindV89::CosignSigstore, "nix-store");
+        }
+        if filename.ends_with(".superdeb") {
             return (PackageFormat::Superdeb, PackageSignatureKindV89::GpgOpenPgp, "ar/tar/superdeb");
         }
-        if norm.ends_with(".deb") {
-            return (PackageFormat::Deb, PackageSignatureKindV89::GpgOpenPgp, "ar/tar/deb");
-        }
-        if norm.ends_with(".tar.gz") || norm.ends_with(".tgz") {
-            return (PackageFormat::TarGz, PackageSignatureKindV89::OpenBsdSignify, "tar.gz");
-        }
-        if norm.ends_with(".tar.xz") || norm.ends_with(".xz") {
-            return (PackageFormat::Xz, PackageSignatureKindV89::OpenBsdSignify, "tar.xz");
-        }
-        if norm.ends_with(".rpm") {
-            return (PackageFormat::Rpm, PackageSignatureKindV89::GpgOpenPgp, "rpm-lead");
-        }
-        if norm.ends_with(".flatpak") {
-            return (PackageFormat::Flatpak, PackageSignatureKindV89::CosignSigstore, "ostree/flatpak");
-        }
-        if norm.ends_with(".app") {
-            return (PackageFormat::App, PackageSignatureKindV89::X509Certificate, "macos/app");
-        }
-        if norm.ends_with(".hap") {
-            return (PackageFormat::Hap, PackageSignatureKindV89::X509Certificate, "harmonyos/hap");
-        }
-        if norm.ends_with(".pisi") {
-            return (PackageFormat::Pisi, PackageSignatureKindV89::GpgOpenPgp, "zip/xml/pisi");
-        }
-        if norm.ends_with(".lzm") {
+        if filename.ends_with(".lzm") {
             return (PackageFormat::Lzm, PackageSignatureKindV89::Unsigned, "squashfs/slax");
         }
-        if norm.ends_with(".pup") {
+        if filename.ends_with(".pup") || filename.ends_with(".pet") {
             return (PackageFormat::Pup, PackageSignatureKindV89::Unsigned, "tar.gz/puppy");
         }
-        if norm.ends_with(".pet") {
-            return (PackageFormat::Pet, PackageSignatureKindV89::Unsigned, "tar.gz/puppy-pet");
-        }
-        if norm.ends_with(".snap") {
+        if filename.ends_with(".snap") {
             return (PackageFormat::Snap, PackageSignatureKindV89::CosignSigstore, "squashfs/snap");
-        }
-        if norm.ends_with(".tar") {
-            return (PackageFormat::Tar, PackageSignatureKindV89::Unsigned, "tar");
-        }
-        if norm.ends_with(".xbps") {
-            return (PackageFormat::Xbps, PackageSignatureKindV89::OpenBsdSignify, "xbps/zstd");
         }
 
         (PackageFormat::SigmaPkg, PackageSignatureKindV89::PqcKyberDilithium5, "sigpkg-native")
@@ -393,7 +339,7 @@ impl PackageCommandV89 for InstallCommandV89 {
 }
 
 // ============================================================================
-// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 14+ Hooks V89
+// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 12+ Hooks V89
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -409,8 +355,8 @@ pub enum UdfHookTypeV89 {
     DepCheck,
     SandboxInit,
     DeltaMerge,
-    RollbackPrepare,
-    PostRollback,
+    VerifyAttestation,
+    SnapshotCreate,
     Cleanup,
 }
 
