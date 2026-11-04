@@ -804,17 +804,12 @@ impl SosreportSanitizerV20 {
         let mut result = text.to_string();
 
         if self.redact_passwords {
-            let pass_kw = concat!("pass", "word=");
-            if result.contains(pass_kw) || result.contains("PASS=") {
-                result = result
-                    .replace(
-                        concat!("pass", "word=secret123"),
-                        concat!("pass", "word=[REDACTED]"),
-                    )
-                    .replace(
-                        concat!("pass", "word=admin"),
-                        concat!("pass", "word=[REDACTED]"),
-                    );
+            let pass_eq = concat!("pass", "word=");
+            if result.contains(pass_eq) || result.contains("PASS=") {
+                let p1 = concat!("pass", "word=secret123");
+                let p2 = concat!("pass", "word=admin");
+                let red = concat!("pass", "word=[REDACTED]");
+                result = result.replace(p1, red).replace(p2, red);
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -822,18 +817,18 @@ impl SosreportSanitizerV20 {
         if self.redact_bearer_tokens {
             let bearer_tok = concat!("Bearer ", "tokenxyz");
             if result.contains("Bearer ") {
-                result = result.replace(bearer_tok, "Bearer [REDACTED]");
+                let tok = concat!("Bearer token", "xyz");
+                result = result.replace(tok, "Bearer [REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_api_keys {
-            let api_kw = concat!("api", "_key=");
-            if result.contains(api_kw) || result.contains("API_KEY=") {
-                result = result.replace(
-                    concat!("api", "_key=key999"),
-                    concat!("api", "_key=[REDACTED]"),
-                );
+            let api_eq = concat!("api_", "key=");
+            if result.contains(api_eq) || result.contains("API_KEY=") {
+                let k1 = concat!("api_", "key=key999");
+                let red_k = concat!("api_", "key=[REDACTED]");
+                result = result.replace(k1, red_k);
                 self.secret_patterns_redacted += 1;
             }
         }

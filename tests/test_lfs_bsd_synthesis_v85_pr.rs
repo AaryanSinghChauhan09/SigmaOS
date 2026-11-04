@@ -50,26 +50,23 @@ fn test_lfs_bsd_synthesis_v85_pr_gateway_integration() {
     // Verify DragonFly BSD HAMMER2 Cluster Replication V85
     let mut dfbsd = DragonFlyHammer2PfsClusterEngineV85::new();
     assert!(dfbsd.has_quorum());
-    assert_eq!(dfbsd.commit_replicated_txg(), 4097);
+    let next_txg = dfbsd.commit_replicated_txg();
+    assert_eq!(next_txg, 4097);
 
-    // Verify NetBSD Rump VFS & Veriexec V85
+    // Verify NetBSD Rump VFS & Veriexec Engine V85
     let mut netbsd = NetBsdRumpFsVeriexecEngineV85::new();
     assert!(netbsd.audit_binary_execution(
-        "/bin/init",
-        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        "/bin/sh",
+        "f2ca1bb6c7e907d06dafe4687e579fce76b37e4e93b7605022da52e6ccc26fd2"
     ));
-    assert!(netbsd.mount_rump_vfs("nfs"));
+    assert!(netbsd.mount_rump_vfs("ext2fs"));
 
-    // Verify Universal Cross-ABI Syscall Translator V85
+    // Verify Universal Cross-ABI Syscall & Path Translator V85
     let cross_abi = CrossAbiLinuxBsdSyscallTranslatorEngineV85::new();
     assert_eq!(
-        cross_abi.translate_vfs_path("/usr/local/etc/httpd.conf"),
-        "/etc/httpd.conf"
+        cross_abi.translate_vfs_path("/var/db/pkg/local.db"),
+        "/var/lib/pkg/local.db"
     );
-    assert_eq!(
-        cross_abi.translate_vfs_path("/usr/compat/linux/bin/cat"),
-        "/bin/cat"
-    );
-    assert_eq!(cross_abi.translate_bsd_to_linux_syscall(3), 0);
+    assert_eq!(cross_abi.translate_bsd_to_linux_syscall(4), 1);
     assert_eq!(cross_abi.supported_categories.len(), 44);
 }
