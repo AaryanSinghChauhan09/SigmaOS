@@ -1,2 +1,1 @@
-# IO Management ADR
-Architecture Decision Record for I/O management in SigmaOS.
+# docs/io/IO_MANAGEMENT_ADR.md policy specification

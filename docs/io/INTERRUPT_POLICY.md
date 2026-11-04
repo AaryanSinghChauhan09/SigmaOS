@@ -1,2 +1,1 @@
-# Interrupt Policy
-Policy for interrupt handling and dispatching in SigmaOS.
+# docs/io/INTERRUPT_POLICY.md policy specification

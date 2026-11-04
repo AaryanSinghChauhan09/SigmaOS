@@ -1,2 +1,1 @@
-# Callback Policy
-Policy for asynchronous callbacks in SigmaOS.
+# docs/io/CALLBACK_POLICY.md policy specification

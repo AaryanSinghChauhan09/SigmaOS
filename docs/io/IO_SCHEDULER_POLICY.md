@@ -1,2 +1,1 @@
-# IO Scheduler Policy
-Policy for I/O scheduling in SigmaOS.
+# docs/io/IO_SCHEDULER_POLICY.md policy specification

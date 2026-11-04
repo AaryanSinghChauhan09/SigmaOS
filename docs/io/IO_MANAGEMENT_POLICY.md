@@ -1,2 +1,1 @@
-# IO Management Policy
-This document outlines the I/O management policy for SigmaOS.
+# docs/io/IO_MANAGEMENT_POLICY.md policy specification

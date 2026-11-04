@@ -1,2 +1,1 @@
-# DMA Policy
-Policy for direct memory access (DMA) operations in SigmaOS.
+# docs/io/DMA_POLICY.md policy specification

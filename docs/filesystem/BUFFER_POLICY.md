@@ -1,2 +1,1 @@
-# Buffer Policy
-Policy for buffer pool and buffer cache in SigmaOS.
+# docs/filesystem/BUFFER_POLICY.md policy specification
