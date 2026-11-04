@@ -3917,6 +3917,13 @@ if [ -f "tests/test_virtualization_and_containers_v89_pr.rs" ]; then
     ./build/test_virt_v89_pr
 fi
 
+if [ -f "tests/test_virtualization_and_containers_v90_pr.rs" ]; then
+    echo "Running Sovereign Virtualization & Containers V90 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_virtualization_and_containers_v90_pr.rs --edition=2021 -o build/test_virtualization_v90_pr
+    ./build/test_virtualization_v90_pr
+fi
+
 if [ -f "tests/test_networking_stack_and_daemons_v88_pr.rs" ]; then
     echo "Running Sovereign Networking Stack & Daemons V88 PR test suite..."
     mkdir -p build
