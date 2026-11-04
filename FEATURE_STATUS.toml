@@ -66,8 +66,7 @@ files = [
 ]
 description = "SigmaOS secondary memory lifecycle subsystem managing block devices, caches, mount trees, and filesystems with strict bounds and typed error handling"
 test_evidence = "15 standalone unit tests pass cleanly across tests/storage/block.rs, tests/filesystem/cache.rs, and tests/filesystem/core.rs"
-next_milestone = "Connect storage drivers to boot-to-shell smoke test path"
-next_milestone = "Real hardware register writes via inline asm"
+next_milestone = "Connect storage drivers to boot-to-shell smoke test path and enable real hardware register writes"
 
 [arch.aarch64]
 status = "partial"
