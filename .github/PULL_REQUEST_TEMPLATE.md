@@ -2,6 +2,27 @@
 
 <!-- What file-management behavior changed and why? -->
 
+## I/O component
+
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O safety review
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
 ## File component
 
 - [ ] File descriptor manager
@@ -81,13 +102,21 @@
 - Risk:
 - Rollback:
 
-<!--
-## I/O Subsystem Verification Checklist
-- I/O component: Verification of registered I/O drivers and peripheral devices
-- I/O policy: Strict conformance to I/O safety guidelines
-- Interrupt manager: Top-half and bottom-half interrupt handling isolation
-- DMA manager / DMA queue: Memory safety in scatter-gather DMA mappings
-- Buffer manager: LRU cache eviction and lock safety
-- I/O scheduler: Deadline and priority queue validation
-- I/O safety review: Reentrancy and race condition audits
--->
+## I/O component
+
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O policy
+- [ ] I/O safety review
+
+## Storage component
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
