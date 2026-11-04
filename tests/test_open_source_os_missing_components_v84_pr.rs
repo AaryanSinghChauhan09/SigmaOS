@@ -28,27 +28,27 @@ fn test_integration_individual_v84_engines() {
     let report = matrix.generate_matrix_report();
     assert!(report.contains("Feature Parity Matrix V84"));
 
-    let sched = Linux637SchedExtAiPredictivePowerGovernorEngineV84::new();
-    assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5800);
+    let sched = Linux638SchedExtAiPredictivePowerGovernorEngineV84::new();
+    assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 6000);
 
-    let freebsd = FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84::new();
+    let freebsd = FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new();
     assert!(freebsd.verify_jail_vnet_isolation(10));
 
-    let openbsd = OpenBsd96FineIbtPinsyscallPteGuardEngineV84::new();
+    let openbsd = OpenBsd97FineIbtPinsyscallPteGuardEngineV84::new();
     assert!(openbsd.validate_syscall_entry_point(0x0000_1000));
 
-    let dfbsd = DragonFly85Hammer3DirectIoErasureEngineV84::new();
+    let dfbsd = DragonFly86Hammer3DirectIoErasureEngineV84::new();
     let parity = dfbsd.compute_erasure_parity(&[&[1, 2], &[3, 4]]);
     assert_eq!(parity, vec![1 ^ 3, 2 ^ 4]);
 
-    let netbsd = NetBsd1212RumpUserlandAudioPciRouterEngineV84::new();
+    let netbsd = NetBsd130RumpUserlandAudioPciRouterEngineV84::new();
     assert!(netbsd.route_pci_hypercall(1));
 
     let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV84::new();
     assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
     let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84::new();
-    assert_eq!(plan9.rfork_namespace(1), 0x0000_1027);
+    assert_eq!(plan9.rfork_namespace(1), 0x0000_2047);
 
     let nix = NixGuixHermeticCasMerkleClosureEngineV84::new();
     assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));

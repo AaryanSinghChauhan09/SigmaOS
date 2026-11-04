@@ -1,1 +1,1 @@
-# Interrupt Policy
+# Policy Specification

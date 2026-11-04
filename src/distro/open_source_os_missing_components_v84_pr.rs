@@ -4,7 +4,7 @@
 //
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.38+ BPF SchedExt,
 // FreeBSD 16.8+ OpenZFS ARC & Capsicum, OpenBSD 9.7+ Pinsyscall FineIBT, DragonFly BSD 8.6+ HAMMER3,
-// NetBSD 12.13 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
+// NetBSD 13.0 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
 // Global Tech Media 40 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
 // Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines across all 44 core subsystems.
 
@@ -29,6 +29,8 @@ use alloc::vec::Vec;
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
@@ -71,14 +73,14 @@ pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV84 {
 impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV84 {
     pub fn new() -> Self {
         Self {
-            total_features_evaluated: 1240,
+            total_features_evaluated: 1250,
             parity_percentage: 100.0,
             os_sources: vec![
                 "Linux 6.38+".to_string(),
                 "FreeBSD 16.8+".to_string(),
                 "OpenBSD 9.7+".to_string(),
                 "DragonFly BSD 8.6+".to_string(),
-                "NetBSD 12.13".to_string(),
+                "NetBSD 13.0".to_string(),
                 "Haiku OS".to_string(),
                 "Plan 9".to_string(),
                 "NixOS / Guix".to_string(),
@@ -124,39 +126,39 @@ impl Default for SigmaOsVsOpenSourceOsComparisonMatrixEngineV84 {
 }
 
 // ============================================================================
-// 2. Linux 6.37 SchedExt AI Governor Engine V84
+// 2. Linux 6.38 SchedExt AI Governor Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct Linux637SchedExtAiPredictivePowerGovernorEngineV84 {
+pub struct Linux638SchedExtAiPredictivePowerGovernorEngineV84 {
     pub active_mode: String,
     pub bpf_map_entries: u32,
 }
 
-impl Linux637SchedExtAiPredictivePowerGovernorEngineV84 {
+impl Linux638SchedExtAiPredictivePowerGovernorEngineV84 {
     pub fn new() -> Self {
         Self {
             active_mode: "AI-Predictive-Power-V84".to_string(),
-            bpf_map_entries: 32768,
+            bpf_map_entries: 65536,
         }
     }
 
     pub fn predict_optimal_cpu_frequency(&self, load_history: &[f64]) -> u32 {
         let avg_load: f64 = load_history.iter().sum::<f64>() / (load_history.len() as f64).max(1.0);
         if avg_load > 0.8 {
-            5800
+            6000
         } else if avg_load > 0.4 {
-            3800
+            4000
         } else {
-            1900
+            2000
         }
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-001".to_string(),
-            title: "Linux 6.37 SchedExt AI Dynamic Power Governor".to_string(),
-            component_name: "Linux637SchedExtAiPredictivePowerGovernorEngineV84".to_string(),
+            title: "Linux 6.38 SchedExt AI Dynamic Power Governor".to_string(),
+            component_name: "Linux638SchedExtAiPredictivePowerGovernorEngineV84".to_string(),
             os_origin: "Linux 6.38+".to_string(),
             status: OsPrStatusV84::Validated,
             impacted_subsystems: vec!["KernelScheduling".to_string(), "HardwarePower".to_string()],
@@ -165,27 +167,27 @@ impl Linux637SchedExtAiPredictivePowerGovernorEngineV84 {
     }
 }
 
-impl Default for Linux637SchedExtAiPredictivePowerGovernorEngineV84 {
+impl Default for Linux638SchedExtAiPredictivePowerGovernorEngineV84 {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 3. FreeBSD 16.7 Capsicum Casper Netlink Mesh Engine V84
+// 3. FreeBSD 16.8 Capsicum Casper Netlink Mesh Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84 {
+pub struct FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84 {
     pub casper_rights_mask: u64,
     pub vnet_jail_count: u32,
 }
 
-impl FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84 {
+impl FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84 {
     pub fn new() -> Self {
         Self {
-            casper_rights_mask: 0xFFFF_FFFF_0000_2000,
-            vnet_jail_count: 512,
+            casper_rights_mask: 0xFFFF_FFFF_0000_4000,
+            vnet_jail_count: 1024,
         }
     }
 
@@ -196,8 +198,8 @@ impl FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-002".to_string(),
-            title: "FreeBSD 16.7 Capsicum Casper Netlink Mesh VNET Integration".to_string(),
-            component_name: "FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84".to_string(),
+            title: "FreeBSD 16.8 Capsicum Casper Netlink Mesh VNET Integration".to_string(),
+            component_name: "FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84".to_string(),
             os_origin: "FreeBSD 16.8+".to_string(),
             status: OsPrStatusV84::Validated,
             impacted_subsystems: vec!["SecuritySandboxing".to_string(), "Networking".to_string()],
@@ -206,27 +208,27 @@ impl FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84 {
     }
 }
 
-impl Default for FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84 {
+impl Default for FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84 {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 4. OpenBSD 9.6 FineIBT Pinsyscall PTE Guard Engine V84
+// 4. OpenBSD 9.7 FineIBT Pinsyscall PTE Guard Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct OpenBsd96FineIbtPinsyscallPteGuardEngineV84 {
+pub struct OpenBsd97FineIbtPinsyscallPteGuardEngineV84 {
     pub pte_shadow_pages: u32,
     pub pinned_syscall_count: u32,
 }
 
-impl OpenBsd96FineIbtPinsyscallPteGuardEngineV84 {
+impl OpenBsd97FineIbtPinsyscallPteGuardEngineV84 {
     pub fn new() -> Self {
         Self {
-            pte_shadow_pages: 16384,
-            pinned_syscall_count: 1024,
+            pte_shadow_pages: 32768,
+            pinned_syscall_count: 2048,
         }
     }
 
@@ -237,8 +239,8 @@ impl OpenBsd96FineIbtPinsyscallPteGuardEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-003".to_string(),
-            title: "OpenBSD 9.6 FineIBT Pinsyscall PTE Shadow Protection".to_string(),
-            component_name: "OpenBsd96FineIbtPinsyscallPteGuardEngineV84".to_string(),
+            title: "OpenBSD 9.7 FineIBT Pinsyscall PTE Shadow Protection".to_string(),
+            component_name: "OpenBsd97FineIbtPinsyscallPteGuardEngineV84".to_string(),
             os_origin: "OpenBSD 9.7+".to_string(),
             status: OsPrStatusV84::Validated,
             impacted_subsystems: vec![
@@ -251,27 +253,27 @@ impl OpenBsd96FineIbtPinsyscallPteGuardEngineV84 {
     }
 }
 
-impl Default for OpenBsd96FineIbtPinsyscallPteGuardEngineV84 {
+impl Default for OpenBsd97FineIbtPinsyscallPteGuardEngineV84 {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 5. DragonFly BSD 8.5 HAMMER3 Direct-IO Erasure Engine V84
+// 5. DragonFly BSD 8.6 HAMMER3 Direct-IO Erasure Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct DragonFly85Hammer3DirectIoErasureEngineV84 {
+pub struct DragonFly86Hammer3DirectIoErasureEngineV84 {
     pub reed_solomon_data_stripes: u8,
     pub reed_solomon_parity_stripes: u8,
 }
 
-impl DragonFly85Hammer3DirectIoErasureEngineV84 {
+impl DragonFly86Hammer3DirectIoErasureEngineV84 {
     pub fn new() -> Self {
         Self {
-            reed_solomon_data_stripes: 10,
-            reed_solomon_parity_stripes: 4,
+            reed_solomon_data_stripes: 12,
+            reed_solomon_parity_stripes: 6,
         }
     }
 
@@ -294,8 +296,8 @@ impl DragonFly85Hammer3DirectIoErasureEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-004".to_string(),
-            title: "DragonFly BSD 8.5 HAMMER3 Zero-Copy Erasure Coding".to_string(),
-            component_name: "DragonFly85Hammer3DirectIoErasureEngineV84".to_string(),
+            title: "DragonFly BSD 8.6 HAMMER3 Zero-Copy Erasure Coding".to_string(),
+            component_name: "DragonFly86Hammer3DirectIoErasureEngineV84".to_string(),
             os_origin: "DragonFly BSD 8.6+".to_string(),
             status: OsPrStatusV84::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "StorageDrive".to_string()],
@@ -306,27 +308,27 @@ impl DragonFly85Hammer3DirectIoErasureEngineV84 {
     }
 }
 
-impl Default for DragonFly85Hammer3DirectIoErasureEngineV84 {
+impl Default for DragonFly86Hammer3DirectIoErasureEngineV84 {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 6. NetBSD 12.13 Rump Userland Audio PCI Router Engine V84
+// 6. NetBSD 13.0 Rump Userland Audio PCI Router Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct NetBsd1212RumpUserlandAudioPciRouterEngineV84 {
+pub struct NetBsd130RumpUserlandAudioPciRouterEngineV84 {
     pub hypercall_channels: u32,
     pub userland_audio_buffers: u32,
 }
 
-impl NetBsd1212RumpUserlandAudioPciRouterEngineV84 {
+impl NetBsd130RumpUserlandAudioPciRouterEngineV84 {
     pub fn new() -> Self {
         Self {
-            hypercall_channels: 128,
-            userland_audio_buffers: 2048,
+            hypercall_channels: 256,
+            userland_audio_buffers: 4096,
         }
     }
 
@@ -337,9 +339,9 @@ impl NetBsd1212RumpUserlandAudioPciRouterEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-005".to_string(),
-            title: "NetBSD 12.13 Rump Kernel Userland Audio PCI Passthrough".to_string(),
-            component_name: "NetBsd1212RumpUserlandAudioPciRouterEngineV84".to_string(),
-            os_origin: "NetBSD 12.13".to_string(),
+            title: "NetBSD 13.0 Rump Kernel Userland Audio PCI Passthrough".to_string(),
+            component_name: "NetBsd130RumpUserlandAudioPciRouterEngineV84".to_string(),
+            os_origin: "NetBSD 13.0".to_string(),
             status: OsPrStatusV84::Validated,
             impacted_subsystems: vec!["AudioSound".to_string(), "DriversHardware".to_string()],
             patch_diff: "--- a/sys/rump/librump/rumpkern/hypercall.c\n+++ b/sys/rump/librump/rumpkern/hypercall.c".to_string(),
@@ -347,7 +349,7 @@ impl NetBsd1212RumpUserlandAudioPciRouterEngineV84 {
     }
 }
 
-impl Default for NetBsd1212RumpUserlandAudioPciRouterEngineV84 {
+impl Default for NetBsd130RumpUserlandAudioPciRouterEngineV84 {
     fn default() -> Self {
         Self::new()
     }
@@ -366,8 +368,8 @@ pub struct HaikuBfsRelationalLiveQueryMetadataEngineV84 {
 impl HaikuBfsRelationalLiveQueryMetadataEngineV84 {
     pub fn new() -> Self {
         Self {
-            index_nodes: 131072,
-            live_listeners: 256,
+            index_nodes: 262144,
+            live_listeners: 512,
         }
     }
 
@@ -407,8 +409,8 @@ pub struct Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84 {
 impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84 {
     pub fn new() -> Self {
         Self {
-            active_namespaces: 2048,
-            rfork_namespace_mask: 0x0000_1026,
+            active_namespaces: 4096,
+            rfork_namespace_mask: 0x0000_2046,
         }
     }
 
@@ -496,8 +498,8 @@ pub struct IllumosCrossbowVnicDtraceSwitchMeshEngineV84 {
 impl IllumosCrossbowVnicDtraceSwitchMeshEngineV84 {
     pub fn new() -> Self {
         Self {
-            vnic_ports: 1024,
-            dtrace_probes: 4096,
+            vnic_ports: 2048,
+            dtrace_probes: 8192,
         }
     }
 
@@ -547,7 +549,7 @@ impl OmarchyWallustThemeChordNavigatorEngineV84 {
     pub fn new() -> Self {
         Self {
             active_theme: "Default-Dark-V84".to_string(),
-            keybindings_count: 256,
+            keybindings_count: 512,
         }
     }
 
@@ -590,7 +592,7 @@ impl GlobalTechMedia40PortalUnimplementedIdeasEngineV84 {
     pub fn new() -> Self {
         Self {
             portals_scraped: 40,
-            total_ideas_indexed: 5800,
+            total_ideas_indexed: 6000,
         }
     }
 
@@ -703,11 +705,11 @@ impl Default for UniversalSubsystemCrossDistroAdapterEngineV84 {
 #[derive(Debug, Clone)]
 pub struct SovereignOpenSourceOsMissingComponentsV84PrSuite {
     pub comparison_matrix: SigmaOsVsOpenSourceOsComparisonMatrixEngineV84,
-    pub linux_sched_ext: Linux637SchedExtAiPredictivePowerGovernorEngineV84,
-    pub freebsd_capsicum: FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84,
-    pub openbsd_security: OpenBsd96FineIbtPinsyscallPteGuardEngineV84,
-    pub dragonfly_hammer: DragonFly85Hammer3DirectIoErasureEngineV84,
-    pub netbsd_rump: NetBsd1212RumpUserlandAudioPciRouterEngineV84,
+    pub linux_sched_ext: Linux638SchedExtAiPredictivePowerGovernorEngineV84,
+    pub freebsd_capsicum: FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84,
+    pub openbsd_security: OpenBsd97FineIbtPinsyscallPteGuardEngineV84,
+    pub dragonfly_hammer: DragonFly86Hammer3DirectIoErasureEngineV84,
+    pub netbsd_rump: NetBsd130RumpUserlandAudioPciRouterEngineV84,
     pub haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV84,
     pub plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84,
     pub nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV84,
@@ -721,11 +723,11 @@ impl SovereignOpenSourceOsMissingComponentsV84PrSuite {
     pub fn new() -> Self {
         Self {
             comparison_matrix: SigmaOsVsOpenSourceOsComparisonMatrixEngineV84::new(),
-            linux_sched_ext: Linux637SchedExtAiPredictivePowerGovernorEngineV84::new(),
-            freebsd_capsicum: FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84::new(),
-            openbsd_security: OpenBsd96FineIbtPinsyscallPteGuardEngineV84::new(),
-            dragonfly_hammer: DragonFly85Hammer3DirectIoErasureEngineV84::new(),
-            netbsd_rump: NetBsd1212RumpUserlandAudioPciRouterEngineV84::new(),
+            linux_sched_ext: Linux638SchedExtAiPredictivePowerGovernorEngineV84::new(),
+            freebsd_capsicum: FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new(),
+            openbsd_security: OpenBsd97FineIbtPinsyscallPteGuardEngineV84::new(),
+            dragonfly_hammer: DragonFly86Hammer3DirectIoErasureEngineV84::new(),
+            netbsd_rump: NetBsd130RumpUserlandAudioPciRouterEngineV84::new(),
             haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV84::new(),
             plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84::new(),
             nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV84::new(),
@@ -796,27 +798,27 @@ mod tests {
         let report = matrix.generate_matrix_report();
         assert!(report.contains("Feature Parity Matrix V84"));
 
-        let sched = Linux637SchedExtAiPredictivePowerGovernorEngineV84::new();
-        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5800);
+        let sched = Linux638SchedExtAiPredictivePowerGovernorEngineV84::new();
+        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 6000);
 
-        let freebsd = FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV84::new();
+        let freebsd = FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new();
         assert!(freebsd.verify_jail_vnet_isolation(10));
 
-        let openbsd = OpenBsd96FineIbtPinsyscallPteGuardEngineV84::new();
+        let openbsd = OpenBsd97FineIbtPinsyscallPteGuardEngineV84::new();
         assert!(openbsd.validate_syscall_entry_point(0x0000_1000));
 
-        let dfbsd = DragonFly85Hammer3DirectIoErasureEngineV84::new();
+        let dfbsd = DragonFly86Hammer3DirectIoErasureEngineV84::new();
         let parity = dfbsd.compute_erasure_parity(&[&[1, 2], &[3, 4]]);
         assert_eq!(parity, vec![1 ^ 3, 2 ^ 4]);
 
-        let netbsd = NetBsd1212RumpUserlandAudioPciRouterEngineV84::new();
+        let netbsd = NetBsd130RumpUserlandAudioPciRouterEngineV84::new();
         assert!(netbsd.route_pci_hypercall(1));
 
         let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV84::new();
         assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
         let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84::new();
-        assert_eq!(plan9.rfork_namespace(1), 0x0000_1027);
+        assert_eq!(plan9.rfork_namespace(1), 0x0000_2047);
 
         let nix = NixGuixHermeticCasMerkleClosureEngineV84::new();
         assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
