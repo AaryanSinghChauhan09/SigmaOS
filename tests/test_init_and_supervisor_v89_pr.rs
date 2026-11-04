@@ -12,7 +12,8 @@ use alloc::vec;
 #[test]
 fn test_init_and_supervisor_v89_pr_integration() {
     let gateway = SovereignInitAndSupervisorV89PrGatewayEngine::new();
-    let manifests = gateway.orchestrate_core_userland_v89().unwrap();
+    let dummy_sig = [0x42u8; 64];
+    let manifests = gateway.orchestrate_core_userland_v89(&dummy_sig).unwrap();
 
     assert_eq!(manifests.len(), 7);
     for manifest in &manifests {
