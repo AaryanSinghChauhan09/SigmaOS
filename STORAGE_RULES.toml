@@ -1,20 +1,30 @@
+# SigmaOS Secondary Memory Component Rules
+# Governed by docs/storage/SECONDARY_MEMORY_POLICY.md and docs/storage/SECONDARY_MEMORY_ADR.md
+
 [rule.storage_completeness]
-description = "Secondary memory and storage operations must be tracked"
+requirement = "Secondary memory defines block I/O, cache, mount, and filesystem semantics."
+enforcement = "Storage tests + rehearsals"
 
 [rule.no_leak]
-description = "Zero leaks in block descriptors or file buffers"
+requirement = "Storage leaks are zero under stress tests."
+enforcement = "Storage stress tests"
 
 [rule.oom_metric]
-description = "Track cache eviction and buffer watermark"
+requirement = "Storage defines and measures OOM behavior."
+enforcement = "Limit rehearsal"
 
 [rule.mount_integrity]
-description = "Mount and unmount integrity without double unmount"
+requirement = "Mount/unmount preserves filesystem and scheduler integrity."
+enforcement = "Mount rehearsal"
 
 [rule.cache_semantics]
-description = "LRU cache semantics and writeback"
+requirement = "Cache eviction defines legal eviction and error codes."
+enforcement = "Cache tests"
 
 [rule.no_model_only_status]
-description = "No model-only status without backing code"
+requirement = "Storage features cannot be marked complete from model tests alone."
+enforcement = "Status audit"
 
 [rule.runtime_evidence]
-description = "Runtime evidence must support all storage operations"
+requirement = "Boot-affecting storage changes require boot-to-shell or integration evidence."
+enforcement = "CI boot gate"

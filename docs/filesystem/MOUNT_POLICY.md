@@ -1,4 +1,6 @@
 # Mount Policy
+
+Key invariants:
 - Race-Free Mount Operations
 - Bounded Filesystem Capacity
 - Failure-Safe Mount / Unmount and Rollback

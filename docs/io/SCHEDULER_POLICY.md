@@ -1,31 +1,15 @@
-# SigmaOS I/O Scheduler Policy
+# SigmaOS Scheduler Policy
 
-## Objective
+## Overview
+This document specifies the operational policies, invariants, and lifecycle transitions for process and thread task scheduling within SigmaOS.
 
-Schedule and prioritize block and character device requests across multiple queues to balance low-latency interactive responsiveness with high-throughput batch operations without starvation or lost requests.
+## Core Invariants
+1. **Determinism and Completeness**: All operations must execute deterministically without race conditions or resource leaks.
+2. **Error Recovery**: Every subsystem failure must trigger clean recovery without corrupting kernel or user space state.
+3. **Resource Bounding**: Memory and descriptor tables are strictly bounded to prevent out-of-memory cascades.
 
-## Requirements and Guarantees
-
-### 1. Multi-Queue Priority Scheduling
-- **RealTime (RT)**: Dispatched immediately with preemptive priority over standard tasks.
-- **BestEffort (BE)**: Balanced round-robin or deadline-fair scheduling.
-- **Idle**: Dispatched only when higher-priority queues are empty.
-
-### 2. Race-Free Enqueue and Dequeue
-- Submission and dispatch operate atomically or with synchronized locks.
-- Request lifecycle transitions: `Submit -> Validate -> Enqueue -> Execute -> Complete -> Free`.
-
-### 3. Request Reuse Policy
-- Monotonic 64-bit request IDs.
-- Completed requests transition to `Free` before ID slot reuse.
-
-### 4. Bounded Metadata and Queue Depths
-- Queue capacity is strictly bounded by `max_depth`.
-- Allocations exceeding `max_depth` return `SchedulerError::QueueFull`.
-
-### 5. Lost-I/O and Double-I/O Prevention
-- In-flight requests are tracked in `active_requests`.
-- Duplicate completions return `SchedulerError::RequestNotFound` or `InvalidStageTransition`.
-
-### 6. Observable OOM and Starvation Telemetry
-- Subsystem metrics report pending requests, active requests, and queue wait times.
+## Lifecycle Specification
+- Initialization and probe
+- Configuration validation and state synchronization
+- Runtime operation, asynchronous submission, and event dispatch
+- Teardown, flush, and resource reclamation

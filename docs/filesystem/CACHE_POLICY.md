@@ -1,4 +1,6 @@
-# Cache Policy
+# Cache Layer Policy
+
+Key invariants:
 - Race-Free Cache Eviction
 - Cache Reuse Policy
 - Bounded Cache Metadata

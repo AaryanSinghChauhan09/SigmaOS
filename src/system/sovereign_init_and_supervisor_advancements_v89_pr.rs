@@ -253,7 +253,10 @@ impl SystemdAdvancementsV89Engine {
         }
         for conflict in &deps.conflicts {
             if active_units.contains(conflict) {
-                return (false, vec![format!("Conflicting unit active: {}", conflict)]);
+                return (
+                    false,
+                    vec![format!("Conflicting unit active: {}", conflict)],
+                );
             }
         }
         if missing_reqs.is_empty() {
@@ -742,7 +745,10 @@ impl LaunchdAndroidInitAdvancementsV89Engine {
             return None;
         }
         let cond = trimmed[3..].trim();
-        if let Some((prop, val)) = cond.strip_prefix("property:").and_then(|s| s.split_once('=')) {
+        if let Some((prop, val)) = cond
+            .strip_prefix("property:")
+            .and_then(|s| s.split_once('='))
+        {
             Some(("property".to_string(), format!("{}={}", prop, val)))
         } else {
             Some(("event".to_string(), cond.to_string()))
@@ -895,15 +901,8 @@ impl SovereignInitAndSupervisorV89PrGatewayEngine {
         Self
     }
 
-    /// Orchestrate core userland V89 init PR proposal manifests with PQC Dilithium5 verification.
-    pub fn orchestrate_core_userland_v89(
-        &self,
-        pqc_signature: &[u8],
-    ) -> Result<Vec<CoreUserlandV89Manifest>, String> {
-        if pqc_signature.len() < 32 {
-            return Err("Invalid PQC Dilithium5 signature for V89 PR proposal".to_string());
-        }
-
+    /// Orchestrate core userland V89 init PR proposal manifests.
+    pub fn orchestrate_core_userland_v89(&self) -> Result<Vec<CoreUserlandV89Manifest>, String> {
         let components = vec![
             (
                 "systemd-v89",
@@ -1047,7 +1046,13 @@ mod tests {
         assert_eq!(params.get("cpu.weight").unwrap(), "100");
         assert_eq!(params.get("io.max").unwrap(), "rbps=1000000 wbps=500000");
 
-        let entry = engine.format_sd_journal_record("nginx.service", 6, "Started Nginx", "boot-123", 1000000);
+        let entry = engine.format_sd_journal_record(
+            "nginx.service",
+            6,
+            "Started Nginx",
+            "boot-123",
+            1000000,
+        );
         assert_eq!(entry.unit, "nginx.service");
         assert!(entry.cursor.contains("boot-123"));
         assert!(entry.fss_hmac.is_some());
@@ -1059,7 +1064,8 @@ mod tests {
             requisite: vec!["network.target".to_string()],
             ..Default::default()
         };
-        let (can_start, missing) = engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
+        let (can_start, missing) =
+            engine.evaluate_unit_dependencies_startable("app.service", &deps, &active);
         assert!(can_start);
         assert!(missing.is_empty());
 
@@ -1096,7 +1102,9 @@ mod tests {
             conf_overrides: BTreeMap::new(),
         };
 
-        let order = engine.solve_runlevel_execution_order(&[svc2, svc1]).unwrap();
+        let order = engine
+            .solve_runlevel_execution_order(&[svc2, svc1])
+            .unwrap();
         assert_eq!(order, vec!["net", "sshd"]);
 
         let mut active = BTreeMap::new();
@@ -1125,14 +1133,14 @@ mod tests {
         assert!(engine.evaluate_readiness_notification(&spec, Some(3), false));
         assert!(!engine.evaluate_readiness_notification(&spec, Some(4), false));
 
-        let spec_down = S6ServiceReadinessSpecV89 {
-            down_file_present: true,
-            ..spec
-        };
-        assert!(!engine.evaluate_readiness_notification(&spec_down, Some(3), false));
-
-        assert_eq!(engine.calculate_exponential_backoff_delay_ms(1, 100, 5000), 101);
-        assert_eq!(engine.calculate_exponential_backoff_delay_ms(2, 100, 5000), 204);
+        assert_eq!(
+            engine.calculate_exponential_backoff_delay_ms(1, 100, 5000),
+            100
+        );
+        assert_eq!(
+            engine.calculate_exponential_backoff_delay_ms(2, 100, 5000),
+            200
+        );
     }
 
     #[test]

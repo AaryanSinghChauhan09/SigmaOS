@@ -1,22 +1,15 @@
-# SigmaOS I/O Callback Policy
+# SigmaOS Callback Management Policy
 
-## Objective
+## Overview
+This document specifies the operational policies, invariants, and lifecycle transitions for asynchronous I/O callbacks within SigmaOS.
 
-Manage completion callbacks and callback-callback chaining for asynchronous I/O operations without reentrancy panics, stack overflows, or lost notifications.
+## Core Invariants
+1. **Determinism and Completeness**: All operations must execute deterministically without race conditions or resource leaks.
+2. **Error Recovery**: Every subsystem failure must trigger clean recovery without corrupting kernel or user space state.
+3. **Resource Bounding**: Memory and descriptor tables are strictly bounded to prevent out-of-memory cascades.
 
-## Requirements and Guarantees
-
-### 1. Bounded Callback Registration
-- Registered callbacks are mapped to unique request IDs.
-- Prevents unbounded memory growth in waiting lists.
-
-### 2. Chained Callback-Callback Safety
-- Callbacks can register secondary callbacks for hierarchical or multi-stage notifications.
-- Execution is isolated so an exception or panic in one callback does not abort other registered handlers.
-
-### 3. Status Reporting
-- Callbacks receive typed statuses: `CallbackStatus::Success`, `CallbackStatus::Failed`, `CallbackStatus::Cancelled`.
-
-### 4. Race-Free Invocation and Reclamation
-- Callbacks are removed from pending tables prior to invocation (at-most-once execution).
-- Resources associated with callback handles are reclaimed immediately after execution.
+## Lifecycle Specification
+- Initialization and probe
+- Configuration validation and state synchronization
+- Runtime operation, asynchronous submission, and event dispatch
+- Teardown, flush, and resource reclamation

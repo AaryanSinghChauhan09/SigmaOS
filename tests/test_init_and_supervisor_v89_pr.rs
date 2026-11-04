@@ -21,7 +21,7 @@ fn test_init_and_supervisor_v89_pr_integration() {
         assert_eq!(manifest.status, "Ready for Integration");
     }
 
-    // Verify systemd V89 state machine, activation & cgroup v2
+    // Verify systemd V89 state machine & cgroup v2
     let systemd = SystemdAdvancementsV89Engine::new();
     let state = systemd.transition_unit_state(SystemdUnitStateV89::Inactive, "start");
     assert_eq!(state, SystemdUnitStateV89::Activating);
@@ -47,13 +47,13 @@ fn test_init_and_supervisor_v89_pr_integration() {
             name: "localmount".to_string(),
             runlevel: "boot".to_string(),
             dependencies: vec![],
-            conf_overrides: BTreeMap::new(),
+            conf_overrides: alloc::collections::BTreeMap::new(),
         },
         OpenRcServiceSpecV89 {
             name: "net".to_string(),
             runlevel: "default".to_string(),
             dependencies: vec![(OpenRcDepKindV89::Need, "localmount".to_string())],
-            conf_overrides: BTreeMap::new(),
+            conf_overrides: alloc::collections::BTreeMap::new(),
         },
     ];
     let order = openrc.solve_runlevel_execution_order(&services).unwrap();
@@ -83,10 +83,20 @@ fn test_init_and_supervisor_v89_pr_integration() {
         pledge_promises: None,
         unveil_paths: vec![],
     };
-    assert_eq!(bsd.build_jail_chroot_command(&hooks), "jail -n secjail exec /usr/bin/test");
+    assert_eq!(
+        bsd.build_jail_chroot_command(&hooks),
+        "jail -n secjail exec /usr/bin/test"
+    );
 
     // Verify Cron timers & load average
     let cron = CronAnacronTimersAtV89Engine::new();
-    assert!(cron.evaluate_batch_load_average(0.40, 0.80));
-    assert!(!cron.evaluate_batch_load_average(0.90, 0.80));
+    let timer = SystemdTimerSpecV89 {
+        on_calendar: None,
+        on_boot_sec: Some(60),
+        on_unit_active_sec: None,
+        persistent: true,
+        accuracy_sec: 1,
+    };
+    assert!(cron.evaluate_timer_readiness(&timer, 1000, 0, 0));
+    assert!(!cron.evaluate_timer_readiness(&timer, 50, 0, 0));
 }
