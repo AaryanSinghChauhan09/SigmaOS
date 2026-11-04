@@ -265,12 +265,13 @@ where
         }
         let hash = self.hash_key(key);
         if let Some(ref mut bucket) = self.buckets[hash] {
-            for i in 0..bucket.len() {
-                if bucket[i].0.borrow() == key {
-                    let (_, value) = bucket.remove(i);
-                    self.len -= 1;
-                    return Some(value);
-                }
+            // Bolt ⚡: Single-pass position lookup and O(1) swap_remove.
+            // Replacing Vec::remove(i) (which shifts all following elements left with memmove)
+            // with Vec::swap_remove(i) avoids O(k) memory copies within collision buckets.
+            if let Some(pos) = bucket.iter().position(|item| item.0.borrow() == key) {
+                let (_, value) = bucket.swap_remove(pos);
+                self.len -= 1;
+                return Some(value);
             }
         }
         None
