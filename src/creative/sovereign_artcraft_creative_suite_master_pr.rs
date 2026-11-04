@@ -23,6 +23,7 @@ use super::anicraft_artcraft_parity_pr::SovereignAnicraftArtcraftParityPrGateway
 use super::artcraft::ArtcraftAdvancementsMasterSuite;
 use super::artcraft_advancements_v75_pr::SovereignArtcraftAdvancementsV75MasterSuite;
 use super::artcraft_advancements_v85_pr::SovereignArtcraftAdvancementsV85MasterSuite;
+use super::artcraft_advancements_v86_pr::SovereignArtcraftAdvancementsV86MasterSuite;
 use super::cadcraft_artcraft_parity_pr::SovereignCadcraftArtcraftParityPrGateway;
 use super::craftlibs_artcraft_parity_pr::SovereignCraftlibsArtcraftParityPrGateway;
 use super::deckcraft_artcraft_parity_pr::SovereignDeckcraftArtcraftParityPrGateway;
@@ -77,6 +78,7 @@ pub struct SovereignArtcraftCreativeSuiteMasterPrGateway {
     pub artcraftlibs_gateway: SovereignArtcraftCraftlibsParityPrGateway,
     pub artcraft_v75_gateway: SovereignArtcraftAdvancementsV75MasterSuite,
     pub artcraft_v85_gateway: SovereignArtcraftAdvancementsV85MasterSuite,
+    pub artcraft_v86_gateway: SovereignArtcraftAdvancementsV86MasterSuite,
     pub artcraft_advancements_engine: ArtcraftAdvancementsMasterSuite,
 }
 
@@ -104,6 +106,7 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
             artcraftlibs_gateway: SovereignArtcraftCraftlibsParityPrGateway::new(),
             artcraft_v75_gateway: SovereignArtcraftAdvancementsV75MasterSuite::new(),
             artcraft_v85_gateway: SovereignArtcraftAdvancementsV85MasterSuite::new(),
+            artcraft_v86_gateway: SovereignArtcraftAdvancementsV86MasterSuite::new(),
             artcraft_advancements_engine: ArtcraftAdvancementsMasterSuite::new(),
         }
     }
@@ -146,6 +149,9 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
         let v85_ok = self
             .artcraft_v85_gateway
             .evaluate_artcraft_advancements_v85_parity();
+        let v86_ok = self
+            .artcraft_v86_gateway
+            .evaluate_artcraft_advancements_v86_parity();
         let advancements_ok = self
             .artcraft_advancements_engine
             .evaluate_all_advancements_parity();
@@ -171,6 +177,7 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
             && artcraftlibs_ok
             && v75_ok
             && v85_ok
+            && v86_ok
     }
 
     /// Collects all master PR proposals across all 18+ creative applications.
@@ -184,6 +191,18 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
                 pr_id: id_counter,
                 pr_title: p.pr_title,
                 creative_app: "PhotoCraft".to_string(),
+                target_subsystem: p.target_subsystem,
+                components_added_count: p.components_added.len(),
+                status: p.status,
+            });
+        }
+
+        for p in self.artcraft_v86_gateway.collect_all_proposals() {
+            id_counter += 1;
+            proposals.push(ArtcraftMasterPrProposal {
+                pr_id: id_counter,
+                pr_title: p.pr_title,
+                creative_app: "ArtCraft V86 Core".to_string(),
                 target_subsystem: p.target_subsystem,
                 components_added_count: p.components_added.len(),
                 status: p.status,

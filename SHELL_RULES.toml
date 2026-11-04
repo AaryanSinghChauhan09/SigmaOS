@@ -1,0 +1,32 @@
+[rule.deterministic_scripts]
+description = "Deterministic script behavior"
+
+[rule.explicit_exit_status]
+description = "Explicit exit status on all exits"
+
+[rule.no_partial_execution_on_parse_error]
+description = "No partial execution when parse errors occur"
+
+[rule.safe_expansion_order]
+description = "Safe parameter and word expansion order"
+
+[rule.quoting_integrity]
+description = "Quoting integrity preserved"
+
+[rule.redirection_safety]
+description = "Safe file redirection"
+
+[rule.signal_safety]
+description = "Signal handling in interactive loops"
+
+[rule.builtin_contract]
+description = "Built-in command contracts"
+
+[rule.no_unbounded_input]
+description = "Bounded line lengths"
+
+[rule.fuzz_external_input]
+description = "Fuzz input streams"
+
+[rule.status_evidence]
+description = "Status evidence required"

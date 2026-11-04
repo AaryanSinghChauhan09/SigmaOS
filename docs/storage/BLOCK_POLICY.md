@@ -1,6 +1,4 @@
-# Block Layer Policy
-
-Key invariants:
+# Block Policy
 - Race-Free Request Enqueue and Dequeue
 - Request Reuse Policy
 - Request Exhaustion Handling
