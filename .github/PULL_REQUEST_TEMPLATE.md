@@ -264,12 +264,65 @@
 - Risk:
 - Rollback:
 
-<!--
+## Component
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] I/O component
+- [ ] Memory component
+- [ ] File component
+- [ ] IPC handler
+
+## Motivation
+- Upstream study and architectural parity
+
+## Implementation notes
+- Native Rust implementations across subsystems
+
+## Tests
+- Comprehensive unit and integration test coverage
+
+## Verification
+- `cargo check --lib`
+- `cargo test --lib`
+- `./run_sigma_tests.sh`
+
+## Capability status
+- Verified and validated
+
+## Integration impact
+- Non-breaking additive extensions
+
+## Reviewer checklist
+- [ ] Scope is narrow
+- [ ] `unsafe` justified
+
+## Shell component
+- [ ] Shell terminal
+- [ ] Desktop compositor
+
+## Shell safety review
+- [ ] Input sanitization verified
+
 ## I/O component
-- Interrupt manager
-- DMA manager / DMA queue
-- Buffer manager
-- I/O scheduler
-- I/O policy
-- I/O safety review
--->
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+
+## I/O policy
+- [ ] I/O completeness
+- [ ] Interrupt integrity
+- [ ] Buffer semantics
+
+## I/O safety review
+- [ ] No buffer cache leaks
+- [ ] Double DMA prevented
+- [ ] Spurious interrupt handling verified
+
+## IPC handler
+- [ ] IPC semantics
+- Blocking behavior: non-blocking or bounded
+- Non-blocking behavior: returns WouldBlock
+- EOF / closure behavior: explicit clean disconnection
+- Security review: Capability/namespace checks enforced
