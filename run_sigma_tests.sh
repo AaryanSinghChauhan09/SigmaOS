@@ -3025,6 +3025,20 @@ if [ -f "tests/test_open_source_os_and_arch_missing_components_v81_pr.rs" ]; the
     ./build/test_v81_os_arch_prs
 fi
 
+if [ -f "tests/test_open_source_os_and_arch_missing_components_v82_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas & Arch Linux Missing Components V82 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_and_arch_missing_components_v82_pr.rs --edition=2021 -o build/test_v82_os_arch_prs
+    ./build/test_v82_os_arch_prs
+fi
+
+if [ -f "tests/test_open_source_os_and_arch_missing_components_v83_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas & Arch Linux Missing Components V83 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_and_arch_missing_components_v83_pr.rs --edition=2021 -o build/test_v83_os_arch_prs
+    ./build/test_v83_os_arch_prs
+fi
+
 if [ -f "tests/test_open_source_os_and_arch_missing_components_v84_pr.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas & Arch Linux Missing Components V84 PR test suite..."
     mkdir -p build
