@@ -231,14 +231,19 @@ impl SovereignDisplayManagerSuiteEngineV92 {
                     user_gecos: String::new(),
                     home_dir: String::new(),
                     default_shell: String::new(),
-                    failure_reason: Some(format!("User {} not recognized in PAM database", req.username)),
+                    failure_reason: Some(format!(
+                        "User {} not recognized in PAM database",
+                        req.username
+                    )),
                 };
             }
         };
 
         let has_credentials = match (&req.password, &req.totp_token, &req.fido2_response) {
             (Some(pass), _, _) if !pass.trim().is_empty() => true,
-            (_, Some(totp), _) if totp.len() == 6 && totp.chars().all(|c| c.is_ascii_digit()) => true,
+            (_, Some(totp), _) if totp.len() == 6 && totp.chars().all(|c| c.is_ascii_digit()) => {
+                true
+            }
             (_, _, Some(fido)) if !fido.is_empty() => true,
             _ => false,
         };
@@ -295,7 +300,10 @@ impl SovereignDisplayManagerSuiteEngineV92 {
                 )
             }
             DisplayManagerKindV92::Xdm | DisplayManagerKindV92::Console => {
-                format!("! XDM Config V92\nDisplayManager.requestPort: {}\n", if self.xdmcp_enabled { 177 } else { 0 })
+                format!(
+                    "! XDM Config V92\nDisplayManager.requestPort: {}\n",
+                    if self.xdmcp_enabled { 177 } else { 0 }
+                )
             }
         }
     }
@@ -366,7 +374,8 @@ impl SovereignGvfsGioFileSystemEngineV92 {
     }
 
     pub fn set_dconf_value(&mut self, path: &str, val: &str) {
-        self.dconf_database.insert(path.to_string(), val.to_string());
+        self.dconf_database
+            .insert(path.to_string(), val.to_string());
     }
 
     pub fn get_dconf_value(&self, path: &str) -> Option<&String> {
@@ -462,8 +471,14 @@ impl SovereignXdgPortalsUtilitiesEngineV92 {
     pub fn new() -> Self {
         let mut user_dirs = BTreeMap::new();
         user_dirs.insert("XDG_DESKTOP_DIR".to_string(), "$HOME/Desktop".to_string());
-        user_dirs.insert("XDG_DOWNLOAD_DIR".to_string(), "$HOME/Downloads".to_string());
-        user_dirs.insert("XDG_DOCUMENTS_DIR".to_string(), "$HOME/Documents".to_string());
+        user_dirs.insert(
+            "XDG_DOWNLOAD_DIR".to_string(),
+            "$HOME/Downloads".to_string(),
+        );
+        user_dirs.insert(
+            "XDG_DOCUMENTS_DIR".to_string(),
+            "$HOME/Documents".to_string(),
+        );
 
         let mut mime_apps = BTreeMap::new();
         mime_apps.insert("text/html".to_string(), "sigma-browser.desktop".to_string());
@@ -484,7 +499,8 @@ impl SovereignXdgPortalsUtilitiesEngineV92 {
                 continue;
             }
             if let Some((k, v)) = trimmed.split_once('=') {
-                self.portals_config.insert(k.trim().to_string(), v.trim().to_string());
+                self.portals_config
+                    .insert(k.trim().to_string(), v.trim().to_string());
                 count += 1;
             }
         }
@@ -499,7 +515,8 @@ impl SovereignXdgPortalsUtilitiesEngineV92 {
                 continue;
             }
             if let Some((k, v)) = trimmed.split_once('=') {
-                self.user_dirs.insert(k.trim().to_string(), v.trim().trim_matches('"').to_string());
+                self.user_dirs
+                    .insert(k.trim().to_string(), v.trim().trim_matches('"').to_string());
                 count += 1;
             }
         }
@@ -651,7 +668,14 @@ impl SovereignNotificationDaemonEngineV92 {
         }
     }
 
-    pub fn notify(&mut self, app_name: &str, summary: &str, body: &str, urgency: u8, timeout: i32) -> u32 {
+    pub fn notify(
+        &mut self,
+        app_name: &str,
+        summary: &str,
+        body: &str,
+        urgency: u8,
+        timeout: i32,
+    ) -> u32 {
         let id = self.next_notification_id;
         self.next_notification_id += 1;
 
@@ -704,7 +728,9 @@ impl SovereignScreenLockerEngineV92 {
     }
 
     pub fn unlock(&mut self, pass: &str) -> bool {
-        if pass == self.pam_password_hash || (!pass.trim().is_empty() && pass == self.pam_password_hash) {
+        if pass == self.pam_password_hash
+            || (!pass.trim().is_empty() && pass == self.pam_password_hash)
+        {
             self.is_locked = false;
             self.ext_session_lock_active = false;
             self.failed_attempts = 0;
@@ -806,16 +832,46 @@ impl SovereignDesktopServicesV92PrGatewayEngine {
 
     pub fn generate_10_distro_prs(&mut self) -> usize {
         let distros = [
-            ("Ubuntu Desktop", "GTK4/Libadwaita Yaru Accent Bridge & GDM PAM FIDO2 Engine V92"),
-            ("Fedora Workstation", "Wayland ext-session-lock-v1 & fontconfig HarfBuzz Pipeline V92"),
-            ("Arch Linux", "Kvantum Qt6 Theme Transpiler & cliphist Secret Autowipe V92"),
-            ("Debian GNU/Linux", "GVfs SFTP/SMB Mount Manager & PolicyKit Rules V92"),
-            ("openSUSE Tumbleweed", "SDDM Greeter Config & Fcitx5 IME Preedit Framework V92"),
-            ("Gentoo Linux", "Skia & Vulkan GTK Render Pipeline & FreeType Hinting V92"),
-            ("Alpine Linux", "LightDM SlickGreeter & Notification Sound Feedback V92"),
-            ("FreeBSD Desktop", "xdm Console Greeter & XDG Portals mimeapps Router V92"),
-            ("Void Linux", "Desktop Notification Daemon & Urgency Escalation Router V92"),
-            ("Manjaro Linux", "GTK5/Qt6 Unified Theme Sync & Clipboard History Manager V92"),
+            (
+                "Ubuntu Desktop",
+                "GTK4/Libadwaita Yaru Accent Bridge & GDM PAM FIDO2 Engine V92",
+            ),
+            (
+                "Fedora Workstation",
+                "Wayland ext-session-lock-v1 & fontconfig HarfBuzz Pipeline V92",
+            ),
+            (
+                "Arch Linux",
+                "Kvantum Qt6 Theme Transpiler & cliphist Secret Autowipe V92",
+            ),
+            (
+                "Debian GNU/Linux",
+                "GVfs SFTP/SMB Mount Manager & PolicyKit Rules V92",
+            ),
+            (
+                "openSUSE Tumbleweed",
+                "SDDM Greeter Config & Fcitx5 IME Preedit Framework V92",
+            ),
+            (
+                "Gentoo Linux",
+                "Skia & Vulkan GTK Render Pipeline & FreeType Hinting V92",
+            ),
+            (
+                "Alpine Linux",
+                "LightDM SlickGreeter & Notification Sound Feedback V92",
+            ),
+            (
+                "FreeBSD Desktop",
+                "xdm Console Greeter & XDG Portals mimeapps Router V92",
+            ),
+            (
+                "Void Linux",
+                "Desktop Notification Daemon & Urgency Escalation Router V92",
+            ),
+            (
+                "Manjaro Linux",
+                "GTK5/Qt6 Unified Theme Sync & Clipboard History Manager V92",
+            ),
         ];
 
         self.proposals.clear();
@@ -852,7 +908,8 @@ mod tests {
         toolkit.set_accent_color("#1e90ff");
         assert_eq!(toolkit.active_accent_hex, "#1e90ff");
 
-        let css = "@define-color accent_color #1e90ff;\nwindow.background { background-color: #000; }";
+        let css =
+            "@define-color accent_color #1e90ff;\nwindow.background { background-color: #000; }";
         let qss = toolkit.convert_css_to_qss(css);
         assert!(qss.contains("Palette Variable"));
         assert!(qss.contains("QMainWindow, QDialog"));
@@ -917,7 +974,10 @@ mod tests {
 
         let dirs_count = portals.parse_user_dirs("XDG_DOCUMENTS_DIR=\"$HOME/Documents\"\n");
         assert_eq!(dirs_count, 1);
-        assert_eq!(portals.user_dirs.get("XDG_DOCUMENTS_DIR"), Some(&"$HOME/Documents".to_string()));
+        assert_eq!(
+            portals.user_dirs.get("XDG_DOCUMENTS_DIR"),
+            Some(&"$HOME/Documents".to_string())
+        );
     }
 
     #[test]
@@ -928,7 +988,9 @@ mod tests {
         assert_eq!(glyphs.len(), 5);
 
         let mut ime = SovereignInputMethodFrameworkEngineV92::new(ImeEngineKindV92::Fcitx5);
-        assert!(ime.handle_text_input_v3_commit("Text").contains("committed 'Text'"));
+        assert!(ime
+            .handle_text_input_v3_commit("Text")
+            .contains("committed 'Text'"));
 
         let mut notif = SovereignNotificationDaemonEngineV92::new();
         let nid = notif.notify("App", "Sum", "Body", 1, 3000);

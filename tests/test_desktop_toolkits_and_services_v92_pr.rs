@@ -51,7 +51,10 @@ fn test_gtk_qt_toolkit_sync_engine_v92_integration() {
     assert!(kv_config.contains("corner_radius=8"));
 
     engine.kvantum_spec = None;
-    assert_eq!(engine.generate_kvantum_config(), "[General]\ntheme=Default\n");
+    assert_eq!(
+        engine.generate_kvantum_config(),
+        "[General]\ntheme=Default\n"
+    );
 }
 
 #[test]
@@ -87,7 +90,9 @@ fn test_display_manager_suite_engine_v92_integration() {
     let xdm_cfg = xdm.generate_dm_config();
     assert!(xdm_cfg.contains("DisplayManager.requestPort: 177"));
     xdm.xdmcp_enabled = false;
-    assert!(xdm.generate_dm_config().contains("DisplayManager.requestPort: 0"));
+    assert!(xdm
+        .generate_dm_config()
+        .contains("DisplayManager.requestPort: 0"));
 
     // PAM Authentications
     // 1. Password auth
@@ -150,7 +155,10 @@ fn test_display_manager_suite_engine_v92_integration() {
     };
     let unknown_resp = gdm.authenticate_pam(&unknown_req);
     assert!(!unknown_resp.authenticated);
-    assert!(unknown_resp.failure_reason.unwrap().contains("not recognized in PAM database"));
+    assert!(unknown_resp
+        .failure_reason
+        .unwrap()
+        .contains("not recognized in PAM database"));
 
     // 6. Empty username failure
     let empty_req = PamAuthRequestV92 {
@@ -171,9 +179,17 @@ fn test_gvfs_gio_virtual_filesystem_engine_v92_integration() {
     let mount_schemes = [
         (MountSchemeV92::Smb, "nas.lan", "/volume1/media"),
         (MountSchemeV92::Sftp, "dev.internal", "/home/developer"),
-        (MountSchemeV92::WebDav, "cloud.example.org", "/remote.php/webdav"),
+        (
+            MountSchemeV92::WebDav,
+            "cloud.example.org",
+            "/remote.php/webdav",
+        ),
         (MountSchemeV92::Afc, "iphone-device-uuid", "/DCIM"),
-        (MountSchemeV92::Mtp, "android-usb-id", "/Internal shared storage"),
+        (
+            MountSchemeV92::Mtp,
+            "android-usb-id",
+            "/Internal shared storage",
+        ),
         (MountSchemeV92::Ftp, "ftp.gnu.org", "/gnu"),
         (MountSchemeV92::Archive, "system_backup.tar.zst", "/"),
         (MountSchemeV92::Trash, "localhost", "/trash"),
@@ -250,9 +266,18 @@ fn test_policykit_authorization_engine_v92_integration() {
 #[test]
 fn test_xdg_portals_and_utilities_engine_v92_integration() {
     let mut portals = SovereignXdgPortalsUtilitiesEngineV92::new();
-    assert_eq!(portals.user_dirs.get("XDG_DESKTOP_DIR"), Some(&"$HOME/Desktop".to_string()));
-    assert_eq!(portals.user_dirs.get("XDG_DOWNLOAD_DIR"), Some(&"$HOME/Downloads".to_string()));
-    assert_eq!(portals.user_dirs.get("XDG_DOCUMENTS_DIR"), Some(&"$HOME/Documents".to_string()));
+    assert_eq!(
+        portals.user_dirs.get("XDG_DESKTOP_DIR"),
+        Some(&"$HOME/Desktop".to_string())
+    );
+    assert_eq!(
+        portals.user_dirs.get("XDG_DOWNLOAD_DIR"),
+        Some(&"$HOME/Downloads".to_string())
+    );
+    assert_eq!(
+        portals.user_dirs.get("XDG_DOCUMENTS_DIR"),
+        Some(&"$HOME/Documents".to_string())
+    );
 
     // portals.conf parser
     let portals_conf = r#"
@@ -263,9 +288,14 @@ fn test_xdg_portals_and_utilities_engine_v92_integration() {
     "#;
     let conf_count = portals.parse_portals_conf(portals_conf);
     assert_eq!(conf_count, 3);
-    assert_eq!(portals.portals_config.get("default"), Some(&"gtk;hyprland".to_string()));
     assert_eq!(
-        portals.portals_config.get("org.freedesktop.impl.portal.FileChooser"),
+        portals.portals_config.get("default"),
+        Some(&"gtk;hyprland".to_string())
+    );
+    assert_eq!(
+        portals
+            .portals_config
+            .get("org.freedesktop.impl.portal.FileChooser"),
         Some(&"gtk".to_string())
     );
 
@@ -278,12 +308,22 @@ fn test_xdg_portals_and_utilities_engine_v92_integration() {
     "#;
     let dirs_count = portals.parse_user_dirs(user_dirs_conf);
     assert_eq!(dirs_count, 3);
-    assert_eq!(portals.user_dirs.get("XDG_MUSIC_DIR"), Some(&"$HOME/Music".to_string()));
-    assert_eq!(portals.user_dirs.get("XDG_PICTURES_DIR"), Some(&"$HOME/Pictures".to_string()));
-    assert_eq!(portals.user_dirs.get("XDG_VIDEOS_DIR"), Some(&"$HOME/Videos".to_string()));
+    assert_eq!(
+        portals.user_dirs.get("XDG_MUSIC_DIR"),
+        Some(&"$HOME/Music".to_string())
+    );
+    assert_eq!(
+        portals.user_dirs.get("XDG_PICTURES_DIR"),
+        Some(&"$HOME/Pictures".to_string())
+    );
+    assert_eq!(
+        portals.user_dirs.get("XDG_VIDEOS_DIR"),
+        Some(&"$HOME/Videos".to_string())
+    );
 
     let uri_handler = portals.open_uri_handler("mailto:admin@sigmaos.org");
-    assert!(uri_handler.contains("Launching browser or default handler for URI: mailto:admin@sigmaos.org"));
+    assert!(uri_handler
+        .contains("Launching browser or default handler for URI: mailto:admin@sigmaos.org"));
 }
 
 #[test]
@@ -295,9 +335,13 @@ fn test_font_text_layout_engine_v92_integration() {
 
     let xml = font_engine.generate_fontconfig_xml();
     assert!(xml.contains("<?xml version=\"1.0\"?>"));
-    assert!(xml.contains("<edit name=\"hintstyle\" mode=\"assign\"><const>hintslight</const></edit>"));
+    assert!(
+        xml.contains("<edit name=\"hintstyle\" mode=\"assign\"><const>hintslight</const></edit>")
+    );
     assert!(xml.contains("<edit name=\"rgba\" mode=\"assign\"><const>rgb</const></edit>"));
-    assert!(xml.contains("<edit name=\"lcdfilter\" mode=\"assign\"><const>lcddefault</const></edit>"));
+    assert!(
+        xml.contains("<edit name=\"lcdfilter\" mode=\"assign\"><const>lcddefault</const></edit>")
+    );
 
     let shaped = font_engine.shape_harfbuzz_text("SigmaOS v92", "Latn");
     assert_eq!(shaped.len(), 11);
@@ -333,7 +377,13 @@ fn test_notification_daemon_engine_v92_integration() {
     let mut daemon = SovereignNotificationDaemonEngineV92::new();
     assert!(daemon.sound_feedback_enabled);
 
-    let n1 = daemon.notify("Browser", "Download Complete", "sigmaos_install.iso finished.", 1, 5000);
+    let n1 = daemon.notify(
+        "Browser",
+        "Download Complete",
+        "sigmaos_install.iso finished.",
+        1,
+        5000,
+    );
     let n2 = daemon.notify("Battery", "Battery Low", "15% remaining", 2, 0);
     assert_eq!(n1, 1);
     assert_eq!(n2, 2);
