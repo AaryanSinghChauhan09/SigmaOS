@@ -10,6 +10,16 @@ Summary of changes proposed in this Pull Request.
 - [x] Tested locally with `./run_sigma_tests.sh`
 - [x] Follows #![no_std] / alloc architecture conventions
 
+## Storage component
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+- Double-completion prevented
+- Resource limits enforced
+
 <!--
 ### I/O Subsystem Verification (if applicable)
 - I/O component: Verification details
