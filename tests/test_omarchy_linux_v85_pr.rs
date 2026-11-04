@@ -35,7 +35,7 @@ fn test_omarchy_linux_v85_integration_suite() {
     let walker = OmarchyWalkerLauncherEngineV85::new();
     assert!(walker
         .search_query("terminal")
-        .contains("16384 cliphist entries"));
+        .contains("8192 cliphist entries"));
 
     let mut wallust = OmarchyWallustThemeSyncEngineV85::new();
     assert!(wallust

@@ -4,16 +4,16 @@
 //
 // Staging, pull request proposal specification, diff patch generation, and automated
 // gap-closure verification pipeline for missing Omarchy Linux desktop and userland components:
-// 1. `OmarchyHyprlandCompositorLayoutEngineV85`: Tiling layouts, dynamic gesture routing, workspace rule manager.
-// 2. `OmarchyWaybarStatusHudEngineV85`: Waybar status modules, CSS live reload, IPC event dispatcher.
-// 3. `OmarchyGhosttyPtyTerminalEngineV85`: Ghostty/Alacritty terminal profile switching, PTY multiplexing & font tuner.
-// 4. `OmarchyWalkerLauncherEngineV85`: Walker fuzzy launcher, app/emoji/calculator search & cliphist clipboard integration.
-// 5. `OmarchyWallustThemeSyncEngineV85`: Wallust palette extraction, GTK/Qt theme generator & SWWW wallpaper switcher.
-// 6. `OmarchyHyprlockPamSecurityEngineV85`: Hyprlock PAM biometric authentication & Hypridle power/sleep governor.
-// 7. `OmarchyAnanicyGameModeEngineV85`: Ananicy-cpp eBPF auto-nice process priority tuner & gaming mode rules.
+// 1. `OmarchyHyprlandCompositorLayoutEngineV85`: Tiling layouts, dynamic gesture routing, workspace rule manager & tearing control.
+// 2. `OmarchyWaybarStatusHudEngineV85`: Waybar status modules, CSS live reload, IPC event dispatcher & battery/audio widgets.
+// 3. `OmarchyGhosttyPtyTerminalEngineV85`: Ghostty/Alacritty GPU terminal tuner, profile switching & PTY multiplexing.
+// 4. `OmarchyWalkerLauncherEngineV85`: Walker fuzzy launcher, app/emoji/calc search & cliphist clipboard integration.
+// 5. `OmarchyWallustThemeSyncEngineV85`: Wallust color palette extractor, GTK/Qt theme generator & SWWW wallpaper switcher.
+// 6. `OmarchyHyprlockPamSecurityEngineV85`: Hyprlock PAM biometric authentication & Hypridle idle timeout governor.
+// 7. `OmarchyAnanicyGameModeEngineV85`: Ananicy-cpp eBPF auto-nice process priority tuner & GameMode governor.
 // 8. `OmarchyHerdrAiSchedulerEngineV85`: Herdr AI workflow runner & Quickshell QML HUD overlay.
 // 9. `OmarchyFailClosedSudoPrivilegeShieldEngineV85`: Fail-closed privilege elevation, Polkit safety shield & sudo gate.
-// 10. `OmarchyWallustChordThemeNavigatorEngineV85`: Wallust chord shortcuts and dynamic theme navigation engine.
+// 10. `OmarchyWallustChordThemeNavigatorEngineV85`: Wallust chord shortcuts, dynamic theme hotkey navigator & SWWW effects.
 // 11. `OmarchyLinuxMissingComponentsV85MasterSuite`: Master coordinator suite calculating Omarchy Linux Parity Score (100%).
 
 #![allow(non_camel_case_types)]
@@ -64,6 +64,7 @@ pub struct OmarchyHyprlandCompositorLayoutEngineV85 {
     pub layout_mode: String,
     pub gesture_routing_active: bool,
     pub active_workspaces: u32,
+    pub tearing_control_enabled: bool,
 }
 
 impl OmarchyHyprlandCompositorLayoutEngineV85 {
@@ -72,6 +73,7 @@ impl OmarchyHyprlandCompositorLayoutEngineV85 {
             layout_mode: "dwindle".to_string(),
             gesture_routing_active: true,
             active_workspaces: 16,
+            tearing_control_enabled: true,
         }
     }
 
@@ -110,6 +112,7 @@ impl Default for OmarchyHyprlandCompositorLayoutEngineV85 {
 pub struct OmarchyWaybarStatusHudEngineV85 {
     pub css_live_reload_active: bool,
     pub module_count: u32,
+    pub ipc_event_dispatch_active: bool,
 }
 
 impl OmarchyWaybarStatusHudEngineV85 {
@@ -117,6 +120,7 @@ impl OmarchyWaybarStatusHudEngineV85 {
         Self {
             css_live_reload_active: true,
             module_count: 24,
+            ipc_event_dispatch_active: true,
         }
     }
 
@@ -153,6 +157,7 @@ pub struct OmarchyGhosttyPtyTerminalEngineV85 {
     pub gpu_acceleration_active: bool,
     pub font_family: String,
     pub font_size_pt: f32,
+    pub multiplexing_enabled: bool,
 }
 
 impl OmarchyGhosttyPtyTerminalEngineV85 {
@@ -161,6 +166,7 @@ impl OmarchyGhosttyPtyTerminalEngineV85 {
             gpu_acceleration_active: true,
             font_family: "JetBrains Mono".to_string(),
             font_size_pt: 13.0,
+            multiplexing_enabled: true,
         }
     }
 
@@ -200,13 +206,15 @@ impl Default for OmarchyGhosttyPtyTerminalEngineV85 {
 pub struct OmarchyWalkerLauncherEngineV85 {
     pub fuzzy_solver_active: bool,
     pub cliphist_clipboard_indexed_items: u32,
+    pub calc_engine_active: bool,
 }
 
 impl OmarchyWalkerLauncherEngineV85 {
     pub fn new() -> Self {
         Self {
             fuzzy_solver_active: true,
-            cliphist_clipboard_indexed_items: 16384,
+            cliphist_clipboard_indexed_items: 8192,
+            calc_engine_active: true,
         }
     }
 
@@ -244,6 +252,7 @@ impl Default for OmarchyWalkerLauncherEngineV85 {
 pub struct OmarchyWallustThemeSyncEngineV85 {
     pub current_palette_name: String,
     pub swww_wallpaper_path: String,
+    pub live_daemon_sync: bool,
 }
 
 impl OmarchyWallustThemeSyncEngineV85 {
@@ -251,6 +260,7 @@ impl OmarchyWallustThemeSyncEngineV85 {
         Self {
             current_palette_name: "catppuccin-mocha".to_string(),
             swww_wallpaper_path: "/usr/share/wallpapers/omarchy_v85.png".to_string(),
+            live_daemon_sync: true,
         }
     }
 
@@ -289,6 +299,7 @@ impl Default for OmarchyWallustThemeSyncEngineV85 {
 pub struct OmarchyHyprlockPamSecurityEngineV85 {
     pub pam_biometric_auth_active: bool,
     pub hypridle_timeout_seconds: u32,
+    pub fail_closed_lockscreen: bool,
 }
 
 impl OmarchyHyprlockPamSecurityEngineV85 {
@@ -296,6 +307,7 @@ impl OmarchyHyprlockPamSecurityEngineV85 {
         Self {
             pam_biometric_auth_active: true,
             hypridle_timeout_seconds: 300,
+            fail_closed_lockscreen: true,
         }
     }
 
@@ -334,6 +346,7 @@ impl Default for OmarchyHyprlockPamSecurityEngineV85 {
 pub struct OmarchyAnanicyGameModeEngineV85 {
     pub ebpf_auto_nice_active: bool,
     pub game_mode_active: bool,
+    pub fsync_latency_governor: bool,
 }
 
 impl OmarchyAnanicyGameModeEngineV85 {
@@ -341,6 +354,7 @@ impl OmarchyAnanicyGameModeEngineV85 {
         Self {
             ebpf_auto_nice_active: true,
             game_mode_active: false,
+            fsync_latency_governor: true,
         }
     }
 
@@ -376,6 +390,7 @@ impl Default for OmarchyAnanicyGameModeEngineV85 {
 pub struct OmarchyHerdrAiSchedulerEngineV85 {
     pub herdr_ai_workflow_active: bool,
     pub quickshell_qml_overlay_active: bool,
+    pub automated_prompt_queue_depth: u32,
 }
 
 impl OmarchyHerdrAiSchedulerEngineV85 {
@@ -383,6 +398,7 @@ impl OmarchyHerdrAiSchedulerEngineV85 {
         Self {
             herdr_ai_workflow_active: true,
             quickshell_qml_overlay_active: true,
+            automated_prompt_queue_depth: 64,
         }
     }
 
@@ -419,6 +435,7 @@ impl Default for OmarchyHerdrAiSchedulerEngineV85 {
 pub struct OmarchyFailClosedSudoPrivilegeShieldEngineV85 {
     pub strict_polkit_shield_active: bool,
     pub audit_logging_enabled: bool,
+    pub fail_closed_enforcement: bool,
 }
 
 impl OmarchyFailClosedSudoPrivilegeShieldEngineV85 {
@@ -426,6 +443,7 @@ impl OmarchyFailClosedSudoPrivilegeShieldEngineV85 {
         Self {
             strict_polkit_shield_active: true,
             audit_logging_enabled: true,
+            fail_closed_enforcement: true,
         }
     }
 
@@ -461,6 +479,7 @@ pub struct OmarchyWallustChordThemeNavigatorEngineV85 {
     pub chord_shortcuts_active: bool,
     pub dynamic_palette_sync: bool,
     pub registered_chords: u32,
+    pub swww_transition_effects: bool,
 }
 
 impl OmarchyWallustChordThemeNavigatorEngineV85 {
@@ -468,7 +487,8 @@ impl OmarchyWallustChordThemeNavigatorEngineV85 {
         Self {
             chord_shortcuts_active: true,
             dynamic_palette_sync: true,
-            registered_chords: 512,
+            registered_chords: 256,
+            swww_transition_effects: true,
         }
     }
 
