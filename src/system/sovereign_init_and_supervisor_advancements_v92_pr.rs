@@ -778,6 +778,13 @@ impl SovereignInitAndSupervisorAdvancementsV92Suite {
     pub fn new() -> Self {
         Self::default()
     }
+
+    /// Collect all PR manifests across all 7 init/supervisor advancement categories.
+    pub fn collect_all_manifests(&self) -> Vec<CoreUserlandV92Manifest> {
+        let gateway = SovereignInitAndSupervisorV92PrGatewayEngine::new();
+        let dummy_sig = [0x5au8; 64];
+        gateway.orchestrate_core_userland_v92(&dummy_sig).unwrap_or_default()
+    }
 }
 
 /// PR Gateway Engine V92 for Init and Supervisor systems.
@@ -886,7 +893,7 @@ impl SovereignInitAndSupervisorV92PrGatewayEngine {
         let mut manifests = Vec::new();
         for (i, (id, title, orig, comps, mult)) in components.into_iter().enumerate() {
             manifests.push(CoreUserlandV92Manifest {
-                pr_id: 9200 + i as u32,
+                pr_id: 9201 + i as u32,
                 pr_title: format!("PR-{}: {}", id.to_uppercase(), title),
                 target_subsystem: "System Init & Supervision V92".to_string(),
                 original_system: orig.to_string(),
