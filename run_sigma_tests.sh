@@ -1137,6 +1137,16 @@ if [ -f "src/toolchain/sovereign_toolchain_development_advancements_v79_pr.rs" ]
     ./build/test_toolchain_v79_integration
 fi
 
+if [ -f "src/toolchain/sovereign_toolchain_development_advancements_v80_pr.rs" ]; then
+    echo "Running Sovereign Toolchain and Development Advancements V80 PR test suite..."
+    mkdir -p build
+    rustc --test src/toolchain/sovereign_toolchain_development_advancements_v80_pr.rs --edition=2021 -o build/test_toolchain_v80_pr
+    ./build/test_toolchain_v80_pr
+
+    rustc --test tests/test_toolchain_development_advancements_v80_pr.rs --edition=2021 -o build/test_toolchain_v80_integration
+    ./build/test_toolchain_v80_integration
+fi
+
 if [ -f "src/automation/macro.rs" ]; then
     echo "Running Macro recorder and playback test suite..."
     mkdir -p build

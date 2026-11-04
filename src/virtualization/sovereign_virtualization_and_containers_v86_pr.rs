@@ -104,7 +104,10 @@ impl KvmQemuV86Engine {
     pub fn trigger_live_migration(&mut self, name: &str, target_host: &str) -> String {
         if let Some(vm) = self.active_vms.get_mut(name) {
             vm.state = KvmVmStateV86::Migrating;
-            format!("Live migration for VM '{}' to host '{}' initiated via QMP/io_uring ring stream", name, target_host)
+            format!(
+                "Live migration for VM '{}' to host '{}' initiated via QMP/io_uring ring stream",
+                name, target_host
+            )
         } else {
             format!("VM '{}' not found", name)
         }
@@ -139,7 +142,13 @@ impl LibvirtDomainV86Engine {
 
     pub fn parse_domain_xml(&mut self, xml_data: &str) -> LibvirtDomainSpecV86 {
         let name = if xml_data.contains("<name>") {
-            xml_data.split("<name>").nth(1).unwrap_or("default").split("</name>").next().unwrap_or("default")
+            xml_data
+                .split("<name>")
+                .nth(1)
+                .unwrap_or("default")
+                .split("</name>")
+                .next()
+                .unwrap_or("default")
         } else {
             "default-domain"
         };
@@ -158,8 +167,10 @@ impl LibvirtDomainV86Engine {
 
     pub fn generate_domain_summary(&self, name: &str) -> String {
         if let Some(dom) = self.domains.get(name) {
-            format!("<domain type='{}'><name>{}</name><memory>{}</memory><bridge>{}</bridge></domain>",
-                dom.virt_type, dom.domain_name, dom.memory_kb, dom.bridge_interface)
+            format!(
+                "<domain type='{}'><name>{}</name><memory>{}</memory><bridge>{}</bridge></domain>",
+                dom.virt_type, dom.domain_name, dom.memory_kb, dom.bridge_interface
+            )
         } else {
             "<domain>Unknown</domain>".to_string()
         }
@@ -198,7 +209,13 @@ impl XenHypervisorV86Engine {
         }
     }
 
-    pub fn create_domu_guest(&mut self, domid: u32, name: &str, mode: XenGuestModeV86, grant_frames: u32) -> XenGuestSpecV86 {
+    pub fn create_domu_guest(
+        &mut self,
+        domid: u32,
+        name: &str,
+        mode: XenGuestModeV86,
+        grant_frames: u32,
+    ) -> XenGuestSpecV86 {
         let mut xs = BTreeMap::new();
         xs.insert("name".to_string(), name.to_string());
         xs.insert("domid".to_string(), domid.to_string());
@@ -307,7 +324,12 @@ impl OciDockerPodmanRuncV86Engine {
         }
     }
 
-    pub fn run_podman_rootless(&mut self, container_id: &str, image: &str, mem_mb: u64) -> OciContainerSpecV86 {
+    pub fn run_podman_rootless(
+        &mut self,
+        container_id: &str,
+        image: &str,
+        mem_mb: u64,
+    ) -> OciContainerSpecV86 {
         let spec = OciContainerSpecV86 {
             container_id: container_id.to_string(),
             image: image.to_string(),
@@ -316,7 +338,8 @@ impl OciDockerPodmanRuncV86Engine {
             cgroups_version: "v2".to_string(),
             memory_limit_mb: mem_mb,
         };
-        self.containers.insert(container_id.to_string(), spec.clone());
+        self.containers
+            .insert(container_id.to_string(), spec.clone());
         spec
     }
 
@@ -353,7 +376,11 @@ impl LxcLxdNspawnV86Engine {
         }
     }
 
-    pub fn spawn_nspawn_chroot(&mut self, instance_name: &str, rootfs: &str) -> SystemContainerSpecV86 {
+    pub fn spawn_nspawn_chroot(
+        &mut self,
+        instance_name: &str,
+        rootfs: &str,
+    ) -> SystemContainerSpecV86 {
         let spec = SystemContainerSpecV86 {
             instance_name: instance_name.to_string(),
             engine_type: "nspawn".to_string(),
@@ -361,11 +388,16 @@ impl LxcLxdNspawnV86Engine {
             ovn_network_id: None,
             machinectl_registered: true,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 
-    pub fn create_incus_instance(&mut self, instance_name: &str, ovn_net: &str) -> SystemContainerSpecV86 {
+    pub fn create_incus_instance(
+        &mut self,
+        instance_name: &str,
+        ovn_net: &str,
+    ) -> SystemContainerSpecV86 {
         let spec = SystemContainerSpecV86 {
             instance_name: instance_name.to_string(),
             engine_type: "incus".to_string(),
@@ -373,7 +405,8 @@ impl LxcLxdNspawnV86Engine {
             ovn_network_id: Some(ovn_net.to_string()),
             machinectl_registered: false,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 }
@@ -417,14 +450,22 @@ impl FreeBsdJailsZonesV86Engine {
             name: name.to_string(),
             path: path.to_string(),
             vnet_interface: epair.to_string(),
-            rctl_rules: alloc::vec!["jail:j1:pcpu:deny=50".to_string(), "jail:j1:memoryuse:deny=2048M".to_string()],
+            rctl_rules: alloc::vec![
+                "jail:j1:pcpu:deny=50".to_string(),
+                "jail:j1:memoryuse:deny=2048M".to_string()
+            ],
             zfs_dataset_delegated: Some(format!("zpool/jails/{}", name)),
         };
         self.jails.insert(name.to_string(), jail.clone());
         jail
     }
 
-    pub fn create_illumos_zone(&mut self, name: &str, brand: &str, mem_mb: u64) -> IllumosZoneSpecV86 {
+    pub fn create_illumos_zone(
+        &mut self,
+        name: &str,
+        brand: &str,
+        mem_mb: u64,
+    ) -> IllumosZoneSpecV86 {
         let zone = IllumosZoneSpecV86 {
             name: name.to_string(),
             brand: brand.to_string(),
@@ -476,7 +517,8 @@ impl KubernetesK3sRancherV86Engine {
     }
 
     pub fn map_harvester_vm(&mut self, vm_name: &str, pod_name: &str) {
-        self.harvester_vm_mappings.insert(vm_name.to_string(), pod_name.to_string());
+        self.harvester_vm_mappings
+            .insert(vm_name.to_string(), pod_name.to_string());
     }
 }
 
@@ -505,7 +547,12 @@ impl FirecrackerCloudHypervisorV86Engine {
         }
     }
 
-    pub fn spawn_firecracker_microvm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV86 {
+    pub fn spawn_firecracker_microvm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV86 {
         let mvm = MicroVmSpecV86 {
             microvm_id: id.to_string(),
             vcpus,
@@ -518,7 +565,12 @@ impl FirecrackerCloudHypervisorV86Engine {
         mvm
     }
 
-    pub fn spawn_cloud_hypervisor_vm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV86 {
+    pub fn spawn_cloud_hypervisor_vm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV86 {
         let mvm = MicroVmSpecV86 {
             microvm_id: id.to_string(),
             vcpus,
@@ -580,7 +632,12 @@ impl GvisorKataAppleHvV86Engine {
         spec
     }
 
-    pub fn launch_apple_hv_guest(&mut self, id: &str, _mem_mb: u64, rosetta: bool) -> SecureSandboxSpecV86 {
+    pub fn launch_apple_hv_guest(
+        &mut self,
+        id: &str,
+        _mem_mb: u64,
+        rosetta: bool,
+    ) -> SecureSandboxSpecV86 {
         let spec = SecureSandboxSpecV86 {
             sandbox_id: id.to_string(),
             technology: "apple_hypervisor".to_string(),
@@ -611,7 +668,8 @@ pub struct SovereignVirtualizationAndContainersParityV86Gateway {
 }
 
 pub type VirtualBoxBhyveV86Engine = VirtualBoxBhyveVmmV86Engine;
-pub type SovereignVirtualizationAndContainersV86PrGatewayEngine = SovereignVirtualizationAndContainersParityV86Gateway;
+pub type SovereignVirtualizationAndContainersV86PrGatewayEngine =
+    SovereignVirtualizationAndContainersParityV86Gateway;
 
 impl SovereignVirtualizationAndContainersParityV86Gateway {
     pub fn new() -> Self {
@@ -746,12 +804,24 @@ impl SovereignVirtualizationAndContainersParityV86Gateway {
 
     pub fn generate_pr_markdown_summary(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut out = String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v86)\n\n");
-        out.push_str("| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier |\n");
-        out.push_str("|-------|-------|----------|--------------|-------------------|----------------|\n");
+        let mut out =
+            String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v86)\n\n");
+        out.push_str(
+            "| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier |\n",
+        );
+        out.push_str(
+            "|-------|-------|----------|--------------|-------------------|----------------|\n",
+        );
         for p in &proposals {
-            out.push_str(&format!("| PR #{} | {} | {} | {}ms | {}% | {} |\n",
-                p.pr_id, p.title, p.category, p.boot_latency_ms, p.overhead_reduction_pct, p.isolation_tier));
+            out.push_str(&format!(
+                "| PR #{} | {} | {} | {}ms | {}% | {} |\n",
+                p.pr_id,
+                p.title,
+                p.category,
+                p.boot_latency_ms,
+                p.overhead_reduction_pct,
+                p.isolation_tier
+            ));
         }
         out
     }
@@ -776,7 +846,8 @@ mod tests {
     #[test]
     fn test_libvirt_domain_v86_engine() {
         let mut engine = LibvirtDomainV86Engine::new();
-        let dom = engine.parse_domain_xml("<domain type='kvm'><name>test-domain-v86</name></domain>");
+        let dom =
+            engine.parse_domain_xml("<domain type='kvm'><name>test-domain-v86</name></domain>");
         assert_eq!(dom.domain_name, "test-domain-v86");
         assert_eq!(dom.bridge_interface, "virbr0");
 

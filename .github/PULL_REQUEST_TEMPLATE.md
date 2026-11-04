@@ -1,15 +1,48 @@
 ## Summary
 
-## Summary
+<!-- What subsystem behavior changed and why? -->
+
+## Motivation
+
+<!-- Why was this change made? -->
+
+## Implementation notes
+
+<!-- Key implementation details -->
+
+## Component
+
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] IPC handler
+- [ ] File descriptor manager
+- [ ] Inode and directory manager
+- [ ] Permission manager
+- [ ] Lock manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
+- [ ] Documentation
+- [ ] CI / tooling
+
+## Component impact
+
+- [ ] Shell component
+- [ ] File component
+- [ ] Storage component
+- [ ] I/O component
 
 ## I/O component
 
 - [ ] I/O policy
 - [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
+- [ ] DMA manager
 - [ ] Buffer manager
 - [ ] I/O scheduler
-- [ ] I/O safety review
 
 ## Storage component
 
@@ -18,34 +51,11 @@
 - [ ] Block cache manager
 - [ ] Filesystem manager
 
-## Storage safety review
+## IPC semantics
 
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## File component
-
-## Component impact
-
-## Shell component
-
-## Shell component
-
-- [ ] Lexer
-- [ ] Parser
-- [ ] Expansion
-- [ ] Executor
-- [ ] Pipelines
-- [ ] Redirection
-- [ ] Job control
-- [ ] Signals
-- [ ] Built-ins
-- [ ] Interactive line editor
-- [ ] Script runner
-- [ ] Diagnostics
-- [ ] Security / sandboxing
-- [ ] Documentation
-- [ ] CI / tooling
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
 
 ## Recurring task
 
@@ -116,7 +126,39 @@
 - [ ] `unsafe` justified
 - [ ] Classified panic diagnostics
 
-## Shell safety review
+## Tests
+
+- Unit tests
+- Integration tests
+
+## Verification
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] File benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
+
+## Security review
+
+- [ ] Capability/namespace checks enforced
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] `unsafe` justified
+
+## Safety and rollback
+
+- Double-completion prevented
+- Resource limits enforced
+
+## File safety review
 
 - [ ] Expansion order is correct
 - [ ] Quoting behavior is preserved
@@ -131,21 +173,23 @@
 - Input validation and failure behavior:
 - Rollback or downgrade path:
 
-## Verification
+## I/O safety review
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] Focused unit tests pass.
-- [ ] New/updated shell tests
-- [ ] POSIX/conformance test evidence
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Security review requested, if applicable
-- [ ] Documentation and wiki mirrors updated where applicable.
-- Test/evidence commands:
-- Results:
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## Capability status
+
+- [ ] Updated in matrix
+
+## Integration impact
+
+- [ ] Subsystem integration verified
 
 ## Capability status
 
