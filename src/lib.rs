@@ -365,6 +365,7 @@ pub use distro::freebsd_missing_components_v68_pr::*;
 pub use distro::freebsd_missing_components_v69_pr::*;
 pub use distro::freebsd_missing_components_v70_pr::*;
 pub use distro::freebsd_missing_components_v71_pr::*;
+pub use distro::freebsd_missing_components_v72_pr::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
