@@ -1,3 +1,2 @@
 # Run Queue Policy Specification
-
-Per-core bounded runqueue operations.
+Run queue specification.

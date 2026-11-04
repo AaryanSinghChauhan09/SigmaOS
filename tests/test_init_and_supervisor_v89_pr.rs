@@ -44,15 +44,15 @@ fn test_init_and_supervisor_v89_pr_integration() {
     let services = vec![
         OpenRcServiceSpecV89 {
             name: "localmount".to_string(),
-            runlevel: "default".to_string(),
+            runlevel: "boot".to_string(),
             dependencies: vec![],
-            conf_overrides: BTreeMap::new(),
+            conf_overrides: alloc::collections::BTreeMap::new(),
         },
         OpenRcServiceSpecV89 {
             name: "net".to_string(),
             runlevel: "default".to_string(),
             dependencies: vec![(OpenRcDepKindV89::Need, "localmount".to_string())],
-            conf_overrides: BTreeMap::new(),
+            conf_overrides: alloc::collections::BTreeMap::new(),
         },
     ];
     let order = openrc.solve_runlevel_execution_order(&services).unwrap();
@@ -89,6 +89,13 @@ fn test_init_and_supervisor_v89_pr_integration() {
 
     // Verify Cron Timers
     let cron = CronAnacronTimersAtV89Engine::new();
-    let parts = cron.parse_crontab_expression("*/15 * * * *").unwrap();
-    assert_eq!(parts.len(), 5);
+    let timer = SystemdTimerSpecV89 {
+        on_calendar: None,
+        on_boot_sec: Some(60),
+        on_unit_active_sec: None,
+        persistent: true,
+        accuracy_sec: 1,
+    };
+    assert!(cron.evaluate_timer_readiness(&timer, 1000, 0, 0));
+    assert!(!cron.evaluate_timer_readiness(&timer, 50, 0, 0));
 }

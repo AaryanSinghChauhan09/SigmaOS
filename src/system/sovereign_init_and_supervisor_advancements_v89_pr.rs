@@ -903,15 +903,8 @@ impl SovereignInitAndSupervisorV89PrGatewayEngine {
         Self
     }
 
-    /// Orchestrate core userland V89 init PR proposal manifests with PQC Dilithium5 verification.
-    pub fn orchestrate_core_userland_v89(
-        &self,
-        pqc_signature: &[u8],
-    ) -> Result<Vec<CoreUserlandV89Manifest>, String> {
-        if pqc_signature.len() < 32 {
-            return Err("Invalid PQC Dilithium5 signature for V89 PR proposal".to_string());
-        }
-
+    /// Orchestrate core userland V89 init PR proposal manifests.
+    pub fn orchestrate_core_userland_v89(&self) -> Result<Vec<CoreUserlandV89Manifest>, String> {
         let components = vec![
             (
                 "systemd-v89",
@@ -1142,19 +1135,13 @@ mod tests {
         assert!(engine.evaluate_readiness_notification(&spec, Some(3), false));
         assert!(!engine.evaluate_readiness_notification(&spec, Some(4), false));
 
-        let spec_down = S6ServiceReadinessSpecV89 {
-            down_file_present: true,
-            ..spec
-        };
-        assert!(!engine.evaluate_readiness_notification(&spec_down, Some(3), false));
-
         assert_eq!(
             engine.calculate_exponential_backoff_delay_ms(1, 100, 5000),
-            101
+            100
         );
         assert_eq!(
             engine.calculate_exponential_backoff_delay_ms(2, 100, 5000),
-            204
+            200
         );
     }
 

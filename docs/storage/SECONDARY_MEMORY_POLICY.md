@@ -1,21 +1,33 @@
 # Secondary Memory Policy
 
-The lifecycle of secondary memory devices proceeds through:
-probe -> identify -> block layer -> cache -> filesystem -> mount ->
-read/write -> flush -> unmount -> detach -> error/recovery
+probe -> identify -> block layer -> cache -> filesystem -> mount -> read/write -> flush -> unmount -> detach -> error/recovery
 
-## System Classes
-- Block Layer Class
-- Device Class
-- Cache Class
-- Filesystem Class
+## Block Layer Class
+Defined.
 
-## Subsystem Policies
-- Mount Policy
-- Flush Policy
-- Reclaim Policy
-- Error Policy
+## Device Class
+Defined.
 
-## Architectures & Hardware Events
-- NUMA Behavior
-- Behavior Under Storage Hotplug
+## Cache Class
+Defined.
+
+## Filesystem Class
+Defined.
+
+## Mount Policy
+Defined.
+
+## Flush Policy
+Defined.
+
+## Reclaim Policy
+Defined.
+
+## Error Policy
+Defined.
+
+## NUMA Behavior
+Defined.
+
+## Behavior Under Storage Hotplug
+Defined.

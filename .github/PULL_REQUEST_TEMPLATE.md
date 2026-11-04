@@ -2,7 +2,28 @@
 
 ## Summary
 
-<!-- What behavior changed and why? -->
+## I/O component
+
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O safety review
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## File component
 
 ## Component impact
 
@@ -141,13 +162,75 @@
 - Risk:
 - Rollback:
 
-<!--
-## I/O Subsystem Verification Checklist
-- I/O component: Verification of registered I/O drivers and peripheral devices
-- I/O policy: Strict conformance to I/O safety guidelines
-- Interrupt manager: Top-half and bottom-half interrupt handling isolation
-- DMA manager / DMA queue: Memory safety in scatter-gather DMA mappings
-- Buffer manager: LRU cache eviction and lock safety
-- I/O scheduler: Deadline and priority queue validation
-- I/O safety review: Reentrancy and race condition audits
--->
+## I/O component
+
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O policy
+- [ ] I/O safety review
+
+## Storage component
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
+## IPC handler
+
+- [ ] This change affects IPC handler behavior, or I confirm it does not.
+- IPC semantics:
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+
+## Security review
+
+- Kernel safety review:
+- Capability/namespace checks enforced:
+- Shared-memory or descriptor implications:
+- Input validation and failure behavior:
+- Rollback or downgrade path:
+
+## Verification
+
+- [ ] Focused unit tests pass.
+- [ ] ./run_sigma_tests.sh
+- [ ] Documentation and wiki mirrors updated where applicable.
+- Test/evidence commands:
+- Results:
+
+## Capability status
+
+- Current status:
+- Evidence supporting the status:
+- Claims intentionally left partial:
+
+## Integration impact
+
+- APIs, ABI, protocols, or file formats affected:
+- Cross-repository synchronization required:
+- Release or migration notes:
+
+## Shell component
+
+- [ ] Interactive shell
+- [ ] Builtins
+- [ ] Parser
+- [ ] Diagnostics
+
+## Component impact
+
+- Component/repository:
+- User-visible behavior:
+- Related issue or plan:
+
+## Shell safety review
+
+- [ ] Shell safety review complete
+- [ ] Safety and rollback
