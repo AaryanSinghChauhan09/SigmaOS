@@ -1,1 +1,0 @@
-# Word Splitting Study
