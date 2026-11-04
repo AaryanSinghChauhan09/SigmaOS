@@ -114,6 +114,7 @@ pub mod pdfcraft_missing_components_parity_pr;
 pub mod photocraft;
 pub mod photocraft_artcraft_missing_components_v65_pr;
 pub mod photocraft_artcraft_missing_components_v66_pr;
+pub mod photocraft_artcraft_missing_components_v67_pr;
 pub mod photocraft_artcraft_parity_pr;
 // pub mod photocraft_missing_components_parity_pr;
 pub mod printcraft;
@@ -317,6 +318,7 @@ pub use photocraft::{
 };
 pub use photocraft_artcraft_missing_components_v65_pr::*;
 pub use photocraft_artcraft_missing_components_v66_pr::*;
+pub use photocraft_artcraft_missing_components_v67_pr::*;
 pub use photocraft_artcraft_parity_pr::*;
 pub use printcraft::*;
 pub use printcraft_artcraft_parity_pr::*;
