@@ -186,48 +186,12 @@
 
 ## I/O component
 
+- [ ] I/O policy
 - [ ] Interrupt manager
 - [ ] DMA manager
 - [ ] Buffer manager
 - [ ] I/O scheduler
-- [ ] I/O policy
 
 ## I/O safety review
 
-- [ ] 10-stage lifecycle transitions are valid
-- [ ] Double DMA prevented
-- [ ] Buffer dirty eviction safe
-
-## Storage component
-
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
-## IPC handler
-- [ ] IPC semantics
-- [ ] Blocking behavior:
-- [ ] Non-blocking behavior:
-- [ ] EOF / closure behavior:
-
-## Security review
-- [ ] Capability/namespace checks enforced
-
-## Verification
-- [ ] ./run_sigma_tests.sh
-- [ ] Capability status
-- [ ] Integration impact
-
-## Shell component
-- [ ] Parser
-- [ ] Builtins
-- [ ] Expansion
-
-## Shell safety review
-- [ ] Quoting integrity
+- [ ] I/O safety review
