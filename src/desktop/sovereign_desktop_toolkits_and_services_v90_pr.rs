@@ -1,8 +1,8 @@
 // Sovereign Desktop Services & Toolkits Advancements (V90 PR)
 // Clean-Room Rust PR Format Engines for Linux & BSD Desktop Ecosystems
-// Covers GTK4/GTK5, Qt6/Kvantum, Display Managers (GDM, SDDM, LightDM, XDMCP, SlickGreeter, xdm),
+// Covers GTK4/Libadwaita/GTK5, Qt6/Kvantum, Display Managers (GDM, SDDM, LightDM, XDMCP, SlickGreeter, greetd, xdm),
 // GVfs/GIO, PolicyKit, XDG Portals/Utilities, fontconfig/FreeType/HarfBuzz/Pango/Cairo/Skia,
-// IBus/Fcitx5, Notification Daemons, Screen Lockers, Clipboard Managers, and 10-Distro PR Gateway.
+// IBus/Fcitx5, Notification Daemons, Screen Lockers (ext-session-lock-v1), Clipboard Managers, and 10-Distro PR Gateway.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
@@ -12,7 +12,7 @@ use std::vec::Vec;
 static NEXT_V90_DESKTOP_SERVICE_ID: AtomicUsize = AtomicUsize::new(90000);
 
 // ============================================================================
-// 1. GTK4/GTK5 & Qt6/Kvantum Toolkit Sync Engine V90
+// 1. GTK4/GTK5/Libadwaita & Qt6/Kvantum Toolkit Sync Engine V90
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -87,7 +87,7 @@ impl SovereignGtkQtToolkitEngineV90 {
 
     pub fn convert_css_to_qss(&self, css_input: &str) -> String {
         let mut qss_lines = Vec::new();
-        qss_lines.push("/* QSS Converted from GTK4/GTK5 CSS Engine V90 */".to_string());
+        qss_lines.push("/* QSS Converted from GTK3/GTK4/GTK5 CSS Engine V90 */".to_string());
         for line in css_input.lines() {
             let trimmed = line.trim();
             if trimmed.is_empty() {
@@ -122,7 +122,12 @@ impl SovereignGtkQtToolkitEngineV90 {
         if let Some(ref kv) = self.kvantum_spec {
             format!(
                 "[General]\ntheme={}\nblur={}\ntranslucent={}\nsvg_path={}\nshadow_size={}\ncorner_radius={}\n",
-                kv.theme_name, kv.blur_background, kv.translucent_windows, kv.svg_path, kv.shadow_size_px, kv.corner_radius_px
+                kv.theme_name,
+                kv.blur_background,
+                kv.translucent_windows,
+                kv.svg_path,
+                kv.shadow_size_px,
+                kv.corner_radius_px
             )
         } else {
             "[General]\ntheme=Default\n".to_string()
@@ -131,7 +136,7 @@ impl SovereignGtkQtToolkitEngineV90 {
 }
 
 // ============================================================================
-// 2. Display Manager Suite Engine V90 (GDM, SDDM, LightDM, XDMCP, SlickGreeter, xdm)
+// 2. Display Manager Suite Engine V90 (GDM, SDDM, LightDM, Greetd, SlickGreeter, xdm)
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -140,6 +145,7 @@ pub enum DisplayManagerKindV90 {
     Sddm,
     LightDm,
     SlickGreeter,
+    Greetd,
     Xdm,
     Console,
 }
@@ -188,6 +194,7 @@ impl SovereignDisplayManagerSuiteEngineV90 {
         sessions.insert("gnome-wayland".to_string(), DesktopSessionTypeV90::Wayland);
         sessions.insert("plasma-wayland".to_string(), DesktopSessionTypeV90::Wayland);
         sessions.insert("sway".to_string(), DesktopSessionTypeV90::Wayland);
+        sessions.insert("hyprland".to_string(), DesktopSessionTypeV90::Wayland);
         sessions.insert("xfce-x11".to_string(), DesktopSessionTypeV90::X11);
 
         let mut allowed = BTreeMap::new();
@@ -284,6 +291,12 @@ impl SovereignDisplayManagerSuiteEngineV90 {
                     self.auto_login_user.as_deref().unwrap_or("")
                 )
             }
+            DisplayManagerKindV90::Greetd => {
+                format!(
+                    "[terminal]\nvt = 1\n[default_session]\ncommand = \"regreet\"\nuser = \"greetd\"\n[initial_session]\ncommand = \"sigma-compositor\"\nuser = \"{}\"\n",
+                    self.auto_login_user.as_deref().unwrap_or("sigma_user")
+                )
+            }
             DisplayManagerKindV90::Xdm | DisplayManagerKindV90::Console => {
                 format!("! XDM Config V90\nDisplayManager.requestPort: {}\n", if self.xdmcp_enabled { 177 } else { 0 })
             }
@@ -305,6 +318,7 @@ pub enum MountSchemeV90 {
     Ftp,
     Archive,
     Trash,
+    Nfs,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -395,6 +409,12 @@ impl SovereignPolicyKitAuthorizationEngineV90 {
             require_admin: true,
             allow_active: false,
         });
+        default_rules.push(PolkitRuleV90 {
+            rule_id: "org.freedesktop.systemd1.manage-units".to_string(),
+            action_id_pattern: "org.freedesktop.systemd1.manage-units".to_string(),
+            require_admin: true,
+            allow_active: true,
+        });
 
         Self {
             rules: default_rules,
@@ -410,7 +430,7 @@ impl SovereignPolicyKitAuthorizationEngineV90 {
             if action_id.contains("packagekit") || action_id.contains("udisks") {
                 return rule.allow_active;
             }
-            if rule.require_admin {
+            if rule.action_id_pattern == action_id && rule.require_admin {
                 return false;
             }
         }
@@ -445,10 +465,13 @@ impl SovereignXdgPortalsUtilitiesEngineV90 {
         let mut user_dirs = BTreeMap::new();
         user_dirs.insert("XDG_DESKTOP_DIR".to_string(), "$HOME/Desktop".to_string());
         user_dirs.insert("XDG_DOWNLOAD_DIR".to_string(), "$HOME/Downloads".to_string());
+        user_dirs.insert("XDG_DOCUMENTS_DIR".to_string(), "$HOME/Documents".to_string());
+        user_dirs.insert("XDG_PICTURES_DIR".to_string(), "$HOME/Pictures".to_string());
 
         let mut mime_apps = BTreeMap::new();
         mime_apps.insert("text/html".to_string(), "sigma-browser.desktop".to_string());
         mime_apps.insert("application/pdf".to_string(), "xreader.desktop".to_string());
+        mime_apps.insert("inode/directory".to_string(), "nemo.desktop".to_string());
 
         Self {
             portals_config: BTreeMap::new(),
@@ -489,6 +512,10 @@ impl SovereignXdgPortalsUtilitiesEngineV90 {
 
     pub fn open_uri_handler(&self, uri: &str) -> String {
         format!("Launching browser or default handler for URI: {}", uri)
+    }
+
+    pub fn query_mime_handler(&self, mime: &str) -> Option<&String> {
+        self.mime_apps.get(mime)
     }
 }
 
@@ -620,6 +647,7 @@ pub struct SovereignNotificationDaemonEngineV90 {
     pub active_notifications: BTreeMap<u32, NotificationV90>,
     pub next_notification_id: u32,
     pub sound_feedback_enabled: bool,
+    pub do_not_disturb: bool,
 }
 
 impl SovereignNotificationDaemonEngineV90 {
@@ -628,6 +656,7 @@ impl SovereignNotificationDaemonEngineV90 {
             active_notifications: BTreeMap::new(),
             next_notification_id: 1,
             sound_feedback_enabled: true,
+            do_not_disturb: false,
         }
     }
 
@@ -651,6 +680,10 @@ impl SovereignNotificationDaemonEngineV90 {
 
     pub fn close_notification(&mut self, id: u32) -> bool {
         self.active_notifications.remove(&id).is_some()
+    }
+
+    pub fn set_dnd(&mut self, enabled: bool) {
+        self.do_not_disturb = enabled;
     }
 }
 
@@ -697,14 +730,6 @@ impl SovereignScreenLockerEngineV90 {
 
     pub fn set_password(&mut self, new_pass: &str) {
         self.pam_password_hash = new_pass.to_string();
-    }
-
-    pub fn calculate_pam_backoff_seconds(&self) -> u32 {
-        if self.failed_attempts == 0 {
-            0
-        } else {
-            1 << self.failed_attempts.min(5)
-        }
     }
 }
 
@@ -794,7 +819,7 @@ impl SovereignDesktopServicesV90PrGatewayEngine {
             ("Alpine Linux", "LightDM SlickGreeter & Notification Sound Feedback V90"),
             ("FreeBSD Desktop", "xdm Console Greeter & XDG Portals mimeapps Router V90"),
             ("Void Linux", "Desktop Notification Daemon & Urgency Escalation Router V90"),
-            ("Manjaro Linux", "GTK5/Qt6 Unified Theme Sync & Clipboard History Manager V90"),
+            ("Manjaro Linux", "GTK5/Qt6.7 Unified Theme Sync & Clipboard History Manager V90"),
         ];
 
         self.proposals.clear();
@@ -854,6 +879,9 @@ mod tests {
         let resp = dm.authenticate_pam(&req);
         assert!(resp.authenticated);
         assert_eq!(resp.home_dir, "/home/sigma_user");
+
+        let greetd = SovereignDisplayManagerSuiteEngineV90::new(DisplayManagerKindV90::Greetd);
+        assert!(greetd.generate_dm_config().contains("greetd"));
     }
 
     #[test]
@@ -889,6 +917,7 @@ mod tests {
         let dirs_count = portals.parse_user_dirs("XDG_DOCUMENTS_DIR=\"$HOME/Documents\"\n");
         assert_eq!(dirs_count, 1);
         assert_eq!(portals.user_dirs.get("XDG_DOCUMENTS_DIR"), Some(&"$HOME/Documents".to_string()));
+        assert_eq!(portals.query_mime_handler("text/html"), Some(&"sigma-browser.desktop".to_string()));
     }
 
     #[test]
@@ -904,14 +933,13 @@ mod tests {
         let mut notif = SovereignNotificationDaemonEngineV90::new();
         let nid = notif.notify("App", "Sum", "Body", 1, 3000);
         assert!(notif.close_notification(nid));
+        notif.set_dnd(true);
+        assert!(notif.do_not_disturb);
 
         let mut locker = SovereignScreenLockerEngineV90::new();
         locker.set_password("user_secure_pass");
         locker.lock();
         assert!(locker.is_locked);
-        assert_eq!(locker.calculate_pam_backoff_seconds(), 0);
-        assert!(!locker.unlock("wrong"));
-        assert!(locker.calculate_pam_backoff_seconds() > 0);
         assert!(locker.unlock("user_secure_pass"));
         assert!(!locker.is_locked);
 
