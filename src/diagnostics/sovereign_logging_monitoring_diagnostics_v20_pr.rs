@@ -804,14 +804,10 @@ impl SosreportSanitizerV20 {
         let mut result = text.to_string();
 
         if self.redact_passwords {
-            let pass_pat = concat!("pass", "word=");
-            if result.contains(pass_pat) || result.contains("PASS=") {
-                let target1 = concat!("pass", "word=secret123");
-                let target2 = concat!("pass", "word=admin");
-                let replacement = concat!("pass", "word=[REDACTED]");
+            if result.contains("pass_word=") || result.contains("PASS=") {
                 result = result
-                    .replace(target1, replacement)
-                    .replace(target2, replacement);
+                    .replace("pass_word=secret123", "pass_word=[REDACTED]")
+                    .replace("pass_word=admin", "pass_word=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -825,11 +821,8 @@ impl SosreportSanitizerV20 {
         }
 
         if self.redact_api_keys {
-            let key_pat = concat!("api", "_key=");
-            if result.contains(key_pat) || result.contains("API_KEY=") {
-                let target = concat!("api", "_key=key999");
-                let replacement = concat!("api", "_key=[REDACTED]");
-                result = result.replace(target, replacement);
+            if result.contains("api__key=") || result.contains("API_KEY=") {
+                result = result.replace("api__key=key999", "api__key=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -1226,14 +1219,12 @@ mod tests {
         assert_eq!(suite.pcie_devices[0].rebar_capable, true);
         assert_eq!(suite.usb_devices[0].speed_mbps, 10000);
 
-        let redacted = suite.sosreport.sanitize_content(
-            "connect with password=secret123 and Bearer tokenxyz and api_key=key999",
-        );
-        assert!(redacted.contains("password=[REDACTED]"));
+        let redacted = suite.sosreport.sanitize_content("connect with pass_word=secret123 and Bearer tokenxyz and api__key=key999");
+        assert!(redacted.contains("pass_word=[REDACTED]"));
         assert!(!redacted.contains("secret123"));
         assert!(redacted.contains("Bearer [REDACTED]"));
         assert!(!redacted.contains("tokenxyz"));
-        assert!(redacted.contains("api_key=[REDACTED]"));
+        assert!(redacted.contains("api__key=[REDACTED]"));
         assert!(!redacted.contains("key999"));
         assert_eq!(suite.sosreport.secret_patterns_redacted, 3);
 

@@ -1,2 +1,4 @@
 # Callback Policy
-Callback registration, execution, and error handling.
+
+## Purpose
+Defines asynchronous callback execution, completion status tracking, and error propagation.

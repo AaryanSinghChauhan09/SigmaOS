@@ -1,2 +1,4 @@
 # I/O Scheduler Policy
-I/O scheduling policies and queue dispatch rules.
+
+## Purpose
+Specifies priority queues, real-time requests, queue bounds, and FIFO / elevator dispatching.

@@ -1,2 +1,4 @@
 # Interrupt Policy
-Rules and requirements for interrupt handling.
+
+## Purpose
+Defines IRQ registration, top-half/bottom-half handling, and spurious interrupt detection.

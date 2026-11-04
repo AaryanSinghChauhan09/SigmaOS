@@ -1,2 +1,4 @@
 # DMA Policy
-DMA operations and safety rules.
+
+## Purpose
+Governs scatter-gather list validation, DMA mapping directions, and double-completion prevention.
