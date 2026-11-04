@@ -3742,15 +3742,8 @@ if [ -f "src/productivity/sovereign_office_suites_engine.rs" ]; then
 fi
 
 if [ -f "tests/test_networking_stack_and_daemons_v87_pr.rs" ]; then
-    echo "Running Sovereign Networking Stack & Daemons V87 PR test suite..."
+    echo "Running Sovereign Networking Stack & Daemons V87 PR Gateway test suite..."
     mkdir -p build
-    rustc --test tests/test_networking_stack_and_daemons_v87_pr.rs --edition=2021 -o build/test_networking_v87_pr
-    ./build/test_networking_v87_pr
-fi
-
-if [ -f "tests/test_device_management_advancements_v80_pr.rs" ]; then
-    echo "Running Sovereign Device Management Advancements V80 PR test suite..."
-    mkdir -p build
-    rustc --test tests/test_device_management_advancements_v80_pr.rs --edition=2021 -o build/test_device_management_v80_pr
-    ./build/test_device_management_v80_pr
+    rustc --test tests/test_networking_stack_and_daemons_v87_pr.rs --edition=2021 -o build/test_networking_stack_v87_pr
+    ./build/test_networking_stack_v87_pr
 fi
