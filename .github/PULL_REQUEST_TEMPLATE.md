@@ -89,3 +89,12 @@
 - [x] Buffer manager integration verified
 - [x] I/O scheduler lifecycle tested
 - [x] I/O safety review approved
+
+## Storage component
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+## Storage safety review
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced

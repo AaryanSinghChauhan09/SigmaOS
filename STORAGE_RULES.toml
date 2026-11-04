@@ -1,0 +1,20 @@
+[rule.storage_completeness]
+status = "enforced"
+
+[rule.no_leak]
+status = "enforced"
+
+[rule.oom_metric]
+status = "enforced"
+
+[rule.mount_integrity]
+status = "enforced"
+
+[rule.cache_semantics]
+status = "enforced"
+
+[rule.no_model_only_status]
+status = "enforced"
+
+[rule.runtime_evidence]
+status = "enforced"
