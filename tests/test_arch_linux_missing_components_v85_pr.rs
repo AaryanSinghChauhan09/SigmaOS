@@ -48,16 +48,21 @@ fn test_arch_linux_v85_pr_engines_and_suite() {
 
     let modprobed = ArchModprobedDbTrimmerEngineV85::new();
     assert_eq!(modprobed.kernel_modules_count, 1024);
+    assert!(modprobed.trim_unused);
 
     let conflict = ArchPacmanFileConflictResolverEngineV85::new();
     assert!(conflict.resolve_orphans);
+    assert!(!conflict.overwrite_allowed);
 
     let supervisor = ArchSystemdServiceSupervisorEngineV85::new();
     assert!(supervisor.auto_restart);
+    assert_eq!(supervisor.tracked_services, 128);
 
     let yay = ArchYayAstDependencySolverEngineV85::new();
     assert_eq!(yay.parallel_download_threads, 16);
+    assert!(yay.aur_comments_filter);
 
     let uki = ArchMkinitcpioSystemdUkiEngineV85::new();
+    assert!(uki.microcode_stubs);
     assert!(uki.unified_kernel_image);
 }

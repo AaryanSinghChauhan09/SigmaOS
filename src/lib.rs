@@ -878,6 +878,8 @@ pub use crate::distro::omarchy_linux_missing_components_v74_pr::*;
 pub use crate::distro::arch_linux_missing_components_v82_pr::*;
 pub use crate::distro::arch_linux_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_and_arch_missing_components_v84_pr::*;
+pub use crate::distro::arch_linux_missing_components_v85_pr::*;
+pub use crate::distro::open_source_os_and_arch_missing_components_v85_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v78_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v82_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v83_pr::*;
@@ -942,6 +944,8 @@ pub use crate::distro::debian_github_repo_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v84_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v85_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v85_pr::*;
+pub use crate::distro::debian_github_repo_missing_components_v86_pr::*;
+pub use crate::distro::open_source_os_debian_unimplemented_ideas_v86_pr::*;
 
 pub mod screen;
 pub mod software_manager;

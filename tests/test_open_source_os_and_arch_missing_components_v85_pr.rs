@@ -20,12 +20,12 @@ use arch_linux_missing_components_v85_pr::SovereignArchLinuxMissingComponentsV85
 
 #[test]
 fn test_v85_open_source_os_and_arch_missing_components_pr_suite() {
-    // 1. Verify Open Source OS Suite (9 manifests)
+    // 1. Verify Open Source OS Suite (via V84 suite)
     let os_suite = SovereignUnimplementedIdeasSuiteV84::new();
     let os_proposals = os_suite.collect_all_manifests();
     assert_eq!(os_proposals.len(), 9);
 
-    // 2. Verify Arch Linux V85 Suite (12 PR engines)
+    // 2. Verify Arch Linux V85 Suite
     let arch_suite = SovereignArchLinuxMissingComponentsV85PrSuite::new();
     let arch_prs = arch_suite.execute_full_v85_arch_pipeline();
     assert_eq!(arch_prs.len(), 12);

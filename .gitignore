@@ -81,3 +81,11 @@ __pycache__/
 !docs/io/*.md
 !docs/filesystem/
 !docs/filesystem/*.md
+!docs/SIGMAOS_GUI_DEVELOPMENT_PLAN.md
+!wiki/30-SigmaOS-GUI-Development-Plan.md
+!docs/PHYSICAL_MEMORY_MANAGER_PLAN.md
+!wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md
+!docs/PROCESS_MANAGER_PLAN.md
+!wiki/PROCESS_MANAGER_PLAN.md
+!docs/PROCESS_SYNCHRONIZATION_PLAN.md
+!wiki/PROCESS_SYNCHRONIZATION_PLAN.md
