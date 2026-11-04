@@ -2,27 +2,6 @@
 
 <!-- What file-management behavior changed and why? -->
 
-## I/O component
-
-- [ ] I/O policy
-- [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] I/O safety review
-
-## Storage component
-
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-
 ## File component
 
 - [ ] File descriptor manager
@@ -102,21 +81,34 @@
 - Risk:
 - Rollback:
 
-## I/O component
+## Component
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
 
+## Motivation
+
+## Implementation notes
+
+## Tests
+
+## Verification
+- cargo check --lib
+- cargo test --lib
+- ./run_sigma_tests.sh
+
+## Capability status
+
+## Integration impact
+
+## I/O component
+- [ ] I/O policy
 - [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
+- [ ] DMA manager
 - [ ] Buffer manager
 - [ ] I/O scheduler
-- [ ] I/O policy
 - [ ] I/O safety review
 
-## Storage component
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
+## Reviewer checklist
+- [ ] Scope is narrow
+- [ ] `unsafe` justified

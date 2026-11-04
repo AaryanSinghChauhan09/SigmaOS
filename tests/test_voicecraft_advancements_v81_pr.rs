@@ -16,11 +16,7 @@ fn test_voicecraft_v81_master_suite_integration() {
     );
 
     let manifests = master_suite.generate_all_manifests();
-    assert_eq!(
-        manifests.len(),
-        5,
-        "Expected 5 PR manifests in VoiceCraft V81 suite"
-    );
+    assert_eq!(manifests.len(), 5, "Expected 5 PR manifests in VoiceCraft V81 suite");
 
     let pr_titles = [
         "feat(voicecraft): Optimal Transport Continuous Flow Matching Acoustic Mel Synthesizer V81",
@@ -36,8 +32,7 @@ fn test_voicecraft_v81_master_suite_integration() {
     }
 
     let markdown = master_suite.export_pr_manifest_markdown();
-    assert!(markdown
-        .contains("# VoiceCraft V81 Zero-Shot Speech Synthesis & Audio DSP Advancements PR Suite"));
+    assert!(markdown.contains("# VoiceCraft V81 Zero-Shot Speech Synthesis & Audio DSP Advancements PR Suite"));
     assert!(markdown.contains("PR #8101"));
     assert!(markdown.contains("PR #8105"));
 
