@@ -17,8 +17,7 @@ fn test_integration_networking_stack_and_daemons_v88_suite() {
     assert_eq!(proposals[6].pr_id, 8167);
 
     let summary = gateway.generate_master_pr_summary();
-    assert!(summary
-        .contains("Sovereign Linux & BSD Networking Stack & Control Daemons Parity Suite (v88)"));
+    assert!(summary.contains("Sovereign Linux & BSD Networking Stack & Control Daemons Parity Suite (v88)"));
     assert!(summary.contains("PR #8161"));
     assert!(summary.contains("PR #8167"));
 }
@@ -43,53 +42,46 @@ fn test_integration_sub_engines_v88() {
     gateway.core_tcpip.register_connection(conn);
     let pacing = gateway.core_tcpip.evaluate_bbrv3_pacing(0);
     assert!(pacing > 0);
+    assert!(gateway.core_tcpip.dual_stack_ipv4_ipv6);
 
     // 2. Network Configuration & Daemons
     let yaml = "network:\n  version: 2\n  ethernets:\n    eth0:\n      dhcp4: true\n";
     assert!(gateway.net_config.parse_netplan_config(yaml));
     let ifconfig_res = gateway.net_config.route_iproute2_cmd("ifconfig -a");
     assert!(ifconfig_res.contains("eth0"));
+    let ip_route_res = gateway.net_config.route_iproute2_cmd("ip route show");
+    assert!(ip_route_res.contains("default via"));
 
     // 3. DHCP & DNS Services
-    let lease = gateway
-        .dhcp_dns
-        .assign_dhcp_lease("00:11:22:33:44:55", "10.0.0.123");
+    let lease = gateway.dhcp_dns.assign_dhcp_lease("00:11:22:33:44:55", "10.0.0.123");
     assert_eq!(lease.ip_address, "10.0.0.123");
     let doh_res = gateway.dhcp_dns.resolve_doh_query("kernel.org");
     assert_eq!(doh_res, "93.184.216.34");
+    assert_eq!(gateway.dhcp_dns.unbound_cache_hits, 1);
 
     // 4. Wireless & Bluetooth
-    assert!(gateway
-        .wireless_bt
-        .connect_wpa3_sae("Corporate-Enterprise", "AA:BB:CC:DD:EE:01"));
+    assert!(gateway.wireless_bt.connect_wpa3_sae("Corporate-Enterprise", "AA:BB:CC:DD:EE:01"));
     assert!(gateway.wireless_bt.initialize_bluez_lc3_audio());
-    assert!(gateway
-        .wireless_bt
-        .bluetooth_active_codecs
-        .contains(&"LC3".to_string()));
+    assert!(gateway.wireless_bt.bluetooth_active_codecs.contains(&"LC3".to_string()));
+    assert!(gateway.wireless_bt.auracast_broadcast_active);
 
     // 5. Packet Filtering & Firewalls
-    gateway
-        .firewall
-        .add_nftables_rule("inet", "filter", "ip saddr 10.0.0.0/8 drop", "drop");
+    gateway.firewall.add_nftables_rule("inet", "filter", "ip saddr 10.0.0.0/8 drop", "drop");
     gateway.firewall.load_openbsd_pf_anchor("vpn_filter");
     assert_eq!(gateway.firewall.iptables_rules.len(), 1);
     assert_eq!(gateway.firewall.pf_anchors[0], "vpn_filter");
+    assert_eq!(gateway.firewall.nftables_flowtables, 2);
 
     // 6. Cryptographic Tunnels & VPNs
-    assert!(gateway
-        .crypto_vpn
-        .establish_wireguard_pqc_tunnel("wg1", "198.51.100.1:51820"));
-    assert_eq!(
-        gateway.crypto_vpn.active_tunnels[0].tunnel_type,
-        "WireGuard-PQC"
-    );
+    assert!(gateway.crypto_vpn.establish_wireguard_pqc_tunnel("wg1", "198.51.100.1:51820"));
+    assert_eq!(gateway.crypto_vpn.active_tunnels[0].tunnel_type, "WireGuard-PQC");
+    assert_eq!(gateway.crypto_vpn.tls_record_version, "TLS 1.3");
 
     // 7. Network Utilities & Diagnostics
-    let http3_res = gateway
-        .net_utils
-        .execute_curl_http3_download("https://www.freebsd.org");
+    let http3_res = gateway.net_utils.execute_curl_http3_download("https://www.freebsd.org");
     assert!(http3_res.contains("HTTP/3"));
     let bpf_count = gateway.net_utils.capture_tcpdump_bpf("tcp and port 443");
-    assert_eq!(bpf_count, 500);
+    assert_eq!(bpf_count, 750);
+    gateway.net_utils.register_avahi_service("_ipp._tcp.local");
+    assert!(gateway.net_utils.registered_mdns_services.contains(&"_ipp._tcp.local".to_string()));
 }
