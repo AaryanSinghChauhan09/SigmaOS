@@ -871,7 +871,6 @@ pub use crate::distro::omarchy_linux_missing_components_v82_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v83_pr::*;
 pub use crate::distro::open_source_os_missing_components_v82_pr::*;
 pub use crate::distro::open_source_os_missing_components_v83_pr::*;
-pub use crate::distro::open_source_os_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_and_arch_missing_components_v82_pr::*;
 pub use crate::distro::arch_linux_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_and_arch_missing_components_v84_pr::*;

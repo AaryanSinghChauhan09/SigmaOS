@@ -106,13 +106,8 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV83 {
             component_name: "SigmaOsVsOpenSourceOsComparisonMatrixEngineV83".to_string(),
             os_origin: "Global Open Source OS Ecosystem".to_string(),
             status: OsPrStatusV83::Validated,
-            impacted_subsystems: vec![
-                "KernelScheduling".to_string(),
-                "FilesystemStorage".to_string(),
-            ],
-            patch_diff:
-                "--- a/matrix_v83.rs\n+++ b/matrix_v83.rs\n@@ -1,3 +1,3 @@\n+pub struct MatrixV83;"
-                    .to_string(),
+            impacted_subsystems: vec!["KernelScheduling".to_string(), "FilesystemStorage".to_string()],
+            patch_diff: "--- a/matrix_v83.rs\n+++ b/matrix_v83.rs\n@@ -1,3 +1,3 @@\n+pub struct MatrixV83;".to_string(),
         }
     }
 }
@@ -184,7 +179,7 @@ pub struct FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV83 {
 impl FreeBsd167CapsicumCasperNetlinkMeshVnetEngineV83 {
     pub fn new() -> Self {
         Self {
-            casper_rights_mask: 0xFFFF_FFFF_0000_2000,
+            casper_rights_mask: 0xFFFF_FFFF_FFFF_0000,
             vnet_jail_count: 512,
         }
     }
@@ -241,12 +236,8 @@ impl OpenBsd96FineIbtPinsyscallPteGuardEngineV83 {
             component_name: "OpenBsd96FineIbtPinsyscallPteGuardEngineV83".to_string(),
             os_origin: "OpenBSD 9.6+".to_string(),
             status: OsPrStatusV83::Validated,
-            impacted_subsystems: vec![
-                "SecuritySandboxing".to_string(),
-                "MemoryVirtualization".to_string(),
-            ],
-            patch_diff: "--- a/sys/arch/amd64/amd64/trap.c\n+++ b/sys/arch/amd64/amd64/trap.c"
-                .to_string(),
+            impacted_subsystems: vec!["SecuritySandboxing".to_string(), "MemoryVirtualization".to_string()],
+            patch_diff: "--- a/sys/arch/amd64/amd64/trap.c\n+++ b/sys/arch/amd64/amd64/trap.c".to_string(),
         }
     }
 }
@@ -270,8 +261,8 @@ pub struct DragonFly85Hammer3DirectIoErasureEngineV83 {
 impl DragonFly85Hammer3DirectIoErasureEngineV83 {
     pub fn new() -> Self {
         Self {
-            reed_solomon_data_stripes: 10,
-            reed_solomon_parity_stripes: 4,
+            reed_solomon_data_stripes: 16,
+            reed_solomon_parity_stripes: 8,
         }
     }
 
@@ -299,9 +290,7 @@ impl DragonFly85Hammer3DirectIoErasureEngineV83 {
             os_origin: "DragonFly BSD 8.5+".to_string(),
             status: OsPrStatusV83::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "StorageDrive".to_string()],
-            patch_diff:
-                "--- a/sys/vfs/hammer3/hammer3_vnops.c\n+++ b/sys/vfs/hammer3/hammer3_vnops.c"
-                    .to_string(),
+            patch_diff: "--- a/sys/vfs/hammer3/hammer3_vnops.c\n+++ b/sys/vfs/hammer3/hammer3_vnops.c".to_string(),
         }
     }
 }
@@ -408,7 +397,7 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV83 {
     pub fn new() -> Self {
         Self {
             active_namespaces: 2048,
-            rfork_namespace_mask: 0x0000_1026,
+            rfork_namespace_mask: 0x0000_2048,
         }
     }
 
@@ -424,12 +413,8 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV83 {
             component_name: "Plan9Synthetic9P2000VfsRforkMultiplexerEngineV83".to_string(),
             os_origin: "Plan 9".to_string(),
             status: OsPrStatusV83::Validated,
-            impacted_subsystems: vec![
-                "FilesystemStorage".to_string(),
-                "ProcessActivity".to_string(),
-            ],
-            patch_diff: "--- a/sys/src/9/port/sysproc.c\n+++ b/sys/src/9/port/sysproc.c"
-                .to_string(),
+            impacted_subsystems: vec!["FilesystemStorage".to_string(), "ProcessActivity".to_string()],
+            patch_diff: "--- a/sys/src/9/port/sysproc.c\n+++ b/sys/src/9/port/sysproc.c".to_string(),
         }
     }
 }
@@ -452,7 +437,7 @@ pub struct NixGuixHermeticCasMerkleClosureEngineV83 {
 impl NixGuixHermeticCasMerkleClosureEngineV83 {
     pub fn new() -> Self {
         Self {
-            store_path_hash: "v83-cas-merkle-closure-hash-abcdef0123456789".to_string(),
+            store_path_hash: "v83-cas-merkle-closure-hash-0123456789".to_string(),
         }
     }
 
@@ -467,12 +452,8 @@ impl NixGuixHermeticCasMerkleClosureEngineV83 {
             component_name: "NixGuixHermeticCasMerkleClosureEngineV83".to_string(),
             os_origin: "NixOS / Guix".to_string(),
             status: OsPrStatusV83::Validated,
-            impacted_subsystems: vec![
-                "PackageManagement".to_string(),
-                "AutomationProvisioning".to_string(),
-            ],
-            patch_diff: "--- a/src/libstore/store-api.cc\n+++ b/src/libstore/store-api.cc"
-                .to_string(),
+            impacted_subsystems: vec!["PackageManagement".to_string(), "AutomationProvisioning".to_string()],
+            patch_diff: "--- a/src/libstore/store-api.cc\n+++ b/src/libstore/store-api.cc".to_string(),
         }
     }
 }
@@ -502,11 +483,7 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV83 {
     }
 
     pub fn probe_vnic_latency(&self, port_id: u32) -> u32 {
-        if port_id < self.vnic_ports {
-            1
-        } else {
-            0
-        }
+        if port_id < self.vnic_ports { 2 } else { 0 }
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV83 {
@@ -516,13 +493,8 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV83 {
             component_name: "IllumosCrossbowVnicDtraceSwitchMeshEngineV83".to_string(),
             os_origin: "Illumos".to_string(),
             status: OsPrStatusV83::Validated,
-            impacted_subsystems: vec![
-                "Networking".to_string(),
-                "ObservabilityDiagnostics".to_string(),
-            ],
-            patch_diff:
-                "--- a/usr/src/uts/common/io/mac/mac.c\n+++ b/usr/src/uts/common/io/mac/mac.c"
-                    .to_string(),
+            impacted_subsystems: vec!["Networking".to_string(), "ObservabilityDiagnostics".to_string()],
+            patch_diff: "--- a/usr/src/uts/common/io/mac/mac.c\n+++ b/usr/src/uts/common/io/mac/mac.c".to_string(),
         }
     }
 }
@@ -540,14 +512,14 @@ impl Default for IllumosCrossbowVnicDtraceSwitchMeshEngineV83 {
 #[derive(Debug, Clone)]
 pub struct OmarchyWallustThemeChordNavigatorEngineV83 {
     pub active_theme: String,
-    pub keybindings_count: u32,
+    pub chord_shortcuts_enabled: bool,
 }
 
 impl OmarchyWallustThemeChordNavigatorEngineV83 {
     pub fn new() -> Self {
         Self {
-            active_theme: "Default-Dark-V83".to_string(),
-            keybindings_count: 256,
+            active_theme: "Default-V83".to_string(),
+            chord_shortcuts_enabled: true,
         }
     }
 
@@ -564,8 +536,7 @@ impl OmarchyWallustThemeChordNavigatorEngineV83 {
             os_origin: "Omarchy Linux".to_string(),
             status: OsPrStatusV83::Validated,
             impacted_subsystems: vec!["DesktopCompositor".to_string(), "ShellTerminal".to_string()],
-            patch_diff: "--- a/config/omarchy/theme.toml\n+++ b/config/omarchy/theme.toml"
-                .to_string(),
+            patch_diff: "--- a/config/omarchy/theme.toml\n+++ b/config/omarchy/theme.toml".to_string(),
         }
     }
 }
@@ -609,10 +580,7 @@ impl GlobalTechMedia39PortalUnimplementedIdeasEngineV83 {
             component_name: "GlobalTechMedia39PortalUnimplementedIdeasEngineV83".to_string(),
             os_origin: "Global Tech Media".to_string(),
             status: OsPrStatusV83::Validated,
-            impacted_subsystems: vec![
-                "AiWorkflowAgent".to_string(),
-                "ObservabilityDiagnostics".to_string(),
-            ],
+            impacted_subsystems: vec!["AiWorkflowAgent".to_string(), "ObservabilityDiagnostics".to_string()],
             patch_diff: "--- a/docs/harvest_v83.md\n+++ b/docs/harvest_v83.md".to_string(),
         }
     }
@@ -816,13 +784,13 @@ mod tests {
         assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
         let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV83::new();
-        assert_eq!(plan9.rfork_namespace(1), 0x0000_1027);
+        assert_eq!(plan9.rfork_namespace(1), 0x0000_2049);
 
         let nix = NixGuixHermeticCasMerkleClosureEngineV83::new();
         assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
 
         let illumos = IllumosCrossbowVnicDtraceSwitchMeshEngineV83::new();
-        assert_eq!(illumos.probe_vnic_latency(5), 1);
+        assert_eq!(illumos.probe_vnic_latency(5), 2);
 
         let mut omarchy = OmarchyWallustThemeChordNavigatorEngineV83::new();
         assert!(omarchy.reload_theme("Dark-V83"));

@@ -48,13 +48,13 @@ fn test_integration_individual_v83_engines() {
     assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
     let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV83::new();
-    assert_eq!(plan9.rfork_namespace(1), 0x0000_1027);
+    assert_eq!(plan9.rfork_namespace(1), 0x0000_2049);
 
     let nix = NixGuixHermeticCasMerkleClosureEngineV83::new();
     assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
 
     let illumos = IllumosCrossbowVnicDtraceSwitchMeshEngineV83::new();
-    assert_eq!(illumos.probe_vnic_latency(5), 1);
+    assert_eq!(illumos.probe_vnic_latency(5), 2);
 
     let mut omarchy = OmarchyWallustThemeChordNavigatorEngineV83::new();
     assert!(omarchy.reload_theme("Dark-V83"));
