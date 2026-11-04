@@ -1050,6 +1050,12 @@ impl SigmaOffice {
         let gateway = crate::productivity::sovereign_office_suite_innovations_v8::SovereignEnterpriseProductivitySuiteV8PrGatewayEngine::new();
         gateway.audit_suite_v8()
     }
+
+    /// Execute V9 Enterprise Productivity Suite audit gateway
+    pub fn audit_v9_productivity_suite(&self) -> crate::productivity::sovereign_office_suite_innovations_v9::ProductivitySuiteV9AuditManifest {
+        let gateway = crate::productivity::sovereign_office_suite_innovations_v9::SovereignEnterpriseProductivitySuiteV9PrGatewayEngine::new();
+        gateway.audit_suite_v9()
+    }
 }
 
 /// Microsoft-style Collaborative Co-authoring Session & Real-time Paragraph Locks
