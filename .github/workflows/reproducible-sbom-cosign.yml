@@ -27,12 +27,18 @@ jobs:
           toolchain: stable
 
       - name: Build Primary Artifact (Runner 1)
+        env:
+          CARGO_BUILD_JOBS: "2"
+          RUSTFLAGS: "-C codegen-units=1"
         run: |
           mkdir -p build/runner1
           cargo build --release --lib
           cp target/release/libsigmaos.rlib build/runner1/
 
       - name: Build Secondary Artifact (Runner 2 - Fresh Build)
+        env:
+          CARGO_BUILD_JOBS: "2"
+          RUSTFLAGS: "-C codegen-units=1"
         run: |
           mkdir -p build/runner2
           cargo clean
