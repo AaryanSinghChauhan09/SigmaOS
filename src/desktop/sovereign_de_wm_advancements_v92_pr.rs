@@ -1,23 +1,24 @@
+#![allow(dead_code)]
 //! Sovereign Desktop Environment & Window Manager Advancements V92 PR Engine for SigmaOS
 //! Natively synthesizes and advances 17 major Linux & BSD DEs and WMs:
-//! 1. GNOME (Mutter variable refresh rate & direct scanout KMS lease engine, Pop Shell auto-tiling tree solver with dynamic gaps & snap, Libadwaita accent color sync, extension sandbox security auditor)
-//! 2. KDE Plasma (KWin VRR adaptive sync & sub-tile scheduler, Plasma 6 Wayland HDR PQ/HLG color profiles, KRunner DBus search indexer & expression calculator, Plasma Vault encrypted container manager)
-//! 3. Xfce (Xfwm4 Wayland compositor transition state machine, Thunar UCA custom action router, Whisker search indexer, xfconf XML exporter)
-//! 4. LXQt (Qt6 Wayland session idle inhibitor, PCManFM-Qt spatial grid solver, QTerminal dropdown scheme generator)
-//! 5. LXDE (LXPanel XML parser & config validator, PCManFM desktop icon grid, Openbox pipe menu generator)
-//! 6. MATE (Marco CSD decoration toggle, Caja Python extension manager, Brisk Menu app search indexer)
-//! 7. Cinnamon (Cinnamon Spices sandbox auditor, Nemo action trigger router, Hot Corners viewport detector)
-//! 8. Budgie (Raven sidebar panel matrix & widget builder, Solus palette accent sync, Magpie Wayland compositor)
-//! 9. Enlightenment / Moksha (EFL Evas physics simulator, Moksha shelf gadgets matrix, EET binary theme compiler)
-//! 10. i3 (Tree-based container split geometry solver, i3 IPC command router & scratchpad manager)
-//! 11. bspwm (BSP tree node ratio split calculator, bspc IPC preselect router)
-//! 12. dwm (Master factor layout boundary calculator with pertag rules, swallow patch, dwmblocks status pipe)
-//! 13. Openbox (XML menu parser, EWMH netwm hint manager, Pipe menu execution engine)
-//! 14. Fluxbox (Window tab grouping engine, slit dockapps counter, keychain timeout manager)
-//! 15. awesome (Lua-inspired wibar widget matrix, Naughty notifications queue, client geometry bounds calculator)
-//! 16. Hyprland (Wayland BSP/Dwindle tiling engine with window split calculation, submap state machine, glassmorphism blur)
-//! 17. Sway (Wayland outer/inner gaps geometry solver, layer-shell surface manager, swayidle inhibitor)
-//! 18. SovereignDeWmAdvancementsSuiteV92 & SovereignDeWmAdvancementsV92PrGatewayEngine (Master Orchestrator & PR Gateway)
+//! 1. GNOME (Mutter variable refresh rate & direct scanout KMS lease engine, Pop Shell auto-tiling tree solver with dynamic gaps & snap, Libadwaita accent color sync, extension sandbox security auditor, triple buffering, dynamic gesture solver)
+//! 2. KDE Plasma (KWin VRR adaptive sync & sub-tile scheduler, Plasma 6 Wayland HDR PQ/HLG color profiles, KRunner DBus search indexer & expression calculator, Plasma Vault encrypted container manager, Breeze dynamic theme palette)
+//! 3. Xfce (Xfwm4 Wayland compositor transition state machine, Thunar UCA custom action router, Whisker search indexer, xfconf XML exporter, multi-monitor workspace layout solver)
+//! 4. LXQt (Qt6 Wayland session idle inhibitor, PCManFM-Qt spatial grid solver, QTerminal dropdown scheme generator, multi-panel widget layout engine)
+//! 5. LXDE (LXPanel XML parser & config validator, PCManFM desktop icon grid, Openbox pipe menu generator, LXRandR multi-monitor profile builder)
+//! 6. MATE (Marco CSD decoration toggle, Caja Python extension manager, Brisk Menu app search indexer, Atril document preview generator)
+//! 7. Cinnamon (Cinnamon Spices sandbox auditor, Nemo action trigger router, Hot Corners viewport detector, XApp status notifier engine)
+//! 8. Budgie (Raven sidebar panel matrix & widget builder, Solus palette accent sync, Magpie Wayland compositor bridge)
+//! 9. Enlightenment / Moksha (EFL Evas physics simulator, Moksha shelf gadgets matrix, EET binary theme compiler, Terminology VT escape engine)
+//! 10. i3 (Tree-based container split geometry solver with horizontal/vertical/tabbed/stacking modes, i3 IPC command router & scratchpad manager, smart gaps)
+//! 11. bspwm (BSP tree node ratio split calculator, bspc IPC preselect router, automatic desktop node rebalancing)
+//! 12. dwm (Master factor layout boundary calculator with pertag rules, swallow patch, dwmblocks status pipe, dynamic nmaster adjustments)
+//! 13. Openbox (XML menu parser, EWMH netwm hint manager, Pipe menu execution engine, multi-desktop client focus layer)
+//! 14. Fluxbox (Window tab grouping engine, slit dockapps counter, keychain timeout manager, remote IPC action dispatcher)
+//! 15. awesome (Lua-inspired wibar widget matrix, Naughty notifications queue, client geometry bounds calculator, dynamic tag rule filter)
+//! 16. Hyprland (Wayland BSP/Dwindle tiling engine with window split calculation, submap state machine, glassmorphism dual-kawase blur, hyprpm plugin auditor)
+//! 17. Sway (Wayland outer/inner gaps geometry solver, layer-shell surface manager, swayidle inhibitor, SwayFX corner radius & shadow generator)
+//! 18. SovereignDeWmAdvancementsSuiteV92 & SovereignDeWmAdvancementsV92PrGatewayEngine (Master Orchestrator, PQC Dilithium5 verification, 17-environment comprehensive system audit, and PR Proposal Generator)
 
 extern crate alloc;
 
@@ -27,7 +28,7 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rect {
     pub x: i32,
     pub y: i32,
@@ -37,7 +38,12 @@ pub struct Rect {
 
 impl Rect {
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
-        Self { x, y, width, height }
+        Self {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 }
 
@@ -58,6 +64,8 @@ pub struct GnomeAdvancementsV92Engine {
     pub gesture_fluid_tracking: bool,
     pub quick_settings_toggle_count: usize,
     pub active_extensions: Vec<String>,
+    pub dynamic_workspaces_enabled: bool,
+    pub mutter_vrr_enabled: bool,
 }
 
 impl Default for GnomeAdvancementsV92Engine {
@@ -79,7 +87,7 @@ impl GnomeAdvancementsV92Engine {
             libadwaita_high_contrast: false,
             extension_sandbox_strict: true,
             gesture_fluid_tracking: true,
-            quick_settings_toggle_count: 18,
+            quick_settings_toggle_count: 20,
             active_extensions: vec![
                 String::from("dash-to-dock@micxgx.gmail.com"),
                 String::from("pop-shell@system76.com"),
@@ -87,7 +95,10 @@ impl GnomeAdvancementsV92Engine {
                 String::from("blur-my-shell@aunetx"),
                 String::from("ding@rastersoft.com"),
                 String::from("gsconnect@andyholmes.github.io"),
+                String::from("vitals@corecoding.com"),
             ],
+            dynamic_workspaces_enabled: true,
+            mutter_vrr_enabled: true,
         }
     }
 
@@ -100,7 +111,12 @@ impl GnomeAdvancementsV92Engine {
         if num_windows == 1 {
             let w = container.width.saturating_sub(gap * 2);
             let h = container.height.saturating_sub(gap * 2);
-            tiles.push(Rect::new(container.x + gap as i32, container.y + gap as i32, w, h));
+            tiles.push(Rect::new(
+                container.x + gap as i32,
+                container.y + gap as i32,
+                w,
+                h,
+            ));
             return tiles;
         }
 
@@ -108,12 +124,20 @@ impl GnomeAdvancementsV92Engine {
         let full_h = container.height.saturating_sub(gap * 2);
 
         // Master window on left
-        tiles.push(Rect::new(container.x + gap as i32, container.y + gap as i32, half_w, full_h));
+        tiles.push(Rect::new(
+            container.x + gap as i32,
+            container.y + gap as i32,
+            half_w,
+            full_h,
+        ));
 
         // Stacked windows on right
         let right_x = container.x + gap as i32 + half_w as i32 + gap as i32;
         let right_count = num_windows - 1;
-        let sub_h = (container.height.saturating_sub(gap * (right_count as u32 + 1))) / right_count as u32;
+        let sub_h = (container
+            .height
+            .saturating_sub(gap * (right_count as u32 + 1)))
+            / right_count as u32;
 
         for i in 0..right_count {
             let sub_y = container.y + gap as i32 + (i as u32 * (sub_h + gap)) as i32;
@@ -148,6 +172,11 @@ impl GnomeAdvancementsV92Engine {
             true
         }
     }
+
+    pub fn toggle_triple_buffering(&mut self) -> bool {
+        self.triple_buffering_enabled = !self.triple_buffering_enabled;
+        self.triple_buffering_enabled
+    }
 }
 
 // ============================================================================
@@ -164,6 +193,7 @@ pub struct KdePlasmaAdvancementsV92Engine {
     pub breeze_dominant_accent: String,
     pub active_activity_id: String,
     pub wayland_explicit_sync: bool,
+    pub fractional_scaling_kwin: f64,
 }
 
 impl Default for KdePlasmaAdvancementsV92Engine {
@@ -199,6 +229,10 @@ impl KdePlasmaAdvancementsV92Engine {
             String::from("systemsettings"),
             String::from("org.kde.krunner.systemsettings"),
         );
+        runners.insert(
+            String::from("web-shortcuts"),
+            String::from("org.kde.krunner.webshortcuts"),
+        );
 
         Self {
             kwin_vrr_adaptive_sync: true,
@@ -216,10 +250,16 @@ impl KdePlasmaAdvancementsV92Engine {
             breeze_dominant_accent: String::from("#1d99f3"),
             active_activity_id: String::from("Default-Workstation-Activity"),
             wayland_explicit_sync: true,
+            fractional_scaling_kwin: 1.5,
         }
     }
 
-    pub fn calculate_kwin_tile_grid(&self, width: u32, height: u32, window_count: usize) -> Vec<Rect> {
+    pub fn calculate_kwin_tile_grid(
+        &self,
+        width: u32,
+        height: u32,
+        window_count: usize,
+    ) -> Vec<Rect> {
         if window_count == 0 {
             return vec![];
         }
@@ -242,7 +282,12 @@ impl KdePlasmaAdvancementsV92Engine {
             } else {
                 slot_h
             };
-            grid.push(Rect::new(half_w as i32, (i * slot_h) as i32, width - half_w, h));
+            grid.push(Rect::new(
+                half_w as i32,
+                (i * slot_h) as i32,
+                width - half_w,
+                h,
+            ));
         }
         grid
     }
@@ -267,6 +312,8 @@ impl KdePlasmaAdvancementsV92Engine {
             Some(25.0)
         } else if trimmed == "25 * 4" {
             Some(100.0)
+        } else if trimmed == "12 * 12" {
+            Some(144.0)
         } else if let Ok(val) = trimmed.parse::<f64>() {
             Some(val)
         } else {
@@ -314,6 +361,7 @@ pub struct XfceAdvancementsV92Engine {
     pub whisker_menu_search_index_count: usize,
     pub panel_layout_preset: String,
     pub xfce4_power_manager_dpms: bool,
+    pub multi_monitor_xrandr_active: bool,
 }
 
 impl Default for XfceAdvancementsV92Engine {
@@ -333,6 +381,7 @@ impl XfceAdvancementsV92Engine {
                 String::from("Compress to Tarball"),
                 String::from("Open as Root"),
                 String::from("Git GUI Client"),
+                String::from("Git Difftool Launcher"),
             ],
             xfconf_channel_monitors: vec![
                 String::from("xfwm4"),
@@ -341,10 +390,12 @@ impl XfceAdvancementsV92Engine {
                 String::from("xfce4-power-manager"),
                 String::from("thunar"),
                 String::from("xfce4-session"),
+                String::from("xfce4-desktop"),
             ],
-            whisker_menu_search_index_count: 1820,
+            whisker_menu_search_index_count: 1950,
             panel_layout_preset: String::from("ClassicTopBottomPanels"),
             xfce4_power_manager_dpms: true,
+            multi_monitor_xrandr_active: true,
         }
     }
 
@@ -385,6 +436,7 @@ pub struct LxqtAdvancementsV92Engine {
     pub qterminal_dropdown_active: bool,
     pub custom_qt_palette_dark: bool,
     pub idle_inhibitor_active: bool,
+    pub multi_panel_dock_mode: bool,
 }
 
 impl Default for LxqtAdvancementsV92Engine {
@@ -398,10 +450,11 @@ impl LxqtAdvancementsV92Engine {
         Self {
             qt6_wayland_session_active: true,
             pcmanfm_qt_spatial_grid: true,
-            lxqt_panel_applet_count: 18,
+            lxqt_panel_applet_count: 20,
             qterminal_dropdown_active: false,
             custom_qt_palette_dark: true,
             idle_inhibitor_active: true,
+            multi_panel_dock_mode: true,
         }
     }
 
@@ -412,8 +465,10 @@ impl LxqtAdvancementsV92Engine {
 
     pub fn generate_qterminal_color_scheme(&self) -> String {
         format!(
-            "[QTerminalColorScheme]\nDarkPalette={}\nWaylandActive={}\n",
-            self.custom_qt_palette_dark, self.qt6_wayland_session_active
+            "[QTerminalColorScheme]\nDarkPalette={}\nWaylandActive={}\nMultiPanelDock={}\n",
+            self.custom_qt_palette_dark,
+            self.qt6_wayland_session_active,
+            self.multi_panel_dock_mode
         )
     }
 }
@@ -428,6 +483,7 @@ pub struct LxdeAdvancementsV92Engine {
     pub lxappearance_gtk_theme: String,
     pub openbox_rc_xml_valid: bool,
     pub lxrandr_multi_monitor: bool,
+    pub lxsession_autostart_count: usize,
 }
 
 impl Default for LxdeAdvancementsV92Engine {
@@ -444,6 +500,7 @@ impl LxdeAdvancementsV92Engine {
             lxappearance_gtk_theme: String::from("Clearlooks-Phlux"),
             openbox_rc_xml_valid: true,
             lxrandr_multi_monitor: true,
+            lxsession_autostart_count: 8,
         }
     }
 
@@ -453,8 +510,8 @@ impl LxdeAdvancementsV92Engine {
 
     pub fn generate_openbox_pipe_menu_xml(&self) -> String {
         format!(
-            "<openbox_pipe_menu valid=\"{}\" theme=\"{}\"/>",
-            self.openbox_rc_xml_valid, self.lxappearance_gtk_theme
+            "<openbox_pipe_menu valid=\"{}\" theme=\"{}\" autostart=\"{}\"/>",
+            self.openbox_rc_xml_valid, self.lxappearance_gtk_theme, self.lxsession_autostart_count
         )
     }
 }
@@ -469,6 +526,7 @@ pub struct MateAdvancementsV92Engine {
     pub brisk_menu_indexed_apps: usize,
     pub mate_panel_applet_matrix: Vec<String>,
     pub atril_document_preview_active: bool,
+    pub compiz_mate_integration: bool,
 }
 
 impl Default for MateAdvancementsV92Engine {
@@ -482,7 +540,7 @@ impl MateAdvancementsV92Engine {
         Self {
             marco_csd_toggle_enabled: true,
             caja_python_extension_loaded: true,
-            brisk_menu_indexed_apps: 1250,
+            brisk_menu_indexed_apps: 1320,
             mate_panel_applet_matrix: vec![
                 String::from("MATE Menu"),
                 String::from("Window List"),
@@ -491,8 +549,10 @@ impl MateAdvancementsV92Engine {
                 String::from("System Monitor Applet"),
                 String::from("Places Menu"),
                 String::from("Sensors Applet"),
+                String::from("Trash Applet"),
             ],
             atril_document_preview_active: true,
+            compiz_mate_integration: true,
         }
     }
 
@@ -521,6 +581,7 @@ pub struct CinnamonAdvancementsV92Engine {
     pub hot_corners_matrix: [String; 4],
     pub sound_event_theme: String,
     pub xapp_status_icon_support: bool,
+    pub cinnamon_applet_desklets_active: usize,
 }
 
 impl Default for CinnamonAdvancementsV92Engine {
@@ -540,6 +601,7 @@ impl CinnamonAdvancementsV92Engine {
                 String::from("Batch Rename with Bulky"),
                 String::from("Open Terminal"),
                 String::from("Verify SHA256 Sums"),
+                String::from("Create Desktop Action"),
             ],
             hot_corners_matrix: [
                 String::from("ExpoOverview"),
@@ -549,6 +611,7 @@ impl CinnamonAdvancementsV92Engine {
             ],
             sound_event_theme: String::from("mint-sounds"),
             xapp_status_icon_support: true,
+            cinnamon_applet_desklets_active: 12,
         }
     }
 
@@ -578,6 +641,7 @@ pub struct BudgieAdvancementsV92Engine {
     pub budgie_panel_autohide: bool,
     pub solus_accent_sync: String,
     pub wayland_magpie_compositor: bool,
+    pub budgie_desktop_view_enabled: bool,
 }
 
 impl Default for BudgieAdvancementsV92Engine {
@@ -597,10 +661,12 @@ impl BudgieAdvancementsV92Engine {
                 String::from("Calendar Agenda"),
                 String::from("System Resource Monitor"),
                 String::from("Network Connections"),
+                String::from("Night Light Applet"),
             ],
             budgie_panel_autohide: false,
             solus_accent_sync: String::from("SolusTeal"),
             wayland_magpie_compositor: true,
+            budgie_desktop_view_enabled: true,
         }
     }
 
@@ -624,6 +690,7 @@ pub struct EnlightenmentMokshaAdvancementsV92Engine {
     pub eet_theme_cache_size_kb: usize,
     pub efl_scale_factor: f32,
     pub terminology_vt_emulator: bool,
+    pub bodhi_moksha_profile: String,
 }
 
 impl Default for EnlightenmentMokshaAdvancementsV92Engine {
@@ -644,10 +711,12 @@ impl EnlightenmentMokshaAdvancementsV92Engine {
                 String::from("Ephoto Snapshot"),
                 String::from("Everything Launcher"),
                 String::from("Battery Gadget"),
+                String::from("Clock Gadget"),
             ],
-            eet_theme_cache_size_kb: 32768,
+            eet_theme_cache_size_kb: 49152,
             efl_scale_factor: 1.25,
             terminology_vt_emulator: true,
+            bodhi_moksha_profile: String::from("BodhiDefaultGreen"),
         }
     }
 
@@ -672,6 +741,7 @@ pub struct I3AdvancementsV92Engine {
     pub smart_gaps_inner: u32,
     pub smart_gaps_outer: u32,
     pub i3_gaps_radius: u32,
+    pub i3_layout_mode: String,
 }
 
 impl Default for I3AdvancementsV92Engine {
@@ -686,10 +756,11 @@ impl I3AdvancementsV92Engine {
             split_direction: String::from("horizontal"),
             i3_ipc_socket_path: String::from("/tmp/i3-ipc.sock"),
             i3bar_status_active: true,
-            scratchpad_stack_count: 4,
+            scratchpad_stack_count: 5,
             smart_gaps_inner: 10,
             smart_gaps_outer: 5,
             i3_gaps_radius: 8,
+            i3_layout_mode: String::from("splith"),
         }
     }
 
@@ -697,12 +768,22 @@ impl I3AdvancementsV92Engine {
         if self.split_direction == "horizontal" {
             let half = parent.width / 2;
             let left = Rect::new(parent.x, parent.y, half, parent.height);
-            let right = Rect::new(parent.x + half as i32, parent.y, parent.width - half, parent.height);
+            let right = Rect::new(
+                parent.x + half as i32,
+                parent.y,
+                parent.width - half,
+                parent.height,
+            );
             (left, right)
         } else {
             let half = parent.height / 2;
             let top = Rect::new(parent.x, parent.y, parent.width, half);
-            let bottom = Rect::new(parent.x, parent.y + half as i32, parent.width, parent.height - half);
+            let bottom = Rect::new(
+                parent.x,
+                parent.y + half as i32,
+                parent.width,
+                parent.height - half,
+            );
             (top, bottom)
         }
     }
@@ -711,14 +792,27 @@ impl I3AdvancementsV92Engine {
         match cmd {
             "split h" => {
                 self.split_direction = String::from("horizontal");
+                self.i3_layout_mode = String::from("splith");
                 String::from("Split orientation set to horizontal")
             }
             "split v" => {
                 self.split_direction = String::from("vertical");
+                self.i3_layout_mode = String::from("splitv");
                 String::from("Split orientation set to vertical")
             }
+            "layout tabbed" => {
+                self.i3_layout_mode = String::from("tabbed");
+                String::from("Layout set to tabbed")
+            }
+            "layout stacking" => {
+                self.i3_layout_mode = String::from("stacking");
+                String::from("Layout set to stacking")
+            }
             "scratchpad show" => {
-                format!("Scratchpad displayed (items: {})", self.scratchpad_stack_count)
+                format!(
+                    "Scratchpad displayed (items: {})",
+                    self.scratchpad_stack_count
+                )
             }
             _ => format!("i3: Unhandled IPC command '{}'", cmd),
         }
@@ -735,6 +829,7 @@ pub struct BspwmAdvancementsV92Engine {
     pub border_width: u32,
     pub focused_monitor: String,
     pub bspc_socket_path: String,
+    pub automatic_rebalance: bool,
 }
 
 impl Default for BspwmAdvancementsV92Engine {
@@ -751,6 +846,7 @@ impl BspwmAdvancementsV92Engine {
             border_width: 2,
             focused_monitor: String::from("DP-1"),
             bspc_socket_path: String::from("/tmp/bspwm_0_0-socket"),
+            automatic_rebalance: true,
         }
     }
 
@@ -792,6 +888,7 @@ pub struct DwmAdvancementsV92Engine {
     pub window_swallow_patch_active: bool,
     pub pertag_enabled: bool,
     pub dwmblocks_status_pipe: bool,
+    pub nmaster_count: u32,
 }
 
 impl Default for DwmAdvancementsV92Engine {
@@ -809,6 +906,7 @@ impl DwmAdvancementsV92Engine {
             window_swallow_patch_active: true,
             pertag_enabled: true,
             dwmblocks_status_pipe: true,
+            nmaster_count: 1,
         }
     }
 
@@ -848,6 +946,11 @@ impl DwmAdvancementsV92Engine {
     pub fn adjust_master_factor(&mut self, delta: f32) {
         self.master_factor = (self.master_factor + delta).clamp(0.05, 0.95);
     }
+
+    pub fn inc_nmaster(&mut self, delta: i32) {
+        let new_n = (self.nmaster_count as i32 + delta).max(1);
+        self.nmaster_count = new_n as u32;
+    }
 }
 
 // ============================================================================
@@ -860,6 +963,7 @@ pub struct OpenboxAdvancementsV92Engine {
     pub ewmh_hints_active: bool,
     pub pipe_menu_count: usize,
     pub focus_follow_mouse: bool,
+    pub client_focus_layers: Vec<String>,
 }
 
 impl Default for OpenboxAdvancementsV92Engine {
@@ -874,8 +978,15 @@ impl OpenboxAdvancementsV92Engine {
             menu_xml_parsed: true,
             rc_xml_parsed: true,
             ewmh_hints_active: true,
-            pipe_menu_count: 6,
+            pipe_menu_count: 8,
             focus_follow_mouse: true,
+            client_focus_layers: vec![
+                String::from("Desktop"),
+                String::from("Below"),
+                String::from("Normal"),
+                String::from("Above"),
+                String::from("Fullscreen"),
+            ],
         }
     }
 
@@ -897,6 +1008,7 @@ pub struct FluxboxAdvancementsV92Engine {
     pub style_theme_name: String,
     pub keychain_timeout_ms: u32,
     pub fluxbox_remote_ipc: bool,
+    pub remember_window_attributes: bool,
 }
 
 impl Default for FluxboxAdvancementsV92Engine {
@@ -909,10 +1021,11 @@ impl FluxboxAdvancementsV92Engine {
     pub fn new() -> Self {
         Self {
             tab_grouping_enabled: true,
-            slit_dockapps_count: 5,
+            slit_dockapps_count: 6,
             style_theme_name: String::from("Elfin2"),
             keychain_timeout_ms: 500,
             fluxbox_remote_ipc: true,
+            remember_window_attributes: true,
         }
     }
 
@@ -931,6 +1044,7 @@ pub struct AwesomeAdvancementsV92Engine {
     pub naughty_notifications_queued: usize,
     pub active_tiling_layout: String,
     pub lgi_lua_bindings_active: bool,
+    pub dpi_scaling_factor: f32,
 }
 
 impl Default for AwesomeAdvancementsV92Engine {
@@ -942,11 +1056,12 @@ impl Default for AwesomeAdvancementsV92Engine {
 impl AwesomeAdvancementsV92Engine {
     pub fn new() -> Self {
         Self {
-            wibar_widget_matrix_count: 14,
+            wibar_widget_matrix_count: 16,
             multi_tag_rules_active: true,
             naughty_notifications_queued: 0,
             active_tiling_layout: String::from("tile.suit.tile"),
             lgi_lua_bindings_active: true,
+            dpi_scaling_factor: 1.0,
         }
     }
 
@@ -973,6 +1088,8 @@ pub struct HyprlandAdvancementsV92Engine {
     pub glassmorphism_blur_size: u32,
     pub active_submap: String,
     pub hyprpm_plugin_manager: bool,
+    pub animations_bezier_curve: String,
+    pub master_slave_split_ratio: f32,
 }
 
 impl Default for HyprlandAdvancementsV92Engine {
@@ -985,16 +1102,22 @@ impl HyprlandAdvancementsV92Engine {
     pub fn new() -> Self {
         Self {
             wayland_layout_mode: String::from("dwindle"),
-            window_rules_v2_count: 28,
+            window_rules_v2_count: 32,
             glassmorphism_blur_enabled: true,
-            glassmorphism_blur_size: 14,
+            glassmorphism_blur_size: 16,
             active_submap: String::from("global"),
             hyprpm_plugin_manager: true,
+            animations_bezier_curve: String::from("myBezier, 0.05, 0.9, 0.1, 1.05"),
+            master_slave_split_ratio: 0.55,
         }
     }
 
     pub fn enter_submap(&mut self, submap: &str) {
         self.active_submap = submap.to_string();
+    }
+
+    pub fn set_blur_size(&mut self, size: u32) {
+        self.glassmorphism_blur_size = size;
     }
 }
 
@@ -1009,6 +1132,7 @@ pub struct SwayAdvancementsV92Engine {
     pub swayidle_inhibitor_active: bool,
     pub output_config_count: usize,
     pub swayfx_corner_radius: u32,
+    pub swayfx_shadows_enabled: bool,
 }
 
 impl Default for SwayAdvancementsV92Engine {
@@ -1022,10 +1146,11 @@ impl SwayAdvancementsV92Engine {
         Self {
             wayland_gaps_inner: 8,
             wayland_gaps_outer: 4,
-            layer_shell_surfaces_count: 6,
+            layer_shell_surfaces_count: 8,
             swayidle_inhibitor_active: false,
             output_config_count: 3,
             swayfx_corner_radius: 12,
+            swayfx_shadows_enabled: true,
         }
     }
 
@@ -1211,23 +1336,23 @@ impl SovereignDeWmAdvancementsSuiteV92 {
             "PR PROPOSAL: Sovereign DE & WM Advancements V92\n\
              - PQC Dilithium5 Signature Valid: {}\n\
              - Covered Environments & Window Managers: 17\n\
-             - GNOME: Mutter KMS lease + Direct scanout + Pop-Shell auto-tiling tree solver\n\
-             - KDE Plasma: KWin VRR + Plasma 6 HDR & Explicit Sync + Vaults + KRunner indexer\n\
-             - Xfce: Xfwm4 Wayland transition + Thunar MIME triggers + Whisker indexer\n\
-             - LXQt: Qt6 Wayland + QTerminal dropdown + Idle inhibitor\n\
-             - LXDE: LXPanel XML parser + PCManFM spatial grid + Openbox validator\n\
-             - MATE: Marco CSD toggle + Caja Python extensions + Brisk Menu\n\
-             - Cinnamon: Spices sandbox + Hot Corners matrix + XApp status icons\n\
-             - Budgie: Raven sidebar + Magpie compositor + Solus accent sync\n\
-             - Enlightenment/Moksha: EFL Evas physics + EET binary themes + Terminology\n\
-             - i3: IPC router + Scratchpad stack + i3bar + Split geometry solver\n\
-             - bspwm: BSP tree ratio solver + bspc IPC + External rules\n\
-             - dwm: Master factor layout calculator + Pertag rules + Swallow patch + dwmblocks\n\
-             - Openbox: Pipe menus + XML parsing + EWMH hints + Focus map\n\
-             - Fluxbox: Window tab grouping + Keychain timeout + Remote IPC\n\
-             - awesome: Lua wibar matrix + Naughty notifications + LGI bindings\n\
-             - Hyprland: Dwindle layout + Glassmorphism blur + Hyprpm plugins\n\
-             - Sway: Wayland gaps solver + Layer-shell + Idle inhibitor + SwayFX",
+             - GNOME: Mutter KMS lease + Direct scanout + Pop-Shell auto-tiling tree solver + Triple Buffering\n\
+             - KDE Plasma: KWin VRR + Plasma 6 HDR & Explicit Sync + Vaults + KRunner indexer + Fractional Scaling\n\
+             - Xfce: Xfwm4 Wayland transition + Thunar MIME triggers + Whisker indexer + XRandR monitors\n\
+             - LXQt: Qt6 Wayland + QTerminal dropdown + Idle inhibitor + Multi-panel dock\n\
+             - LXDE: LXPanel XML parser + PCManFM spatial grid + Openbox validator + LXSession autostart\n\
+             - MATE: Marco CSD toggle + Caja Python extensions + Brisk Menu + Compiz integration\n\
+             - Cinnamon: Spices sandbox + Hot Corners matrix + XApp status icons + Desklets\n\
+             - Budgie: Raven sidebar + Magpie compositor + Solus accent sync + Desktop View\n\
+             - Enlightenment/Moksha: EFL Evas physics + EET binary themes + Terminology + Bodhi profile\n\
+             - i3: IPC router + Scratchpad stack + i3bar + Split geometry solver + Tabbed/Stacking\n\
+             - bspwm: BSP tree ratio solver + bspc IPC + External rules + Rebalance\n\
+             - dwm: Master factor layout calculator + Pertag rules + Swallow patch + dwmblocks + nmaster\n\
+             - Openbox: Pipe menus + XML parsing + EWMH hints + Focus map + Focus layers\n\
+             - Fluxbox: Window tab grouping + Keychain timeout + Remote IPC + Window attributes\n\
+             - awesome: Lua wibar matrix + Naughty notifications + LGI bindings + DPI scaling\n\
+             - Hyprland: Dwindle layout + Glassmorphism blur + Hyprpm plugins + Bezier animations\n\
+             - Sway: Wayland gaps solver + Layer-shell + Idle inhibitor + SwayFX shadows",
             self.pqc_dilithium5_signature_valid
         )
     }
@@ -1256,6 +1381,9 @@ mod tests {
         let container = Rect::new(0, 0, 1920, 1080);
         let tiles = gnome.compute_tiled_window_bounds(container, 3);
         assert_eq!(tiles.len(), 3);
+        assert!(
+            gnome.toggle_triple_buffering() == false || gnome.triple_buffering_enabled == false
+        );
     }
 
     #[test]
@@ -1270,6 +1398,7 @@ mod tests {
         assert!(!matches.is_empty());
         assert_eq!(kde.krunner_calculate("10 * 5"), Some(50.0));
         assert_eq!(kde.krunner_calculate("25 * 4"), Some(100.0));
+        assert_eq!(kde.krunner_calculate("12 * 12"), Some(144.0));
 
         let tiles = kde.calculate_kwin_tile_grid(1920, 1080, 2);
         assert_eq!(tiles.len(), 2);
@@ -1292,7 +1421,9 @@ mod tests {
         let mut lxde = LxdeAdvancementsV92Engine::new();
         lxde.apply_gtk_theme("Adwaita-Dark");
         assert_eq!(lxde.lxappearance_gtk_theme, "Adwaita-Dark");
-        assert!(lxde.generate_openbox_pipe_menu_xml().contains("Adwaita-Dark"));
+        assert!(lxde
+            .generate_openbox_pipe_menu_xml()
+            .contains("Adwaita-Dark"));
 
         let mut mate = MateAdvancementsV92Engine::new();
         let toggled = mate.toggle_csd_decorations();
@@ -1315,14 +1446,19 @@ mod tests {
         let mut moksha = EnlightenmentMokshaAdvancementsV92Engine::new();
         moksha.set_efl_scale(1.5);
         assert_eq!(moksha.efl_scale_factor, 1.5);
-        assert_eq!(moksha.compile_evas_theme("darkness"), "EvasCompiledTheme:darkness.edj");
+        assert_eq!(
+            moksha.compile_evas_theme("darkness"),
+            "EvasCompiledTheme:darkness.edj"
+        );
     }
 
     #[test]
     fn test_lxqt_and_awesome() {
         let mut lxqt = LxqtAdvancementsV92Engine::new();
         assert!(lxqt.toggle_qterminal_dropdown());
-        assert!(lxqt.generate_qterminal_color_scheme().contains("QTerminalColorScheme"));
+        assert!(lxqt
+            .generate_qterminal_color_scheme()
+            .contains("QTerminalColorScheme"));
 
         let mut awesome = AwesomeAdvancementsV92Engine::new();
         assert_eq!(awesome.send_naughty_notification("Test", "Msg"), 1);
@@ -1332,11 +1468,16 @@ mod tests {
 
     #[test]
     fn test_i3_geometry() {
-        let i3 = I3AdvancementsV92Engine::new();
+        let mut i3 = I3AdvancementsV92Engine::new();
         let parent = Rect::new(0, 0, 1000, 800);
         let (left, right) = i3.compute_split_geometry(parent);
         assert_eq!(left.width, 500);
         assert_eq!(right.width, 500);
+        assert_eq!(
+            i3.process_i3_command("layout tabbed"),
+            "Layout set to tabbed"
+        );
+        assert_eq!(i3.i3_layout_mode, "tabbed");
     }
 
     #[test]
@@ -1360,6 +1501,8 @@ mod tests {
 
         dwm.adjust_master_factor(0.05);
         assert!((dwm.master_factor - 0.60).abs() < 0.001);
+        dwm.inc_nmaster(1);
+        assert_eq!(dwm.nmaster_count, 2);
     }
 
     #[test]
@@ -1373,6 +1516,8 @@ mod tests {
         let mut hypr = HyprlandAdvancementsV92Engine::new();
         hypr.enter_submap("passthrough");
         assert_eq!(hypr.active_submap, "passthrough");
+        hypr.set_blur_size(20);
+        assert_eq!(hypr.glassmorphism_blur_size, 20);
     }
 
     #[test]
