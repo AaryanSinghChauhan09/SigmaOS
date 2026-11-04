@@ -186,3 +186,45 @@ fn test_master_network_development_suite() {
     let mut master = SovereignNetworkDevelopmentAndPrMasterSuite::new();
     assert!(master.run_complete_verification_suite());
 }
+
+
+#[test]
+fn test_network_development_plan_documentation_verification() {
+    use std::fs;
+    use std::path::Path;
+
+    let docs_path = "docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md";
+    let wiki_path = "wiki/28-Network-Development-And-Maintenance-Plan.md";
+
+    assert!(Path::new(docs_path).exists(), "docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md must exist");
+    assert!(Path::new(wiki_path).exists(), "wiki/28-Network-Development-And-Maintenance-Plan.md must exist");
+
+    let docs_content = fs::read_to_string(docs_path).expect("read docs content");
+    let wiki_content = fs::read_to_string(wiki_path).expect("read wiki content");
+
+    assert_eq!(docs_content, wiki_content, "Wiki documentation must match docs specification");
+
+    // Verify key sections
+    assert!(docs_content.contains("# SigmaOS development and maintenance plan"));
+    assert!(docs_content.contains("## Scope and operating rules"));
+    assert!(docs_content.contains("## Proposed PR sequence"));
+    assert!(docs_content.contains("## Periodic maintenance cadence"));
+    assert!(docs_content.contains("## Cross-component rules to add"));
+    assert!(docs_content.contains("## PR review and merge gates"));
+    assert!(docs_content.contains("## Execution order and exit criteria"));
+
+    // Verify all 13 PRs in table
+    assert!(docs_content.contains("`docs(net): define network architecture, status, and support boundaries`"));
+    assert!(docs_content.contains("`test(net): add deterministic packet fixtures and parser fuzz targets`"));
+    assert!(docs_content.contains("`feat(net): connect VirtIO NIC to the Ethernet receive and transmit path`"));
+    assert!(docs_content.contains("`feat(net): add interface and link-state model`"));
+    assert!(docs_content.contains("`feat(net): add IPv4 routing and ICMP host support`"));
+    assert!(docs_content.contains("`feat(net): add IPv6 host networking foundation`"));
+    assert!(docs_content.contains("`feat(net): add TCP transport with socket lifecycle`"));
+    assert!(docs_content.contains("`feat(net): harden DHCP and DNS client behavior`"));
+    assert!(docs_content.contains("`feat(net): add persistent network configuration and rollback`"));
+    assert!(docs_content.contains("`feat(net): add network control CLI and diagnostics`"));
+    assert!(docs_content.contains("`feat(net): add firewall policy framework with default-deny service rules`"));
+    assert!(docs_content.contains("`ci(net): add QEMU networking integration and regression workflow`"));
+    assert!(docs_content.contains("`docs(net): publish supported networking matrix and recovery guide`"));
+}
