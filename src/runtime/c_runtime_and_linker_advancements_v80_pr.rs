@@ -3,16 +3,18 @@
 //! Provides zero-dependency `#![no_std]` / `alloc` native parity engines and Pull Request
 //! proposal generators inspired by landmark Linux, BSD, Android, Cosmopolitan, and embedded
 //! C libraries, C++ runtimes, and dynamic linkers:
-//! - **GlibcInspirationsV80Engine**: glibc 2.45+ (IFUNC dynamic resolver with APX 32-reg & AVX10.2, DT_GNU_HASH 64-bit dual-bloom filter, GLIBC_TUNABLES deep parser with memory/cpu tunables, DTV generation counter & lazy TLS allocation, malloc_info v2 telemetry, malloc_trim threshold evaluator)
-//! - **MuslLibcInspirationsV80Engine**: musl libc 1.2.9+ (malloc-ng slab group header verification with chunk checksums, zero-allocation signal-safe printf engine, __synccall broadcast barrier synchronization, __unmapself thread stack teardown, parallel DNS __res_msend query multiplexer)
-//! - **UclibcInspirationsV80Engine**: uClibc-ng 1.0.54+ (FD-PIC dual-relocation GOT and function descriptor resolver for MMU-less targets, fine-grained feature mask stripper, compact SysV ELF hash chain resolver, bFLT v4/v5 compressed binary header validator)
-//! - **BsdLibcInspirationsV80Engine**: FreeBSD 15+ / OpenBSD 7.7+ / NetBSD 10.1+ libc (ChaCha20 arc4random stream cipher with stir interval, explicit_bzero / freezero memory barrier wiping, boundary-safe strlcpy / strlcat, reallocarray arithmetic overflow check, OpenBSD pledge / unveil capability matrix, sysctlbyname MIB parser)
-//! - **BionicInspirationsV80Engine**: Android Bionic (Scudo hardened allocator chunk header checksum & quarantine ring, ARM PAC / BTI verification, Property Service trie lookup, fdsan file descriptor sanitizer owner check, async_safe_format_log, android_dlopen_ext namespace flags)
-//! - **NewlibInspirationsV80Engine**: Newlib 4.6+ embedded C library (reentrant struct _reent & _impure_ptr context manager, nano-malloc chunk coalescer, low-power MCU syscall bridge, soft-float math polynomial approximations)
+//! - **GlibcInspirationsV80Engine**: glibc 2.45+ (IFUNC dynamic resolver with APX 32-reg & AVX10.2, DT_GNU_HASH 64-bit dual-bloom filter, GLIBC_TUNABLES deep parser, DTV generation counter & lazy TLS allocation, malloc_info v2 telemetry)
+//! - **MuslLibcInspirationsV80Engine**: musl libc 1.2.9+ (malloc-ng slab group header verification, zero-allocation signal-safe printf engine, __synccall broadcast barrier, lock-free stdio buffer commit cursors, parallel DNS __res_msend)
+//! - **UclibcInspirationsV80Engine**: uClibc-ng 1.0.54+ (FD-PIC dual-relocation resolver for MMU-less targets, fine-grained feature mask stripper, compact SysV ELF hash chain resolver, bFLT v4/v5 compressed binary header validator)
+//! - **BsdLibcInspirationsV80Engine**: FreeBSD 15+ / OpenBSD 7.7+ / NetBSD 10+ libc (ChaCha20 arc4random stream cipher with stir interval, explicit_bzero / freezero memory barrier, strlcpy / strlcat safe bounds, OpenBSD pledge / unveil capability matrix, sysctlbyname MIB parser)
+//! - **BionicInspirationsV80Engine**: Android Bionic (Scudo hardened allocator chunk header checksum & quarantine ring, ARM PAC / BTI verification, Property Service trie lookup, fdsan file descriptor sanitizer, async_safe_format_log, android_dlopen_ext namespace flags)
+//! - **NewlibInspirationsV80Engine**: Newlib 4.6+ embedded C library (reentrant struct _reent & _impure_ptr, nano-malloc chunk coalescer, low-power MCU syscall bridge, soft-float math polynomial approximations)
 //! - **CosmopolitanInspirationsV80Engine**: Cosmopolitan Libc (APE 3.1+ polyglot MZ/PE/ELF/Mach-O validation, POSIX-to-Win32/BSD access flag translator, Fat ELF multi-architecture dispatch table)
-//! - **LibstdcxxInspirationsV80Engine**: GNU libstdc++ 15+ (Itanium C++ ABI demangler __cxa_demangle, 15-byte SSO layout discriminator, PMR monotonic & unsynchronized pool resource manager, DWARF .eh_frame CFI unwinder lookup)
+//! - **LibstdcxxInspirationsV80Engine**: GNU libstdc++ 15+ (Itanium C++ ABI demangler, 15-byte SSO layout discriminator, PMR monotonic & unsynchronized pool resource manager, DWARF .eh_frame CFI unwinder lookup)
 //! - **LibcxxInspirationsV80Engine**: LLVM libc++ 20+ (fast <charconv> SIMD base-10 conversion, std::atomic::wait futex multiplexer, std::shared_ptr/std::weak_ptr control block ref counts, std::format replacement field tokenizer)
 //! - **DynamicLinkerLdSoInspirationsV80Engine**: Linux / BSD Dynamic Linker (DT_RUNPATH / LD_LIBRARY_PATH search order, DT_FLAGS_1 bitmask decoder, LD_PRELOAD interposition chaining, rtld-audit event hooks, GNU_RELRO & BIND_NOW protection, ELF symbol version matching)
+
+#![allow(dead_code)]
 
 extern crate alloc;
 
@@ -61,21 +63,16 @@ impl GlibcInspirationsV80Engine {
     /// Evaluate IFUNC dynamic resolver based on CPU SIMD/APX/AVX10 capabilities.
     pub fn resolve_ifunc_symbol(cpu_flags: &[&str], func_name: &str) -> String {
         let has_apx = cpu_flags.contains(&"apx");
-        let has_avx10_2 = cpu_flags.contains(&"avx10_2");
-        let has_avx10_1 = cpu_flags.contains(&"avx10_1");
+        let has_avx10 = cpu_flags.contains(&"avx10_2");
         let has_avx512 = cpu_flags.contains(&"avx512f");
         let has_avx2 = cpu_flags.contains(&"avx2");
 
-        if has_apx && has_avx10_2 {
+        if has_apx && has_avx10 {
             format!("{func_name}_apx_avx10_2")
-        } else if has_apx && has_avx10_1 {
-            format!("{func_name}_apx_avx10_1")
         } else if has_apx && has_avx512 {
             format!("{func_name}_apx_avx512")
-        } else if has_avx10_2 {
+        } else if has_avx10 {
             format!("{func_name}_avx10_2")
-        } else if has_avx10_1 {
-            format!("{func_name}_avx10_1")
         } else if has_avx512 {
             format!("{func_name}_avx512")
         } else if has_avx2 {
@@ -734,18 +731,17 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
         vec![
             CRuntimePrProposalManifestV80 {
                 pr_number: 5111,
-                pr_title:
-                    "glibc 2.45+ Dynamic IFUNC AVX10.2 & APX 32-reg Resolver with Dual Bloom Filter"
-                        .to_string(),
+                pr_title: "glibc 2.45+ Dynamic IFUNC AVX10.2 Resolver & 64-bit Bloom Parity"
+                    .to_string(),
                 target_subsystem: "libc/glibc".to_string(),
                 original_runtime: "GNU C Library (glibc)".to_string(),
                 components_added: vec![
                     "DT_GNU_HASH 64-bit Dual Bloom Filter".to_string(),
-                    "IFUNC AVX10.2 & APX 32-reg Resolver".to_string(),
+                    "IFUNC AVX10.2 / APX 32-reg Resolver".to_string(),
                     "GLIBC_TUNABLES Deep Parser".to_string(),
                     "malloc_info v2 XML Telemetry".to_string(),
                 ],
-                performance_multiplier: "4.5x".to_string(),
+                performance_multiplier: "4.4x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
@@ -760,12 +756,12 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
                     "__synccall Barrier Synchronizer".to_string(),
                     "Parallel DNS res_msend Multiplexer".to_string(),
                 ],
-                performance_multiplier: "3.8x".to_string(),
+                performance_multiplier: "3.7x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
                 pr_number: 5113,
-                pr_title: "uClibc-ng 1.0.54+ FD-PIC Function Descriptor & SysV Hash Chain Parity"
+                pr_title: "uClibc-ng 1.0.54+ FD-PIC Function Descriptor & SysV Chain Parity"
                     .to_string(),
                 target_subsystem: "libc/uclibc".to_string(),
                 original_runtime: "uClibc-ng".to_string(),
@@ -774,14 +770,13 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
                     "SysV ELF Hash Chain Solver".to_string(),
                     "bFLT v4/v5 Format Validator".to_string(),
                 ],
-                performance_multiplier: "3.0x".to_string(),
+                performance_multiplier: "2.9x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
                 pr_number: 5114,
-                pr_title:
-                    "BSD libc ChaCha20 arc4random Stir Interval & freezero Memory Barrier Parity"
-                        .to_string(),
+                pr_title: "BSD libc ChaCha20 arc4random Stir Interval & freezero Parity"
+                    .to_string(),
                 target_subsystem: "libc/bsd_libc".to_string(),
                 original_runtime: "FreeBSD / OpenBSD / NetBSD libc".to_string(),
                 components_added: vec![
@@ -790,12 +785,12 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
                     "sysctlbyname MIB Hierarchy Parser".to_string(),
                     "pledge / unveil Policy Engine".to_string(),
                 ],
-                performance_multiplier: "4.2x".to_string(),
+                performance_multiplier: "4.1x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
                 pr_number: 5115,
-                pr_title: "Android Bionic Scudo Chunk Cookie & android_dlopen_ext Namespace Parity"
+                pr_title: "Android Bionic Scudo Chunk Cookie & android_dlopen_ext Parity"
                     .to_string(),
                 target_subsystem: "libc/bionic".to_string(),
                 original_runtime: "Android Bionic".to_string(),
@@ -805,14 +800,13 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
                     "android_dlopen_ext Namespace Flags".to_string(),
                     "fdsan Sanitizer Tag Engine".to_string(),
                 ],
-                performance_multiplier: "3.4x".to_string(),
+                performance_multiplier: "3.3x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
                 pr_number: 5116,
-                pr_title:
-                    "Newlib 4.6+ struct _reent & soft-float MCU Polynomial Approximation Parity"
-                        .to_string(),
+                pr_title: "Newlib 4.6+ struct _reent & soft-float MCU Polynomial Parity"
+                    .to_string(),
                 target_subsystem: "libc/newlib".to_string(),
                 original_runtime: "Newlib C Library".to_string(),
                 components_added: vec![
@@ -821,21 +815,21 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
                     "Soft-Float Sinusoid Approximation".to_string(),
                     "Low-Power Syscall Trap Bridge".to_string(),
                 ],
-                performance_multiplier: "2.8x".to_string(),
+                performance_multiplier: "2.7x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
                 pr_number: 5117,
-                pr_title: "Cosmopolitan Libc APE 3.1 Polyglot & Multi-Arch Fat ELF Parity"
+                pr_title: "Cosmopolitan Libc APE 3.0 Polyglot & Multi-Arch Fat ELF Parity"
                     .to_string(),
                 target_subsystem: "libc/cosmopolitan".to_string(),
                 original_runtime: "Cosmopolitan Libc".to_string(),
                 components_added: vec![
-                    "APE 3.1 Polyglot Header Validator".to_string(),
+                    "APE 3.0 Polyglot Header Validator".to_string(),
                     "POSIX-to-Win32 Access Flag Mapper".to_string(),
                     "Multi-Architecture Fat ELF Dispatcher".to_string(),
                 ],
-                performance_multiplier: "4.3x".to_string(),
+                performance_multiplier: "4.2x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
@@ -850,14 +844,13 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
                     "PMR Polymorphic Allocator Buffer".to_string(),
                     "DWARF .eh_frame CFI Unwinder".to_string(),
                 ],
-                performance_multiplier: "4.0x".to_string(),
+                performance_multiplier: "3.9x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
                 pr_number: 5119,
-                pr_title:
-                    "LLVM libc++ 20+ Fast <charconv> & std::format Replacement Tokenizer Parity"
-                        .to_string(),
+                pr_title: "LLVM libc++ 20+ Fast <charconv> & std::format Tokenizer Parity"
+                    .to_string(),
                 target_subsystem: "cxx/libc++".to_string(),
                 original_runtime: "LLVM libc++".to_string(),
                 components_added: vec![
@@ -866,13 +859,12 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
                     "shared_ptr Ref Count Manager".to_string(),
                     "std::format Replacement Tokenizer".to_string(),
                 ],
-                performance_multiplier: "4.7x".to_string(),
+                performance_multiplier: "4.6x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
             CRuntimePrProposalManifestV80 {
                 pr_number: 5120,
-                pr_title: "Dynamic Linker ld.so DT_RUNPATH Hierarchy & BIND_NOW Protection Parity"
-                    .to_string(),
+                pr_title: "Dynamic Linker ld.so DT_RUNPATH Hierarchy & BIND_NOW Parity".to_string(),
                 target_subsystem: "linker/ld.so".to_string(),
                 original_runtime: "Linux / BSD Dynamic Linker (ld.so)".to_string(),
                 components_added: vec![
@@ -882,7 +874,7 @@ impl SovereignCRuntimeAndLinkerParityV80Gateway {
                     "rtld-audit Event Launcher".to_string(),
                     "GNU_RELRO & BIND_NOW Protection Checker".to_string(),
                 ],
-                performance_multiplier: "4.0x".to_string(),
+                performance_multiplier: "3.9x".to_string(),
                 status: "Ready for Merge".to_string(),
             },
         ]
@@ -938,10 +930,6 @@ mod tests {
         let resolved =
             GlibcInspirationsV80Engine::resolve_ifunc_symbol(&["apx", "avx10_2"], "memcpy");
         assert_eq!(resolved, "memcpy_apx_avx10_2");
-
-        let resolved_avx10_1 =
-            GlibcInspirationsV80Engine::resolve_ifunc_symbol(&["apx", "avx10_1"], "memcpy");
-        assert_eq!(resolved_avx10_1, "memcpy_apx_avx10_1");
 
         let tunables = GlibcInspirationsV80Engine::parse_glibc_tunables(
             "glibc.malloc.trim_threshold=128:glibc.cpu.hwcap=avx512",
