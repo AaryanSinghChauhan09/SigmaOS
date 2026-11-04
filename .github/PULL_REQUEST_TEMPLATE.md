@@ -12,6 +12,16 @@ Provide a concise overview of the changes in this pull request.
 - [ ] I/O scheduler evaluated
 - [ ] I/O safety review completed
 
+## Storage component
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
 ## Verification
 - Unit tests
 - Integration tests
