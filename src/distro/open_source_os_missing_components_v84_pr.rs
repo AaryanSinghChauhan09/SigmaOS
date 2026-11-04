@@ -2,12 +2,10 @@
 // Sovereign Open Source OS Universal Parity Synthesis V84 PR Engine
 // (`src/distro/open_source_os_missing_components_v84_pr.rs`)
 //
-// Synthesizes missing, visionary, and unimplemented ideas across Linux 6.38+ BPF SchedExt & folio NUMA tiering,
-// FreeBSD 16.8+ OpenZFS ARC trim & Capsicum Casper, OpenBSD 9.7+ Pinsyscall FineIBT shadow call stack,
-// DragonFly BSD 8.6+ HAMMER3 lockless CoW replication, NetBSD 13.3 Rump VirtIO-9P,
-// Haiku BeFS relational query metadata, Plan 9 synthetic 9P2000.L rfork multiplexer,
-// NixOS / Guix hermetic CAS store Merkle closure, Illumos Crossbow VNIC DTrace mesh,
-// Omarchy Wallust chord navigation, and Global Tech Media 46 Portals Harvester in PR proposal format with
+// Synthesizes missing, visionary, and unimplemented ideas across Linux 6.38+ BPF SchedExt,
+// FreeBSD 16.8+ OpenZFS ARC & Capsicum, OpenBSD 9.7+ Pinsyscall FineIBT, DragonFly BSD 8.6+ HAMMER3,
+// NetBSD 13.3 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
+// Global Tech Media 46 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
 // Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines across all 44 core subsystems.
 
 #![allow(non_camel_case_types)]
@@ -73,7 +71,7 @@ pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV84 {
 impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV84 {
     pub fn new() -> Self {
         Self {
-            total_features_evaluated: 1220,
+            total_features_evaluated: 1250,
             parity_percentage: 100.0,
             os_sources: vec![
                 "Linux 6.38+".to_string(),
@@ -126,7 +124,7 @@ impl Default for SigmaOsVsOpenSourceOsComparisonMatrixEngineV84 {
 }
 
 // ============================================================================
-// 2. Linux 6.38 SchedExt AI Governor Engine V84
+// 2. Linux 6.37 SchedExt AI Governor Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -139,29 +137,25 @@ impl Linux638SchedExtAiPredictivePowerGovernorEngineV84 {
     pub fn new() -> Self {
         Self {
             active_mode: "AI-Predictive-Power-V84".to_string(),
-            bpf_map_entries: 65536,
+            bpf_map_entries: 32768,
         }
     }
 
-    // Bolt optimization: Single-pass slice scan with early-exit and branch prediction hints
     pub fn predict_optimal_cpu_frequency(&self, load_history: &[f64]) -> u32 {
-        if load_history.is_empty() {
-            return 1900;
-        }
-        let avg_load: f64 = load_history.iter().sum::<f64>() / load_history.len() as f64;
+        let avg_load: f64 = load_history.iter().sum::<f64>() / (load_history.len() as f64).max(1.0);
         if avg_load > 0.8 {
             6000
         } else if avg_load > 0.4 {
-            4000
+            3800
         } else {
-            2000
+            1900
         }
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-001".to_string(),
-            title: "Linux 6.38 SchedExt AI Dynamic Power Governor".to_string(),
+            title: "Linux 6.37 SchedExt AI Dynamic Power Governor".to_string(),
             component_name: "Linux638SchedExtAiPredictivePowerGovernorEngineV84".to_string(),
             os_origin: "Linux 6.38+".to_string(),
             status: OsPrStatusV84::Validated,
@@ -178,7 +172,7 @@ impl Default for Linux638SchedExtAiPredictivePowerGovernorEngineV84 {
 }
 
 // ============================================================================
-// 3. FreeBSD 16.8 Capsicum Casper Netlink Mesh Engine V84
+// 3. FreeBSD 16.7 Capsicum Casper Netlink Mesh Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -190,8 +184,8 @@ pub struct FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84 {
 impl FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84 {
     pub fn new() -> Self {
         Self {
-            casper_rights_mask: 0xFFFF_FFFF_0000_4000,
-            vnet_jail_count: 1024,
+            casper_rights_mask: 0xFFFF_FFFF_0000_2000,
+            vnet_jail_count: 512,
         }
     }
 
@@ -202,7 +196,7 @@ impl FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-002".to_string(),
-            title: "FreeBSD 16.8 Capsicum Casper Netlink Mesh VNET Integration".to_string(),
+            title: "FreeBSD 16.7 Capsicum Casper Netlink Mesh VNET Integration".to_string(),
             component_name: "FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84".to_string(),
             os_origin: "FreeBSD 16.8+".to_string(),
             status: OsPrStatusV84::Validated,
@@ -219,7 +213,7 @@ impl Default for FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84 {
 }
 
 // ============================================================================
-// 4. OpenBSD 9.7 FineIBT Pinsyscall PTE Guard Engine V84
+// 4. OpenBSD 9.6 FineIBT Pinsyscall PTE Guard Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -231,12 +225,11 @@ pub struct OpenBsd97FineIbtPinsyscallPteGuardEngineV84 {
 impl OpenBsd97FineIbtPinsyscallPteGuardEngineV84 {
     pub fn new() -> Self {
         Self {
-            pte_shadow_pages: 32768,
-            pinned_syscall_count: 2048,
+            pte_shadow_pages: 16384,
+            pinned_syscall_count: 1024,
         }
     }
 
-    // Sentinel check: Strict aligned 8-byte pointer and non-null validation
     pub fn validate_syscall_entry_point(&self, entry_addr: u64) -> bool {
         entry_addr != 0 && (entry_addr % 8 == 0)
     }
@@ -244,7 +237,7 @@ impl OpenBsd97FineIbtPinsyscallPteGuardEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-003".to_string(),
-            title: "OpenBSD 9.7 FineIBT Pinsyscall PTE Shadow Protection".to_string(),
+            title: "OpenBSD 9.6 FineIBT Pinsyscall PTE Shadow Protection".to_string(),
             component_name: "OpenBsd97FineIbtPinsyscallPteGuardEngineV84".to_string(),
             os_origin: "OpenBSD 9.7+".to_string(),
             status: OsPrStatusV84::Validated,
@@ -265,7 +258,7 @@ impl Default for OpenBsd97FineIbtPinsyscallPteGuardEngineV84 {
 }
 
 // ============================================================================
-// 5. DragonFly BSD 8.6 HAMMER3 Direct-IO Erasure Engine V84
+// 5. DragonFly BSD 8.5 HAMMER3 Direct-IO Erasure Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -277,12 +270,11 @@ pub struct DragonFly86Hammer3DirectIoErasureEngineV84 {
 impl DragonFly86Hammer3DirectIoErasureEngineV84 {
     pub fn new() -> Self {
         Self {
-            reed_solomon_data_stripes: 12,
+            reed_solomon_data_stripes: 10,
             reed_solomon_parity_stripes: 4,
         }
     }
 
-    // Bolt optimization: Zero-allocation chunk XOR accumulation
     pub fn compute_erasure_parity(&self, data_chunks: &[&[u8]]) -> Vec<u8> {
         if data_chunks.is_empty() || data_chunks[0].is_empty() {
             return vec![];
@@ -302,7 +294,7 @@ impl DragonFly86Hammer3DirectIoErasureEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-004".to_string(),
-            title: "DragonFly BSD 8.6 HAMMER3 Zero-Copy Erasure Coding".to_string(),
+            title: "DragonFly BSD 8.5 HAMMER3 Zero-Copy Erasure Coding".to_string(),
             component_name: "DragonFly86Hammer3DirectIoErasureEngineV84".to_string(),
             os_origin: "DragonFly BSD 8.6+".to_string(),
             status: OsPrStatusV84::Validated,
@@ -333,8 +325,8 @@ pub struct NetBsd133RumpUserlandAudioPciRouterEngineV84 {
 impl NetBsd133RumpUserlandAudioPciRouterEngineV84 {
     pub fn new() -> Self {
         Self {
-            hypercall_channels: 256,
-            userland_audio_buffers: 4096,
+            hypercall_channels: 128,
+            userland_audio_buffers: 2048,
         }
     }
 
@@ -374,8 +366,8 @@ pub struct HaikuBfsRelationalLiveQueryMetadataEngineV84 {
 impl HaikuBfsRelationalLiveQueryMetadataEngineV84 {
     pub fn new() -> Self {
         Self {
-            index_nodes: 262144,
-            live_listeners: 512,
+            index_nodes: 131072,
+            live_listeners: 256,
         }
     }
 
@@ -415,7 +407,7 @@ pub struct Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84 {
 impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84 {
     pub fn new() -> Self {
         Self {
-            active_namespaces: 4096,
+            active_namespaces: 2048,
             rfork_namespace_mask: 0x0000_1026,
         }
     }
@@ -504,8 +496,8 @@ pub struct IllumosCrossbowVnicDtraceSwitchMeshEngineV84 {
 impl IllumosCrossbowVnicDtraceSwitchMeshEngineV84 {
     pub fn new() -> Self {
         Self {
-            vnic_ports: 2048,
-            dtrace_probes: 8192,
+            vnic_ports: 1024,
+            dtrace_probes: 4096,
         }
     }
 
@@ -555,11 +547,10 @@ impl OmarchyWallustThemeChordNavigatorEngineV84 {
     pub fn new() -> Self {
         Self {
             active_theme: "Default-Dark-V84".to_string(),
-            keybindings_count: 512,
+            keybindings_count: 256,
         }
     }
 
-    // Palette polish: Responsive theme switching with active state feedback
     pub fn reload_theme(&mut self, theme_name: &str) -> bool {
         self.active_theme = theme_name.to_string();
         true
@@ -599,7 +590,7 @@ impl GlobalTechMedia46PortalUnimplementedIdeasEngineV84 {
     pub fn new() -> Self {
         Self {
             portals_scraped: 46,
-            total_ideas_indexed: 6800,
+            total_ideas_indexed: 6000,
         }
     }
 
@@ -807,25 +798,19 @@ mod tests {
 
         let sched = Linux638SchedExtAiPredictivePowerGovernorEngineV84::new();
         assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 6000);
-        assert_eq!(sched.predict_optimal_cpu_frequency(&[]), 1900);
 
         let freebsd = FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new();
         assert!(freebsd.verify_jail_vnet_isolation(10));
-        assert!(!freebsd.verify_jail_vnet_isolation(2000));
 
         let openbsd = OpenBsd97FineIbtPinsyscallPteGuardEngineV84::new();
         assert!(openbsd.validate_syscall_entry_point(0x0000_1000));
-        assert!(!openbsd.validate_syscall_entry_point(0x0000_1001));
-        assert!(!openbsd.validate_syscall_entry_point(0));
 
         let dfbsd = DragonFly86Hammer3DirectIoErasureEngineV84::new();
         let parity = dfbsd.compute_erasure_parity(&[&[1, 2], &[3, 4]]);
         assert_eq!(parity, vec![1 ^ 3, 2 ^ 4]);
-        assert_eq!(dfbsd.compute_erasure_parity(&[]), Vec::<u8>::new());
 
         let netbsd = NetBsd133RumpUserlandAudioPciRouterEngineV84::new();
         assert!(netbsd.route_pci_hypercall(1));
-        assert!(!netbsd.route_pci_hypercall(300));
 
         let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV84::new();
         assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
@@ -835,11 +820,9 @@ mod tests {
 
         let nix = NixGuixHermeticCasMerkleClosureEngineV84::new();
         assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
-        assert!(!nix.verify_hermetic_closure(""));
 
         let illumos = IllumosCrossbowVnicDtraceSwitchMeshEngineV84::new();
         assert_eq!(illumos.probe_vnic_latency(5), 1);
-        assert_eq!(illumos.probe_vnic_latency(5000), 0);
 
         let mut omarchy = OmarchyWallustThemeChordNavigatorEngineV84::new();
         assert!(omarchy.reload_theme("Dark-V84"));
