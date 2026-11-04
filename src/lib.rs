@@ -663,14 +663,11 @@ pub use security::{
     BsdHardeningAndIsolationV80Engine, CapabilityGate, CapabilityToken, ForensicStorageFilter,
     IdentityAndEnterpriseAuthV80Engine, LinuxAccessControlAndSandboxingV80Engine, Permission,
     PledgeManager, PledgePromise, RoutingMode, SandboxPolicy,
-    SecurityV80PrProposalManifest, SecurityV89PrProposalManifest, SovereignSecurityAndHardeningParityPrGateway,
+    SecurityV80PrProposalManifest, SovereignSecurityAndHardeningParityPrGateway,
     SovereignSecurityAndHardeningParityV61Gateway, SovereignSecurityAndHardeningParityV64Gateway,
     SovereignSecurityAndHardeningParityV68Gateway, SovereignSecurityAndHardeningParityV70Gateway,
     SovereignSecurityAndHardeningParityV76Gateway, SovereignSecurityAndHardeningParityV77Gateway,
-    SovereignSecurityAndHardeningParityV80Gateway, SovereignSecurityAndHardeningParityV89Gateway,
-    AntivirusAndCryptoEngineV89Engine, AuditAndIntrusionPreventionV89Engine,
-    BsdHardeningAndIsolationV89Engine, IdentityAndEnterpriseAuthV89Engine,
-    LinuxAccessControlAndSandboxingV89Engine,
+    SovereignSecurityAndHardeningParityV80Gateway,
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
