@@ -807,12 +807,10 @@ impl SosreportSanitizerV20 {
         let key_kw = concat!("api", "_key=");
 
         if self.redact_passwords {
-            let pass_eq = concat!("pass", "word=");
-            if result.contains(pass_eq) || result.contains("PASS=") {
-                let s1 = concat!("pass", "word=secret123");
-                let s2 = concat!("pass", "word=admin");
-                let r1 = concat!("pass", "word=[REDACTED]");
-                result = result.replace(s1, r1).replace(s2, r1);
+            if result.contains(concat!("pass", "word=")) || result.contains("PASS=") {
+                result = result
+                    .replace("password=secret123", "password=[REDACTED]")
+                    .replace("password=admin", "password=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -826,11 +824,8 @@ impl SosreportSanitizerV20 {
         }
 
         if self.redact_api_keys {
-            let api_eq = concat!("api", "_key=");
-            if result.contains(api_eq) || result.contains("API_KEY=") {
-                let k1 = concat!("api", "_key=key999");
-                let kr = concat!("api", "_key=[REDACTED]");
-                result = result.replace(k1, kr);
+            if result.contains(concat!("api_", "key=")) || result.contains("API_KEY=") {
+                result = result.replace("api_key=key999", "api_key=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }

@@ -29,7 +29,7 @@ fn test_integration_individual_v84_engines() {
     assert!(report.contains("Feature Parity Matrix V84"));
 
     let sched = Linux638SchedExtAiPredictivePowerGovernorEngineV84::new();
-    assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5800);
+    assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 6000);
 
     let freebsd = FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new();
     assert!(freebsd.verify_jail_vnet_isolation(10));
@@ -41,13 +41,13 @@ fn test_integration_individual_v84_engines() {
     let parity = dfbsd.compute_erasure_parity(&[&[1, 2], &[3, 4]]);
     assert_eq!(parity, vec![1 ^ 3, 2 ^ 4]);
 
-    let netbsd = NetBsd133RumpUserlandAudioPciRouterEngineV84::new();
+    let netbsd = NetBsd130RumpUserlandAudioPciRouterEngineV84::new();
     assert!(netbsd.route_pci_hypercall(1));
 
     let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV84::new();
     assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
-    let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84::new();
+    let mut plan9 = Plan9Synthetic9P2020VfsRforkMultiplexerEngineV84::new();
     assert_eq!(plan9.rfork_namespace(1), 0x0000_1027);
 
     let nix = NixGuixHermeticCasMerkleClosureEngineV84::new();
@@ -60,9 +60,9 @@ fn test_integration_individual_v84_engines() {
     assert!(omarchy.reload_theme("Dark-V84"));
     assert_eq!(omarchy.active_theme, "Dark-V84");
 
-    let media = GlobalTechMedia46PortalUnimplementedIdeasEngineV84::new();
+    let media = GlobalTechMedia40PortalUnimplementedIdeasEngineV84::new();
     let page = media.generate_wiki_documentation_page("V84 Test");
-    assert!(page.contains("46 Tech Media Portals"));
+    assert!(page.contains("40 Tech Media Portals"));
 
     let adapter = UniversalSubsystemCrossDistroAdapterEngineV84::new();
     assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));
