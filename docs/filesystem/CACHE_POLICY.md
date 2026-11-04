@@ -1,5 +1,4 @@
 # Cache Policy
-
 - Race-Free Cache Eviction
 - Cache Reuse Policy
 - Bounded Cache Metadata

@@ -1,7 +1,10 @@
-# Secondary Memory Lifecycle Subsystem Architecture Decision Record
+# Secondary Memory Lifecycle Subsystem
+
+## Context
+Architecture Decision Record for storage.
 
 ## Decision
-Establish unified secondary memory lifecycle architecture across storage layers.
+Enforce modular secondary memory lifecycle.
 
 ## Consequences
-Guarantees consistent caching, mounting, and fail-safe block operations.
+Deterministic lifecycle management.

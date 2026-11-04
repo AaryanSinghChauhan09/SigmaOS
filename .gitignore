@@ -81,3 +81,9 @@ __pycache__/
 !docs/io/*.md
 !docs/filesystem/
 !docs/filesystem/*.md
+!STORAGE_RULES.toml
+!FEATURE_STATUS.toml
+!docs/INTERRUPT_HANDLER_PLAN.md
+!docs/storage/
+!docs/storage/*.md
+!wiki/INTERRUPT_HANDLER_PLAN.md
