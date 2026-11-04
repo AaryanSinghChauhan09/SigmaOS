@@ -3767,3 +3767,10 @@ if [ -f "tests/test_networking_stack_and_daemons_v87_pr.rs" ]; then
     rustc --test tests/test_networking_stack_and_daemons_v87_pr.rs --edition=2021 -o build/test_networking_stack_v87_pr
     ./build/test_networking_stack_v87_pr
 fi
+
+if [ -f "tests/test_shells_terminals_supervisors_v90_pr.rs" ]; then
+    echo "Running Sovereign Shells, Terminals & Supervisors V90 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_shells_terminals_supervisors_v90_pr.rs --edition=2021 -o build/test_shells_v90_pr
+    ./build/test_shells_v90_pr
+fi
