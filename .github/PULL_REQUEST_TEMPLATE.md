@@ -1,6 +1,12 @@
 ## Summary
 
-<!-- What shell behavior changed and why? -->
+## Summary
+
+<!-- What behavior changed and why? -->
+
+## Component impact
+
+## Shell component
 
 ## Shell component
 
@@ -18,11 +24,32 @@
 - [ ] Diagnostics
 - [ ] Security / sandboxing
 - [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+- [ ] CI / tooling
 
-## Motivation
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
+
+## Upstream study and reference behavior
+
+- Reference study:
+- Upstream project, document, or behavior reviewed:
+- POSIX section:
+- Bash/dash/Zsh/BusyBox reference:
+- SigmaOS current behavior:
+- What SigmaOS adopts:
+- What remains intentionally different:
+- Compatibility impact:
 
 <!-- Detailed motivation behind the component rule or capability enhancement -->
 
@@ -78,6 +105,10 @@
 - [ ] No unbounded recursion or allocation
 - [ ] Interactive terminal state is restored
 - [ ] Script mode does not execute invalid partial input
+- Capability/namespace checks enforced:
+- Shared-memory or descriptor implications:
+- Input validation and failure behavior:
+- Rollback or downgrade path:
 
 ## Verification
 
@@ -85,27 +116,15 @@
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
+- [ ] Focused unit tests pass.
 - [ ] New/updated shell tests
 - [ ] POSIX/conformance test evidence
 - [ ] Fuzz target or documented exemption
 - [ ] Boot-to-shell evidence, if boot-affecting
 - [ ] Security review requested, if applicable
-
-## Runtime evidence
-
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
-
-## Safety and rollback
-
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Package scripts sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- [ ] Documentation and wiki mirrors updated where applicable.
+- Test/evidence commands:
+- Results:
 
 ## Capability status
 
@@ -142,14 +161,6 @@
 
 ## Integration impact
 
-## I/O component
-- [ ] I/O policy
-- [ ] Interrupt manager
-- [ ] DMA manager
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] I/O safety review
-
-## Reviewer checklist
-- [ ] Scope is narrow
-- [ ] `unsafe` justified
+- APIs, ABI, protocols, or file formats affected:
+- Cross-repository synchronization required:
+- Release or migration notes:
