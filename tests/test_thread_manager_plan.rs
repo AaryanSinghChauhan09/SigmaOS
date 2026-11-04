@@ -5,13 +5,12 @@ use std::fs;
 
 #[test]
 fn test_thread_manager_documentation_parity() {
-    let docs_plan =
-        fs::read_to_string("docs/thread-manager.md").expect("docs/thread-manager.md must exist");
-    let wiki_plan =
-        fs::read_to_string("wiki/thread-manager.md").expect("wiki/thread-manager.md must exist");
+    let docs_plan = fs::read_to_string("docs/thread-manager.md")
+        .expect("docs/thread-manager.md must exist");
+    let wiki_plan = fs::read_to_string("wiki/thread-manager.md")
+        .expect("wiki/thread-manager.md must exist");
 
-    assert!(docs_plan
-        .contains("SigmaOS Thread Manager Master Architecture, Support Matrix, and Program Plan"));
+    assert!(docs_plan.contains("SigmaOS Thread Manager Master Architecture, Support Matrix, and Program Plan"));
     assert!(docs_plan.contains("Thread Lifecycle States"));
     assert!(docs_plan.contains("`New`"));
     assert!(docs_plan.contains("`Ready`"));
@@ -39,8 +38,10 @@ fn test_thread_manager_documentation_parity() {
 
 #[test]
 fn test_governance_and_component_rules_presence() {
-    let contributing = fs::read_to_string("CONTRIBUTING.md").expect("CONTRIBUTING.md must exist");
-    let agents = fs::read_to_string("AGENTS.md").expect("AGENTS.md must exist");
+    let contributing = fs::read_to_string("CONTRIBUTING.md")
+        .expect("CONTRIBUTING.md must exist");
+    let agents = fs::read_to_string("AGENTS.md")
+        .expect("AGENTS.md must exist");
 
     for content in &[&contributing, &agents] {
         assert!(content.contains("Engineering Cadence"));
@@ -89,8 +90,8 @@ fn test_pull_request_template_structure() {
 
 #[test]
 fn test_feature_status_thread_manager_entry() {
-    let status_toml =
-        fs::read_to_string("FEATURE_STATUS.toml").expect("FEATURE_STATUS.toml must exist");
+    let status_toml = fs::read_to_string("FEATURE_STATUS.toml")
+        .expect("FEATURE_STATUS.toml must exist");
 
     assert!(status_toml.contains("[kernel.thread_manager]"));
     assert!(status_toml.contains("status = \"unit-tested\""));
