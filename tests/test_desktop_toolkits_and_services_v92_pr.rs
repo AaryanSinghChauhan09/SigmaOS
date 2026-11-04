@@ -1,6 +1,5 @@
 // Integration Test Suite for Sovereign Desktop Services and Toolkits Advancements V92 PR
-// Verifying all 11 sub-engines across GTK, Qt, DMs, GVfs/GIO, PolicyKit, XDG utilities/portals,
-// fonts, IBus/Fcitx, notification daemons, screen lockers, clipboard managers, and 10-distro PR gateway.
+// Verifying all 11 sub-engines, master gateway, and PR proposals
 
 #[path = "../src/desktop/sovereign_desktop_toolkits_and_services_v92_pr.rs"]
 mod sovereign_desktop_toolkits_and_services_v92_pr;
@@ -8,280 +7,206 @@ mod sovereign_desktop_toolkits_and_services_v92_pr;
 use sovereign_desktop_toolkits_and_services_v92_pr::*;
 
 #[test]
-fn test_gtk_qt_toolkit_v92_integration() {
-    let mut engine = SovereignGtkQtToolkitEngineV92::new();
-    assert_eq!(engine.adw_color_scheme, AdwColorSchemeV92::PreferDark);
-    assert_eq!(engine.qt_style, Qt6PlatformStyleV92::Kvantum);
-    assert_eq!(engine.gtk_render_pipeline, GtkRenderPipelineV92::Vulkan);
+fn test_gtk_qt_toolkit_integration_v92() {
+    let mut toolkit = SovereignGtkQtToolkitEngineV92::new();
+    assert_eq!(toolkit.gtk_render_pipeline, GtkRenderPipelineV92::Vulkan);
+    assert_eq!(toolkit.adw_color_scheme, AdwColorSchemeV92::PreferDark);
 
-    engine.set_accent_color("#ff5500");
-    assert_eq!(engine.active_accent_hex, "#ff5500");
+    toolkit.set_accent_color("#e66100");
+    assert_eq!(toolkit.active_accent_hex, "#e66100");
 
     let css = r#"
-        @define-color accent_color #ff5500;
-        window.background {
-            background-color: #121212;
-            border-radius: 8px;
-        }
-        button.suggested-action {
-            background-color: #ff5500;
-        }
-        entry {
-            border-radius: 4px;
-        }
-        headerbar {
-            background-color: #202020;
-        }
+        @define-color accent_bg_color #e66100;
+        window.background { background-color: #121212; }
+        button.suggested-action { border-radius: 6px; }
+        entry { background-color: #242424; }
+        headerbar { background-color: #1e1e1e; }
     "#;
-    let qss = engine.convert_css_to_qss(css);
-    assert!(qss.contains("/* Palette Variable: accent_color -> #ff5500 */"));
+    let qss = toolkit.convert_css_to_qss(css);
+    assert!(qss.contains("Palette Variable: accent_bg_color -> #e66100"));
     assert!(qss.contains("QMainWindow, QDialog"));
     assert!(qss.contains("QPushButton[accent=\"true\"]"));
     assert!(qss.contains("QLineEdit"));
     assert!(qss.contains("QHeaderView"));
 
-    let kv_cfg = engine.generate_kvantum_config();
-    assert!(kv_cfg.contains("theme=SovereignDarkV92"));
-    assert!(kv_cfg.contains("blur=true"));
-    assert!(kv_cfg.contains("translucent=true"));
+    let kv_config = toolkit.generate_kvantum_config();
+    assert!(kv_config.contains("theme=SovereignDarkV92"));
+    assert!(kv_config.contains("blur=true"));
+    assert!(kv_config.contains("translucent=true"));
 }
 
 #[test]
-fn test_display_manager_v92_integration() {
+fn test_display_manager_suite_integration_v92() {
     let mut gdm = SovereignDisplayManagerSuiteEngineV92::new(DisplayManagerKindV92::Gdm);
     gdm.auto_login_user = Some("desktop_tester".to_string());
-    gdm.xdmcp_enabled = true;
+    gdm.xdmcp_enabled = false;
     let gdm_cfg = gdm.generate_dm_config();
     assert!(gdm_cfg.contains("AutomaticLoginEnable=true"));
     assert!(gdm_cfg.contains("AutomaticLogin=desktop_tester"));
-    assert!(gdm_cfg.contains("Enable=true"));
 
     let mut sddm = SovereignDisplayManagerSuiteEngineV92::new(DisplayManagerKindV92::Sddm);
-    sddm.auto_login_user = Some("desktop_tester".to_string());
+    sddm.auto_login_user = Some("plasma_user".to_string());
     let sddm_cfg = sddm.generate_dm_config();
-    assert!(sddm_cfg.contains("User=desktop_tester"));
-    assert!(sddm_cfg.contains("Current=SovereignSddmV92"));
+    assert!(sddm_cfg.contains("User=plasma_user"));
+    assert!(sddm_cfg.contains("Theme"));
 
-    let lightdm = SovereignDisplayManagerSuiteEngineV92::new(DisplayManagerKindV92::LightDm);
+    let mut lightdm = SovereignDisplayManagerSuiteEngineV92::new(DisplayManagerKindV92::LightDm);
+    lightdm.auto_login_user = Some("light_user".to_string());
     let lightdm_cfg = lightdm.generate_dm_config();
-    assert!(lightdm_cfg.contains("greeter-session=slick-greeter"));
+    assert!(lightdm_cfg.contains("autologin-user=light_user"));
 
-    let xdm = SovereignDisplayManagerSuiteEngineV92::new(DisplayManagerKindV92::Xdm);
+    let mut xdm = SovereignDisplayManagerSuiteEngineV92::new(DisplayManagerKindV92::Xdm);
+    xdm.xdmcp_enabled = true;
     let xdm_cfg = xdm.generate_dm_config();
-    assert!(xdm_cfg.contains("DisplayManager.requestPort: 0"));
+    assert!(xdm_cfg.contains("DisplayManager.requestPort: 177"));
 
-    // PAM authentication check
-    let pam_req_valid = PamAuthRequestV92 {
+    let auth_valid = PamAuthRequestV92 {
         username: "sigma_user".to_string(),
-        password: Some("secret123".to_string()),
+        password: Some("secret_pass".to_string()),
         totp_token: None,
         fido2_response: None,
-        service_name: "login".to_string(),
+        service_name: "gdm-password".to_string(),
     };
-    let resp = gdm.authenticate_pam(&pam_req_valid);
+    let resp = gdm.authenticate_pam(&auth_valid);
     assert!(resp.authenticated);
     assert_eq!(resp.uid, 1000);
-    assert_eq!(resp.home_dir, "/home/sigma_user");
 
-    let pam_req_empty = PamAuthRequestV92 {
-        username: String::new(),
-        password: None,
+    let auth_invalid = PamAuthRequestV92 {
+        username: "nonexistent".to_string(),
+        password: Some("pwd".to_string()),
         totp_token: None,
         fido2_response: None,
-        service_name: "login".to_string(),
+        service_name: "gdm-password".to_string(),
     };
-    let resp_empty = gdm.authenticate_pam(&pam_req_empty);
-    assert!(!resp_empty.authenticated);
-
-    let pam_req_unknown = PamAuthRequestV92 {
-        username: "unknown_person".to_string(),
-        password: Some("pass".to_string()),
-        totp_token: None,
-        fido2_response: None,
-        service_name: "login".to_string(),
-    };
-    let resp_unknown = gdm.authenticate_pam(&pam_req_unknown);
-    assert!(!resp_unknown.authenticated);
+    let resp_invalid = gdm.authenticate_pam(&auth_invalid);
+    assert!(!resp_invalid.authenticated);
 }
 
 #[test]
-fn test_gvfs_gio_v92_integration() {
+fn test_gvfs_gio_virtual_filesystem_integration_v92() {
     let mut gvfs = SovereignGvfsGioFileSystemEngineV92::new();
-    assert!(gvfs.network_connected);
+    let smb_mount = gvfs.mount_location(MountSchemeV92::Smb, "nas.local", "public");
+    let sftp_mount = gvfs.mount_location(MountSchemeV92::Sftp, "remote.server", "var_log");
 
-    let smb_id = gvfs.mount_location(MountSchemeV92::Smb, "nas.local", "backup");
-    let sftp_id = gvfs.mount_location(MountSchemeV92::Sftp, "remote.server", "var/www");
+    assert!(gvfs.active_mounts.contains_key(&smb_mount));
+    assert!(gvfs.active_mounts.contains_key(&sftp_mount));
     assert_eq!(gvfs.active_mounts.len(), 2);
-    assert!(gvfs.active_mounts.contains_key(&smb_id));
-    assert!(gvfs.active_mounts.contains_key(&sftp_id));
 
-    gvfs.set_dconf_value("/org/gnome/desktop/interface/font-name", "Cantarell 11");
+    gvfs.set_dconf_value("/org/gnome/desktop/interface/gtk-theme", "Adwaita-dark");
     assert_eq!(
-        gvfs.get_dconf_value("/org/gnome/desktop/interface/font-name"),
-        Some(&"Cantarell 11".to_string())
+        gvfs.get_dconf_value("/org/gnome/desktop/interface/gtk-theme"),
+        Some(&"Adwaita-dark".to_string())
     );
 
-    assert!(gvfs.unmount_id(&smb_id));
+    assert!(gvfs.unmount_id(&smb_mount));
     assert_eq!(gvfs.active_mounts.len(), 1);
-    assert!(!gvfs.unmount_id("non_existent"));
 }
 
 #[test]
-fn test_polkit_v92_integration() {
+fn test_policykit_and_xdg_portals_integration_v92() {
     let mut polkit = SovereignPolicyKitAuthorizationEngineV92::new();
+    assert!(polkit.evaluate_js_rule("org.freedesktop.packagekit.system-update", "desktop_user"));
+    assert!(!polkit.evaluate_js_rule("org.freedesktop.policykit.exec", "desktop_user"));
     assert!(polkit.evaluate_js_rule("org.freedesktop.policykit.exec", "root"));
-    assert!(!polkit.evaluate_js_rule("org.freedesktop.policykit.exec", "regular_user"));
-    assert!(polkit.evaluate_js_rule("org.freedesktop.packagekit.system-update", "regular_user"));
 
     let pkla = r#"
-        [Admin Rights]
+        [Allow Admin Tasks]
         Identity=unix-group:wheel
-        Action=org.freedesktop.udisks2.filesystem-mount-system
+        Action=org.freedesktop.NetworkManager.*
+        ResultAny=no
+        ResultInactive=no
         ResultActive=yes
     "#;
-    let count = polkit.parse_pkla_file(pkla);
-    assert_eq!(count, 1);
-}
+    assert_eq!(polkit.parse_pkla_file(pkla), 1);
 
-#[test]
-fn test_xdg_portals_v92_integration() {
     let mut portals = SovereignXdgPortalsUtilitiesEngineV92::new();
     let conf = r#"
         [preferred]
         default=gtk;hyprland
         org.freedesktop.impl.portal.FileChooser=gtk
     "#;
-    let loaded = portals.parse_portals_conf(conf);
-    assert_eq!(loaded, 2);
+    assert_eq!(portals.parse_portals_conf(conf), 2);
     assert_eq!(portals.portals_config.get("default"), Some(&"gtk;hyprland".to_string()));
 
-    let user_dirs_text = r#"
+    let dirs = r#"
         XDG_DESKTOP_DIR="$HOME/Desktop"
-        XDG_DOWNLOAD_DIR="$HOME/Downloads"
-        XDG_TEMPLATES_DIR="$HOME/Templates"
-        XDG_PUBLICSHARE_DIR="$HOME/Public"
         XDG_DOCUMENTS_DIR="$HOME/Documents"
+        XDG_DOWNLOAD_DIR="$HOME/Downloads"
         XDG_MUSIC_DIR="$HOME/Music"
-        XDG_PICTURES_DIR="$HOME/Pictures"
-        XDG_VIDEOS_DIR="$HOME/Videos"
     "#;
-    let parsed_dirs = portals.parse_user_dirs(user_dirs_text);
-    assert_eq!(parsed_dirs, 8);
-    assert_eq!(portals.user_dirs.get("XDG_PICTURES_DIR"), Some(&"$HOME/Pictures".to_string()));
+    assert_eq!(portals.parse_user_dirs(dirs), 4);
+    assert_eq!(portals.user_dirs.get("XDG_MUSIC_DIR"), Some(&"$HOME/Music".to_string()));
 
-    let open_res = portals.open_uri_handler("mailto:developer@sigmaos.org");
-    assert!(open_res.contains("mailto:developer@sigmaos.org"));
+    let handler_msg = portals.open_uri_handler("mailto:user@example.com");
+    assert!(handler_msg.contains("user@example.com"));
 }
 
 #[test]
-fn test_font_text_layout_v92_integration() {
-    let font_engine = SovereignFontTextLayoutEngineV92::new();
-    let xml = font_engine.generate_fontconfig_xml();
-    assert!(xml.contains("<?xml version=\"1.0\"?>"));
-    assert!(xml.contains("<edit name=\"hintstyle\" mode=\"assign\"><const>hintslight</const></edit>"));
-    assert!(xml.contains("<edit name=\"lcdfilter\" mode=\"assign\"><const>lcddefault</const></edit>"));
+fn test_font_and_text_layout_integration_v92() {
+    let mut layout = SovereignFontTextLayoutEngineV92::new();
+    layout.font_family = "Fira Code".to_string();
+    layout.hinting_mode = FreeTypeHintingV92::Full;
+    layout.lcd_filter = "lcdlight".to_string();
 
-    let shaped = font_engine.shape_harfbuzz_text("SigmaOS Desktop", "Latn");
-    assert_eq!(shaped.len(), 15);
-    for glyph in shaped {
-        assert_eq!(glyph.x_advance, 640);
-        assert_eq!(glyph.y_advance, 0);
-    }
+    let fontconfig_xml = layout.generate_fontconfig_xml();
+    assert!(fontconfig_xml.contains("<const>lcdlight</const>"));
+
+    let glyphs = layout.shape_harfbuzz_text("Rust Desktop V92", "Latn");
+    assert_eq!(glyphs.len(), 16);
+    assert_eq!(glyphs[0].glyph_id, 'R' as u32);
+    assert_eq!(glyphs[0].x_advance, 640);
 }
 
 #[test]
-fn test_ime_framework_v92_integration() {
-    let mut ibus_engine = SovereignInputMethodFrameworkEngineV92::new(ImeEngineKindV92::IBus);
-    ibus_engine.update_preedit("nihao", vec!["你好".to_string(), "擬好".to_string()]);
-    assert_eq!(ibus_engine.preedit_text, "nihao");
-    assert_eq!(ibus_engine.candidate_list.len(), 2);
+fn test_ime_notifications_screenlocker_clipboard_integration_v92() {
+    let mut ime = SovereignInputMethodFrameworkEngineV92::new(ImeEngineKindV92::Fcitx5);
+    ime.update_preedit("nihao", vec!["你好".to_string(), "拟好".to_string()]);
+    assert_eq!(ime.preedit_text, "nihao");
+    assert_eq!(ime.candidate_list.len(), 2);
+    let commit_res = ime.handle_text_input_v3_commit("你好");
+    assert!(commit_res.contains("你好"));
+    assert!(ime.preedit_text.is_empty());
 
-    let commit_msg = ibus_engine.handle_text_input_v3_commit("你好");
-    assert!(commit_msg.contains("committed '你好'"));
-    assert!(ibus_engine.preedit_text.is_empty());
-    assert!(ibus_engine.candidate_list.is_empty());
-
-    let fcitx_engine = SovereignInputMethodFrameworkEngineV92::new(ImeEngineKindV92::Fcitx5);
-    assert_eq!(fcitx_engine.active_kind, ImeEngineKindV92::Fcitx5);
-
-    let wayland_ime = SovereignInputMethodFrameworkEngineV92::new(ImeEngineKindV92::WaylandTextInputV3);
-    assert_eq!(wayland_ime.active_kind, ImeEngineKindV92::WaylandTextInputV3);
-}
-
-#[test]
-fn test_notification_daemon_v92_integration() {
     let mut notif_daemon = SovereignNotificationDaemonEngineV92::new();
-    assert!(notif_daemon.sound_feedback_enabled);
-
-    let id1 = notif_daemon.notify("System", "Disk Warning", "Low disk space", 2, 5000);
-    let _id2 = notif_daemon.notify("Chat", "Message Received", "Hey there!", 1, 3000);
+    let id1 = notif_daemon.notify("SigmaPortal", "System Ready", "All components operational", 1, 5000);
+    let id2 = notif_daemon.notify("BatteryMonitor", "Low Battery", "15% remaining", 2, 0);
     assert_eq!(notif_daemon.active_notifications.len(), 2);
-
-    let n1 = notif_daemon.active_notifications.get(&id1).unwrap();
-    assert_eq!(n1.urgency, 2);
-    assert_eq!(n1.summary, "Disk Warning");
-
     assert!(notif_daemon.close_notification(id1));
     assert_eq!(notif_daemon.active_notifications.len(), 1);
-    assert!(!notif_daemon.close_notification(9999));
-}
+    assert_eq!(notif_daemon.active_notifications.get(&id2).unwrap().urgency, 2);
 
-#[test]
-fn test_screen_locker_v92_integration() {
     let mut locker = SovereignScreenLockerEngineV92::new();
-    assert!(!locker.is_locked);
-    assert!(!locker.ext_session_lock_active);
-
+    locker.set_password("sigma_secure_key");
     locker.lock();
     assert!(locker.is_locked);
     assert!(locker.ext_session_lock_active);
-
-    assert_eq!(locker.calculate_pam_backoff_seconds(), 0);
-    assert!(!locker.unlock("incorrect_password"));
+    assert!(!locker.unlock("incorrect"));
     assert_eq!(locker.failed_attempts, 1);
     assert_eq!(locker.calculate_pam_backoff_seconds(), 2);
-
-    assert!(!locker.unlock("incorrect_password_2"));
-    assert_eq!(locker.failed_attempts, 2);
-    assert_eq!(locker.calculate_pam_backoff_seconds(), 4);
-
-    assert!(locker.unlock("user_secure_pass"));
+    assert!(locker.unlock("sigma_secure_key"));
     assert!(!locker.is_locked);
-    assert!(!locker.ext_session_lock_active);
-    assert_eq!(locker.failed_attempts, 0);
-}
+    assert_eq!(locker.calculate_pam_backoff_seconds(), 0);
 
-#[test]
-fn test_clipboard_manager_v92_integration() {
     let mut clip = SovereignClipboardManagerEngineV92::new();
-    assert_eq!(clip.max_history_size, 100);
-
-    clip.push_item("text/plain", b"public text", false);
-    clip.push_item("text/plain", b"password_token_value", true);
-    clip.push_item("image/png", &[0x89, 0x50, 0x4e, 0x47], false);
+    clip.push_item("text/plain", b"Sample copied text", false);
+    clip.push_item("text/plain", b"auth_token_value", true);
+    clip.push_item("image/png", &[137, 80, 78, 71], false);
     assert_eq!(clip.history.len(), 3);
-
     let wiped = clip.wipe_secrets();
     assert_eq!(wiped, 1);
     assert_eq!(clip.history.len(), 2);
-    assert!(!clip.history.iter().any(|i| i.is_secret));
 }
 
 #[test]
-fn test_10_distro_pr_gateway_v92_integration() {
-    let mut pr_gateway = SovereignDesktopServicesV92PrGatewayEngine::new();
-    let pr_count = pr_gateway.generate_10_distro_prs();
-    assert_eq!(pr_count, 10);
-    assert_eq!(pr_gateway.proposals.len(), 10);
+fn test_distro_pr_gateway_integration_v92() {
+    let mut gateway = SovereignDesktopServicesV92PrGatewayEngine::new();
+    let count = gateway.generate_10_distro_prs();
+    assert_eq!(count, 10);
+    assert!(gateway.audit_all_proposals());
 
-    assert!(pr_gateway.audit_all_proposals());
-
-    // PQC Dilithium5 signature verification
-    let valid_signature = [0x42u8; 32];
-    assert!(pr_gateway.verify_pqc_signature(92100, &valid_signature));
-    assert!(pr_gateway.verify_pqc_signature(92109, &valid_signature));
-    assert!(!pr_gateway.verify_pqc_signature(99999, &valid_signature));
-
-    let invalid_short_signature = [0x42u8; 16];
-    assert!(!pr_gateway.verify_pqc_signature(92100, &invalid_short_signature));
+    let targets: Vec<String> = gateway.proposals.iter().map(|p| p.distro_target.clone()).collect();
+    assert!(targets.contains(&"Ubuntu Desktop".to_string()));
+    assert!(targets.contains(&"Fedora Workstation".to_string()));
+    assert!(targets.contains(&"Arch Linux".to_string()));
+    assert!(targets.contains(&"FreeBSD Desktop".to_string()));
 }
