@@ -60,9 +60,9 @@ fn test_integration_individual_v84_engines() {
     assert!(omarchy.reload_theme("Dark-V84"));
     assert_eq!(omarchy.active_theme, "Dark-V84");
 
-    let media = GlobalTechMedia46PortalUnimplementedIdeasEngineV84::new();
+    let media = GlobalTechMedia40PortalUnimplementedIdeasEngineV84::new();
     let page = media.generate_wiki_documentation_page("V84 Test");
-    assert!(page.contains("46 Tech Media Portals"));
+    assert!(page.contains("40 Tech Media Portals"));
 
     let adapter = UniversalSubsystemCrossDistroAdapterEngineV84::new();
     assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));

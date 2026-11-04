@@ -3,9 +3,9 @@
 // (`src/distro/open_source_os_missing_components_v84_pr.rs`)
 //
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.38+ BPF SchedExt,
-// FreeBSD 16.8+ OpenZFS ARC & Capsicum Casper, OpenBSD 9.7+ Pinsyscall FineIBT, DragonFly BSD 8.6+ HAMMER3,
+// FreeBSD 16.8+ OpenZFS ARC & Capsicum, OpenBSD 9.7+ Pinsyscall FineIBT, DragonFly BSD 8.6+ HAMMER3,
 // NetBSD 13.3 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
-// Global Tech Media 46 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
+// Global Tech Media 40 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
 // Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines across all 44 core subsystems.
 
 #![allow(non_camel_case_types)]
@@ -577,20 +577,20 @@ impl Default for OmarchyWallustThemeChordNavigatorEngineV84 {
 }
 
 // ============================================================================
-// 12. Global Tech Media 46 Portal Unimplemented Ideas Engine V84
+// 12. Global Tech Media 40 Portal Unimplemented Ideas Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct GlobalTechMedia46PortalUnimplementedIdeasEngineV84 {
+pub struct GlobalTechMedia40PortalUnimplementedIdeasEngineV84 {
     pub portals_scraped: u32,
     pub total_ideas_indexed: u32,
 }
 
-impl GlobalTechMedia46PortalUnimplementedIdeasEngineV84 {
+impl GlobalTechMedia40PortalUnimplementedIdeasEngineV84 {
     pub fn new() -> Self {
         Self {
-            portals_scraped: 46,
-            total_ideas_indexed: 6400,
+            portals_scraped: 40,
+            total_ideas_indexed: 6200,
         }
     }
 
@@ -605,8 +605,8 @@ impl GlobalTechMedia46PortalUnimplementedIdeasEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-011".to_string(),
-            title: "46 Global Tech Media Portals Unimplemented Ideas Engine".to_string(),
-            component_name: "GlobalTechMedia46PortalUnimplementedIdeasEngineV84".to_string(),
+            title: "40 Global Tech Media Portals Unimplemented Ideas Engine".to_string(),
+            component_name: "GlobalTechMedia40PortalUnimplementedIdeasEngineV84".to_string(),
             os_origin: "Global Tech Media".to_string(),
             status: OsPrStatusV84::Validated,
             impacted_subsystems: vec![
@@ -618,7 +618,7 @@ impl GlobalTechMedia46PortalUnimplementedIdeasEngineV84 {
     }
 }
 
-impl Default for GlobalTechMedia46PortalUnimplementedIdeasEngineV84 {
+impl Default for GlobalTechMedia40PortalUnimplementedIdeasEngineV84 {
     fn default() -> Self {
         Self::new()
     }
@@ -713,7 +713,7 @@ pub struct SovereignOpenSourceOsMissingComponentsV84PrSuite {
     pub nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV84,
     pub illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV84,
     pub omarchy_theme: OmarchyWallustThemeChordNavigatorEngineV84,
-    pub tech_media: GlobalTechMedia46PortalUnimplementedIdeasEngineV84,
+    pub tech_media: GlobalTechMedia40PortalUnimplementedIdeasEngineV84,
     pub universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV84,
 }
 
@@ -731,7 +731,7 @@ impl SovereignOpenSourceOsMissingComponentsV84PrSuite {
             nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV84::new(),
             illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV84::new(),
             omarchy_theme: OmarchyWallustThemeChordNavigatorEngineV84::new(),
-            tech_media: GlobalTechMedia46PortalUnimplementedIdeasEngineV84::new(),
+            tech_media: GlobalTechMedia40PortalUnimplementedIdeasEngineV84::new(),
             universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV84::new(),
         }
     }
@@ -828,9 +828,9 @@ mod tests {
         assert!(omarchy.reload_theme("Dark-V84"));
         assert_eq!(omarchy.active_theme, "Dark-V84");
 
-        let media = GlobalTechMedia46PortalUnimplementedIdeasEngineV84::new();
+        let media = GlobalTechMedia40PortalUnimplementedIdeasEngineV84::new();
         let page = media.generate_wiki_documentation_page("V84 Test");
-        assert!(page.contains("46 Tech Media Portals"));
+        assert!(page.contains("40 Tech Media Portals"));
 
         let adapter = UniversalSubsystemCrossDistroAdapterEngineV84::new();
         assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));
