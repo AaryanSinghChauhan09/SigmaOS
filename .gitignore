@@ -50,8 +50,16 @@ __pycache__/
 !docs/studies/*.md
 !docs/component-rules/
 !docs/component-rules/*.md
+!docs/io/
+!docs/io/*.md
+!docs/filesystem/
+!docs/filesystem/*.md
 !.github/PULL_REQUEST_TEMPLATE.md
 !ImprovementPlan.md
 !NEXT_STEPS_GUIDELINES.md
 !.jules/
 !.jules/*.md
+!docs/SIGMAOS_GUI_DEVELOPMENT_PLAN.md
+!wiki/30-SigmaOS-GUI-Development-Plan.md
+!docs/storage/
+!docs/storage/*.md
