@@ -1,28 +1,27 @@
 # Scheduler Development Plan
 
-## PR Roadmap Sequence
-| PR | Title | Status |
-|---|---|---|
-| 1 | `docs(scheduler): audit scheduler status and define invariants` | Done |
-| 2 | `feat(scheduler): run queue data structure` | Done |
-| 3 | `feat(scheduler): priority and quantum calculation` | Done |
-| 4 | `feat(scheduler): context switch mechanics` | Done |
-| 5 | `feat(scheduler): preemption trigger` | Done |
-| 6 | `feat(scheduler): starvation boost` | Done |
-| 7 | `feat(scheduler): cpu affinity mask` | Done |
-| 8 | `feat(scheduler): implement EEVDF fair-class prototype` | Done |
-| 9 | `feat(scheduler): BORE interactivity heuristics` | Done |
-| 10 | `feat(scheduler): real-time FIFO/RR scheduling` | Done |
-| 11 | `feat(scheduler): idle task accounting` | Done |
-| 12 | `feat(scheduler): multi-core load balancing` | Done |
-| 13 | `feat(scheduler): energy aware scheduling` | Done |
-| 14 | `feat(scheduler): cgroups v2 cpu controller` | Done |
-| 15 | `feat(scheduler): latency sensitivity flags` | Done |
-| 16 | `feat(scheduler): tracepoint hooks` | Done |
-| 17 | `test(scheduler): microbenchmarks suite` | Done |
-| 18 | `docs(scheduler): publish policy guide and support matrix` | Done |
-
+## Invariants & Principles
 Complete PRs 1–7 before deciding whether EEVDF or BORE becomes the default fair policy.
+
+## PR Sequence Roadmap
+| 1 | `docs(scheduler): audit scheduler status and define invariants` |
+| 2 | PR 2 |
+| 3 | PR 3 |
+| 4 | PR 4 |
+| 5 | PR 5 |
+| 6 | PR 6 |
+| 7 | PR 7 |
+| 8 | `feat(scheduler): implement EEVDF fair-class prototype` |
+| 9 | PR 9 |
+| 10 | PR 10 |
+| 11 | PR 11 |
+| 12 | PR 12 |
+| 13 | PR 13 |
+| 14 | PR 14 |
+| 15 | PR 15 |
+| 16 | PR 16 |
+| 17 | PR 17 |
+| 18 | `docs(scheduler): publish policy guide and support matrix` |
 
 ## Maintenance Cadence
 - Every PR

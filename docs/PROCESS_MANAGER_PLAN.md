@@ -8,19 +8,21 @@
 - Keep service dependencies declarative and cycle-checked
 
 ## Proposed PR Sequence
-Sequence of PRs for process management.
+Roadmap of process management PRs.
 
 ## Recommended First Milestone
-First milestone scope.
+Core process supervisor and orphan adoption.
 
 ## Periodic Maintenance PR Cadence
-Maintenance cadences.
+Scheduled process management reviews.
 
 ## Component-Specific Rules
-Rules for components.
+Detailed rules per component.
 
 ## PR Template and Merge Gates
-Template and merge gates.
+Authoritative merge gates.
 
 ## Completion Gates
-Completion gates.
+- Prototype
+- Integrated
+- Supported

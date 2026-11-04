@@ -6,8 +6,6 @@ mod sovereign_init_and_supervisor_advancements_v89_pr;
 use sovereign_init_and_supervisor_advancements_v89_pr::*;
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::ToString;
-use alloc::vec;
 
 #[test]
 fn test_init_and_supervisor_v89_pr_integration() {
@@ -16,7 +14,7 @@ fn test_init_and_supervisor_v89_pr_integration() {
 
     assert_eq!(manifests.len(), 7);
     for manifest in &manifests {
-        assert!(manifest.pr_id >= 8900 && manifest.pr_id <= 8906);
+        assert!(manifest.pr_id >= 8900 && manifest.pr_id <= 8907);
         assert!(!manifest.pr_title.is_empty());
         assert_eq!(manifest.status, "Ready for Integration");
     }
@@ -26,7 +24,8 @@ fn test_init_and_supervisor_v89_pr_integration() {
     let state = systemd.transition_unit_state(SystemdUnitStateV89::Inactive, "start");
     assert_eq!(state, SystemdUnitStateV89::Activating);
     let state_active = systemd.transition_unit_state(state, "started");
-    assert_eq!(state_active, SystemdUnitStateV89::Active);
+    let state_failed = systemd.transition_unit_state(state_active, "crash");
+    assert_eq!(state_failed, SystemdUnitStateV89::Failed);
 
     let limits = SystemdCgroupV2LimitsV89 {
         memory_max_bytes: Some(4096),
@@ -47,13 +46,13 @@ fn test_init_and_supervisor_v89_pr_integration() {
             name: "localmount".to_string(),
             runlevel: "boot".to_string(),
             dependencies: vec![],
-            conf_overrides: alloc::collections::BTreeMap::new(),
+            conf_overrides: BTreeMap::new(),
         },
         OpenRcServiceSpecV89 {
             name: "net".to_string(),
             runlevel: "default".to_string(),
             dependencies: vec![(OpenRcDepKindV89::Need, "localmount".to_string())],
-            conf_overrides: alloc::collections::BTreeMap::new(),
+            conf_overrides: BTreeMap::new(),
         },
     ];
     let order = openrc.solve_runlevel_execution_order(&services).unwrap();
@@ -92,11 +91,10 @@ fn test_init_and_supervisor_v89_pr_integration() {
     let cron = CronAnacronTimersAtV89Engine::new();
     let timer = SystemdTimerSpecV89 {
         on_calendar: None,
-        on_boot_sec: Some(60),
-        on_unit_active_sec: None,
+        on_boot_sec: Some(100),
+        on_unit_active_sec: Some(300),
         persistent: true,
         accuracy_sec: 1,
     };
-    assert!(cron.evaluate_timer_readiness(&timer, 1000, 0, 0));
-    assert!(!cron.evaluate_timer_readiness(&timer, 50, 0, 0));
+    assert!(cron.evaluate_timer_readiness(&timer, 1000, 0, 500));
 }

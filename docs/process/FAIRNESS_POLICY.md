@@ -1,2 +1,3 @@
 # Fairness and Starvation Prevention Policy
-Fairness specification.
+
+vruntime calculation and starvation boosting.

@@ -1,1 +1,3 @@
-# Shell Maintenance
+# docs/shell/SHELL_MAINTENANCE.md
+
+Shell documentation specifications.

@@ -14,16 +14,22 @@
 
 ## Proposed PR Sequence Roadmap
 Priority order:
-PRs 1 to 17 roadmap sequence.
+1. Kernel wait/wakeup primitives
+2. Kernel locks and completions
+3. Userspace synchronization APIs
+4. Process-shared IPC synchronization
+5. Concurrency diagnostics
 
 ## Periodic Maintenance PR Cadence
-Maintenance cadences.
+Scheduled synchronization audits.
 
 ## Component-Specific Rules
-Component rules.
+Detailed rules for futex, semaphore, and wait queues.
 
 ## PR Review Template and Merge Gates
-Review template and merge gates.
+Authoritative merge gates.
 
 ## Completion Gates
-Completion criteria.
+- Prototype
+- Integrated
+- Supported

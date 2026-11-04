@@ -1,2 +1,3 @@
 # CPU Affinity Policy Specification
-Affinity specification.
+
+Affinity mask validation and migration.

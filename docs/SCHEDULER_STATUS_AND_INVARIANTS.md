@@ -1,6 +1,5 @@
-# Scheduler Status & Invariants
+# Scheduler Status and Invariants
 
-## Invariants and Rules
 - Separate policy from mechanism.
 - Define task states and transitions.
 - Fair scheduling needs a measurable contract.

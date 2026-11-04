@@ -567,3 +567,16 @@ files = ["src/iso/builder.rs", "src/iso/mod.rs"]
 description = "Modernized SigmaOS ISO Builder: refactored from OOP-based to functional design with multiple ISO variants (Desktop, Minimal, Live, Recovery, Developer), multi-architecture support (x86_64, aarch64, riscv64, armv7, loongarch64), configurable bootloaders (GRUB2, systemd-boot, syslinux, rEFInd, m1n1), build plan estimation, and validation. Inspired by Omarchy ISO, Linux Mint ISO, and Ubuntu casper."
 test_evidence = "Unit tests pass for config validation, empty package detection, volume label length checks, size estimation, build plan steps, architecture string conversion, and build output path generation."
 next_milestone = "Implement actual build system calling mksquashfs, xorriso, grub-mkrescue, and other ISO tools"
+
+
+
+
+[kernel.interrupt_framework]
+status = "integrated"
+files = ["docs/INTERRUPT_HANDLER_PLAN.md", "src/io/interrupt.rs"]
+description = "Authoritative interrupt architecture and support matrix"
+
+[kernel.irq_subsystem]
+status = "working"
+files = ["src/io/interrupt.rs"]
+description = "IRQ routing and top-half/bottom-half handling"

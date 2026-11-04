@@ -1,2 +1,3 @@
-# Buffer Policy
-Policy for buffer pool and buffer cache in SigmaOS.
+# SigmaOS Buffer Policy
+
+LRU buffer cache eviction semantics and dirty block writeback protocols.

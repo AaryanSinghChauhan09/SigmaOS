@@ -1,2 +1,3 @@
 # Architectural Decision Record: Scheduler Subsystem Lifecycle State Machine
-Decision record.
+
+Decision on runqueue and state machine design.

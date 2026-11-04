@@ -1,1 +1,3 @@
-# Interactive Shell
+# docs/shell/INTERACTIVE_SHELL.md
+
+Shell documentation specifications.

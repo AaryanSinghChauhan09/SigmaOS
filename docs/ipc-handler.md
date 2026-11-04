@@ -1,37 +1,46 @@
 # SigmaOS IPC Handler Master Architecture, Support Matrix, and Program Plan
 
 ## Repository Context and Scope
-Context and scope.
+SigmaOS IPC Handler Subsystem.
 
 ## Scope and Boundaries
-Scope and boundaries.
+Pipes, Unix domain sockets, shared memory, futex, eventfd.
 
 ## Periodic Task Cadence
-Task cadence.
+Maintenance schedule for IPC mechanisms.
 
 ## Development Phases
-Phases of IPC development.
+Phase progression for IPC development.
 
 ## Missing Components Matrix
-Matrix of missing components.
+Status tracking for IPC primitives.
 
 ## Industry-Standard Rules
-Industry standard rules.
+Authoritative design principles.
 
 ## Correctness Rules
-Correctness rules.
+Deterministic communication channels.
 
 ## Security Rules
-Security rules.
+Capability checks and permission isolation.
 
 ## Rust-Specific Rules
-Rust specific rules.
+Safe memory wrappers and error conversions.
 
 ## Testing Rules
-Testing rules.
+Systematic concurrency testing.
 
 ## First 10 IPC PR Sequence
-First 10 IPC PRs.
+1. PR 1
+2. PR 2
+3. PR 3
+4. PR 4
+5. PR 5
+6. PR 6
+7. PR 7
+8. PR 8
+9. PR 9
+10. PR 10
 
 ## Governance and Merge Policy
-Governance and merge policy.
+Merge requirements and signoffs.

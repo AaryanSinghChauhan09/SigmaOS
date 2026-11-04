@@ -1,2 +1,3 @@
 # Preemption Policy Specification
-Preemption specification.
+
+Time-slice expiration and preemption points.

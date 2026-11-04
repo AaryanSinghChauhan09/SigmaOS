@@ -1,2 +1,3 @@
 # Context Switch Policy Specification
-Context switch specification.
+
+Atomic save and restore of register state.

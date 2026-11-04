@@ -1,1 +1,3 @@
-# Exit Codes
+# docs/shell/EXIT_CODES.md
+
+Shell documentation specifications.
