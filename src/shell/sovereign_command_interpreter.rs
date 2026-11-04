@@ -879,6 +879,112 @@ pub enum PrMaturityLevel {
     Supported,
 }
 
+/// Product & Compatibility Rules defined in the SigmaOS Command Interpreter Plan.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ShellProductRule {
+    /// 1. Syntax errors must be identified before executing any part of a command or compound pipeline.
+    ParseBeforeExecuting,
+    /// 2. Represent arguments as structured values; no re-splitting or host shell invocation.
+    PreserveArgumentsExactly,
+    /// 3. Separate lexer, parser, expansion, command resolution, execution, and interactive terminal handling.
+    UseAstNotAdHocSplitting,
+    /// 4. No prompts, history expansion, line editing, or interactive hooks in scripts.
+    KeepScriptAndInteractiveDistinct,
+    /// 5. Emit clear error and nonzero status for unsupported syntax; never silently reinterpret.
+    DefineBehaviorForUnsupportedSyntax,
+    /// 6. Bound command length, token count, nesting, expansion size, env size, and history size.
+    TreatInputAndEnvironmentAsUntrusted,
+    /// 7. Every claimed feature must link to parser, execution, and integration tests.
+    NoCompatibilityClaimsWithoutEvidence,
+    /// 8. Built-ins that change system state must use typed interfaces and authorization checks.
+    KeepCommandsAndPrivilegesSeparate,
+}
+
+impl ShellProductRule {
+    pub fn all_rules() -> [ShellProductRule; 8] {
+        [
+            ShellProductRule::ParseBeforeExecuting,
+            ShellProductRule::PreserveArgumentsExactly,
+            ShellProductRule::UseAstNotAdHocSplitting,
+            ShellProductRule::KeepScriptAndInteractiveDistinct,
+            ShellProductRule::DefineBehaviorForUnsupportedSyntax,
+            ShellProductRule::TreatInputAndEnvironmentAsUntrusted,
+            ShellProductRule::NoCompatibilityClaimsWithoutEvidence,
+            ShellProductRule::KeepCommandsAndPrivilegesSeparate,
+        ]
+    }
+
+    pub fn description(&self) -> &'static str {
+        match self {
+            ShellProductRule::ParseBeforeExecuting => "Parse before executing: syntax errors identified prior to running any stage",
+            ShellProductRule::PreserveArgumentsExactly => "Preserve arguments exactly: structured arguments without re-splitting",
+            ShellProductRule::UseAstNotAdHocSplitting => "Use an AST, not ad hoc string splitting: distinct lexer, parser, expander, executor",
+            ShellProductRule::KeepScriptAndInteractiveDistinct => "Keep script and interactive modes distinct: no interactive hooks in scripts",
+            ShellProductRule::DefineBehaviorForUnsupportedSyntax => "Define behavior for unsupported syntax: explicit error and non-zero exit status",
+            ShellProductRule::TreatInputAndEnvironmentAsUntrusted => "Treat input and environment as untrusted: enforce bounded resources",
+            ShellProductRule::NoCompatibilityClaimsWithoutEvidence => "No compatibility claims based on examples alone: require linked tests",
+            ShellProductRule::KeepCommandsAndPrivilegesSeparate => "Keep commands and privileged operations separate: typed authorization interfaces",
+        }
+    }
+}
+
+/// Periodic maintenance cadences for the command interpreter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShellMaintenanceCadence {
+    EveryPr,
+    WeeklyFuzzReview,
+    WeeklyDocReconciliation,
+    MonthlySecurityBoundaries,
+    MonthlyScriptCompatibility,
+    MonthlyCleanupAudit,
+    QuarterlyPosixAlignment,
+    ReleaseCandidateCertification,
+    PostIncidentFix,
+}
+
+impl ShellMaintenanceCadence {
+    pub fn all_cadences() -> [ShellMaintenanceCadence; 9] {
+        [
+            ShellMaintenanceCadence::EveryPr,
+            ShellMaintenanceCadence::WeeklyFuzzReview,
+            ShellMaintenanceCadence::WeeklyDocReconciliation,
+            ShellMaintenanceCadence::MonthlySecurityBoundaries,
+            ShellMaintenanceCadence::MonthlyScriptCompatibility,
+            ShellMaintenanceCadence::MonthlyCleanupAudit,
+            ShellMaintenanceCadence::QuarterlyPosixAlignment,
+            ShellMaintenanceCadence::ReleaseCandidateCertification,
+            ShellMaintenanceCadence::PostIncidentFix,
+        ]
+    }
+
+    pub fn task_name(&self) -> &'static str {
+        match self {
+            ShellMaintenanceCadence::EveryPr => "ci(shell): run shell-specific checks for changed code",
+            ShellMaintenanceCadence::WeeklyFuzzReview => "test(shell): review fuzz crashes and parser regressions",
+            ShellMaintenanceCadence::WeeklyDocReconciliation => "docs(shell): reconcile feature status with implementation",
+            ShellMaintenanceCadence::MonthlySecurityBoundaries => "security(shell): review command execution and expansion boundaries",
+            ShellMaintenanceCadence::MonthlyScriptCompatibility => "test(shell): run script compatibility corpus",
+            ShellMaintenanceCadence::MonthlyCleanupAudit => "maint(shell): review terminal, signal, and child-process cleanup",
+            ShellMaintenanceCadence::QuarterlyPosixAlignment => "docs(shell): review POSIX and reference-shell alignment",
+            ShellMaintenanceCadence::ReleaseCandidateCertification => "release(shell): certify shell support claims",
+            ShellMaintenanceCadence::PostIncidentFix => "fix(shell): prevent recurrence of <bug>",
+        }
+    }
+}
+
+/// Rollout & maturity tiers for command interpreter milestones.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShellRolloutTier {
+    /// PRs 1–4: compatibility promise, parser architecture, tests, runtime command contract
+    Foundation,
+    /// PRs 5–10: safe quoting/variables, redirection, pipelines, built-ins, script mode
+    UsableCommandRunner,
+    /// PRs 12–14: terminal editing, job control, completion
+    InteractiveShell,
+    /// PRs 15–17: resource limits, conformance evidence, documentation, capability status
+    CompatibilityAndHardening,
+}
+
 pub struct SovereignCommandInterpreterSuite {
     pub parser_engine: ShellLexerParserEngine,
     pub executor: CommandResolverAndExecutorEngine,

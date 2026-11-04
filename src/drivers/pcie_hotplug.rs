@@ -372,6 +372,13 @@ mod tests {
         // Register dummy interrupt vector in controller and MSI routing for test
         let vector = 0x30;
         let device_id = slot_id as u32;
+        let _ = manager
+            .interrupt_controller
+            .register_irq(vector, crate::kernel::interrupt::IrqTriggerType::Edge);
+        let _ = manager
+            .msi_routing
+            .interrupt_controller
+            .register_irq(vector, crate::kernel::interrupt::IrqTriggerType::Edge);
         manager.msi_routing.msi_vectors.insert(
             device_id,
             crate::kernel::msi_routing::MsiVector {
@@ -404,6 +411,9 @@ mod tests {
         manager.identify_device(slot_id, 0x8086, 0x100E).unwrap();
 
         let vector = 0x30;
+        let _ = manager
+            .interrupt_controller
+            .register_irq(vector, crate::kernel::interrupt::IrqTriggerType::Edge);
 
         if let Some(slot_mut) = manager.slots.get_mut(&slot_id) {
             slot_mut.interrupt_vector = Some(vector as u8);

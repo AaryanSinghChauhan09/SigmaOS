@@ -23,6 +23,27 @@
 - [ ] Double-completion prevented
 - [ ] Resource limits enforced
 
+## I/O component
+
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O safety review
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+
 ## File component
 
 ## Implementation notes
@@ -169,12 +190,15 @@
 - [ ] DMA manager / DMA queue
 - [ ] Buffer manager
 - [ ] I/O scheduler
-- [ ] Callback manager
 - [ ] I/O policy
+- [ ] I/O safety review
 
-## I/O safety review
+## Storage component
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
 
-- [ ] Interrupt priority levels validated
-- [ ] Buffer in-use protection enforced
-- [ ] DMA memory mapped cleanly without leaks
-- [ ] Zero-copy boundaries verified
+## Storage safety review
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced

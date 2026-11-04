@@ -57,6 +57,7 @@ __pycache__/
 !docs/filesystem/MOUNT_POLICY.md
 !docs/shell/
 !docs/shell/*.md
+!wiki/34-SigmaOS-Command-Interpreter-Plan.md
 !docs/studies/
 !docs/studies/*.md
 !docs/component-rules/

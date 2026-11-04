@@ -3209,6 +3209,13 @@ if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
     ./build/test_command_interpreter
 fi
 
+if [ -f "tests/test_command_interpreter_plan.rs" ]; then
+    echo "Running Sovereign Command Interpreter Plan Integration Suite..."
+    mkdir -p build
+    rustc --test tests/test_command_interpreter_plan.rs --edition=2021 -o build/test_command_interpreter_plan
+    ./build/test_command_interpreter_plan
+fi
+
 if [ -f "src/shell/sovereign_shells_terminals_supervisors_pr.rs" ]; then
     echo "Running Sovereign Shells, Terminals, Init Systems & Supervisors PR test suite..."
     mkdir -p build
