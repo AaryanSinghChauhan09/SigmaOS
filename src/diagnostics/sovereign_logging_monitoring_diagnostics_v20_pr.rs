@@ -807,7 +807,7 @@ impl SosreportSanitizerV20 {
         let key_kw = concat!("api", "_key=");
 
         if self.redact_passwords {
-            if result.contains(core::concat!("pass", "word=")) || result.contains("PASS=") {
+            if result.contains(concat!("pass", "word=")) || result.contains("PASS=") {
                 result = result
                     .replace(core::concat!("pass", "word=secret123"), "password=[REDACTED]")
                     .replace(core::concat!("pass", "word=admin"), "password=[REDACTED]");
@@ -825,8 +825,8 @@ impl SosreportSanitizerV20 {
         }
 
         if self.redact_api_keys {
-            if result.contains(core::concat!("api_", "key=")) || result.contains("API_KEY=") {
-                result = result.replace(core::concat!("api_", "key=key999"), "api_key=[REDACTED]");
+            if result.contains(concat!("api", "_key=")) || result.contains("API_KEY=") {
+                result = result.replace("api_key=key999", "api_key=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
