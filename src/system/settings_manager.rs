@@ -324,12 +324,16 @@ impl SettingsManager {
             .collect()
     }
 
-    /// Search settings by key
+    /// Search settings by key using zero-allocation case-insensitive ASCII matching.
+    ///
+    /// Performance optimization (Bolt ⚡):
+    /// In settings navigation and dynamic search filtering, queries happen keystroke-by-keystroke.
+    /// Comparing byte windows using `eq_ignore_ascii_case` avoids allocating heap `String`s
+    /// (`s.key.to_lowercase()` and `query.to_lowercase()`) per setting entry.
     pub fn search(&self, query: &str) -> Vec<&SettingEntry> {
-        let query_lower = query.to_lowercase();
         self.settings
             .values()
-            .filter(|s| s.key.to_lowercase().contains(&query_lower))
+            .filter(|s| contains_ignore_case(&s.key, query))
             .collect()
     }
 
@@ -426,6 +430,29 @@ pub struct SettingsStatistics {
     pub by_category: HashMap<SettingCategory, usize>,
 }
 
+/// Zero-allocation case-insensitive substring search helper for ASCII strings.
+///
+/// Performance optimization (Bolt ⚡):
+/// Avoids heap allocations from `to_lowercase()` when matching ASCII keys against search terms.
+/// Falls back to Unicode lowercase only when non-ASCII codepoints are present.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let n_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(n_bytes.len())
+            .any(|window| window.eq_ignore_ascii_case(n_bytes))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -499,6 +526,21 @@ mod tests {
         let manager = SettingsManager::new();
         let results = manager.search("theme");
         assert!(results.len() >= 1);
+        let results_upper = manager.search("THEME");
+        assert_eq!(results.len(), results_upper.len());
+        let results_partial = manager.search("bright");
+        assert_eq!(results_partial.len(), 1);
+        assert_eq!(results_partial[0].key, "brightness");
+    }
+
+    #[test]
+    fn test_contains_ignore_case() {
+        assert!(contains_ignore_case("brightness", "BRIGHT"));
+        assert!(contains_ignore_case("theme", "theme"));
+        assert!(contains_ignore_case("accent_color", "color"));
+        assert!(contains_ignore_case("settings", ""));
+        assert!(!contains_ignore_case("short", "longer_needle"));
+        assert!(!contains_ignore_case("volume", "network"));
     }
 
     #[test]
