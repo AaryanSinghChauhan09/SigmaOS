@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// Integration Test Suite for Filmcraft ArtCraft Missing Components V71 PR Engine
+// Test Suite for Filmcraft ArtCraft Missing Components V71 PR Engine & Integration
 
 #[path = "../src/creative/filmcraft_artcraft_missing_components_v71_pr.rs"]
 mod filmcraft_artcraft_missing_components_v71_pr;
@@ -8,101 +8,93 @@ use filmcraft_artcraft_missing_components_v71_pr::*;
 
 #[test]
 fn test_v71_filmcraft_individual_engines() {
-    // 1. AI Neural Super-Resolution Temporal Upscaler V71
-    let sr_engine = FilmcraftNeuralSuperResolutionTemporalUpscalerV71PrEngine::new();
-    let lr_data = [0.1f32, 0.2, 0.3, 0.4];
-    let mvs = [(0.5f32, -0.2f32)];
-    let mut hr_out = Vec::new();
-    let res = sr_engine.upscale_frame(&lr_data, &mvs, &mut hr_out);
-    assert!(res.is_ok());
-    assert_eq!(hr_out.len(), 4 * (2 * 2));
-    let p1 = sr_engine.generate_proposal();
-    assert_eq!(p1.pr_id, 7151);
-    assert_eq!(p1.status, "Proposed");
+    // 1. AI Temporal Super-Resolution
+    let mut sr_engine = FilmcraftNeuralSuperResolutionTemporalUpscalerV71PrEngine::new();
+    let lr_buf = [12u8, 24, 36, 48];
+    let mut sr_out = Vec::new();
+    let (w, h) = sr_engine.upscale_frame(&lr_buf, 2, 2, &mut sr_out).unwrap();
+    assert_eq!(w, 8);
+    assert_eq!(h, 8);
+    assert_eq!(sr_out.len(), 8 * 8 * 4);
+    assert_eq!(sr_engine.processed_frames_count, 1);
 
-    // 2. Hardware-Accelerated ProRes RAW & CinemaDNG Bayer Demosaic V71
-    let demosaic_engine = FilmcraftHardwareAcceleratedProResRawBayerDemosaicV71PrEngine::new();
-    let (r, g, b) = demosaic_engine.demosaic_bayer_quad(12000, 15000, 15200, 18000);
-    assert!(r > 0.0 && g > 0.0 && b > 0.0);
-    let p2 = demosaic_engine.generate_proposal();
-    assert_eq!(p2.pr_id, 7152);
+    // 2. Hardware ProRes RAW Bayer Demosaic
+    let mut demosaic_engine = FilmcraftHardwareAcceleratedProResRawBayerDemosaicV71PrEngine::new();
+    let raw = [500u16, 1000, 1500, 2000];
+    let mut rgb = Vec::new();
+    let channels = demosaic_engine.demosaic_bayer(&raw, 2, 2, &mut rgb).unwrap();
+    assert_eq!(channels, 12);
+    assert_eq!(demosaic_engine.processed_raw_chunks, 1);
 
-    // 3. Acoustic Room Impulse Response (RIR) 3D Convolution V71
-    let rir_engine = FilmcraftAcousticRoomImpulseResponseConvolutionV71PrEngine::new();
-    let rt60 = rir_engine.calculate_rt60();
-    assert!(rt60 > 0.0 && rt60 < 10.0);
-    let dry_samples = [0.1f32, 0.5, -0.3, 0.0];
-    let mut wet_samples = Vec::new();
-    rir_engine.convolve_reverb(&dry_samples, &mut wet_samples);
-    assert_eq!(wet_samples.len(), dry_samples.len());
-    let p3 = rir_engine.generate_proposal();
-    assert_eq!(p3.pr_id, 7153);
+    // 3. Acoustic RIR Spatial Convolution
+    let acoustic_engine = FilmcraftAcousticRoomImpulseResponseConvolutionV71PrEngine::new();
+    let dry = [0.1f32, 0.4, -0.2, 0.7, 0.3];
+    let mut wet = Vec::new();
+    let conv_len = acoustic_engine.convolve_dry_audio(&dry, &mut wet);
+    assert_eq!(conv_len, 5);
+    assert_eq!(wet.len(), 5);
 
-    // 4. AI Neural Object Segmentation & Video Inpainting V71
-    let inpaint_engine = FilmcraftAiNeuralObjectSegmentationInpaintingV71PrEngine::new();
-    let frame_rgb = [10u8, 20, 30, 40, 50, 60, 200, 210, 220];
-    let mask = [0u8, 0, 255];
-    let mut out_rgb = Vec::new();
-    let inpaint_res = inpaint_engine.inpaint_frame(&frame_rgb, &mask, &mut out_rgb);
-    assert!(inpaint_res.is_ok());
-    assert_eq!(out_rgb.len(), frame_rgb.len());
-    let p4 = inpaint_engine.generate_proposal();
-    assert_eq!(p4.pr_id, 7154);
+    // 4. Zero-Shot Object Segmentation & Inpainting
+    let mut inpaint_engine = FilmcraftAiNeuralObjectSegmentationInpaintingV71PrEngine::new();
+    let frame = [100u8, 120, 140, 160];
+    let mask = [0u8, 255, 0, 255];
+    let mut clean_plate = Vec::new();
+    let inpainted_count = inpaint_engine.segment_and_inpaint(&frame, &mask, &mut clean_plate).unwrap();
+    assert_eq!(inpainted_count, 2);
+    assert_eq!(clean_plate.len(), 4);
+    assert_eq!(inpaint_engine.segmented_objects_count, 1);
 
-    // 5. Subframe Audio Multiband Transient Shaper V71
-    let transient_engine = FilmcraftSubframeAudioMultibandTransientShaperV71PrEngine::new();
-    let audio_in = [0.0f32, 0.8, 0.2, 0.1, -0.5, 0.0];
-    let mut audio_out = Vec::new();
-    transient_engine.shape_transients(&audio_in, &mut audio_out);
-    assert_eq!(audio_out.len(), audio_in.len());
-    let p5 = transient_engine.generate_proposal();
-    assert_eq!(p5.pr_id, 7155);
+    // 5. Subframe Multiband Transient Shaper
+    let shaper_engine = FilmcraftSubframeAudioMultibandTransientShaperV71PrEngine::new();
+    let audio_buf = [0.0f32, 0.6, 0.05, -0.5, 0.02];
+    let mut shaped = Vec::new();
+    let processed_samples = shaper_engine.process_transient_punch(&audio_buf, &mut shaped);
+    assert_eq!(processed_samples, 5);
+    assert_eq!(shaped.len(), 5);
 
-    // 6. CRDT Peer-to-Peer Timeline Gossip Sync V71
-    let mut gossip_local = FilmcraftCrdtPeerToPeerTimelineGossipSyncV71PrEngine::new("host_node");
-    let (tx_seq, tx_hash) = gossip_local.record_mutation("split_clip_head");
-    assert_eq!(tx_seq, 2);
-    assert!(tx_hash.contains("split_clip_head"));
-    let mut remote_vc = std::collections::BTreeMap::new();
-    remote_vc.insert("remote_node".to_string(), 5u64);
-    let updated = gossip_local.merge_remote_gossip(&remote_vc);
-    assert_eq!(updated, 1);
-    assert_eq!(gossip_local.vector_clock.get("remote_node"), Some(&5));
-    let p6 = gossip_local.generate_proposal();
-    assert_eq!(p6.pr_id, 7156);
+    // 6. CRDT P2P Gossip Sync
+    let mut gossip_engine = FilmcraftCrdtPeerToPeerTimelineGossipSyncV71PrEngine::new();
+    let (v_clock, digest) = gossip_engine.broadcast_edit_operation(2, "ripple_delete");
+    assert_eq!(v_clock, 2);
+    assert!(digest.contains("p2p-op"));
+    let merged = gossip_engine.ingest_peer_gossip(3, 10);
+    assert!(merged);
+    assert_eq!(gossip_engine.state_vector_clock, 11);
 
-    // 7. OCIOv2 Spectral Curve Mapper & Color Grading V71
-    let curve_engine = FilmcraftColorGradingOcioV2SpectralCurveMapperV71PrEngine::new();
-    let comp_val = curve_engine.compress_gamut_coordinate(1.2);
-    assert!(comp_val < 1.2 && comp_val >= 0.85);
-    let p7 = curve_engine.generate_proposal();
-    assert_eq!(p7.pr_id, 7157);
+    // 7. OCIOv2 Spectral Radiance Curve Color Grading
+    let color_engine = FilmcraftColorGradingOcioV2SpectralCurveMapperV71PrEngine::new();
+    let graded = color_engine.grade_pixel_spectral([0.5, 0.4, 0.2], 0.5);
+    assert!(graded[0] > 0.0);
+    assert!(graded[1] > 0.0);
+    assert!(graded[2] > 0.0);
 
-    // 8. OpenFX Sandboxed GPU Kernel Host V71
-    let ofx_host = FilmcraftOpenFxSandboxedGpuKernelHostV71PrEngine::new();
-    assert!(ofx_host.validate_plugin_memory_request(512 * 1024 * 1024));
-    assert!(!ofx_host.validate_plugin_memory_request(8 * 1024 * 1024 * 1024));
-    let p8 = ofx_host.generate_proposal();
-    assert_eq!(p8.pr_id, 7158);
+    // 8. Sandboxed OFX GPU Kernel Host
+    let mut ofx_engine = FilmcraftOpenFxSandboxedGpuKernelHostV71PrEngine::new();
+    let plugin_handle = ofx_engine.register_plugin("com.borisfx.mocha").unwrap();
+    assert_eq!(plugin_handle, 1);
+    let dispatch_msg = ofx_engine.dispatch_gpu_render(plugin_handle, 42).unwrap();
+    assert!(dispatch_msg.contains("OFX_DISPATCH:plugin=1:frame=42"));
 
-    // 9. Kinetic Typography Physics Spline Renderer V71
-    let typography_engine = FilmcraftKineticTypographyPhysicsSplineRendererV71PrEngine::new();
-    let (next_pos, next_vel) = typography_engine.step_spring_physics(0.0, 0.0, 50.0, 0.016);
-    assert!(next_pos > 0.0);
-    assert!(next_vel > 0.0);
-    let p9 = typography_engine.generate_proposal();
-    assert_eq!(p9.pr_id, 7159);
+    // 9. Kinetic Typography Physics Spline Renderer
+    let mut text_engine = FilmcraftKineticTypographyPhysicsSplineRendererV71PrEngine::new();
+    let svg = text_engine.deform_text_along_spline("SigmaOS Pro Video", 0.75);
+    assert!(svg.contains("SigmaOS Pro Video"));
+    assert_eq!(text_engine.active_text_elements_count, 1);
 
-    // 10. Lossless Multi-Codec Smart Render Exporter V71
-    let exporter = FilmcraftLosslessMultiCodecSmartRenderExporterV71PrEngine::new();
-    assert!(exporter.evaluate_smart_render_eligibility("DNxHR", false, false));
-    assert!(!exporter.evaluate_smart_render_eligibility("DNxHR", false, true));
-    let p10 = exporter.generate_proposal();
-    assert_eq!(p10.pr_id, 7160);
+    // 10. Smart Render Zero-Transcode Exporter
+    let mut exporter_engine = FilmcraftLosslessMultiCodecSmartRenderExporterV71PrEngine::new();
+    assert!(exporter_engine.can_smart_render("Apple ProRes", false, false));
+    assert!(!exporter_engine.can_smart_render("Apple ProRes", true, false));
+    assert!(!exporter_engine.can_smart_render("Apple ProRes", false, true));
+    let mut sink = Vec::new();
+    let spliced = exporter_engine.splice_bitstream_packet(&[0x11, 0x22, 0x33, 0x44, 0x55], &mut sink).unwrap();
+    assert_eq!(spliced, 5);
+    assert_eq!(sink.len(), 5);
+    assert_eq!(exporter_engine.exported_byte_savings, 5);
 }
 
 #[test]
-fn test_v71_sovereign_gateway_and_master_suite() {
+fn test_v71_gateway_evaluation_and_proposals() {
     let gateway = SovereignFilmcraftArtcraftMissingComponentsV71PrGateway::new();
     assert!(gateway.evaluate_filmcraft_v71_parity());
     assert_eq!(gateway.compute_parity_score(), 100.0);
@@ -110,15 +102,19 @@ fn test_v71_sovereign_gateway_and_master_suite() {
     let proposals = gateway.collect_all_proposals();
     assert_eq!(proposals.len(), 10);
 
-    for prop in &proposals {
-        assert!(prop.pr_id >= 7151 && prop.pr_id <= 7160);
-        assert!(!prop.pr_title.is_empty());
-        assert!(!prop.target_subsystem.is_empty());
-        assert!(!prop.components_added.is_empty());
-        assert!(!prop.performance_multiplier.is_empty());
-        assert_eq!(prop.status, "Proposed");
+    for (idx, p) in proposals.iter().enumerate() {
+        let expected_pr_id = 7151 + idx as u64;
+        assert_eq!(p.pr_id, expected_pr_id);
+        assert!(!p.pr_title.is_empty());
+        assert_eq!(p.status, "Ready for Merge");
+        assert_eq!(p.components_added.len(), 3);
+        assert!(!p.performance_multiplier.is_empty());
     }
+}
 
+#[test]
+fn test_v71_suite_verification() {
     let mut suite = FilmcraftArtcraftMissingComponentsV71PrSuite::new();
+    assert_eq!(suite.total_proposals_count(), 10);
     assert!(suite.verify_complete_parity());
 }
