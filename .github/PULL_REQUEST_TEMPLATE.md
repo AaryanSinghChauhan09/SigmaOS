@@ -118,7 +118,14 @@ Closes #<issue-id>
 - [ ] I/O scheduler
 - [ ] I/O safety review
 
-### Storage safety review
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
 - [ ] Block device manager
 - [ ] virtio / NVMe / virtio
 - [ ] Block cache manager
@@ -165,7 +172,9 @@ make format
 - [ ] Rollback/recovery behavior defined
 - [ ] Security review completed, if applicable
 
-## Capability status and integration impact
+## Capability status
+
+## Integration impact
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`

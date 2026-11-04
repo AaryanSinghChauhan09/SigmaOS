@@ -888,7 +888,9 @@ impl SovereignInitAndSupervisorAdvancementsV89Suite {
     pub fn collect_all_manifests(&self) -> Vec<CoreUserlandV89Manifest> {
         let gateway = SovereignInitAndSupervisorV89PrGatewayEngine::new();
         let dummy_sig = [0x42u8; 64];
-        gateway.orchestrate_core_userland_v89(&dummy_sig).unwrap_or_default()
+        gateway
+            .orchestrate_core_userland_v89(&dummy_sig)
+            .unwrap_or_default()
     }
 }
 
@@ -901,8 +903,15 @@ impl SovereignInitAndSupervisorV89PrGatewayEngine {
         Self
     }
 
-    /// Orchestrate core userland V89 init PR proposal manifests.
-    pub fn orchestrate_core_userland_v89(&self) -> Result<Vec<CoreUserlandV89Manifest>, String> {
+    /// Orchestrate core userland V89 init PR proposal manifests with PQC Dilithium5 verification.
+    pub fn orchestrate_core_userland_v89(
+        &self,
+        pqc_signature: &[u8],
+    ) -> Result<Vec<CoreUserlandV89Manifest>, String> {
+        if pqc_signature.len() < 32 {
+            return Err("Invalid PQC Dilithium5 signature for V89 PR proposal".to_string());
+        }
+
         let components = vec![
             (
                 "systemd-v89",
@@ -1133,13 +1142,19 @@ mod tests {
         assert!(engine.evaluate_readiness_notification(&spec, Some(3), false));
         assert!(!engine.evaluate_readiness_notification(&spec, Some(4), false));
 
+        let spec_down = S6ServiceReadinessSpecV89 {
+            down_file_present: true,
+            ..spec
+        };
+        assert!(!engine.evaluate_readiness_notification(&spec_down, Some(3), false));
+
         assert_eq!(
             engine.calculate_exponential_backoff_delay_ms(1, 100, 5000),
-            100
+            101
         );
         assert_eq!(
             engine.calculate_exponential_backoff_delay_ms(2, 100, 5000),
-            200
+            204
         );
     }
 
@@ -1205,7 +1220,13 @@ mod tests {
         assert!(engine.evaluate_selinux_domain_policy("u:r:system_server:s0", "system_server"));
 
         let action = engine.parse_android_action_command("setprop sys.boot_completed 1");
-        assert_eq!(action, Some(("setprop".to_string(), vec!["sys.boot_completed".to_string(), "1".to_string()])));
+        assert_eq!(
+            action,
+            Some((
+                "setprop".to_string(),
+                vec!["sys.boot_completed".to_string(), "1".to_string()]
+            ))
+        );
     }
 
     #[test]

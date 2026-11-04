@@ -76,12 +76,7 @@ __pycache__/
 !NEXT_STEPS_GUIDELINES.md
 !.jules/
 !.jules/*.md
-!docs/SIGMAOS_GUI_DEVELOPMENT_PLAN.md
-!wiki/30-SigmaOS-GUI-Development-Plan.md
 !docs/storage/
 !docs/storage/*.md
-!docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
-!wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md
-!wiki/26-System-Utilities-Development-Plan.md
-!docs/PHYSICAL_MEMORY_MANAGER_PLAN.md
-!wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md
+!docs/filesystem/
+!docs/filesystem/*.md
