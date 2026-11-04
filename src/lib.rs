@@ -10,6 +10,10 @@ pub mod stubs;
 
 pub mod ai;
 pub mod arch_kernel_inspirations;
+pub mod arch_omarchy_design;
+pub mod sigma_platform;
+pub mod smoke_tests;
+pub mod sigma_release;
 pub mod auth;
 pub mod compositor;
 pub mod graphics;
