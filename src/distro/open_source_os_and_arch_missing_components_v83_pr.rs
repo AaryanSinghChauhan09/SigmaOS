@@ -3,9 +3,9 @@
 // (`src/distro/open_source_os_and_arch_missing_components_v83_pr.rs`)
 //
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.37+ BPF SchedExt,
-// FreeBSD 16.7+ OpenZFS ARC & Capsicum, OpenBSD 9.6+ Pinsyscall FineIBT, DragonFly BSD 8.5+ HAMMER3,
+// FreeBSD 16.7+ Capsicum, OpenBSD 9.6+ FineIBT Pinsyscall, DragonFly BSD 8.5+ HAMMER3,
 // NetBSD 13.2 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
-// NixOS / GNU Guix Merkle CAS, Omarchy Wallust Theme Chord Navigator, Global Tech Media 39 Portals Harvester,
+// Global Tech Media Harvester, Omarchy Hyprland Navigator,
 // and 12 Arch Linux GitHub Ecosystem PR Engines (pacman keyring PQC rotation, AUR web RPC v5 auditor, devtools
 // clean chroot nspawn, reflector speed ranker, archiso customizer, snapper auto-snapshots, security tracker
 // CVE scanner, modprobed-db trimmer, pacman conflict resolver, systemd service supervisor, yay AST dependency
@@ -72,13 +72,13 @@ impl UniversalOpenSourceOsAndArchV83PrGatewayManager {
     pub fn execute_full_v83_master_pipeline(&self) -> Vec<CombinedOsAndArchPrSpecV83> {
         let mut combined = Vec::new();
 
-        let os_proposals = self.open_source_os_suite.collect_all_manifests();
-        for pr in os_proposals {
+        let os_manifests = self.open_source_os_suite.collect_all_manifests();
+        for pr in os_manifests {
             combined.push(CombinedOsAndArchPrSpecV83 {
                 spec_id: pr.pr_id,
                 title: pr.title,
                 origin_system: pr.os_origin,
-                summary: format!("Subsystems: {}", pr.impacted_subsystems.join(", ")),
+                summary: format!("Impacted Subsystems: {}", pr.impacted_subsystems.join(", ")),
                 patch_diff: pr.patch_diff,
             });
         }
