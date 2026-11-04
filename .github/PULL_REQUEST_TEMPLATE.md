@@ -3,6 +3,12 @@
 ## Description
 Provide a concise overview of the changes in this pull request.
 
+## Study document
+Reference study and upstream study details:
+- Reference study: Linux/BSD/Redox/xv6 reference
+- What SigmaOS adopts: Architecture and subsystem parity
+- Reference behavior: Verified deterministic semantics
+
 ## Subsystem Checklist
 - [ ] I/O component changes verified
 - [ ] I/O policy conformance checked
@@ -21,6 +27,11 @@ Provide a concise overview of the changes in this pull request.
 ## Storage safety review
 - [ ] Double-completion prevented
 - [ ] Resource limits enforced
+
+## Risks and rollback
+Safety and rollback plan:
+- Rollback defined and tested
+- Kernel safety review completed
 
 ## Verification
 - Unit tests
