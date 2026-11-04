@@ -29,7 +29,7 @@ fn test_integration_individual_v84_engines() {
     assert!(report.contains("Feature Parity Matrix V84"));
 
     let sched = Linux638SchedExtAiPredictivePowerGovernorEngineV84::new();
-    assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 6000);
+    assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5800);
 
     let freebsd = FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new();
     assert!(freebsd.verify_jail_vnet_isolation(10));

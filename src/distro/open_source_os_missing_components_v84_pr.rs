@@ -144,7 +144,7 @@ impl Linux638SchedExtAiPredictivePowerGovernorEngineV84 {
     pub fn predict_optimal_cpu_frequency(&self, load_history: &[f64]) -> u32 {
         let avg_load: f64 = load_history.iter().sum::<f64>() / (load_history.len() as f64).max(1.0);
         if avg_load > 0.8 {
-            6000
+            5800
         } else if avg_load > 0.4 {
             3800
         } else {
@@ -577,7 +577,7 @@ impl Default for OmarchyWallustThemeChordNavigatorEngineV84 {
 }
 
 // ============================================================================
-// 12. Global Tech Media 46 Portal Unimplemented Ideas Engine V84
+// 12. Global Tech Media 39 Portal Unimplemented Ideas Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -590,7 +590,7 @@ impl GlobalTechMedia46PortalUnimplementedIdeasEngineV84 {
     pub fn new() -> Self {
         Self {
             portals_scraped: 46,
-            total_ideas_indexed: 6000,
+            total_ideas_indexed: 5800,
         }
     }
 
@@ -605,7 +605,7 @@ impl GlobalTechMedia46PortalUnimplementedIdeasEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-011".to_string(),
-            title: "46 Global Tech Media Portals Unimplemented Ideas Engine".to_string(),
+            title: "39 Global Tech Media Portals Unimplemented Ideas Engine".to_string(),
             component_name: "GlobalTechMedia46PortalUnimplementedIdeasEngineV84".to_string(),
             os_origin: "Global Tech Media".to_string(),
             status: OsPrStatusV84::Validated,
@@ -797,7 +797,7 @@ mod tests {
         assert!(report.contains("Feature Parity Matrix V84"));
 
         let sched = Linux638SchedExtAiPredictivePowerGovernorEngineV84::new();
-        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 6000);
+        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5800);
 
         let freebsd = FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new();
         assert!(freebsd.verify_jail_vnet_isolation(10));

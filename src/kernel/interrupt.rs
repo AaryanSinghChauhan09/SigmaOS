@@ -266,6 +266,11 @@ impl InterruptController {
     pub fn irq_count(&self) -> usize {
         self.irq_lines.len()
     }
+
+    /// Allocate or register an IRQ
+    pub fn allocate_irq(&mut self, irq: u32, _flags: u32) {
+        let _ = self.register_irq(irq, IrqTriggerType::Edge);
+    }
 }
 
 #[cfg(test)]

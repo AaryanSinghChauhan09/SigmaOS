@@ -1,4 +1,4 @@
-# Cache Policy
+# Filesystem Cache Policy
 
 - Race-Free Cache Eviction
 - Cache Reuse Policy
