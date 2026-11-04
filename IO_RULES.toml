@@ -1,20 +1,29 @@
+# SigmaOS Subsystem I/O Management Rules
+
 [rule.io_completeness]
-enabled = true
+requirement = "I/O management defines submit, interrupt, DMA, buffer, and scheduler semantics."
+enforcement = "I/O tests + rehearsals"
 
 [rule.no_leak]
-enabled = true
+requirement = "I/O leaks are zero under stress tests."
+enforcement = "I/O stress tests"
 
 [rule.oom_metric]
-enabled = true
+requirement = "I/O defines and measures OOM behavior."
+enforcement = "Limit rehearsal"
 
 [rule.interrupt_integrity]
-enabled = true
+requirement = "Interrupt handler preserves scheduler and I/O integrity."
+enforcement = "Interrupt rehearsal"
 
 [rule.buffer_semantics]
-enabled = true
+requirement = "Buffer eviction defines legal eviction and error codes."
+enforcement = "Buffer tests"
 
 [rule.no_model_only_status]
-enabled = true
+requirement = "I/O features cannot be marked complete from model tests alone."
+enforcement = "Status audit"
 
 [rule.runtime_evidence]
-enabled = true
+requirement = "Boot-affecting I/O changes require boot-to-shell or integration evidence."
+enforcement = "CI boot gate"
