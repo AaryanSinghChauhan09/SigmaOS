@@ -689,7 +689,11 @@ pub use shell::{
     SovereignShellsTerminalsSupervisorsParityV89Gateway,
     SovereignShellsTerminalsSupervisorsV89PrSuite,
     SovereignShellsTerminalsSupervisorsParityV90Gateway,
-    SovereignShellsTerminalsSupervisorsV90PrSuite, TerminalMultiplexersAndEmulatorsPrEngine,
+    SovereignShellsTerminalsSupervisorsV90PrSuite,
+    SovereignShellsTerminalsSupervisorsParityV91Gateway,
+    SovereignShellsTerminalsSupervisorsParityV91GatewayEngine,
+    SovereignShellsTerminalsSupervisorsV91PrSuite,
+    TerminalMultiplexersAndEmulatorsPrEngine,
     ZshPromptFormatter,
 };
 pub use sigpkg::{
