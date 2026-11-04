@@ -1,20 +1,29 @@
+# SigmaOS Subsystem I/O Management Rules
+
 [rule.io_completeness]
-description = "All I/O operations must be fully tracked and completed"
+requirement = "I/O management defines submit, interrupt, DMA, buffer, and scheduler semantics."
+enforcement = "I/O tests + rehearsals"
 
 [rule.no_leak]
-description = "No memory or descriptor leaks across the lifecycle"
+requirement = "I/O leaks are zero under stress tests."
+enforcement = "I/O stress tests"
 
 [rule.oom_metric]
-description = "Out-of-memory metrics must be tracked"
+requirement = "I/O defines and measures OOM behavior."
+enforcement = "Limit rehearsal"
 
 [rule.interrupt_integrity]
-description = "Interrupt handler integrity must be maintained without double registration"
+requirement = "Interrupt handler preserves scheduler and I/O integrity."
+enforcement = "Interrupt rehearsal"
 
 [rule.buffer_semantics]
-description = "Buffer cache semantics and dirty flushing must be preserved"
+requirement = "Buffer eviction defines legal eviction and error codes."
+enforcement = "Buffer tests"
 
 [rule.no_model_only_status]
-description = "Components must have concrete runtime implementations, not just model status"
+requirement = "I/O features cannot be marked complete from model tests alone."
+enforcement = "Status audit"
 
 [rule.runtime_evidence]
-description = "Runtime evidence must validate every I/O transaction"
+requirement = "Boot-affecting I/O changes require boot-to-shell or integration evidence."
+enforcement = "CI boot gate"

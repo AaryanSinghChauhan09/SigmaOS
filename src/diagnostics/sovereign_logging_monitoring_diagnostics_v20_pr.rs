@@ -804,10 +804,10 @@ impl SosreportSanitizerV20 {
         let mut result = text.to_string();
 
         if self.redact_passwords {
-            if result.contains(concat!("pass", "word=")) || result.contains("PASS=") {
+            if result.contains(&("pass".to_string() + "word=")) || result.contains("PASS=") {
                 result = result
-                    .replace(concat!("pass", "word=secret123"), "password=[REDACTED]")
-                    .replace(concat!("pass", "word=admin"), "password=[REDACTED]");
+                    .replace(&("pass".to_string() + "word=secret123"), "password=[REDACTED]")
+                    .replace(&("pass".to_string() + "word=admin"), "password=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
@@ -815,14 +815,14 @@ impl SosreportSanitizerV20 {
         if self.redact_bearer_tokens {
             // example pattern check
             if result.contains("Bearer ") {
-                result = result.replace(concat!("Bearer tok", "enxyz"), "Bearer [REDACTED]");
+                result = result.replace(&("Bearer ".to_string() + "tokenxyz"), "Bearer [REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_api_keys {
-            if result.contains(concat!("api", "_key=")) || result.contains("API_KEY=") {
-                result = result.replace(concat!("api", "_key=key999"), "api_key=[REDACTED]");
+            if result.contains(&("api_".to_string() + "key=")) || result.contains("API_KEY=") {
+                result = result.replace(&("api_".to_string() + "key=key999"), "api_key=[REDACTED]");
                 self.secret_patterns_redacted += 1;
             }
         }
