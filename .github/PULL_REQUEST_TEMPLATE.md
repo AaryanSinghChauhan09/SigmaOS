@@ -80,3 +80,15 @@ make format
 - [ ] Documentation matches implementation
 - [ ] Capability status is evidence-based
 - [ ] No unsupported Linux/BSD parity claims
+
+## Storage component
+
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+
+## Storage safety review
+
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
