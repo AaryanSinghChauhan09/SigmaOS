@@ -1,3 +1,2 @@
-# SigmaOS DMA Policy
-
-Direct Memory Access buffer mapping and scatter-gather list specifications.
+# DMA Policy
+DMA mapping and memory buffer policies.

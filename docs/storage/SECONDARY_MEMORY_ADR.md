@@ -1,10 +1,10 @@
-# Secondary Memory Lifecycle Subsystem ADR
+# Architecture Decision Record: Secondary Memory Lifecycle Subsystem
 
 ## Context
-Secondary Memory Lifecycle Subsystem architecture.
+SigmaOS requires a structured secondary memory and storage subsystem.
 
 ## Decision
-Authoritative lifecycle contract implementation.
+Implement the secondary memory lifecycle management architecture.
 
 ## Consequences
-Deterministic memory management and IO execution.
+Guarantees race-free request dispatch, block cache consistency, and clean unmounts.

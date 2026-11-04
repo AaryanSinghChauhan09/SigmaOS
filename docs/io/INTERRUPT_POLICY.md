@@ -1,3 +1,2 @@
-# SigmaOS Interrupt Policy
-
-Interrupt handler priority, registration, and dispatch guidelines.
+# Interrupt Policy
+Interrupt handling policy and constraints.

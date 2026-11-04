@@ -1,3 +1,2 @@
-# SigmaOS I/O Management Architecture Decision Record
-
-ADR for unified I/O subsystem and PR gateway.
+# I/O Management ADR
+Architecture Decision Record for I/O subsystem.

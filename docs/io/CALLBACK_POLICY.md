@@ -1,3 +1,2 @@
-# SigmaOS Callback Policy
-
-Asynchronous completion callback invocation and notification invariants.
+# Callback Policy
+Asynchronous I/O completion callback rules.
