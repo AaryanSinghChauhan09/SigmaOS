@@ -41,14 +41,14 @@ fn test_integration_individual_v84_engines() {
     let parity = dfbsd.compute_erasure_parity(&[&[1, 2], &[3, 4]]);
     assert_eq!(parity, vec![1 ^ 3, 2 ^ 4]);
 
-    let netbsd = NetBsd130RumpUserlandAudioPciRouterEngineV84::new();
+    let netbsd = NetBsd133RumpUserlandAudioPciRouterEngineV84::new();
     assert!(netbsd.route_pci_hypercall(1));
 
     let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV84::new();
     assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
     let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84::new();
-    assert_eq!(plan9.rfork_namespace(1), 0x0000_2047);
+    assert_eq!(plan9.rfork_namespace(1), 0x0000_1029);
 
     let nix = NixGuixHermeticCasMerkleClosureEngineV84::new();
     assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));

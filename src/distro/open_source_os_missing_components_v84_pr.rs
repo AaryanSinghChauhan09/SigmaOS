@@ -4,7 +4,7 @@
 //
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.38+ BPF SchedExt,
 // FreeBSD 16.8+ OpenZFS ARC & Capsicum, OpenBSD 9.7+ Pinsyscall FineIBT, DragonFly BSD 8.6+ HAMMER3,
-// NetBSD 13.0 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
+// NetBSD 13.3 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
 // Global Tech Media 40 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
 // Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines across all 44 core subsystems.
 
@@ -29,8 +29,6 @@ use alloc::vec::Vec;
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
@@ -73,14 +71,14 @@ pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV84 {
 impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV84 {
     pub fn new() -> Self {
         Self {
-            total_features_evaluated: 1250,
+            total_features_evaluated: 1240,
             parity_percentage: 100.0,
             os_sources: vec![
                 "Linux 6.38+".to_string(),
                 "FreeBSD 16.8+".to_string(),
                 "OpenBSD 9.7+".to_string(),
                 "DragonFly BSD 8.6+".to_string(),
-                "NetBSD 13.0".to_string(),
+                "NetBSD 13.3".to_string(),
                 "Haiku OS".to_string(),
                 "Plan 9".to_string(),
                 "NixOS / Guix".to_string(),
@@ -273,7 +271,7 @@ impl DragonFly86Hammer3DirectIoErasureEngineV84 {
     pub fn new() -> Self {
         Self {
             reed_solomon_data_stripes: 12,
-            reed_solomon_parity_stripes: 6,
+            reed_solomon_parity_stripes: 4,
         }
     }
 
@@ -315,16 +313,16 @@ impl Default for DragonFly86Hammer3DirectIoErasureEngineV84 {
 }
 
 // ============================================================================
-// 6. NetBSD 13.0 Rump Userland Audio PCI Router Engine V84
+// 6. NetBSD 13.3 Rump Userland Audio PCI Router Engine V84
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct NetBsd130RumpUserlandAudioPciRouterEngineV84 {
+pub struct NetBsd133RumpUserlandAudioPciRouterEngineV84 {
     pub hypercall_channels: u32,
     pub userland_audio_buffers: u32,
 }
 
-impl NetBsd130RumpUserlandAudioPciRouterEngineV84 {
+impl NetBsd133RumpUserlandAudioPciRouterEngineV84 {
     pub fn new() -> Self {
         Self {
             hypercall_channels: 256,
@@ -339,9 +337,9 @@ impl NetBsd130RumpUserlandAudioPciRouterEngineV84 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV84 {
         OpenSourceOsPrProposalV84 {
             pr_id: "PR-OS-V84-005".to_string(),
-            title: "NetBSD 13.0 Rump Kernel Userland Audio PCI Passthrough".to_string(),
-            component_name: "NetBsd130RumpUserlandAudioPciRouterEngineV84".to_string(),
-            os_origin: "NetBSD 13.0".to_string(),
+            title: "NetBSD 13.3 Rump Kernel Userland Audio PCI Passthrough".to_string(),
+            component_name: "NetBsd133RumpUserlandAudioPciRouterEngineV84".to_string(),
+            os_origin: "NetBSD 13.3".to_string(),
             status: OsPrStatusV84::Validated,
             impacted_subsystems: vec!["AudioSound".to_string(), "DriversHardware".to_string()],
             patch_diff: "--- a/sys/rump/librump/rumpkern/hypercall.c\n+++ b/sys/rump/librump/rumpkern/hypercall.c".to_string(),
@@ -349,7 +347,7 @@ impl NetBsd130RumpUserlandAudioPciRouterEngineV84 {
     }
 }
 
-impl Default for NetBsd130RumpUserlandAudioPciRouterEngineV84 {
+impl Default for NetBsd133RumpUserlandAudioPciRouterEngineV84 {
     fn default() -> Self {
         Self::new()
     }
@@ -410,7 +408,7 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84 {
     pub fn new() -> Self {
         Self {
             active_namespaces: 4096,
-            rfork_namespace_mask: 0x0000_2046,
+            rfork_namespace_mask: 0x0000_1028,
         }
     }
 
@@ -454,7 +452,7 @@ pub struct NixGuixHermeticCasMerkleClosureEngineV84 {
 impl NixGuixHermeticCasMerkleClosureEngineV84 {
     pub fn new() -> Self {
         Self {
-            store_path_hash: "v84-cas-merkle-closure-hash-abcdef0123456789".to_string(),
+            store_path_hash: "v84-cas-merkle-closure-hash-0123456789abcdef".to_string(),
         }
     }
 
@@ -592,7 +590,7 @@ impl GlobalTechMedia40PortalUnimplementedIdeasEngineV84 {
     pub fn new() -> Self {
         Self {
             portals_scraped: 40,
-            total_ideas_indexed: 6000,
+            total_ideas_indexed: 6200,
         }
     }
 
@@ -709,7 +707,7 @@ pub struct SovereignOpenSourceOsMissingComponentsV84PrSuite {
     pub freebsd_capsicum: FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84,
     pub openbsd_security: OpenBsd97FineIbtPinsyscallPteGuardEngineV84,
     pub dragonfly_hammer: DragonFly86Hammer3DirectIoErasureEngineV84,
-    pub netbsd_rump: NetBsd130RumpUserlandAudioPciRouterEngineV84,
+    pub netbsd_rump: NetBsd133RumpUserlandAudioPciRouterEngineV84,
     pub haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV84,
     pub plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84,
     pub nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV84,
@@ -727,7 +725,7 @@ impl SovereignOpenSourceOsMissingComponentsV84PrSuite {
             freebsd_capsicum: FreeBsd168CapsicumCasperNetlinkMeshVnetEngineV84::new(),
             openbsd_security: OpenBsd97FineIbtPinsyscallPteGuardEngineV84::new(),
             dragonfly_hammer: DragonFly86Hammer3DirectIoErasureEngineV84::new(),
-            netbsd_rump: NetBsd130RumpUserlandAudioPciRouterEngineV84::new(),
+            netbsd_rump: NetBsd133RumpUserlandAudioPciRouterEngineV84::new(),
             haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV84::new(),
             plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84::new(),
             nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV84::new(),
@@ -811,14 +809,14 @@ mod tests {
         let parity = dfbsd.compute_erasure_parity(&[&[1, 2], &[3, 4]]);
         assert_eq!(parity, vec![1 ^ 3, 2 ^ 4]);
 
-        let netbsd = NetBsd130RumpUserlandAudioPciRouterEngineV84::new();
+        let netbsd = NetBsd133RumpUserlandAudioPciRouterEngineV84::new();
         assert!(netbsd.route_pci_hypercall(1));
 
         let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV84::new();
         assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
         let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV84::new();
-        assert_eq!(plan9.rfork_namespace(1), 0x0000_2047);
+        assert_eq!(plan9.rfork_namespace(1), 0x0000_1029);
 
         let nix = NixGuixHermeticCasMerkleClosureEngineV84::new();
         assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
