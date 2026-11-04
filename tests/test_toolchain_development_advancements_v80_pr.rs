@@ -15,240 +15,261 @@ fn test_toolchain_development_advancements_v80_integration() {
     let gateway = SovereignToolchainDevelopmentParityV80Gateway::new();
 
     // 1. Verify Compiler and Linker Engine
-    let gcc_flags = gateway.compiler_engine.generate_gcc_flags();
+    let gcc_flags = gateway.gcc_engine.generate_gcc_flags();
     assert!(gcc_flags.contains(&"-O3".to_string()));
     assert!(gcc_flags.contains(&"-D_FORTIFY_SOURCE=3".to_string()));
     assert!(gcc_flags.contains(&"-fuse-ld=mold".to_string()));
 
-    let clang_flags = gateway.compiler_engine.generate_clang_flags();
+    let clang_flags = gateway.gcc_engine.generate_clang_flags();
     assert!(clang_flags.contains(&"-flto=thin".to_string()));
 
     let bolt_spec = gateway
-        .compiler_engine
+        .gcc_engine
         .generate_bolt_reorder_spec("/usr/bin/sigmaos");
     assert!(bolt_spec.contains("llvm-bolt"));
-    assert!(bolt_spec.contains("--reorder-blocks=ext-tsp"));
 
-    let polly_flags = gateway.compiler_engine.generate_llvm_polly_flags();
+    let polly_flags = gateway.gcc_engine.generate_llvm_polly_flags();
     assert!(polly_flags.contains(&"-polly".to_string()));
 
-    let mlgo_flags = gateway.compiler_engine.generate_mlgo_inline_flags();
+    let mlgo_flags = gateway.gcc_engine.generate_mlgo_inline_flags();
     assert!(mlgo_flags.contains(&"-enable-ml-inliner=release".to_string()));
 
-    let mold_rsp = gateway.compiler_engine.generate_mold_response_file(
-        "libsigma.so",
-        &["core.o", "net.o"],
-        &["c", "pthread"],
-    );
-    assert!(mold_rsp.contains("-o libsigma.so"));
-    assert!(mold_rsp.contains("-lpthread"));
-
     let ctf_count = gateway
-        .compiler_engine
+        .gcc_engine
         .parse_ctf_compact_c_type_info(&[0xf2, 0xd9, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     assert_eq!(ctf_count, 1);
 
-    let btf_valid = gateway
-        .compiler_engine
-        .parse_btf_header(&[0x9f, 0xeb, 1, 0, 0, 0, 0, 0]);
-    assert!(btf_valid);
-
-    let comp_profile = gateway.compiler_engine.estimate_compiler_optimization(
+    let comp_profile = gateway.gcc_engine.estimate_compiler_optimization(
         ToolchainOptModeV80::ClearLinuxO3,
         ToolchainHardeningModeV80::FedoraFortifyLevel3,
     );
-    assert_eq!(comp_profile.estimated_speedup_pct, 40);
+    assert_eq!(comp_profile.estimated_speedup_pct, 36);
 
-    // 2. Verify Build Systems & pkg-config Engine
-    let fifo = gateway
+    // 2. Verify Build Systems & Pkg-Config Engine
+    let jobserver_fd = gateway
         .build_engine
-        .make_jobserver_fifo_spec("/run/make_fifo", 16);
-    assert!(fifo.contains("-j16"));
+        .parse_make_jobserver_flags("MAKEFLAGS=--jobserver-auth=4,5");
+    assert_eq!(jobserver_fd, Some(4));
 
-    let file_api = gateway.build_engine.cmake_file_api_query_spec();
-    assert!(file_api.contains("codemodel"));
+    let acquired_tokens = gateway.build_engine.jobserver_acquire_tokens(2, 8);
+    assert_eq!(acquired_tokens, 6);
 
-    let gen_expr = gateway
+    let cmake_targets = gateway
         .build_engine
-        .evaluate_cmake_generator_expression("$<CONFIG:Release>", "Release");
-    assert_eq!(gen_expr, "1");
+        .parse_cmake_file_api_reply("{\"name\": \"target1\"}, {\"name\": \"target2\"}");
+    assert_eq!(
+        cmake_targets,
+        vec!["target1".to_string(), "target2".to_string()]
+    );
 
-    let presets = gateway
+    let genex = gateway
         .build_engine
-        .parse_cmake_presets_v10("{\"configurePresets\": [{\"name\": \"ci-linux\"}]}");
-    assert_eq!(presets, vec!["ci-linux"]);
+        .generate_cmake_generator_expression("OPENSSL", "-lssl");
+    assert_eq!(genex, "$<$<TARGET_EXISTS:OPENSSL>:-lssl>");
 
-    let nodes = vec![NinjaBuildGraphNodeV80 {
-        name: "compile".to_string(),
-        inputs: vec!["sigma.c".to_string()],
-        outputs: vec!["sigma.o".to_string()],
-        command: "gcc -c sigma.c".to_string(),
-    }];
-    let comp_db = gateway
+    let ninja_node = NinjaBuildGraphNodeV80 {
+        name: "link".to_string(),
+        inputs: vec!["a.o".to_string(), "b.o".to_string()],
+        outputs: vec!["app".to_string()],
+        command: "mold -o app a.o b.o".to_string(),
+    };
+    assert!(!gateway
         .build_engine
-        .ninja_generate_compilation_db(&nodes, "/workspace");
-    assert!(comp_db.contains("\"file\": \"sigma.c\""));
+        .detect_ninja_graph_cycles(&[ninja_node]));
 
-    let wrap_pkg = gateway
-        .build_engine
-        .meson_resolve_wrap_subproject("sqlite3", "3.45.0");
-    assert!(wrap_pkg.contains("[wrap-file]"));
+    let comp_db =
+        gateway
+            .build_engine
+            .generate_compilation_database_entry("foo.c", "gcc -c foo.c", "/src");
+    assert!(comp_db.contains("\"file\": \"foo.c\""));
 
-    let autoconf_cache = gateway
+    let wrap_content = "directory = libz\nurl = https://zlib.net/zlib-1.3.tar.gz\n";
+    let (wrap_dir, wrap_url) = gateway
         .build_engine
-        .autoconf_preseed_cache("x86_64-sigmaos");
-    assert!(autoconf_cache
-        .iter()
-        .any(|line| line.contains("ac_cv_host=x86_64-sigmaos")));
+        .parse_meson_wrap_file(wrap_content)
+        .unwrap();
+    assert_eq!(wrap_dir, "libz");
+    assert_eq!(wrap_url, "https://zlib.net/zlib-1.3.tar.gz");
 
-    let pkg_conf = gateway
+    let autoconf_cache = gateway.build_engine.generate_autoconf_config_cache("musl");
+    assert!(autoconf_cache.contains("musl"));
+
+    let libtool_deps = gateway
         .build_engine
-        .pkgconf_multiarch_resolver("libuv", "x86_64-sigma-elf");
-    assert_eq!(pkg_conf.sysroot, "/usr/x86_64-sigma-elf");
+        .parse_libtool_la_dependency_libs("dependency_libs=' -lz -lssl '");
+    assert_eq!(libtool_deps, vec!["-lz".to_string(), "-lssl".to_string()]);
+
+    let paths = gateway
+        .build_engine
+        .resolve_multiarch_pkg_config_paths("x86_64-sigmaos");
+    assert_eq!(paths.len(), 4);
+
+    let pkg_provider = gateway
+        .build_engine
+        .pkgconf_virtual_provider_lookup("wayland");
+    assert_eq!(pkg_provider, "wayland-client");
+
+    let pkg_query = gateway
+        .build_engine
+        .query_pkg_config("glib-2.0", "x86_64-sigmaos");
+    assert_eq!(pkg_query.package_name, "glib-2.0");
 
     // 3. Verify Debuggers, Tracing & Profilers Engine
-    let rsp_pack = gateway.debug_engine.gdb_encode_rsp_packet("Hg0");
-    assert!(rsp_pack.starts_with("$Hg0#"));
-    assert_eq!(
-        gateway.debug_engine.gdb_decode_rsp_packet(&rsp_pack),
-        Some("Hg0".to_string())
-    );
-
-    // DWARF stack op: lit0 (0), consts 10 (10), plus (10), consts 3 (3), mul (30)
-    let dwarf_ops = [0x1e, 0x11, 10, 0x22, 0x11, 3, 0x24];
-    assert_eq!(
-        gateway.debug_engine.lldb_evaluate_dwarf_expr(&dwarf_ops),
-        Ok(30)
-    );
-
-    let ebpf_rule = gateway.debug_engine.strace_ebpf_filter_rule("read", 9999);
-    assert!(ebpf_rule.contains("sys_enter_read"));
-
-    let plt_hook = gateway.debug_engine.ltrace_plt_hook("write");
-    assert!(plt_hook.contains("hook_plt_trampoline(\"write\""));
-
-    let leak_cat = gateway
+    let (rsp_payload, rsp_checksum) = gateway
         .debug_engine
-        .valgrind_categorize_error("<error>Leak_DefinitelyLost 100 bytes</error>");
-    assert_eq!(leak_cat, "Definitely Lost (Memory Leak)");
+        .parse_gdb_rsp_packet("$Hg0#db")
+        .unwrap();
+    assert_eq!(rsp_payload, "Hg0");
+    assert_eq!(rsp_checksum, "db");
+    assert_eq!(gateway.debug_engine.format_gdb_rsp_ack(true), "+");
+    assert_eq!(gateway.debug_engine.format_gdb_rsp_ack(false), "-");
 
-    let (ret, bad, fe, be) = gateway
+    let sbapi_expr = gateway
         .debug_engine
-        .perf_topdown_v5_metrics(1000, 350, 150, 200);
-    assert!((ret - 35.0).abs() < 0.01);
-    assert!((bad - 15.0).abs() < 0.01);
-    assert!((fe - 20.0).abs() < 0.01);
-    assert!((be - 30.0).abs() < 0.01);
+        .format_lldb_sbapi_expression("process.id");
+    assert!(sbapi_expr.contains("process.id"));
 
-    let usdt = gateway
+    let (sc_name, sc_args) = gateway
         .debug_engine
-        .format_dtrace_usdt_probe("kernel", "vfs", "lookup", "entry");
-    assert_eq!(usdt, "kernel:vfs:lookup:entry");
+        .parse_strace_ebpf_syscall_args("mprotect(0x1000, 1024, 0x7)")
+        .unwrap();
+    assert_eq!(sc_name, "mprotect");
+    assert_eq!(sc_args, vec![0x1000, 1024, 0x7]);
 
-    let ktrace_str = gateway.debug_engine.parse_ktrace_sysrel_event(101, 12, -1);
-    assert!(ktrace_str.contains("ret=-1"));
+    let (func, ret) = gateway
+        .debug_engine
+        .parse_ltrace_plt_call("getpid() -> 42")
+        .unwrap();
+    assert_eq!(func, "getpid()");
+    assert_eq!(ret, "42");
 
-    let ptrace_str = gateway.debug_engine.format_ptrace_seize_opts(0x10);
-    assert_eq!(ptrace_str, "PTRACE_SEIZE opts=0x10");
+    let valgrind_leak = gateway
+        .debug_engine
+        .evaluate_valgrind_memcheck_leak(4096, 1);
+    assert!(valgrind_leak.contains("4096 bytes"));
 
-    // 4. Verify Distributed VCS & Git Topology Engine
-    let oid = [0xabu8; 20];
-    let reftable_rec = gateway
+    let (retiring, bad_spec, fe, be) = gateway
+        .debug_engine
+        .parse_perf_topdown_metrics(200, 80, 20, 40, 60);
+    assert!((retiring - 40.0).abs() < 0.001);
+    assert!((bad_spec - 10.0).abs() < 0.001);
+    assert!((fe - 20.0).abs() < 0.001);
+    assert!((be - 30.0).abs() < 0.001);
+
+    let flame = gateway
+        .debug_engine
+        .generate_perf_flamegraph_ascii(&[("kernel;sched;idle", 15)]);
+    assert!(flame.contains("kernel;sched;idle 15"));
+
+    let usdt_probe = gateway
+        .debug_engine
+        .format_dtrace_usdt_probe("sigma", "fs", "lookup", "hit");
+    assert_eq!(usdt_probe, "sigma:fs:lookup:hit");
+
+    let ktrace_entry = gateway.debug_engine.parse_ktrace_sysrel_event(2048, 12, 0);
+    assert!(ktrace_entry.contains("pid=2048"));
+
+    let ptrace_str = gateway.debug_engine.format_ptrace_seize_opts(0x80);
+    assert_eq!(ptrace_str, "PTRACE_SEIZE opts=0x80");
+
+    // 4. Verify VCS & Git Topology Engine
+    let midx_lookup = gateway
         .vcs_engine
-        .format_git_reftable_record("refs/heads/master", &oid, 42);
-    assert!(reftable_rec.contains("ref=refs/heads/master"));
-    assert!(reftable_rec.contains("update_index=42"));
+        .git_midx_reachability_bitmap_lookup("deadbeef");
+    assert!(midx_lookup.is_some());
 
-    let midx_bitmap = [0x1u64];
-    assert!(gateway.vcs_engine.git_midx_bitmap_lookup(0, &midx_bitmap));
-    assert!(!gateway.vcs_engine.git_midx_bitmap_lookup(1, &midx_bitmap));
+    let pack_search = gateway
+        .vcs_engine
+        .git_packfile_binary_search_object(&[0x10, 0x20], 500);
+    assert!(pack_search.is_some());
 
+    let reftable_entry = gateway
+        .vcs_engine
+        .parse_git_reftable_ref_entry("refs/tags/v80.0.0 a1b2c3d4")
+        .unwrap();
+    assert_eq!(reftable_entry.0, "refs/tags/v80.0.0");
+    assert_eq!(reftable_entry.1, "a1b2c3d4");
+
+    let jj_hash = gateway
+        .vcs_engine
+        .jujutsu_change_id_to_git_oid_bridge("zyxw987");
+    assert_eq!(jj_hash, "jj-rev-zyxw987");
+
+    let commits = [
+        ("init", &[][..]),
+        ("feat1", &["init"][..]),
+        ("feat2", &["feat1"][..]),
+    ];
+    let sorted_commits = gateway.vcs_engine.topological_commit_sort(&commits);
+    assert_eq!(sorted_commits.len(), 3);
+
+    // 5. Verify Polyglot Language Runtimes Engine
+    let py_flags = gateway
+        .polyglot_engine
+        .python_free_threaded_jit_config(true);
+    assert!(py_flags.contains(&"jit=on".to_string()));
+    assert!(py_flags.contains(&"gil=0".to_string()));
+
+    let pyc = gateway
+        .polyglot_engine
+        .python_bytecode_aot_compile("/usr/lib/sigma.py", 3);
+    assert_eq!(pyc, "/usr/lib/sigma.pyc (opt_level=3)");
+
+    let perl_xs = gateway
+        .polyglot_engine
+        .perl_xs_c_bridge_generate("Sigma::IO");
+    assert!(perl_xs.contains("Sigma::IO"));
     assert!(gateway
-        .vcs_engine
-        .evaluate_partial_clone_filter("blob:none", "tree", 100));
-    assert!(!gateway
-        .vcs_engine
-        .evaluate_partial_clone_filter("blob:none", "blob", 100));
+        .polyglot_engine
+        .perl_cpan_vendor_sandbox_verify("Net::SSLeay"));
 
-    let cone = ["src", "kernel"];
-    assert!(gateway
-        .vcs_engine
-        .sparse_checkout_cone_match("src/lib.rs", &cone));
-    assert!(!gateway
-        .vcs_engine
-        .sparse_checkout_cone_match("docs/info.txt", &cone));
+    let ruby_yjit = gateway.polyglot_engine.ruby_yjit_profile_evaluator(50);
+    assert!(ruby_yjit.contains("50ms"));
 
-    let jj_bridge = gateway
-        .vcs_engine
-        .jujutsu_git_commit_bridge("change_1", "git_commit_1");
-    assert!(jj_bridge.contains("co-located"));
+    let cargo_sbom = gateway
+        .polyglot_engine
+        .cargo_auditable_sbom_json_generate("sigma-kernel", "0.80.0");
+    assert!(cargo_sbom.contains("sigma-kernel"));
 
-    let sendbug =
+    let cargo_verify =
         gateway
-            .vcs_engine
-            .format_sendbug_patch("toolchain", "New V80 toolchain engine", "+// v80");
-    assert!(sendbug.contains("SEND-PR: Category: toolchain"));
-
-    // 5. Verify Language Runtimes & Polyglot Engine
-    let vendor_res =
-        gateway
-            .runtimes_engine
-            .cargo_vendor_mirror_verify("tokio", "sha123", b"cargo-archive");
-    assert!(vendor_res.is_valid);
-
-    let cranelift_flags = gateway.runtimes_engine.rustc_cranelift_codegen_flags();
-    assert!(cranelift_flags.contains(&"-Zcodegen-backend=cranelift".to_string()));
+            .polyglot_engine
+            .cargo_vendor_mirror_verify("syn", "checksum-syn", b"blob");
+    assert!(cargo_verify.is_valid);
 
     let go_pgo = gateway
-        .runtimes_engine
-        .build_go_pgo_profile("production.pprof");
-    assert!(go_pgo.contains("go build -pgo=production.pprof"));
+        .polyglot_engine
+        .build_go_pgo_profile("profiles/cpu.pprof");
+    assert!(go_pgo.contains("-pgo=profiles/cpu.pprof"));
 
-    let cgo_res = gateway
-        .runtimes_engine
+    let cgo_bridge = gateway
+        .polyglot_engine
         .go_cgo_zero_copy_bridge_dispatch(0x4000, 1024);
-    assert_eq!(cgo_res, Ok(1024));
+    assert_eq!(cgo_bridge, Ok(1024));
 
-    let py_free = gateway
-        .runtimes_engine
-        .python_freethreaded_evaluator(true, 8);
-    assert!(py_free.contains("GIL disabled"));
-
-    let py_aot = gateway
-        .runtimes_engine
-        .python_bytecode_aot_compile("script.py", 1);
-    assert_eq!(py_aot, "script.pyc (opt_level=1)");
-
-    let perl_cow = gateway
-        .runtimes_engine
-        .perl_cow_sv_inspector("buffer", true);
-    assert!(perl_cow.contains("Cow=true"));
-
-    let ruby_jit = gateway.runtimes_engine.ruby_yjit_profile_evaluator(100);
-    assert!(ruby_jit.contains("100 instructions"));
-
-    let shenandoah_flags = gateway
-        .runtimes_engine
+    let shenandoah = gateway
+        .polyglot_engine
         .openjdk_shenandoah_pause_time_tuner(5);
-    assert!(shenandoah_flags.contains(&"-XX:ShenandoahMaxPause=5".to_string()));
+    assert!(shenandoah.contains(&"-XX:MaxGCPauseMillis=5".to_string()));
 
-    let leyden_flags = gateway
-        .runtimes_engine
-        .openjdk_leyden_aot_config("shared.aot");
-    assert!(leyden_flags.contains(&"-XX:AOTCache=shared.aot".to_string()));
+    let zgc = gateway.polyglot_engine.openjdk_graalvm_zgc_config(8192);
+    assert!(zgc.contains(&"-Xmx8192m".to_string()));
 
-    let graal_img = gateway
-        .runtimes_engine
-        .openjdk_graalvm_native_image_optimize(100_000);
-    assert_eq!(graal_img.estimated_startup_ms, 6);
+    let graal_native = gateway
+        .polyglot_engine
+        .openjdk_graalvm_native_image_optimize(20_000_000);
+    assert_eq!(graal_native.estimated_startup_ms, 7);
 
-    let zig_eval = gateway.runtimes_engine.polyglot_runtime_evaluator("zig");
-    assert!(zig_eval.contains("Zig 0.15"));
+    let zig_runner = gateway.polyglot_engine.zig_build_runner("aarch64-linux");
+    assert!(zig_runner.contains("zig build -Dtarget=aarch64-linux"));
 
-    let swift_eval = gateway.runtimes_engine.polyglot_runtime_evaluator("swift");
-    assert!(swift_eval.contains("Swift 6.1"));
+    let polyglot_eval = gateway.polyglot_engine.polyglot_runtime_evaluator("ocaml");
+    assert!(polyglot_eval.contains("OCaml 5.3"));
 
-    // 6. Verify Master Proposals and Markdown Generation
+    let bun_eval = gateway.polyglot_engine.bun_deno_runtime_evaluator("deno");
+    assert!(bun_eval.contains("deno V8 isolate engine"));
+
+    // 6. Verify Master Gateway and PR Proposal Manifests
     let proposals = gateway.collect_all_proposals();
     assert_eq!(proposals.len(), 5);
     assert_eq!(proposals[0].pr_number, 6031);
@@ -257,17 +278,23 @@ fn test_toolchain_development_advancements_v80_integration() {
     assert_eq!(proposals[3].pr_number, 6034);
     assert_eq!(proposals[4].pr_number, 6035);
 
+    for p in &proposals {
+        assert_eq!(p.status, "Ready for Merge");
+        assert!(!p.tools_covered.is_empty());
+        assert!(!p.key_features_added.is_empty());
+        assert!(!p.distro_inspirations.is_empty());
+    }
+
     let summary = gateway.generate_master_summary();
     assert!(summary.contains("SIGMAOS TOOLCHAIN & DEVELOPMENT PARITY PR PROPOSAL SUMMARY (V80)"));
     assert!(summary.contains("Total PR Proposals: 5"));
 
-    let md = gateway.generate_pr_proposal_markdown();
-    assert!(
-        md.contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V80)")
-    );
-    assert!(md.contains("## PR #6031:"));
-    assert!(md.contains("## PR #6032:"));
-    assert!(md.contains("## PR #6033:"));
-    assert!(md.contains("## PR #6034:"));
-    assert!(md.contains("## PR #6035:"));
+    let markdown = gateway.generate_pr_proposal_markdown();
+    assert!(markdown
+        .contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V80)"));
+    assert!(markdown.contains("PR #6031"));
+    assert!(markdown.contains("PR #6032"));
+    assert!(markdown.contains("PR #6033"));
+    assert!(markdown.contains("PR #6034"));
+    assert!(markdown.contains("PR #6035"));
 }

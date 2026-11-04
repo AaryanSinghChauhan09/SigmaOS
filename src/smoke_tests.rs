@@ -29,10 +29,16 @@ pub struct SmokeTest {
 
 impl SmokeTest {
     pub fn run(name: &'static str, category: &'static str, f: impl Fn() -> SmokeResult) -> Self {
-        Self { name, category, result: f() }
+        Self {
+            name,
+            category,
+            result: f(),
+        }
     }
 
-    pub fn passed(&self) -> bool { self.result == SmokeResult::Pass }
+    pub fn passed(&self) -> bool {
+        self.result == SmokeResult::Pass
+    }
 }
 
 pub struct SmokeSuite {
@@ -46,93 +52,141 @@ impl SmokeSuite {
         let tests = vec![
             // ─── Boot ───────────────────────────────────────────────────
             SmokeTest::run("boot.pipeline_reaches_ready", "boot", || {
-                if platform.boot.is_ready() { SmokeResult::Pass }
-                else { SmokeResult::Fail("boot pipeline did not reach Ready stage".into()) }
+                if platform.boot.is_ready() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("boot pipeline did not reach Ready stage".into())
+                }
             }),
             SmokeTest::run("boot.all_stages_logged", "boot", || {
-                if platform.boot.log.len() >= 8 { SmokeResult::Pass }
-                else { SmokeResult::Fail(format!("only {} boot log entries", platform.boot.log.len())) }
+                if platform.boot.log.len() >= 8 {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail(format!("only {} boot log entries", platform.boot.log.len()))
+                }
             }),
             SmokeTest::run("boot.no_failed_stage", "boot", || {
-                if platform.boot.failed_stage.is_none() { SmokeResult::Pass }
-                else { SmokeResult::Fail(format!("failed stage: {:?}", platform.boot.failed_stage)) }
+                if platform.boot.failed_stage.is_none() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail(format!("failed stage: {:?}", platform.boot.failed_stage))
+                }
             }),
-
             // ─── Services ───────────────────────────────────────────────
             SmokeTest::run("system.required_services_running", "system", || {
-                if platform.system.all_required_running() { SmokeResult::Pass }
-                else { SmokeResult::Fail("not all required services running".into()) }
+                if platform.system.all_required_running() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("not all required services running".into())
+                }
             }),
-
             // ─── Packages ───────────────────────────────────────────────
             SmokeTest::run("packages.base_packages_installed", "packages", || {
                 let required = ["sigmaos-core", "sigmaos-desktop", "hyprland"];
-                let missing: Vec<_> = required.iter()
+                let missing: Vec<_> = required
+                    .iter()
                     .filter(|&&name| platform.packages.find(name).is_none())
                     .collect();
-                if missing.is_empty() { SmokeResult::Pass }
-                else { SmokeResult::Fail(format!("missing: {:?}", missing)) }
+                if missing.is_empty() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail(format!("missing: {:?}", missing))
+                }
             }),
             SmokeTest::run("packages.all_installed_signed", "packages", || {
-                if platform.packages.all_signed() { SmokeResult::Pass }
-                else { SmokeResult::Fail("unsigned packages installed".into()) }
+                if platform.packages.all_signed() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("unsigned packages installed".into())
+                }
             }),
             SmokeTest::run("packages.block_unsigned_install", "packages", || {
                 let mut pkgs = crate::sigma_platform::PackageCoordinator::new(backend);
                 let result = pkgs.install("unsigned-pkg", "0.1.0", false);
-                if !result { SmokeResult::Pass }
-                else { SmokeResult::Fail("unsigned package was not blocked".into()) }
+                if !result {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("unsigned package was not blocked".into())
+                }
             }),
-
             // ─── Config ─────────────────────────────────────────────────
             SmokeTest::run("config.defaults_valid", "config", || {
-                if platform.config.is_valid() { SmokeResult::Pass }
-                else { SmokeResult::Fail("config defaults are invalid".into()) }
+                if platform.config.is_valid() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("config defaults are invalid".into())
+                }
             }),
             SmokeTest::run("config.theme_set", "config", || {
-                if !platform.config.theme.is_empty() { SmokeResult::Pass }
-                else { SmokeResult::Fail("theme not set".into()) }
+                if !platform.config.theme.is_empty() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("theme not set".into())
+                }
             }),
-
             // ─── Security ───────────────────────────────────────────────
             SmokeTest::run("security.hardening_active", "security", || {
-                if platform.security.is_hardened() { SmokeResult::Pass }
-                else { SmokeResult::Fail("security hardening not active".into()) }
+                if platform.security.is_hardened() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("security hardening not active".into())
+                }
             }),
             SmokeTest::run("security.audit_enabled", "security", || {
-                if platform.security.audit_enabled { SmokeResult::Pass }
-                else { SmokeResult::Fail("audit not enabled".into()) }
+                if platform.security.audit_enabled {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("audit not enabled".into())
+                }
             }),
             SmokeTest::run("security.signed_packages_enforced", "security", || {
-                if platform.security.signed_packages_only { SmokeResult::Pass }
-                else { SmokeResult::Fail("signed-packages-only not enforced".into()) }
+                if platform.security.signed_packages_only {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("signed-packages-only not enforced".into())
+                }
             }),
-
             // ─── Apps ────────────────────────────────────────────────────
             SmokeTest::run("apps.default_apps_registered", "apps", || {
-                if platform.apps.installed_count() >= 4 { SmokeResult::Pass }
-                else { SmokeResult::Fail(format!("only {} default apps", platform.apps.installed_count())) }
+                if platform.apps.installed_count() >= 4 {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail(format!(
+                        "only {} default apps",
+                        platform.apps.installed_count()
+                    ))
+                }
             }),
             SmokeTest::run("apps.terminal_available", "apps", || {
-                if platform.apps.find("foot").is_some() { SmokeResult::Pass }
-                else { SmokeResult::Fail("terminal (foot) not registered".into()) }
+                if platform.apps.find("foot").is_some() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("terminal (foot) not registered".into())
+                }
             }),
-
             // ─── Platform Integration ────────────────────────────────────
             SmokeTest::run("platform.is_ready", "platform", || {
-                if platform.is_ready() { SmokeResult::Pass }
-                else { SmokeResult::Fail("platform.is_ready() returned false".into()) }
+                if platform.is_ready() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("platform.is_ready() returned false".into())
+                }
             }),
             SmokeTest::run("platform.backend_name_non_empty", "platform", || {
-                if !platform.backend.kind().name().is_empty() { SmokeResult::Pass }
-                else { SmokeResult::Fail("backend name is empty".into()) }
+                if !platform.backend.kind().name().is_empty() {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail("backend name is empty".into())
+                }
             }),
             SmokeTest::run("platform.status_report_complete", "platform", || {
                 let report = platform.status_report();
-                if report.len() >= 8 { SmokeResult::Pass }
-                else { SmokeResult::Fail(format!("status report only {} lines", report.len())) }
+                if report.len() >= 8 {
+                    SmokeResult::Pass
+                } else {
+                    SmokeResult::Fail(format!("status report only {} lines", report.len()))
+                }
             }),
-
             // ─── QEMU (skipped in stub mode, run with Linux backend) ─────
             SmokeTest::run("qemu.boot_to_shell", "qemu", || {
                 if backend == BackendKind::Stub {
@@ -154,30 +208,48 @@ impl SmokeSuite {
         Self { backend, tests }
     }
 
-    pub fn pass_count(&self) -> usize { self.tests.iter().filter(|t| t.passed()).count() }
+    pub fn pass_count(&self) -> usize {
+        self.tests.iter().filter(|t| t.passed()).count()
+    }
     pub fn fail_count(&self) -> usize {
-        self.tests.iter().filter(|t| matches!(t.result, SmokeResult::Fail(_))).count()
+        self.tests
+            .iter()
+            .filter(|t| matches!(t.result, SmokeResult::Fail(_)))
+            .count()
     }
     pub fn skip_count(&self) -> usize {
-        self.tests.iter().filter(|t| matches!(t.result, SmokeResult::Skip(_))).count()
+        self.tests
+            .iter()
+            .filter(|t| matches!(t.result, SmokeResult::Skip(_)))
+            .count()
     }
-    pub fn all_passed(&self) -> bool { self.fail_count() == 0 }
+    pub fn all_passed(&self) -> bool {
+        self.fail_count() == 0
+    }
 
     pub fn report(&self) -> Vec<String> {
-        let mut lines = vec![
-            format!("=== SigmaOS Smoke Tests (backend={}) ===", self.backend.name()),
-        ];
+        let mut lines = vec![format!(
+            "=== SigmaOS Smoke Tests (backend={}) ===",
+            self.backend.name()
+        )];
         for t in &self.tests {
             let status = match &t.result {
-                SmokeResult::Pass       => "PASS".to_string(),
-                SmokeResult::Fail(msg)  => format!("FAIL: {}", msg),
-                SmokeResult::Skip(msg)  => format!("SKIP: {}", msg),
+                SmokeResult::Pass => "PASS".to_string(),
+                SmokeResult::Fail(msg) => format!("FAIL: {}", msg),
+                SmokeResult::Skip(msg) => format!("SKIP: {}", msg),
             };
-            lines.push(format!("  [{:<6}] {}", status.split(':').next().unwrap_or(""), t.name));
+            lines.push(format!(
+                "  [{:<6}] {}",
+                status.split(':').next().unwrap_or(""),
+                t.name
+            ));
         }
         lines.push(format!(
             "Result: {}/{} passed, {} failed, {} skipped",
-            self.pass_count(), self.tests.len(), self.fail_count(), self.skip_count()
+            self.pass_count(),
+            self.tests.len(),
+            self.fail_count(),
+            self.skip_count()
         ));
         lines
     }
@@ -196,9 +268,14 @@ mod tests {
         let suite = SmokeSuite::run_all(BackendKind::Stub);
         let report = suite.report();
         // Print for visibility in cargo test output
-        for line in &report { let _ = line; }
-        assert!(suite.all_passed(),
-            "Smoke test failures:\n{}", report.join("\n"));
+        for line in &report {
+            let _ = line;
+        }
+        assert!(
+            suite.all_passed(),
+            "Smoke test failures:\n{}",
+            report.join("\n")
+        );
     }
 
     #[test]

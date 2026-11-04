@@ -12,12 +12,17 @@ pub struct SigmaVersion {
     pub major: u32,
     pub minor: u32,
     pub patch: u32,
-    pub pre: Option<String>,    // e.g. "alpha", "beta", "rc.1"
+    pub pre: Option<String>, // e.g. "alpha", "beta", "rc.1"
 }
 
 impl SigmaVersion {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
-        Self { major, minor, patch, pre: None }
+        Self {
+            major,
+            minor,
+            patch,
+            pre: None,
+        }
     }
 
     pub fn pre(mut self, label: impl Into<String>) -> Self {
@@ -29,11 +34,13 @@ impl SigmaVersion {
         let base = format!("{}.{}.{}", self.major, self.minor, self.patch);
         match &self.pre {
             Some(p) => format!("{}-{}", base, p),
-            None    => base,
+            None => base,
         }
     }
 
-    pub fn is_stable(&self) -> bool { self.pre.is_none() }
+    pub fn is_stable(&self) -> bool {
+        self.pre.is_none()
+    }
 }
 
 /// The current SigmaOS version.
@@ -59,7 +66,7 @@ pub enum ReleaseChannel {
 impl ReleaseChannel {
     pub fn name(self) -> &'static str {
         match self {
-            Self::Stable  => "stable",
+            Self::Stable => "stable",
             Self::Testing => "testing",
             Self::Nightly => "nightly",
         }
@@ -115,7 +122,10 @@ impl ReleaseReadiness {
             ReleaseCheck {
                 name: "config_valid",
                 passed: platform.config.is_valid(),
-                detail: format!("theme={} lang={}", platform.config.theme, platform.config.language),
+                detail: format!(
+                    "theme={} lang={}",
+                    platform.config.theme, platform.config.language
+                ),
             },
             ReleaseCheck {
                 name: "security_hardened",
@@ -131,7 +141,9 @@ impl ReleaseReadiness {
                 name: "signed_packages_enforced",
                 passed: if channel.requires_signed_packages() {
                     platform.security.signed_packages_only
-                } else { true },
+                } else {
+                    true
+                },
                 detail: format!("channel={}", channel.name()),
             },
         ];
@@ -152,15 +164,27 @@ impl ReleaseReadiness {
     }
 
     pub fn report(&self) -> Vec<String> {
-        let mut lines = vec![
-            format!("Release Readiness — v{}  channel={}", self.version, self.channel.name()),
-        ];
+        let mut lines = vec![format!(
+            "Release Readiness — v{}  channel={}",
+            self.version,
+            self.channel.name()
+        )];
         for c in &self.checks {
-            lines.push(format!("  [{}] {}  ({})",
+            lines.push(format!(
+                "  [{}] {}  ({})",
                 if c.passed { "PASS" } else { "FAIL" },
-                c.name, c.detail));
+                c.name,
+                c.detail
+            ));
         }
-        lines.push(format!("Overall: {}", if self.is_release_ready() { "READY ✅" } else { "NOT READY ❌" }));
+        lines.push(format!(
+            "Overall: {}",
+            if self.is_release_ready() {
+                "READY ✅"
+            } else {
+                "NOT READY ❌"
+            }
+        ));
         lines
     }
 }
@@ -192,24 +216,32 @@ pub struct RollbackManager {
 }
 
 impl RollbackManager {
-    pub fn new() -> Self { Self { history: Vec::new() } }
+    pub fn new() -> Self {
+        Self {
+            history: Vec::new(),
+        }
+    }
 
     pub fn execute(&mut self, from: &str, to: &str, trigger: RollbackTrigger) -> RollbackRecord {
         let record = RollbackRecord {
             from_version: from.to_string(),
             to_version: to.to_string(),
             trigger,
-            success: true,   // Real impl: verify boot + smoke test post-rollback
+            success: true, // Real impl: verify boot + smoke test post-rollback
         };
         self.history.push(record.clone());
         record
     }
 
-    pub fn rollback_count(&self) -> usize { self.history.len() }
+    pub fn rollback_count(&self) -> usize {
+        self.history.len()
+    }
 }
 
 impl Default for RollbackManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -242,8 +274,11 @@ mod tests {
     #[test]
     fn release_readiness_testing_channel() {
         let rr = ReleaseReadiness::evaluate(ReleaseChannel::Testing);
-        assert!(rr.is_release_ready(),
-            "Release readiness failed:\n{}", rr.report().join("\n"));
+        assert!(
+            rr.is_release_ready(),
+            "Release readiness failed:\n{}",
+            rr.report().join("\n")
+        );
         assert_eq!(rr.failed_checks().len(), 0);
     }
 
@@ -268,6 +303,9 @@ mod tests {
     fn report_has_overall_line() {
         let rr = ReleaseReadiness::evaluate(ReleaseChannel::Testing);
         let report = rr.report();
-        assert!(report.last().unwrap().contains("READY") || report.last().unwrap().contains("NOT READY"));
+        assert!(
+            report.last().unwrap().contains("READY")
+                || report.last().unwrap().contains("NOT READY")
+        );
     }
 }

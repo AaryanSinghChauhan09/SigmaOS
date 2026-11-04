@@ -1,2 +1,3 @@
-# Scheduler Policy
-Policy for scheduling in SigmaOS.
+# SigmaOS Scheduler Policy
+
+Policy specification for scheduling operations.
