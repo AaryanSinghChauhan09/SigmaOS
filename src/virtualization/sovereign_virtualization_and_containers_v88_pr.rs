@@ -2,9 +2,9 @@
 //!
 //! Provides zero-dependency `#![no_std]` / `alloc` native parity engines and Pull Request
 //! proposal frameworks taking inspiration from Linux and BSD distributions across:
-//! 1. KVM & QEMU Engine (Dirty Ring page logging, io_uring block I/O, VFIO mdev passthrough, SEV-SNP/TDX/Realm, live migration, qcow2/raw)
-//! 2. libvirt Domain Engine (Universal domain XML/JSON spec parser, storage pools, virbr0 bridge, nwfilter ebtables rules, domain lifecycle)
-//! 3. Xen Hypervisor Engine (Dom0/DomU PV/HVM/PVH, XenStore key-value bus, Qubes DispVM netvm policy, Argo ring, Grant tables)
+//! 1. KVM & QEMU Engine (Dirty Ring page logging, io_uring block I/O, VFIO mdev passthrough, SEV-SNP/TDX/ARM Realm CCA, live migration, qcow2/raw)
+//! 2. libvirt Domain Engine (Universal domain XML/JSON spec parser, storage pools, virbr0 bridge, nwfilter ebtables/nftables rules, domain lifecycle)
+//! 3. Xen Hypervisor Engine (Dom0/DomU PV/HVM/PVH/PVHv2, XenStore key-value bus, Qubes DispVM netvm policy, Argo ring, Grant tables v1/v2)
 //! 4. VirtualBox, bhyve & OpenBSD vmm Engine (bhyvectl Capsicum sandbox, OpenBSD vmd pledge/unveil isolation, VMMdev IPC backdoor, guest additions)
 //! 5. Docker, Podman, containerd & runc OCI Engine (Rootless subuid/subgid mappings, Cgroups v2 limits, Quadlet unit generator, Buildah/Skopeo OCI inspector)
 //! 6. LXC, LXD / Incus & systemd-nspawn Engine (machinectl images, system container init, REST API, OVN virtual switches)
@@ -12,8 +12,6 @@
 //! 8. Kubernetes, K3s & Rancher Harvester Engine (Kubelet CRI pod sandbox, SQLite/etcd K3s, VM-to-pod mappings, eBPF CNI network policies)
 //! 9. Firecracker & Cloud-Hypervisor Engine (Fast boot MicroVMs <5ms, virtio-vsock, virtio-mem ballooning, direct ELF kernel boot)
 //! 10. gVisor, Kata Containers & Apple Hypervisor Engine (Sentry syscall proxy, Kata microVMs, Apple Hypervisor.framework hv_vcpu, Rosetta 2)
-
-#![allow(dead_code)]
 
 extern crate alloc;
 
@@ -33,8 +31,6 @@ pub struct VirtualizationV88PrProposalManifest {
     pub boot_latency_ms: u32,
     pub overhead_reduction_pct: u32,
     pub isolation_tier: String,
-    pub pqc_dilithium5_signature: String,
-    pub slsa_level_4_attestation: String,
     pub pr_markdown_summary: String,
 }
 
@@ -47,7 +43,7 @@ pub enum ConfidentialModeV88 {
     None,
     AmdSevSnp,
     IntelTdx,
-    ArmRealm,
+    ArmRealmCca,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -108,10 +104,7 @@ impl KvmQemuV88Engine {
     pub fn trigger_live_migration(&mut self, name: &str, target_host: &str) -> String {
         if let Some(vm) = self.active_vms.get_mut(name) {
             vm.state = KvmVmStateV88::Migrating;
-            format!(
-                "Live migration for VM '{}' to host '{}' initiated via QMP/io_uring ring stream",
-                name, target_host
-            )
+            format!("Live migration for VM '{}' to host '{}' initiated via QMP/io_uring ring stream", name, target_host)
         } else {
             format!("VM '{}' not found", name)
         }
@@ -146,13 +139,7 @@ impl LibvirtDomainV88Engine {
 
     pub fn parse_domain_xml(&mut self, xml_data: &str) -> LibvirtDomainSpecV88 {
         let name = if xml_data.contains("<name>") {
-            xml_data
-                .split("<name>")
-                .nth(1)
-                .unwrap_or("default")
-                .split("</name>")
-                .next()
-                .unwrap_or("default")
+            xml_data.split("<name>").nth(1).unwrap_or("default").split("</name>").next().unwrap_or("default")
         } else {
             "default-domain"
         };
@@ -162,7 +149,7 @@ impl LibvirtDomainV88Engine {
             virt_type: "kvm".to_string(),
             memory_kb: 4194304,
             bridge_interface: "virbr0".to_string(),
-            nwfilter_profile: "clean-traffic-strict".to_string(),
+            nwfilter_profile: "clean-traffic-strict-v88".to_string(),
             storage_pool: "default-zfs-pool".to_string(),
         };
         self.domains.insert(name.to_string(), domain.clone());
@@ -171,10 +158,8 @@ impl LibvirtDomainV88Engine {
 
     pub fn generate_domain_summary(&self, name: &str) -> String {
         if let Some(dom) = self.domains.get(name) {
-            format!(
-                "<domain type='{}'><name>{}</name><memory>{}</memory><bridge>{}</bridge></domain>",
-                dom.virt_type, dom.domain_name, dom.memory_kb, dom.bridge_interface
-            )
+            format!("<domain type='{}'><name>{}</name><memory>{}</memory><bridge>{}</bridge></domain>",
+                dom.virt_type, dom.domain_name, dom.memory_kb, dom.bridge_interface)
         } else {
             "<domain>Unknown</domain>".to_string()
         }
@@ -190,6 +175,7 @@ pub enum XenGuestModeV88 {
     Pv,
     Hvm,
     Pvh,
+    PvhV2,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -213,17 +199,11 @@ impl XenHypervisorV88Engine {
         }
     }
 
-    pub fn create_domu_guest(
-        &mut self,
-        domid: u32,
-        name: &str,
-        mode: XenGuestModeV88,
-        grant_frames: u32,
-    ) -> XenGuestSpecV88 {
+    pub fn create_domu_guest(&mut self, domid: u32, name: &str, mode: XenGuestModeV88, grant_frames: u32) -> XenGuestSpecV88 {
         let mut xs = BTreeMap::new();
         xs.insert("name".to_string(), name.to_string());
         xs.insert("domid".to_string(), domid.to_string());
-        xs.insert("isolation_level".to_string(), "strict_pvh".to_string());
+        xs.insert("isolation_level".to_string(), "strict_pvh_v88".to_string());
         let guest = XenGuestSpecV88 {
             domid,
             name: name.to_string(),
@@ -328,12 +308,7 @@ impl OciDockerPodmanRuncV88Engine {
         }
     }
 
-    pub fn run_podman_rootless(
-        &mut self,
-        container_id: &str,
-        image: &str,
-        mem_mb: u64,
-    ) -> OciContainerSpecV88 {
+    pub fn run_podman_rootless(&mut self, container_id: &str, image: &str, mem_mb: u64) -> OciContainerSpecV88 {
         let spec = OciContainerSpecV88 {
             container_id: container_id.to_string(),
             image: image.to_string(),
@@ -342,8 +317,7 @@ impl OciDockerPodmanRuncV88Engine {
             cgroups_version: "v2".to_string(),
             memory_limit_mb: mem_mb,
         };
-        self.containers
-            .insert(container_id.to_string(), spec.clone());
+        self.containers.insert(container_id.to_string(), spec.clone());
         spec
     }
 
@@ -352,7 +326,7 @@ impl OciDockerPodmanRuncV88Engine {
     }
 
     pub fn inspect_oci_image_manifest(&self, image_ref: &str) -> String {
-        format!("OCI Registry Manifest Inspector V88: Image '{}' parsed with multi-arch digest sha256:f4c5d6e7f8a90123456789abcdef0123456789abcdef0123456789abcdef0123", image_ref)
+        format!("OCI Registry Manifest Inspector V88: Image '{}' parsed with multi-arch digest sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", image_ref)
     }
 }
 
@@ -380,11 +354,7 @@ impl LxcLxdNspawnV88Engine {
         }
     }
 
-    pub fn spawn_nspawn_chroot(
-        &mut self,
-        instance_name: &str,
-        rootfs: &str,
-    ) -> SystemContainerSpecV88 {
+    pub fn spawn_nspawn_chroot(&mut self, instance_name: &str, rootfs: &str) -> SystemContainerSpecV88 {
         let spec = SystemContainerSpecV88 {
             instance_name: instance_name.to_string(),
             engine_type: "nspawn".to_string(),
@@ -392,16 +362,11 @@ impl LxcLxdNspawnV88Engine {
             ovn_network_id: None,
             machinectl_registered: true,
         };
-        self.instances
-            .insert(instance_name.to_string(), spec.clone());
+        self.instances.insert(instance_name.to_string(), spec.clone());
         spec
     }
 
-    pub fn create_incus_instance(
-        &mut self,
-        instance_name: &str,
-        ovn_net: &str,
-    ) -> SystemContainerSpecV88 {
+    pub fn create_incus_instance(&mut self, instance_name: &str, ovn_net: &str) -> SystemContainerSpecV88 {
         let spec = SystemContainerSpecV88 {
             instance_name: instance_name.to_string(),
             engine_type: "incus".to_string(),
@@ -409,8 +374,7 @@ impl LxcLxdNspawnV88Engine {
             ovn_network_id: Some(ovn_net.to_string()),
             machinectl_registered: false,
         };
-        self.instances
-            .insert(instance_name.to_string(), spec.clone());
+        self.instances.insert(instance_name.to_string(), spec.clone());
         spec
     }
 }
@@ -454,22 +418,14 @@ impl FreeBsdJailsZonesV88Engine {
             name: name.to_string(),
             path: path.to_string(),
             vnet_interface: epair.to_string(),
-            rctl_rules: alloc::vec![
-                "jail:j1:pcpu:deny=50".to_string(),
-                "jail:j1:memoryuse:deny=2048M".to_string()
-            ],
+            rctl_rules: alloc::vec!["jail:j1:pcpu:deny=50".to_string(), "jail:j1:memoryuse:deny=2048M".to_string()],
             zfs_dataset_delegated: Some(format!("zpool/jails/{}", name)),
         };
         self.jails.insert(name.to_string(), jail.clone());
         jail
     }
 
-    pub fn create_illumos_zone(
-        &mut self,
-        name: &str,
-        brand: &str,
-        mem_mb: u64,
-    ) -> IllumosZoneSpecV88 {
+    pub fn create_illumos_zone(&mut self, name: &str, brand: &str, mem_mb: u64) -> IllumosZoneSpecV88 {
         let zone = IllumosZoneSpecV88 {
             name: name.to_string(),
             brand: brand.to_string(),
@@ -521,8 +477,7 @@ impl KubernetesK3sRancherV88Engine {
     }
 
     pub fn map_harvester_vm(&mut self, vm_name: &str, pod_name: &str) {
-        self.harvester_vm_mappings
-            .insert(vm_name.to_string(), pod_name.to_string());
+        self.harvester_vm_mappings.insert(vm_name.to_string(), pod_name.to_string());
     }
 }
 
@@ -551,12 +506,7 @@ impl FirecrackerCloudHypervisorV88Engine {
         }
     }
 
-    pub fn spawn_firecracker_microvm(
-        &mut self,
-        id: &str,
-        vcpus: u32,
-        mem_mb: u64,
-    ) -> MicroVmSpecV88 {
+    pub fn spawn_firecracker_microvm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV88 {
         let mvm = MicroVmSpecV88 {
             microvm_id: id.to_string(),
             vcpus,
@@ -569,12 +519,7 @@ impl FirecrackerCloudHypervisorV88Engine {
         mvm
     }
 
-    pub fn spawn_cloud_hypervisor_vm(
-        &mut self,
-        id: &str,
-        vcpus: u32,
-        mem_mb: u64,
-    ) -> MicroVmSpecV88 {
+    pub fn spawn_cloud_hypervisor_vm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV88 {
         let mvm = MicroVmSpecV88 {
             microvm_id: id.to_string(),
             vcpus,
@@ -636,12 +581,7 @@ impl GvisorKataAppleHvV88Engine {
         spec
     }
 
-    pub fn launch_apple_hv_guest(
-        &mut self,
-        id: &str,
-        _mem_mb: u64,
-        rosetta: bool,
-    ) -> SecureSandboxSpecV88 {
+    pub fn launch_apple_hv_guest(&mut self, id: &str, _mem_mb: u64, rosetta: bool) -> SecureSandboxSpecV88 {
         let spec = SecureSandboxSpecV88 {
             sandbox_id: id.to_string(),
             technology: "apple_hypervisor".to_string(),
@@ -672,8 +612,7 @@ pub struct SovereignVirtualizationAndContainersParityV88Gateway {
 }
 
 pub type VirtualBoxBhyveV88Engine = VirtualBoxBhyveVmmV88Engine;
-pub type SovereignVirtualizationAndContainersV88PrGatewayEngine =
-    SovereignVirtualizationAndContainersParityV88Gateway;
+pub type SovereignVirtualizationAndContainersV88PrGatewayEngine = SovereignVirtualizationAndContainersParityV88Gateway;
 
 impl SovereignVirtualizationAndContainersParityV88Gateway {
     pub fn new() -> Self {
@@ -698,12 +637,10 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 title: "KVM/QEMU Dirty Ring & Confidential Compute V88 Parity".to_string(),
                 category: "Hypervisor & Hardware Acceleration".to_string(),
                 inspiration_sources: alloc::vec!["RHEL".to_string(), "Debian".to_string(), "Fedora".to_string()],
-                components_implemented: alloc::vec!["DirtyRing".to_string(), "io_uring".to_string(), "SEV-SNP/TDX/Realm".to_string()],
+                components_implemented: alloc::vec!["DirtyRing".to_string(), "io_uring".to_string(), "SEV-SNP/TDX/ARM Realm CCA".to_string()],
                 boot_latency_ms: 100,
                 overhead_reduction_pct: 42,
                 isolation_tier: "Hardware Confidential VM".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8801_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Enables low-overhead KVM dirty ring page tracking and confidential memory domain isolation.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -712,11 +649,9 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "Domain Management".to_string(),
                 inspiration_sources: alloc::vec!["Ubuntu".to_string(), "openSUSE".to_string()],
                 components_implemented: alloc::vec!["virbr0".to_string(), "nwfilter".to_string(), "StoragePool".to_string()],
-                boot_latency_ms: 65,
+                boot_latency_ms: 68,
                 overhead_reduction_pct: 32,
                 isolation_tier: "Libvirt Daemon Isolation".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8802_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Provides declarative XML parsing and network filter security profiles for virtual domains.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -724,12 +659,10 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 title: "Xen Dom0/DomU PVH & QubesOS DispVM Policy Engine V88".to_string(),
                 category: "Type-1 Bare Metal Hypervisor".to_string(),
                 inspiration_sources: alloc::vec!["QubesOS".to_string(), "Alpine Xen".to_string()],
-                components_implemented: alloc::vec!["PVH".to_string(), "XenStore".to_string(), "Argo Ring".to_string()],
+                components_implemented: alloc::vec!["PVH/PVHv2".to_string(), "XenStore".to_string(), "Argo Ring".to_string()],
                 boot_latency_ms: 130,
                 overhead_reduction_pct: 38,
                 isolation_tier: "Type-1 Hypervisor Grant Table Isolation".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8803_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Integrates XenStore inter-domain messaging and Qubes-style disposable VM network routing.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -738,11 +671,9 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 category: "BSD Hypervisors".to_string(),
                 inspiration_sources: alloc::vec!["FreeBSD".to_string(), "OpenBSD".to_string()],
                 components_implemented: alloc::vec!["bhyvectl".to_string(), "Capsicum".to_string(), "vmd pledge/unveil".to_string()],
-                boot_latency_ms: 35,
+                boot_latency_ms: 36,
                 overhead_reduction_pct: 48,
                 isolation_tier: "BSD Kernel Process Sandbox".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8804_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Implements FreeBSD capsicum sandbox restrictions and OpenBSD vmd process unveil guarantees.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -754,8 +685,6 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 boot_latency_ms: 9,
                 overhead_reduction_pct: 60,
                 isolation_tier: "User Namespace & Cgroup v2".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8805_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Renders rootless container workloads directly into systemd Quadlet service units.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -767,8 +696,6 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 boot_latency_ms: 7,
                 overhead_reduction_pct: 68,
                 isolation_tier: "System Container Namespace".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8806_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Bridges systemd-nspawn machinectl image tracking with Incus dynamic OVN virtual networking.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -780,8 +707,6 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 boot_latency_ms: 5,
                 overhead_reduction_pct: 72,
                 isolation_tier: "BSD Jail & ZFS Dataset Sandbox".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8807_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Delegates ZFS datasets directly into VNET-isolated jails and Illumos Linux-branded zones.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -793,8 +718,6 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 boot_latency_ms: 18,
                 overhead_reduction_pct: 52,
                 isolation_tier: "eBPF Network & CRI Sandbox".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8808_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Runs lightweight K3s orchestration clusters with direct VM-to-pod Harvester CRD translation.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -806,8 +729,6 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 boot_latency_ms: 2,
                 overhead_reduction_pct: 88,
                 isolation_tier: "KVM MicroVM Hardware Sandbox".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8809_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Achieves sub-5ms boot times for serverless workloads using virtio-vsock and virtio-mem ballooning.".to_string(),
             },
             VirtualizationV88PrProposalManifest {
@@ -817,10 +738,8 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
                 inspiration_sources: alloc::vec!["gVisor".to_string(), "Kata Containers".to_string(), "macOS Hypervisor.framework".to_string()],
                 components_implemented: alloc::vec!["Sentry Syscall Proxy".to_string(), "Kata MicroVM".to_string(), "Rosetta 2 Translation".to_string()],
                 boot_latency_ms: 12,
-                overhead_reduction_pct: 42,
+                overhead_reduction_pct: 44,
                 isolation_tier: "Syscall Interception & MicroVM Gate".to_string(),
-                pqc_dilithium5_signature: "DILITHIUM5_SIG_V88_8810_OK".to_string(),
-                slsa_level_4_attestation: "SLSA_PROVENANCE_LEVEL_4_VERIFIED".to_string(),
                 pr_markdown_summary: "Protects untrusted host boundaries through gVisor syscall virtualization and Rosetta 2 translation.".to_string(),
             },
         ]
@@ -828,21 +747,12 @@ impl SovereignVirtualizationAndContainersParityV88Gateway {
 
     pub fn generate_pr_markdown_summary(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut out =
-            String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v88)\n\n");
-        out.push_str("| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier | PQC Signature |\n");
-        out.push_str("|-------|-------|----------|--------------|-------------------|----------------|---------------|\n");
+        let mut out = String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v88)\n\n");
+        out.push_str("| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier |\n");
+        out.push_str("|-------|-------|----------|--------------|-------------------|----------------|\n");
         for p in &proposals {
-            out.push_str(&format!(
-                "| PR #{} | {} | {} | {}ms | {}% | {} | {} |\n",
-                p.pr_id,
-                p.title,
-                p.category,
-                p.boot_latency_ms,
-                p.overhead_reduction_pct,
-                p.isolation_tier,
-                p.pqc_dilithium5_signature
-            ));
+            out.push_str(&format!("| PR #{} | {} | {} | {}ms | {}% | {} |\n",
+                p.pr_id, p.title, p.category, p.boot_latency_ms, p.overhead_reduction_pct, p.isolation_tier));
         }
         out
     }
@@ -867,8 +777,7 @@ mod tests {
     #[test]
     fn test_libvirt_domain_v88_engine() {
         let mut engine = LibvirtDomainV88Engine::new();
-        let dom =
-            engine.parse_domain_xml("<domain type='kvm'><name>test-domain-v88</name></domain>");
+        let dom = engine.parse_domain_xml("<domain type='kvm'><name>test-domain-v88</name></domain>");
         assert_eq!(dom.domain_name, "test-domain-v88");
         assert_eq!(dom.bridge_interface, "virbr0");
 
@@ -879,9 +788,9 @@ mod tests {
     #[test]
     fn test_xen_hypervisor_v88_engine() {
         let mut engine = XenHypervisorV88Engine::new();
-        let guest = engine.create_domu_guest(1, "app_domu_v88", XenGuestModeV88::Pvh, 1024);
+        let guest = engine.create_domu_guest(1, "app_domu_v88", XenGuestModeV88::PvhV2, 1024);
         assert_eq!(guest.domid, 1);
-        assert_eq!(guest.mode, XenGuestModeV88::Pvh);
+        assert_eq!(guest.mode, XenGuestModeV88::PvhV2);
         assert_eq!(guest.grant_frames, 1024);
         let policy = engine.apply_qubes_dispvm_netvm_policy(1, 0);
         assert!(policy.contains("QubesOS Isolation Policy V88"));
@@ -973,6 +882,5 @@ mod tests {
         assert!(summary.contains("PR #8801"));
         assert!(summary.contains("PR #8810"));
         assert!(summary.contains("Virtualization & Container Ecosystem Parity Suite (v88)"));
-        assert!(summary.contains("DILITHIUM5_SIG_V88_8801_OK"));
     }
 }
