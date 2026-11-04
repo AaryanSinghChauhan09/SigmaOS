@@ -1,4 +1,2 @@
 # Callback Policy
-
-## Purpose
-Defines asynchronous callback execution, completion status tracking, and error propagation.
+Policy for asynchronous callbacks in SigmaOS.

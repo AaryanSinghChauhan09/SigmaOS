@@ -184,11 +184,37 @@ make format
 
 ## Reviewer checklist
 
+- Risk:
+- Rollback:
+
+## Component
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+
+## Motivation
+
+## Implementation notes
+
+## Tests
+
+## Verification
+- cargo check --lib
+- cargo test --lib
+- ./run_sigma_tests.sh
+
+## Capability status
+
+## Integration impact
+
+## I/O component
+- [ ] I/O policy
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O safety review
+
+## Reviewer checklist
 - [ ] Scope is narrow
 - [ ] `unsafe` justified
-- [ ] Component rules are enforceable
-- [ ] Tests cover the rules
-- [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported Linux/BSD parity claims

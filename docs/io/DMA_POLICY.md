@@ -1,4 +1,2 @@
 # DMA Policy
-
-## Purpose
-Governs scatter-gather list validation, DMA mapping directions, and double-completion prevention.
+Policy for direct memory access (DMA) operations in SigmaOS.
