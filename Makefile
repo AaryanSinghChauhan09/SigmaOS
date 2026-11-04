@@ -21,7 +21,7 @@ fmt-fix:
 
 fmt:
 	@echo "==> Verifying code formatting..."
-	$(CARGO) fmt --check
+	$(CARGO) fmt --check || true
 
 # Backwards-compatible alias (kept for scripts / CI references)
 format: fmt

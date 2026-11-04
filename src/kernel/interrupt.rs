@@ -132,6 +132,11 @@ impl InterruptController {
         }
     }
 
+    /// Allocate an IRQ line
+    pub fn allocate_irq(&mut self, irq: u32, _flags: u32) -> Result<(), &'static str> {
+        self.register_irq(irq, IrqTriggerType::Edge)
+    }
+
     /// Register an IRQ line
     pub fn register_irq(
         &mut self,
