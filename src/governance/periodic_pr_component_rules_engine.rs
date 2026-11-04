@@ -2,7 +2,7 @@
 //!
 //! Codifies the periodic governance model, 12-step component rule lifecycle,
 //! component-specific mandatory rules, 12-week study plan, 10-month milestones,
-//! PR-only workflow validation, CI gates, and 14 industry-standard PR rules.
+//! PR-only workflow validation, CI gates, promotion criteria, and 14 industry-standard PR rules.
 
 use std::string::String;
 use std::vec::Vec;
@@ -189,6 +189,42 @@ impl ComponentDomain {
             Self::InstallerUpdate => "Clean install and rollback test",
         }
     }
+
+    pub fn component_owner(&self) -> &'static str {
+        match self {
+            Self::Kernel => "kernel-agent",
+            Self::Memory => "memory-agent",
+            Self::VfsFilesystems => "filesystem-agent",
+            Self::Ipc => "ipc-agent",
+            Self::Security => "security-agent",
+            Self::Drivers => "driver-agent",
+            Self::Packaging => "packaging-agent",
+            Self::Desktop => "desktop-agent",
+            Self::InstallerUpdate => "installer-agent",
+        }
+    }
+}
+
+/// Promotion Criteria Levels for SigmaOS components
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum PromotionLevel {
+    Proposed,
+    Prototype,
+    Integrated,
+    Hardened,
+    Supported,
+}
+
+impl PromotionLevel {
+    pub fn requirement(&self) -> &'static str {
+        match self {
+            Self::Proposed => "ADR and gap analysis",
+            Self::Prototype => "Unit tests",
+            Self::Integrated => "Runtime path plus integration tests",
+            Self::Hardened => "Fuzzing, negative tests, security review",
+            Self::Supported => "Reproducible boot/install/update evidence",
+        }
+    }
 }
 
 /// The 14 Industry-Standard Rules
@@ -299,6 +335,31 @@ pub struct PrValidationRecord {
     pub runtime_evidence_path: Option<String>,
     pub security_review_done: bool,
     pub status_promoted: bool,
+    pub rollback_defined: bool,
+    pub regression_test_included: bool,
+    pub license_compliant: bool,
+    pub target_promotion_level: Option<PromotionLevel>,
+}
+
+impl Default for PrValidationRecord {
+    fn default() -> Self {
+        Self {
+            pr_title: String::new(),
+            branch_name: String::new(),
+            component: ComponentDomain::Kernel,
+            study_issue_id: None,
+            has_adr: true,
+            unit_tests_passed: true,
+            integration_tests_passed: true,
+            runtime_evidence_path: None,
+            security_review_done: true,
+            status_promoted: false,
+            rollback_defined: true,
+            regression_test_included: true,
+            license_compliant: true,
+            target_promotion_level: None,
+        }
+    }
 }
 
 /// Governance Engine for Periodic PR-Only Component Rules
@@ -449,9 +510,19 @@ impl PeriodicPrComponentRulesEngine {
 
     /// Validate PR according to Industry Rules 1-14
     pub fn validate_pr(&mut self, record: PrValidationRecord) -> Result<(), String> {
+        // Rule 1: Everything is a pull request - branch must not be main
+        if record.branch_name == "main" || record.branch_name == "master" {
+            return Err("Rule 1 Violation: No direct commits to main. All work must arrive through PRs.".into());
+        }
+
         // Rule 3: Study before implementation (must have ADR)
         if !record.has_adr {
             return Err("Rule 3 Violation: A component rule or major change requires an upstream study note and ADR first.".into());
+        }
+
+        // Rule 4: Rules must be testable (unit tests must pass)
+        if !record.unit_tests_passed {
+            return Err("Rule 4 Violation: Unit tests must pass to verify component rules.".into());
         }
 
         // Rule 5: Status promotion requires runtime evidence
@@ -462,6 +533,49 @@ impl PeriodicPrComponentRulesEngine {
         // Rule 8: Security changes require security review
         if record.component == ComponentDomain::Security && !record.security_review_done {
             return Err("Rule 8 Violation: Security capability, sandboxing, and policy changes require a separate security review.".into());
+        }
+
+        // Rule 9: Fail safely - boot, installer, update, filesystem PRs must define rollback
+        let requires_rollback = matches!(
+            record.component,
+            ComponentDomain::Kernel
+                | ComponentDomain::InstallerUpdate
+                | ComponentDomain::VfsFilesystems
+        );
+        if requires_rollback && !record.rollback_defined {
+            return Err("Rule 9 Violation: Boot, installer, update, and filesystem PRs must define rollback or recovery behavior before merge.".into());
+        }
+
+        // Rule 10: Regression tests are mandatory
+        if !record.regression_test_included {
+            return Err("Rule 10 Violation: Regression tests are mandatory for bug fixes and newly enforced rules.".into());
+        }
+
+        // Rule 11: License compliance first
+        if !record.license_compliant {
+            return Err("Rule 11 Violation: Dual-license MIT/GPL-2.0 compliance and clean-room attribution required.".into());
+        }
+
+        // Promotion level gate validation
+        if let Some(level) = record.target_promotion_level {
+            match level {
+                PromotionLevel::Integrated => {
+                    if !record.integration_tests_passed || record.runtime_evidence_path.is_none() {
+                        return Err("Promotion Gate Failure: Integrated level requires integration tests and runtime evidence path.".into());
+                    }
+                }
+                PromotionLevel::Hardened => {
+                    if !record.security_review_done || record.runtime_evidence_path.is_none() {
+                        return Err("Promotion Gate Failure: Hardened level requires security review and runtime evidence.".into());
+                    }
+                }
+                PromotionLevel::Supported => {
+                    if record.runtime_evidence_path.is_none() || !record.integration_tests_passed {
+                        return Err("Promotion Gate Failure: Supported level requires reproducible boot/install/update evidence and integration tests.".into());
+                    }
+                }
+                _ => {}
+            }
         }
 
         self.validations.push(record);

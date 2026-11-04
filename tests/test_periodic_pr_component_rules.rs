@@ -4,6 +4,8 @@
 mod periodic_pr_component_rules_engine;
 
 use periodic_pr_component_rules_engine::*;
+use std::fs;
+use std::path::Path;
 
 #[test]
 fn test_periodic_cadence_metadata() {
@@ -70,12 +72,14 @@ fn test_component_domain_mapping_and_gates() {
         assert!(!domain.name().is_empty());
         assert!(domain.rules_file().starts_with("docs/component-rules/"));
         assert!(!domain.additional_gate().is_empty());
+        assert!(!domain.component_owner().is_empty());
     }
 
     let kernel = ComponentDomain::Kernel;
     assert_eq!(kernel.name(), "Kernel");
     assert_eq!(kernel.rules_file(), "docs/component-rules/kernel.md");
     assert_eq!(kernel.additional_gate(), "QEMU boot smoke test");
+    assert_eq!(kernel.component_owner(), "kernel-agent");
 
     let vfs = ComponentDomain::VfsFilesystems;
     assert_eq!(vfs.name(), "VFS/filesystems");
@@ -84,25 +88,30 @@ fn test_component_domain_mapping_and_gates() {
         vfs.additional_gate(),
         "Filesystem conformance and QEMU RAM-disk test"
     );
+    assert_eq!(vfs.component_owner(), "filesystem-agent");
 
     let sec = ComponentDomain::Security;
     assert_eq!(sec.name(), "Security");
     assert_eq!(sec.additional_gate(), "Denial tests and fuzzing");
+    assert_eq!(sec.component_owner(), "security-agent");
 
     let packaging = ComponentDomain::Packaging;
     assert_eq!(packaging.name(), "Packaging");
     assert_eq!(packaging.rules_file(), "docs/component-rules/packaging.md");
     assert_eq!(packaging.additional_gate(), "Metadata corpus and dry-run tests");
+    assert_eq!(packaging.component_owner(), "packaging-agent");
 
     let desktop = ComponentDomain::Desktop;
     assert_eq!(desktop.name(), "Desktop");
     assert_eq!(desktop.rules_file(), "docs/component-rules/desktop.md");
     assert_eq!(desktop.additional_gate(), "Graphical smoke test");
+    assert_eq!(desktop.component_owner(), "desktop-agent");
 
     let installer = ComponentDomain::InstallerUpdate;
     assert_eq!(installer.name(), "Installer/update");
     assert_eq!(installer.rules_file(), "docs/component-rules/installer_update.md");
     assert_eq!(installer.additional_gate(), "Clean install and rollback test");
+    assert_eq!(installer.component_owner(), "installer-agent");
 }
 
 #[test]
@@ -180,8 +189,58 @@ fn test_study_schedule_and_milestones() {
 }
 
 #[test]
+fn test_promotion_levels() {
+    assert_eq!(PromotionLevel::Proposed.requirement(), "ADR and gap analysis");
+    assert_eq!(PromotionLevel::Prototype.requirement(), "Unit tests");
+    assert_eq!(PromotionLevel::Integrated.requirement(), "Runtime path plus integration tests");
+    assert_eq!(PromotionLevel::Hardened.requirement(), "Fuzzing, negative tests, security review");
+    assert_eq!(PromotionLevel::Supported.requirement(), "Reproducible boot/install/update evidence");
+}
+
+#[test]
+fn test_component_rule_files_exist_and_conform() {
+    let readme_path = Path::new("docs/component-rules/README.md");
+    assert!(readme_path.exists(), "README.md must exist in docs/component-rules/");
+    let readme_content = fs::read_to_string(readme_path).unwrap();
+    assert!(readme_content.contains("Periodic Governance Model"));
+    assert!(readme_content.contains("Component Rule Lifecycle"));
+    assert!(readme_content.contains("14 Industry-Standard PR Rules"));
+    assert!(readme_content.contains("Periodic Study Plan"));
+    assert!(readme_content.contains("Monthly Milestones"));
+    assert!(readme_content.contains("Definition of Done"));
+
+    for domain in ComponentDomain::all() {
+        let path = Path::new(domain.rules_file());
+        assert!(path.exists(), "Rules file must exist: {}", domain.rules_file());
+        let content = fs::read_to_string(path).expect("Failed to read rules file");
+        assert!(content.contains("## Component owner"));
+        assert!(content.contains(domain.component_owner()));
+        assert!(content.contains("## Upstream references"));
+        assert!(content.contains("## Purpose"));
+        assert!(content.contains("## Mandatory rules"));
+        assert!(content.contains("## Prohibited"));
+        assert!(content.contains("## Required evidence"));
+        assert!(content.contains("## Promotion criteria"));
+    }
+}
+
+#[test]
 fn test_pr_validation_rule_enforcement() {
     let mut engine = PeriodicPrComponentRulesEngine::new();
+
+    // 0. Rejection due to direct commit / main branch (Rule 1)
+    let invalid_branch_rec = PrValidationRecord {
+        pr_title: "feat(kernel): direct commit".into(),
+        branch_name: "main".into(),
+        component: ComponentDomain::Kernel,
+        has_adr: true,
+        unit_tests_passed: true,
+        integration_tests_passed: true,
+        ..Default::default()
+    };
+    let res0 = engine.validate_pr(invalid_branch_rec);
+    assert!(res0.is_err());
+    assert!(res0.unwrap_err().contains("Rule 1 Violation"));
 
     // 1. Rejection due to missing ADR (Rule 3)
     let invalid_adr_rec = PrValidationRecord {
@@ -195,12 +254,28 @@ fn test_pr_validation_rule_enforcement() {
         runtime_evidence_path: Some("reports/qemu.log".into()),
         security_review_done: false,
         status_promoted: false,
+        rollback_defined: true,
+        regression_test_included: true,
+        license_compliant: true,
+        target_promotion_level: None,
     };
     let res1 = engine.validate_pr(invalid_adr_rec);
     assert!(res1.is_err());
     assert!(res1.unwrap_err().contains("Rule 3 Violation"));
 
-    // 2. Rejection due to status promotion without runtime evidence (Rule 5)
+    // 2. Rejection due to failing unit tests (Rule 4)
+    let invalid_unit_test_rec = PrValidationRecord {
+        pr_title: "feat(vfs): path resolver".into(),
+        branch_name: "feat/vfs-path-resolver".into(),
+        component: ComponentDomain::VfsFilesystems,
+        unit_tests_passed: false, // Failing unit tests!
+        ..Default::default()
+    };
+    let res_ut = engine.validate_pr(invalid_unit_test_rec);
+    assert!(res_ut.is_err());
+    assert!(res_ut.unwrap_err().contains("Rule 4 Violation"));
+
+    // 3. Rejection due to status promotion without runtime evidence (Rule 5)
     let invalid_evidence_rec = PrValidationRecord {
         pr_title: "feat(vfs): path resolver".into(),
         branch_name: "feat/vfs-path-resolver".into(),
@@ -212,12 +287,16 @@ fn test_pr_validation_rule_enforcement() {
         runtime_evidence_path: None, // Missing runtime evidence!
         security_review_done: false,
         status_promoted: true, // Attempted promotion
+        rollback_defined: true,
+        regression_test_included: true,
+        license_compliant: true,
+        target_promotion_level: None,
     };
     let res2 = engine.validate_pr(invalid_evidence_rec);
     assert!(res2.is_err());
     assert!(res2.unwrap_err().contains("Rule 5 Violation"));
 
-    // 3. Rejection due to security change without security review (Rule 8)
+    // 4. Rejection due to security change without security review (Rule 8)
     let invalid_sec_rec = PrValidationRecord {
         pr_title: "security(pledge): sandbox filters".into(),
         branch_name: "security/pledge-filters".into(),
@@ -229,12 +308,66 @@ fn test_pr_validation_rule_enforcement() {
         runtime_evidence_path: Some("reports/security.log".into()),
         security_review_done: false, // Security review missing!
         status_promoted: false,
+        rollback_defined: true,
+        regression_test_included: true,
+        license_compliant: true,
+        target_promotion_level: None,
     };
     let res3 = engine.validate_pr(invalid_sec_rec);
     assert!(res3.is_err());
     assert!(res3.unwrap_err().contains("Rule 8 Violation"));
 
-    // 4. Valid PR proposal
+    // 5. Rejection due to missing rollback definition for boot/vfs/installer (Rule 9)
+    let invalid_rollback_rec = PrValidationRecord {
+        pr_title: "feat(kernel): boot loader init".into(),
+        branch_name: "feat/kernel-boot".into(),
+        component: ComponentDomain::Kernel,
+        rollback_defined: false, // Missing rollback!
+        ..Default::default()
+    };
+    let res_rb = engine.validate_pr(invalid_rollback_rec);
+    assert!(res_rb.is_err());
+    assert!(res_rb.unwrap_err().contains("Rule 9 Violation"));
+
+    // 6. Rejection due to missing regression tests (Rule 10)
+    let invalid_reg_rec = PrValidationRecord {
+        pr_title: "fix(kernel): page fault handler".into(),
+        branch_name: "fix/page-fault".into(),
+        component: ComponentDomain::Kernel,
+        regression_test_included: false, // Missing regression test!
+        ..Default::default()
+    };
+    let res_reg = engine.validate_pr(invalid_reg_rec);
+    assert!(res_reg.is_err());
+    assert!(res_reg.unwrap_err().contains("Rule 10 Violation"));
+
+    // 7. Rejection due to license non-compliance (Rule 11)
+    let invalid_lic_rec = PrValidationRecord {
+        pr_title: "feat(drivers): imported gpl3 driver".into(),
+        branch_name: "feat/driver-gpl3".into(),
+        component: ComponentDomain::Drivers,
+        license_compliant: false, // License non-compliant!
+        ..Default::default()
+    };
+    let res_lic = engine.validate_pr(invalid_lic_rec);
+    assert!(res_lic.is_err());
+    assert!(res_lic.unwrap_err().contains("Rule 11 Violation"));
+
+    // 8. Rejection due to promotion gate failure without integration tests / evidence
+    let invalid_promo_rec = PrValidationRecord {
+        pr_title: "feat(kernel): promote to integrated".into(),
+        branch_name: "feat/kernel-promo".into(),
+        component: ComponentDomain::Kernel,
+        integration_tests_passed: false,
+        runtime_evidence_path: None,
+        target_promotion_level: Some(PromotionLevel::Integrated),
+        ..Default::default()
+    };
+    let res_promo = engine.validate_pr(invalid_promo_rec);
+    assert!(res_promo.is_err());
+    assert!(res_promo.unwrap_err().contains("Promotion Gate Failure"));
+
+    // 9. Valid PR proposal
     let valid_rec = PrValidationRecord {
         pr_title: "feat(vfs): centralized path resolver".into(),
         branch_name: "feat/vfs-path-resolver-043".into(),
@@ -246,6 +379,10 @@ fn test_pr_validation_rule_enforcement() {
         runtime_evidence_path: Some("reports/boot/qemu-ramdisk.log".into()),
         security_review_done: false,
         status_promoted: true,
+        rollback_defined: true,
+        regression_test_included: true,
+        license_compliant: true,
+        target_promotion_level: Some(PromotionLevel::Integrated),
     };
     let res4 = engine.validate_pr(valid_rec);
     assert!(res4.is_ok());
