@@ -81,3 +81,5 @@ __pycache__/
 !docs/io/*.md
 !docs/filesystem/
 !docs/filesystem/*.md
+!docs/SIGMAOS_GUI_DEVELOPMENT_PLAN.md
+!wiki/30-SigmaOS-GUI-Development-Plan.md
