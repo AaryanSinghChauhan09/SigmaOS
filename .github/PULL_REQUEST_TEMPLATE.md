@@ -205,20 +205,17 @@
 - Risk:
 - Rollback:
 
-## I/O Parity Checklist
-- [x] I/O component specification validated
-- [x] I/O policy compliance confirmed
-- [x] Interrupt manager verification completed
-- [x] DMA manager / DMA queue verification completed
-- [x] Buffer manager integration verified
-- [x] I/O scheduler lifecycle tested
-- [x] I/O safety review approved
+<!-- I/O lifecycle verification additions -->
+## I/O component
 
-## Storage component
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-## Storage safety review
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
+- [ ] Interrupt manager
+- [ ] DMA manager / DMA queue
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] I/O policy
+
+## I/O safety review
+
+- [ ] Interrupt-context safety
+- [ ] DMA safety
+- [ ] Buffer semantics
