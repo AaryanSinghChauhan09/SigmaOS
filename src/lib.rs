@@ -889,6 +889,8 @@ pub use crate::distro::open_source_os_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_and_arch_missing_components_v82_pr::*;
 pub use crate::distro::arch_linux_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_and_arch_missing_components_v84_pr::*;
+pub use crate::distro::arch_linux_missing_components_v85_pr::*;
+pub use crate::distro::open_source_os_and_arch_missing_components_v85_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v69_pr::*;
