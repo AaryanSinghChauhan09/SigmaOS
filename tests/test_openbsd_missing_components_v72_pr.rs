@@ -15,7 +15,7 @@ use openbsd_missing_components_v72_pr::*;
 fn test_integration_openbsd_v72_master_suite() {
     let mut suite = OpenBsdMissingComponentsV72PrSuite::new();
     let summaries: Vec<String> = suite.run_all_checks();
-    assert_eq!(summaries.len(), 10);
+    assert_eq!(summaries.len(), 11);
     for s in &summaries {
         assert!(!s.is_empty());
         assert!(s.contains("V72") || s.contains("v72") || s.contains("Dilithium"));
@@ -38,9 +38,7 @@ fn test_integration_openbsd_v72_engines() {
     assert!(v_ok.is_valid);
 
     let mut unveil = OpenBsdUnveilTreeInheritanceMountIsolationV72PrEngine::new();
-    assert!(unveil
-        .apply_unveil_tree(100, "/usr/bin", "rx", true)
-        .is_ok());
+    assert!(unveil.apply_unveil_tree(100, "/usr/bin", "rx", true).is_ok());
     assert!(unveil.check_access(100, "/usr/bin/cat", 'r'));
 
     let mut pledge = OpenBsdPledgeSyscallCategoryGuardV72PrEngine::new();
