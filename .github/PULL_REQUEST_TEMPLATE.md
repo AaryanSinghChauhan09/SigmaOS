@@ -264,21 +264,10 @@
 - Risk:
 - Rollback:
 
-## I/O component
-
-- [ ] Interrupt manager
-- [ ] DMA manager / DMA queue
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] I/O policy
-- [ ] I/O safety review
-
-## Storage component
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-
-## Storage safety review
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
+- [ ] I/O component specification validated
+- [ ] I/O policy compliance confirmed
+- [ ] Interrupt manager registered and bounded
+- [ ] DMA manager mapped and completed
+- [ ] Buffer manager dirty cache flushing verified
+- [ ] I/O scheduler prioritizes real-time requests
+- [ ] I/O safety review signed off
