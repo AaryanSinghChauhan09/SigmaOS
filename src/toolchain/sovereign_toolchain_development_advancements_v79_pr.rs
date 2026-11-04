@@ -45,7 +45,7 @@ pub enum ToolchainOptModeV79 {
 /// Hardening profile inspired by Linux & BSD security posture (V79).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainHardeningModeV79 {
-    FedoraFortifyLevel3, // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection)
+    FedoraFortifyLevel3,   // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection)
     StandardFortifyLevel2, // Standard Ubuntu/Debian hardening (-D_FORTIFY_SOURCE=2 -fstack-protector-strong)
     None,
 }
@@ -385,12 +385,7 @@ impl BuildSystemsAndPkgConfigV79Engine {
         false
     }
 
-    pub fn generate_compilation_database_entry(
-        &self,
-        file: &str,
-        command: &str,
-        dir: &str,
-    ) -> String {
+    pub fn generate_compilation_database_entry(&self, file: &str, command: &str, dir: &str) -> String {
         format!("{{\"directory\": \"{dir}\", \"command\": \"{command}\", \"file\": \"{file}\"}}")
     }
 
@@ -426,9 +421,7 @@ impl BuildSystemsAndPkgConfigV79Engine {
         for line in la_content.lines() {
             let trimmed = line.trim();
             if trimmed.starts_with("dependency_libs=") {
-                let val = trimmed
-                    .trim_start_matches("dependency_libs=")
-                    .trim_matches('\'');
+                let val = trimmed.trim_start_matches("dependency_libs=").trim_matches('\'');
                 for item in val.split_whitespace() {
                     libs.push(item.to_string());
                 }
@@ -456,15 +449,16 @@ impl BuildSystemsAndPkgConfigV79Engine {
         }
     }
 
-    pub fn query_pkg_config(&self, package: &str, sysroot_triple: &str) -> PkgConfigQueryResultV79 {
+    pub fn query_pkg_config(
+        &self,
+        package: &str,
+        sysroot_triple: &str,
+    ) -> PkgConfigQueryResultV79 {
         PkgConfigQueryResultV79 {
             package_name: package.to_string(),
             version: "2.5.0".to_string(),
             cflags: vec![format!("-I/usr/include/{sysroot_triple}/{package}")],
-            libs: vec![
-                format!("-L/usr/lib/{sysroot_triple}"),
-                format!("-l{package}"),
-            ],
+            libs: vec![format!("-L/usr/lib/{sysroot_triple}"), format!("-l{package}")],
             sysroot: format!("/usr/{sysroot_triple}"),
         }
     }
@@ -598,13 +592,7 @@ impl DebuggersTracersProfilersV79Engine {
         result
     }
 
-    pub fn format_dtrace_usdt_probe(
-        &self,
-        provider: &str,
-        module: &str,
-        func: &str,
-        name: &str,
-    ) -> String {
+    pub fn format_dtrace_usdt_probe(&self, provider: &str, module: &str, func: &str, name: &str) -> String {
         format!("{provider}:{module}:{func}:{name}")
     }
 
@@ -692,11 +680,7 @@ impl VcsAndLanguageRuntimesV79Engine {
         }
     }
 
-    pub fn git_packfile_binary_search_object(
-        &self,
-        object_id: &[u8],
-        num_objects: u32,
-    ) -> Option<u32> {
+    pub fn git_packfile_binary_search_object(&self, object_id: &[u8], num_objects: u32) -> Option<u32> {
         if object_id.is_empty() || num_objects == 0 {
             None
         } else {
@@ -753,11 +737,7 @@ impl VcsAndLanguageRuntimesV79Engine {
         format!("go build -pgo={profile_path} -ldflags=\"-s -w\"")
     }
 
-    pub fn go_cgo_zero_copy_bridge_dispatch(
-        &self,
-        ptr: usize,
-        len: usize,
-    ) -> Result<usize, &'static str> {
+    pub fn go_cgo_zero_copy_bridge_dispatch(&self, ptr: usize, len: usize) -> Result<usize, &'static str> {
         if ptr == 0 {
             Err("Null Pointer")
         } else {
@@ -781,10 +761,7 @@ impl VcsAndLanguageRuntimesV79Engine {
         ]
     }
 
-    pub fn openjdk_graalvm_native_image_optimize(
-        &self,
-        java_bytecode_bytes: usize,
-    ) -> GraalVmNativeImageResultV79 {
+    pub fn openjdk_graalvm_native_image_optimize(&self, java_bytecode_bytes: usize) -> GraalVmNativeImageResultV79 {
         GraalVmNativeImageResultV79 {
             native_elf_size_bytes: java_bytecode_bytes / 2 + 1000,
             estimated_startup_ms: 7,
@@ -962,9 +939,7 @@ mod tests {
         let mlgo = engine.generate_mlgo_inline_flags();
         assert!(mlgo.contains(&"-enable-ml-inliner=release".to_string()));
 
-        let ctf_count = engine.parse_ctf_compact_c_type_info(&[
-            0xf2, 0xd9, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-        ]);
+        let ctf_count = engine.parse_ctf_compact_c_type_info(&[0xf2, 0xd9, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
         assert_eq!(ctf_count, 1);
 
         let result = engine.estimate_compiler_optimization(
@@ -1002,8 +977,7 @@ mod tests {
         };
         assert!(!engine.detect_ninja_graph_cycles(&[node]));
 
-        let comp_db =
-            engine.generate_compilation_database_entry("main.c", "gcc -c main.c", "/build");
+        let comp_db = engine.generate_compilation_database_entry("main.c", "gcc -c main.c", "/build");
         assert!(comp_db.contains("\"file\": \"main.c\""));
 
         let wrap = "directory = foo\nurl = https://example.com/foo.tar.gz\n";
@@ -1049,9 +1023,7 @@ mod tests {
         assert_eq!(sc_name, "openat");
         assert_eq!(args, vec![0x3, 0x7fff, 0x0]);
 
-        let (func, ret) = engine
-            .parse_ltrace_plt_call("malloc(1024) -> 0x55555")
-            .unwrap();
+        let (func, ret) = engine.parse_ltrace_plt_call("malloc(1024) -> 0x55555").unwrap();
         assert_eq!(func, "malloc(1024)");
         assert_eq!(ret, "0x55555");
 
@@ -1152,7 +1124,6 @@ mod tests {
         assert!(summary.contains("Total PR Proposals: 4"));
 
         let md = gateway.generate_pr_proposal_markdown();
-        assert!(md
-            .contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V79)"));
+        assert!(md.contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V79)"));
     }
 }
