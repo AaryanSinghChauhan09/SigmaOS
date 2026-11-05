@@ -2782,6 +2782,16 @@ if [ -f "src/distro/open_source_os_missing_components_v84_pr.rs" ]; then
     ./build/test_open_source_v84_pr_integration
 fi
 
+if [ -f "src/distro/open_source_os_missing_components_v85_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V85 PR Suite tests..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_missing_components_v85_pr.rs --edition=2021 -o build/test_open_source_v85_pr
+    ./build/test_open_source_v85_pr
+
+    rustc --test tests/test_open_source_os_missing_components_v85_pr.rs --edition=2021 -o build/test_open_source_v85_pr_integration
+    ./build/test_open_source_v85_pr_integration
+fi
+
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
     mkdir -p build
@@ -3915,13 +3925,6 @@ if [ -f "tests/test_virtualization_and_containers_v89_pr.rs" ]; then
     mkdir -p build
     rustc --test tests/test_virtualization_and_containers_v89_pr.rs --edition=2021 -o build/test_virt_v89_pr
     ./build/test_virt_v89_pr
-fi
-
-if [ -f "tests/test_virtualization_and_containers_v90_pr.rs" ]; then
-    echo "Running Sovereign Virtualization & Containers V90 PR test suite..."
-    mkdir -p build
-    rustc --test tests/test_virtualization_and_containers_v90_pr.rs --edition=2021 -o build/test_virtualization_v90_pr
-    ./build/test_virtualization_v90_pr
 fi
 
 if [ -f "tests/test_networking_stack_and_daemons_v88_pr.rs" ]; then

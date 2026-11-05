@@ -52,11 +52,11 @@ fn test_integration_individual_v85_engines() {
     let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV85::new();
     assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
-    let mut plan9 = Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85::new();
+    let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV85::new();
     assert_eq!(plan9.rfork_namespace(1), 0x0000_2049);
 
     let nix = NixGuixHermeticCasMerkleClosureEngineV85::new();
-    assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
+    assert!(nix.verify_hermetic_closure("fedcba9876543210fedcba9876543210"));
 
     let illumos = IllumosCrossbowVnicDtraceSwitchMeshEngineV85::new();
     assert_eq!(illumos.probe_vnic_latency(5), 1);
@@ -65,9 +65,9 @@ fn test_integration_individual_v85_engines() {
     assert!(omarchy.reload_theme("Dark-V85"));
     assert_eq!(omarchy.active_theme, "Dark-V85");
 
-    let media = GlobalTechMedia48PortalUnimplementedIdeasEngineV85::new();
+    let media = GlobalTechMedia47PortalUnimplementedIdeasEngineV85::new();
     let page = media.generate_wiki_documentation_page("V85 Test");
-    assert!(page.contains("48 Tech Media Portals"));
+    assert!(page.contains("47 Tech Media Portals"));
 
     let adapter = UniversalSubsystemCrossDistroAdapterEngineV85::new();
     assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));

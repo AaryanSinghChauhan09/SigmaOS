@@ -5,8 +5,8 @@
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.39+ BPF SchedExt & folio NUMA tiering,
 // FreeBSD 16.9+ OpenZFS ARC trim & Capsicum Casper, OpenBSD 9.8+ Pinsyscall FineIBT shadow call stack,
 // DragonFly BSD 8.7+ HAMMER3 lockless CoW replication, NetBSD 13.4 Rump VirtIO-9P, Haiku BeFS relational query metadata,
-// Plan 9 synthetic 9P2020.L rfork multiplexer, NixOS / Guix hermetic CAS store Merkle closure,
-// Illumos Crossbow VNIC DTrace mesh, Omarchy Wallust chord navigation, and Global Tech Media 48 Portals Harvester
+// Plan 9 synthetic 9P2000.L rfork multiplexer, NixOS / Guix hermetic CAS store Merkle closure,
+// Illumos Crossbow VNIC DTrace mesh, Omarchy Wallust chord navigation, and Global Tech Media 47 Portals Harvester
 // in PR proposal format with Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines
 // across all 44 core subsystems.
 
@@ -73,7 +73,7 @@ pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV85 {
 impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV85 {
     pub fn new() -> Self {
         Self {
-            total_features_evaluated: 1300,
+            total_features_evaluated: 1260,
             parity_percentage: 100.0,
             os_sources: vec![
                 "Linux 6.39+".to_string(),
@@ -432,10 +432,7 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV85 {
             component_name: "HaikuBfsRelationalLiveQueryMetadataEngineV85".to_string(),
             os_origin: "Haiku OS".to_string(),
             status: OsPrStatusV85::Validated,
-            impacted_subsystems: vec![
-                "FilesystemStorage".to_string(),
-                "ObservabilityDiagnostics".to_string(),
-            ],
+            impacted_subsystems: vec!["FilesystemStorage".to_string(), "ObservabilityDiagnostics".to_string()],
             patch_diff: "--- a/src/add-ons/kernel/file_systems/bfs/Query.cpp\n+++ b/src/add-ons/kernel/file_systems/bfs/Query.cpp".to_string(),
         }
     }
@@ -448,16 +445,16 @@ impl Default for HaikuBfsRelationalLiveQueryMetadataEngineV85 {
 }
 
 // ============================================================================
-// 8. Plan 9 Synthetic 9P2020.L VFS Rfork Multiplexer Engine V85
+// 8. Plan 9 Synthetic 9P2000.L VFS Rfork Multiplexer Engine V85
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85 {
+pub struct Plan9Synthetic9P2000VfsRforkMultiplexerEngineV85 {
     pub active_namespaces: u32,
     pub rfork_namespace_mask: u32,
 }
 
-impl Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85 {
+impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV85 {
     pub fn new() -> Self {
         Self {
             active_namespaces: 8192,
@@ -473,8 +470,8 @@ impl Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV85 {
         OpenSourceOsPrProposalV85 {
             pr_id: "PR-OS-V85-007".to_string(),
-            title: "Plan 9 Synthetic 9P2020.L VFS Process Rfork Namespace Multiplexer".to_string(),
-            component_name: "Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85".to_string(),
+            title: "Plan 9 Synthetic 9P2000.L VFS Process Rfork Namespace Multiplexer".to_string(),
+            component_name: "Plan9Synthetic9P2000VfsRforkMultiplexerEngineV85".to_string(),
             os_origin: "Plan 9".to_string(),
             status: OsPrStatusV85::Validated,
             impacted_subsystems: vec![
@@ -487,7 +484,7 @@ impl Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85 {
     }
 }
 
-impl Default for Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85 {
+impl Default for Plan9Synthetic9P2000VfsRforkMultiplexerEngineV85 {
     fn default() -> Self {
         Self::new()
     }
@@ -505,7 +502,7 @@ pub struct NixGuixHermeticCasMerkleClosureEngineV85 {
 impl NixGuixHermeticCasMerkleClosureEngineV85 {
     pub fn new() -> Self {
         Self {
-            store_path_hash: "v85-cas-merkle-closure-hash-abcdef0123456789".to_string(),
+            store_path_hash: "v85-cas-merkle-closure-hash-fedcba9876543210".to_string(),
         }
     }
 
@@ -630,20 +627,20 @@ impl Default for OmarchyWallustThemeChordNavigatorEngineV85 {
 }
 
 // ============================================================================
-// 12. Global Tech Media 48 Portal Unimplemented Ideas Engine V85
+// 12. Global Tech Media 47 Portal Unimplemented Ideas Engine V85
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct GlobalTechMedia48PortalUnimplementedIdeasEngineV85 {
+pub struct GlobalTechMedia47PortalUnimplementedIdeasEngineV85 {
     pub portals_scraped: u32,
     pub total_ideas_indexed: u32,
 }
 
-impl GlobalTechMedia48PortalUnimplementedIdeasEngineV85 {
+impl GlobalTechMedia47PortalUnimplementedIdeasEngineV85 {
     pub fn new() -> Self {
         Self {
-            portals_scraped: 48,
-            total_ideas_indexed: 7200,
+            portals_scraped: 47,
+            total_ideas_indexed: 7050,
         }
     }
 
@@ -658,8 +655,8 @@ impl GlobalTechMedia48PortalUnimplementedIdeasEngineV85 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV85 {
         OpenSourceOsPrProposalV85 {
             pr_id: "PR-OS-V85-011".to_string(),
-            title: "48 Global Tech Media Portals Unimplemented Ideas Engine V85".to_string(),
-            component_name: "GlobalTechMedia48PortalUnimplementedIdeasEngineV85".to_string(),
+            title: "47 Global Tech Media Portals Unimplemented Ideas Engine V85".to_string(),
+            component_name: "GlobalTechMedia47PortalUnimplementedIdeasEngineV85".to_string(),
             os_origin: "Global Tech Media".to_string(),
             status: OsPrStatusV85::Validated,
             impacted_subsystems: vec![
@@ -671,7 +668,7 @@ impl GlobalTechMedia48PortalUnimplementedIdeasEngineV85 {
     }
 }
 
-impl Default for GlobalTechMedia48PortalUnimplementedIdeasEngineV85 {
+impl Default for GlobalTechMedia47PortalUnimplementedIdeasEngineV85 {
     fn default() -> Self {
         Self::new()
     }
@@ -762,11 +759,11 @@ pub struct SovereignOpenSourceOsMissingComponentsV85PrSuite {
     pub dragonfly_hammer: DragonFly87Hammer3DirectIoErasureEngineV85,
     pub netbsd_rump: NetBsd134RumpUserlandAudioPciRouterEngineV85,
     pub haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV85,
-    pub plan9_9p: Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85,
+    pub plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV85,
     pub nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV85,
     pub illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV85,
     pub omarchy_theme: OmarchyWallustThemeChordNavigatorEngineV85,
-    pub tech_media: GlobalTechMedia48PortalUnimplementedIdeasEngineV85,
+    pub tech_media: GlobalTechMedia47PortalUnimplementedIdeasEngineV85,
     pub universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV85,
 }
 
@@ -780,11 +777,11 @@ impl SovereignOpenSourceOsMissingComponentsV85PrSuite {
             dragonfly_hammer: DragonFly87Hammer3DirectIoErasureEngineV85::new(),
             netbsd_rump: NetBsd134RumpUserlandAudioPciRouterEngineV85::new(),
             haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV85::new(),
-            plan9_9p: Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85::new(),
+            plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV85::new(),
             nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV85::new(),
             illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV85::new(),
             omarchy_theme: OmarchyWallustThemeChordNavigatorEngineV85::new(),
-            tech_media: GlobalTechMedia48PortalUnimplementedIdeasEngineV85::new(),
+            tech_media: GlobalTechMedia47PortalUnimplementedIdeasEngineV85::new(),
             universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV85::new(),
         }
     }
@@ -873,11 +870,11 @@ mod tests {
         let haiku = HaikuBfsRelationalLiveQueryMetadataEngineV85::new();
         assert_eq!(haiku.execute_live_query("ARTIST"), vec!["META:ARTIST"]);
 
-        let mut plan9 = Plan9Synthetic9P2020VfsRforkMultiplexerEngineV85::new();
+        let mut plan9 = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV85::new();
         assert_eq!(plan9.rfork_namespace(1), 0x0000_2049);
 
         let nix = NixGuixHermeticCasMerkleClosureEngineV85::new();
-        assert!(nix.verify_hermetic_closure("0123456789abcdef0123456789abcdef"));
+        assert!(nix.verify_hermetic_closure("fedcba9876543210fedcba9876543210"));
 
         let illumos = IllumosCrossbowVnicDtraceSwitchMeshEngineV85::new();
         assert_eq!(illumos.probe_vnic_latency(5), 1);
@@ -886,9 +883,9 @@ mod tests {
         assert!(omarchy.reload_theme("Dark-V85"));
         assert_eq!(omarchy.active_theme, "Dark-V85");
 
-        let media = GlobalTechMedia48PortalUnimplementedIdeasEngineV85::new();
+        let media = GlobalTechMedia47PortalUnimplementedIdeasEngineV85::new();
         let page = media.generate_wiki_documentation_page("V85 Test");
-        assert!(page.contains("48 Tech Media Portals"));
+        assert!(page.contains("47 Tech Media Portals"));
 
         let adapter = UniversalSubsystemCrossDistroAdapterEngineV85::new();
         assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));
