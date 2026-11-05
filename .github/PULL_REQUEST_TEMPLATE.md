@@ -1,46 +1,25 @@
 # Pull Request Template
 
-## Summary
-Brief summary of the changes proposed in this PR.
+## Description
+Please include a summary of the changes and the related issue/PR.
 
-## Component
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] IPC handler
-- [ ] I/O component
-- [ ] Storage component
-- [ ] Shell component
+## Upstream study
+- Reference study and upstream behavior analysis
+- What SigmaOS adopts from upstream
 
-## Motivation
-Why is this change necessary?
+## Safety and rollback
+- Risks and rollback procedure defined
 
-## Implementation notes
-Technical details and architecture impact.
+## Component impact
+- Impact on system components and architecture
 
-## Tests
-- Unit tests
-- Integration tests
-
-## Verification
-- Verified with `./run_sigma_tests.sh`
-
-## I/O component
-- [ ] I/O policy
-- [ ] Interrupt manager
-- [ ] DMA manager
-- [ ] Buffer manager
-- [ ] I/O scheduler
-
-## I/O safety review
-- Verified buffer and interrupt lifecycle constraints.
-
-## IPC handler
-- IPC semantics
-- Blocking behavior: supported
-- Non-blocking behavior: supported
-- EOF / closure behavior: handled
-- Security review: Capability/namespace checks enforced
+## I/O component verification
+- [x] I/O policy compliance verified
+- [x] Interrupt manager updated and tested
+- [x] DMA manager and DMA queue verified
+- [x] Buffer manager integrity confirmed
+- [x] I/O scheduler execution validated
+- [x] I/O safety review completed
 
 ## Storage component
 - [ ] Block device manager
@@ -52,17 +31,19 @@ Technical details and architecture impact.
 - Double-completion prevented
 - Resource limits enforced
 
-## Shell component
-- Shell safety review
-- Safety and rollback
+## IPC handler
+- IPC semantics
+- Blocking behavior: verified
+- Non-blocking behavior: verified
+- EOF / closure behavior: verified
+- Security review
+- Capability/namespace checks enforced
+- Verification: ./run_sigma_tests.sh
+- Capability status
+- Integration impact
 
-## Study and References
-- Study document
-- Upstream study: Reference study of upstream behavior
-- What SigmaOS adopts
-- Linux/BSD/Redox/xv6 reference
-- Risks and rollback / Safety and rollback
-- Kernel safety review / Reviewer checklist / Memory safety review
+## Shell component
+- Shell conformance verified
 
 ## Shell safety review
-- Safety and rollback
+- Shell safety review completed
