@@ -689,11 +689,7 @@ pub use shell::{
     SovereignShellsTerminalsSupervisorsParityV89Gateway,
     SovereignShellsTerminalsSupervisorsV89PrSuite,
     SovereignShellsTerminalsSupervisorsParityV90Gateway,
-    SovereignShellsTerminalsSupervisorsV90PrSuite,
-    SovereignShellsTerminalsSupervisorsParityV91Gateway,
-    SovereignShellsTerminalsSupervisorsParityV91GatewayEngine,
-    SovereignShellsTerminalsSupervisorsV91PrSuite,
-    TerminalMultiplexersAndEmulatorsPrEngine,
+    SovereignShellsTerminalsSupervisorsV90PrSuite, TerminalMultiplexersAndEmulatorsPrEngine,
     ZshPromptFormatter,
 };
 pub use sigpkg::{
@@ -751,6 +747,7 @@ pub use virtualization::{
 };
 pub use virtualization::sovereign_virtualization_and_containers_v88_pr::*;
 pub use virtualization::sovereign_virtualization_and_containers_v89_pr::*;
+pub use virtualization::sovereign_virtualization_and_containers_v91_pr::*;
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
 
