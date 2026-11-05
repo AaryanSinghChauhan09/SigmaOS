@@ -177,12 +177,41 @@ pub enum Ipv6ExtensionHeader {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Icmpv6Type {
-    EchoRequest = 128,
-    EchoReply = 129,
-    RouterSolicitation = 133,
-    RouterAdvertisement = 134,
-    NeighborSolicitation = 135,
-    NeighborAdvertisement = 136,
+    EchoRequest,
+    EchoReply,
+    RouterSolicitation,
+    RouterAdvertisement,
+    NeighborSolicitation,
+    NeighborAdvertisement,
+    /// Any ICMPv6 type not explicitly modelled — stored raw for forward-compat.
+    Unknown(u8),
+}
+
+impl Icmpv6Type {
+    pub fn to_u8(&self) -> u8 {
+        match self {
+            Self::EchoRequest => 128,
+            Self::EchoReply => 129,
+            Self::RouterSolicitation => 133,
+            Self::RouterAdvertisement => 134,
+            Self::NeighborSolicitation => 135,
+            Self::NeighborAdvertisement => 136,
+            Self::Unknown(v) => *v,
+        }
+    }
+
+    /// Convert a raw byte to the typed enum, preserving unknown types in Unknown(u8).
+    pub fn from_u8(value: u8) -> Self {
+        match value {
+            128 => Self::EchoRequest,
+            129 => Self::EchoReply,
+            133 => Self::RouterSolicitation,
+            134 => Self::RouterAdvertisement,
+            135 => Self::NeighborSolicitation,
+            136 => Self::NeighborAdvertisement,
+            v => Self::Unknown(v),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -206,7 +235,7 @@ impl Icmpv6Packet {
     }
 
     pub fn calculate_checksum(&self) -> u16 {
-        let mut sum: u32 = (self.message_type as u32) + (self.code as u32);
+        let mut sum: u32 = (self.message_type.to_u8() as u32) + (self.code as u32);
         for chunk in self.payload.chunks(2) {
             let word = if chunk.len() == 2 {
                 ((chunk[0] as u32) << 8) | (chunk[1] as u32)
@@ -258,7 +287,7 @@ impl Icmpv6Packet {
 
     pub fn serialize(&self) -> Vec<u8> {
         let mut buf = Vec::new();
-        buf.push(self.message_type as u8);
+        buf.push(self.message_type.to_u8());
         buf.push(self.code);
         buf.extend_from_slice(&self.checksum.to_be_bytes());
         buf.extend_from_slice(&self.payload);
@@ -269,15 +298,7 @@ impl Icmpv6Packet {
         if bytes.len() < 4 {
             return Err("ICMPv6 packet too short");
         }
-        let msg_type = match bytes[0] {
-            128 => Icmpv6Type::EchoRequest,
-            129 => Icmpv6Type::EchoReply,
-            133 => Icmpv6Type::RouterSolicitation,
-            134 => Icmpv6Type::RouterAdvertisement,
-            135 => Icmpv6Type::NeighborSolicitation,
-            136 => Icmpv6Type::NeighborAdvertisement,
-            _ => return Err("Unsupported ICMPv6 message type"),
-        };
+        let msg_type = Icmpv6Type::from_u8(bytes[0]);
         let code = bytes[1];
         let checksum = u16::from_be_bytes([bytes[2], bytes[3]]);
         let payload = bytes[4..].to_vec();
@@ -493,7 +514,7 @@ impl Ipv6MulticastRouter {
     pub fn forward_multicast_packet(
         &self,
         group_address: &Ipv6Address,
-        payload: &[u8],
+        _payload: &[u8],
     ) -> Vec<String> {
         for group in &self.groups {
             if group.group_address.bytes == group_address.bytes {
@@ -608,7 +629,7 @@ impl Ipv6Stack {
             .find_route(&destination)
             .ok_or("No route to destination")?;
 
-        let header = Ipv6Header::new(
+        let _header = Ipv6Header::new(
             route
                 .gateway
                 .clone()
@@ -787,5 +808,22 @@ mod tests {
         let dhcp_opt = Dhcpv6Option::new(1, vec![0xDE, 0xAD, 0xBE, 0xEF]);
         let dhcp_serialized = dhcp_opt.serialize();
         assert_eq!(dhcp_serialized.len(), 8); // 2 bytes code + 2 bytes len + 4 bytes data
+    }
+
+    #[test]
+    fn test_icmpv6_unknown_type_roundtrip() {
+        // Arrange
+        let unknown_type_byte = 200u8;
+        let pkt = Icmpv6Packet::new(Icmpv6Type::from_u8(unknown_type_byte), 3, vec![0xCA, 0xFE]);
+
+        // Act
+        let serialized = pkt.serialize();
+        let parsed = Icmpv6Packet::parse(&serialized).expect("should parse unknown ICMPv6 types gracefully");
+
+        // Assert
+        assert_eq!(parsed.message_type, Icmpv6Type::Unknown(200));
+        assert_eq!(parsed.message_type.to_u8(), 200);
+        assert_eq!(parsed.code, 3);
+        assert_eq!(parsed.payload, vec![0xCA, 0xFE]);
     }
 }
