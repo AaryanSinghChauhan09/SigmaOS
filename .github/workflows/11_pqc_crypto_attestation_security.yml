@@ -25,6 +25,8 @@ jobs:
           toolchain: stable
 
       - name: Verify Aegis Vault & PQC Cryptographic Tests
+        env:
+          CARGO_BUILD_JOBS: "2"
         run: |
           cargo test crypto::aegis_vault --lib || true
           cargo check --lib
