@@ -21,6 +21,9 @@ Please include a summary of the changes and the related issue/PR.
 
 ## Storage component
 - [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
 - [ ] Cache policy conformance
 - [ ] Mount manager lifecycle verified
 - [ ] Secondary memory ADR alignment
