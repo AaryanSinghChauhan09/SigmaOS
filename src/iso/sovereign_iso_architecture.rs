@@ -18,6 +18,8 @@
 //! - FAIL-FAST: Early error detection in build pipeline
 //! - OPEN STANDARD & INTEROPERABILITY: ISO 9660 El Torito / UEFI ESP
 
+extern crate alloc;
+
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -585,7 +587,7 @@ impl SigmaIsoProfile {
     pub fn desktop_standard(arch: ArchTarget) -> Self {
         Self {
             name: "SigmaOS Desktop".to_string(),
-            version: env!("CARGO_PKG_VERSION").to_string(),
+            version: option_env!("CARGO_PKG_VERSION").unwrap_or("1.0.0").to_string(),
             arch,
             boot: BootLayer::new(arch),
             live_fs: LiveFilesystemLayer::default(),

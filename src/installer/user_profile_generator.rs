@@ -4,7 +4,8 @@
 //! sets MIME type associations, applies the default theme, and generates
 //! shell configuration files for new SigmaOS users.
 
-use std::path::{Path, PathBuf};
+use std::fmt;
+use std::path::PathBuf;
 
 /// Application category for grouping in menus and defaults.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -343,17 +344,30 @@ pub const DEFAULT_MIME_ASSOCIATIONS: &[FileAssociation] = &[
 ];
 
 /// Errors from the user profile generator.
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug)]
 pub enum ProfileError {
-    #[error("username is empty")]
     EmptyUsername,
-    #[error("home directory path is invalid: {0}")]
     InvalidHomePath(String),
-    #[error("I/O error creating directory {path}: {reason}")]
     DirectoryCreation { path: String, reason: String },
-    #[error("failed to write config file {path}: {reason}")]
     ConfigWrite { path: String, reason: String },
 }
+
+impl fmt::Display for ProfileError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::EmptyUsername => write!(f, "username is empty"),
+            Self::InvalidHomePath(p) => write!(f, "home directory path is invalid: {}", p),
+            Self::DirectoryCreation { path, reason } => {
+                write!(f, "I/O error creating directory {}: {}", path, reason)
+            }
+            Self::ConfigWrite { path, reason } => {
+                write!(f, "failed to write config file {}: {}", path, reason)
+            }
+        }
+    }
+}
+
+impl std::error::Error for ProfileError {}
 
 /// Generates and installs a default user environment.
 pub struct UserProfileGenerator {

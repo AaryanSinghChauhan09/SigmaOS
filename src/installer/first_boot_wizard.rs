@@ -201,30 +201,39 @@ impl UserProfile {
 }
 
 /// Errors that can occur during the first-boot wizard.
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug)]
 pub enum FirstBootError {
     /// Username is empty, too long, or contains invalid characters.
-    #[error("invalid username: {0}")]
     InvalidUsername(String),
     /// Password hash is missing or malformed.
-    #[error("invalid password hash")]
     InvalidPasswordHash,
     /// Locale string is not a valid BCP-47 / POSIX locale.
-    #[error("invalid locale: {0}")]
     InvalidLocale(String),
     /// Timezone string is not a valid IANA zone.
-    #[error("invalid timezone: {0}")]
     InvalidTimezone(String),
     /// Configuration is incomplete — cannot advance.
-    #[error("wizard step incomplete: missing {0}")]
     StepIncomplete(String),
     /// I/O error when writing configuration files.
-    #[error("I/O error: {0}")]
     Io(String),
     /// First-boot wizard has already been completed on this system.
-    #[error("first boot already completed")]
     AlreadyCompleted,
 }
+
+impl fmt::Display for FirstBootError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidUsername(u) => write!(f, "invalid username: {}", u),
+            Self::InvalidPasswordHash => write!(f, "invalid password hash"),
+            Self::InvalidLocale(l) => write!(f, "invalid locale: {}", l),
+            Self::InvalidTimezone(tz) => write!(f, "invalid timezone: {}", tz),
+            Self::StepIncomplete(s) => write!(f, "wizard step incomplete: missing {}", s),
+            Self::Io(err) => write!(f, "I/O error: {}", err),
+            Self::AlreadyCompleted => write!(f, "first boot already completed"),
+        }
+    }
+}
+
+impl std::error::Error for FirstBootError {}
 
 /// State machine driving the first-boot wizard.
 pub struct FirstBootWizard {
