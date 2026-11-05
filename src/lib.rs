@@ -661,18 +661,21 @@ pub use resilience::{
 pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AntivirusAndCryptoEngineV80Engine, AntivirusAndCryptoEngineV89Engine,
-    AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, AuditAndIntrusionPreventionV80Engine,
-    AuditAndIntrusionPreventionV89Engine, BsdHardeningAndIsolationV80Engine,
-    BsdHardeningAndIsolationV89Engine, CapabilityGate, CapabilityToken, ForensicStorageFilter,
-    IdentityAndEnterpriseAuthV80Engine, IdentityAndEnterpriseAuthV89Engine,
-    LinuxAccessControlAndSandboxingV80Engine, LinuxAccessControlAndSandboxingV89Engine, Permission,
-    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy,
-    SecurityV80PrProposalManifest, SecurityV89PrProposalManifest,
-    SovereignSecurityAndHardeningParityPrGateway,
+    AntivirusAndCryptoEngineV90Engine, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator,
+    AuditAndIntrusionPreventionV80Engine, AuditAndIntrusionPreventionV89Engine,
+    AuditAndIntrusionPreventionV90Engine, BsdHardeningAndIsolationV80Engine,
+    BsdHardeningAndIsolationV89Engine, BsdHardeningAndIsolationV90Engine, CapabilityGate,
+    CapabilityToken, ForensicStorageFilter, IdentityAndEnterpriseAuthV80Engine,
+    IdentityAndEnterpriseAuthV89Engine, IdentityAndEnterpriseAuthV90Engine,
+    LinuxAccessControlAndSandboxingV80Engine, LinuxAccessControlAndSandboxingV89Engine,
+    LinuxAccessControlAndSandboxingV90Engine, Permission, PledgeManager, PledgePromise,
+    RoutingMode, SandboxPolicy, SecurityV80PrProposalManifest, SecurityV89PrProposalManifest,
+    SecurityV90PrProposalManifest, SovereignSecurityAndHardeningParityPrGateway,
     SovereignSecurityAndHardeningParityV61Gateway, SovereignSecurityAndHardeningParityV64Gateway,
     SovereignSecurityAndHardeningParityV68Gateway, SovereignSecurityAndHardeningParityV70Gateway,
     SovereignSecurityAndHardeningParityV76Gateway, SovereignSecurityAndHardeningParityV77Gateway,
     SovereignSecurityAndHardeningParityV80Gateway, SovereignSecurityAndHardeningParityV89Gateway,
+    SovereignSecurityAndHardeningParityV90Gateway,
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
