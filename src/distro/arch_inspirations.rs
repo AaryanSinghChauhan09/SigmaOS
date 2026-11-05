@@ -1,6 +1,6 @@
 // SigmaOS — arch_inspirations.rs
 // Implements Arch Linux-inspired features:
-//   • Rolling release model
+//   • Rolling release model (ALPM vercmp algorithm — epoch:pkgver-pkgrel)
 //   • AUR-style package building (PKGBUILD parsing + makepkg equivalent)
 //   • Signed package databases
 //   • pacman-style dependency resolution
@@ -14,6 +14,100 @@ extern crate alloc;
 
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+
+// ── ALPM vercmp — proper epoch:pkgver-pkgrel comparison (RFC: pacman/lib/libalpm/version.c)
+// Replaces the previous naive dot-segment split which could not handle epochs.
+
+/// Parse an ALPM version string of the form `[epoch:]pkgver[-pkgrel]`.
+fn alpm_parse(version: &str) -> (u32, &str, u32) {
+    let mut s = version;
+    // Epoch
+    let epoch = if let Some(colon) = s.find(':') {
+        let ep = s[..colon].parse::<u32>().unwrap_or(0);
+        s = &s[colon + 1..];
+        ep
+    } else {
+        0
+    };
+    // pkgrel
+    let pkgrel = if let Some(dash) = s.rfind('-') {
+        let rel = s[dash + 1..].parse::<u32>().unwrap_or(1);
+        s = &s[..dash];
+        rel
+    } else {
+        1
+    };
+    (epoch, s, pkgrel)
+}
+
+/// Compare two ALPM version strings.  Returns:
+/// - `Ordering::Greater` if `a` is newer than `b`
+/// - `Ordering::Less`    if `a` is older than `b`
+/// - `Ordering::Equal`   if identical
+fn alpm_vercmp(a: &str, b: &str) -> core::cmp::Ordering {
+    use core::cmp::Ordering;
+    let (ae, av, ar) = alpm_parse(a);
+    let (be, bv, br) = alpm_parse(b);
+    // 1. Epoch wins
+    if ae != be {
+        return ae.cmp(&be);
+    }
+    // 2. pkgver: compare segment by segment (numeric then alpha)
+    let pkgver_cmp = alpm_pkgver_cmp(av, bv);
+    if pkgver_cmp != Ordering::Equal {
+        return pkgver_cmp;
+    }
+    // 3. pkgrel
+    ar.cmp(&br)
+}
+
+/// Segment-aware pkgver comparison (mirrors libalpm `vercmp` inner loop).
+fn alpm_pkgver_cmp(a: &str, b: &str) -> core::cmp::Ordering {
+    use core::cmp::Ordering;
+    let mut ai = 0usize;
+    let mut bi = 0usize;
+    let ab = a.as_bytes();
+    let bb = b.as_bytes();
+
+    loop {
+        // Skip separators (`.`, `_`, `-`)
+        while ai < ab.len() && (ab[ai] == b'.' || ab[ai] == b'_' || ab[ai] == b'-') { ai += 1; }
+        while bi < bb.len() && (bb[bi] == b'.' || bb[bi] == b'_' || bb[bi] == b'-') { bi += 1; }
+
+        if ai >= ab.len() && bi >= bb.len() { return Ordering::Equal; }
+        if ai >= ab.len() { return Ordering::Less; }
+        if bi >= bb.len() { return Ordering::Greater; }
+
+        // Determine segment type
+        let a_is_digit = ab[ai].is_ascii_digit();
+        let b_is_digit = bb[bi].is_ascii_digit();
+
+        if a_is_digit && !b_is_digit { return Ordering::Greater; } // numeric > alpha
+        if !a_is_digit && b_is_digit { return Ordering::Less; }
+
+        if a_is_digit {
+            // Collect numeric segments
+            let a_start = ai;
+            while ai < ab.len() && ab[ai].is_ascii_digit() { ai += 1; }
+            let b_start = bi;
+            while bi < bb.len() && bb[bi].is_ascii_digit() { bi += 1; }
+            let a_num: u64 = core::str::from_utf8(&ab[a_start..ai]).unwrap_or("0").parse().unwrap_or(0);
+            let b_num: u64 = core::str::from_utf8(&bb[b_start..bi]).unwrap_or("0").parse().unwrap_or(0);
+            let cmp = a_num.cmp(&b_num);
+            if cmp != Ordering::Equal { return cmp; }
+        } else {
+            // Collect alpha segments
+            let a_start = ai;
+            while ai < ab.len() && ab[ai].is_ascii_alphabetic() { ai += 1; }
+            let b_start = bi;
+            while bi < bb.len() && bb[bi].is_ascii_alphabetic() { bi += 1; }
+            let a_seg = &ab[a_start..ai];
+            let b_seg = &bb[b_start..bi];
+            let cmp = a_seg.cmp(b_seg);
+            if cmp != Ordering::Equal { return cmp; }
+        }
+    }
+}
 
 // ── Rolling release model ─────────────────────────────────────────────────────
 
@@ -98,24 +192,10 @@ impl RollingReleaseManager {
         upgrades
     }
 
-    /// Naive version comparison: splits on `.` and compares numeric segments.
+    /// Compare version strings using the full ALPM algorithm (epoch:pkgver-pkgrel).
+    /// Returns `true` if `a` is strictly newer than `b`.
     fn version_gt(a: &str, b: &str) -> bool {
-        let parse_seg =
-            |s: &str| -> Vec<u32> { s.split('.').filter_map(|x| x.parse::<u32>().ok()).collect() };
-        let av = parse_seg(a);
-        let bv = parse_seg(b);
-        let len = av.len().max(bv.len());
-        for i in 0..len {
-            let ai = av.get(i).copied().unwrap_or(0);
-            let bi = bv.get(i).copied().unwrap_or(0);
-            if ai > bi {
-                return true;
-            }
-            if ai < bi {
-                return false;
-            }
-        }
-        false
+        alpm_vercmp(a, b) == core::cmp::Ordering::Greater
     }
 }
 
@@ -527,5 +607,61 @@ sha256sums=('abcdef1234567890')
         assert_eq!(results.len(), 2);
         let top = idx.top_packages(1);
         assert_eq!(top[0].name, "vim-sigma"); // higher votes
+    }
+
+    // ── ALPM vercmp tests (Arrange-Act-Assert) ────────────────────────────
+
+    #[test]
+    fn test_alpm_vercmp_epoch_wins() {
+        // Arrange: epoch 1 vs epoch 0 — epoch must dominate pkgver
+        // Act + Assert
+        assert!(alpm_vercmp("1:1.0-1", "2.0-1") == core::cmp::Ordering::Greater,
+            "epoch 1 must beat epoch-less 2.0");
+        assert!(alpm_vercmp("0:5.0-1", "1:1.0-1") == core::cmp::Ordering::Less,
+            "epoch 0 must lose to epoch 1");
+        assert!(alpm_vercmp("2:1.0-1", "2:1.0-1") == core::cmp::Ordering::Equal,
+            "identical epoch+pkgver+pkgrel must be Equal");
+    }
+
+    #[test]
+    fn test_alpm_vercmp_pkgrel_tiebreaker() {
+        // Arrange: same epoch+pkgver, different pkgrel
+        // Act + Assert
+        assert!(alpm_vercmp("1.0.0-2", "1.0.0-1") == core::cmp::Ordering::Greater,
+            "pkgrel 2 must beat pkgrel 1");
+        assert!(alpm_vercmp("1.0.0-1", "1.0.0-2") == core::cmp::Ordering::Less,
+            "pkgrel 1 must lose to pkgrel 2");
+    }
+
+    #[test]
+    fn test_alpm_vercmp_numeric_segment() {
+        // Arrange: numeric segments compared as integers, not strings
+        assert!(alpm_vercmp("2.9.0-1", "2.10.0-1") == core::cmp::Ordering::Less,
+            "2.9 < 2.10 numerically (string ordering would be wrong)");
+        assert!(alpm_vercmp("1.100-1", "1.99-1") == core::cmp::Ordering::Greater,
+            "1.100 > 1.99 numerically");
+    }
+
+    #[test]
+    fn test_rolling_upgrade_uses_alpm_vercmp() {
+        // Arrange: epoch-qualified available version must trigger upgrade
+        let mut mgr = RollingReleaseManager::new(RollingChannel::Stable);
+        mgr.register("openssl", "3.0.0");
+        // Act
+        let upgrades = mgr.simulate_upgrade(&[("openssl", "1:3.0.0")]); // epoch bumped
+        // Assert: epoch 1 > epoch 0, so must upgrade
+        assert_eq!(upgrades.len(), 1, "epoch bump must trigger upgrade");
+        assert_eq!(upgrades[0].2, "1:3.0.0");
+    }
+
+    #[test]
+    fn test_rolling_upgrade_no_downgrade() {
+        // Arrange: installed version is newer
+        let mut mgr = RollingReleaseManager::new(RollingChannel::Stable);
+        mgr.register("zlib", "1.3.1-2");
+        // Act
+        let upgrades = mgr.simulate_upgrade(&[("zlib", "1.3.1-1")]); // older pkgrel
+        // Assert: no downgrade
+        assert!(upgrades.is_empty(), "must not downgrade pkgrel");
     }
 }

@@ -13,7 +13,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::vec;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
+use core::sync::atomic::{AtomicU64, Ordering};
 
 // ============================================================================
 // 1. ETHERNET II FRAME
@@ -253,7 +253,7 @@ impl Ipv4Packet {
     }
 
     pub fn compute_checksum(&self) -> u16 {
-        let mut words = [
+        let words = [
             ((self.version_ihl as u32) << 8) | self.dscp_ecn as u32,
             self.total_length as u32,
             self.identification as u32,
@@ -497,6 +497,8 @@ impl TcpSocket {
 pub struct SovereignNetworkStack {
     pub mac: MacAddress,
     pub ip: [u8; 4],
+    /// Link-local IPv6 address derived from MAC (EUI-64)
+    pub ipv6_addr: [u8; 16],
     pub gateway: [u8; 4],
     pub subnet_mask: [u8; 4],
     pub arp_cache: ArpCache,
@@ -511,9 +513,16 @@ impl SovereignNetworkStack {
     pub fn new(mac: MacAddress, ip: [u8; 4], gateway: [u8; 4]) -> Self {
         let mut arp = ArpCache::new();
         arp.insert(ip, mac); // Self entry
+        // Derive EUI-64 link-local IPv6 address from MAC (RFC 4291 §2.5.6)
+        let m = mac.0;
+        let ipv6_addr = [
+            0xFE, 0x80, 0, 0, 0, 0, 0, 0,
+            m[0] ^ 0x02, m[1], m[2], 0xFF, 0xFE, m[3], m[4], m[5],
+        ];
         Self {
             mac,
             ip,
+            ipv6_addr,
             gateway,
             subnet_mask: [255, 255, 255, 0],
             arp_cache: arp,
@@ -535,6 +544,7 @@ impl SovereignNetworkStack {
         match frame.ethertype {
             ETHERTYPE_ARP => self.handle_arp(frame.payload, frame.src),
             ETHERTYPE_IPV4 => self.handle_ipv4(frame.payload),
+            ETHERTYPE_IPV6 => self.handle_ipv6(frame.payload),
             _ => {
                 self.total_dropped.fetch_add(1, Ordering::SeqCst);
                 None
@@ -618,6 +628,204 @@ impl SovereignNetworkStack {
         self.total_tx_packets.fetch_add(1, Ordering::SeqCst);
         Some(ip_buf)
     }
+
+    // -------------------------------------------------------------------------
+    // IPv6 frame dispatch (RFC 2460) + ICMPv6 (RFC 4443) + NDP (RFC 4861)
+    // -------------------------------------------------------------------------
+
+    /// Parse IPv6 header and dispatch payload to ICMPv6 or upper-layer handler.
+    fn handle_ipv6(&mut self, payload: &[u8]) -> Option<Vec<u8>> {
+        // Minimum IPv6 fixed header = 40 bytes
+        if payload.len() < 40 {
+            self.total_dropped.fetch_add(1, Ordering::SeqCst);
+            return None;
+        }
+
+        // Parse fixed header fields inline (no_std compatible)
+        let next_header = payload[6];
+        let hop_limit   = payload[7];
+
+        let mut dst_bytes = [0u8; 16];
+        dst_bytes.copy_from_slice(&payload[24..40]);
+        let mut src_bytes = [0u8; 16];
+        src_bytes.copy_from_slice(&payload[8..24]);
+
+        // Accept packets addressed to our link-local address or all-nodes multicast (ff02::1)
+        let all_nodes: [u8; 16] = [0xFF, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1];
+        if dst_bytes != self.ipv6_addr && dst_bytes != all_nodes {
+            return None; // Not for us
+        }
+
+        if hop_limit == 0 {
+            // RFC 2460 §4: discard; a real stack would send ICMPv6 Time Exceeded
+            self.total_dropped.fetch_add(1, Ordering::SeqCst);
+            return None;
+        }
+
+        let ip6_payload = &payload[40..];
+        const IPPROTO_ICMPV6: u8 = 58;
+
+        match next_header {
+            IPPROTO_ICMPV6 => self.handle_icmpv6(src_bytes, dst_bytes, ip6_payload),
+            _ => None, // TCP/UDP over IPv6 — future work
+        }
+    }
+
+    /// Process an ICMPv6 message and produce an optional reply frame payload.
+    fn handle_icmpv6(
+        &mut self,
+        src: [u8; 16],
+        _dst: [u8; 16],
+        payload: &[u8],
+    ) -> Option<Vec<u8>> {
+        if payload.len() < 4 {
+            return None;
+        }
+
+        let msg_type = payload[0];
+        let _code    = payload[1];
+        // bytes [2..4] = received checksum (we recompute on reply)
+
+        match msg_type {
+            // --- ICMPv6 Echo Request (128) → Echo Reply (129) ---------------
+            128 => {
+                if payload.len() < 8 {
+                    return None;
+                }
+                let identifier = u16::from_be_bytes([payload[4], payload[5]]);
+                let sequence   = u16::from_be_bytes([payload[6], payload[7]]);
+                let echo_data  = payload[8..].to_vec();
+
+                // Build Echo Reply payload (type=129, code=0)
+                let mut reply_icmpv6: Vec<u8> = Vec::new();
+                reply_icmpv6.push(129u8);        // Echo Reply
+                reply_icmpv6.push(0u8);           // Code
+                reply_icmpv6.push(0); reply_icmpv6.push(0); // checksum placeholder
+                reply_icmpv6.extend_from_slice(&identifier.to_be_bytes());
+                reply_icmpv6.extend_from_slice(&sequence.to_be_bytes());
+                reply_icmpv6.extend_from_slice(&echo_data);
+
+                // Pseudo-header checksum (RFC 4443 §2.3)
+                let csum = icmpv6_pseudo_checksum(&src, &self.ipv6_addr, &reply_icmpv6);
+                reply_icmpv6[2] = (csum >> 8) as u8;
+                reply_icmpv6[3] = csum as u8;
+
+                // Prepend IPv6 header (src↔dst swapped)
+                let mut pkt = build_ipv6_header(self.ipv6_addr, src, reply_icmpv6.len() as u16, 58);
+                pkt.extend_from_slice(&reply_icmpv6);
+
+                self.total_tx_packets.fetch_add(1, Ordering::SeqCst);
+                Some(pkt)
+            }
+
+            // --- Neighbor Solicitation (135) → Neighbor Advertisement (136) -
+            // RFC 4861 §4.3 / §4.4
+            135 => {
+                if payload.len() < 24 {
+                    return None; // NS body = 4 reserved + 16 target
+                }
+                // Target address is bytes [8..24] of the ICMPv6 body
+                let mut target = [0u8; 16];
+                target.copy_from_slice(&payload[8..24]);
+
+                // Only respond if we own the target address
+                if target != self.ipv6_addr {
+                    return None;
+                }
+
+                // Build Neighbor Advertisement (type=136)
+                // Flags: S=1 (solicited), O=1 (override)   → 0x60_00_00_00
+                let flags: u32 = 0x6000_0000;
+                let mut na_body: Vec<u8> = Vec::new();
+                na_body.push(136u8);
+                na_body.push(0u8);              // code
+                na_body.push(0); na_body.push(0); // checksum placeholder
+                na_body.extend_from_slice(&flags.to_be_bytes());
+                na_body.extend_from_slice(&target); // Target address
+                // Option: Target Link-Layer Address (type=2, len=1 unit=8B)
+                na_body.push(2); na_body.push(1);
+                na_body.extend_from_slice(&self.mac.0);
+
+                let csum = icmpv6_pseudo_checksum(&self.ipv6_addr, &src, &na_body);
+                na_body[2] = (csum >> 8) as u8;
+                na_body[3] = csum as u8;
+
+                let mut pkt = build_ipv6_header(self.ipv6_addr, src, na_body.len() as u16, 58);
+                pkt.extend_from_slice(&na_body);
+
+                self.total_tx_packets.fetch_add(1, Ordering::SeqCst);
+                Some(pkt)
+            }
+
+            // --- Router Solicitation (133) — we are a host, not a router ----
+            // RFC 4861 §6.3.7: hosts silently ignore RS
+            133 => None,
+
+            // --- Router Advertisement (134) — received from a router --------
+            // RFC 4861 §6.3.4: host should process, but we keep it minimal
+            134 => None,
+
+            // --- Neighbor Advertisement (136) --------------------------------
+            // RFC 4861 §7.2.5: update NDP cache (future work, accept silently)
+            136 => None,
+
+            // --- All other ICMPv6 types: drop gracefully (no Err/panic) -----
+            _ => {
+                self.total_dropped.fetch_add(1, Ordering::SeqCst);
+                None
+            }
+        }
+    }
+}
+
+// ─── IPv6 helpers (free functions, no_std compatible) ────────────────────────
+
+/// Build a minimal 40-byte IPv6 fixed header.
+fn build_ipv6_header(src: [u8; 16], dst: [u8; 16], payload_len: u16, next_header: u8) -> Vec<u8> {
+    let mut h: Vec<u8> = Vec::with_capacity(40);
+    // Version=6, Traffic Class=0, Flow Label=0
+    h.extend_from_slice(&[0x60, 0x00, 0x00, 0x00]);
+    h.extend_from_slice(&payload_len.to_be_bytes());
+    h.push(next_header);
+    h.push(64); // Hop Limit
+    h.extend_from_slice(&src);
+    h.extend_from_slice(&dst);
+    h
+}
+
+/// ICMPv6 pseudo-header checksum (RFC 4443 §2.3 / RFC 2460 §8.1).
+fn icmpv6_pseudo_checksum(src: &[u8; 16], dst: &[u8; 16], icmpv6_payload: &[u8]) -> u16 {
+    let mut sum: u32 = 0;
+
+    // Source address
+    for chunk in src.chunks(2) {
+        sum = sum.wrapping_add(((chunk[0] as u32) << 8) | (chunk[1] as u32));
+    }
+    // Destination address
+    for chunk in dst.chunks(2) {
+        sum = sum.wrapping_add(((chunk[0] as u32) << 8) | (chunk[1] as u32));
+    }
+    // Upper-Layer Packet Length
+    let len = icmpv6_payload.len() as u32;
+    sum = sum.wrapping_add(len >> 16);
+    sum = sum.wrapping_add(len & 0xFFFF);
+    // Next Header = 58 (ICMPv6)
+    sum = sum.wrapping_add(58u32);
+
+    // ICMPv6 payload (checksum field must be zeroed by caller before this)
+    for chunk in icmpv6_payload.chunks(2) {
+        let word = if chunk.len() == 2 {
+            ((chunk[0] as u32) << 8) | (chunk[1] as u32)
+        } else {
+            (chunk[0] as u32) << 8
+        };
+        sum = sum.wrapping_add(word);
+    }
+
+    while (sum >> 16) != 0 {
+        sum = (sum & 0xFFFF) + (sum >> 16);
+    }
+    !(sum as u16)
 }
 
 /// Internet checksum (RFC 1071)
@@ -719,5 +927,168 @@ mod tests {
         assert_eq!(reply.identifier, 0x1234);
         assert_eq!(reply.sequence, 1);
         assert_ne!(reply.checksum, 0);
+    }
+
+    // ── IPv6 / ICMPv6 tests (Arrange-Act-Assert) ──────────────────────────
+
+    /// Helper: build a raw Ethernet-II frame carrying an IPv6 payload.
+    fn make_eth_ipv6_frame(src_mac: [u8; 6], ipv6_payload: Vec<u8>) -> Vec<u8> {
+        let dst_mac = [0xFF; 6]; // multicast dst
+        let mut frame = Vec::new();
+        frame.extend_from_slice(&dst_mac);
+        frame.extend_from_slice(&src_mac);
+        frame.extend_from_slice(&ETHERTYPE_IPV6.to_be_bytes());
+        frame.extend_from_slice(&ipv6_payload);
+        frame
+    }
+
+    /// Helper: build an IPv6 packet with ICMPv6 Echo Request body.
+    fn make_icmpv6_echo_request(src: [u8; 16], dst: [u8; 16]) -> Vec<u8> {
+        // ICMPv6 body: type=128, code=0, csum=0, id=1, seq=1, data=0xABCD
+        let mut icmp_body: Vec<u8> = vec![128, 0, 0, 0, 0, 1, 0, 1, 0xAB, 0xCD];
+        let csum = icmpv6_pseudo_checksum(&src, &dst, &icmp_body);
+        icmp_body[2] = (csum >> 8) as u8;
+        icmp_body[3] = csum as u8;
+
+        let mut pkt = build_ipv6_header(src, dst, icmp_body.len() as u16, 58);
+        pkt.extend_from_slice(&icmp_body);
+        pkt
+    }
+
+    /// Helper: build an ICMPv6 Neighbor Solicitation targeting `target`.
+    fn make_icmpv6_ns(src: [u8; 16], dst: [u8; 16], target: [u8; 16]) -> Vec<u8> {
+        // NS body: type=135, code=0, csum(0,0), reserved(4B), target(16B)
+        let mut ns_body: Vec<u8> = Vec::new();
+        ns_body.push(135); ns_body.push(0); ns_body.push(0); ns_body.push(0);
+        ns_body.extend_from_slice(&[0u8; 4]); // reserved
+        ns_body.extend_from_slice(&target);
+        let csum = icmpv6_pseudo_checksum(&src, &dst, &ns_body);
+        ns_body[2] = (csum >> 8) as u8;
+        ns_body[3] = csum as u8;
+
+        let mut pkt = build_ipv6_header(src, dst, ns_body.len() as u16, 58);
+        pkt.extend_from_slice(&ns_body);
+        pkt
+    }
+
+    #[test]
+    fn test_ipv6_eui64_link_local_derivation() {
+        // Arrange
+        let mac = MacAddress([0x02, 0x00, 0x5E, 0x10, 0x00, 0x01]);
+        let stack = SovereignNetworkStack::new(mac, [10, 0, 0, 1], [10, 0, 0, 254]);
+        // Act — read ipv6_addr
+        let addr = stack.ipv6_addr;
+        // Assert — EUI-64: prefix fe80::/10, universal/local bit flipped
+        assert_eq!(&addr[0..2], &[0xFE, 0x80], "must be link-local fe80::");
+        assert_eq!(addr[8], 0x02 ^ 0x02, "U/L bit flip: 0x02 → 0x00");
+        assert_eq!(&addr[11..13], &[0xFF, 0xFE], "EUI-64 injected FF:FE");
+    }
+
+    #[test]
+    fn test_ipv6_icmpv6_echo_request_reply() {
+        // Arrange
+        let mac = MacAddress([0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x01]);
+        let mut stack = SovereignNetworkStack::new(mac, [10, 0, 0, 1], [10, 0, 0, 254]);
+        let our_ipv6 = stack.ipv6_addr;
+        let peer_ipv6: [u8; 16] = [0xFE, 0x80, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+        let ipv6_pkt = make_icmpv6_echo_request(peer_ipv6, our_ipv6);
+        let eth_frame = make_eth_ipv6_frame([0x11; 6], ipv6_pkt);
+
+        // Act
+        let reply = stack.rx_frame(&eth_frame);
+
+        // Assert — stack must generate an Echo Reply
+        assert!(reply.is_some(), "must produce ICMPv6 Echo Reply");
+        let reply_bytes = reply.unwrap();
+        // IPv6 fixed header = 40 bytes; ICMPv6 type byte is at offset 40
+        assert!(reply_bytes.len() >= 41, "reply too short");
+        assert_eq!(reply_bytes[40], 129, "ICMPv6 type must be Echo Reply (129)");
+        assert_eq!(stack.total_tx_packets.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_ipv6_icmpv6_echo_wrong_dst_dropped() {
+        // Arrange — destination is NOT our address
+        let mac = MacAddress([0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0x02]);
+        let mut stack = SovereignNetworkStack::new(mac, [10, 0, 0, 1], [10, 0, 0, 254]);
+        let _our_ipv6 = stack.ipv6_addr;
+        let peer_ipv6: [u8; 16] = [0xFE, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2];
+        let other_ipv6: [u8; 16] = [0xFE, 0x80, 0, 0, 0, 0, 0, 0, 0xDE, 0xAD, 0, 0, 0, 0, 0, 1];
+
+        let ipv6_pkt = make_icmpv6_echo_request(peer_ipv6, other_ipv6); // dst ≠ ours
+        let eth_frame = make_eth_ipv6_frame([0x22; 6], ipv6_pkt);
+
+        // Act
+        let reply = stack.rx_frame(&eth_frame);
+
+        // Assert — must be silently dropped
+        assert!(reply.is_none(), "packet not for us must be dropped");
+        assert_eq!(stack.total_tx_packets.load(Ordering::SeqCst), 0);
+    }
+
+    #[test]
+    fn test_ipv6_neighbor_solicitation_generates_advertisement() {
+        // Arrange
+        let mac = MacAddress([0xCA, 0xFE, 0xDE, 0xAD, 0xBE, 0xEF]);
+        let mut stack = SovereignNetworkStack::new(mac, [10, 0, 0, 1], [10, 0, 0, 254]);
+        let our_ipv6 = stack.ipv6_addr;
+        let peer_ipv6: [u8; 16] = [0xFE, 0x80, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1];
+
+        let ipv6_pkt = make_icmpv6_ns(peer_ipv6, our_ipv6, our_ipv6);
+        let eth_frame = make_eth_ipv6_frame([0x33; 6], ipv6_pkt);
+
+        // Act
+        let reply = stack.rx_frame(&eth_frame);
+
+        // Assert — must generate Neighbor Advertisement (type=136)
+        assert!(reply.is_some(), "NS must produce a Neighbor Advertisement");
+        let reply_bytes = reply.unwrap();
+        assert!(reply_bytes.len() >= 41);
+        assert_eq!(reply_bytes[40], 136, "ICMPv6 type must be Neighbor Advertisement (136)");
+    }
+
+    #[test]
+    fn test_ipv6_neighbor_solicitation_wrong_target_dropped() {
+        // Arrange — NS targets an address we don't own
+        let mac = MacAddress([0x01, 0x02, 0x03, 0x04, 0x05, 0x06]);
+        let mut stack = SovereignNetworkStack::new(mac, [10, 0, 0, 1], [10, 0, 0, 254]);
+        let our_ipv6 = stack.ipv6_addr;
+        let peer_ipv6: [u8; 16] = [0xFE, 0x80, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2];
+        let other_target: [u8; 16] = [0xFE, 0x80, 0, 0, 0, 0, 0, 0, 0xFF, 0, 0, 0, 0, 0, 0, 1];
+
+        let ipv6_pkt = make_icmpv6_ns(peer_ipv6, our_ipv6, other_target); // wrong target
+        let eth_frame = make_eth_ipv6_frame([0x44; 6], ipv6_pkt);
+
+        // Act
+        let reply = stack.rx_frame(&eth_frame);
+
+        // Assert — NS for a different address must be silently ignored
+        assert!(reply.is_none(), "NS for wrong target must be dropped");
+    }
+
+    #[test]
+    fn test_ipv6_unknown_icmpv6_type_dropped_gracefully() {
+        // Arrange — unknown ICMPv6 type (e.g. 200)
+        let mac = MacAddress([0x05, 0x05, 0x05, 0x05, 0x05, 0x05]);
+        let mut stack = SovereignNetworkStack::new(mac, [10, 0, 0, 1], [10, 0, 0, 254]);
+        let our_ipv6 = stack.ipv6_addr;
+        let peer_ipv6: [u8; 16] = [0xFE, 0x80, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3];
+
+        let mut icmp_body: Vec<u8> = vec![200, 0, 0, 0, 0xDE, 0xAD]; // type=200 (unknown)
+        let csum = icmpv6_pseudo_checksum(&peer_ipv6, &our_ipv6, &icmp_body);
+        icmp_body[2] = (csum >> 8) as u8;
+        icmp_body[3] = csum as u8;
+        let mut ipv6_pkt = build_ipv6_header(peer_ipv6, our_ipv6, icmp_body.len() as u16, 58);
+        ipv6_pkt.extend_from_slice(&icmp_body);
+        let eth_frame = make_eth_ipv6_frame([0x55; 6], ipv6_pkt);
+
+        // Act
+        let reply = stack.rx_frame(&eth_frame);
+        let dropped_before = stack.total_dropped.load(Ordering::SeqCst);
+
+        // Assert — unknown type dropped cleanly (no panic)
+        assert!(reply.is_none(), "unknown ICMPv6 type must be dropped");
+        assert!(dropped_before > 0, "drop counter must be incremented");
     }
 }
