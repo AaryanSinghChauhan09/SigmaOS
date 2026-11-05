@@ -35,3 +35,5 @@ Roadmap for core IPC delivery.
 
 ## Governance and Merge Policy
 Evidence-based merge gating.
+
+<!-- verified synchronization -->
