@@ -234,12 +234,7 @@ impl FreeBsdKqueueZeroCopyRingBufferIoPrEngine {
         Self { rings }
     }
 
-    pub fn register_zerocopy_ring(
-        &mut self,
-        fd: u32,
-        capacity: u32,
-        user_events: u32,
-    ) -> String {
+    pub fn register_zerocopy_ring(&mut self, fd: u32, capacity: u32, user_events: u32) -> String {
         let spec = KqueueZeroCopyRingSpec {
             queue_fd: fd,
             ring_capacity: capacity,
@@ -288,7 +283,10 @@ impl FreeBsdCapsicumCasperCapKvmVmMiniJailPrEngine {
                 target_jail: "telemetry_jail".to_string(),
                 allow_process_dump: false,
                 allow_kernel_symbols: true,
-                sandboxed_cap_rights: vec!["CAP_KVM_READ_VMSTATS".to_string(), "CAP_KVM_READ_PROCLIST".to_string()],
+                sandboxed_cap_rights: vec![
+                    "CAP_KVM_READ_VMSTATS".to_string(),
+                    "CAP_KVM_READ_PROCLIST".to_string(),
+                ],
                 audit_logging: true,
             },
         );
@@ -357,13 +355,7 @@ impl FreeBsdNetgraphNgVxlanHardwareOffloadPrEngine {
         Self { vxlan_nodes }
     }
 
-    pub fn setup_vxlan_offload(
-        &mut self,
-        node: &str,
-        vni: u32,
-        group: &str,
-        port: u16,
-    ) -> String {
+    pub fn setup_vxlan_offload(&mut self, node: &str, vni: u32, group: &str, port: u16) -> String {
         let spec = NgVxlanOffloadSpec {
             vxlan_node: node.to_string(),
             vni,
@@ -800,7 +792,9 @@ impl FreeBsdMissingComponentsV72PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let draid_diff = self.draid_rebuild.configure_draid_rebuild("pool_fast", "draid2:8d:24c:2s-0", 8, 2, 2);
+        let draid_diff =
+            self.draid_rebuild
+                .configure_draid_rebuild("pool_fast", "draid2:8d:24c:2s-0", 8, 2, 2);
         let pr2 = self.submit_pr_proposal(
             "OpenZFS 2.4+ dRAID distributed spare parallel rebuild and fast sequential resilver engine",
             "jules",
@@ -883,7 +877,12 @@ mod tests {
         assert!(kq.rings.contains_key(&20));
 
         let mut casper = FreeBsdCapsicumCasperCapKvmVmMiniJailPrEngine::new();
-        let diff2 = casper.configure_cap_kvm("audit_jail", false, true, vec!["CAP_KVM_READ_VMSTATS".to_string()]);
+        let diff2 = casper.configure_cap_kvm(
+            "audit_jail",
+            false,
+            true,
+            vec!["CAP_KVM_READ_VMSTATS".to_string()],
+        );
         assert!(diff2.contains("cap_service_open(cap_chan, \"cap_kvm\")"));
         assert!(casper.kvm_delegates.contains_key("audit_jail"));
 
@@ -912,12 +911,18 @@ mod tests {
         assert!(ab.commit_update("main_box"));
 
         let mut kinst = FreeBsdDtraceKinstBranchPredictionSamplerPrEngine::new();
-        let diff4 = kinst.profile_branch_prediction("kinst::sys_read:0x28", 0xffffffff80123456, 5.0);
+        let diff4 =
+            kinst.profile_branch_prediction("kinst::sys_read:0x28", 0xffffffff80123456, 5.0);
         assert!(diff4.contains("kinst::sys_read:0x28:branch-miss"));
         assert!(kinst.branch_probes.contains_key("kinst::sys_read:0x28"));
 
         let mut kexec = FreeBsdPqcKexecSignedKernelChainPrEngine::new();
-        let diff5 = kexec.verify_and_prepare_kexec("/boot/kernel1", "/boot/kernel2", "sig_d5_abc", "fp_sha3");
+        let diff5 = kexec.verify_and_prepare_kexec(
+            "/boot/kernel1",
+            "/boot/kernel2",
+            "sig_d5_abc",
+            "fp_sha3",
+        );
         assert!(diff5.contains("kexec -l /boot/kernel2 --pqc-sig-dilithium5"));
         assert!(kexec.kernel_chains.contains_key("/boot/kernel1"));
     }

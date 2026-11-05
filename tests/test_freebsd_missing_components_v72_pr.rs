@@ -55,7 +55,10 @@ fn test_integration_freebsd_v72_all_engines() {
         "kvm_monitor_jail",
         false,
         true,
-        vec!["CAP_KVM_READ_VMSTATS".to_string(), "CAP_KVM_READ_PAGECOUNTERS".to_string()],
+        vec![
+            "CAP_KVM_READ_VMSTATS".to_string(),
+            "CAP_KVM_READ_PAGECOUNTERS".to_string(),
+        ],
     );
     assert!(d4.contains("cap_service_open(cap_chan, \"cap_kvm\")"));
     assert!(casper.kvm_delegates.contains_key("kvm_monitor_jail"));
@@ -104,5 +107,7 @@ fn test_integration_freebsd_v72_all_engines() {
         "sha3_384:98234fedca9876",
     );
     assert!(d10.contains("kexec -l /boot/kernel/kernel.v72 --pqc-sig-dilithium5"));
-    assert!(kexec.kernel_chains.contains_key("/boot/kernel/kernel.current"));
+    assert!(kexec
+        .kernel_chains
+        .contains_key("/boot/kernel/kernel.current"));
 }
