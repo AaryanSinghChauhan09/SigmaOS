@@ -266,13 +266,37 @@ impl MacOsSpotlightEngine {
         });
     }
 
+    /// Query index using zero-allocation ASCII case-insensitive substring search.
+    ///
+    /// Performance: avoids creating intermediate `String` heap allocations
+    /// (`term.to_lowercase()` and `e.title.to_lowercase()`) per index entry,
+    /// reducing memory fragmentation and CPU cycles during frequent spotlight lookups.
     pub fn query(&self, term: &str) -> Vec<SpotlightIndexEntry> {
-        let term_lower = term.to_lowercase();
         self.index
             .iter()
-            .filter(|e| e.title.to_lowercase().contains(&term_lower))
+            .filter(|e| contains_ignore_case(&e.title, term))
             .cloned()
             .collect()
+    }
+}
+
+/// Helper function for zero-allocation ASCII case-insensitive substring matching.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let n_bytes = needle.as_bytes();
+        let h_bytes = haystack.as_bytes();
+        if n_bytes.len() > h_bytes.len() {
+            return false;
+        }
+        h_bytes
+            .windows(n_bytes.len())
+            .any(|window| window.eq_ignore_ascii_case(n_bytes))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
 
@@ -502,8 +526,27 @@ mod tests {
     fn test_spotlight_and_airdrop() {
         let mut spotlight = MacOsSpotlightEngine::new();
         spotlight.add_index("Sigma Terminal", "/bin/sigma-sh", "Application");
+        spotlight.add_index("Sigma Calculator", "/bin/sigma-calc", "Application");
+        spotlight.add_index("System Settings", "/bin/sigma-settings", "System");
+
         let results = spotlight.query("Terminal");
         assert_eq!(results.len(), 1);
+        assert_eq!(results[0].title, "Sigma Terminal");
+
+        // Test case-insensitivity across uppercase and lowercase queries
+        let results_lower = spotlight.query("terminal");
+        assert_eq!(results_lower.len(), 1);
+
+        let results_upper = spotlight.query("SIGMA");
+        assert_eq!(results_upper.len(), 2);
+
+        // Empty query matches all entries
+        let results_all = spotlight.query("");
+        assert_eq!(results_all.len(), 3);
+
+        // Non-matching query
+        let results_none = spotlight.query("nonexistent");
+        assert_eq!(results_none.len(), 0);
 
         let mut airdrop = MacOsAirDropEngine::new();
         airdrop.discover_device("MacBook Pro", "192.168.1.15", true);
