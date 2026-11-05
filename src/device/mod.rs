@@ -9,6 +9,7 @@ pub mod sovereign_device_management_advancements_v77_pr;
 pub mod sovereign_device_management_advancements_v78_pr;
 pub mod sovereign_device_management_advancements_v79_pr;
 pub mod sovereign_device_management_advancements_v80_pr;
+pub mod sovereign_device_management_advancements_v81_pr;
 pub mod sovereign_device_management_inspirations_pr;
 pub mod udev_devd_rules;
 
@@ -19,5 +20,6 @@ pub use sovereign_device_management_advancements_v77_pr::*;
 pub use sovereign_device_management_advancements_v78_pr::*;
 pub use sovereign_device_management_advancements_v79_pr::*;
 pub use sovereign_device_management_advancements_v80_pr::*;
+pub use sovereign_device_management_advancements_v81_pr::*;
 pub use sovereign_device_management_inspirations_pr::*;
 pub use udev_devd_rules::*;

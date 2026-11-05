@@ -675,4 +675,6 @@ pub mod sovereign_de_wm_advancements_v90_pr;
 pub use sovereign_de_wm_advancements_v90_pr::*;
 pub mod sovereign_de_wm_advancements_v92_pr;
 pub use sovereign_de_wm_advancements_v92_pr::*;
+pub mod sovereign_de_wm_advancements_v94_pr;
+pub use sovereign_de_wm_advancements_v94_pr::*;
 pub mod app_platform;
