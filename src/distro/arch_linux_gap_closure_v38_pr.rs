@@ -206,13 +206,72 @@ impl ArchAurWebRpcClientV38 {
 
     pub fn parse_rpc_response(json: &str) -> Vec<AurPackageResultV38> {
         let mut results = Vec::new();
-        if json.contains("\"Name\":\"") {
-            results.push(AurPackageResultV38 {
-                name: "yay".to_string(),
-                version: "12.3.5".to_string(),
-                num_votes: 3500,
-                popularity: 15,
-            });
+        let mut idx = 0;
+        while let Some(rel_name_pos) = json[idx..].find("\"Name\":") {
+            let n_str = json[idx + rel_name_pos + 7..].trim_start();
+            if !n_str.starts_with('"') {
+                idx += rel_name_pos + 7;
+                continue;
+            }
+            let inner = &n_str[1..];
+            if let Some(name_end) = inner.find('"') {
+                let name = &inner[..name_end];
+                let rest = &inner[name_end + 1..];
+                let obj_boundary = rest.find('}').unwrap_or(rest.len());
+                let obj_slice = &rest[..obj_boundary];
+
+                let version = if let Some(ver_pos) = obj_slice.find("\"Version\":") {
+                    let v_str = obj_slice[ver_pos + 10..].trim_start();
+                    if v_str.starts_with('"') {
+                        let v_inner = &v_str[1..];
+                        if let Some(v_end) = v_inner.find('"') {
+                            v_inner[..v_end].to_string()
+                        } else {
+                            "1.0.0".to_string()
+                        }
+                    } else {
+                        "1.0.0".to_string()
+                    }
+                } else {
+                    "1.0.0".to_string()
+                };
+
+                let num_votes = if let Some(votes_pos) = obj_slice.find("\"NumVotes\":") {
+                    let vt_str = obj_slice[votes_pos + 11..].trim_start();
+                    let vt_end = vt_str
+                        .find(|c: char| !c.is_ascii_digit())
+                        .unwrap_or(vt_str.len());
+                    vt_str[..vt_end].parse::<u32>().unwrap_or(0)
+                } else {
+                    0
+                };
+
+                let popularity = if let Some(pop_pos) = obj_slice.find("\"Popularity\":") {
+                    let p_str = obj_slice[pop_pos + 13..].trim_start();
+                    let p_end = p_str
+                        .find(|c: char| !c.is_ascii_digit() && c != '.')
+                        .unwrap_or(p_str.len());
+                    let p_val = &p_str[..p_end];
+                    if let Some(dot) = p_val.find('.') {
+                        p_val[..dot].parse::<u32>().unwrap_or(0)
+                    } else {
+                        p_val.parse::<u32>().unwrap_or(0)
+                    }
+                } else {
+                    0
+                };
+
+                results.push(AurPackageResultV38 {
+                    name: name.to_string(),
+                    version,
+                    num_votes,
+                    popularity,
+                });
+
+                idx = (n_str.as_ptr() as usize - json.as_ptr() as usize) + 1 + name_end;
+            } else {
+                break;
+            }
         }
         results
     }
@@ -881,6 +940,19 @@ mod tests {
         let news_engine = ArchNewsAdvisoryFeedEngineV38::new();
         let pending = news_engine.check_pending_interventions(&["python"]);
         assert_eq!(pending.len(), 1);
+
+        // Verify full JSON field extraction without mock hardcoding
+        let full_aur_json = r#"{"resultcount":2,"results":[{"Name":"yay","Version":"12.3.5","NumVotes":3500,"Popularity":15.4},{"Name":"paru","Version":"2.0.3","NumVotes":1200,"Popularity":8.2}]}"#;
+        let parsed = ArchAurWebRpcClientV38::parse_rpc_response(full_aur_json);
+        assert_eq!(parsed.len(), 2);
+        assert_eq!(parsed[0].name, "yay");
+        assert_eq!(parsed[0].version, "12.3.5");
+        assert_eq!(parsed[0].num_votes, 3500);
+        assert_eq!(parsed[0].popularity, 15);
+        assert_eq!(parsed[1].name, "paru");
+        assert_eq!(parsed[1].version, "2.0.3");
+        assert_eq!(parsed[1].num_votes, 1200);
+        assert_eq!(parsed[1].popularity, 8);
     }
 
     #[test]

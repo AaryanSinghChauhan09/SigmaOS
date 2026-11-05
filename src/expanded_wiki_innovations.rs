@@ -150,35 +150,114 @@ impl Default for DebianDpkgTriggersEngine {
     }
 }
 
+/// VuXML security vulnerability advisory entry
+#[derive(Debug, Clone)]
+pub struct VuXmlAdvisory {
+    pub pkg: String,
+    pub cve_id: String,
+    pub severity: String,
+    pub fixed_version: Option<String>,
+}
+
+/// Helper function to split package strings like "openssl-3.0.13" into ("openssl", "3.0.13")
+fn parse_pkg_name_and_version(pkg_str: &str) -> Option<(&str, &str)> {
+    if let Some(dash) = pkg_str.rfind('-') {
+        let name = &pkg_str[..dash];
+        let ver = &pkg_str[dash + 1..];
+        if !ver.is_empty() && ver.chars().next().map_or(false, |c| c.is_ascii_digit()) {
+            return Some((name, ver));
+        }
+    }
+    None
+}
+
+/// Helper function for numeric segment version comparison
+fn compare_pkg_versions(v1: &str, v2: &str) -> i32 {
+    let parse_segs = |s: &str| -> Vec<u32> {
+        s.split(|c: char| c == '.' || c == '-' || c == '_')
+            .filter_map(|x| x.parse::<u32>().ok())
+            .collect()
+    };
+    let s1 = parse_segs(v1);
+    let s2 = parse_segs(v2);
+    let max_len = s1.len().max(s2.len());
+    for i in 0..max_len {
+        let n1 = s1.get(i).copied().unwrap_or(0);
+        let n2 = s2.get(i).copied().unwrap_or(0);
+        if n1 != n2 {
+            return if n1 > n2 { 1 } else { -1 };
+        }
+    }
+    0
+}
+
 /// FreeBSD `pkg audit` & `pkg autoremove` Engine
 pub struct FreeBsdPkgAuditEngine {
     pub vulnerability_cve_db: Vec<(String, String, String)>, // (pkg, cve_id, severity)
+    pub advisories: Vec<VuXmlAdvisory>,
 }
 
 impl FreeBsdPkgAuditEngine {
     pub fn new() -> Self {
         Self {
             vulnerability_cve_db: Vec::new(),
+            advisories: Vec::new(),
         }
     }
 
     pub fn add_vulnerability(&mut self, pkg: &str, cve_id: &str, severity: &str) {
         self.vulnerability_cve_db
             .push((pkg.to_string(), cve_id.to_string(), severity.to_string()));
+        self.advisories.push(VuXmlAdvisory {
+            pkg: pkg.to_string(),
+            cve_id: cve_id.to_string(),
+            severity: severity.to_string(),
+            fixed_version: None,
+        });
+    }
+
+    pub fn add_vulnerability_with_fix(
+        &mut self,
+        pkg: &str,
+        cve_id: &str,
+        severity: &str,
+        fixed_version: &str,
+    ) {
+        self.vulnerability_cve_db
+            .push((pkg.to_string(), cve_id.to_string(), severity.to_string()));
+        self.advisories.push(VuXmlAdvisory {
+            pkg: pkg.to_string(),
+            cve_id: cve_id.to_string(),
+            severity: severity.to_string(),
+            fixed_version: Some(fixed_version.to_string()),
+        });
     }
 
     /// Scans installed packages against known FreeBSD VuXML CVE database (`pkg audit`)
+    /// Performs version comparison when a fixed version is recorded in the advisory.
     pub fn audit_vulnerabilities(
         &self,
         installed_pkgs: &[String],
     ) -> Vec<(String, String, String)> {
         let mut found = Vec::new();
-        for (pkg, cve, sev) in &self.vulnerability_cve_db {
-            if installed_pkgs
-                .iter()
-                .any(|p: &String| p.starts_with(pkg.as_str()))
-            {
-                found.push((pkg.clone(), cve.clone(), sev.clone()));
+        for adv in &self.advisories {
+            for installed in installed_pkgs {
+                if let Some((name, ver)) = parse_pkg_name_and_version(installed) {
+                    if name == adv.pkg {
+                        if let Some(ref fix) = adv.fixed_version {
+                            if compare_pkg_versions(ver, fix) < 0 {
+                                found.push((adv.pkg.clone(), adv.cve_id.clone(), adv.severity.clone()));
+                                break;
+                            }
+                        } else {
+                            found.push((adv.pkg.clone(), adv.cve_id.clone(), adv.severity.clone()));
+                            break;
+                        }
+                    }
+                } else if installed.starts_with(&adv.pkg) {
+                    found.push((adv.pkg.clone(), adv.cve_id.clone(), adv.severity.clone()));
+                    break;
+                }
             }
         }
         found
@@ -866,6 +945,19 @@ mod expanded_wiki_tests {
         let found = audit.audit_vulnerabilities(&installed);
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].1, "CVE-2024-0001");
+
+        // Version-aware CVE tests
+        let mut audit2 = FreeBsdPkgAuditEngine::new();
+        audit2.add_vulnerability_with_fix("curl", "CVE-2024-0002", "Medium", "8.3.0");
+        audit2.add_vulnerability_with_fix("openssl", "CVE-2024-0003", "Critical", "3.6.0");
+
+        // curl-8.2.1 is vulnerable (< 8.3.0)
+        // openssl-3.10.0 is NOT vulnerable (3.10.0 > 3.6.0, testing numeric segments over ASCII)
+        let installed2 = vec!["curl-8.2.1".to_string(), "openssl-3.10.0".to_string()];
+        let found2 = audit2.audit_vulnerabilities(&installed2);
+        assert_eq!(found2.len(), 1);
+        assert_eq!(found2[0].0, "curl");
+        assert_eq!(found2[0].1, "CVE-2024-0002");
 
         let orphans = audit.autoremove_orphans(
             &["orphan-lib".to_string(), "core-pkg".to_string()],

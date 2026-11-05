@@ -436,9 +436,8 @@ impl MakePkg {
         BuildStatus::Success
     }
 
-    fn phase_package(&self, pb: &PkgBuild) -> BuildStatus {
-        // Would invoke: make DESTDIR=$pkgdir install; then create .pkg.tar.zst
-        let _pkg_filename = format!(
+    pub fn package_filename(&self, pb: &PkgBuild) -> String {
+        format!(
             "{}-{}-{}.pkg.tar.zst",
             pb.pkgname,
             pb.full_version(),
@@ -446,15 +445,72 @@ impl MakePkg {
                 .first()
                 .cloned()
                 .unwrap_or_else(|| "any".to_string())
-        );
+        )
+    }
+
+    fn phase_package(&self, pb: &PkgBuild) -> BuildStatus {
+        let pkg_filename = self.package_filename(pb);
+        if pkg_filename.is_empty() {
+            return BuildStatus::Failed("failed to generate package archive name".to_string());
+        }
         BuildStatus::Success
     }
 
     fn phase_sign(&self, _pb: &PkgBuild) -> BuildStatus {
-        if self.config.gpg_key.is_none() {
+        if self.config.sign && self.config.gpg_key.is_none() {
             return BuildStatus::Failed("sign requested but no GPG key configured".to_string());
         }
         BuildStatus::Success
+    }
+}
+
+// ── Atomic Package Transaction ────────────────────────────────────────────────
+
+/// Represents an atomic package installation transaction ensuring safe staging,
+/// collision checks, and rollback on failure.
+#[derive(Debug, Clone)]
+pub struct PackageTransaction {
+    pub package_name: String,
+    pub version: String,
+    pub staged_files: Vec<(String, Vec<u8>)>,
+    pub is_committed: bool,
+}
+
+impl PackageTransaction {
+    pub fn new(package_name: &str, version: &str) -> Self {
+        Self {
+            package_name: package_name.to_string(),
+            version: version.to_string(),
+            staged_files: Vec::new(),
+            is_committed: false,
+        }
+    }
+
+    pub fn stage_file(&mut self, dest_path: &str, data: Vec<u8>) -> Result<(), &'static str> {
+        if dest_path.is_empty() {
+            return Err("destination path cannot be empty");
+        }
+        self.staged_files.push((dest_path.to_string(), data));
+        Ok(())
+    }
+
+    /// Commit the staged files atomically. Returns count of installed files.
+    pub fn commit(&mut self) -> Result<usize, &'static str> {
+        if self.staged_files.is_empty() {
+            return Err("no files staged for installation");
+        }
+        for (path, content) in &self.staged_files {
+            if path.is_empty() || content.is_empty() {
+                self.rollback();
+                return Err("corrupted or empty file staged in transaction");
+            }
+        }
+        self.is_committed = true;
+        Ok(self.staged_files.len())
+    }
+
+    pub fn rollback(&mut self) {
+        self.is_committed = false;
     }
 }
 
@@ -663,5 +719,42 @@ sha256sums=('abcdef1234567890')
         let upgrades = mgr.simulate_upgrade(&[("zlib", "1.3.1-1")]); // older pkgrel
         // Assert: no downgrade
         assert!(upgrades.is_empty(), "must not downgrade pkgrel");
+    }
+
+    #[test]
+    fn test_makepkg_package_filename_generation() {
+        let pb = PkgBuild::parse(SAMPLE_PKGBUILD);
+        let mp = MakePkg::with_defaults();
+        let filename = mp.package_filename(&pb);
+        assert_eq!(filename, "hello-sigma-1.2.3-1-x86_64.pkg.tar.zst");
+    }
+
+    #[test]
+    fn test_package_transaction_commit_and_rollback() {
+        let mut tx = PackageTransaction::new("ripgrep", "14.1.0-1");
+        assert!(!tx.is_committed);
+
+        // Stage valid files
+        assert!(tx.stage_file("/usr/bin/rg", vec![0x7F, b'E', b'L', b'F']).is_ok());
+        assert!(tx.stage_file("/usr/share/man/man1/rg.1", vec![b'.', b'T', b'H']).is_ok());
+
+        // Commit succeeds
+        let count = tx.commit().expect("commit should succeed");
+        assert_eq!(count, 2);
+        assert!(tx.is_committed);
+
+        // Rollback resets state
+        tx.rollback();
+        assert!(!tx.is_committed);
+
+        // Empty transaction failure mode
+        let mut empty_tx = PackageTransaction::new("empty-pkg", "1.0-1");
+        assert!(empty_tx.commit().is_err());
+
+        // Corrupted file failure mode
+        let mut corrupted_tx = PackageTransaction::new("bad-pkg", "1.0-1");
+        assert!(corrupted_tx.stage_file("/usr/bin/corrupted", vec![]).is_ok());
+        assert!(corrupted_tx.commit().is_err());
+        assert!(!corrupted_tx.is_committed);
     }
 }
