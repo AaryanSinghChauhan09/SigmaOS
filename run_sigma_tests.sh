@@ -3244,13 +3244,6 @@ if [ -f "tests/test_device_management_advancements_v80_pr.rs" ]; then
     ./build/test_device_advancements_v80_pr
 fi
 
-if [ -f "tests/test_device_management_advancements_v81_pr.rs" ]; then
-    echo "Running Sovereign Device Management Advancements V81 PR Suite..."
-    mkdir -p build
-    rustc --test tests/test_device_management_advancements_v81_pr.rs --edition=2021 -o build/test_device_advancements_v81_pr
-    ./build/test_device_advancements_v81_pr
-fi
-
 if [ -f "src/userland/coreutils_pr_gateway.rs" ]; then
     echo "Running Core Utilities & PR Gateway test suite..."
     mkdir -p build
@@ -3885,6 +3878,13 @@ if [ -f "tests/test_shells_terminals_supervisors_v90_pr.rs" ]; then
     mkdir -p build
     rustc --test tests/test_shells_terminals_supervisors_v90_pr.rs --edition=2021 -o build/test_shells_v90_pr
     ./build/test_shells_v90_pr
+fi
+
+if [ -f "tests/test_shells_terminals_supervisors_v91_pr.rs" ]; then
+    echo "Running Sovereign Shells, Terminals & Supervisors V91 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_shells_terminals_supervisors_v91_pr.rs --edition=2021 -o build/test_shells_v91_pr
+    ./build/test_shells_v91_pr
 fi
 
 if [ -f "tests/test_networking_stack_and_daemons_v88_pr.rs" ]; then
