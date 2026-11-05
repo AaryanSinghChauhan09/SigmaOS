@@ -1,0 +1,346 @@
+# SigmaOS Consolidated Component Suites Specification
+# Authoritative architectural framework for multi-repository consolidation.
+# Adheres to: Avoid Fragmentation, Maximise Cohesion, Minimise Coupling,
+# Separation of Concerns, Single Responsibility, Uniform Access, Gall's Law, KISS, DRY.
+
+[metadata]
+version = "1.0.0"
+updated = "2026-11-05"
+description = "Canonical federation and consolidation mapping for SigmaOS modular repositories"
+governance = "SigmaOS Architecture Authority"
+
+# ==============================================================================
+# SUITE 1: OFFICE & PRODUCTIVITY
+# ==============================================================================
+[suites.office]
+canonical = "SigmaOS-office"
+category = "Productivity & Documents"
+tier = 3
+description = "Consolidated productivity suite integrating word processing, spreadsheets, presentations, vector drawing, database frontends, and MathML rendering."
+upstream = ["https://github.com/linuxmint/libreoffice-style-mint", "https://github.com/omacom/omawrite"]
+consolidates = [
+    "SigmaOS-genoffice",
+    "SigmaOS-genoffice-docs",
+    "SigmaOS-genoffice-html",
+    "SigmaOS-genoffice-markdown",
+    "SigmaOS-genoffice-pdf",
+    "SigmaOS-genoffice-sheet",
+    "SigmaOS-genoffice-slides",
+    "SigmaOS-genoffice-tests",
+    "SigmaOS-betteroffice-diagrams",
+    "SigmaOS-betteroffice-documents",
+    "SigmaOS-betteroffice-slides",
+    "SigmaOS-betteroffice-spreadsheets",
+    "SigmaOS-openoffice-base",
+    "SigmaOS-openoffice-calc",
+    "SigmaOS-openoffice-draw",
+    "SigmaOS-openoffice-impress",
+    "SigmaOS-openoffice-math",
+    "SigmaOS-openoffice-writer",
+    "SigmaOS-office-core",
+    "SigmaOS-office-diagrams",
+    "SigmaOS-office-documents",
+    "SigmaOS-office-html",
+    "SigmaOS-office-integration",
+    "SigmaOS-office-interop",
+    "SigmaOS-office-markdown",
+    "SigmaOS-office-packaging",
+    "SigmaOS-office-pdf",
+    "SigmaOS-office-slides",
+    "SigmaOS-office-spreadsheets",
+    "SigmaOS-office-tests",
+    "SigmaOS-office-web",
+    "SigmaOS-onlyoffice",
+    "SigmaOS-spreadsheet",
+    "SigmaOS-diagram",
+    "SigmaOS-presentation"
+]
+provides = ["document-engine", "spreadsheet-engine", "presentation-engine", "vector-draw-engine", "math-engine", "database-engine", "odf-ooxml-bridge"]
+
+# ==============================================================================
+# SUITE 2: CRAFT CREATIVE & MEDIA WORKSTATION
+# ==============================================================================
+[suites.craft]
+canonical = "SigmaOS-craft-core"
+category = "Creative & Design"
+tier = 3
+description = "Consolidated digital creation suite for procedural animation, vector drafting, color spaces, audio processing, 3D modelling, and publishing."
+upstream = ["https://github.com/omacom/aether", "https://github.com/linuxmint/drawing"]
+consolidates = [
+    "SigmaOS-craft-3d",
+    "SigmaOS-craft-ani",
+    "SigmaOS-craft-animation",
+    "SigmaOS-craft-art",
+    "SigmaOS-craft-cad",
+    "SigmaOS-craft-craftlibs",
+    "SigmaOS-craft-libs",
+    "SigmaOS-craft-deck",
+    "SigmaOS-craft-design",
+    "SigmaOS-craft-effect",
+    "SigmaOS-craft-fig",
+    "SigmaOS-craft-film",
+    "SigmaOS-craft-font",
+    "SigmaOS-craft-grid",
+    "SigmaOS-craft-light",
+    "SigmaOS-craft-pdf",
+    "SigmaOS-craft-photo",
+    "SigmaOS-craft-print",
+    "SigmaOS-craft-sound",
+    "SigmaOS-craft-vector",
+    "SigmaOS-craft-voice",
+    "SigmaOS-craft-word"
+]
+provides = ["animation-engine", "color-spaces", "vector-canvas", "audio-processing", "cad-primitives", "typography-engine"]
+
+# ==============================================================================
+# SUITE 3: DEBIAN & APT PACKAGING SUBSYSTEM
+# ==============================================================================
+[suites.apt]
+canonical = "SigmaOS-daemon-apt"
+category = "Package Management"
+tier = 2
+description = "Consolidated APT/dpkg transaction daemon, source repository indexer, package cache evaluator, and policy management."
+upstream = ["https://github.com/linuxmint/aptdaemon", "https://github.com/linuxmint/apturl"]
+consolidates = [
+    "SigmaOS-apt-cache",
+    "SigmaOS-apt-cdrom",
+    "SigmaOS-apt-config",
+    "SigmaOS-apt-extracttemplates",
+    "SigmaOS-apt-file",
+    "SigmaOS-apt-ftparchive",
+    "SigmaOS-apt-get",
+    "SigmaOS-apt-key",
+    "SigmaOS-apt-listbugs",
+    "SigmaOS-apt-listchanges",
+    "SigmaOS-apt-mark",
+    "SigmaOS-apt-show-source",
+    "SigmaOS-apt-show-versions",
+    "SigmaOS-apt-sortpkgs",
+    "SigmaOS-apt-transport-https",
+    "SigmaOS-apt-transport-tor",
+    "SigmaOS-apt-utils",
+    "SigmaOS-apturl",
+    "SigmaOS-dpkg",
+    "SigmaOS-gdebi"
+]
+provides = ["apt-daemon", "dpkg-parser", "repository-indexer", "package-cache", "deb-installer"]
+
+# ==============================================================================
+# SUITE 4: ARCH LINUX & ALPM PACKAGING SUBSYSTEM
+# ==============================================================================
+[suites.alpm]
+canonical = "SigmaOS-packages"
+category = "Package Management"
+tier = 2
+description = "Consolidated Arch Linux and ALPM runtime integration, pacman database synchronization, and binary package manifest parsing."
+upstream = ["https://github.com/linuxmint/mintsources", "https://github.com/omacom/omarchy-pkgs"]
+consolidates = [
+    "SigmaOS-alpm-go",
+    "SigmaOS-alpm-hooks",
+    "SigmaOS-alpm-python",
+    "SigmaOS-alpm-rust",
+    "SigmaOS-pacman",
+    "SigmaOS-linux-arch",
+    "SigmaOS-packages-kit",
+    "SigmaOS-packages-tools",
+    "SigmaOS-package-manager",
+    "SigmaOS-package-signing"
+]
+provides = ["alpm-engine", "pacman-bridge", "package-signing", "repo-sync"]
+
+# ==============================================================================
+# SUITE 5: DESKTOP ENVIRONMENT & CINNAMON WORKSPACE
+# ==============================================================================
+[suites.desktop]
+canonical = "SigmaOS-desktop-environment"
+category = "Desktop & Window Management"
+tier = 4
+description = "Consolidated graphical desktop environment integrating Cinnamon shell, window compositor, display manager, session coordinator, and settings."
+upstream = ["https://github.com/linuxmint/cinnamon", "https://github.com/linuxmint/cinnamon-desktop"]
+consolidates = [
+    "SigmaOS-cinnamon",
+    "SigmaOS-cinnamon-control-center",
+    "SigmaOS-cinnamon-desktop",
+    "SigmaOS-cinnamon-menus",
+    "SigmaOS-cinnamon-screensaver",
+    "SigmaOS-cinnamon-session",
+    "SigmaOS-cinnamon-settings-daemon",
+    "SigmaOS-cinnamon-themes",
+    "SigmaOS-desktop",
+    "SigmaOS-desktop-app-platform",
+    "SigmaOS-desktop-configuration",
+    "SigmaOS-desktop-library",
+    "SigmaOS-desktop-portal",
+    "SigmaOS-desktop-session",
+    "SigmaOS-display-manager",
+    "SigmaOS-greeter",
+    "SigmaOS-session-manager",
+    "SigmaOS-session-manager2"
+]
+provides = ["desktop-shell", "window-manager", "display-manager", "settings-daemon", "session-lifecycle"]
+
+# ==============================================================================
+# SUITE 6: THEMING, PALETTES & VISUAL ASSETS
+# ==============================================================================
+[suites.theming]
+canonical = "SigmaOS-theming-native"
+category = "Theming & Appearance"
+tier = 4
+description = "Consolidated styling and design token engine synchronizing GTK, Qt, Wayland compositors, and terminal palette themes."
+upstream = ["https://github.com/linuxmint/mint-themes", "https://github.com/omacom/aether"]
+consolidates = [
+    "SigmaOS-theme-color",
+    "SigmaOS-theme-cursor",
+    "SigmaOS-theme-desktop-environment",
+    "SigmaOS-theme-engine",
+    "SigmaOS-theme-gtk3",
+    "SigmaOS-theme-icon",
+    "SigmaOS-theme-marketplace",
+    "SigmaOS-theme-mdm",
+    "SigmaOS-theme-registry",
+    "SigmaOS-theme-support",
+    "SigmaOS-theme-sync",
+    "SigmaOS-theme-y"
+]
+provides = ["theme-token-engine", "gtk-palette-sync", "icon-theme-cache", "cursor-theme-manager"]
+
+# ==============================================================================
+# SUITE 7: SYSTEM UPDATE & RECOVERY SNAPSHOTS
+# ==============================================================================
+[suites.update]
+canonical = "SigmaOS-update"
+category = "System Services"
+tier = 2
+description = "Consolidated system lifecycle manager handling atomic rolling updates, safety tier filtering, Btrfs/ZFS snapshots, and rollback orchestration."
+upstream = ["https://github.com/linuxmint/mintupdate", "https://github.com/linuxmint/timeshift"]
+consolidates = [
+    "SigmaOS-backup-tool",
+    "SigmaOS-mintbackup",
+    "SigmaOS-mintupdate",
+    "SigmaOS-timeshift",
+    "SigmaOS-upgrade",
+    "SigmaOS-upgrade-info",
+    "SigmaOS-upgrade-legacy"
+]
+provides = ["update-evaluator", "snapshot-orchestrator", "rollback-engine", "backup-manager"]
+
+# ==============================================================================
+# SUITE 8: FILE MANAGEMENT & LOCAL SHARING
+# ==============================================================================
+[suites.file_system]
+canonical = "SigmaOS-file-manager-system"
+category = "File Management"
+tier = 3
+description = "Consolidated file management platform supporting dual-pane browsing, bulk regex renaming, note drafting, and zero-config local LAN file sharing."
+upstream = ["https://github.com/linuxmint/nemo", "https://github.com/linuxmint/warpinator", "https://github.com/linuxmint/bulky"]
+consolidates = [
+    "SigmaOS-file-manager",
+    "SigmaOS-file-associations",
+    "SigmaOS-file-writer",
+    "SigmaOS-nemo",
+    "SigmaOS-renamer-bulk",
+    "SigmaOS-renamer-file",
+    "SigmaOS-thingy",
+    "SigmaOS-LAN-fileshare"
+]
+provides = ["vfs-explorer", "bulk-renamer", "lan-fileshare", "mime-associations", "quick-note-writer"]
+
+# ==============================================================================
+# SUITE 9: SCREEN, CAPTURE & RECORDING
+# ==============================================================================
+[suites.screen]
+canonical = "SigmaOS-screen-recorder"
+category = "Desktop Utilities"
+tier = 3
+description = "Consolidated display capture suite providing Wayland-native screen recording, interactive area screenshotting, and screensaver locking."
+upstream = ["https://github.com/omacom/omasnap", "https://github.com/omacom/monologue"]
+consolidates = [
+    "SigmaOS-screen-saver",
+    "SigmaOS-screen-shot",
+    "SigmaOS-screen-recorder"
+]
+provides = ["screen-capture", "screencast-recorder", "screen-lock-security"]
+
+# ==============================================================================
+# SUITE 10: AUDIO, STREAMING & MULTIMEDIA
+# ==============================================================================
+[suites.multimedia]
+canonical = "SigmaOS-player"
+category = "Media & Workstation"
+tier = 3
+description = "Consolidated multimedia stack incorporating low-latency audio tuning, tray status indicators, internet radio streams, and video playback."
+upstream = ["https://github.com/linuxmint/hypnotix", "https://github.com/linuxmint/xplayer"]
+consolidates = [
+    "SigmaOS-audio",
+    "SigmaOS-audio-tuner",
+    "SigmaOS-indicator-sound",
+    "SigmaOS-indicator-sound2",
+    "SigmaOS-player-library",
+    "SigmaOS-radio-stream",
+    "SigmaOS-reel",
+    "SigmaOS-stream"
+]
+provides = ["media-playback", "audio-routing-control", "stream-resolver", "tray-volume-indicator"]
+
+# ==============================================================================
+# SUITE 11: DATABASE & RDBMS CONNECTIVITY
+# ==============================================================================
+[suites.database]
+canonical = "SigmaOS-database"
+category = "Data & Analytics"
+tier = 3
+description = "Consolidated database client abstractions connecting PostgreSQL, DuckDB, Apache Arrow Flight, and enterprise analytics servers."
+upstream = ["native"]
+consolidates = [
+    "SigmaOS-rdbms-apache",
+    "SigmaOS-rdbms-dbearer",
+    "SigmaOS-rdbms-dbeaver",
+    "SigmaOS-rdbms-duckdb",
+    "SigmaOS-rdbms-metabase",
+    "SigmaOS-rdbms-postgresql",
+    "SigmaOS-rdbms-superset"
+]
+provides = ["universal-db-connector", "sql-query-executor", "schema-inspector", "arrow-flight-client"]
+
+# ==============================================================================
+# SUITE 12: DEVELOPER & AI AGENT PLATFORM
+# ==============================================================================
+[suites.developer_tools]
+canonical = "SigmaOS-dev-tools"
+category = "Developer Tools"
+tier = 3
+description = "Consolidated developer toolchain and autonomous coding assistant runtime incorporating command repls, agent coordination, and text editor bridges."
+upstream = ["https://github.com/linuxmint/mint-dev-tools", "https://github.com/omacom/herdr"]
+consolidates = [
+    "SigmaOS-tools-command-code",
+    "SigmaOS-tools-commandcode",
+    "SigmaOS-tools-deepseek-coder",
+    "SigmaOS-tools-deepseekcoder",
+    "SigmaOS-tools-hermes-agent",
+    "SigmaOS-tools-hermesagent",
+    "SigmaOS-tools-notepadpp",
+    "SigmaOS-tools-notepadplusplus",
+    "SigmaOS-ai-assistant",
+    "SigmaOS-ai-governance",
+    "SigmaOS-ai-models",
+    "SigmaOS-tools"
+]
+provides = ["repl-auditor", "agent-orchestrator", "ai-inference-adapter", "scintilla-editor-bridge"]
+
+# ==============================================================================
+# SUITE 13: DOCUMENTATION & USER GUIDANCE
+# ==============================================================================
+[suites.documentation]
+canonical = "SigmaOS-guide-docs"
+category = "Documentation"
+tier = 5
+description = "Consolidated documentation portal compiling developer handbooks, installation runbooks, translation catalogues, and troubleshooting guides."
+upstream = ["https://github.com/linuxmint/mintdoc"]
+consolidates = [
+    "SigmaOS-guide-developer",
+    "SigmaOS-guide-installation",
+    "SigmaOS-guide-translations",
+    "SigmaOS-guide-troubleshooting",
+    "SigmaOS-guide-user"
+]
+provides = ["man-pages", "info-pages", "doc-catalog", "translation-matrix"]
