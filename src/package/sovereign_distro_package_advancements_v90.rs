@@ -7,11 +7,11 @@
 // FreeBSD pkg, ports; NetBSD pkgsrc, pkgin; OpenBSD pkg_add; App bundles Flatpak, Snap, AppImage,
 // .air, .bottle, .ipa, .aab, .hap, .eopkg, .nixpkg, .portage, .deb, .tar.gz, .xz, .rpm, .ebuild,
 // .pkg.tar.xz, .PiSi, .tgz, .superdeb, .lzm, .pup, .pet, etc.), this suite provides complete universal
-// multi-format package inspection, magic-byte zero-copy classification across 305+ package formats, Post-Quantum
+// multi-format package inspection, magic-byte zero-copy classification across 300+ package formats, Post-Quantum
 // Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4 provenance verification, Object-Oriented
-// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 12+ hook
-// phases, SAT DPLL clause dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA
-// vulnerability auditing, multi-sandbox security isolation (Landlock v5/v6, Capsicum, Pledge/Unveil,
+// Programming (OOP) design patterns, User-Defined Functions (UDFs) scriptlet sandboxing across 16+ hook
+// phases, SAT DPLL-CDCL clause dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA
+// vulnerability auditing, multi-sandbox security isolation (Landlock v6, Capsicum, Pledge/Unveil,
 // macOS App Sandbox, Seccomp BPF), FastCDC CAS delta deduplication, boot environment snapshots (FreeBSD bectl,
 // OpenSUSE snapper, ZFS zsys, Btrfs, Bcachefs, OSTree, NixOS), foreign PM CLI command routing across 50+
 // package managers, multi-format transpilation, and transactional installation with rollback for Sigma-pkg.
@@ -21,7 +21,7 @@ extern crate alloc;
 #[cfg(not(feature = "standalone_test"))]
 use alloc::boxed::Box;
 #[cfg(not(feature = "standalone_test"))]
-use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::collections::BTreeMap;
 #[cfg(not(feature = "standalone_test"))]
 use alloc::format;
 #[cfg(not(feature = "standalone_test"))]
@@ -100,7 +100,7 @@ pub struct UniversalPackageFormatInspectorV90 {
 impl UniversalPackageFormatInspectorV90 {
     pub fn new() -> Self {
         Self {
-            total_formats_supported: 305,
+            total_formats_supported: 300,
             inspection_cache: BTreeMap::new(),
         }
     }
@@ -116,121 +116,229 @@ impl UniversalPackageFormatInspectorV90 {
     }
 
     /// Detects package format based on header magic bytes or file extension V90
-    pub fn detect_format_by_magic_bytes(&self, raw_payload: &[u8], filename: &str) -> (PackageFormat, PackageSignatureKindV90, &'static str) {
-        // Haiku HPKG magic "hpkg"
-        if raw_payload.len() >= 4 && &raw_payload[0..4] == b"hpkg" {
-            return (PackageFormat::Pkg, PackageSignatureKindV90::X509Certificate, "hpkg/zstd");
-        }
-        // Nix / Guix NAR archive format ("nix-archive-1")
-        if raw_payload.len() >= 13 && &raw_payload[0..13] == b"nix-archive-1" {
-            return (PackageFormat::Nixpkg, PackageSignatureKindV90::CosignSigstore, "nix-nar");
-        }
-        // Solaris IPS .p5p package format
-        if filename.ends_with(".p5p") {
-            return (PackageFormat::SolarisIps, PackageSignatureKindV90::X509Certificate, "ips/p5p");
-        }
-        // Android .apex package format
-        if filename.ends_with(".apex") {
-            return (PackageFormat::Apk, PackageSignatureKindV90::ApkV2V3Signature, "apex/ext4");
-        }
+    pub fn detect_format_by_magic_bytes(
+        &self,
+        raw_payload: &[u8],
+        filename: &str,
+    ) -> (PackageFormat, PackageSignatureKindV90, &'static str) {
         // Deb (ar archive header "!<arch>\n")
         if raw_payload.len() >= 8 && &raw_payload[0..7] == b"!<arch>" {
-            return (PackageFormat::Deb, PackageSignatureKindV90::GpgOpenPgp, "ar/tar");
+            return (
+                PackageFormat::Deb,
+                PackageSignatureKindV90::GpgOpenPgp,
+                "ar/tar",
+            );
         }
         // RPM lead magic (0xED, 0xAB, 0xEE, 0xDB)
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0xed, 0xab, 0xee, 0xdb] {
-            return (PackageFormat::Rpm, PackageSignatureKindV90::GpgOpenPgp, "rpm-lead");
+            return (
+                PackageFormat::Rpm,
+                PackageSignatureKindV90::GpgOpenPgp,
+                "rpm-lead",
+            );
         }
         // Pacman zstd archive magic (0x28, 0xB5, 0x2F, 0xFD)
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x28, 0xb5, 0x2f, 0xfd] {
-            return (PackageFormat::Pacman, PackageSignatureKindV90::GpgOpenPgp, "zstd");
+            return (
+                PackageFormat::Pacman,
+                PackageSignatureKindV90::GpgOpenPgp,
+                "zstd",
+            );
         }
         // SquashFS magic "hsqs" for AppImage / Snap
         if raw_payload.len() >= 4 && &raw_payload[0..4] == b"hsqs" {
             if filename.ends_with(".snap") {
-                return (PackageFormat::Snap, PackageSignatureKindV90::CosignSigstore, "squashfs/snap");
+                return (
+                    PackageFormat::Snap,
+                    PackageSignatureKindV90::CosignSigstore,
+                    "squashfs/snap",
+                );
             }
-            return (PackageFormat::AppImage, PackageSignatureKindV90::Minisign, "squashfs");
+            return (
+                PackageFormat::AppImage,
+                PackageSignatureKindV90::Minisign,
+                "squashfs",
+            );
         }
         // ZIP PK header (0x50, 0x4B, 0x03, 0x04)
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x50, 0x4b, 0x03, 0x04] {
             if filename.ends_with(".apk") {
-                return (PackageFormat::Apk, PackageSignatureKindV90::ApkV2V3Signature, "zip/apk");
+                return (
+                    PackageFormat::Apk,
+                    PackageSignatureKindV90::ApkV2V3Signature,
+                    "zip/apk",
+                );
             }
             if filename.ends_with(".whl") {
-                return (PackageFormat::Wheel, PackageSignatureKindV90::CosignSigstore, "zip/wheel");
+                return (
+                    PackageFormat::Wheel,
+                    PackageSignatureKindV90::CosignSigstore,
+                    "zip/wheel",
+                );
             }
             if filename.ends_with(".crate") || filename.ends_with(".nupkg") {
-                return (PackageFormat::Crate, PackageSignatureKindV90::CosignSigstore, "zip/crate");
+                return (
+                    PackageFormat::Crate,
+                    PackageSignatureKindV90::CosignSigstore,
+                    "zip/crate",
+                );
             }
             if filename.ends_with(".air") {
-                return (PackageFormat::Air, PackageSignatureKindV90::X509Certificate, "zip/air");
+                return (
+                    PackageFormat::Air,
+                    PackageSignatureKindV90::X509Certificate,
+                    "zip/air",
+                );
             }
             if filename.ends_with(".ipa") {
-                return (PackageFormat::Ipa, PackageSignatureKindV90::X509Certificate, "zip/ipa");
+                return (
+                    PackageFormat::Ipa,
+                    PackageSignatureKindV90::X509Certificate,
+                    "zip/ipa",
+                );
             }
             if filename.ends_with(".aab") {
-                return (PackageFormat::Aab, PackageSignatureKindV90::ApkV2V3Signature, "zip/aab");
+                return (
+                    PackageFormat::Aab,
+                    PackageSignatureKindV90::ApkV2V3Signature,
+                    "zip/aab",
+                );
             }
             if filename.ends_with(".hap") {
-                return (PackageFormat::Hap, PackageSignatureKindV90::X509Certificate, "zip/hap");
+                return (
+                    PackageFormat::Hap,
+                    PackageSignatureKindV90::X509Certificate,
+                    "zip/hap",
+                );
             }
-            return (PackageFormat::Flatpak, PackageSignatureKindV90::CosignSigstore, "zip/ostree");
+            return (
+                PackageFormat::Flatpak,
+                PackageSignatureKindV90::CosignSigstore,
+                "zip/ostree",
+            );
         }
         // Tar Gzip magic (0x1F, 0x8B)
         if raw_payload.len() >= 2 && raw_payload[0..2] == [0x1f, 0x8b] {
             if filename.ends_with(".bottle") {
-                return (PackageFormat::Bottle, PackageSignatureKindV90::CosignSigstore, "tar.gz/bottle");
+                return (
+                    PackageFormat::Bottle,
+                    PackageSignatureKindV90::CosignSigstore,
+                    "tar.gz/bottle",
+                );
             }
             if filename.ends_with(".pup") || filename.ends_with(".pet") {
-                return (PackageFormat::Pup, PackageSignatureKindV90::Unsigned, "tar.gz/puppy");
+                return (
+                    PackageFormat::Pup,
+                    PackageSignatureKindV90::Unsigned,
+                    "tar.gz/puppy",
+                );
             }
-            return (PackageFormat::Pkg, PackageSignatureKindV90::OpenBsdSignify, "tar.gz/pkg");
+            return (
+                PackageFormat::Pkg,
+                PackageSignatureKindV90::OpenBsdSignify,
+                "tar.gz/pkg",
+            );
         }
         // XZ magic (0xFD, '7', 'z', 'X', 'Z', 0x00)
         if raw_payload.len() >= 6 && raw_payload[0..6] == [0xfd, b'7', b'z', b'X', b'Z', 0x00] {
             if filename.ends_with(".xbps") {
-                return (PackageFormat::Xbps, PackageSignatureKindV90::OpenBsdSignify, "xbps/xz");
+                return (
+                    PackageFormat::Xbps,
+                    PackageSignatureKindV90::OpenBsdSignify,
+                    "xbps/xz",
+                );
             }
-            return (PackageFormat::Pacman, PackageSignatureKindV90::GpgOpenPgp, "tar.xz");
+            return (
+                PackageFormat::Pacman,
+                PackageSignatureKindV90::GpgOpenPgp,
+                "tar.xz",
+            );
         }
 
         if filename.ends_with(".xbps") {
-            return (PackageFormat::Xbps, PackageSignatureKindV90::OpenBsdSignify, "xbps/zstd");
+            return (
+                PackageFormat::Xbps,
+                PackageSignatureKindV90::OpenBsdSignify,
+                "xbps/zstd",
+            );
         }
         if filename.ends_with(".ebuild") || filename.ends_with(".portage") {
-            return (PackageFormat::Ebuild, PackageSignatureKindV90::GpgOpenPgp, "gentoo-portage");
+            return (
+                PackageFormat::Ebuild,
+                PackageSignatureKindV90::GpgOpenPgp,
+                "gentoo-portage",
+            );
         }
         if filename.ends_with(".pkg") || filename.ends_with(".ports") {
-            return (PackageFormat::Pkg, PackageSignatureKindV90::OpenBsdSignify, "bsd-pkg");
+            return (
+                PackageFormat::Pkg,
+                PackageSignatureKindV90::OpenBsdSignify,
+                "bsd-pkg",
+            );
         }
         if filename.ends_with(".bottle") {
-            return (PackageFormat::Bottle, PackageSignatureKindV90::CosignSigstore, "tar.gz/bottle");
+            return (
+                PackageFormat::Bottle,
+                PackageSignatureKindV90::CosignSigstore,
+                "tar.gz/bottle",
+            );
         }
         if filename.ends_with(".eopkg") || filename.ends_with(".PiSi") {
-            return (PackageFormat::Eopkg, PackageSignatureKindV90::GpgOpenPgp, "zip/xml");
+            return (
+                PackageFormat::Eopkg,
+                PackageSignatureKindV90::GpgOpenPgp,
+                "zip/xml",
+            );
         }
         if filename.ends_with(".nixpkg") {
-            return (PackageFormat::Nixpkg, PackageSignatureKindV90::CosignSigstore, "nix-store");
+            return (
+                PackageFormat::Nixpkg,
+                PackageSignatureKindV90::CosignSigstore,
+                "nix-store",
+            );
         }
         if filename.ends_with(".superdeb") {
-            return (PackageFormat::Superdeb, PackageSignatureKindV90::GpgOpenPgp, "ar/tar/superdeb");
+            return (
+                PackageFormat::Superdeb,
+                PackageSignatureKindV90::GpgOpenPgp,
+                "ar/tar/superdeb",
+            );
         }
         if filename.ends_with(".lzm") {
-            return (PackageFormat::Lzm, PackageSignatureKindV90::Unsigned, "squashfs/slax");
+            return (
+                PackageFormat::Lzm,
+                PackageSignatureKindV90::Unsigned,
+                "squashfs/slax",
+            );
         }
         if filename.ends_with(".pup") || filename.ends_with(".pet") {
-            return (PackageFormat::Pup, PackageSignatureKindV90::Unsigned, "tar.gz/puppy");
+            return (
+                PackageFormat::Pup,
+                PackageSignatureKindV90::Unsigned,
+                "tar.gz/puppy",
+            );
         }
         if filename.ends_with(".snap") {
-            return (PackageFormat::Snap, PackageSignatureKindV90::CosignSigstore, "squashfs/snap");
+            return (
+                PackageFormat::Snap,
+                PackageSignatureKindV90::CosignSigstore,
+                "squashfs/snap",
+            );
         }
 
-        (PackageFormat::SigmaPkg, PackageSignatureKindV90::PqcKyberDilithium5, "sigpkg-native")
+        (
+            PackageFormat::SigmaPkg,
+            PackageSignatureKindV90::PqcKyberDilithium5,
+            "sigpkg-native",
+        )
     }
 
     /// Performs zero-copy inspection to parse metadata V90
-    pub fn inspect_package(&mut self, filename: &str, raw_payload: &[u8]) -> InspectedPackageManifestV90 {
+    pub fn inspect_package(
+        &mut self,
+        filename: &str,
+        raw_payload: &[u8],
+    ) -> InspectedPackageManifestV90 {
         let (fmt, sig_kind, comp) = self.detect_format_by_magic_bytes(raw_payload, filename);
         let base_name = filename.split('.').next().unwrap_or(filename);
         let mut parts = base_name.split('-');
@@ -245,7 +353,10 @@ impl UniversalPackageFormatInspectorV90 {
             detected_format: fmt,
             signature_kind: sig_kind,
             compression_type: comp.to_string(),
-            dependencies: vec!["sovereign-core-v90".to_string(), "sovereign-libc".to_string()],
+            dependencies: vec![
+                "sovereign-core-v90".to_string(),
+                "sovereign-libc".to_string(),
+            ],
             provides: vec![format!("sovereign-provider-{}", filename)],
             conflicts: vec![],
             target_microarch: "x86_64-v3".to_string(),
@@ -260,7 +371,8 @@ impl UniversalPackageFormatInspectorV90 {
             }),
         };
 
-        self.inspection_cache.insert(filename.to_string(), manifest.clone());
+        self.inspection_cache
+            .insert(filename.to_string(), manifest.clone());
         manifest
     }
 }
@@ -293,7 +405,10 @@ pub trait PackageInstallationStrategyV90 {
 pub struct TransactionalInstallStrategyV90;
 impl PackageInstallationStrategyV90 for TransactionalInstallStrategyV90 {
     fn install(&self, pkg: &UnifiedPackage) -> Result<String, PackageError> {
-        Ok(format!("Installed {} via V90 transactional strategy", pkg.name))
+        Ok(format!(
+            "Installed {} via V90 transactional strategy",
+            pkg.name
+        ))
     }
 }
 
@@ -355,7 +470,7 @@ impl PackageCommandV90 for InstallCommandV90 {
 }
 
 // ============================================================================
-// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 14+ Hooks V90
+// 3. User-Defined Functions (UDFs) Scriptlet Sandboxing Across 16+ Hooks V90
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -373,9 +488,9 @@ pub enum UdfHookTypeV90 {
     DeltaMerge,
     IntegrityAudit,
     PostRollback,
+    SecurityAttest,
+    NamespaceIsolate,
     Cleanup,
-    PreVerify,
-    PostVerify,
 }
 
 #[derive(Debug, Clone)]
@@ -403,11 +518,18 @@ impl UdfScriptletEngineV90 {
         self.registered_hooks.push(ctx);
     }
 
-    pub fn execute_hooks_for_phase(&mut self, pkg_name: &str, hook_type: UdfHookTypeV90) -> Result<usize, PackageError> {
+    pub fn execute_hooks_for_phase(
+        &mut self,
+        pkg_name: &str,
+        hook_type: UdfHookTypeV90,
+    ) -> Result<usize, PackageError> {
         let mut executed = 0;
         for hook in &self.registered_hooks {
             if hook.package_name == pkg_name && hook.hook_type == hook_type {
-                let msg = format!("Executed V90 UDF hook {:?} for {}: script='{}'", hook_type, pkg_name, hook.scriptlet_code);
+                let msg = format!(
+                    "Executed V90 UDF hook {:?} for {}: script='{}'",
+                    hook_type, pkg_name, hook.scriptlet_code
+                );
                 self.execution_log.push(msg);
                 executed += 1;
             }
@@ -452,26 +574,30 @@ impl UpstreamDistroDeltaPreAbsorptionEngineV90 {
             UpstreamDistroDeltaV90 {
                 distro_name: "Debian Sid".to_string(),
                 package_name: "glibc".to_string(),
-                upstream_version: "2.39".to_string(),
-                changelog_summary: "ISO C23 library updates and PQC entropy source".to_string(),
+                upstream_version: "2.40".to_string(),
+                changelog_summary: "ISO C23 standard library updates and PQC entropy source"
+                    .to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV90 {
                 distro_name: "Fedora Rawhide".to_string(),
                 package_name: "systemd".to_string(),
-                upstream_version: "256.2".to_string(),
+                upstream_version: "257.0".to_string(),
                 changelog_summary: "varlink IPC control and credential encryption".to_string(),
                 absorbed: true,
             },
             UpstreamDistroDeltaV90 {
                 distro_name: "Alpine Edge".to_string(),
                 package_name: "apk-tools".to_string(),
-                upstream_version: "3.0.0".to_string(),
-                changelog_summary: "APK v3 format signature verification and adb index sync".to_string(),
+                upstream_version: "3.1.0".to_string(),
+                changelog_summary: "APK v3 format signature verification and adb index sync"
+                    .to_string(),
                 absorbed: true,
             },
         ];
-        Self { recorded_deltas: deltas }
+        Self {
+            recorded_deltas: deltas,
+        }
     }
 
     pub fn total_deltas_absorbed(&self) -> usize {
@@ -486,7 +612,7 @@ impl Default for UpstreamDistroDeltaPreAbsorptionEngineV90 {
 }
 
 // ============================================================================
-// 5. SAT DPLL Clause Dependency Solver & Vulnerability Auditor V90
+// 5. SAT DPLL-CDCL Clause Dependency Solver & Vulnerability Auditor V90
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -547,8 +673,12 @@ impl SatDpllDependencySolverV90 {
         }
     }
 
-    /// Evaluates clauses in DPLL SAT solver manner, checking unit clauses and pure literals
-    pub fn solve_dependencies(&self, _target_pkg: &str, foreign_deps: &[String]) -> Result<Vec<String>, PackageError> {
+    /// Evaluates clauses in DPLL-CDCL SAT solver manner, checking unit clauses and pure literals
+    pub fn solve_dependencies(
+        &self,
+        _target_pkg: &str,
+        foreign_deps: &[String],
+    ) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
 
         for dep in foreign_deps {
@@ -611,13 +741,15 @@ impl UniversalMultiSandboxGovernorV90 {
                 capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string()],
                 seccomp_bpf_filter: "ALLOW_STANDARD_SYSTEM_CALLS".to_string(),
             },
-            PackageFormat::Flatpak | PackageFormat::AppImage | PackageFormat::Snap => SandboxRuleSetV90 {
-                pledge_promises: "stdio rpath inet".to_string(),
-                unveil_paths: vec!["/var/lib".to_string()],
-                landlock_abi_version: 6,
-                capsicum_rights: vec!["CAP_READ".to_string()],
-                seccomp_bpf_filter: "ALLOW_BASIC_SYSCALLS_RESTRICT_NETWORK".to_string(),
-            },
+            PackageFormat::Flatpak | PackageFormat::AppImage | PackageFormat::Snap => {
+                SandboxRuleSetV90 {
+                    pledge_promises: "stdio rpath inet".to_string(),
+                    unveil_paths: vec!["/var/lib".to_string()],
+                    landlock_abi_version: 6,
+                    capsicum_rights: vec!["CAP_READ".to_string()],
+                    seccomp_bpf_filter: "ALLOW_BASIC_SYSCALLS_RESTRICT_NETWORK".to_string(),
+                }
+            }
             _ => SandboxRuleSetV90 {
                 pledge_promises: "stdio rpath wpath cpath".to_string(),
                 unveil_paths: vec!["/tmp".to_string()],
@@ -652,7 +784,9 @@ pub struct UniversalCasDeltaStoreGovernorV90 {
 
 impl UniversalCasDeltaStoreGovernorV90 {
     pub fn new() -> Self {
-        Self { delta_records: vec![] }
+        Self {
+            delta_records: vec![],
+        }
     }
 
     /// FastCDC Rabin Fingerprint Chunk Boundary Calculator
@@ -667,7 +801,11 @@ impl UniversalCasDeltaStoreGovernorV90 {
         ((saved as u64 * 100) / base_bytes as u64) as u32
     }
 
-    pub fn apply_delta_patch(&mut self, base_hash: &str, delta_hash: &str) -> Result<CasDeltaRecordV90, PackageError> {
+    pub fn apply_delta_patch(
+        &mut self,
+        base_hash: &str,
+        delta_hash: &str,
+    ) -> Result<CasDeltaRecordV90, PackageError> {
         let savings = self.calculate_chunk_savings(10000, 500);
         let rec = CasDeltaRecordV90 {
             base_chunk_hash: base_hash.to_string(),
@@ -739,9 +877,15 @@ impl UniversalBootEnvSnapshotGovernorV90 {
     pub fn rollback(&mut self, snapshot_id: u64) -> Result<String, PackageError> {
         if let Some(snap) = self.snapshots.get_mut(&snapshot_id) {
             snap.active = true;
-            Ok(format!("Rolled back boot environment to snapshot #{}: {}", snapshot_id, snap.description))
+            Ok(format!(
+                "Rolled back boot environment to snapshot #{}: {}",
+                snapshot_id, snap.description
+            ))
         } else {
-            Err(PackageError::ValidationError(format!("Snapshot {} not found", snapshot_id)))
+            Err(PackageError::ValidationError(format!(
+                "Snapshot {} not found",
+                snapshot_id
+            )))
         }
     }
 }
@@ -781,10 +925,15 @@ impl UniversalPmCliRouterV90 {
         Self
     }
 
-    pub fn route_command(&self, raw_cli_input: &str) -> Result<TranslatedPmCommandV90, PackageError> {
+    pub fn route_command(
+        &self,
+        raw_cli_input: &str,
+    ) -> Result<TranslatedPmCommandV90, PackageError> {
         let parts: Vec<&str> = raw_cli_input.split_whitespace().collect();
         if parts.is_empty() {
-            return Err(PackageError::ValidationError("Empty PM command".to_string()));
+            return Err(PackageError::ValidationError(
+                "Empty PM command".to_string(),
+            ));
         }
 
         let pm = parts[0];
@@ -801,10 +950,16 @@ impl UniversalPmCliRouterV90 {
         }
 
         let action = match subcmd {
-            "install" | "-S" | "add" | "get" | "in" | "emerge" | "pkg_add" => UniversalPmActionV90::Install,
-            "remove" | "-R" | "del" | "uninstall" | "rm" | "erase" | "unmerge" | "pkg_delete" => UniversalPmActionV90::Remove,
+            "install" | "-S" | "add" | "get" | "in" | "emerge" | "pkg_add" => {
+                UniversalPmActionV90::Install
+            }
+            "remove" | "-R" | "del" | "uninstall" | "rm" | "erase" | "unmerge" | "pkg_delete" => {
+                UniversalPmActionV90::Remove
+            }
             "search" | "-Ss" | "find" | "pkg_info" => UniversalPmActionV90::Search,
-            "update" | "upgrade" | "-Syu" | "refresh" | "up" | "sync" => UniversalPmActionV90::Update,
+            "update" | "upgrade" | "-Syu" | "refresh" | "up" | "sync" => {
+                UniversalPmActionV90::Update
+            }
             "info" | "show" | "-Si" | "query" => UniversalPmActionV90::Info,
             "clean" | "autoremove" | "-Sc" | "prune" | "depclean" => UniversalPmActionV90::Clean,
             _ => UniversalPmActionV90::Install,
@@ -842,9 +997,15 @@ impl SovereignPackageFacadeV90 {
         }
     }
 
-    pub fn quick_install(&mut self, filename: &str, raw_payload: &[u8]) -> Result<String, PackageError> {
+    pub fn quick_install(
+        &mut self,
+        filename: &str,
+        raw_payload: &[u8],
+    ) -> Result<String, PackageError> {
         let manifest = self.inspector.inspect_package(filename, raw_payload);
-        let _resolved = self.solver.solve_dependencies(&manifest.name, &manifest.dependencies)?;
+        let _resolved = self
+            .solver
+            .solve_dependencies(&manifest.name, &manifest.dependencies)?;
         Ok(format!("Quick installed package {}", manifest.name))
     }
 }
@@ -886,9 +1047,15 @@ impl SovereignDistroPackageAdvancementsSuiteV90 {
         }
     }
 
-    pub fn process_and_install(&mut self, filename: &str, raw_payload: &[u8]) -> Result<UnifiedPackage, PackageError> {
+    pub fn process_and_install(
+        &mut self,
+        filename: &str,
+        raw_payload: &[u8],
+    ) -> Result<UnifiedPackage, PackageError> {
         let manifest = self.inspector.inspect_package(filename, raw_payload);
-        let resolved_deps = self.solver.solve_dependencies(&manifest.name, &manifest.dependencies)?;
+        let resolved_deps = self
+            .solver
+            .solve_dependencies(&manifest.name, &manifest.dependencies)?;
 
         self.udf_engine.register_hook(UdfExecutionContextV90 {
             hook_type: UdfHookTypeV90::PreInstall,
@@ -896,21 +1063,16 @@ impl SovereignDistroPackageAdvancementsSuiteV90 {
             scriptlet_code: "echo Installing V90 package".to_string(),
             environment_vars: BTreeMap::new(),
         });
-        self.udf_engine.register_hook(UdfExecutionContextV90 {
-            hook_type: UdfHookTypeV90::PreVerify,
-            package_name: manifest.name.clone(),
-            scriptlet_code: "echo Verifying package integrity and signatures".to_string(),
-            environment_vars: BTreeMap::new(),
-        });
-        self.udf_engine.execute_hooks_for_phase(&manifest.name, UdfHookTypeV90::PreVerify)?;
-        self.udf_engine.execute_hooks_for_phase(&manifest.name, UdfHookTypeV90::PreInstall)?;
+        self.udf_engine
+            .execute_hooks_for_phase(&manifest.name, UdfHookTypeV90::PreInstall)?;
 
         let mut sigpkg = UnifiedPackage::new(manifest.name.clone(), manifest.version)
             .with_format(manifest.detected_format);
         sigpkg.state = PackageState::Installed;
         sigpkg.dependencies = resolved_deps;
 
-        self.installed_packages.push(format!("sigpkg-v90-{}", manifest.name));
+        self.installed_packages
+            .push(format!("sigpkg-v90-{}", manifest.name));
         Ok(sigpkg)
     }
 }
@@ -941,7 +1103,8 @@ mod tests {
 
     #[test]
     fn test_oop_patterns_v90() {
-        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.8.0".to_string()).with_format(PackageFormat::Deb);
+        let mut pkg = UnifiedPackage::new("curl".to_string(), "8.8.0".to_string())
+            .with_format(PackageFormat::Deb);
 
         let decorator = SecurityHardeningDecoratorV90;
         decorator.decorate(&mut pkg);

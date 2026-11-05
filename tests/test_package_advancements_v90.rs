@@ -6,14 +6,14 @@
 mod sovereign_distro_package_advancements_v90_pr;
 
 use sovereign_distro_package_advancements_v90_pr::sovereign_distro_package_advancements_v90::*;
-use sovereign_distro_package_advancements_v90_pr::SovereignDistroPackagePrGatewayV90;
 use sovereign_distro_package_advancements_v90_pr::universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v90_pr::SovereignDistroPackagePrGatewayV90;
 
 #[test]
 fn test_package_advancements_v90_full_cycle() {
     // 1. Universal Package Inspector V90
     let mut inspector = UniversalPackageFormatInspectorV90::new();
-    assert_eq!(inspector.total_formats_supported, 305);
+    assert_eq!(inspector.total_formats_supported, 300);
 
     let manifest = inspector
         .inspect_package("ripgrep-14.1.0-amd64.deb", b"!<arch>\ndebian-binary\n")
@@ -59,7 +59,10 @@ fn test_package_advancements_v90_full_cycle() {
     let solved = solver
         .solve_dependencies("ripgrep", &raw_deps)
         .expect("SAT solver failed");
-    assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v90"]);
+    assert_eq!(
+        solved,
+        vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v90"]
+    );
 
     // 5. Multi-Sandbox Security Governor V90
     let sandbox_gov = UniversalMultiSandboxGovernorV90::new();

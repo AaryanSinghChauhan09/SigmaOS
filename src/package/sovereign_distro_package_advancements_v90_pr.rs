@@ -37,7 +37,9 @@ pub mod sovereign_distro_package_advancements_v90;
 pub use sovereign_distro_package_advancements_v90::universal;
 
 #[cfg(feature = "standalone_test")]
-pub use sovereign_distro_package_advancements_v90::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+pub use sovereign_distro_package_advancements_v90::universal::{
+    PackageError, PackageFormat, PackageState, UnifiedPackage,
+};
 
 /// Pull Request Proposal Manifest V90
 #[derive(Debug, Clone, PartialEq, Eq)]
