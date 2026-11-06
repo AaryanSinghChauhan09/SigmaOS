@@ -463,6 +463,8 @@ pub use package::sovereign_distro_package_advancements_v88::*;
 pub use package::sovereign_distro_package_advancements_v88_pr::*;
 pub use package::sovereign_distro_package_advancements_v89::*;
 pub use package::sovereign_distro_package_advancements_v89_pr::*;
+pub use package::sovereign_distro_package_advancements_v90::*;
+pub use package::sovereign_distro_package_advancements_v90_pr::*;
 pub use tools::tech_media_extended_suite::*;
 pub mod sovereign_wiki_master_engine;
 pub use sovereign_wiki_master_engine::*;

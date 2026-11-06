@@ -1807,6 +1807,13 @@ if [ -f "tests/test_package_advancements_v89.rs" ]; then
     ./build/test_package_advancements_v89
 fi
 
+if [ -f "tests/test_package_advancements_v90.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V90 Integration test suite..."
+    mkdir -p build
+    TMPDIR=/tmp rustc --test tests/test_package_advancements_v90.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v90
+    ./build/test_package_advancements_v90
+fi
+
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
     mkdir -p build
