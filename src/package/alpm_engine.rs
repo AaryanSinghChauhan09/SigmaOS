@@ -138,51 +138,121 @@ impl SovereignAlpmEngine {
         SyncStatus::NotInstalled
     }
 
+    /// Look up a package by name across all sync repositories.
+    /// Mirrors libalpm's `alpm_db_get_pkg` sync search; first repo wins.
+    fn find_in_sync(&self, name: &str) -> Option<&AlpmPackage> {
+        self.sync_dbs
+            .values()
+            .find_map(|db| db.get(name))
+    }
+
+    /// Check whether `name` conflicts with any already-installed package.
+    fn has_conflict_with_installed(&self, pkg: &AlpmPackage, ignore: &str) -> bool {
+        for (name, installed) in &self.local_db {
+            if name == ignore {
+                continue;
+            }
+            // pkg declares a conflict on an installed package
+            if pkg.conflicts.iter().any(|c| c == name) {
+                return true;
+            }
+            // installed package declares a conflict on pkg
+            if installed.conflicts.iter().any(|c| c == &pkg.name) {
+                return true;
+            }
+        }
+        false
+    }
+
     /// Install or upgrade package into local database (pacman -S)
     ///
-    /// Supports APT-style transaction semantics:
-    /// - Pre-resolution of all dependencies before commit
-    /// - Atomic commit or full rollback on failure
-    /// - Download-only mode for offline planning
+    /// Transactional semantics (libalpm prepare -> commit -> rollback):
+    /// - Phase 1: recursive dependency closure resolved from sync DBs
+    /// - Phase 2: conflict checks across the whole transaction set
+    /// - Phase 3: atomic commit; any failure rolls back to the pre-state
+    /// - `download_only` performs resolution without mutating local_db
     pub fn install_package(
         &mut self,
         pkg: AlpmPackage,
         flags: AlpmTransactionFlags,
     ) -> Result<(), &'static str> {
-        // Phase 1: Pre-resolution of all dependencies
-        let mut pending: Vec<&str> = pkg.depends.iter().map(|s| s.as_str()).collect();
-        let mut resolved: Vec<&str> = Vec::new();
+        // Phase 1: dependency closure (post-order DFS over sync DBs)
+        let mut order: Vec<AlpmPackage> = Vec::new();
+        let mut visiting: Vec<String> = Vec::new();
+        let mut visited: Vec<String> = Vec::new();
 
-        while !pending.is_empty() {
-            let dep_name = pending.remove(0);
-
-            if self.local_db.contains_key(dep_name) || resolved.contains(&dep_name) {
-                continue;
+        fn visit(
+            name: &str,
+            root: &AlpmPackage,
+            engine: &SovereignAlpmEngine,
+            order: &mut Vec<AlpmPackage>,
+            visiting: &mut Vec<String>,
+            visited: &mut Vec<String>,
+            nodeps: bool,
+        ) -> Result<(), &'static str> {
+            if visited.iter().any(|v| v == name) {
+                return Ok(());
             }
-
-            // Check if dependency is in any sync DB
-            let found_in_sync = self.sync_dbs.values().any(|db| db.contains_key(dep_name));
-
-            if !found_in_sync {
-                // Try to resolve as a nested dependency from sync repos
-                return Err("Unresolved dependency: ");
+            if engine.local_db.contains_key(name) {
+                return Ok(());
             }
-
-            resolved.push(dep_name);
+            if visiting.iter().any(|v| v == name) {
+                return Err("dependency cycle detected");
+            }
+            let candidate_owned;
+            let candidate = if name == root.name {
+                root
+            } else {
+                candidate_owned = engine
+                    .find_in_sync(name)
+                    .or_else(|| engine.local_db.get(name))
+                    .ok_or("Unresolved dependency")?;
+                candidate_owned
+            };
+            visiting.push(name.to_string());
+            if !nodeps {
+                for dep in &candidate.depends {
+                    // deps may use versioned specs like "foo>=1.2"; match on name prefix
+                    let dep_name = dep.split(|c| c == '>' || c == '<' || c == '=' || c == ' ')
+                        .next()
+                        .unwrap_or(dep);
+                    visit(dep_name, root, engine, order, visiting, visited, nodeps)?;
+                }
+            }
+            visiting.retain(|v| v != name);
+            visited.push(name.to_string());
+            if !engine.local_db.contains_key(name) {
+                order.push(candidate.clone());
+            }
+            Ok(())
         }
 
-        // Phase 2: Atomic commit - install all packages together
-        // In a full implementation, this would use a transaction journal
-        // for rollback capabilities (similar to pacman's Prepare -> Commit -> Rollback)
-        for dep_name in &pkg.depends {
-            if !self.local_db.contains_key(dep_name) {
-                // Fetch and install dependency from sync repo
-                // This is a simplified version; full implementation would
-                // download and verify the package
-                return Err("Dependency resolution pending - use dry-run mode");
+        visit(
+            &pkg.name.clone(),
+            &pkg,
+            self,
+            &mut order,
+            &mut visiting,
+            &mut visited,
+            flags.nodeps,
+        )?;
+
+        // Phase 2: conflict checks across the transaction set
+        for candidate in order.iter().chain(core::iter::once(&pkg)) {
+            if self.has_conflict_with_installed(candidate, "") && !flags.force {
+                return Err("package conflicts with installed package");
             }
         }
 
+        if flags.download_only {
+            return Ok(());
+        }
+
+        // Phase 3: atomic commit — all inserts are infallible once phases
+        // 1-2 succeed, so the transaction either fully applies or not at all.
+        for candidate in order {
+            self.local_db.insert(candidate.name.clone(), candidate);
+        }
         self.local_db.insert(pkg.name.clone(), pkg);
         Ok(())
     }
@@ -205,7 +275,7 @@ impl SovereignAlpmEngine {
     pub fn check_updates(&self) -> Vec<(&String, &AlpmPackage, &AlpmPackage)> {
         let mut updates = Vec::new();
         for (pkg_name, local_pkg) in &self.local_db {
-            for (repo_name, db) in &self.sync_dbs {
+            for (_repo_name, db) in &self.sync_dbs {
                 if let Some(remote_pkg) = db.get(pkg_name) {
                     if local_pkg.version != remote_pkg.version {
                         updates.push((pkg_name, local_pkg, remote_pkg));
@@ -316,5 +386,54 @@ mod tests {
             .remove_package("glibc", AlpmTransactionFlags::default())
             .is_ok());
         assert_eq!(alpm.installed_count(), 0);
+    }
+
+    #[test]
+    fn test_transactional_dep_resolution_from_sync() {
+        let mut alpm = SovereignAlpmEngine::new();
+        alpm.register_repo("core");
+
+        let mkpkg = |name: &str, deps: Vec<String>| AlpmPackage {
+            name: name.to_string(),
+            version: "1.0-1".to_string(),
+            description: String::new(),
+            url: String::new(),
+            arch: PackageArch::Any,
+            isize: 0,
+            installed_size: 0,
+            sha256_checksum: String::new(),
+            depends: deps,
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+        };
+
+        // glibc and zlib live only in the sync repo; bash depends on both
+        alpm.add_sync_package("core", mkpkg("glibc", Vec::new())).unwrap();
+        alpm.add_sync_package("core", mkpkg("zlib", Vec::new())).unwrap();
+
+        let bash = mkpkg("bash", alloc::vec!["glibc".to_string(), "zlib>=1.2".to_string()]);
+        let flags = AlpmTransactionFlags {
+            download_only: true,
+            ..AlpmTransactionFlags::default()
+        };
+        assert!(alpm.install_package(bash, flags).is_ok());
+        // download_only must not mutate local db
+        assert_eq!(alpm.installed_count(), 0);
+
+        // real install pulls the whole closure
+        let bash2 = mkpkg("bash", alloc::vec!["glibc".to_string(), "zlib>=1.2".to_string()]);
+        assert!(alpm
+            .install_package(bash2, AlpmTransactionFlags::default())
+            .is_ok());
+        assert_eq!(alpm.installed_count(), 3);
+        assert!(alpm.check_status("glibc") != SyncStatus::NotInstalled);
+
+        // unresolvable dep fails without partial install
+        let orphan = mkpkg("orphan", alloc::vec!["nonexistent-dep".to_string()]);
+        let before = alpm.installed_count();
+        assert!(alpm
+            .install_package(orphan, AlpmTransactionFlags::default())
+            .is_err());
+        assert_eq!(alpm.installed_count(), before);
     }
 }
