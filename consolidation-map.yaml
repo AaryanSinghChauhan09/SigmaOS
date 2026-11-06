@@ -1,7 +1,7 @@
 # SigmaOS repository consolidation map
 # variant repo -> canonical repo
 # suffix variants archived on GitHub; case variants share one remote (GitHub is case-insensitive)
-version: 2
+version: 3
 duplicates:
   SigmaOS-github-action: SigmaOS-Github-Action
   SigmaOS-gtk: SigmaOS-GTK
@@ -68,3 +68,5 @@ duplicates:
   security-tools: security
   srcpkg-tools: srcpkg
   standard-version: standard
+
+# Local cleanup: SigmaOS-iso and SigmaOS-gtk dirs removed (byte-identical to SigmaOS-ISO/SigmaOS-GTK)
