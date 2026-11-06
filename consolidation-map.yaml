@@ -1,8 +1,10 @@
 # SigmaOS repository consolidation map
 # variant repo -> canonical repo
 # suffix variants archived on GitHub; case variants share one remote (GitHub is case-insensitive)
-version: 3
+version: 4
 duplicates:
+  # libc umbrella stub superseded by real glibc+musl implementations
+  SigmaOS-libc: SigmaOS-glibc
   SigmaOS-github-action: SigmaOS-Github-Action
   SigmaOS-gtk: SigmaOS-GTK
   SigmaOS-gtk-plus: SigmaOS-GTK-plus
