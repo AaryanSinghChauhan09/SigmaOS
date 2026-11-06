@@ -585,6 +585,8 @@ pub use freebsd_missing_components_v70_pr::*;
 
 pub mod freebsd_missing_components_v71_pr;
 pub use freebsd_missing_components_v71_pr::*;
+pub mod freebsd_missing_components_v72_pr;
+pub use freebsd_missing_components_v72_pr::*;
 pub mod openbsd_missing_components_v60_pr;
 pub use openbsd_missing_components_v60_pr::*;
 pub mod openbsd_missing_components_v61_pr;
