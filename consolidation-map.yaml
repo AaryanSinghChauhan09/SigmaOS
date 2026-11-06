@@ -72,3 +72,11 @@ duplicates:
   standard-version: standard
 
 # Local cleanup: SigmaOS-iso and SigmaOS-gtk dirs removed (byte-identical to SigmaOS-ISO/SigmaOS-GTK)
+
+  # --- modularisation sweep results (2026-10) ---
+  # 127 repos had src/*.rs files never declared by lib.rs.
+  # SigmaOS-system: all 259 modules wired, latent bugs fixed, 1986 tests green.
+  # SigmaOS-posix: split into errno/syscall/path/stat/tests modules.
+  # SigmaOS-pacman: real modules wired, dead pacman.rs removed, bugs fixed.
+  # Bulk-wiring config/error/service stubs in 91 other repos failed compile
+  # (modules have unsatisfied deps) -> reverted; needs per-repo repair.
