@@ -43,6 +43,7 @@ init = "SigmaOS-core"
 storage = "SigmaOS-services"
 nvme = "SigmaOS-services"
 wifi = "SigmaOS-services"
+oom-pressure-guard = "SigmaOS-services"
 acpi = "SigmaOS-core"
 graphics = "SigmaOS-shell"
 desktop-session = "SigmaOS-shell"
@@ -109,6 +110,14 @@ status = "partial"
 priority = "critical"
 capability = "wifi_networking"
 upstreams = ["torvalds/linux", "linux-firmware/linux-firmware"]
+
+[[component]]
+name = "oom-pressure-guard"
+repository = "SigmaOS-services"
+status = "partial"
+priority = "high"
+capability = "psi_memory_pressure_policy_planning"
+upstreams = ["systemd/systemd", "rfjakob/earlyoom"]
 
 [[component]]
 name = "acpi"

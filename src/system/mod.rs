@@ -307,6 +307,7 @@ pub mod dmesg;
 pub mod duplicate;
 pub mod generation_manager;
 pub mod memory;
+pub mod oom_guard;
 pub mod optimizer;
 pub mod power;
 pub mod process_supervisor;

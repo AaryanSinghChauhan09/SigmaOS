@@ -45,6 +45,11 @@ owner = "SigmaOS-core"
 component = "memory management"
 
 [[module]]
+path = "src/system/oom_guard.rs"
+owner = "SigmaOS-services"
+component = "PSI-based memory-pressure policy planning"
+
+[[module]]
 path = "src/net"
 owner = "SigmaOS-services"
 component = "network transport"

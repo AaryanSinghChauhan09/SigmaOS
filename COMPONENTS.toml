@@ -58,12 +58,12 @@ depends_on = ["SigmaOS-kernel"]
 
 [[component]]
 name = "SigmaOS-system"
-description = "Init, service manager & system orchestration"
+description = "Init, service manager, system orchestration, and advisory PSI-based memory-pressure policy"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system"
 engine = "system_core"
 category = "System Services"
 language = "rust"
-inspirations = ["native"]
+inspirations = ["https://github.com/systemd/systemd", "https://github.com/rfjakob/earlyoom"]
 visibility = "private"
 depends_on = ["SigmaOS-filesystem", "SigmaOS-kernel", "SigmaOS-security"]
 
