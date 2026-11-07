@@ -48,8 +48,9 @@ impl PacCacheTrimmer {
         self.cache_entries.push(entry);
     }
 
-    /// Trims the package cache, retaining `keep_versions` candidate versions per package name.
-    /// If `remove_uninstalled` is true, purged packages for uninstalled software are also removed.
+    /// Plan cache pruning while retaining the newest `keep_versions` for each
+    /// selected package. With `remove_uninstalled`, only packages with no
+    /// installed cache entry are selected. Unparseable versions are retained.
     pub fn trim_cache(&self, keep_versions: usize, remove_uninstalled: bool) -> PacCacheResult {
         let mut removed_files = Vec::new();
         let mut bytes_freed = 0u64;
@@ -70,27 +71,35 @@ impl PacCacheTrimmer {
         let mut remaining_count = 0;
 
         for (_pkg_name, entries) in package_groups {
-            // Sort entries (older versions first, assuming entries retain insertion or version order)
-            // If remove_uninstalled is set and no entry is currently installed, remove all
             let any_installed = entries.iter().any(|e| e.is_installed);
-            if remove_uninstalled && !any_installed {
-                for entry in entries {
-                    removed_files.push(entry.file_name.clone());
-                    bytes_freed += entry.size_bytes;
-                }
+            if remove_uninstalled && any_installed {
+                remaining_count += entries.len();
                 continue;
             }
 
-            if entries.len() > keep_versions {
-                let to_remove = entries.len() - keep_versions;
-                for i in 0..to_remove {
-                    removed_files.push(entries[i].file_name.clone());
-                    bytes_freed += entries[i].size_bytes;
+            let mut versioned: Vec<&PackageCacheEntry> = Vec::new();
+            let mut unclassified = 0;
+            for entry in entries {
+                if CheckUpdatesEngine::compare_versions(&entry.version, &entry.version).is_some() {
+                    versioned.push(entry);
+                } else {
+                    // Do not destroy a cache file whose version cannot be ordered.
+                    unclassified += 1;
                 }
-                remaining_count += keep_versions;
-            } else {
-                remaining_count += entries.len();
             }
+
+            versioned.sort_by(|left, right| {
+                CheckUpdatesEngine::compare_versions(&right.version, &left.version)
+                    .unwrap_or(Ordering::Equal)
+                    .then_with(|| left.file_name.cmp(&right.file_name))
+            });
+
+            let retained_versions = keep_versions.min(versioned.len());
+            for entry in versioned.into_iter().skip(retained_versions) {
+                removed_files.push(entry.file_name.clone());
+                bytes_freed = bytes_freed.saturating_add(entry.size_bytes);
+            }
+            remaining_count += unclassified + retained_versions;
         }
 
         PacCacheResult {
@@ -539,6 +548,13 @@ mod tests {
         let mut trimmer = PacCacheTrimmer::new();
         trimmer.add_cache_entry(PackageCacheEntry {
             package_name: "linux".to_string(),
+            version: "6.6.3".to_string(),
+            file_name: "linux-6.6.3-x86_64.pkg.tar.zst".to_string(),
+            size_bytes: 110_000_000,
+            is_installed: true,
+        });
+        trimmer.add_cache_entry(PackageCacheEntry {
+            package_name: "linux".to_string(),
             version: "6.6.1".to_string(),
             file_name: "linux-6.6.1-x86_64.pkg.tar.zst".to_string(),
             size_bytes: 100_000_000,
@@ -550,13 +566,6 @@ mod tests {
             file_name: "linux-6.6.2-x86_64.pkg.tar.zst".to_string(),
             size_bytes: 105_000_000,
             is_installed: false,
-        });
-        trimmer.add_cache_entry(PackageCacheEntry {
-            package_name: "linux".to_string(),
-            version: "6.6.3".to_string(),
-            file_name: "linux-6.6.3-x86_64.pkg.tar.zst".to_string(),
-            size_bytes: 110_000_000,
-            is_installed: true,
         });
 
         // Retain 2 candidate versions
