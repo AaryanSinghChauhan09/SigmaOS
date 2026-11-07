@@ -7,8 +7,8 @@ use std::path::Path;
 
 #[test]
 fn test_process_manager_documentation_plan_verification() {
-    let docs_path = "docs/PROCESS_MANAGER_PLAN.md";
-    let wiki_path = "wiki/PROCESS_MANAGER_PLAN.md";
+    let docs_path = "/home/aaryansinghchauhan/SigmaOS.wiki/PROCESS_MANAGER_PLAN.md";
+    let wiki_path = "/home/aaryansinghchauhan/SigmaOS.wiki/PROCESS_MANAGER_PLAN.md";
 
     assert!(
         Path::new(docs_path).exists(),

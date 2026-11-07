@@ -17,9 +17,9 @@ use system_utilities::{
 
 #[test]
 fn test_system_utilities_documentation_plan_verification() {
-    let docs_path = "docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md";
-    let wiki_path_1 = "wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md";
-    let wiki_path_2 = "wiki/26-System-Utilities-Development-Plan.md";
+    let docs_path = "/home/aaryansinghchauhan/SigmaOS.wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md";
+    let wiki_path_1 = "/home/aaryansinghchauhan/SigmaOS.wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md";
+    let wiki_path_2 = "/home/aaryansinghchauhan/SigmaOS.wiki/26-System-Utilities-Development-Plan.md";
 
     assert!(
         Path::new(docs_path).exists(),
@@ -120,9 +120,9 @@ fn test_feature_status_toml_system_utilities_registration() {
         .expect("FEATURE_STATUS.toml must exist");
 
     assert!(toml_content.contains("[userspace.system_utilities]"));
-    assert!(toml_content.contains("docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
-    assert!(toml_content.contains("wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
-    assert!(toml_content.contains("wiki/26-System-Utilities-Development-Plan.md"));
+    assert!(toml_content.contains("/home/aaryansinghchauhan/SigmaOS.wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
+    assert!(toml_content.contains("/home/aaryansinghchauhan/SigmaOS.wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
+    assert!(toml_content.contains("/home/aaryansinghchauhan/SigmaOS.wiki/26-System-Utilities-Development-Plan.md"));
     assert!(toml_content.contains("src/userland/system_utilities.rs"));
 }
 

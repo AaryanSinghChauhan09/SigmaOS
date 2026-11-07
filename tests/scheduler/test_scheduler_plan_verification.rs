@@ -5,19 +5,19 @@ use std::path::Path;
 
 #[test]
 fn test_scheduler_documentation_policy_verification() {
-    let sched_policy = fs::read_to_string("docs/process/SCHEDULER_POLICY.md")
+    let sched_policy = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-process-SCHEDULER_POLICY.md")
         .expect("docs/process/SCHEDULER_POLICY.md must exist");
-    let sched_adr = fs::read_to_string("docs/process/SCHEDULER_ADR.md")
+    let sched_adr = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-process-SCHEDULER_ADR.md")
         .expect("docs/process/SCHEDULER_ADR.md must exist");
-    let rq_policy = fs::read_to_string("docs/process/RUN_QUEUE_POLICY.md")
+    let rq_policy = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-process-RUN_QUEUE_POLICY.md")
         .expect("docs/process/RUN_QUEUE_POLICY.md must exist");
-    let ctx_policy = fs::read_to_string("docs/process/CONTEXT_SWITCH_POLICY.md")
+    let ctx_policy = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-process-CONTEXT_SWITCH_POLICY.md")
         .expect("docs/process/CONTEXT_SWITCH_POLICY.md must exist");
-    let preempt_policy = fs::read_to_string("docs/process/PREEMPTION_POLICY.md")
+    let preempt_policy = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-process-PREEMPTION_POLICY.md")
         .expect("docs/process/PREEMPTION_POLICY.md must exist");
-    let fairness_policy = fs::read_to_string("docs/process/FAIRNESS_POLICY.md")
+    let fairness_policy = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-process-FAIRNESS_POLICY.md")
         .expect("docs/process/FAIRNESS_POLICY.md must exist");
-    let affinity_policy = fs::read_to_string("docs/process/CPU_AFFINITY_POLICY.md")
+    let affinity_policy = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-process-CPU_AFFINITY_POLICY.md")
         .expect("docs/process/CPU_AFFINITY_POLICY.md must exist");
 
     assert!(sched_policy.contains("SigmaOS Scheduler Subsystem Policy"));
@@ -32,9 +32,9 @@ fn test_scheduler_documentation_policy_verification() {
 
 #[test]
 fn test_scheduler_master_plan_documents_exist_and_match() {
-    let doc_invariants = Path::new("docs/SCHEDULER_STATUS_AND_INVARIANTS.md");
+    let doc_invariants = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/SCHEDULER_STATUS_AND_INVARIANTS.md");
     let wiki_invariants = Path::new("wiki/SCHEDULER_STATUS_AND_INVARIANTS.md");
-    let doc_plan = Path::new("docs/SCHEDULER_DEVELOPMENT_PLAN.md");
+    let doc_plan = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/SCHEDULER_DEVELOPMENT_PLAN.md");
     let wiki_plan = Path::new("wiki/SCHEDULER_DEVELOPMENT_PLAN.md");
 
     assert!(doc_invariants.exists(), "docs/SCHEDULER_STATUS_AND_INVARIANTS.md must exist");
@@ -53,7 +53,7 @@ fn test_scheduler_master_plan_documents_exist_and_match() {
 
 #[test]
 fn test_scheduler_master_plan_invariants_and_rules() {
-    let content = fs::read_to_string("docs/SCHEDULER_STATUS_AND_INVARIANTS.md")
+    let content = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/SCHEDULER_STATUS_AND_INVARIANTS.md")
         .expect("read docs/SCHEDULER_STATUS_AND_INVARIANTS.md");
 
     let required_rules = [
@@ -75,7 +75,7 @@ fn test_scheduler_master_plan_invariants_and_rules() {
 
 #[test]
 fn test_scheduler_master_plan_pr_sequence() {
-    let content = fs::read_to_string("docs/SCHEDULER_DEVELOPMENT_PLAN.md")
+    let content = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/SCHEDULER_DEVELOPMENT_PLAN.md")
         .expect("read docs/SCHEDULER_DEVELOPMENT_PLAN.md");
 
     for pr_num in 1..=18 {
@@ -108,7 +108,7 @@ fn test_scheduler_master_plan_pr_sequence() {
 
 #[test]
 fn test_scheduler_master_plan_cadence_and_gates() {
-    let content = fs::read_to_string("docs/SCHEDULER_DEVELOPMENT_PLAN.md")
+    let content = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/SCHEDULER_DEVELOPMENT_PLAN.md")
         .expect("read docs/SCHEDULER_DEVELOPMENT_PLAN.md");
 
     let cadences = [
@@ -161,11 +161,11 @@ fn test_feature_status_toml_scheduler_registration() {
     }
 
     assert!(
-        content.contains("docs/SCHEDULER_STATUS_AND_INVARIANTS.md"),
+        content.contains("SCHEDULER_STATUS_AND_INVARIANTS.md"),
         "FEATURE_STATUS.toml must reference docs/SCHEDULER_STATUS_AND_INVARIANTS.md"
     );
     assert!(
-        content.contains("docs/SCHEDULER_DEVELOPMENT_PLAN.md"),
+        content.contains("SCHEDULER_DEVELOPMENT_PLAN.md"),
         "FEATURE_STATUS.toml must reference docs/SCHEDULER_DEVELOPMENT_PLAN.md"
     );
 }

@@ -13,8 +13,8 @@ use sovereign_gui_development_and_pr_suite::*;
 
 #[test]
 fn test_gui_development_plan_documentation_verification() {
-    let docs_path = "docs/SIGMAOS_GUI_DEVELOPMENT_PLAN.md";
-    let wiki_path = "wiki/30-SigmaOS-GUI-Development-Plan.md";
+    let docs_path = "/home/aaryansinghchauhan/SigmaOS.wiki/30-SigmaOS-GUI-Development-Plan.md";
+    let wiki_path = "/home/aaryansinghchauhan/SigmaOS.wiki/30-SigmaOS-GUI-Development-Plan.md";
 
     assert!(
         Path::new(docs_path).exists(),

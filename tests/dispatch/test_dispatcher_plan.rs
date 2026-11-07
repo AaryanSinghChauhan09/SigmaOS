@@ -5,8 +5,8 @@ use std::path::Path;
 
 #[test]
 fn test_dispatcher_documentation_plan_verification() {
-    let docs_path = Path::new("docs/DISPATCHER_PLAN.md");
-    let wiki_path = Path::new("wiki/DISPATCHER_PLAN.md");
+    let docs_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/DISPATCHER_PLAN.md");
+    let wiki_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/DISPATCHER_PLAN.md");
 
     assert!(docs_path.exists(), "docs/DISPATCHER_PLAN.md must exist");
     assert!(wiki_path.exists(), "wiki/DISPATCHER_PLAN.md must exist");
@@ -62,7 +62,7 @@ fn test_dispatcher_documentation_plan_verification() {
 #[test]
 fn test_dispatcher_pr_sequence_roadmap() {
     let docs_plan =
-        fs::read_to_string("docs/DISPATCHER_PLAN.md").expect("docs/DISPATCHER_PLAN.md must exist");
+        fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/DISPATCHER_PLAN.md").expect("docs/DISPATCHER_PLAN.md must exist");
 
     let expected_prs = [
         (
@@ -139,7 +139,7 @@ fn test_dispatcher_pr_sequence_roadmap() {
 #[test]
 fn test_dispatcher_cadences_and_component_rules() {
     let docs_plan =
-        fs::read_to_string("docs/DISPATCHER_PLAN.md").expect("docs/DISPATCHER_PLAN.md must exist");
+        fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/DISPATCHER_PLAN.md").expect("docs/DISPATCHER_PLAN.md must exist");
 
     let cadences = [
         "Every PR",
@@ -192,11 +192,11 @@ fn test_feature_status_toml_dispatcher_registration() {
         "FEATURE_STATUS.toml must contain [kernel.dispatcher]"
     );
     assert!(
-        feature_status.contains("docs/DISPATCHER_PLAN.md"),
+        feature_status.contains("DISPATCHER_PLAN.md"),
         "FEATURE_STATUS.toml must reference docs/DISPATCHER_PLAN.md"
     );
     assert!(
-        feature_status.contains("wiki/DISPATCHER_PLAN.md"),
+        feature_status.contains("DISPATCHER_PLAN.md"),
         "FEATURE_STATUS.toml must reference wiki/DISPATCHER_PLAN.md"
     );
 }

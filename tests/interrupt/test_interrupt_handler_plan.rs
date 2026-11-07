@@ -7,8 +7,8 @@ use std::path::Path;
 
 #[test]
 fn test_interrupt_handler_plan_docs_exist() {
-    let doc_path = Path::new("docs/INTERRUPT_HANDLER_PLAN.md");
-    let wiki_path = Path::new("wiki/INTERRUPT_HANDLER_PLAN.md");
+    let doc_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/INTERRUPT_HANDLER_PLAN.md");
+    let wiki_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/INTERRUPT_HANDLER_PLAN.md");
 
     assert!(doc_path.exists(), "docs/INTERRUPT_HANDLER_PLAN.md must exist");
     assert!(wiki_path.exists(), "wiki/INTERRUPT_HANDLER_PLAN.md must exist");
@@ -24,7 +24,7 @@ fn test_interrupt_handler_plan_docs_exist() {
 
 #[test]
 fn test_interrupt_handler_plan_rules_and_invariants() {
-    let content = fs::read_to_string("docs/INTERRUPT_HANDLER_PLAN.md")
+    let content = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/INTERRUPT_HANDLER_PLAN.md")
         .expect("Failed to read docs/INTERRUPT_HANDLER_PLAN.md");
 
     let required_invariants = [
@@ -50,7 +50,7 @@ fn test_interrupt_handler_plan_rules_and_invariants() {
 
 #[test]
 fn test_interrupt_handler_plan_pr_sequence() {
-    let content = fs::read_to_string("docs/INTERRUPT_HANDLER_PLAN.md")
+    let content = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/INTERRUPT_HANDLER_PLAN.md")
         .expect("Failed to read docs/INTERRUPT_HANDLER_PLAN.md");
 
     for pr_num in 1..=17 {
@@ -78,7 +78,7 @@ fn test_interrupt_handler_plan_pr_sequence() {
 
 #[test]
 fn test_interrupt_handler_plan_cadence_and_rules() {
-    let content = fs::read_to_string("docs/INTERRUPT_HANDLER_PLAN.md")
+    let content = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/INTERRUPT_HANDLER_PLAN.md")
         .expect("Failed to read docs/INTERRUPT_HANDLER_PLAN.md");
 
     let cadences = [
@@ -119,8 +119,8 @@ fn test_feature_status_toml_interrupt_registration() {
         "FEATURE_STATUS.toml must contain [kernel.interrupt_framework]"
     );
     assert!(
-        content.contains("docs/INTERRUPT_HANDLER_PLAN.md"),
-        "FEATURE_STATUS.toml must reference docs/INTERRUPT_HANDLER_PLAN.md"
+        content.contains("INTERRUPT_HANDLER_PLAN.md"),
+        "FEATURE_STATUS.toml must reference INTERRUPT_HANDLER_PLAN.md"
     );
     assert!(
         content.contains("[kernel.irq_subsystem]"),

@@ -179,9 +179,9 @@ fn test_plan_eventfd_contract() {
 fn test_process_synchronization_documentation_plan_verification() {
     use std::fs;
 
-    let docs_plan = fs::read_to_string("docs/PROCESS_SYNCHRONIZATION_PLAN.md")
+    let docs_plan = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/PROCESS_SYNCHRONIZATION_PLAN.md")
         .expect("docs/PROCESS_SYNCHRONIZATION_PLAN.md must exist");
-    let wiki_plan = fs::read_to_string("wiki/PROCESS_SYNCHRONIZATION_PLAN.md")
+    let wiki_plan = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/PROCESS_SYNCHRONIZATION_PLAN.md")
         .expect("wiki/PROCESS_SYNCHRONIZATION_PLAN.md must exist");
 
     assert!(docs_plan

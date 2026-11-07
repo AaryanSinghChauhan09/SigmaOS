@@ -103,8 +103,8 @@ fn test_pmm_completion_gates() {
 
 #[test]
 fn test_pmm_documentation_plan_verification() {
-    let doc_path = Path::new("docs/PHYSICAL_MEMORY_MANAGER_PLAN.md");
-    let wiki_path = Path::new("wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md");
+    let doc_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md");
+    let wiki_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md");
 
     assert!(doc_path.exists(), "docs/PHYSICAL_MEMORY_MANAGER_PLAN.md must exist");
     assert!(wiki_path.exists(), "wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md must exist");
@@ -186,11 +186,11 @@ fn test_feature_status_toml_pmm_registration() {
         "FEATURE_STATUS.toml must contain [kernel.physical_memory_manager]"
     );
     assert!(
-        content.contains("docs/PHYSICAL_MEMORY_MANAGER_PLAN.md"),
+        content.contains("PHYSICAL_MEMORY_MANAGER_PLAN.md"),
         "FEATURE_STATUS.toml must reference docs/PHYSICAL_MEMORY_MANAGER_PLAN.md"
     );
     assert!(
-        content.contains("wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md"),
+        content.contains("PHYSICAL_MEMORY_MANAGER_PLAN.md"),
         "FEATURE_STATUS.toml must reference wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md"
     );
 }

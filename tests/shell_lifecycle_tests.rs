@@ -43,14 +43,14 @@ fn test_pull_request_template_exists() {
 
 #[test]
 fn test_shell_documentation_suite_exists() {
-    assert!(Path::new("docs/shell/SHELL_MAINTENANCE.md").exists());
-    assert!(Path::new("docs/shell/SHELL_CONFORMANCE.md").exists());
-    assert!(Path::new("docs/shell/GRAMMAR.md").exists());
-    assert!(Path::new("docs/shell/BUILTINS.md").exists());
-    assert!(Path::new("docs/shell/EXIT_CODES.md").exists());
-    assert!(Path::new("docs/shell/INTERACTIVE_SHELL.md").exists());
-    assert!(Path::new("docs/shell/DIAGNOSTICS.md").exists());
-    assert!(Path::new("docs/studies/2026-W41-shell-word-splitting.md").exists());
+    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-SHELL_MAINTENANCE.md").exists());
+    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-SHELL_CONFORMANCE.md").exists());
+    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-GRAMMAR.md").exists());
+    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-BUILTINS.md").exists());
+    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-EXIT_CODES.md").exists());
+    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-INTERACTIVE_SHELL.md").exists());
+    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-DIAGNOSTICS.md").exists());
+    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-studies-2026-W41-shell-word-splitting.md").exists());
 }
 
 #[test]

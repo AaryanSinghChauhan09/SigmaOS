@@ -193,8 +193,8 @@ fn test_network_development_plan_documentation_verification() {
     use std::fs;
     use std::path::Path;
 
-    let docs_path = "docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md";
-    let wiki_path = "wiki/28-Network-Development-And-Maintenance-Plan.md";
+    let docs_path = "/home/aaryansinghchauhan/SigmaOS.wiki/Doc-net-NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md";
+    let wiki_path = "/home/aaryansinghchauhan/SigmaOS.wiki/28-Network-Development-And-Maintenance-Plan.md";
 
     assert!(Path::new(docs_path).exists(), "docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md must exist");
     assert!(Path::new(wiki_path).exists(), "wiki/28-Network-Development-And-Maintenance-Plan.md must exist");
