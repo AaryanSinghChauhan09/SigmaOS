@@ -9716,12 +9716,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-rolling-release"
-description = "Rolling release update system component for SigmaOS"
+description = "Rolling release update system with real pacnew discovery, diff preview, and backed-up manual merge support"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rolling-release"
 engine = "update_manager"
 category = "Utilities"
 language = "shell"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux"]
+inspirations = ["https://archlinux.org", "https://github.com/archlinux", "https://wiki.archlinux.org/title/pacman/Pacnew_and_Pacsave"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 

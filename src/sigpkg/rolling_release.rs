@@ -460,7 +460,8 @@ impl Reflector {
         self.mirror_list.mirrors.retain(|m| {
             // Mirror URL is used as a proxy for country in this stub;
             // real impl would use GeoIP / mirror metadata
-            m.url.to_lowercase().contains(&lower) || self.mirror_list.country.to_lowercase() == lower
+            m.url.to_lowercase().contains(&lower)
+                || self.mirror_list.country.to_lowercase() == lower
         });
     }
 
@@ -511,40 +512,174 @@ impl PacnewHandler {
         }
     }
 
-    /// Discover `.pacnew` files under `/etc` (stubbed — returns canned results)
+    /// Return the latest scan snapshot. Call `scan_directory` to refresh it.
     pub fn list_pacnew_files(&mut self) -> &[PacnewFile] {
-        // Real impl: walk /etc and collect *.pacnew entries via std::fs::read_dir
-        if self.known_files.is_empty() {
-            self.known_files.push(PacnewFile {
-                original_path: "/etc/pacman.conf".to_string(),
-                pacnew_path: "/etc/pacman.conf.pacnew".to_string(),
-            });
-        }
         &self.known_files
     }
 
-    /// Produce a unified diff between the installed config and its `.pacnew` counterpart
-    pub fn diff_pacnew(&self, path: &str) -> String {
-        let pacnew = std::format!("{}.pacnew", path);
-        // Stub: real impl reads both files and produces a unified diff
-        std::format!("--- {}\n+++ {}\n@@ -1 +1 @@\n# (diff stub)\n", path, pacnew)
+    /// Find `.pacnew` files below `root` without following symlinks.
+    /// The current snapshot is replaced only after a complete successful scan.
+    pub fn scan_directory<P: AsRef<std::path::Path>>(
+        &mut self,
+        root: P,
+    ) -> std::io::Result<&[PacnewFile]> {
+        fn visit(directory: &std::path::Path, found: &mut Vec<PacnewFile>) -> std::io::Result<()> {
+            for entry in std::fs::read_dir(directory)? {
+                let entry = entry?;
+                let file_type = entry.file_type()?;
+                let path = entry.path();
+                if file_type.is_dir() {
+                    visit(&path, found)?;
+                } else if file_type.is_file() {
+                    let Some(file_name) = path.file_name().and_then(|name| name.to_str()) else {
+                        continue;
+                    };
+                    let Some(original_name) = file_name.strip_suffix(".pacnew") else {
+                        continue;
+                    };
+                    let original_path = path.with_file_name(original_name);
+                    found.push(PacnewFile {
+                        original_path: original_path.to_string_lossy().into_owned(),
+                        pacnew_path: path.to_string_lossy().into_owned(),
+                    });
+                }
+            }
+            Ok(())
+        }
+
+        let root = root.as_ref();
+        if !std::fs::symlink_metadata(root)?.is_dir() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "pacnew scan root must be a directory",
+            ));
+        }
+
+        let mut found = Vec::new();
+        visit(root, &mut found)?;
+        found.sort_by(|left, right| left.pacnew_path.cmp(&right.pacnew_path));
+        self.known_files = found;
+        Ok(&self.known_files)
     }
 
-    /// Apply the `.pacnew` file by overwriting the original (destructive!)
-    pub fn merge_pacnew(&mut self, path: &str) -> Result<(), &'static str> {
+    /// Produce a full-file unified diff preview for the current and `.pacnew`
+    /// files. Missing current files are treated as empty; I/O and UTF-8 errors
+    /// are returned to the caller.
+    pub fn diff_pacnew(&self, path: &str) -> std::io::Result<String> {
         let pacnew = std::format!("{}.pacnew", path);
-        // Stub: real impl would copy pacnew -> original, then remove pacnew
+        let current = match std::fs::read_to_string(path) {
+            Ok(contents) => contents,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => String::new(),
+            Err(error) => return Err(error),
+        };
+        let proposed = std::fs::read_to_string(&pacnew)?;
+        let mut diff = std::format!("--- {}\n+++ {}\n", path, pacnew);
+        diff.push_str(&std::format!(
+            "@@ -1,{} +1,{} @@\n",
+            current.lines().count(),
+            proposed.lines().count()
+        ));
+        for line in current.lines() {
+            diff.push_str("-");
+            diff.push_str(line);
+            diff.push('\n');
+        }
+        for line in proposed.lines() {
+            diff.push_str("+");
+            diff.push_str(line);
+            diff.push('\n');
+        }
+        Ok(diff)
+    }
+
+    /// Apply caller-reviewed merged content. The prior file is preserved as
+    /// `<path>.sigmaos-before-pacnew`; an existing backup is never overwritten.
+    pub fn merge_pacnew(&mut self, path: &str, merged_contents: &str) -> std::io::Result<()> {
+        use std::io::Write;
+
+        let original = std::path::Path::new(path);
+        let pacnew = std::path::PathBuf::from(std::format!("{}.pacnew", path));
+        let candidate_metadata = std::fs::symlink_metadata(&pacnew)?;
+        if !candidate_metadata.is_file() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "pacnew candidate must be a regular file",
+            ));
+        }
+
+        let original_metadata = match std::fs::symlink_metadata(original) {
+            Ok(metadata) if metadata.is_file() => Some(metadata),
+            Ok(_) => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    "current configuration must be a regular file",
+                ));
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+            Err(error) => return Err(error),
+        };
+
+        let backup = std::path::PathBuf::from(std::format!("{}.sigmaos-before-pacnew", path));
+        if original_metadata.is_some() {
+            std::fs::hard_link(original, &backup)?;
+        }
+
+        let parent = original
+            .parent()
+            .unwrap_or_else(|| std::path::Path::new("."));
+        let file_name = original.file_name().ok_or_else(|| {
+            std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "invalid configuration path",
+            )
+        })?;
+        let temporary = parent.join(std::format!(
+            ".{}.sigmaos-pacnew-{}.tmp",
+            file_name.to_string_lossy(),
+            std::process::id()
+        ));
+        let mut replacement_applied = false;
+        let write_result = (|| {
+            let mut file = std::fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(&temporary)?;
+            file.write_all(merged_contents.as_bytes())?;
+            file.sync_all()?;
+            let permissions = original_metadata
+                .as_ref()
+                .map(|metadata| metadata.permissions())
+                .unwrap_or_else(|| candidate_metadata.permissions());
+            std::fs::set_permissions(&temporary, permissions)?;
+            std::fs::rename(&temporary, original)?;
+            replacement_applied = true;
+            std::fs::remove_file(&pacnew)?;
+            Ok(())
+        })();
+        if write_result.is_err() {
+            let _ = std::fs::remove_file(&temporary);
+            if !replacement_applied && original_metadata.is_some() {
+                let _ = std::fs::remove_file(&backup);
+            }
+            return write_result;
+        }
+
         self.known_files.retain(|f| f.original_path != path);
-        let _ = pacnew; // suppress unused warning in stub
         Ok(())
     }
 
     /// Discard the `.pacnew` file, keeping the installed config unchanged
-    pub fn discard_pacnew(&mut self, path: &str) -> Result<(), &'static str> {
-        let pacnew = std::format!("{}.pacnew", path);
-        // Stub: real impl would remove the .pacnew file
+    pub fn discard_pacnew(&mut self, path: &str) -> std::io::Result<()> {
+        let pacnew = std::path::PathBuf::from(std::format!("{}.pacnew", path));
+        let metadata = std::fs::symlink_metadata(&pacnew)?;
+        if !metadata.is_file() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "pacnew candidate must be a regular file",
+            ));
+        }
+        std::fs::remove_file(pacnew)?;
         self.known_files.retain(|f| f.original_path != path);
-        let _ = pacnew;
         Ok(())
     }
 }
@@ -617,17 +752,38 @@ mod sigma_rolling_tests {
     fn test_reflector_rank_by_speed() {
         // Arrange
         let mut ml = MirrorList::new("Global", 1_700_000_000);
-        ml.add_mirror(make_mirror("https://slow.sigma.org", MirrorProtocol::Https, 10.0, true));
-        ml.add_mirror(make_mirror("https://fast.sigma.org", MirrorProtocol::Https, 500.0, true));
-        ml.add_mirror(make_mirror("https://mid.sigma.org", MirrorProtocol::Https, 150.0, true));
+        ml.add_mirror(make_mirror(
+            "https://slow.sigma.org",
+            MirrorProtocol::Https,
+            10.0,
+            true,
+        ));
+        ml.add_mirror(make_mirror(
+            "https://fast.sigma.org",
+            MirrorProtocol::Https,
+            500.0,
+            true,
+        ));
+        ml.add_mirror(make_mirror(
+            "https://mid.sigma.org",
+            MirrorProtocol::Https,
+            150.0,
+            true,
+        ));
         let mut reflector = Reflector::new(ml);
 
         // Act
         reflector.rank_by_speed();
 
         // Assert
-        assert_eq!(reflector.mirror_list.mirrors[0].url, "https://fast.sigma.org");
-        assert_eq!(reflector.mirror_list.mirrors[2].url, "https://slow.sigma.org");
+        assert_eq!(
+            reflector.mirror_list.mirrors[0].url,
+            "https://fast.sigma.org"
+        );
+        assert_eq!(
+            reflector.mirror_list.mirrors[2].url,
+            "https://slow.sigma.org"
+        );
     }
 
     // --- AAA: HTTPS-only filter ---
@@ -635,9 +791,24 @@ mod sigma_rolling_tests {
     fn test_reflector_https_only_filter() {
         // Arrange
         let mut ml = MirrorList::new("Global", 1_700_000_000);
-        ml.add_mirror(make_mirror("http://insecure.sigma.org", MirrorProtocol::Http, 200.0, true));
-        ml.add_mirror(make_mirror("https://secure.sigma.org", MirrorProtocol::Https, 200.0, true));
-        ml.add_mirror(make_mirror("rsync://sync.sigma.org", MirrorProtocol::Rsync, 300.0, true));
+        ml.add_mirror(make_mirror(
+            "http://insecure.sigma.org",
+            MirrorProtocol::Http,
+            200.0,
+            true,
+        ));
+        ml.add_mirror(make_mirror(
+            "https://secure.sigma.org",
+            MirrorProtocol::Https,
+            200.0,
+            true,
+        ));
+        ml.add_mirror(make_mirror(
+            "rsync://sync.sigma.org",
+            MirrorProtocol::Rsync,
+            300.0,
+            true,
+        ));
         let mut reflector = Reflector::new(ml);
 
         // Act
@@ -645,28 +816,45 @@ mod sigma_rolling_tests {
 
         // Assert
         assert_eq!(reflector.mirror_list.mirrors.len(), 1);
-        assert_eq!(reflector.mirror_list.mirrors[0].url, "https://secure.sigma.org");
+        assert_eq!(
+            reflector.mirror_list.mirrors[0].url,
+            "https://secure.sigma.org"
+        );
     }
 
-    // --- AAA: pacnew detection and discard ---
+    // --- AAA: pacnew discovery, preview, and backed-up manual merge ---
     #[test]
-    fn test_pacnew_detection_and_discard() {
-        // Arrange
+    fn test_pacnew_scan_preview_and_merge() {
+        let root =
+            std::env::temp_dir().join(std::format!("sigmaos-pacnew-test-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(root.join("nested")).unwrap();
+        let current = root.join("nested/service.conf");
+        let candidate = std::path::PathBuf::from(std::format!("{}.pacnew", current.display()));
+        let backup =
+            std::path::PathBuf::from(std::format!("{}.sigmaos-before-pacnew", current.display()));
+        std::fs::write(&current, "old setting\n").unwrap();
+        std::fs::write(&candidate, "new default\n").unwrap();
+
         let mut handler = PacnewHandler::new();
+        let files = handler.scan_directory(&root).unwrap();
+        assert_eq!(files.len(), 1);
+        assert!(handler
+            .diff_pacnew(current.to_str().unwrap())
+            .unwrap()
+            .contains("+new default"));
 
-        // Act: discover pacnew files
-        let files = handler.list_pacnew_files();
-
-        // Assert: at least one entry
-        assert!(!files.is_empty());
-        assert!(files[0].pacnew_path.ends_with(".pacnew"));
-
-        // Act: discard the pacnew
-        let path = files[0].original_path.clone();
-        assert!(handler.discard_pacnew(&path).is_ok());
-
-        // Assert: entry removed
+        handler
+            .merge_pacnew(current.to_str().unwrap(), "merged setting\n")
+            .unwrap();
+        assert_eq!(
+            std::fs::read_to_string(&current).unwrap(),
+            "merged setting\n"
+        );
+        assert_eq!(std::fs::read_to_string(&backup).unwrap(), "old setting\n");
+        assert!(!candidate.exists());
         assert!(handler.known_files.is_empty());
+        std::fs::remove_dir_all(root).unwrap();
     }
 
     // --- AAA: update channel switching ---
@@ -693,7 +881,11 @@ mod sigma_rolling_tests {
         let mut mgr = RollingReleaseManager::default();
         mgr.register_package(
             SigmaString::from("sigma-core"),
-            Version { major: 1, minor: 0, patch: 0 },
+            Version {
+                major: 1,
+                minor: 0,
+                patch: 0,
+            },
         );
 
         // Act: apply updates then rollback
@@ -706,7 +898,11 @@ mod sigma_rolling_tests {
             .package_versions
             .get(&SigmaString::from("sigma-core"))
             .copied()
-            .unwrap_or(Version { major: 0, minor: 0, patch: 0 });
+            .unwrap_or(Version {
+                major: 0,
+                minor: 0,
+                patch: 0,
+            });
         assert_eq!(ver.minor, 0); // rolled back to 1.0.0
     }
 }
