@@ -683,6 +683,11 @@ impl NamecapLinter {
         if spec.pkgname.is_empty() {
             self.errors
                 .push("pkgname is required and must not be empty".to_string());
+        } else if !Self::is_valid_package_name(&spec.pkgname) {
+            self.errors.push(format!(
+                "pkgname '{}' contains invalid characters or starts with a hyphen or dot",
+                spec.pkgname
+            ));
         } else if spec.pkgname.chars().any(|c| c.is_uppercase()) {
             self.warnings
                 .push(format!("pkgname '{}' should be lowercase", spec.pkgname));
@@ -734,6 +739,15 @@ impl NamecapLinter {
             && !ver
                 .chars()
                 .any(|character| matches!(character, ':' | '/' | '-') || character.is_whitespace())
+    }
+
+    fn is_valid_package_name(name: &str) -> bool {
+        !name.starts_with('-')
+            && !name.starts_with('.')
+            && name.chars().all(|character| {
+                character.is_ascii_alphanumeric()
+                    || matches!(character, '@' | '.' | '_' | '+' | '-')
+            })
     }
 
     fn is_valid_release(release: &str) -> bool {

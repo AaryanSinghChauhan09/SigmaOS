@@ -9650,7 +9650,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-pacman"
-description = "Pacman compatible package tooling with makepkg source checksums and Arch PKGBUILD version/release validation"
+description = "Pacman compatible package tooling with makepkg source checksums and Arch PKGBUILD name/version/release validation"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman"
 engine = "pkg_manager"
 category = "Package Management"
