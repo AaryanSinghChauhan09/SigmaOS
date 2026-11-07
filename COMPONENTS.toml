@@ -10266,12 +10266,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-pacman-contrib"
-description = "Pacman contrib tools with ALPM version-aware checkupdates and paccache pruning"
+description = "Pacman contrib tools with ALPM version checks, cache pruning, and SHA-256 PKGBUILD checksums"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman-contrib"
 engine = "package_tools"
 category = "Package Management"
 language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman-contrib", "https://man.archlinux.org/man/core/pacman/vercmp.8.en", "https://man.archlinux.org/man/paccache.8"]
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman-contrib", "https://man.archlinux.org/man/core/pacman/vercmp.8.en", "https://man.archlinux.org/man/paccache.8", "https://man.archlinux.org/man/updpkgsums.8.en"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 

@@ -398,14 +398,14 @@ impl UpdPkgSumsGenerator {
         Self
     }
 
-    /// Computes SHA-256 hash string for source data
+    /// Computes the lowercase SHA-256 digest used by PKGBUILD sha256sums.
     pub fn compute_sha256(data: &[u8]) -> String {
-        let mut hash: u64 = 14695981039346656037;
-        for &byte in data {
-            hash ^= byte as u64;
-            hash = hash.wrapping_mul(1099511628211);
+        let digest = crate::crypto::primitives::sha256_hash(data);
+        let mut hex = String::with_capacity(64);
+        for byte in digest.data {
+            hex.push_str(&format!("{:02x}", byte));
         }
-        format!("{:016x}{:016x}", hash, hash.swap_bytes())
+        hex
     }
 
     /// Replaces or appends sha256sums array in PKGBUILD script text
