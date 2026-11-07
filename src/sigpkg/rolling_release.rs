@@ -47,6 +47,7 @@ pub struct RollingReleaseManager {
     update_channel: UpdateChannel,
     auto_update_enabled: bool,
     package_versions: HashMap<SigmaString, Version>,
+    sync_packages: HashMap<SigmaString, Version>,
     update_history: Vec<PackageUpdate>,
 }
 
@@ -57,6 +58,7 @@ impl RollingReleaseManager {
             update_channel: channel,
             auto_update_enabled: false,
             package_versions: HashMap::new(),
+            sync_packages: HashMap::new(),
             update_history: Vec::new(),
         }
     }
@@ -75,6 +77,12 @@ impl RollingReleaseManager {
 
     pub fn register_package(&mut self, name: SigmaString, version: Version) {
         self.package_versions.insert(name, version);
+    }
+
+    /// Replace the available package set with one repository database snapshot.
+    /// An empty snapshot is valid and produces no available updates.
+    pub fn replace_sync_database(&mut self, packages: HashMap<SigmaString, Version>) {
+        self.sync_packages = packages;
     }
 
     pub fn check_for_updates(
@@ -116,10 +124,14 @@ impl RollingReleaseManager {
     }
 
     pub fn apply_update(&mut self, update: PackageUpdate) -> Result<(), &'static str> {
-        if let Some(current_version) = self.package_versions.get(&update.package_name) {
-            if *current_version != update.old_version {
-                return Err("Version mismatch - package already updated");
-            }
+        let Some(current_version) = self.package_versions.get(&update.package_name) else {
+            return Err("Package is not installed");
+        };
+        if *current_version != update.old_version {
+            return Err("Version mismatch - package already updated");
+        }
+        if update.new_version <= update.old_version {
+            return Err("Update version must be newer than the installed version");
         }
 
         self.package_versions
@@ -692,32 +704,29 @@ impl Default for PacnewHandler {
 
 // Extend RollingReleaseManager with the new Arch-inspired methods
 impl RollingReleaseManager {
-    /// Return a canned list of pending package updates (stub / mock data)
+    /// Compare installed versions with the current sync database snapshot.
     pub fn check_updates(&self) -> Vec<PackageUpdate> {
-        // Real impl: query remote mirror for package db and diff against installed
-        vec![PackageUpdate {
-            package_name: SigmaString::from("sigma-core"),
-            old_version: Version {
-                major: 1,
-                minor: 0,
-                patch: 0,
-            },
-            new_version: Version {
-                major: 1,
-                minor: 1,
-                patch: 0,
-            },
-            update_type: UpdateType::Minor,
-            security_critical: false,
-        }]
+        self.check_for_updates(&self.sync_packages)
     }
 
-    /// Apply all pending updates (delegates to apply_update per entry)
-    pub fn apply_updates(&mut self) {
+    /// Apply the complete plan from the current snapshot.
+    /// All installed versions are checked before any package state changes.
+    pub fn apply_updates(&mut self) -> Result<Vec<PackageUpdate>, &'static str> {
         let pending = self.check_updates();
-        for update in pending {
-            let _ = self.apply_update(update);
+        for update in &pending {
+            match self.package_versions.get(&update.package_name) {
+                Some(current) if *current == update.old_version => {}
+                Some(_) => return Err("Version mismatch - refresh the upgrade plan"),
+                None => return Err("Package is not installed"),
+            }
         }
+
+        for update in &pending {
+            self.package_versions
+                .insert(update.package_name.clone(), update.new_version);
+            self.update_history.push(update.clone());
+        }
+        Ok(pending)
     }
 
     /// Roll back the most recently applied update
@@ -888,8 +897,18 @@ mod sigma_rolling_tests {
             },
         );
 
-        // Act: apply updates then rollback
-        mgr.apply_updates();
+        // Act: load a repository snapshot, apply its complete upgrade plan, then roll back.
+        let mut sync_packages = HashMap::new();
+        sync_packages.insert(
+            SigmaString::from("sigma-core"),
+            Version {
+                major: 1,
+                minor: 1,
+                patch: 0,
+            },
+        );
+        mgr.replace_sync_database(sync_packages);
+        assert!(mgr.apply_updates().is_ok());
         let rollback_result = mgr.rollback_last();
 
         // Assert
