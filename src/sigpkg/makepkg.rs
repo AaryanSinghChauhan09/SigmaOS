@@ -688,22 +688,24 @@ impl NamecapLinter {
                 .push(format!("pkgname '{}' should be lowercase", spec.pkgname));
         }
 
-        // Required: valid semver-like version (N.N.N or N.N or N)
+        // Arch allows upstream version formats beyond numeric dotted semver,
+        // while reserving separators used by package filenames and versioning.
         if spec.pkgver.is_empty() {
             self.errors.push("pkgver is required".to_string());
         } else if !Self::is_valid_version(&spec.pkgver) {
             self.errors.push(format!(
-                "pkgver '{}' is not a valid version (expected digits and dots)",
+                "pkgver '{}' must not contain colons, slashes, hyphens, or whitespace",
                 spec.pkgver
             ));
         }
 
-        // Required: pkgrel must be a positive integer
+        // Required: pkgrel is a positive integer, optionally with a positive
+        // subrelease in x.y form.
         if spec.pkgrel.is_empty() {
             self.errors.push("pkgrel is required".to_string());
-        } else if spec.pkgrel.parse::<u32>().is_err() {
+        } else if !Self::is_valid_release(&spec.pkgrel) {
             self.errors.push(format!(
-                "pkgrel '{}' must be a positive integer",
+                "pkgrel '{}' must be a positive integer or positive x.y release",
                 spec.pkgrel
             ));
         }
@@ -726,15 +728,27 @@ impl NamecapLinter {
         }
     }
 
-    /// Validate a version string: digits separated by dots, optionally suffixed with _pre/_rc etc.
+    /// Validate the characters Arch reserves in PKGBUILD pkgver values.
     fn is_valid_version(ver: &str) -> bool {
-        // Accept N, N.N, N.N.N, N.N.N.N — purely numeric dot-separated components
-        // Also accept trailing pre-release tags like "1.0_rc1"
-        let base = ver.split('_').next().unwrap_or("");
-        !base.is_empty()
-            && base
-                .split('.')
-                .all(|part| !part.is_empty() && part.chars().all(|c| c.is_ascii_digit()))
+        !ver.is_empty()
+            && !ver
+                .chars()
+                .any(|character| matches!(character, ':' | '/' | '-') || character.is_whitespace())
+    }
+
+    fn is_valid_release(release: &str) -> bool {
+        let mut parts = release.split('.');
+        let positive_integer = |part: &str| {
+            !part.is_empty()
+                && part.bytes().all(|byte| byte.is_ascii_digit())
+                && part.parse::<u64>().map(|value| value > 0).unwrap_or(false)
+        };
+
+        match (parts.next(), parts.next(), parts.next()) {
+            (Some(major), None, None) => positive_integer(major),
+            (Some(major), Some(minor), None) => positive_integer(major) && positive_integer(minor),
+            _ => false,
+        }
     }
 }
 
@@ -857,7 +871,7 @@ mod sigma_makepkg_tests {
         // Arrange
         let spec = MakepkgBuilder::new()
             .pkgname("test-pkg")
-            .pkgver("not_a_version!!")
+            .pkgver("1.0-invalid")
             .pkgrel("1")
             .build();
         let mut linter = NamecapLinter::new();
