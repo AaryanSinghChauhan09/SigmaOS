@@ -798,3 +798,283 @@ mod tests {
         assert_eq!(init.system_state().to_string(), "booting");
     }
 }
+
+// ============================================================================
+// Arch Linux systemd Compatibility: Journal, Socket Activation & Timers
+// ============================================================================
+
+use alloc::format;
+
+/// Priority level for journal logs (systemd-journald RFC 5424 mapping)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum JournalPriority {
+    Emergency = 0,
+    Alert = 1,
+    Critical = 2,
+    Error = 3,
+    Warning = 4,
+    Notice = 5,
+    Info = 6,
+    Debug = 7,
+}
+
+impl fmt::Display for JournalPriority {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Emergency => write!(f, "emerg"),
+            Self::Alert => write!(f, "alert"),
+            Self::Critical => write!(f, "crit"),
+            Self::Error => write!(f, "err"),
+            Self::Warning => write!(f, "warning"),
+            Self::Notice => write!(f, "notice"),
+            Self::Info => write!(f, "info"),
+            Self::Debug => write!(f, "debug"),
+        }
+    }
+}
+
+/// A structured journal log record
+#[derive(Debug, Clone, PartialEq)]
+pub struct JournalEntry {
+    pub timestamp_us: u64,
+    pub unit: String,
+    pub priority: JournalPriority,
+    pub message: String,
+    pub pid: u32,
+}
+
+/// In-memory ring buffer for systemd-journald parity
+#[derive(Debug, Clone)]
+pub struct JournalManager {
+    entries: Vec<JournalEntry>,
+    max_entries: usize,
+}
+
+impl Default for JournalManager {
+    fn default() -> Self {
+        Self::new(10_000)
+    }
+}
+
+impl JournalManager {
+    pub fn new(max_entries: usize) -> Self {
+        Self {
+            entries: Vec::new(),
+            max_entries,
+        }
+    }
+
+    pub fn log(&mut self, unit: &str, priority: JournalPriority, pid: u32, message: &str, timestamp_us: u64) {
+        if self.entries.len() >= self.max_entries {
+            self.entries.remove(0);
+        }
+        self.entries.push(JournalEntry {
+            timestamp_us,
+            unit: unit.to_string(),
+            priority,
+            message: message.to_string(),
+            pid,
+        });
+    }
+
+    pub fn query_by_unit<'a>(&'a self, unit: &str) -> Vec<&'a JournalEntry> {
+        self.entries.iter().filter(|e| e.unit == unit).collect()
+    }
+
+    pub fn query_by_priority<'a>(&'a self, max_priority: JournalPriority) -> Vec<&'a JournalEntry> {
+        self.entries.iter().filter(|e| e.priority <= max_priority).collect()
+    }
+
+    pub fn tail(&self, n: usize) -> &[JournalEntry] {
+        let len = self.entries.len();
+        if n >= len {
+            &self.entries
+        } else {
+            &self.entries[len - n..]
+        }
+    }
+
+    pub fn count(&self) -> usize {
+        self.entries.len()
+    }
+}
+
+/// Protocol for socket-activated system units (e.g. systemd.socket)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketProtocol {
+    Stream,
+    Datagram,
+    SequentialPacket,
+}
+
+/// Socket activation unit (systemd `.socket` parity)
+#[derive(Debug, Clone, PartialEq)]
+pub struct SocketUnit {
+    pub name: String,
+    pub listen_address: String,
+    pub service_name: String,
+    pub protocol: SocketProtocol,
+    pub active: bool,
+    pub pending_connections: usize,
+}
+
+impl SocketUnit {
+    pub fn new(name: &str, listen_address: &str, service_name: &str, protocol: SocketProtocol) -> Self {
+        Self {
+            name: name.to_string(),
+            listen_address: listen_address.to_string(),
+            service_name: service_name.to_string(),
+            protocol,
+            active: false,
+            pending_connections: 0,
+        }
+    }
+
+    pub fn listen(&mut self) {
+        self.active = true;
+    }
+
+    pub fn close(&mut self) {
+        self.active = false;
+        self.pending_connections = 0;
+    }
+
+    pub fn queue_connection(&mut self) {
+        if self.active {
+            self.pending_connections += 1;
+        }
+    }
+
+    pub fn trigger_activation(&mut self) -> Result<String, &'static str> {
+        if !self.active {
+            return Err("Socket unit is inactive");
+        }
+        if self.pending_connections == 0 {
+            return Err("No pending connections to trigger service");
+        }
+        self.pending_connections -= 1;
+        Ok(self.service_name.clone())
+    }
+}
+
+/// Monotonic schedule specifications for systemd-style timers
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TimerSchedule {
+    OnBootSec(u64),
+    OnUnitActiveSec(u64),
+    Daily,
+    Weekly,
+}
+
+/// Timer unit (systemd `.timer` parity)
+#[derive(Debug, Clone, PartialEq)]
+pub struct TimerUnit {
+    pub name: String,
+    pub target_service: String,
+    pub schedule: TimerSchedule,
+    pub last_triggered_us: u64,
+    pub enabled: bool,
+}
+
+impl TimerUnit {
+    pub fn new(name: &str, target_service: &str, schedule: TimerSchedule) -> Self {
+        Self {
+            name: name.to_string(),
+            target_service: target_service.to_string(),
+            schedule,
+            last_triggered_us: 0,
+            enabled: true,
+        }
+    }
+
+    pub fn should_trigger(&self, current_time_us: u64) -> bool {
+        if !self.enabled {
+            return false;
+        }
+        match self.schedule {
+            TimerSchedule::OnBootSec(sec) => {
+                self.last_triggered_us == 0 && current_time_us >= sec * 1_000_000
+            }
+            TimerSchedule::OnUnitActiveSec(sec) => {
+                current_time_us >= self.last_triggered_us + sec * 1_000_000
+            }
+            TimerSchedule::Daily => {
+                current_time_us >= self.last_triggered_us + 86_400 * 1_000_000
+            }
+            TimerSchedule::Weekly => {
+                current_time_us >= self.last_triggered_us + 7 * 86_400 * 1_000_000
+            }
+        }
+    }
+
+    pub fn mark_triggered(&mut self, current_time_us: u64) {
+        self.last_triggered_us = current_time_us;
+    }
+}
+
+#[cfg(test)]
+mod arch_systemd_tests {
+    use super::*;
+
+    // --- AAA Pattern: Journal logging and priority filtering ---
+    #[test]
+    fn test_journal_log_and_query() {
+        // Arrange
+        let mut journal = JournalManager::new(100);
+
+        // Act
+        journal.log("systemd-networkd", JournalPriority::Info, 101, "Link eth0 entered state configured", 1_000_000);
+        journal.log("sshd", JournalPriority::Error, 202, "Failed password for invalid user root", 1_500_000);
+        journal.log("systemd-networkd", JournalPriority::Debug, 101, "Carrier lost on wlan0", 2_000_000);
+
+        // Assert: query by unit
+        let net_logs = journal.query_by_unit("systemd-networkd");
+        assert_eq!(net_logs.len(), 2);
+        assert_eq!(net_logs[0].message, "Link eth0 entered state configured");
+
+        // Assert: query by priority (Errors only)
+        let errors = journal.query_by_priority(JournalPriority::Error);
+        assert_eq!(errors.len(), 1);
+        assert_eq!(errors[0].unit, "sshd");
+    }
+
+    // --- AAA Pattern: Socket activation trigger ---
+    #[test]
+    fn test_socket_activation_lifecycle() {
+        // Arrange
+        let mut socket = SocketUnit::new("sshd.socket", "0.0.0.0:22", "sshd.service", SocketProtocol::Stream);
+        socket.listen();
+
+        // Act: incoming connection received
+        socket.queue_connection();
+        let service = socket.trigger_activation();
+
+        // Assert
+        assert!(service.is_ok());
+        assert_eq!(service.unwrap(), "sshd.service");
+        assert_eq!(socket.pending_connections, 0);
+
+        // Further activation without pending connections fails cleanly
+        assert!(socket.trigger_activation().is_err());
+    }
+
+    // --- AAA Pattern: Timer scheduling evaluation ---
+    #[test]
+    fn test_timer_unit_trigger_evaluation() {
+        // Arrange
+        let mut timer = TimerUnit::new("fstrim.timer", "fstrim.service", TimerSchedule::OnUnitActiveSec(3600));
+
+        // Act & Assert before interval (1800s)
+        assert!(!timer.should_trigger(1800 * 1_000_000));
+
+        // Act & Assert after interval (3601s)
+        assert!(timer.should_trigger(3601 * 1_000_000));
+
+        // Mark triggered at 3601s
+        timer.mark_triggered(3601 * 1_000_000);
+
+        // Assert reset
+        assert!(!timer.should_trigger(3602 * 1_000_000));
+        assert!(timer.should_trigger((3601 + 3601) * 1_000_000));
+    }
+}

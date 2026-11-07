@@ -380,3 +380,326 @@ mod tests {
         assert!(mgr.verify_signature(&sig));
     }
 }
+
+// ============================================================================
+// Arch Linux DKMS (Dynamic Kernel Module Support) & modprobe.d Extensions
+// Inspired by: dkms, kmod / modprobe.d
+// ============================================================================
+
+/// Lifecycle state of a DKMS kernel module
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DkmsState {
+    Added,
+    Built,
+    Installed,
+    PoorInstall,
+}
+
+/// Dynamic Kernel Module descriptor (e.g. nvidia-dkms, zfs-dkms)
+#[derive(Debug, Clone, PartialEq)]
+pub struct DkmsModule {
+    pub name: String,
+    pub version: String,
+    pub source_path: String,
+    pub built_kernels: Vec<String>,
+    pub installed_kernels: Vec<String>,
+    pub state: DkmsState,
+    pub auto_rebuild: bool,
+}
+
+impl DkmsModule {
+    pub fn new(name: &str, version: &str, source_path: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            version: version.to_string(),
+            source_path: source_path.to_string(),
+            built_kernels: Vec::new(),
+            installed_kernels: Vec::new(),
+            state: DkmsState::Added,
+            auto_rebuild: true,
+        }
+    }
+}
+
+/// Errors from DKMS build, install, or removal operations
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DkmsError {
+    NotFound(String),
+    BuildFailed(String),
+    InstallFailed(String),
+    AlreadyInstalled(String),
+    Blacklisted(String),
+}
+
+impl core::fmt::Display for DkmsError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::NotFound(name) => write!(f, "DKMS module not registered: {}", name),
+            Self::BuildFailed(msg) => write!(f, "DKMS module compilation failure: {}", msg),
+            Self::InstallFailed(msg) => write!(f, "DKMS module install failure: {}", msg),
+            Self::AlreadyInstalled(name) => write!(f, "DKMS module already installed for kernel: {}", name),
+            Self::Blacklisted(name) => write!(f, "Module is blacklisted in modprobe.d: {}", name),
+        }
+    }
+}
+
+/// Status summary row for `dkms status` CLI parity
+#[derive(Debug, Clone, PartialEq)]
+pub struct DkmsStatusReport {
+    pub module_name: String,
+    pub module_version: String,
+    pub kernel_version: String,
+    pub state: DkmsState,
+}
+
+/// DKMS Manager orchestrating module builds across installed kernel targets
+#[derive(Debug, Clone, Default)]
+pub struct DkmsManager {
+    modules: BTreeMap<String, DkmsModule>,
+}
+
+impl DkmsManager {
+    pub fn new() -> Self {
+        Self {
+            modules: BTreeMap::new(),
+        }
+    }
+
+    pub fn register(&mut self, module: DkmsModule) {
+        self.modules.insert(module.name.clone(), module);
+    }
+
+    pub fn unregister(&mut self, name: &str) -> Option<DkmsModule> {
+        self.modules.remove(name)
+    }
+
+    pub fn get(&self, name: &str) -> Option<&DkmsModule> {
+        self.modules.get(name)
+    }
+
+    pub fn build_for_kernel(&mut self, name: &str, kernel_ver: &str) -> Result<(), DkmsError> {
+        let mod_entry = self.modules.get_mut(name).ok_or_else(|| DkmsError::NotFound(name.to_string()))?;
+        if !mod_entry.built_kernels.contains(&kernel_ver.to_string()) {
+            mod_entry.built_kernels.push(kernel_ver.to_string());
+        }
+        mod_entry.state = DkmsState::Built;
+        Ok(())
+    }
+
+    pub fn install_for_kernel(&mut self, name: &str, kernel_ver: &str) -> Result<(), DkmsError> {
+        let mod_entry = self.modules.get_mut(name).ok_or_else(|| DkmsError::NotFound(name.to_string()))?;
+        if !mod_entry.built_kernels.contains(&kernel_ver.to_string()) {
+            return Err(DkmsError::InstallFailed(format!("Module {} not built for {}", name, kernel_ver)));
+        }
+        if mod_entry.installed_kernels.contains(&kernel_ver.to_string()) {
+            return Err(DkmsError::AlreadyInstalled(format!("{}/{}", name, kernel_ver)));
+        }
+        mod_entry.installed_kernels.push(kernel_ver.to_string());
+        mod_entry.state = DkmsState::Installed;
+        Ok(())
+    }
+
+    pub fn autoinstall(&mut self, kernel_ver: &str) -> Vec<Result<(), DkmsError>> {
+        let mut results = Vec::new();
+        let module_names: Vec<String> = self.modules
+            .values()
+            .filter(|m| m.auto_rebuild)
+            .map(|m| m.name.clone())
+            .collect();
+
+        for name in module_names {
+            let res = self.build_for_kernel(&name, kernel_ver)
+                .and_then(|_| self.install_for_kernel(&name, kernel_ver));
+            results.push(res);
+        }
+        results
+    }
+
+    pub fn status(&self) -> Vec<DkmsStatusReport> {
+        let mut reports = Vec::new();
+        for m in self.modules.values() {
+            if m.installed_kernels.is_empty() && m.built_kernels.is_empty() {
+                reports.push(DkmsStatusReport {
+                    module_name: m.name.clone(),
+                    module_version: m.version.clone(),
+                    kernel_version: "none".to_string(),
+                    state: m.state,
+                });
+            } else {
+                for k in &m.installed_kernels {
+                    reports.push(DkmsStatusReport {
+                        module_name: m.name.clone(),
+                        module_version: m.version.clone(),
+                        kernel_version: k.clone(),
+                        state: DkmsState::Installed,
+                    });
+                }
+                for k in &m.built_kernels {
+                    if !m.installed_kernels.contains(k) {
+                        reports.push(DkmsStatusReport {
+                            module_name: m.name.clone(),
+                            module_version: m.version.clone(),
+                            kernel_version: k.clone(),
+                            state: DkmsState::Built,
+                        });
+                    }
+                }
+            }
+        }
+        reports
+    }
+}
+
+/// Parser and repository for modprobe.d configuration directives
+#[derive(Debug, Clone, Default)]
+pub struct ModprobeConf {
+    pub blacklists: Vec<String>,
+    pub options: BTreeMap<String, BTreeMap<String, String>>, // module -> (param -> value)
+    pub aliases: BTreeMap<String, String>, // alias -> module
+}
+
+impl ModprobeConf {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn add_blacklist(&mut self, module_name: &str) {
+        if !self.blacklists.contains(&module_name.to_string()) {
+            self.blacklists.push(module_name.to_string());
+        }
+    }
+
+    pub fn is_blacklisted(&self, module_name: &str) -> bool {
+        self.blacklists.iter().any(|b| b == module_name)
+    }
+
+    pub fn set_option(&mut self, module_name: &str, param: &str, value: &str) {
+        self.options
+            .entry(module_name.to_string())
+            .or_default()
+            .insert(param.to_string(), value.to_string());
+    }
+
+    pub fn get_options(&self, module_name: &str) -> Option<&BTreeMap<String, String>> {
+        self.options.get(module_name)
+    }
+
+    pub fn add_alias(&mut self, alias: &str, module: &str) {
+        self.aliases.insert(alias.to_string(), module.to_string());
+    }
+
+    pub fn resolve_alias<'a>(&'a self, name: &'a str) -> &'a str {
+        self.aliases.get(name).map(|s| s.as_str()).unwrap_or(name)
+    }
+
+    /// Parse a single modprobe.d config file content
+    pub fn parse_file(&mut self, content: &str) {
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            let tokens: Vec<&str> = trimmed.split_whitespace().collect();
+            if tokens.is_empty() {
+                continue;
+            }
+            match tokens[0] {
+                "blacklist" if tokens.len() >= 2 => {
+                    self.add_blacklist(tokens[1]);
+                }
+                "alias" if tokens.len() >= 3 => {
+                    self.add_alias(tokens[1], tokens[2]);
+                }
+                "options" if tokens.len() >= 3 => {
+                    let mod_name = tokens[1];
+                    for opt in &tokens[2..] {
+                        if let Some((k, v)) = opt.split_once('=') {
+                            self.set_option(mod_name, k, v);
+                        } else {
+                            self.set_option(mod_name, opt, "1");
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod arch_dkms_tests {
+    use super::*;
+
+    // --- AAA Pattern: DKMS Registration and Kernel Build ---
+    #[test]
+    fn test_dkms_register_and_build() {
+        // Arrange
+        let mut dkms = DkmsManager::new();
+        let module = DkmsModule::new("zfs", "2.2.3", "/usr/src/zfs-2.2.3");
+        let kernel_ver = "6.8.9-arch1-1";
+
+        // Act
+        dkms.register(module);
+        let build_res = dkms.build_for_kernel("zfs", kernel_ver);
+        let install_res = dkms.install_for_kernel("zfs", kernel_ver);
+
+        // Assert
+        assert!(build_res.is_ok());
+        assert!(install_res.is_ok());
+        let zfs = dkms.get("zfs").unwrap();
+        assert_eq!(zfs.state, DkmsState::Installed);
+        assert!(zfs.installed_kernels.contains(&kernel_ver.to_string()));
+    }
+
+    // --- AAA Pattern: DKMS Autoinstall ---
+    #[test]
+    fn test_dkms_autoinstall_on_new_kernel() {
+        // Arrange
+        let mut dkms = DkmsManager::new();
+        let mod1 = DkmsModule::new("nvidia", "550.78", "/usr/src/nvidia-550.78");
+        let mod2 = DkmsModule::new("v4l2loopback", "0.13.1", "/usr/src/v4l2loopback-0.13.1");
+        dkms.register(mod1);
+        dkms.register(mod2);
+        let new_kernel = "6.9.1-arch1-1";
+
+        // Act
+        let results = dkms.autoinstall(new_kernel);
+
+        // Assert
+        assert_eq!(results.len(), 2);
+        for res in results {
+            assert!(res.is_ok());
+        }
+        let status = dkms.status();
+        assert_eq!(status.len(), 2);
+        assert!(status.iter().all(|s| s.state == DkmsState::Installed && s.kernel_version == new_kernel));
+    }
+
+    // --- AAA Pattern: modprobe.d Blacklisting and Options ---
+    #[test]
+    fn test_modprobe_conf_parsing() {
+        // Arrange
+        let mut conf = ModprobeConf::new();
+        let config_text = "\
+# Blacklist nouveau in favor of nvidia
+blacklist nouveau
+blacklist rivafb
+# Aliases
+alias eth0 e1000e
+# Module parameters
+options iwlwifi power_save=1 11n_disable=8
+";
+
+        // Act
+        conf.parse_file(config_text);
+
+        // Assert
+        assert!(conf.is_blacklisted("nouveau"));
+        assert!(conf.is_blacklisted("rivafb"));
+        assert!(!conf.is_blacklisted("e1000e"));
+        assert_eq!(conf.resolve_alias("eth0"), "e1000e");
+        let iwl_opts = conf.get_options("iwlwifi").unwrap();
+        assert_eq!(iwl_opts.get("power_save"), Some(&"1".to_string()));
+        assert_eq!(iwl_opts.get("11n_disable"), Some(&"8".to_string()));
+    }
+}

@@ -6,7 +6,16 @@ use std::vec::Vec;
 use std::collections::HashMap;
 use std::string::String;
 type SigmaString = String;
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::Version;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Version {
+    pub major: u32,
+    pub minor: u32,
+    pub patch: u32,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UpdateChannel {
@@ -377,5 +386,327 @@ mod tests {
         list.rank_mirrors();
         assert_eq!(list.mirrors[0].url.as_str(), "https://fast.arch.org");
         assert_eq!(list.mirrors[1].url.as_str(), "https://slow.arch.org");
+    }
+}
+
+// ============================================================================
+// Arch Linux Rolling Release Improvements: MirrorList, Reflector, PacnewHandler
+// ============================================================================
+
+/// Mirror transport protocol
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MirrorProtocol {
+    Https,
+    Http,
+    Rsync,
+}
+
+/// A single package mirror entry
+#[derive(Debug, Clone)]
+pub struct Mirror {
+    pub url: String,
+    pub protocol: MirrorProtocol,
+    pub speed_mbps: f64,
+    pub score: f64,
+    pub active: bool,
+}
+
+/// An ordered list of mirrors for a country / region
+#[derive(Debug, Clone)]
+pub struct MirrorList {
+    pub mirrors: Vec<Mirror>,
+    pub country: String,
+    /// Unix epoch timestamp of the last mirror list refresh
+    pub last_updated: u64,
+}
+
+impl MirrorList {
+    pub fn new(country: &str, last_updated: u64) -> Self {
+        Self {
+            mirrors: Vec::new(),
+            country: country.to_string(),
+            last_updated,
+        }
+    }
+
+    pub fn add_mirror(&mut self, mirror: Mirror) {
+        self.mirrors.push(mirror);
+    }
+}
+
+/// Reflector: ranks and filters mirrors (mirrors Arch Linux's `reflector` tool)
+#[derive(Debug, Clone)]
+pub struct Reflector {
+    pub mirror_list: MirrorList,
+}
+
+impl Reflector {
+    pub fn new(mirror_list: MirrorList) -> Self {
+        Self { mirror_list }
+    }
+
+    /// Sort mirrors by speed descending (highest bandwidth first)
+    pub fn rank_by_speed(&mut self) {
+        self.mirror_list.mirrors.sort_by(|a, b| {
+            b.speed_mbps
+                .partial_cmp(&a.speed_mbps)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
+    }
+
+    /// Keep only mirrors for the given country (case-insensitive)
+    pub fn filter_by_country(&mut self, country: &str) {
+        let lower = country.to_lowercase();
+        self.mirror_list.mirrors.retain(|m| {
+            // Mirror URL is used as a proxy for country in this stub;
+            // real impl would use GeoIP / mirror metadata
+            m.url.to_lowercase().contains(&lower) || self.mirror_list.country.to_lowercase() == lower
+        });
+    }
+
+    /// Discard any mirrors that are not using HTTPS
+    pub fn filter_by_https_only(&mut self) {
+        self.mirror_list
+            .mirrors
+            .retain(|m| m.protocol == MirrorProtocol::Https);
+    }
+
+    /// Serialise the mirror list into a pacman-style mirrorlist string
+    pub fn save_mirrorlist(&self) -> String {
+        let mut out = String::new();
+        out.push_str(&std::format!(
+            "# SigmaOS Mirrorlist — country: {} — updated: {}\n",
+            self.mirror_list.country,
+            self.mirror_list.last_updated
+        ));
+        for mirror in &self.mirror_list.mirrors {
+            if mirror.active {
+                out.push_str(&std::format!("Server = {}\n", mirror.url));
+            } else {
+                out.push_str(&std::format!("#Server = {}\n", mirror.url));
+            }
+        }
+        out
+    }
+}
+
+/// A `.pacnew` conflict file discovered on the system
+#[derive(Debug, Clone)]
+pub struct PacnewFile {
+    pub original_path: String,
+    pub pacnew_path: String,
+}
+
+/// Handles `.pacnew` merge conflicts (Arch Linux pacdiff parity)
+#[derive(Debug, Clone)]
+pub struct PacnewHandler {
+    /// Known `.pacnew` files; populated via `list_pacnew_files()`
+    pub known_files: Vec<PacnewFile>,
+}
+
+impl PacnewHandler {
+    pub fn new() -> Self {
+        Self {
+            known_files: Vec::new(),
+        }
+    }
+
+    /// Discover `.pacnew` files under `/etc` (stubbed — returns canned results)
+    pub fn list_pacnew_files(&mut self) -> &[PacnewFile] {
+        // Real impl: walk /etc and collect *.pacnew entries via std::fs::read_dir
+        if self.known_files.is_empty() {
+            self.known_files.push(PacnewFile {
+                original_path: "/etc/pacman.conf".to_string(),
+                pacnew_path: "/etc/pacman.conf.pacnew".to_string(),
+            });
+        }
+        &self.known_files
+    }
+
+    /// Produce a unified diff between the installed config and its `.pacnew` counterpart
+    pub fn diff_pacnew(&self, path: &str) -> String {
+        let pacnew = std::format!("{}.pacnew", path);
+        // Stub: real impl reads both files and produces a unified diff
+        std::format!("--- {}\n+++ {}\n@@ -1 +1 @@\n# (diff stub)\n", path, pacnew)
+    }
+
+    /// Apply the `.pacnew` file by overwriting the original (destructive!)
+    pub fn merge_pacnew(&mut self, path: &str) -> Result<(), &'static str> {
+        let pacnew = std::format!("{}.pacnew", path);
+        // Stub: real impl would copy pacnew -> original, then remove pacnew
+        self.known_files.retain(|f| f.original_path != path);
+        let _ = pacnew; // suppress unused warning in stub
+        Ok(())
+    }
+
+    /// Discard the `.pacnew` file, keeping the installed config unchanged
+    pub fn discard_pacnew(&mut self, path: &str) -> Result<(), &'static str> {
+        let pacnew = std::format!("{}.pacnew", path);
+        // Stub: real impl would remove the .pacnew file
+        self.known_files.retain(|f| f.original_path != path);
+        let _ = pacnew;
+        Ok(())
+    }
+}
+
+impl Default for PacnewHandler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// Extend RollingReleaseManager with the new Arch-inspired methods
+impl RollingReleaseManager {
+    /// Return a canned list of pending package updates (stub / mock data)
+    pub fn check_updates(&self) -> Vec<PackageUpdate> {
+        // Real impl: query remote mirror for package db and diff against installed
+        vec![PackageUpdate {
+            package_name: SigmaString::from("sigma-core"),
+            old_version: Version {
+                major: 1,
+                minor: 0,
+                patch: 0,
+            },
+            new_version: Version {
+                major: 1,
+                minor: 1,
+                patch: 0,
+            },
+            update_type: UpdateType::Minor,
+            security_critical: false,
+        }]
+    }
+
+    /// Apply all pending updates (delegates to apply_update per entry)
+    pub fn apply_updates(&mut self) {
+        let pending = self.check_updates();
+        for update in pending {
+            let _ = self.apply_update(update);
+        }
+    }
+
+    /// Roll back the most recently applied update
+    pub fn rollback_last(&mut self) -> Result<(), &'static str> {
+        if let Some(last) = self.update_history.last().cloned() {
+            self.package_versions
+                .insert(last.package_name.clone(), last.old_version);
+            self.update_history.pop();
+            Ok(())
+        } else {
+            Err("No updates in history to roll back")
+        }
+    }
+}
+
+#[cfg(test)]
+mod sigma_rolling_tests {
+    use super::*;
+
+    fn make_mirror(url: &str, protocol: MirrorProtocol, speed: f64, active: bool) -> Mirror {
+        Mirror {
+            url: url.to_string(),
+            protocol,
+            speed_mbps: speed,
+            score: speed / 100.0,
+            active,
+        }
+    }
+
+    // --- AAA: mirror ranking by speed ---
+    #[test]
+    fn test_reflector_rank_by_speed() {
+        // Arrange
+        let mut ml = MirrorList::new("Global", 1_700_000_000);
+        ml.add_mirror(make_mirror("https://slow.sigma.org", MirrorProtocol::Https, 10.0, true));
+        ml.add_mirror(make_mirror("https://fast.sigma.org", MirrorProtocol::Https, 500.0, true));
+        ml.add_mirror(make_mirror("https://mid.sigma.org", MirrorProtocol::Https, 150.0, true));
+        let mut reflector = Reflector::new(ml);
+
+        // Act
+        reflector.rank_by_speed();
+
+        // Assert
+        assert_eq!(reflector.mirror_list.mirrors[0].url, "https://fast.sigma.org");
+        assert_eq!(reflector.mirror_list.mirrors[2].url, "https://slow.sigma.org");
+    }
+
+    // --- AAA: HTTPS-only filter ---
+    #[test]
+    fn test_reflector_https_only_filter() {
+        // Arrange
+        let mut ml = MirrorList::new("Global", 1_700_000_000);
+        ml.add_mirror(make_mirror("http://insecure.sigma.org", MirrorProtocol::Http, 200.0, true));
+        ml.add_mirror(make_mirror("https://secure.sigma.org", MirrorProtocol::Https, 200.0, true));
+        ml.add_mirror(make_mirror("rsync://sync.sigma.org", MirrorProtocol::Rsync, 300.0, true));
+        let mut reflector = Reflector::new(ml);
+
+        // Act
+        reflector.filter_by_https_only();
+
+        // Assert
+        assert_eq!(reflector.mirror_list.mirrors.len(), 1);
+        assert_eq!(reflector.mirror_list.mirrors[0].url, "https://secure.sigma.org");
+    }
+
+    // --- AAA: pacnew detection and discard ---
+    #[test]
+    fn test_pacnew_detection_and_discard() {
+        // Arrange
+        let mut handler = PacnewHandler::new();
+
+        // Act: discover pacnew files
+        let files = handler.list_pacnew_files();
+
+        // Assert: at least one entry
+        assert!(!files.is_empty());
+        assert!(files[0].pacnew_path.ends_with(".pacnew"));
+
+        // Act: discard the pacnew
+        let path = files[0].original_path.clone();
+        assert!(handler.discard_pacnew(&path).is_ok());
+
+        // Assert: entry removed
+        assert!(handler.known_files.is_empty());
+    }
+
+    // --- AAA: update channel switching ---
+    #[test]
+    fn test_update_channel_switching() {
+        // Arrange
+        let mut mgr = RollingReleaseManager::default();
+
+        // Act
+        mgr.set_update_channel(UpdateChannel::Testing);
+
+        // Assert
+        assert_eq!(mgr.update_channel, UpdateChannel::Testing);
+
+        // Switch back
+        mgr.set_update_channel(UpdateChannel::Stable);
+        assert_eq!(mgr.update_channel, UpdateChannel::Stable);
+    }
+
+    // --- AAA: rollback_last ---
+    #[test]
+    fn test_rollback_last_update() {
+        // Arrange
+        let mut mgr = RollingReleaseManager::default();
+        mgr.register_package(
+            SigmaString::from("sigma-core"),
+            Version { major: 1, minor: 0, patch: 0 },
+        );
+
+        // Act: apply updates then rollback
+        mgr.apply_updates();
+        let rollback_result = mgr.rollback_last();
+
+        // Assert
+        assert!(rollback_result.is_ok());
+        let ver = mgr
+            .package_versions
+            .get(&SigmaString::from("sigma-core"))
+            .copied()
+            .unwrap_or(Version { major: 0, minor: 0, patch: 0 });
+        assert_eq!(ver.minor, 0); // rolled back to 1.0.0
     }
 }
