@@ -120,9 +120,8 @@ fn test_feature_status_toml_system_utilities_registration() {
         .expect("FEATURE_STATUS.toml must exist");
 
     assert!(toml_content.contains("[userspace.system_utilities]"));
-    assert!(toml_content.contains("/home/aaryansinghchauhan/SigmaOS.wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
-    assert!(toml_content.contains("/home/aaryansinghchauhan/SigmaOS.wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
-    assert!(toml_content.contains("/home/aaryansinghchauhan/SigmaOS.wiki/26-System-Utilities-Development-Plan.md"));
+    assert!(toml_content.contains("SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
+    assert!(toml_content.contains("26-System-Utilities-Development-Plan.md"));
     assert!(toml_content.contains("src/userland/system_utilities.rs"));
 }
 
