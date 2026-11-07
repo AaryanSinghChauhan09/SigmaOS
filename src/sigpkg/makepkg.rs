@@ -534,8 +534,9 @@ impl core::fmt::Display for MakepkgError {
 #[derive(Debug, Clone)]
 pub struct MakepkgRunner {
     pub spec: SigmaPkgBuild,
-    /// Simulated fetched source contents (source_url -> content)
-    pub fetched_sources: std::collections::BTreeMap<String, String>,
+    /// Downloaded source bytes keyed by the exact entry in `spec.source`.
+    /// The repository/download layer is responsible for populating this map.
+    pub fetched_sources: std::collections::BTreeMap<String, Vec<u8>>,
 }
 
 impl MakepkgRunner {
@@ -544,6 +545,11 @@ impl MakepkgRunner {
             spec,
             fetched_sources: std::collections::BTreeMap::new(),
         }
+    }
+
+    /// Supply verified-input bytes obtained by the caller's source fetcher.
+    pub fn provide_source_data(&mut self, source: &str, data: Vec<u8>) {
+        self.fetched_sources.insert(source.to_string(), data);
     }
 
     /// Validate required fields and structural invariants (Fail-Fast)
@@ -570,21 +576,42 @@ impl MakepkgRunner {
                 self.spec.source.len()
             )));
         }
+        for (index, checksum) in self.spec.sha256sums.iter().enumerate() {
+            if checksum.eq_ignore_ascii_case("SKIP") {
+                continue;
+            }
+            if checksum.len() != 64 || !checksum.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+                return Err(MakepkgError::ValidationFailed(format!(
+                    "sha256sums[{}] must be a 64-digit SHA-256 hex digest or SKIP",
+                    index
+                )));
+            }
+        }
         Ok(())
     }
 
-    /// Simulate fetching sources and verifying checksums
+    /// Verify caller-fetched source bytes against the PKGBUILD SHA-256 values.
     pub fn prepare(&self) -> Result<(), MakepkgError> {
         self.validate()?;
         for (i, src) in self.spec.source.iter().enumerate() {
-            // Simulate fetch; in production this would download the URL
-            let simulated_digest = format!("sha256:{}", src.len());
+            let source_data = self
+                .fetched_sources
+                .get(src)
+                .ok_or_else(|| MakepkgError::SourceFetchFailed(src.clone()))?;
             let expected = &self.spec.sha256sums[i];
-            // For simulation: treat "SKIP" as unconditionally accepted
-            if expected != "SKIP" && *expected != simulated_digest {
+            if expected.eq_ignore_ascii_case("SKIP") {
+                continue;
+            }
+
+            let digest = crate::crypto::primitives::sha256_hash(source_data).data;
+            let mut actual = String::with_capacity(64);
+            for byte in digest {
+                actual.push_str(&format!("{:02x}", byte));
+            }
+            if !expected.eq_ignore_ascii_case(&actual) {
                 return Err(MakepkgError::ChecksumMismatch {
                     expected: expected.clone(),
-                    got: simulated_digest,
+                    got: actual,
                 });
             }
         }
@@ -654,12 +681,11 @@ impl NamecapLinter {
 
         // Required: non-empty pkgname
         if spec.pkgname.is_empty() {
-            self.errors.push("pkgname is required and must not be empty".to_string());
+            self.errors
+                .push("pkgname is required and must not be empty".to_string());
         } else if spec.pkgname.chars().any(|c| c.is_uppercase()) {
-            self.warnings.push(format!(
-                "pkgname '{}' should be lowercase",
-                spec.pkgname
-            ));
+            self.warnings
+                .push(format!("pkgname '{}' should be lowercase", spec.pkgname));
         }
 
         // Required: valid semver-like version (N.N.N or N.N or N)
@@ -689,7 +715,8 @@ impl NamecapLinter {
 
         // Recommended: at least one arch target
         if spec.arch.is_empty() {
-            self.warnings.push("arch array should not be empty".to_string());
+            self.warnings
+                .push("arch array should not be empty".to_string());
         }
 
         if self.errors.is_empty() {
@@ -732,8 +759,12 @@ mod sigma_makepkg_tests {
             .license(vec!["MIT".to_string()])
             .depends(vec!["glibc".to_string()])
             .makedepends(vec!["gcc".to_string()])
-            .source(vec!["https://example.com/sigma-hello-1.2.3.tar.gz".to_string()])
-            .sha256sums(vec!["SKIP".to_string()])
+            .source(vec![
+                "https://example.com/sigma-hello-1.2.3.tar.gz".to_string()
+            ])
+            .sha256sums(vec![
+                "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad".to_string(),
+            ])
             .build_fn("make -j$(nproc)")
             .package_fn("make DESTDIR=$pkgdir install")
             .build()
@@ -744,7 +775,11 @@ mod sigma_makepkg_tests {
     fn test_makepkg_runner_valid_build() {
         // Arrange
         let spec = valid_spec();
-        let runner = MakepkgRunner::new(spec);
+        let mut runner = MakepkgRunner::new(spec);
+        runner.provide_source_data(
+            "https://example.com/sigma-hello-1.2.3.tar.gz",
+            b"abc".to_vec(),
+        );
 
         // Act + Assert
         assert!(runner.validate().is_ok());
@@ -764,9 +799,15 @@ mod sigma_makepkg_tests {
             .pkgver("1.0.0")
             .pkgrel("1")
             .source(vec!["https://example.com/file.tar.gz".to_string()])
-            .sha256sums(vec!["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".to_string()])
+            .sha256sums(vec![
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".to_string(),
+            ])
             .build();
-        let runner = MakepkgRunner::new(spec);
+        let mut runner = MakepkgRunner::new(spec);
+        runner.provide_source_data(
+            "https://example.com/file.tar.gz",
+            b"different source".to_vec(),
+        );
 
         // Act
         let result = runner.prepare();
@@ -804,7 +845,11 @@ mod sigma_makepkg_tests {
         let result = linter.lint(&spec);
 
         // Assert
-        assert!(result.is_ok(), "Expected no lint errors: {:?}", linter.errors);
+        assert!(
+            result.is_ok(),
+            "Expected no lint errors: {:?}",
+            linter.errors
+        );
     }
 
     #[test]

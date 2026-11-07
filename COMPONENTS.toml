@@ -9650,12 +9650,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-pacman"
-description = "Package manager component for SigmaOS inspired by Arch Linux pacman"
+description = "Pacman compatible package tooling with makepkg source byte validation against declared SHA-256 sums"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman"
 engine = "pkg_manager"
 category = "Package Management"
 language = "shell"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman"]
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman", "https://man.archlinux.org/man/makepkg.8"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
