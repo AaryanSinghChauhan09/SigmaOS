@@ -10266,12 +10266,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-pacman-contrib"
-description = "Pacman contrib tools for SigmaOS"
+description = "Pacman contrib tools including checkupdates with epoch, numeric segment, and pkgrel aware update detection"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman-contrib"
 engine = "package_tools"
 category = "Package Management"
 language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman-contrib"]
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman-contrib", "https://man.archlinux.org/man/core/pacman/vercmp.8.en"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 

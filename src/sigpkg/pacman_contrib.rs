@@ -3,6 +3,7 @@
 // Native Rust implementation of pacman-contrib utilities:
 // Maccache, pacdiff, checkupdates, paclist, updpkgsums, paclog
 
+use std::cmp::Ordering;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
@@ -221,6 +222,108 @@ impl CheckUpdatesEngine {
         Self
     }
 
+    /// Compare ALPM-style package versions, including epochs and pkgrel when
+    /// both sides specify one. Invalid version strings return `None`.
+    pub fn compare_versions(left: &str, right: &str) -> Option<Ordering> {
+        fn split_version(version: &str) -> Option<(u64, &str, Option<&str>)> {
+            let (epoch, body) = match version.split_once(':') {
+                Some((epoch, body)) => (epoch.parse::<u64>().ok()?, body),
+                None => (0, version),
+            };
+            if body.is_empty() {
+                return None;
+            }
+            let (pkgver, pkgrel) = match body.split_once('-') {
+                Some((pkgver, pkgrel)) if !pkgver.is_empty() && !pkgrel.is_empty() => {
+                    (pkgver, Some(pkgrel))
+                }
+                Some(_) => return None,
+                None => (body, None),
+            };
+            Some((epoch, pkgver, pkgrel))
+        }
+
+        fn next_segment<'a>(value: &'a [u8], cursor: &mut usize) -> Option<(&'a [u8], bool)> {
+            while *cursor < value.len() && !value[*cursor].is_ascii_alphanumeric() {
+                *cursor += 1;
+            }
+            if *cursor == value.len() {
+                return None;
+            }
+
+            let start = *cursor;
+            let numeric = value[start].is_ascii_digit();
+            while *cursor < value.len()
+                && value[*cursor].is_ascii_alphanumeric()
+                && value[*cursor].is_ascii_digit() == numeric
+            {
+                *cursor += 1;
+            }
+            Some((&value[start..*cursor], numeric))
+        }
+
+        fn compare_part(left: &str, right: &str) -> Ordering {
+            let left = left.as_bytes();
+            let right = right.as_bytes();
+            let (mut li, mut ri) = (0, 0);
+            loop {
+                let lhs = next_segment(left, &mut li);
+                let rhs = next_segment(right, &mut ri);
+                match (lhs, rhs) {
+                    (None, None) => return Ordering::Equal,
+                    (Some((_, true)), None) | (None, Some((_, false))) => return Ordering::Greater,
+                    (Some((_, false)), None) | (None, Some((_, true))) => return Ordering::Less,
+                    (Some((lhs, lhs_numeric)), Some((rhs, rhs_numeric))) => {
+                        match (lhs_numeric, rhs_numeric) {
+                            (true, true) => {
+                                let lhs = lhs
+                                    .iter()
+                                    .position(|byte| *byte != b'0')
+                                    .map(|offset| &lhs[offset..])
+                                    .unwrap_or(&lhs[lhs.len()..]);
+                                let rhs = rhs
+                                    .iter()
+                                    .position(|byte| *byte != b'0')
+                                    .map(|offset| &rhs[offset..])
+                                    .unwrap_or(&rhs[rhs.len()..]);
+                                let order = lhs.len().cmp(&rhs.len()).then_with(|| lhs.cmp(rhs));
+                                if order != Ordering::Equal {
+                                    return order;
+                                }
+                            }
+                            (false, false) => {
+                                let order = lhs.cmp(rhs);
+                                if order != Ordering::Equal {
+                                    return order;
+                                }
+                            }
+                            (true, false) => return Ordering::Greater,
+                            (false, true) => return Ordering::Less,
+                        }
+                    }
+                }
+            }
+        }
+
+        let (left_epoch, left_pkgver, left_pkgrel) = split_version(left)?;
+        let (right_epoch, right_pkgver, right_pkgrel) = split_version(right)?;
+        let epoch_order = left_epoch.cmp(&right_epoch);
+        if epoch_order != Ordering::Equal {
+            return Some(epoch_order);
+        }
+
+        let pkgver_order = compare_part(left_pkgver, right_pkgver);
+        if pkgver_order != Ordering::Equal {
+            return Some(pkgver_order);
+        }
+
+        // libalpm ignores pkgrel if either version is in minimal form.
+        Some(match (left_pkgrel, right_pkgrel) {
+            (Some(left), Some(right)) => compare_part(left, right),
+            _ => Ordering::Equal,
+        })
+    }
+
     /// Compares installed packages against sync repository databases without touching system database or locks
     pub fn check_updates(
         &self,
@@ -231,7 +334,9 @@ impl CheckUpdatesEngine {
 
         for inst in installed {
             if let Some(sync) = sync_db.iter().find(|s| s.name == inst.name) {
-                if sync.sync_version != inst.current_version {
+                if Self::compare_versions(&sync.sync_version, &inst.current_version)
+                    == Some(Ordering::Greater)
+                {
                     pending.push(PendingUpdate {
                         name: inst.name.clone(),
                         old_version: inst.current_version.clone(),
