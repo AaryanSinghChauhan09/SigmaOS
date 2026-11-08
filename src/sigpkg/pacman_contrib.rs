@@ -2015,6 +2015,109 @@ impl Default for SyncFileDbManager {
 }
 
 // ============================================================================
+// 22. PacmanKeyring (pacman-key parity)
+// ============================================================================
+
+/// A trusted package-signing key in the pacman keyring
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PacmanKey {
+    /// key fingerprint (hex, e.g. SHA-256 of pubkey or assigned id)
+    pub fingerprint: String,
+    /// uid / owner name shown by `pacman-key --list-keys`
+    pub uid: String,
+    /// Ed25519 public key bytes (32 bytes)
+    pub public_key: [u8; 32],
+    /// trust level: "ultimate" | "full" | "marginal" | "never"
+    pub trust: String,
+}
+
+/// Arch `pacman-key` parity: manages the trusted package-signing keyring
+/// used to verify repository packages. Backed by Ed25519 (RFC 8032).
+#[derive(Debug, Default)]
+pub struct PacmanKeyring {
+    pub keys: Vec<PacmanKey>,
+}
+
+impl PacmanKeyring {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// `pacman-key --add` parity: enroll a trusted signing key
+    pub fn add_key(&mut self, fingerprint: &str, uid: &str, public_key: [u8; 32], trust: &str) {
+        if let Some(existing) = self.keys.iter_mut().find(|k| k.fingerprint == fingerprint) {
+            existing.uid = uid.to_string();
+            existing.public_key = public_key;
+            existing.trust = trust.to_string();
+        } else {
+            self.keys.push(PacmanKey {
+                fingerprint: fingerprint.to_string(),
+                uid: uid.to_string(),
+                public_key,
+                trust: trust.to_string(),
+            });
+        }
+    }
+
+    /// `pacman-key --delete` parity: remove a key by fingerprint.
+    /// Returns true when a key was removed.
+    pub fn remove_key(&mut self, fingerprint: &str) -> bool {
+        let before = self.keys.len();
+        self.keys.retain(|k| k.fingerprint != fingerprint);
+        self.keys.len() != before
+    }
+
+    /// `pacman-key --list-keys` parity: uid listing
+    pub fn list_keys(&self) -> Vec<(&str, &str)> {
+        self.keys
+            .iter()
+            .map(|k| (k.fingerprint.as_str(), k.uid.as_str()))
+            .collect()
+    }
+
+    /// Look up a key's trust level
+    pub fn trust_of(&self, fingerprint: &str) -> Option<&str> {
+        self.keys
+            .iter()
+            .find(|k| k.fingerprint == fingerprint)
+            .map(|k| k.trust.as_str())
+    }
+
+    /// Verify a package signature (64-byte Ed25519 sig over payload)
+    /// against any trusted key in the keyring. Returns the matching
+    /// fingerprint on success.
+    pub fn verify_package(&self, payload: &[u8], signature: &[u8; 64]) -> Option<String> {
+        for key in &self.keys {
+            if key.trust == "never" {
+                continue;
+            }
+            if crate::sigpkg::ed25519::verify(&key.public_key, payload, signature) {
+                return Some(key.fingerprint.clone());
+            }
+        }
+        None
+    }
+
+    /// Convenience: verify a hex-encoded signature
+    pub fn verify_package_hex(&self, payload: &[u8], signature_hex: &str) -> Option<String> {
+        let bytes = hex_decode_str(signature_hex)?;
+        let sig: [u8; 64] = bytes.try_into().ok()?;
+        self.verify_package(payload, &sig)
+    }
+}
+
+fn hex_decode_str(s: &str) -> Option<Vec<u8>> {
+    let s = s.trim();
+    if s.len() % 2 != 0 {
+        return None;
+    }
+    (0..s.len())
+        .step_by(2)
+        .map(|i| u8::from_str_radix(&s[i..i + 2], 16).ok())
+        .collect()
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -2623,5 +2726,46 @@ sha256sums=('sum')
         );
         assert_eq!(searcher.find_exact("/usr/bin/bash").len(), 1);
         assert_eq!(searcher.find_exact("/usr/bin/bash")[0].repository, "core");
+    }
+
+    #[test]
+    fn test_pacman_keyring() {
+        use crate::sigpkg::ed25519::sign_with_seed;
+
+        let mut ring = PacmanKeyring::new();
+        let (sig, pubkey) = sign_with_seed(&[5u8; 32], b"pkg payload");
+        ring.add_key("DEADBEEF", "SigmaOS Release Key", pubkey, "ultimate");
+        ring.add_key("UNTRUSTED", "Random Key", [9u8; 32], "never");
+
+        assert_eq!(ring.list_keys().len(), 2);
+        assert_eq!(ring.trust_of("DEADBEEF"), Some("ultimate"));
+
+        // valid sig verifies and reports the signing fingerprint
+        let fp = ring.verify_package(b"pkg payload", &sig);
+        assert_eq!(fp.as_deref(), Some("DEADBEEF"));
+
+        // tampered payload rejected
+        assert!(ring.verify_package(b"evil", &sig).is_none());
+
+        // never-trust key skipped even if it somehow matches
+        assert!(ring
+            .keys
+            .iter()
+            .all(|k| k.fingerprint != "UNTRUSTED" || k.trust == "never"));
+
+        // hex path works
+        let hexsig: String = sig.iter().map(|b| format!("{:02x}", b)).collect();
+        assert_eq!(
+            ring.verify_package_hex(b"pkg payload", &hexsig).as_deref(),
+            Some("DEADBEEF")
+        );
+        assert!(ring.verify_package_hex(b"pkg payload", "zz").is_none());
+
+        // delete + re-add updates in place
+        assert!(ring.remove_key("DEADBEEF"));
+        assert!(!ring.remove_key("DEADBEEF"));
+        ring.add_key("DEADBEEF", "SigmaOS Release Key v2", pubkey, "full");
+        assert_eq!(ring.keys.len(), 2);
+        assert_eq!(ring.trust_of("DEADBEEF"), Some("full"));
     }
 }
