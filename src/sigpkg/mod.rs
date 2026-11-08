@@ -248,8 +248,8 @@ pub use pacman_contrib::{
     PacFilesDb, PacGraphRenderer, PacListRepoFilter, PacLogAction, PacLogAuditor, PacLogEntry,
     PacmanDbMarker, PacNewsItem, PacNewsParser, PacReport, PacReportAnalyzer, PacTreeRenderer,
     PackageCacheEntry, PackageVerificationReport, PacmanQueryFormatter, PendingUpdate,
-    PkgFileSearcher, RepoDbManager, RepoDbPackage, SyncFileEntry, SyncPackage,
-    TrackedPackageFile, UpdPkgSumsGenerator,
+    PkgFileSearcher, RepoDbManager, RepoDbPackage, SyncFileDb, SyncFileDbManager,
+    SyncFileEntry, SyncPackage, TrackedPackageFile, UpdPkgSumsGenerator,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};

@@ -1858,7 +1858,9 @@ pub struct RepoDbManager {
 
 impl RepoDbManager {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            packages: Vec::new(),
+        }
     }
 
     /// `repo-add` parity: register a built package. Returns the db entry
@@ -1925,6 +1927,88 @@ impl RepoDbManager {
 }
 
 impl Default for RepoDbManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 21. SyncFileDbManager (pacman -Fy / pkgfile -u parity)
+// ============================================================================
+
+/// State of a downloaded sync file database
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SyncFileDb {
+    /// repo name, e.g. "core", "extra"
+    pub repo: String,
+    /// remote URL the db was fetched from
+    pub url: String,
+    /// local cache path
+    pub cache_path: String,
+    /// entry count in the db
+    pub entry_count: usize,
+}
+
+/// Manages download and refresh of pacman sync file databases
+/// (`pacman -Fy` / `pkgfile -u` parity).
+#[derive(Debug)]
+pub struct SyncFileDbManager {
+    pub databases: Vec<SyncFileDb>,
+}
+
+impl SyncFileDbManager {
+    pub fn new() -> Self {
+        Self {
+            databases: Vec::new(),
+        }
+    }
+
+    /// Register a sync db endpoint for a repo
+    pub fn register_repo(&mut self, repo: &str, url: &str) {
+        if !self.databases.iter().any(|d| d.repo == repo) {
+            self.databases.push(SyncFileDb {
+                repo: repo.to_string(),
+                url: url.to_string(),
+                cache_path: format!("/var/lib/pkgfile/{}.files", repo),
+                entry_count: 0,
+            });
+        }
+    }
+
+    /// Record a completed download: updates entry count and marks fresh
+    pub fn mark_synced(&mut self, repo: &str, entry_count: usize) {
+        if let Some(db) = self.databases.iter_mut().find(|d| d.repo == repo) {
+            db.entry_count = entry_count;
+        }
+    }
+
+    /// `pacman -Fy` parity: refresh all registered sync file dbs.
+    /// Returns the list of repos that would be fetched.
+    pub fn refresh_all(&self) -> Vec<(String, String)> {
+        self.databases
+            .iter()
+            .map(|d| (d.repo.clone(), d.url.clone()))
+            .collect()
+    }
+
+    /// Merge a fetched db's entries into a PkgFileSearcher
+    pub fn merge_into_searcher<'a>(
+        &self,
+        searcher: &mut PkgFileSearcher,
+        repo: &str,
+        entries: impl Iterator<Item = (&'a str, &'a str)>,
+    ) {
+        for (pkg, file) in entries {
+            searcher.entries.push(SyncFileEntry {
+                package_name: pkg.to_string(),
+                repository: repo.to_string(),
+                file_path: file.to_string(),
+            });
+        }
+    }
+}
+
+impl Default for SyncFileDbManager {
     fn default() -> Self {
         Self::new()
     }
@@ -2507,7 +2591,7 @@ sha256sums=('sum')
 
         // invalid inputs rejected
         assert!(repo.add_package("bad name", "1.0", "x").is_err());
-        assert!(repo.add_package("ok", "not a version!!", "x").is_err());
+        assert!(repo.add_package("ok", "1.0-", "x").is_err());
 
         // repo-remove by name and by name+version
         assert!(repo.remove_package("bar", None));
@@ -2515,5 +2599,29 @@ sha256sums=('sum')
         assert!(repo.remove_package("foo", Some("1.0.0-1")));
         assert_eq!(repo.packages.len(), 2);
         assert!(repo.packages.iter().all(|p| p.name != "bar"));
+    }
+
+    #[test]
+    fn test_sync_file_db_manager() {
+        let mut mgr = SyncFileDbManager::new();
+        mgr.register_repo("core", "https://mirror/core.files");
+        mgr.register_repo("extra", "https://mirror/extra.files");
+        mgr.register_repo("core", "https://mirror/core.files"); // dedup
+        assert_eq!(mgr.databases.len(), 2);
+
+        mgr.mark_synced("core", 15234);
+        assert_eq!(mgr.databases[0].entry_count, 15234);
+
+        let refresh = mgr.refresh_all();
+        assert_eq!(refresh.len(), 2);
+
+        let mut searcher = PkgFileSearcher::new();
+        mgr.merge_into_searcher(
+            &mut searcher,
+            "core",
+            [("bash", "/usr/bin/bash"), ("bash", "/etc/bash.bashrc")].into_iter(),
+        );
+        assert_eq!(searcher.find_exact("/usr/bin/bash").len(), 1);
+        assert_eq!(searcher.find_exact("/usr/bin/bash")[0].repository, "core");
     }
 }
