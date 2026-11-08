@@ -10,8 +10,6 @@
 // - Keyboard shortcuts
 // - Plugin system
 
-#![no_std]
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
@@ -59,32 +57,32 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
 /// Score an ordered character match. Contiguous runs and word starts rank
 /// above scattered matches, while a missing query character is a hard miss.
 fn subsequence_score(haystack: &str, needle: &str) -> Option<i32> {
-    if needle.is_empty() {
+    let mut query = needle.chars().flat_map(char::to_lowercase).peekable();
+    if query.peek().is_none() {
         return Some(0);
     }
 
-    let haystack: Vec<char> = haystack.chars().flat_map(char::to_lowercase).collect();
-    let needle: Vec<char> = needle.chars().flat_map(char::to_lowercase).collect();
-    let mut query_index = 0;
-    let mut previous = None;
+    let mut previous_match: Option<usize> = None;
+    let mut previous_is_alphanumeric = false;
     let mut score = 500;
-    for (index, ch) in haystack.iter().enumerate() {
-        if *ch != needle[query_index] {
-            continue;
+    for (index, ch) in haystack.chars().flat_map(char::to_lowercase).enumerate() {
+        let word_start = index == 0 || !previous_is_alphanumeric;
+        if query.peek().map_or(false, |next| *next == ch) {
+            score += 10;
+            if previous_match.map_or(false, |prior| prior + 1 == index) {
+                score += 25;
+            } else if word_start {
+                score += 20;
+            } else if let Some(prior) = previous_match {
+                score -= (((index - prior - 1) * 3).min(24)) as i32;
+            }
+            previous_match = Some(index);
+            query.next();
+            if query.peek().is_none() {
+                return Some(score);
+            }
         }
-
-        score += 10;
-        if previous.map_or(false, |prior| prior + 1 == index) {
-            score += 20;
-        } else if index == 0 || !haystack[index - 1].is_alphanumeric() {
-            score += 15;
-        }
-        previous = Some(index);
-        query_index += 1;
-        if query_index == needle.len() {
-            score -= (haystack.len() - needle.len()).min(100) as i32;
-            return Some(score);
-        }
+        previous_is_alphanumeric = ch.is_alphanumeric();
     }
     None
 }
@@ -532,6 +530,19 @@ mod tests {
         assert_eq!(app.fuzzy_score("firefox browser"), 1000); // Exact
         assert_eq!(app.fuzzy_score("firefox"), 900); // Prefix
         assert!(app.fuzzy_score("fox") > 0); // Fuzzy
+    }
+
+    #[test]
+    fn fuzzy_subsequence_search_handles_compact_and_empty_queries() {
+        let app = AppEntry::new("Firefox Browser", "/usr/bin/firefox");
+
+        let compact_query_score = app.fuzzy_score("fbr");
+        let empty_query_score = app.fuzzy_score("");
+        let missing_query_score = app.fuzzy_score("zzz");
+
+        assert!(compact_query_score > 0);
+        assert_eq!(empty_query_score, 0);
+        assert_eq!(missing_query_score, 0);
     }
 
     #[test]
