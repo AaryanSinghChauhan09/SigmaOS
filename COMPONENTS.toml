@@ -169,11 +169,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-power-manager"
-description = "Battery / power-profile & idle management"
+description = "Pure Rust policy for lid-close and idle-timeout decisions; delegates hardware actions to integration backends"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-manager"
 engine = "power_manager"
 category = "System Services"
-language = "shell"
+language = "rust"
 inspirations = ["https://github.com/linuxmint/xfce4-power-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
