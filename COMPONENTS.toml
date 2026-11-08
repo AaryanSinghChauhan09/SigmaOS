@@ -4,9 +4,9 @@
 # Registry audit (2026-11-08): 1,642 declarations / 1,591 unique names.
 # 45 names have repeated declarations with conflicting metadata and remain
 # visible for explicit reconciliation; consumers must not silently choose one.
-# GitHub account audit (2026-11-08): 1,078 SigmaOS-prefixed repositories;
-# 322 of 1,562 declared repository URLs are published, 756 account repositories
-# lack registry records, and 1,240 declared URLs are not present in the account.
+# GitHub account audit (2026-11-08): 1,079 SigmaOS-prefixed repositories;
+# 323 of 1,562 declared repository URLs are published, 756 account repositories
+# lack registry records, and 1,239 declared URLs are not present in the account.
 # See `scripts/audit_component_fleet.py --github` for the read-only audit.
 #
 # Classification complete: All 1,635 components have explicit engine and category.
