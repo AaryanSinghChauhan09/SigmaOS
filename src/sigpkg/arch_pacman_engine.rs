@@ -655,6 +655,33 @@ impl SovereignDbscriptsEngine {
         Ok(())
     }
 
+    /// Canonical signing payload for a repo db entry: `name-version-sha256`.
+    /// This is what release signatures cover (dbscripts + sigstore parity).
+    pub fn signing_payload(entry: &RepoDbPackageEntry) -> String {
+        format!("{}-{}-{}", entry.name, entry.version, entry.sha256_hash)
+    }
+
+    /// repo-add with real signature verification (sigstore/dbscripts parity).
+    /// `entry.pgp_dilithium5_signature` must be the hex-encoded 64-byte
+    /// Ed25519 signature over `signing_payload(entry)` by a key registered
+    /// in `verifier` under `key_name`. Unsigned, malformed, or forged
+    /// entries are rejected before touching the database.
+    pub fn repo_add_signed(
+        &mut self,
+        stage: RepoStageTier,
+        entry: RepoDbPackageEntry,
+        verifier: &crate::sigpkg::CryptoVerifier,
+        key_name: &str,
+    ) -> Result<(), &'static str> {
+        let sig_bytes = hex_decode(&entry.pgp_dilithium5_signature)
+            .ok_or("dbscripts: malformed signature hex")?;
+        let payload = Self::signing_payload(&entry);
+        if !verifier.verify_ed25519_signature(key_name, &sig_bytes, payload.as_bytes()) {
+            return Err("dbscripts: Ed25519 signature verification failed");
+        }
+        self.repo_add(stage, entry)
+    }
+
     /// db-update parity: Process incoming package builds, verify signatures, and refresh DB tarball indexes
     pub fn db_update(&mut self, incoming_packages: Vec<RepoDbPackageEntry>) -> usize {
         let mut count = 0;
@@ -666,6 +693,19 @@ impl SovereignDbscriptsEngine {
         }
         count
     }
+}
+
+/// Decode a hex string into bytes; returns None on odd length or
+/// non-hex characters.
+fn hex_decode(s: &str) -> Option<Vec<u8>> {
+    let s = s.trim();
+    if s.len() % 2 != 0 {
+        return None;
+    }
+    (0..s.len())
+        .step_by(2)
+        .map(|i| u8::from_str_radix(&s[i..i + 2], 16).ok())
+        .collect()
 }
 
 impl Default for SovereignDbscriptsEngine {
@@ -991,5 +1031,76 @@ depends=('glibc')
 
         let deps = contrib.finddeps(&local_db, "glibc");
         assert_eq!(deps, vec!["linux-zen".to_string()]);
+    }
+
+    #[test]
+    fn test_repo_add_signed_verification() {
+        use crate::sigpkg::ed25519::sign_with_seed;
+
+        let mut engine = SovereignDbscriptsEngine::new();
+        let mut verifier = crate::sigpkg::CryptoVerifier::new();
+
+        let entry = RepoDbPackageEntry {
+            name: "testpkg".to_string(),
+            version: "1.0.0-1".to_string(),
+            filename: "testpkg-1.0.0-1-x86_64.pkg.tar.zst".to_string(),
+            sha256_hash: "abc123".to_string(),
+            pgp_dilithium5_signature: String::new(),
+            stage: RepoStageTier::Testing,
+            depends: Vec::new(),
+            files: Vec::new(),
+        };
+
+        // sign canonical payload with a release key
+        let (sig, pubkey) = sign_with_seed(
+            &[42u8; 32],
+            SovereignDbscriptsEngine::signing_payload(&entry).as_bytes(),
+        );
+        let mut signed_entry = entry.clone();
+        signed_entry.pgp_dilithium5_signature = sig.iter().map(|b| format!("{:02x}", b)).collect();
+
+        // untrusted key -> reject
+        assert!(engine
+            .repo_add_signed(
+                RepoStageTier::Testing,
+                signed_entry.clone(),
+                &verifier,
+                "sigmaos-release"
+            )
+            .is_err());
+
+        verifier.register_ed25519_key("sigmaos-release", &pubkey);
+        assert!(engine
+            .repo_add_signed(
+                RepoStageTier::Testing,
+                signed_entry.clone(),
+                &verifier,
+                "sigmaos-release"
+            )
+            .is_ok());
+
+        // tampered version -> signature no longer matches
+        let mut evil = signed_entry.clone();
+        evil.version = "9.9.9-1".to_string();
+        assert!(engine
+            .repo_add_signed(RepoStageTier::Testing, evil, &verifier, "sigmaos-release")
+            .is_err());
+
+        // malformed hex -> reject
+        let mut bad = signed_entry.clone();
+        bad.pgp_dilithium5_signature = "not-hex".to_string();
+        assert!(engine
+            .repo_add_signed(RepoStageTier::Testing, bad, &verifier, "sigmaos-release")
+            .is_err());
+
+        // only the valid entry landed in the db
+        let db = &engine
+            .repo_databases
+            .iter()
+            .find(|(s, _)| *s == RepoStageTier::Testing)
+            .unwrap()
+            .1;
+        assert_eq!(db.len(), 1);
+        assert_eq!(db[0].name, "testpkg");
     }
 }
