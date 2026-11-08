@@ -95,6 +95,28 @@ impl PacmanDatabase {
         }
     }
 
+    /// Install a package with Ed25519 signature verification
+    /// (pacman signed-repo parity). The signature covers the canonical
+    /// `name-version` payload; `signature_hex` must verify against a
+    /// trusted key in `keyring`. Unsigned/untrusted packages are refused.
+    pub fn install_package_signed(
+        &mut self,
+        package_name: &str,
+        keyring: &crate::sigpkg::PacmanKeyring,
+        signature_hex: &str,
+    ) -> Result<(), String> {
+        let pkg = self
+            .find_package(package_name)
+            .ok_or_else(|| format!("Package '{}' not found", package_name))?;
+        let payload = format!("{}-{}", pkg.name, pkg.version);
+        keyring
+            .verify_package_hex(payload.as_bytes(), signature_hex)
+            .ok_or_else(|| format!("Package '{}' failed signature verification", package_name))?;
+        self.install_dependencies(&pkg.depends)?;
+        self.local_packages.push(pkg);
+        Ok(())
+    }
+
     /// Remove a package (pacman -R)
     pub fn remove_package(&mut self, package_name: &str) -> Result<(), String> {
         if let Some(pos) = self
@@ -1124,5 +1146,53 @@ depends=('glibc')
             .1;
         assert_eq!(db.len(), 1);
         assert_eq!(db[0].name, "testpkg");
+    }
+
+    #[test]
+    fn test_install_package_signed() {
+        use crate::sigpkg::ed25519::sign_with_seed;
+        use crate::sigpkg::PacmanKeyring;
+
+        let mut db = PacmanDatabase::new();
+        db.packages.push(ArchPacmanPackage {
+            name: "signedpkg".to_string(),
+            version: "2.0-1".to_string(),
+            description: String::new(),
+            url: String::new(),
+            architecture: "x86_64".to_string(),
+            license: Vec::new(),
+            groups: Vec::new(),
+            depends: Vec::new(),
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 0,
+            packager: String::new(),
+            build_date: String::new(),
+            install_date: String::new(),
+            is_explicit: true,
+        });
+
+        let mut ring = PacmanKeyring::new();
+        let payload = b"signedpkg-2.0-1";
+        let (sig, pubkey) = sign_with_seed(&[77u8; 32], payload);
+        ring.add_key("RELKEY", "Release", pubkey, "ultimate");
+        let hexsig: String = sig.iter().map(|b| format!("{:02x}", b)).collect();
+
+        assert!(db.install_package_signed("signedpkg", &ring, "00").is_err());
+        assert!(db
+            .install_package_signed("signedpkg", &ring, &hexsig)
+            .is_ok());
+        assert_eq!(db.local_packages.len(), 1);
+        assert_eq!(db.local_packages[0].name, "signedpkg");
+
+        let empty_ring = PacmanKeyring::new();
+        assert!(db
+            .install_package_signed("signedpkg", &empty_ring, &hexsig)
+            .is_err());
     }
 }
