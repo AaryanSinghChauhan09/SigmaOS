@@ -693,6 +693,28 @@ impl SovereignDbscriptsEngine {
         }
         count
     }
+
+    /// Signed variant of db_update: every incoming entry must carry a valid
+    /// Ed25519 signature over its canonical payload or it is skipped.
+    /// Returns (accepted, rejected) counts.
+    pub fn db_update_signed(
+        &mut self,
+        incoming_packages: Vec<RepoDbPackageEntry>,
+        verifier: &crate::sigpkg::CryptoVerifier,
+        key_name: &str,
+    ) -> (usize, usize) {
+        let mut accepted = 0;
+        let mut rejected = 0;
+        for pkg in incoming_packages {
+            let stage = pkg.stage;
+            if self.repo_add_signed(stage, pkg, verifier, key_name).is_ok() {
+                accepted += 1;
+            } else {
+                rejected += 1;
+            }
+        }
+        (accepted, rejected)
+    }
 }
 
 /// Decode a hex string into bytes; returns None on odd length or
