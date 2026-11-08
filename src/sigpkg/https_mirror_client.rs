@@ -243,9 +243,8 @@ impl MirrorClient {
     }
 
     /// Compute SHA-256 checksum of data
-    fn sha256(&self, _data: &[u8]) -> [u8; 32] {
-        // TODO: use ring or sha2 crate or inline SHA-256
-        [0u8; 32]
+    fn sha256(&self, data: &[u8]) -> [u8; 32] {
+        crate::crypto::primitives::sha256_hash(data).data
     }
 
     /// Apply rate limiting: sleep if download rate exceeds configured limit
