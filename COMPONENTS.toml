@@ -1,11 +1,11 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit (2026-11-08): 1,642 declarations / 1,591 unique names.
+# Registry audit (2026-11-08): 1,643 declarations / 1,592 unique names.
 # 45 names have repeated declarations with conflicting metadata and remain
 # visible for explicit reconciliation; consumers must not silently choose one.
-# GitHub account audit (2026-11-08): 1,080 SigmaOS-prefixed repositories;
-# 324 of 1,562 declared repository URLs are published, 756 account repositories
+# GitHub account audit (2026-11-08): 1,081 SigmaOS-prefixed repositories;
+# 325 of 1,563 declared repository URLs are published, 756 account repositories
 # lack registry records, and 1,238 declared URLs are not present in the account.
 # See `scripts/audit_component_fleet.py --github` for the read-only audit.
 #
@@ -18063,3 +18063,14 @@ category = "Developer Tools"
 language = "unknown"
 visibility = "public"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-craft-core"
+description = "Shared creative project manifests, path-safe asset metadata, and format plugin registry"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-core"
+engine = "craft_core"
+category = "Creative & Design"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/drawing", "https://github.com/omacom/aether"]
+visibility = "public"
+depends_on = ["SigmaOS-core"]

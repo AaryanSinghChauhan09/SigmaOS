@@ -6,7 +6,8 @@
 [metadata]
 version = "1.0.0"
 updated = "2026-11-05"
-description = "Canonical federation and consolidation mapping for SigmaOS modular repositories"
+description = "Target federation plan for SigmaOS; live registry coverage is checked by scripts/audit_consolidation.py"
+status = "planned; constituent mappings require reconciliation against COMPONENTS.toml"
 governance = "SigmaOS Architecture Authority"
 
 # ==============================================================================
@@ -256,8 +257,7 @@ description = "Consolidated display capture suite providing Wayland-native scree
 upstream = ["https://github.com/omacom/omasnap", "https://github.com/omacom/monologue"]
 consolidates = [
     "SigmaOS-screen-saver",
-    "SigmaOS-screen-shot",
-    "SigmaOS-screen-recorder"
+    "SigmaOS-screen-shot"
 ]
 provides = ["screen-capture", "screencast-recorder", "screen-lock-security"]
 

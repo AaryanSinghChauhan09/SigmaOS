@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -7,12 +7,16 @@ PYTHON ?= python3
 all: check test
 
 # 0. Milestone M0 reproducible verify target
-verify: fmt check test registry-audit
+verify: fmt check test registry-audit consolidation-audit
 	@echo "==> make verify succeeded: formatting, check, tests, and registry audit passed cleanly."
 
 # Read-only inventory of all repositories declared in COMPONENTS.toml.
 registry-audit:
 	@$(PYTHON) scripts/audit_component_fleet.py
+
+# Read-only validation of canonical suite mappings and unresolved constituents.
+consolidation-audit:
+	@$(PYTHON) scripts/audit_consolidation.py
 
 # 1. Code formatting
 fmt-fix:
