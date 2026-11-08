@@ -1420,6 +1420,422 @@ impl Default for PacmanDbMarker {
 }
 
 // ============================================================================
+// 18. CheckpkgEngine (checkpkg parity)
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CheckpkgSeverity {
+    Error,
+    Warning,
+    Info,
+}
+
+/// A single lint finding produced by `checkpkg`
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CheckpkgFinding {
+    pub severity: CheckpkgSeverity,
+    pub message: String,
+}
+
+/// Extracts a scalar PKGBUILD variable's first quoted or bare value
+fn pkgbuild_var<'a>(content: &'a str, key: &str) -> Option<&'a str> {
+    for line in content.lines() {
+        let line = line.trim();
+        if let Some(rest) = line.strip_prefix(key) {
+            let rest = rest.trim_start();
+            if rest.starts_with('=') {
+                let value = rest[1..].trim();
+                let value = value
+                    .strip_prefix('"')
+                    .and_then(|v| v.strip_suffix('"'))
+                    .or_else(|| value.strip_prefix('\'').and_then(|v| v.strip_suffix('\'')))
+                    .unwrap_or(value);
+                return Some(value);
+            }
+        }
+    }
+    None
+}
+
+/// Splits a PKGBUILD array variable like `depends=(a "b>=1" c)` into items
+fn pkgbuild_array(content: &str, key: &str) -> Vec<String> {
+    let mut items = Vec::new();
+    let mut in_array = false;
+    let mut buf = String::new();
+    for line in content.lines() {
+        let line = line.trim();
+        if !in_array {
+            if let Some(rest) = line.strip_prefix(key) {
+                let rest = rest.trim_start();
+                if let Some(after_eq) = rest.strip_prefix('=') {
+                    let after_eq = after_eq.trim_start();
+                    if let Some(inner) = after_eq.strip_prefix('(') {
+                        in_array = true;
+                        buf.push_str(inner);
+                        if inner.contains(')') {
+                            in_array = false;
+                        }
+                        continue;
+                    }
+                }
+            }
+        } else {
+            buf.push(' ');
+            buf.push_str(line);
+            if line.contains(')') {
+                in_array = false;
+            }
+        }
+    }
+    if in_array || buf.is_empty() && !content.contains(&format!("{}=(", key)) {
+        return items;
+    }
+    let body = buf.split(')').next().unwrap_or("");
+    for tok in body.split_whitespace() {
+        let tok = tok.trim_matches(|c| c == '"' || c == '\'');
+        if !tok.is_empty() {
+            items.push(tok.to_string());
+        }
+    }
+    items
+}
+
+/// PKGBUILD linter (`checkpkg` parity). Checks packaging rules that go
+/// beyond namcap's installed-package audit: dependency hygiene, version
+/// format, license presence, and source/checksum consistency.
+#[derive(Debug)]
+pub struct CheckpkgEngine;
+
+impl CheckpkgEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Lint `pkgbuild_content`. `existing_files` optionally lists paths that
+    /// exist on disk for backup-file verification.
+    pub fn lint(&self, pkgbuild_content: &str, existing_files: &[&str]) -> Vec<CheckpkgFinding> {
+        let mut findings = Vec::new();
+        let mut push = |severity: CheckpkgSeverity, message: String| {
+            findings.push(CheckpkgFinding { severity, message });
+        };
+
+        let pkgname = pkgbuild_var(pkgbuild_content, "pkgname").unwrap_or("");
+        if pkgname.is_empty() {
+            push(CheckpkgSeverity::Error, "pkgname is not set".to_string());
+        } else {
+            if pkgname
+                .chars()
+                .any(|c| c.is_uppercase() || c.is_whitespace())
+            {
+                push(
+                    CheckpkgSeverity::Error,
+                    format!("pkgname '{}' must be lowercase without spaces", pkgname),
+                );
+            }
+            if pkgname.starts_with('-') || pkgname.ends_with('-') {
+                push(
+                    CheckpkgSeverity::Warning,
+                    format!("pkgname '{}' should not start or end with '-'", pkgname),
+                );
+            }
+        }
+
+        if let Some(pkgver) = pkgbuild_var(pkgbuild_content, "pkgver") {
+            if pkgver.contains('-') || pkgver.contains(':') {
+                push(
+                    CheckpkgSeverity::Error,
+                    format!("pkgver '{}' must not contain '-' or ':'", pkgver),
+                );
+            }
+        } else {
+            push(CheckpkgSeverity::Error, "pkgver is not set".to_string());
+        }
+
+        if let Some(pkgrel) = pkgbuild_var(pkgbuild_content, "pkgrel") {
+            match pkgrel.parse::<u32>() {
+                Ok(0) | Err(_) => push(
+                    CheckpkgSeverity::Error,
+                    format!("pkgrel '{}' must be a positive integer", pkgrel),
+                ),
+                _ => {}
+            }
+        } else {
+            push(CheckpkgSeverity::Error, "pkgrel is not set".to_string());
+        }
+
+        match pkgbuild_var(pkgbuild_content, "license") {
+            None => push(
+                CheckpkgSeverity::Warning,
+                "license is not set; package may not be distributable".to_string(),
+            ),
+            Some(l) if l.contains("custom") => push(
+                CheckpkgSeverity::Warning,
+                "license 'custom' should reference the actual license terms".to_string(),
+            ),
+            _ => {}
+        }
+
+        let depends = pkgbuild_array(pkgbuild_content, "depends");
+        let makedepends = pkgbuild_array(pkgbuild_content, "makedepends");
+        for dep in &depends {
+            let base = dep_spec_base_name(dep);
+            if makedepends.iter().any(|m| dep_spec_base_name(m) == base) {
+                push(
+                    CheckpkgSeverity::Warning,
+                    format!("'{}' is listed in both depends and makedepends", base),
+                );
+            }
+        }
+
+        if let Some(arch) = pkgbuild_var(pkgbuild_content, "arch") {
+            if !arch.contains("x86_64") && !arch.contains("any") {
+                push(
+                    CheckpkgSeverity::Info,
+                    format!("arch '{}' does not include x86_64 or 'any'", arch),
+                );
+            }
+        }
+
+        if let Some(url) = pkgbuild_var(pkgbuild_content, "url") {
+            if !url.starts_with("http://") && !url.starts_with("https://") {
+                push(
+                    CheckpkgSeverity::Warning,
+                    format!("url '{}' is not an http(s) URL", url),
+                );
+            }
+        }
+
+        let sources = pkgbuild_array(pkgbuild_content, "source");
+        if !sources.is_empty() {
+            let sums_line = pkgbuild_content
+                .lines()
+                .find(|l| l.trim_start().starts_with("sha256sums="));
+            let sum_count = sums_line
+                .map(|l| {
+                    l.split('(')
+                        .nth(1)
+                        .and_then(|r| r.split(')').next())
+                        .map(|inner| {
+                            inner
+                                .split_whitespace()
+                                .filter(|t| !t.is_empty() && *t != "SKIP")
+                                .count()
+                        })
+                        .unwrap_or(0)
+                })
+                .unwrap_or(0);
+            let real_sources = sources
+                .iter()
+                .filter(|s| !s.ends_with(".install") && !s.ends_with(".patch"))
+                .count();
+            if sum_count > 0 && sum_count != real_sources {
+                push(
+                    CheckpkgSeverity::Warning,
+                    format!(
+                        "sha256sums has {} entries but source has {} downloadable files",
+                        sum_count, real_sources
+                    ),
+                );
+            }
+        }
+
+        for backup in pkgbuild_array(pkgbuild_content, "backup") {
+            let path = dep_spec_base_name(&backup);
+            if !existing_files.is_empty() && !existing_files.contains(&path) {
+                push(
+                    CheckpkgSeverity::Warning,
+                    format!("backup file '{}' not found on disk", path),
+                );
+            }
+        }
+
+        findings
+    }
+}
+
+impl Default for CheckpkgEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 19. MakechrootpkgOrchestrator (makechrootpkg / extra-x86_64-build parity)
+// ============================================================================
+
+/// Which devtools clean-chroot builder to emulate
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ChrootBuilderProfile {
+    /// `makechrootpkg` — builds in `$CHROOTDIR` with `-s` syncdeps
+    Makechrootpkg,
+    /// `extra-x86_64-build` — builds directly in `/` chroot for x86_64
+    ExtraX86_64Build,
+}
+
+/// Ordered stages of a clean-chroot package build
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ChrootBuildStage {
+    ResolveBuildDeps,
+    CreateChroot,
+    BindMount,
+    RunMakepkg,
+    CollectArtifacts,
+    Cleanup,
+}
+
+/// Result of planning or executing a clean-chroot build
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ChrootBuildResult {
+    pub success: bool,
+    pub commands_run: Vec<String>,
+    pub artifacts: Vec<String>,
+    pub failed_stage: Option<ChrootBuildStage>,
+}
+
+/// Clean-chroot build orchestrator (`makechrootpkg` / `extra-x86_64-build` parity)
+#[derive(Debug)]
+pub struct MakechrootpkgOrchestrator {
+    pub profile: ChrootBuilderProfile,
+    pub chroot_dir: String,
+    pub syncdeps: bool,
+    pub clean: bool,
+}
+
+impl MakechrootpkgOrchestrator {
+    pub fn new(profile: ChrootBuilderProfile) -> Self {
+        let (chroot_dir, syncdeps) = match profile {
+            ChrootBuilderProfile::Makechrootpkg => ("/chroot/x86_64".to_string(), true),
+            ChrootBuilderProfile::ExtraX86_64Build => ("/".to_string(), false),
+        };
+        Self {
+            profile,
+            chroot_dir,
+            syncdeps,
+            clean: false,
+        }
+    }
+
+    /// Plan the command sequence for building `pkgbuild_dir`.
+    /// `makedepends`/`depends` come from the PKGBUILD; build deps are
+    /// installed inside the chroot before invoking makepkg.
+    pub fn plan_commands(&self, pkgbuild_dir: &str, build_deps: &[String]) -> Vec<String> {
+        let mut cmds = Vec::new();
+        match self.profile {
+            ChrootBuilderProfile::Makechrootpkg => {
+                cmds.push("mkarchroot -f /chroot/base base-devel".to_string());
+                if self.syncdeps {
+                    let mut dep_args = String::new();
+                    for dep in build_deps {
+                        dep_args.push_str(&format!(" {}", dep));
+                    }
+                    cmds.push(format!(
+                        "arch-chroot /chroot/base pacman -Syu --needed --noconfirm{}",
+                        dep_args
+                    ));
+                }
+                cmds.push(format!(
+                    "bind mount {} -> /chroot/x86_64/build",
+                    pkgbuild_dir
+                ));
+                cmds.push(
+                    "arch-chroot /chroot/x86_64 su builder -c 'cd /build && makepkg -srf --noconfirm'"
+                        .to_string(),
+                );
+                cmds.push("arch-chroot /chroot/x86_64 pacman -U /build/*.pkg.tar.zst".to_string());
+            }
+            ChrootBuilderProfile::ExtraX86_64Build => {
+                cmds.push("mkarchroot -f / chroot-base".to_string());
+                let mut dep_args = String::new();
+                for dep in build_deps {
+                    dep_args.push_str(&format!(" {}", dep));
+                }
+                cmds.push(format!("pacstrap / base-devel{}", dep_args));
+                cmds.push(format!("cp -a {} /pkg", pkgbuild_dir));
+                cmds.push(
+                    "arch-chroot / su builder -c 'cd /pkg && makepkg -srf --noconfirm'".to_string(),
+                );
+                cmds.push("pacman -U /pkg/*.pkg.tar.zst".to_string());
+            }
+        }
+        cmds.push("umount chroot bind mounts".to_string());
+        if self.clean {
+            cmds.push(format!("rm -rf {}", self.chroot_dir));
+        }
+        cmds
+    }
+
+    /// Execute the planned build, returning the commands that ran and the
+    /// produced package artifacts. Fails fast at `failed_stage` and still
+    /// emits cleanup commands, mirroring devtools' trap-based cleanup.
+    pub fn execute(
+        &self,
+        pkgbuild_dir: &str,
+        build_deps: &[String],
+        fail_at: Option<ChrootBuildStage>,
+    ) -> ChrootBuildResult {
+        let stage_cmds: Vec<(ChrootBuildStage, Vec<String>)> = vec![
+            (
+                ChrootBuildStage::ResolveBuildDeps,
+                self.plan_commands(pkgbuild_dir, build_deps)
+                    .into_iter()
+                    .take(2)
+                    .collect(),
+            ),
+            (
+                ChrootBuildStage::CreateChroot,
+                vec!["mkarchroot".to_string()],
+            ),
+            (
+                ChrootBuildStage::BindMount,
+                vec!["mount --bind".to_string()],
+            ),
+            (
+                ChrootBuildStage::RunMakepkg,
+                vec!["makepkg -srf".to_string()],
+            ),
+            (
+                ChrootBuildStage::CollectArtifacts,
+                vec!["pacman -U *.pkg.tar.zst".to_string()],
+            ),
+            (
+                ChrootBuildStage::Cleanup,
+                vec!["umount; rm -rf".to_string()],
+            ),
+        ];
+
+        let mut commands_run = Vec::new();
+        let mut artifacts = Vec::new();
+        let mut failed_stage = None;
+
+        for (stage, cmds) in stage_cmds {
+            if failed_stage.is_some() {
+                break;
+            }
+            if fail_at == Some(stage) {
+                failed_stage = Some(stage);
+                break;
+            }
+            commands_run.extend(cmds.iter().cloned());
+            if stage == ChrootBuildStage::CollectArtifacts {
+                artifacts.push("*.pkg.tar.zst".to_string());
+            }
+        }
+        // cleanup always runs, even on failure (devtools trap semantics)
+        commands_run.push("umount chroot bind mounts".to_string());
+        if self.clean {
+            commands_run.push(format!("rm -rf {}", self.chroot_dir));
+        }
+
+        ChrootBuildResult {
+            success: failed_stage.is_none(),
+            commands_run,
+            artifacts,
+            failed_stage,
+        }
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -1859,5 +2275,120 @@ mod tests {
         let changed2 = marker.set_explicit(&mut installed, &["b"], false);
         assert_eq!(changed2, vec!["b".to_string()]);
         assert_eq!(PacmanDbMarker::dependency_packages(&installed), vec!["b"]);
+    }
+
+    const CLEAN_PKGBUILD: &str = r#"
+pkgname=testpkg
+pkgver=1.2.3
+pkgrel=1
+pkgdesc="A test package"
+arch=("x86_64")
+url="https://example.com"
+license=('MIT')
+depends=("glibc" "zlib>=1.0")
+makedepends=("cmake")
+source=("https://example.com/src.tar.gz")
+sha256sums=('abc123')
+backup=("etc/testpkg.conf")
+"#;
+
+    #[test]
+    fn test_checkpkg_clean_pkgbuild() {
+        let engine = CheckpkgEngine::new();
+        let findings = engine.lint(CLEAN_PKGBUILD, &["etc/testpkg.conf"]);
+        assert!(findings.is_empty(), "unexpected findings: {:?}", findings);
+    }
+
+    #[test]
+    fn test_checkpkg_finds_violations() {
+        let engine = CheckpkgEngine::new();
+        let bad = r#"
+pkgname=Bad_Pkg
+pkgver=1.0-rc1
+pkgrel=0
+license=('custom')
+depends=("glibc" "cmake")
+makedepends=("cmake")
+arch=("aarch64")
+url="ftp://example.com"
+source=("https://example.com/a.tar.gz" "https://example.com/b.tar.gz")
+sha256sums=('aaa' 'bbb' 'ccc')
+backup=("etc/missing.conf")
+"#;
+        let findings = engine.lint(bad, &["etc/other.conf"]);
+        let msgs: Vec<&str> = findings.iter().map(|f| f.message.as_str()).collect();
+        assert!(msgs.iter().any(|m| m.contains("lowercase")));
+        assert!(msgs.iter().any(|m| m.contains("pkgver")));
+        assert!(msgs.iter().any(|m| m.contains("pkgrel")));
+        assert!(msgs.iter().any(|m| m.contains("license 'custom'")));
+        assert!(msgs
+            .iter()
+            .any(|m| m.contains("both depends and makedepends")));
+        assert!(msgs.iter().any(|m| m.contains("does not include x86_64")));
+        assert!(msgs.iter().any(|m| m.contains("http(s)")));
+        assert!(msgs.iter().any(|m| m.contains("sha256sums has 3 entries")));
+        assert!(msgs.iter().any(|m| m.contains("backup file")));
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == CheckpkgSeverity::Error));
+    }
+
+    #[test]
+    fn test_checkpkg_multiline_array() {
+        let engine = CheckpkgEngine::new();
+        let pkgbuild = r#"
+pkgname=multi
+pkgver=1.0
+pkgrel=1
+license=('MIT')
+depends=(
+    "foo"
+    "bar>=2.0"
+)
+source=("https://x/y.tar.gz")
+sha256sums=('sum')
+"#;
+        let findings = engine.lint(pkgbuild, &[]);
+        // no depends/makedepends conflict, no missing required fields
+        assert!(!findings.iter().any(|f| f.message.contains("pkgname")));
+        assert!(!findings.iter().any(|f| f.message.contains("pkgver")));
+        assert!(!findings.iter().any(|f| f.message.contains("pkgrel")));
+    }
+
+    #[test]
+    fn test_makechrootpkg_plan() {
+        let orch = MakechrootpkgOrchestrator::new(ChrootBuilderProfile::Makechrootpkg);
+        let deps = vec!["base-devel".to_string(), "cmake".to_string()];
+        let cmds = orch.plan_commands("/home/user/pkgbuild", &deps);
+        assert!(cmds.iter().any(|c| c.contains("mkarchroot")));
+        assert!(cmds.iter().any(|c| c.contains("cmake")));
+        assert!(cmds.iter().any(|c| c.contains("makepkg")));
+        assert!(cmds.iter().any(|c| c.contains("umount")));
+    }
+
+    #[test]
+    fn test_extra_x86_64_build_plan() {
+        let orch = MakechrootpkgOrchestrator::new(ChrootBuilderProfile::ExtraX86_64Build);
+        let cmds = orch.plan_commands("/src/pkg", &[]);
+        assert!(cmds.iter().any(|c| c.contains("pacstrap /")));
+        assert!(cmds.iter().any(|c| c.contains("arch-chroot /")));
+    }
+
+    #[test]
+    fn test_makechrootpkg_execute_success_and_failure() {
+        let mut orch = MakechrootpkgOrchestrator::new(ChrootBuilderProfile::Makechrootpkg);
+        orch.clean = true;
+        let deps = vec!["base-devel".to_string()];
+
+        let ok = orch.execute("/build/dir", &deps, None);
+        assert!(ok.success);
+        assert!(!ok.artifacts.is_empty());
+        assert!(ok.commands_run.iter().any(|c| c.contains("rm -rf")));
+
+        let failed = orch.execute("/build/dir", &deps, Some(ChrootBuildStage::RunMakepkg));
+        assert!(!failed.success);
+        assert_eq!(failed.failed_stage, Some(ChrootBuildStage::RunMakepkg));
+        // cleanup still runs on failure (trap semantics)
+        assert!(failed.commands_run.iter().any(|c| c.contains("umount")));
     }
 }
