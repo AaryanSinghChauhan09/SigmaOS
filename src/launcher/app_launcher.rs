@@ -56,6 +56,39 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
     }
 }
 
+/// Score an ordered character match. Contiguous runs and word starts rank
+/// above scattered matches, while a missing query character is a hard miss.
+fn subsequence_score(haystack: &str, needle: &str) -> Option<i32> {
+    if needle.is_empty() {
+        return Some(0);
+    }
+
+    let haystack: Vec<char> = haystack.chars().flat_map(char::to_lowercase).collect();
+    let needle: Vec<char> = needle.chars().flat_map(char::to_lowercase).collect();
+    let mut query_index = 0;
+    let mut previous = None;
+    let mut score = 500;
+    for (index, ch) in haystack.iter().enumerate() {
+        if *ch != needle[query_index] {
+            continue;
+        }
+
+        score += 10;
+        if previous.map_or(false, |prior| prior + 1 == index) {
+            score += 20;
+        } else if index == 0 || !haystack[index - 1].is_alphanumeric() {
+            score += 15;
+        }
+        previous = Some(index);
+        query_index += 1;
+        if query_index == needle.len() {
+            score -= (haystack.len() - needle.len()).min(100) as i32;
+            return Some(score);
+        }
+    }
+    None
+}
+
 /// Application entry
 #[derive(Debug, Clone)]
 pub struct AppEntry {
@@ -132,6 +165,9 @@ impl AppEntry {
     }
 
     pub fn fuzzy_score(&self, query: &str) -> i32 {
+        if query.is_empty() {
+            return 0;
+        }
         if eq_ignore_case(&self.name, query) {
             return 1000; // Exact match
         }
@@ -156,6 +192,16 @@ impl AppEntry {
             if contains_ignore_case(keyword, query) {
                 return 600;
             }
+        }
+
+        // Walker-style fuzzy matching: allow skipped characters while
+        // rewarding compact matches and word boundaries.
+        let mut best = subsequence_score(&self.name, query).unwrap_or(0);
+        for keyword in &self.keywords {
+            best = best.max(subsequence_score(keyword, query).unwrap_or(0) - 50);
+        }
+        if best > 0 {
+            return best;
         }
 
         0 // No match
