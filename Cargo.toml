@@ -9,6 +9,7 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 default-run = "sigmaos"
 
 [dependencies]
+ed25519-dalek = "3.0.0"
 # Core dependencies (minimal as per SigmaOS philosophy)
 thiserror = "1.0"
 

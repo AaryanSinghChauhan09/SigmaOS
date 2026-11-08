@@ -21,6 +21,7 @@ pub mod debian_apt_engine;
 pub mod debian_crusher;
 pub mod debian_defeater;
 pub mod declarative_build;
+pub mod ed25519;
 pub use declarative_build::{
     ArchLinuxReproBuildInspector, BazelBuildEngine, BazelRuleType, BazelTarget,
     DebianDiffoscopeEngine, FreeBsdPortsPackageReproducer, GentooPortageReproducibleEbuildEngine,
@@ -241,15 +242,15 @@ pub use package_snapshot_rollback::{
     SovereignPackageSnapshotRollbackEngine,
 };
 pub use pacman_contrib::{
-    CheckpkgEngine, CheckpkgFinding, CheckpkgSeverity, CheckUpdatesEngine, ChrootBuildResult,
+    CheckUpdatesEngine, CheckpkgEngine, CheckpkgFinding, CheckpkgSeverity, ChrootBuildResult,
     ChrootBuildStage, ChrootBuilderProfile, DevelPackage, DevelUpdateChecker, ExpacFormatter,
-    InstalledPackage, MakechrootpkgOrchestrator, OwnedPackageFile, PacCacheResult,
-    PacCacheTrimmer, PacCheckVerifier, PacDiffAction, PacDiffCandidate, PacDiffConfigResolver,
-    PacFilesDb, PacGraphRenderer, PacListRepoFilter, PacLogAction, PacLogAuditor, PacLogEntry,
-    PacmanDbMarker, PacNewsItem, PacNewsParser, PacReport, PacReportAnalyzer, PacTreeRenderer,
-    PackageCacheEntry, PackageVerificationReport, PacmanQueryFormatter, PendingUpdate,
-    PkgFileSearcher, RepoDbManager, RepoDbPackage, SyncFileDb, SyncFileDbManager,
-    SyncFileEntry, SyncPackage, TrackedPackageFile, UpdPkgSumsGenerator,
+    InstalledPackage, MakechrootpkgOrchestrator, OwnedPackageFile, PacCacheResult, PacCacheTrimmer,
+    PacCheckVerifier, PacDiffAction, PacDiffCandidate, PacDiffConfigResolver, PacFilesDb,
+    PacGraphRenderer, PacListRepoFilter, PacLogAction, PacLogAuditor, PacLogEntry, PacNewsItem,
+    PacNewsParser, PacReport, PacReportAnalyzer, PacTreeRenderer, PackageCacheEntry,
+    PackageVerificationReport, PacmanDbMarker, PacmanQueryFormatter, PendingUpdate,
+    PkgFileSearcher, RepoDbManager, RepoDbPackage, SyncFileDb, SyncFileDbManager, SyncFileEntry,
+    SyncPackage, TrackedPackageFile, UpdPkgSumsGenerator,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
