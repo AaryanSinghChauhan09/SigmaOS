@@ -868,6 +868,323 @@ impl Default for OmarchyRefreshRegistry {
     }
 }
 
+// ============================================================================
+// 9. OmarchyPowerMenu (omarchy-menu power / omarchy-power-* parity)
+// ============================================================================
+
+/// System power actions offered by the Omarchy menu
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerAction {
+    Shutdown,
+    Reboot,
+    Suspend,
+    Hibernate,
+    Logout,
+    Lock,
+}
+
+impl PowerAction {
+    pub fn label(&self) -> &'static str {
+        match self {
+            Self::Shutdown => "Shut Down",
+            Self::Reboot => "Restart",
+            Self::Suspend => "Suspend",
+            Self::Hibernate => "Hibernate",
+            Self::Logout => "Log Out",
+            Self::Lock => "Lock Screen",
+        }
+    }
+
+    /// systemd/logind command the action maps to
+    pub fn command(&self) -> &'static str {
+        match self {
+            Self::Shutdown => "systemctl poweroff",
+            Self::Reboot => "systemctl reboot",
+            Self::Suspend => "systemctl suspend",
+            Self::Hibernate => "systemctl hibernate",
+            Self::Logout => "loginctl terminate-session $XDG_SESSION_ID",
+            Self::Lock => "omarchy-lock",
+        }
+    }
+
+    /// Actions that need polkit authorization
+    pub fn needs_auth(&self) -> bool {
+        !matches!(self, Self::Lock | Self::Logout)
+    }
+}
+
+/// Ordered power menu entries with optional confirmation gating
+#[derive(Debug)]
+pub struct OmarchyPowerMenu;
+
+impl OmarchyPowerMenu {
+    pub fn entries(&self) -> Vec<PowerAction> {
+        vec![
+            PowerAction::Lock,
+            PowerAction::Suspend,
+            PowerAction::Logout,
+            PowerAction::Reboot,
+            PowerAction::Shutdown,
+            PowerAction::Hibernate,
+        ]
+    }
+
+    /// Destructive actions that should show a confirm dialog first
+    pub fn needs_confirmation(&self, action: PowerAction) -> bool {
+        matches!(
+            action,
+            PowerAction::Shutdown | PowerAction::Reboot | PowerAction::Hibernate
+        )
+    }
+
+    /// Execute an action: returns the command plus whether it ran through
+    /// polkit. Caller decides whether to show a confirmation first.
+    pub fn execute(&self, action: PowerAction, confirmed: bool) -> Option<String> {
+        if self.needs_confirmation(action) && !confirmed {
+            return None;
+        }
+        Some(action.command().to_string())
+    }
+}
+
+impl Default for OmarchyPowerMenu {
+    fn default() -> Self {
+        Self
+    }
+}
+
+// ============================================================================
+// 10. OmarchyAppLauncher (omarchy-launch-* parity)
+// ============================================================================
+
+/// A launchable application entry (`omarchy-launch-*` / walker entries)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LaunchableApp {
+    pub id: String,
+    pub name: String,
+    /// desktop file id or binary name
+    pub exec: String,
+    /// icon name for menu/launcher display
+    pub icon: String,
+    /// terminal apps need a terminal wrapper
+    pub terminal: bool,
+}
+
+/// Registry of Omarchy's curated default applications and their launch
+/// wrappers (`omarchy-launch-browser`, `omarchy-launch-terminal`, etc.)
+#[derive(Debug)]
+pub struct OmarchyAppLauncher {
+    pub apps: Vec<LaunchableApp>,
+}
+
+impl OmarchyAppLauncher {
+    pub fn new() -> Self {
+        Self {
+            apps: vec![
+                LaunchableApp {
+                    id: "browser".to_string(),
+                    name: "Browser".to_string(),
+                    exec: "omarchy-launch-browser".to_string(),
+                    icon: "web-browser".to_string(),
+                    terminal: false,
+                },
+                LaunchableApp {
+                    id: "terminal".to_string(),
+                    name: "Terminal".to_string(),
+                    exec: "ghostty".to_string(),
+                    icon: "utilities-terminal".to_string(),
+                    terminal: true,
+                },
+                LaunchableApp {
+                    id: "files".to_string(),
+                    name: "Files".to_string(),
+                    exec: "nautilus".to_string(),
+                    icon: "system-file-manager".to_string(),
+                    terminal: false,
+                },
+                LaunchableApp {
+                    id: "editor".to_string(),
+                    name: "Editor".to_string(),
+                    exec: "omarchy-launch-editor".to_string(),
+                    icon: "accessories-text-editor".to_string(),
+                    terminal: true,
+                },
+                LaunchableApp {
+                    id: "music".to_string(),
+                    name: "Music".to_string(),
+                    exec: "spotify".to_string(),
+                    icon: "multimedia-audio-player".to_string(),
+                    terminal: false,
+                },
+                LaunchableApp {
+                    id: "photos".to_string(),
+                    name: "Photos".to_string(),
+                    exec: "omarchy-launch-photos".to_string(),
+                    icon: "multimedia-photo-viewer".to_string(),
+                    terminal: false,
+                },
+            ],
+        }
+    }
+
+    /// Find an app by id or name (case-insensitive)
+    pub fn find(&self, query: &str) -> Option<&LaunchableApp> {
+        let q = query.to_lowercase();
+        self.apps.iter().find(|a| {
+            a.id.to_lowercase() == q || a.name.to_lowercase() == q || a.exec.to_lowercase() == q
+        })
+    }
+
+    /// Build the shell command to launch an app, wrapping terminal apps
+    /// in the configured terminal like the real omarchy-launch-* scripts
+    pub fn launch_command(&self, app_id: &str, args: &[&str]) -> Option<String> {
+        let app = self.find(app_id)?;
+        let mut cmd = if app.terminal {
+            format!("{} -e {}", self.terminal_command(), app.exec)
+        } else {
+            app.exec.clone()
+        };
+        for arg in args {
+            cmd.push(' ');
+            cmd.push_str(arg);
+        }
+        Some(cmd)
+    }
+
+    fn terminal_command(&self) -> String {
+        "ghostty".to_string()
+    }
+}
+
+impl Default for OmarchyAppLauncher {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 11. OmarchyMigrationHelper (omarchy-migrate-* parity)
+// ============================================================================
+
+/// Source distro a user is migrating from
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MigrationSource {
+    MacOS,
+    Windows,
+    Ubuntu,
+    Fedora,
+    Other,
+}
+
+/// Post-install migration checklist generated by `omarchy-migrate-*`
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MigrationStep {
+    pub description: String,
+    pub command: String,
+    /// steps marked optional are suggested but not required
+    pub optional: bool,
+}
+
+/// Generates migration steps for bringing settings/files over from a
+/// previous OS install (`omarchy-migrate-from-*` helpers).
+#[derive(Debug)]
+pub struct OmarchyMigrationHelper;
+
+impl OmarchyMigrationHelper {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Steps to migrate user config from another Linux distro
+    pub fn linux_steps(&self) -> Vec<MigrationStep> {
+        vec![
+            MigrationStep {
+                description: "Copy dotfiles and shell config".to_string(),
+                command: "rsync -av /mnt/oldhome/$USER/{.bashrc,.zshrc,.config} ~/".to_string(),
+                optional: false,
+            },
+            MigrationStep {
+                description: "Import GNOME/other DE settings via omarchy-theme-set".to_string(),
+                command: "omarchy-theme-set --import ~/.config/omarchy/themes".to_string(),
+                optional: true,
+            },
+            MigrationStep {
+                description: "Reinstall AUR packages from old pacman log".to_string(),
+                command: "grep 'installed ' /mnt/oldvar/log/pacman.log | awk '{print $4}' | yay -S --needed".to_string(),
+                optional: true,
+            },
+            MigrationStep {
+                description: "Mount old home and verify data".to_string(),
+                command: "omarchy-mount-old /mnt/oldhome && ls /mnt/oldhome/$USER".to_string(),
+                optional: false,
+            },
+        ]
+    }
+
+    /// Steps to migrate from macOS (files, browser data, keys)
+    pub fn macos_steps(&self) -> Vec<MigrationStep> {
+        vec![
+            MigrationStep {
+                description: "Copy SSH keys and GPG keys".to_string(),
+                command:
+                    "mkdir -p ~/.ssh && cp /Volumes/MacHome/.ssh/* ~/.ssh/ && chmod 700 ~/.ssh"
+                        .to_string(),
+                optional: false,
+            },
+            MigrationStep {
+                description: "Import macOS fonts".to_string(),
+                command:
+                    "cp /Volumes/MacHome/Library/Fonts/*.ttf ~/.local/share/fonts/ && fc-cache -fv"
+                        .to_string(),
+                optional: true,
+            },
+            MigrationStep {
+                description: "Copy documents and desktop files".to_string(),
+                command: "rsync -av /Volumes/MacHome/{Documents,Desktop,Pictures} ~/".to_string(),
+                optional: false,
+            },
+        ]
+    }
+
+    /// Steps to migrate from Windows (NTFS mount + WSL data)
+    pub fn windows_steps(&self) -> Vec<MigrationStep> {
+        vec![
+            MigrationStep {
+                description: "Mount Windows partition read-write via ntfs3".to_string(),
+                command: "sudo mount -t ntfs3 /dev/nvme0n1p3 /mnt/windows".to_string(),
+                optional: false,
+            },
+            MigrationStep {
+                description: "Copy browser profiles from Windows".to_string(),
+                command: "rsync -av /mnt/windows/Users/*/AppData/Local/Google/Chrome/User\\ Data/Default ~/".to_string(),
+                optional: true,
+            },
+            MigrationStep {
+                description: "Copy Documents/Desktop from Windows profile".to_string(),
+                command: "rsync -av /mnt/windows/Users/*/Documents ~/".to_string(),
+                optional: false,
+            },
+        ]
+    }
+
+    /// Pick the right step list for a migration source
+    pub fn steps_for(&self, source: MigrationSource) -> Vec<MigrationStep> {
+        match source {
+            MigrationSource::MacOS => self.macos_steps(),
+            MigrationSource::Windows => self.windows_steps(),
+            MigrationSource::Ubuntu | MigrationSource::Fedora | MigrationSource::Other => {
+                self.linux_steps()
+            }
+        }
+    }
+}
+
+impl Default for OmarchyMigrationHelper {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1078,5 +1395,56 @@ mod tests {
         let headless = reg.headless_commands();
         assert_eq!(headless.len(), 3);
         assert!(reg.find("nonexistent").is_none());
+    }
+
+    #[test]
+    fn test_power_menu() {
+        let menu = OmarchyPowerMenu;
+        let entries = menu.entries();
+        assert_eq!(entries.len(), 6);
+        assert_eq!(entries[0], PowerAction::Lock);
+
+        // destructive actions require confirmation
+        assert!(menu.execute(PowerAction::Shutdown, false).is_none());
+        assert!(menu
+            .execute(PowerAction::Shutdown, true)
+            .unwrap()
+            .contains("poweroff"));
+        // lock needs no confirmation
+        assert!(menu.execute(PowerAction::Lock, false).is_some());
+        assert!(PowerAction::Reboot.needs_auth());
+        assert!(!PowerAction::Lock.needs_auth());
+    }
+
+    #[test]
+    fn test_app_launcher() {
+        let launcher = OmarchyAppLauncher::new();
+        assert!(launcher.find("browser").is_some());
+        assert!(launcher.find("Terminal").is_some());
+        assert!(launcher.find("nonexistent").is_none());
+
+        // terminal apps get wrapped in the terminal
+        let term_cmd = launcher.launch_command("terminal", &[]).unwrap();
+        assert!(term_cmd.contains("ghostty"));
+        // GUI apps launch directly
+        let gui_cmd = launcher.launch_command("files", &["~/Documents"]).unwrap();
+        assert_eq!(gui_cmd, "nautilus ~/Documents");
+    }
+
+    #[test]
+    fn test_migration_helper() {
+        let helper = OmarchyMigrationHelper::new();
+        let mac = helper.steps_for(MigrationSource::MacOS);
+        assert!(mac.iter().any(|s| s.command.contains(".ssh")));
+        let win = helper.steps_for(MigrationSource::Windows);
+        assert!(win.iter().any(|s| s.command.contains("ntfs3")));
+        let linux = helper.steps_for(MigrationSource::Ubuntu);
+        assert!(linux.iter().any(|s| s.command.contains("pacman.log")));
+        // every step has a command
+        assert!(mac
+            .iter()
+            .chain(win.iter())
+            .chain(linux.iter())
+            .all(|s| !s.command.is_empty()));
     }
 }
