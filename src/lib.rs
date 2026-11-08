@@ -199,7 +199,13 @@ pub use memory::low_level;
 pub use memory::page_compaction::*;
 pub mod network;
 pub mod observability;
+pub mod omarchy;
+pub mod omarchy_bar;
+pub mod omarchy_overlay;
+pub mod omarchy_plugin;
 pub mod orchestration;
+pub mod quickshell;
+pub mod wallpaper_palette;
 pub mod package;
 pub use package::{
     ForeignRepoIndexParser, PkgConfig, SandboxActionType, SandboxedScriptletResult, SigmaPkg,

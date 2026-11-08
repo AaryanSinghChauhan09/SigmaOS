@@ -1,6 +1,9 @@
+pub mod omarchy_theme_suite;
 pub mod theme_engine;
 pub mod theme_manager;
 pub mod wallpaper_palette_extractor;
+
+pub use omarchy_theme_suite::{OmarchyThemeSuite, SovereignThemeEngine, ThemePalette};
 
 pub use theme_engine::*;
 pub use theme_manager::{
