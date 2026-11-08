@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS Pacman Contrib Utility Parity Suite
 // Native Rust implementation of pacman-contrib utilities:
-// Maccache, pacdiff, checkupdates, paclist, updpkgsums, paclog
+// Maccache, pacdiff, checkupdates, paclist, updpkgsums, paclog,
+// pacfiles, paccheck, pacreport, pkgfile, and pacman -Qi/-Si formatting
 
 use std::cmp::Ordering;
+use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+
+use crate::sigpkg::arch_pacman_engine::ArchPacmanPackage;
 
 // ============================================================================
 // 1. PacCacheTrimmer (paccache parity)
@@ -536,6 +540,466 @@ impl PacLogAuditor {
 }
 
 // ============================================================================
+// 7. PacFilesDb (pacfiles / pacman -Ql / pacman -Qo parity)
+// ============================================================================
+
+/// A single file owned by an installed package (`pacman -Ql` entry)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OwnedPackageFile {
+    pub path: String,
+    pub size_bytes: u64,
+    pub is_dir: bool,
+}
+
+/// Installed package file database (`pacfiles` and `pacman -Qo` parity)
+#[derive(Debug, Default)]
+pub struct PacFilesDb {
+    /// package name -> files it owns
+    pub packages: BTreeMap<String, Vec<OwnedPackageFile>>,
+}
+
+impl PacFilesDb {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Register the file list of an installed package
+    pub fn register_package(&mut self, package_name: &str, files: Vec<OwnedPackageFile>) {
+        self.packages.insert(package_name.to_string(), files);
+    }
+
+    /// List files owned by a package (`pacman -Ql <pkg>`)
+    pub fn files_of(&self, package_name: &str) -> Vec<&OwnedPackageFile> {
+        self.packages
+            .get(package_name)
+            .map(|files| files.iter().collect())
+            .unwrap_or_default()
+    }
+
+    /// Find which installed package owns a path (`pacman -Qo <path>`).
+    /// An exact file match wins; otherwise the longest matching directory
+    /// prefix is used, mirroring how pacman resolves ownership of paths
+    /// beneath a package-owned directory.
+    pub fn owner_of(&self, path: &str) -> Option<String> {
+        let normalized = path.trim_end_matches('/');
+        if normalized.is_empty() {
+            return None;
+        }
+
+        for (pkg, files) in &self.packages {
+            if files.iter().any(|f| !f.is_dir && f.path == normalized) {
+                return Some(pkg.clone());
+            }
+        }
+
+        let mut best: Option<(&str, usize)> = None;
+        for (pkg, files) in &self.packages {
+            for file in files {
+                if !file.is_dir {
+                    continue;
+                }
+                let dir = file.path.trim_end_matches('/');
+                let matches = normalized == dir || normalized.starts_with(&format!("{}/", dir));
+                if matches && best.map_or(true, |(_, len)| dir.len() > len) {
+                    best = Some((pkg.as_str(), dir.len()));
+                }
+            }
+        }
+        best.map(|(pkg, _)| pkg.to_string())
+    }
+
+    /// Total tracked file count across all registered packages
+    pub fn total_files(&self) -> usize {
+        self.packages.values().map(Vec::len).sum()
+    }
+}
+
+// ============================================================================
+// 8. PacCheckVerifier (pacman -Qk / paccheck parity)
+// ============================================================================
+
+/// A file entry recorded in an installed package database with its expected
+/// digest and size, mirroring `.MTREE` metadata used by `pacman -Qk`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TrackedPackageFile {
+    pub path: String,
+    pub sha256: Option<String>,
+    pub size_bytes: Option<u64>,
+}
+
+/// Result of verifying an installed package against its recorded digests
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct PackageVerificationReport {
+    pub package_name: String,
+    pub checked_files: usize,
+    pub ok_files: usize,
+    pub missing_files: Vec<String>,
+    pub modified_files: Vec<String>,
+}
+
+impl PackageVerificationReport {
+    /// True when every tracked file is present with matching metadata
+    pub fn is_clean(&self) -> bool {
+        self.missing_files.is_empty() && self.modified_files.is_empty()
+    }
+}
+
+/// Installed package integrity verifier (`paccheck` / `pacman -Qk` parity)
+pub struct PacCheckVerifier;
+
+impl PacCheckVerifier {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Verifies a package's tracked files against on-disk contents.
+    /// `disk` maps absolute paths to file bytes; a missing key means the file
+    /// is absent. When both size and digest metadata are recorded, any
+    /// mismatch marks the file as modified.
+    pub fn verify(
+        &self,
+        package_name: &str,
+        tracked: &[TrackedPackageFile],
+        disk: &BTreeMap<String, Vec<u8>>,
+    ) -> PackageVerificationReport {
+        let mut report = PackageVerificationReport {
+            package_name: package_name.to_string(),
+            ..PackageVerificationReport::default()
+        };
+
+        for file in tracked {
+            report.checked_files += 1;
+            match disk.get(&file.path) {
+                None => report.missing_files.push(file.path.clone()),
+                Some(contents) => {
+                    let size_mismatch = file
+                        .size_bytes
+                        .map_or(false, |expected| expected != contents.len() as u64);
+                    let digest_mismatch = file.sha256.as_ref().map_or(false, |expected| {
+                        UpdPkgSumsGenerator::compute_sha256(contents) != *expected
+                    });
+                    if size_mismatch || digest_mismatch {
+                        report.modified_files.push(file.path.clone());
+                    } else {
+                        report.ok_files += 1;
+                    }
+                }
+            }
+        }
+
+        report.missing_files.sort();
+        report.modified_files.sort();
+        report
+    }
+}
+
+impl Default for PacCheckVerifier {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 9. PacReportAnalyzer (pacreport parity)
+// ============================================================================
+
+/// Analysis of the local package database (`pacreport` parity)
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct PacReport {
+    /// (package, optdep) pairs where the optdep is installed but not required
+    /// by any installed package's hard dependencies
+    pub unrequired_optdepends: Vec<(String, String)>,
+    /// installed, non-explicit packages that nothing depends on (orphans)
+    pub unrequired_dependencies: Vec<String>,
+    /// (package name, installed size) sorted by size descending
+    pub disk_usage: Vec<(String, u64)>,
+    /// sum of all installed package sizes in bytes
+    pub total_installed_size: u64,
+}
+
+/// Strips version constraints (`>=`, `<=`, `=`, `<`, `>`) from a dependency spec
+fn dep_spec_base_name(spec: &str) -> &str {
+    spec.split(|c| matches!(c, '<' | '>' | '='))
+        .next()
+        .unwrap_or(spec)
+        .trim()
+}
+
+/// Strips the `: description` suffix and version constraint from an optdepend spec
+fn optdep_spec_name(spec: &str) -> &str {
+    dep_spec_base_name(spec.split(':').next().unwrap_or(spec))
+}
+
+/// Local database reporter (`pacreport` parity)
+pub struct PacReportAnalyzer;
+
+impl PacReportAnalyzer {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Analyzes the installed package set for unrequired optdepends,
+    /// orphaned dependencies, and per-package disk usage.
+    pub fn analyze(&self, installed: &[ArchPacmanPackage]) -> PacReport {
+        let installed_names: Vec<&str> = installed.iter().map(|p| p.name.as_str()).collect();
+
+        let mut required: Vec<String> = Vec::new();
+        for pkg in installed {
+            for dep in &pkg.depends {
+                let base = dep_spec_base_name(dep);
+                if !base.is_empty() && !required.iter().any(|r| r == base) {
+                    required.push(base.to_string());
+                }
+            }
+        }
+
+        let mut unrequired_optdepends = Vec::new();
+        let mut unrequired_dependencies = Vec::new();
+        for pkg in installed {
+            for optdep in &pkg.optdepends {
+                let name = optdep_spec_name(optdep);
+                if !name.is_empty()
+                    && installed_names.contains(&name)
+                    && !required.iter().any(|r| r.as_str() == name)
+                {
+                    unrequired_optdepends.push((pkg.name.clone(), name.to_string()));
+                }
+            }
+            if !pkg.is_explicit && !required.iter().any(|r| r.as_str() == pkg.name.as_str()) {
+                unrequired_dependencies.push(pkg.name.clone());
+            }
+        }
+
+        let mut disk_usage: Vec<(String, u64)> = installed
+            .iter()
+            .map(|p| (p.name.clone(), p.installed_size))
+            .collect();
+        disk_usage.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+
+        unrequired_optdepends.sort();
+        unrequired_optdepends.dedup();
+        unrequired_dependencies.sort();
+
+        PacReport {
+            unrequired_optdepends,
+            unrequired_dependencies,
+            total_installed_size: installed.iter().map(|p| p.installed_size).sum(),
+            disk_usage,
+        }
+    }
+}
+
+impl Default for PacReportAnalyzer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 10. PkgFileSearcher (pkgfile / pacman -F parity)
+// ============================================================================
+
+/// A file entry in a sync repository database (`pkgfile` / `pacman -F`)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SyncFileEntry {
+    pub package_name: String,
+    pub repository: String,
+    pub file_path: String,
+}
+
+/// Searches sync databases for which package provides a file
+/// (`pkgfile` and `pacman -F` parity)
+#[derive(Debug, Default)]
+pub struct PkgFileSearcher {
+    pub entries: Vec<SyncFileEntry>,
+}
+
+impl PkgFileSearcher {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Register a package's file list from a sync database
+    pub fn register_package_files(&mut self, package_name: &str, repository: &str, files: &[&str]) {
+        for file in files {
+            self.entries.push(SyncFileEntry {
+                package_name: package_name.to_string(),
+                repository: repository.to_string(),
+                file_path: (*file).to_string(),
+            });
+        }
+    }
+
+    /// Exact path lookup (`pacman -F /usr/bin/foo`)
+    pub fn find_exact(&self, path: &str) -> Vec<&SyncFileEntry> {
+        self.entries
+            .iter()
+            .filter(|e| e.file_path == path)
+            .collect()
+    }
+
+    /// Glob lookup supporting `*` (any sequence) and `?` (single character),
+    /// matching `pkgfile` pattern semantics (`pkgfile '*gcc*'`)
+    pub fn find_glob(&self, pattern: &str) -> Vec<&SyncFileEntry> {
+        self.entries
+            .iter()
+            .filter(|e| glob_match(pattern, &e.file_path))
+            .collect()
+    }
+}
+
+/// Minimal glob matcher supporting `*` and `?` wildcards
+fn glob_match(pattern: &str, text: &str) -> bool {
+    fn inner(p: &[u8], t: &[u8]) -> bool {
+        match p.first() {
+            None => t.is_empty(),
+            Some(b'*') => {
+                // collapse consecutive stars
+                let mut rest = &p[1..];
+                while rest.first() == Some(&b'*') {
+                    rest = &rest[1..];
+                }
+                (0..=t.len()).any(|skip| inner(rest, &t[skip..]))
+            }
+            Some(b'?') => !t.is_empty() && inner(&p[1..], &t[1..]),
+            Some(&c) => t.first() == Some(&c) && inner(&p[1..], &t[1..]),
+        }
+    }
+    inner(pattern.as_bytes(), text.as_bytes())
+}
+
+// ============================================================================
+// 11. PacmanQueryFormatter (pacman -Qi / pacman -Si parity)
+// ============================================================================
+
+/// Formats package database records the way `pacman -Qi` / `pacman -Si` do
+pub struct PacmanQueryFormatter;
+
+impl PacmanQueryFormatter {
+    pub fn new() -> Self {
+        Self
+    }
+
+    fn join_or_none(items: &[String]) -> String {
+        if items.is_empty() {
+            "None".to_string()
+        } else {
+            items.join(", ")
+        }
+    }
+
+    fn line(label: &str, value: &str) -> String {
+        format!("{:<16}: {}", label, value)
+    }
+
+    /// `pacman -Qi` parity: installed package record
+    pub fn format_installed(&self, pkg: &ArchPacmanPackage) -> String {
+        let mut out = String::new();
+        out.push_str(&Self::line("Name", &pkg.name));
+        out.push('\n');
+        out.push_str(&Self::line("Version", &pkg.version));
+        out.push('\n');
+        out.push_str(&Self::line("Description", &pkg.description));
+        out.push('\n');
+        out.push_str(&Self::line("Architecture", &pkg.architecture));
+        out.push('\n');
+        out.push_str(&Self::line("URL", &pkg.url));
+        out.push('\n');
+        out.push_str(&Self::line("Licenses", &Self::join_or_none(&pkg.license)));
+        out.push('\n');
+        out.push_str(&Self::line("Groups", &Self::join_or_none(&pkg.groups)));
+        out.push('\n');
+        out.push_str(&Self::line("Provides", &Self::join_or_none(&pkg.provides)));
+        out.push('\n');
+        out.push_str(&Self::line("Depends On", &Self::join_or_none(&pkg.depends)));
+        out.push('\n');
+        out.push_str(&Self::line(
+            "Optional Deps",
+            &Self::join_or_none(&pkg.optdepends),
+        ));
+        out.push('\n');
+        out.push_str(&Self::line("Required By", "None"));
+        out.push('\n');
+        out.push_str(&Self::line("Optional For", "None"));
+        out.push('\n');
+        out.push_str(&Self::line(
+            "Conflicts With",
+            &Self::join_or_none(&pkg.conflicts),
+        ));
+        out.push('\n');
+        out.push_str(&Self::line("Replaces", &Self::join_or_none(&pkg.replaces)));
+        out.push('\n');
+        out.push_str(&Self::line(
+            "Installed Size",
+            &format!("{} KiB", pkg.installed_size / 1024),
+        ));
+        out.push('\n');
+        out.push_str(&Self::line("Packager", &pkg.packager));
+        out.push('\n');
+        out.push_str(&Self::line("Build Date", &pkg.build_date));
+        out.push('\n');
+        out.push_str(&Self::line("Install Date", &pkg.install_date));
+        out.push('\n');
+        out
+    }
+
+    /// `pacman -Si` parity: sync database record including repository
+    pub fn format_sync(&self, pkg: &ArchPacmanPackage, repository: &str) -> String {
+        let mut out = String::new();
+        out.push_str(&Self::line("Repository", repository));
+        out.push('\n');
+        out.push_str(&Self::line("Name", &pkg.name));
+        out.push('\n');
+        out.push_str(&Self::line("Version", &pkg.version));
+        out.push('\n');
+        out.push_str(&Self::line("Description", &pkg.description));
+        out.push('\n');
+        out.push_str(&Self::line("Architecture", &pkg.architecture));
+        out.push('\n');
+        out.push_str(&Self::line("URL", &pkg.url));
+        out.push('\n');
+        out.push_str(&Self::line("Licenses", &Self::join_or_none(&pkg.license)));
+        out.push('\n');
+        out.push_str(&Self::line("Groups", &Self::join_or_none(&pkg.groups)));
+        out.push('\n');
+        out.push_str(&Self::line("Provides", &Self::join_or_none(&pkg.provides)));
+        out.push('\n');
+        out.push_str(&Self::line("Depends On", &Self::join_or_none(&pkg.depends)));
+        out.push('\n');
+        out.push_str(&Self::line(
+            "Optional Deps",
+            &Self::join_or_none(&pkg.optdepends),
+        ));
+        out.push('\n');
+        out.push_str(&Self::line(
+            "Conflicts With",
+            &Self::join_or_none(&pkg.conflicts),
+        ));
+        out.push('\n');
+        out.push_str(&Self::line("Replaces", &Self::join_or_none(&pkg.replaces)));
+        out.push('\n');
+        out.push_str(&Self::line(
+            "Download Size",
+            &format!("{} KiB", pkg.installed_size / 1024),
+        ));
+        out.push('\n');
+        out.push_str(&Self::line("Installed Size", "Unknown"));
+        out.push('\n');
+        out.push_str(&Self::line("Packager", &pkg.packager));
+        out.push('\n');
+        out.push_str(&Self::line("Build Date", &pkg.build_date));
+        out.push('\n');
+        out
+    }
+}
+
+impl Default for PacmanQueryFormatter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -677,5 +1141,171 @@ mod tests {
         let warnings = auditor.filter_warnings_and_errors(&[entry1, entry2]);
         assert_eq!(warnings.len(), 1);
         assert_eq!(warnings[0].action, PacLogAction::Warning);
+    }
+
+    fn sample_pkg(name: &str) -> ArchPacmanPackage {
+        ArchPacmanPackage {
+            name: name.to_string(),
+            version: "1.0.0-1".to_string(),
+            description: format!("{} package", name),
+            url: String::new(),
+            architecture: "x86_64".to_string(),
+            license: vec!["MIT".to_string()],
+            groups: Vec::new(),
+            depends: Vec::new(),
+            optdepends: Vec::new(),
+            makedepends: Vec::new(),
+            checkdepends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            replaces: Vec::new(),
+            backup: Vec::new(),
+            installed_size: 1024,
+            packager: "SigmaOS".to_string(),
+            build_date: "2026-01-01".to_string(),
+            install_date: "2026-01-02".to_string(),
+            is_explicit: true,
+        }
+    }
+
+    #[test]
+    fn test_pacfiles_db() {
+        let mut db = PacFilesDb::new();
+        db.register_package(
+            "bash",
+            vec![
+                OwnedPackageFile {
+                    path: "/usr/bin".to_string(),
+                    size_bytes: 0,
+                    is_dir: true,
+                },
+                OwnedPackageFile {
+                    path: "/usr/bin/bash".to_string(),
+                    size_bytes: 1_234_567,
+                    is_dir: false,
+                },
+            ],
+        );
+        db.register_package(
+            "coreutils",
+            vec![OwnedPackageFile {
+                path: "/usr/bin/ls".to_string(),
+                size_bytes: 100,
+                is_dir: false,
+            }],
+        );
+
+        assert_eq!(db.files_of("bash").len(), 2);
+        assert_eq!(db.owner_of("/usr/bin/ls"), Some("coreutils".to_string()));
+        assert_eq!(db.owner_of("/usr/bin/bash"), Some("bash".to_string()));
+        // directory-prefix ownership like pacman -Qo
+        assert_eq!(
+            db.owner_of("/usr/bin/bash/subshell"),
+            Some("bash".to_string())
+        );
+        assert_eq!(db.owner_of("/etc/hostname"), None);
+        assert_eq!(db.total_files(), 3);
+    }
+
+    #[test]
+    fn test_paccheck_verifier() {
+        let verifier = PacCheckVerifier::new();
+        let contents = b"#!/bin/sh\necho hi\n";
+        let sha = UpdPkgSumsGenerator::compute_sha256(contents);
+        let tracked = vec![
+            TrackedPackageFile {
+                path: "/usr/bin/bash".to_string(),
+                sha256: Some(sha),
+                size_bytes: Some(contents.len() as u64),
+            },
+            TrackedPackageFile {
+                path: "/usr/share/bash/README".to_string(),
+                sha256: None,
+                size_bytes: None,
+            },
+            TrackedPackageFile {
+                path: "/usr/bin/bash.bak".to_string(),
+                sha256: Some(UpdPkgSumsGenerator::compute_sha256(b"other")),
+                size_bytes: None,
+            },
+        ];
+
+        let mut disk = BTreeMap::new();
+        disk.insert("/usr/bin/bash".to_string(), contents.to_vec());
+        disk.insert("/usr/bin/bash.bak".to_string(), contents.to_vec());
+
+        let report = verifier.verify("bash", &tracked, &disk);
+        assert_eq!(report.checked_files, 3);
+        assert_eq!(report.ok_files, 1);
+        assert_eq!(
+            report.missing_files,
+            vec!["/usr/share/bash/README".to_string()]
+        );
+        assert_eq!(report.modified_files, vec!["/usr/bin/bash.bak".to_string()]);
+        assert!(!report.is_clean());
+
+        disk.insert("/usr/share/bash/README".to_string(), b"readme".to_vec());
+        let clean = verifier.verify("bash", &tracked[..1], &disk);
+        assert!(clean.is_clean());
+    }
+
+    #[test]
+    fn test_pacreport_analyzer() {
+        let analyzer = PacReportAnalyzer::new();
+        let mut shell = sample_pkg("zsh");
+        shell.depends = vec!["bash>=5.0".to_string()];
+        let mut bash = sample_pkg("bash");
+        bash.is_explicit = true;
+        let mut git = sample_pkg("git");
+        git.optdepends = vec!["zsh-completions: zsh completion".to_string()];
+        git.installed_size = 2048;
+        let mut helper = sample_pkg("helper");
+        helper.is_explicit = false; // orphan: nothing depends on it
+        let mut compl = sample_pkg("zsh-completions");
+        compl.is_explicit = true; // installed optdep, not required by depends
+
+        let report = analyzer.analyze(&[shell, bash, git, helper, compl]);
+        assert_eq!(
+            report.unrequired_optdepends,
+            vec![("git".to_string(), "zsh-completions".to_string())]
+        );
+        assert_eq!(report.unrequired_dependencies, vec!["helper".to_string()]);
+        assert_eq!(report.disk_usage[0], ("git".to_string(), 2048));
+        assert_eq!(report.total_installed_size, 5 * 1024 + 1024);
+    }
+
+    #[test]
+    fn test_pkgfile_searcher() {
+        let mut searcher = PkgFileSearcher::new();
+        searcher.register_package_files("gcc", "core", &["/usr/bin/gcc", "/usr/lib/libgcc.so"]);
+        searcher.register_package_files("clang", "extra", &["/usr/bin/clang"]);
+
+        assert_eq!(searcher.find_exact("/usr/bin/gcc").len(), 1);
+        assert_eq!(searcher.find_exact("/usr/bin/missing").len(), 0);
+
+        let glob = searcher.find_glob("/usr/bin/*cc");
+        assert_eq!(glob.len(), 1);
+        let qmark = searcher.find_glob("/usr/bin/gcc?");
+        assert!(qmark.is_empty());
+        let qmark2 = searcher.find_glob("/usr/bin/g?c");
+        assert_eq!(qmark2.len(), 1);
+    }
+
+    #[test]
+    fn test_pacman_query_formatter() {
+        let formatter = PacmanQueryFormatter::new();
+        let mut pkg = sample_pkg("bash");
+        pkg.depends = vec!["readline".to_string(), "ncurses>=6.0".to_string()];
+        pkg.optdepends = vec!["bash-completion: completions".to_string()];
+
+        let installed = formatter.format_installed(&pkg);
+        assert!(installed.contains("Name            : bash"));
+        assert!(installed.contains("Depends On      : readline, ncurses>=6.0"));
+        assert!(installed.contains("Optional Deps   : bash-completion: completions"));
+        assert!(installed.contains("Installed Size  : 1 KiB"));
+
+        let sync = formatter.format_sync(&pkg, "core");
+        assert!(sync.contains("Repository      : core"));
+        assert!(sync.contains("Download Size   : 1 KiB"));
     }
 }
