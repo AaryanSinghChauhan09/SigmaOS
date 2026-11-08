@@ -11301,11 +11301,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-firewall"
-description = "Firewall component for SigmaOS"
+description = "Reusable firewall rule, chain, NAT, and connection-tracking policy models; no host rules are applied by this crate"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firewall"
 engine = "firewall"
-category = "Utilities"
-language = "shell"
+category = "Security"
+language = "rust"
 inspirations = ["https://archlinux.org", "https://github.com/nftables"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
