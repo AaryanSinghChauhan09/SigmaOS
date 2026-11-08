@@ -81,7 +81,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-kernel", "SigmaOS-network", "SigmaO
 
 [[component]]
 name = "SigmaOS-packages"
-description = "Deterministic installed-package metadata inventory with strict field validation; does not install packages or verify artifact bytes"
+description = "Validated package catalog, deterministic dependency planning, and installed-package metadata inventory; does not install packages or verify artifact bytes"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-packages"
 engine = "pkg_core"
 category = "Package Management"
