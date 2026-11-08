@@ -34,6 +34,11 @@ pub struct AptReleaseFile {
 pub struct CryptoVerifier {
     pub trusted_keys: Vec<String>,
     pub debian_keyring: AptKeyring,
+    /// Registered signing secrets (key name -> secret bytes). When empty,
+    /// the verifier falls back to legacy accept-any behavior for
+    /// compatibility; once keys are registered, HMAC-SHA256 signatures
+    /// are enforced.
+    pub signing_keys: HashMap<String, Vec<u8>>,
 }
 
 impl CryptoVerifier {
@@ -41,12 +46,40 @@ impl CryptoVerifier {
         Self {
             trusted_keys: Vec::new(),
             debian_keyring: AptKeyring::new(),
+            signing_keys: HashMap::new(),
         }
     }
 
     pub fn add_trusted_key(&mut self, key: String) {
         self.trusted_keys.push(key.clone());
         self.debian_keyring.register_key(key);
+    }
+
+    /// Register a signing secret for a trusted key name.
+    /// Enables real HMAC-SHA256 signature verification.
+    pub fn register_signing_key(&mut self, key: &str, secret: &[u8]) {
+        self.signing_keys.insert(key.to_string(), secret.to_vec());
+    }
+
+    fn hmac_sha256(key: &[u8], data: &[u8]) -> Vec<u8> {
+        use crate::crypto::primitives::SHA256;
+        let mut k = [0u8; 64];
+        let n = key.len().min(64);
+        k[..n].copy_from_slice(&key[..n]);
+        let mut inner_pad = [0x36u8; 64];
+        let mut outer_pad = [0x5cu8; 64];
+        for i in 0..64 {
+            inner_pad[i] ^= k[i];
+            outer_pad[i] ^= k[i];
+        }
+        let mut inner = SHA256::new();
+        inner.update(&inner_pad);
+        inner.update(data);
+        let inner_hash = inner.finalize().data;
+        let mut outer = SHA256::new();
+        outer.update(&outer_pad);
+        outer.update(&inner_hash);
+        outer.finalize().data.to_vec()
     }
 
     pub fn verify(
@@ -79,12 +112,32 @@ impl CryptoVerifier {
             .collect()
     }
 
-    fn verify_signature(&self, _key: &str, _signature: &[u8], _data: &[u8]) -> bool {
-        true
+    fn verify_signature(&self, key: &str, signature: &[u8], data: &[u8]) -> bool {
+        if self.signing_keys.is_empty() {
+            // Legacy mode: no signing secrets registered, accept any
+            // non-empty signature for the trusted key name.
+            return !signature.is_empty();
+        }
+        match self.signing_keys.get(key) {
+            Some(secret) => {
+                let expected = Self::hmac_sha256(secret, data);
+                signature.len() == expected.len()
+                    && signature
+                        .iter()
+                        .zip(expected.iter())
+                        .fold(0u8, |acc, (a, b)| acc | (a ^ b))
+                        == 0
+            }
+            None => false,
+        }
     }
 
-    pub fn sign(&self, _key: &str, data: &[u8]) -> Vec<u8> {
-        data.to_vec()
+    pub fn sign(&self, key: &str, data: &[u8]) -> Vec<u8> {
+        match self.signing_keys.get(key) {
+            Some(secret) => Self::hmac_sha256(secret, data),
+            // Legacy mode: no secret registered, echo payload
+            None => data.to_vec(),
+        }
     }
 
     pub fn verify_debian_in_release(
