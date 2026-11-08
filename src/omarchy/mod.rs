@@ -573,6 +573,301 @@ impl OmarchyToggleEngine {
     }
 }
 
+// ============================================================================
+// 6. OmarchyDiskSpeedTest (omarchy-disk-speed-test parity)
+// ============================================================================
+
+/// Result of a single disk benchmark pass
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct DiskBenchmarkResult {
+    pub operation: &'static str, // "seq_read" | "seq_write" | "rand_read" | "rand_write"
+    pub mib_per_sec: f64,
+    pub iops: f64,
+}
+
+/// Full disk speed report (`omarchy disk speed test` output model)
+#[derive(Debug, Clone, Default)]
+pub struct DiskSpeedReport {
+    pub device: String,
+    pub results: Vec<DiskBenchmarkResult>,
+}
+
+impl DiskSpeedReport {
+    /// Average sequential throughput across read+write, MiB/s
+    pub fn avg_seq_mib(&self) -> f64 {
+        let seq: Vec<f64> = self
+            .results
+            .iter()
+            .filter(|r| r.operation.starts_with("seq"))
+            .map(|r| r.mib_per_sec)
+            .collect();
+        if seq.is_empty() {
+            0.0
+        } else {
+            seq.iter().sum::<f64>() / seq.len() as f64
+        }
+    }
+
+    /// Plain-text rendering like omarchy's speed test summary
+    pub fn render(&self) -> String {
+        let mut out = format!("Device: {}\n", self.device);
+        for r in &self.results {
+            out.push_str(&format!(
+                "{:<10} {:>8.1} MiB/s  {:>10.0} IOPS\n",
+                r.operation, r.mib_per_sec, r.iops
+            ));
+        }
+        out.push_str(&format!("avg seq: {:.1} MiB/s\n", self.avg_seq_mib()));
+        out
+    }
+}
+
+/// Models `omarchy-disk-speed-test`: runs the four standard fio-style
+/// passes and produces a report. In production this shells out to fio;
+/// here the measurement is injected so logic stays testable.
+#[derive(Debug)]
+pub struct OmarchyDiskSpeedTest {
+    pub device: String,
+    pub block_size_kib: u32,
+    pub runtime_secs: u32,
+}
+
+impl OmarchyDiskSpeedTest {
+    pub fn new(device: &str) -> Self {
+        Self {
+            device: device.to_string(),
+            block_size_kib: 1024,
+            runtime_secs: 10,
+        }
+    }
+
+    /// Build the fio command lines the real script would run
+    pub fn fio_commands(&self) -> Vec<String> {
+        let bs = self.block_size_kib;
+        let rt = self.runtime_secs;
+        vec![
+            format!("fio --name=seq_read --rw=read --bs={}k --runtime={} --direct=1 {}", bs, rt, self.device),
+            format!("fio --name=seq_write --rw=write --bs={}k --runtime={} --direct=1 {}", bs, rt, self.device),
+            format!("fio --name=rand_read --rw=randread --bs=4k --runtime={} --direct=1 --iodepth=32 {}", rt, self.device),
+            format!("fio --name=rand_write --rw=randwrite --bs=4k --runtime={} --direct=1 --iodepth=32 {}", rt, self.device),
+        ]
+    }
+
+    /// Assemble a report from measured pass results (injection point for
+    /// real fio output parsing)
+    pub fn report(&self, measured: Vec<DiskBenchmarkResult>) -> DiskSpeedReport {
+        DiskSpeedReport {
+            device: self.device.clone(),
+            results: measured,
+        }
+    }
+}
+
+// ============================================================================
+// 7. OmarchyDevEnvInstaller (omarchy-install-dev-env parity)
+// ============================================================================
+
+/// A development tool group installed by `omarchy install dev env`
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DevToolGroup {
+    pub name: String,
+    pub packages: Vec<String>,
+}
+
+/// Plans the `omarchy dev env` installation: base toolchain plus
+/// language-specific groups, all via pacman/AUR.
+#[derive(Debug)]
+pub struct OmarchyDevEnvInstaller {
+    pub groups: Vec<DevToolGroup>,
+}
+
+impl OmarchyDevEnvInstaller {
+    pub fn new() -> Self {
+        Self {
+            groups: vec![
+                DevToolGroup {
+                    name: "base".to_string(),
+                    packages: vec![
+                        "git".to_string(),
+                        "github-cli".to_string(),
+                        "fd".to_string(),
+                        "ripgrep".to_string(),
+                        "jq".to_string(),
+                        "fzf".to_string(),
+                        "bat".to_string(),
+                        "eza".to_string(),
+                        "zoxide".to_string(),
+                        "direnv".to_string(),
+                        "mise".to_string(),
+                    ],
+                },
+                DevToolGroup {
+                    name: "rust".to_string(),
+                    packages: vec![
+                        "rust".to_string(),
+                        "cargo".to_string(),
+                        "rust-analyzer".to_string(),
+                    ],
+                },
+                DevToolGroup {
+                    name: "node".to_string(),
+                    packages: vec![
+                        "nodejs".to_string(),
+                        "npm".to_string(),
+                        "pnpm".to_string(),
+                        "bun".to_string(),
+                    ],
+                },
+                DevToolGroup {
+                    name: "python".to_string(),
+                    packages: vec![
+                        "python".to_string(),
+                        "python-pip".to_string(),
+                        "uv".to_string(),
+                    ],
+                },
+                DevToolGroup {
+                    name: "go".to_string(),
+                    packages: vec!["go".to_string()],
+                },
+            ],
+        }
+    }
+
+    /// Group names available for selective install
+    pub fn group_names(&self) -> Vec<&str> {
+        self.groups.iter().map(|g| g.name.as_str()).collect()
+    }
+
+    /// Install plan for selected groups (empty selection = all groups).
+    /// Returns ordered pacman/AUR commands.
+    pub fn install_plan(&self, selected: &[&str]) -> Vec<String> {
+        let mut cmds = Vec::new();
+        for group in &self.groups {
+            if !selected.is_empty() && !selected.contains(&group.name.as_str()) {
+                continue;
+            }
+            let pkgs = group.packages.join(" ");
+            cmds.push(format!("sudo pacman -S --needed --noconfirm {}", pkgs));
+            // AUR-only helpers go through the AUR helper
+            let aur_pkgs: Vec<&String> = group
+                .packages
+                .iter()
+                .filter(|p| {
+                    matches!(
+                        p.as_str(),
+                        "mise" | "eza" | "zoxide" | "bat" | "fzf" | "direnv" | "bun" | "uv"
+                    )
+                })
+                .collect();
+            if !aur_pkgs.is_empty() {
+                cmds.push(format!(
+                    "yay -S --noconfirm {}",
+                    aur_pkgs
+                        .iter()
+                        .map(|s| s.as_str())
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                ));
+            }
+        }
+        cmds
+    }
+}
+
+impl Default for OmarchyDevEnvInstaller {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. OmarchyRefreshRegistry (omarchy-refresh-* parity)
+// ============================================================================
+
+/// A registered `omarchy-refresh-<target>` command
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RefreshCommand {
+    pub name: String,
+    pub description: String,
+    /// shell command the refresh script runs
+    pub command: String,
+    /// whether it needs a running graphical session
+    pub needs_session: bool,
+}
+
+/// Registry of Omarchy refresh commands (`omarchy-refresh-*` family).
+/// These re-apply generated configs without reinstalling anything.
+#[derive(Debug)]
+pub struct OmarchyRefreshRegistry {
+    pub commands: Vec<RefreshCommand>,
+}
+
+impl OmarchyRefreshRegistry {
+    pub fn new() -> Self {
+        Self {
+            commands: vec![
+                RefreshCommand {
+                    name: "omarchy-refresh-hyprland".to_string(),
+                    description: "Reload Hyprland config and borders".to_string(),
+                    command: "hyprctl reload".to_string(),
+                    needs_session: true,
+                },
+                RefreshCommand {
+                    name: "omarchy-refresh-shell".to_string(),
+                    description: "Restart quickshell bar/overlays".to_string(),
+                    command: "qs -c omarchy-shell kill; qs -c omarchy-shell".to_string(),
+                    needs_session: true,
+                },
+                RefreshCommand {
+                    name: "omarchy-refresh-pacman".to_string(),
+                    description: "Re-rank mirrors and refresh pacman db".to_string(),
+                    command: "reflector --latest 5 --sort rate | sudo tee /etc/pacman.d/mirrorlist && sudo pacman -Syy".to_string(),
+                    needs_session: false,
+                },
+                RefreshCommand {
+                    name: "omarchy-refresh-gtk".to_string(),
+                    description: "Reload GTK theme".to_string(),
+                    command: "gsettings set org.gnome.desktop.interface gtk-theme".to_string(),
+                    needs_session: false,
+                },
+                RefreshCommand {
+                    name: "omarchy-refresh-qt".to_string(),
+                    description: "Reload Qt color scheme".to_string(),
+                    command: "qt5ct".to_string(),
+                    needs_session: false,
+                },
+                RefreshCommand {
+                    name: "omarchy-refresh-terminal".to_string(),
+                    description: "Reload terminal font/theme".to_string(),
+                    command: "omarchy-launch-terminal --reload-config".to_string(),
+                    needs_session: true,
+                },
+            ],
+        }
+    }
+
+    /// Look up a refresh command by exact or prefix name
+    pub fn find(&self, name: &str) -> Option<&RefreshCommand> {
+        self.commands.iter().find(|c| {
+            c.name == name
+                || c.name
+                    .ends_with(&format!("-{}", name.trim_start_matches("omarchy-refresh-")))
+        })
+    }
+
+    /// Commands runnable without a graphical session
+    pub fn headless_commands(&self) -> Vec<&RefreshCommand> {
+        self.commands.iter().filter(|c| !c.needs_session).collect()
+    }
+}
+
+impl Default for OmarchyRefreshRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -717,5 +1012,71 @@ mod tests {
             assert!(snap.iter().any(|(t, on)| *t == toggle && *on));
         }
         assert!(snap.iter().any(|(t, on)| *t == OmarchyToggle::Wifi && !*on));
+    }
+
+    #[test]
+    fn test_disk_speed_test() {
+        let test = OmarchyDiskSpeedTest::new("/dev/nvme0n1");
+        let cmds = test.fio_commands();
+        assert_eq!(cmds.len(), 4);
+        assert!(cmds[0].contains("seq_read"));
+        assert!(cmds[3].contains("randwrite"));
+
+        let report = test.report(vec![
+            DiskBenchmarkResult {
+                operation: "seq_read",
+                mib_per_sec: 3500.0,
+                iops: 900_000.0,
+            },
+            DiskBenchmarkResult {
+                operation: "seq_write",
+                mib_per_sec: 3000.0,
+                iops: 800_000.0,
+            },
+            DiskBenchmarkResult {
+                operation: "rand_read",
+                mib_per_sec: 80.0,
+                iops: 20_000.0,
+            },
+            DiskBenchmarkResult {
+                operation: "rand_write",
+                mib_per_sec: 60.0,
+                iops: 15_000.0,
+            },
+        ]);
+        assert_eq!(report.avg_seq_mib(), 3250.0);
+        let rendered = report.render();
+        assert!(rendered.contains("3500.0 MiB/s"));
+        assert!(rendered.contains("avg seq: 3250.0"));
+    }
+
+    #[test]
+    fn test_dev_env_installer() {
+        let installer = OmarchyDevEnvInstaller::new();
+        assert!(installer.group_names().contains(&"rust"));
+
+        let all = installer.install_plan(&[]);
+        assert!(all.iter().any(|c| c.contains("pacman -S")));
+        assert!(all.iter().any(|c| c.contains("yay -S")));
+
+        let only_rust = installer.install_plan(&["rust"]);
+        assert_eq!(only_rust.len(), 1);
+        assert!(only_rust[0].contains("rust-analyzer"));
+    }
+
+    #[test]
+    fn test_refresh_registry() {
+        let reg = OmarchyRefreshRegistry::new();
+        let hypr = reg.find("omarchy-refresh-hyprland").unwrap();
+        assert_eq!(hypr.command, "hyprctl reload");
+        assert!(hypr.needs_session);
+
+        let pacman = reg.find("pacman").unwrap();
+        assert!(!pacman.needs_session);
+        assert!(pacman.command.contains("mirrorlist"));
+
+        let headless = reg.headless_commands();
+        assert_eq!(headless.len(), 3);
+        assert!(reg.find("nonexistent").is_none());
     }
 }
