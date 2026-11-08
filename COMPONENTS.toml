@@ -2809,11 +2809,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-software-center"
-description = "Software center component for SigmaOS"
+description = "Application catalog with validated listings, exact ID lookup, title search, and Flatpak filtering; does not install applications"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-center"
 engine = "software_manager"
 category = "Package Management"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
