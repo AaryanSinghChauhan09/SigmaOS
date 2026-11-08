@@ -3414,11 +3414,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-driver-manager"
-description = "Driver manager component for SigmaOS"
+description = "Validated device-driver registration, exact PCI matching, and in-memory lifecycle state"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-driver-manager"
 engine = "driver_manager"
 category = "Drivers & Hardware"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
