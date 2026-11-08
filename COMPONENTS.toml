@@ -1,12 +1,13 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit baseline: 1,635 declarations / 1,584 unique component names.
-# Keep this comment synchronized with `make registry-audit`; duplicate names are
-# reported rather than silently discarded.
-# GitHub account audit (2026-10-31): 308 SigmaOS-prefixed repositories;
-# all are represented by registry URLs. 1,557 unique URLs are declared, of
-# which 1,249 are unpublished; 25 extra component names alias existing URLs.
+# Registry audit (2026-11-08): 1,642 declarations / 1,591 unique names.
+# Duplicate names have conflicting metadata and remain visible for explicit
+# reconciliation; consumers must not silently select one declaration.
+# GitHub account audit (2026-11-08): 1,078 SigmaOS-prefixed repositories;
+# 322 of 1,562 declared repository URLs are published, 756 account repositories
+# lack registry records, and 1,240 declared URLs are not present in the account.
+# See `scripts/audit_component_fleet.py --github` for the read-only audit.
 #
 # Classification complete: All 1,635 components have explicit engine and category.
 # Last updated by classify.py (Phase 1 Task 1.2)
