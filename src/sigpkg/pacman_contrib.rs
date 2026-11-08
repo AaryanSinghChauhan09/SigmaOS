@@ -2106,6 +2106,56 @@ impl PacmanKeyring {
     }
 }
 
+/// A remote keyserver endpoint for `pacman-key --populate` / `--refresh`
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PacmanKeyserver {
+    /// keyserver name, e.g. "keyserver.ubuntu.com"
+    pub name: String,
+    /// HKP/keyserver URL
+    pub url: String,
+}
+
+impl PacmanKeyring {
+    /// `pacman-key --populate` parity: bulk-import trusted keys from an
+    /// iterator of (fingerprint, uid, pubkey, trust) tuples — e.g. the
+    /// Arch default keyring shipped with the distro.
+    pub fn populate<'a>(
+        &mut self,
+        keys: impl Iterator<Item = (&'a str, &'a str, [u8; 32], &'a str)>,
+    ) -> usize {
+        let mut count = 0;
+        for (fp, uid, pk, trust) in keys {
+            self.add_key(fp, uid, pk, trust);
+            count += 1;
+        }
+        count
+    }
+
+    /// Default SigmaOS/Arch-style keyserver list used by populate/refresh
+    pub fn default_keyservers() -> Vec<PacmanKeyserver> {
+        vec![
+            PacmanKeyserver {
+                name: "sigmaos-keyserver".to_string(),
+                url: "hkps://keys.sigmaos.dev/pks/lookup?op=get".to_string(),
+            },
+            PacmanKeyserver {
+                name: "keys.openpgp.org".to_string(),
+                url: "hkps://keys.openpgp.org/pks/lookup?op=get".to_string(),
+            },
+        ]
+    }
+
+    /// `pacman-key --refresh-keys` parity: produce fetch commands for each
+    /// keyserver to update marginal-trust keys (callers execute and feed
+    /// results back through `populate`).
+    pub fn refresh_plan(&self) -> Vec<String> {
+        Self::default_keyservers()
+            .iter()
+            .map(|ks| format!("gpg --keyserver {} --refresh-keys", ks.url))
+            .collect()
+    }
+}
+
 fn hex_decode_str(s: &str) -> Option<Vec<u8>> {
     let s = s.trim();
     if s.len() % 2 != 0 {
@@ -2767,5 +2817,27 @@ sha256sums=('sum')
         ring.add_key("DEADBEEF", "SigmaOS Release Key v2", pubkey, "full");
         assert_eq!(ring.keys.len(), 2);
         assert_eq!(ring.trust_of("DEADBEEF"), Some("full"));
+    }
+
+    #[test]
+    fn test_pacman_keyring_populate_and_refresh() {
+        let mut ring = PacmanKeyring::new();
+        let imported = ring.populate(
+            [
+                ("FP1", "Key One", [1u8; 32], "full"),
+                ("FP2", "Key Two", [2u8; 32], "marginal"),
+            ]
+            .into_iter(),
+        );
+        assert_eq!(imported, 2);
+        assert_eq!(ring.keys.len(), 2);
+
+        let servers = PacmanKeyring::default_keyservers();
+        assert!(!servers.is_empty());
+        assert!(servers.iter().all(|s| s.url.starts_with("hkps://")));
+
+        let plan = ring.refresh_plan();
+        assert_eq!(plan.len(), servers.len());
+        assert!(plan.iter().all(|c| c.contains("--refresh-keys")));
     }
 }
