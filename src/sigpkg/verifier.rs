@@ -39,6 +39,10 @@ pub struct CryptoVerifier {
     /// compatibility; once keys are registered, HMAC-SHA256 signatures
     /// are enforced.
     pub signing_keys: HashMap<String, Vec<u8>>,
+    /// Trusted Ed25519 (RFC 8032) package-signing public keys.
+    /// Unlike the symmetric HMAC path, these let verifiers check
+    /// signatures without holding any secret material.
+    pub trusted_ed25519_keys: Vec<(String, [u8; 32])>,
 }
 
 impl CryptoVerifier {
@@ -47,7 +51,37 @@ impl CryptoVerifier {
             trusted_keys: Vec::new(),
             debian_keyring: AptKeyring::new(),
             signing_keys: HashMap::new(),
+            trusted_ed25519_keys: Vec::new(),
         }
+    }
+
+    /// Register a trusted Ed25519 package-signing public key (32 bytes).
+    pub fn register_ed25519_key(&mut self, name: &str, public_key: &[u8; 32]) {
+        self.trusted_ed25519_keys
+            .push((name.to_string(), *public_key));
+    }
+
+    /// Verify an Ed25519 package signature against a registered trusted key.
+    /// `signature` must be the 64-byte RFC 8032 signature over `data`.
+    /// Returns true only when `key_name` is trusted AND the signature
+    /// verifies — untrusted or malformed inputs return false.
+    pub fn verify_ed25519_signature(
+        &self,
+        key_name: &str,
+        signature: &[u8],
+        data: &[u8],
+    ) -> bool {
+        let Some((_, pubkey)) = self
+            .trusted_ed25519_keys
+            .iter()
+            .find(|(name, _)| name == key_name)
+        else {
+            return false;
+        };
+        let Ok(sig) = <[u8; 64]>::try_from(signature) else {
+            return false;
+        };
+        crate::sigpkg::ed25519::verify(pubkey, data, &sig)
     }
 
     pub fn add_trusted_key(&mut self, key: String) {
@@ -395,5 +429,30 @@ mod tests {
                 .unwrap_err(),
             VerifyError::KeyNotFound
         );
+    }
+
+    #[test]
+    fn test_verify_ed25519_signature() {
+        use crate::sigpkg::ed25519::{sign_with_seed, Ed25519Signer};
+
+        let seed = [7u8; 32];
+        let (sig, pubkey) = sign_with_seed(&seed, b"package payload");
+
+        let mut verifier = CryptoVerifier::new();
+        verifier.register_ed25519_key("sigmaos-release", &pubkey);
+
+        // valid signature verifies
+        assert!(verifier.verify_ed25519_signature("sigmaos-release", &sig, b"package payload"));
+        // tampered payload fails
+        assert!(!verifier.verify_ed25519_signature("sigmaos-release", &sig, b"evil payload"));
+        // untrusted key name fails
+        assert!(!verifier.verify_ed25519_signature("other-key", &sig, b"package payload"));
+        // wrong-length signature fails
+        assert!(!verifier.verify_ed25519_signature("sigmaos-release", &sig[..32], b"package payload"));
+
+        // different signer cannot forge
+        let other = Ed25519Signer::from_seed(&[9u8; 32]);
+        let forged = other.sign(b"package payload");
+        assert!(!verifier.verify_ed25519_signature("sigmaos-release", &forged, b"package payload"));
     }
 }
