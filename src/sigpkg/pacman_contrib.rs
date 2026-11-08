@@ -1836,6 +1836,101 @@ impl MakechrootpkgOrchestrator {
 }
 
 // ============================================================================
+// 20. RepoDbManager (repo-add / repo-remove parity)
+// ============================================================================
+
+/// A package entry inside an Arch repository database (repo-add output)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RepoDbPackage {
+    pub name: String,
+    pub version: String,
+    /// package file name, e.g. "foo-1.0-1-x86_64.pkg.tar.zst"
+    pub file_name: String,
+    pub is_debug: bool,
+}
+
+/// Manages a local Arch repository database directory.
+/// `repo-add` adds built packages to the db; `repo-remove` removes them.
+#[derive(Debug)]
+pub struct RepoDbManager {
+    pub packages: Vec<RepoDbPackage>,
+}
+
+impl RepoDbManager {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// `repo-add` parity: register a built package. Returns the db entry
+    /// written, or an error for invalid names/versions.
+    pub fn add_package(
+        &mut self,
+        name: &str,
+        version: &str,
+        file_name: &str,
+    ) -> Result<RepoDbPackage, &'static str> {
+        if name.is_empty()
+            || name
+                .chars()
+                .any(|c| c.is_whitespace() || c == '/' || c == '\\')
+        {
+            return Err("repo-add: invalid package name");
+        }
+        if CheckUpdatesEngine::compare_versions(version, version).is_none() {
+            return Err("repo-add: invalid package version");
+        }
+        let entry = RepoDbPackage {
+            name: name.to_string(),
+            version: version.to_string(),
+            file_name: file_name.to_string(),
+            is_debug: file_name.contains("-debug"),
+        };
+        // repo-add replaces an existing entry of the same pkgrel line
+        self.packages
+            .retain(|p| p.name != entry.name || p.version != entry.version);
+        self.packages.push(entry.clone());
+        Ok(entry)
+    }
+
+    /// `repo-remove` parity: drop a package by name (and optional version).
+    /// Returns true when something was removed.
+    pub fn remove_package(&mut self, name: &str, version: Option<&str>) -> bool {
+        let before = self.packages.len();
+        self.packages
+            .retain(|p| !(p.name == name && version.map_or(true, |v| p.version == v)));
+        self.packages.len() != before
+    }
+
+    /// Render the repo `desc` database file content (one stanza per package)
+    pub fn render_desc(&self) -> String {
+        let mut out = String::new();
+        for pkg in &self.packages {
+            out.push_str(&format!("%NAME%\n{}\n", pkg.name));
+            out.push_str(&format!("%VERSION%\n{}\n", pkg.version));
+            out.push_str("%BASE%\n");
+            out.push_str("%DESC%\n");
+            if pkg.is_debug {
+                out.push_str("%DEBUG%\n");
+            }
+        }
+        out
+    }
+
+    /// File names currently in the repo, sorted for deterministic output
+    pub fn file_list(&self) -> Vec<&str> {
+        let mut files: Vec<&str> = self.packages.iter().map(|p| p.file_name.as_str()).collect();
+        files.sort();
+        files
+    }
+}
+
+impl Default for RepoDbManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -2390,5 +2485,35 @@ sha256sums=('sum')
         assert_eq!(failed.failed_stage, Some(ChrootBuildStage::RunMakepkg));
         // cleanup still runs on failure (trap semantics)
         assert!(failed.commands_run.iter().any(|c| c.contains("umount")));
+    }
+
+    #[test]
+    fn test_repo_db_manager() {
+        let mut repo = RepoDbManager::new();
+        repo.add_package("foo", "1.0.0-1", "foo-1.0.0-1-x86_64.pkg.tar.zst")
+            .unwrap();
+        repo.add_package("foo", "1.1.0-1", "foo-1.1.0-1-x86_64.pkg.tar.zst")
+            .unwrap();
+        repo.add_package("bar", "2.0-1", "bar-2.0-1-x86_64.pkg.tar.zst")
+            .unwrap();
+        repo.add_package("baz", "3.0-1", "baz-3.0-1-x86_64-debug.pkg.tar.zst")
+            .unwrap();
+
+        assert_eq!(repo.packages.len(), 4);
+        assert!(repo.file_list().contains(&"bar-2.0-1-x86_64.pkg.tar.zst"));
+        let desc = repo.render_desc();
+        assert!(desc.contains("%NAME%\nfoo\n"));
+        assert!(desc.contains("%DEBUG%")); // debug package flagged
+
+        // invalid inputs rejected
+        assert!(repo.add_package("bad name", "1.0", "x").is_err());
+        assert!(repo.add_package("ok", "not a version!!", "x").is_err());
+
+        // repo-remove by name and by name+version
+        assert!(repo.remove_package("bar", None));
+        assert!(!repo.remove_package("bar", None));
+        assert!(repo.remove_package("foo", Some("1.0.0-1")));
+        assert_eq!(repo.packages.len(), 2);
+        assert!(repo.packages.iter().all(|p| p.name != "bar"));
     }
 }

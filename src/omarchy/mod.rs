@@ -474,6 +474,105 @@ impl OmarchyMenu {
     }
 }
 
+// ============================================================================
+// 5. OmarchyToggleEngine (omarchy-toggle-* parity)
+// ============================================================================
+
+/// Toggleable Omarchy desktop features
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum OmarchyToggle {
+    /// omarchy-toggle-theme / dark-light switch
+    DarkLight,
+    /// omarchy-toggle-animations
+    Animations,
+    /// omarchy-toggle-nightlight
+    Nightlight,
+    /// omarchy-toggle-input-device (mic mute)
+    MicMute,
+    /// omarchy-toggle-bluetooth
+    Bluetooth,
+    /// omarchy-toggle-wifi
+    Wifi,
+}
+
+impl OmarchyToggle {
+    pub fn cli_name(&self) -> &'static str {
+        match self {
+            Self::DarkLight => "omarchy-toggle-theme",
+            Self::Animations => "omarchy-toggle-animations",
+            Self::Nightlight => "omarchy-toggle-nightlight",
+            Self::MicMute => "omarchy-toggle-input-device",
+            Self::Bluetooth => "omarchy-toggle-bluetooth",
+            Self::Wifi => "omarchy-toggle-wifi",
+        }
+    }
+}
+
+/// State of all Omarchy toggles plus the command each emits when flipped
+#[derive(Debug, Clone, Default)]
+pub struct OmarchyToggleEngine {
+    /// toggle -> current on/off state
+    pub states: BTreeMap<OmarchyToggle, bool>,
+}
+
+impl OmarchyToggleEngine {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn is_on(&self, toggle: OmarchyToggle) -> bool {
+        self.states.get(&toggle).copied().unwrap_or(false)
+    }
+
+    /// Flip a toggle and return the shell commands the real
+    /// `omarchy-toggle-*` script would run.
+    pub fn flip(&mut self, toggle: OmarchyToggle) -> Vec<String> {
+        let now_on = !self.is_on(toggle);
+        self.states.insert(toggle, now_on);
+        match toggle {
+            OmarchyToggle::DarkLight => vec![
+                "omarchy-theme-set --toggle-mode".to_string(),
+                "omarchy-refresh-shell".to_string(),
+            ],
+            OmarchyToggle::Animations => vec![format!(
+                "hyprctl keyword general:animations {}",
+                if now_on { "1" } else { "0" }
+            )],
+            OmarchyToggle::Nightlight => vec![format!(
+                "omarchy-nightlight {}",
+                if now_on { "on" } else { "off" }
+            )],
+            OmarchyToggle::MicMute => vec![format!(
+                "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ {}",
+                if now_on { "0" } else { "1" }
+            )],
+            OmarchyToggle::Bluetooth => vec![format!(
+                "bluetoothctl {}",
+                if now_on { "power on" } else { "power off" }
+            )],
+            OmarchyToggle::Wifi => vec![format!(
+                "nmcli radio wifi {}",
+                if now_on { "on" } else { "off" }
+            )],
+        }
+    }
+
+    /// All registered toggles with their current state
+    pub fn snapshot(&self) -> Vec<(OmarchyToggle, bool)> {
+        [
+            OmarchyToggle::DarkLight,
+            OmarchyToggle::Animations,
+            OmarchyToggle::Nightlight,
+            OmarchyToggle::MicMute,
+            OmarchyToggle::Bluetooth,
+            OmarchyToggle::Wifi,
+        ]
+        .iter()
+        .map(|t| (*t, self.is_on(*t)))
+        .collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -587,5 +686,36 @@ mod tests {
         let cats = menu.categories();
         assert_eq!(cats.len(), 1);
         assert_eq!(cats[0].1.len(), 3);
+    }
+
+    #[test]
+    fn test_toggle_engine() {
+        let mut toggles = OmarchyToggleEngine::new();
+        assert!(!toggles.is_on(OmarchyToggle::Animations));
+
+        let cmds = toggles.flip(OmarchyToggle::Animations);
+        assert!(toggles.is_on(OmarchyToggle::Animations));
+        assert_eq!(cmds, vec!["hyprctl keyword general:animations 1"]);
+
+        let cmds2 = toggles.flip(OmarchyToggle::DarkLight);
+        assert!(cmds2.iter().any(|c| c.contains("theme-set")));
+
+        let cmds3 = toggles.flip(OmarchyToggle::Nightlight);
+        assert!(cmds3.iter().any(|c| c.contains("nightlight on")));
+
+        toggles.flip(OmarchyToggle::MicMute);
+        assert!(toggles.is_on(OmarchyToggle::MicMute));
+
+        let snap = toggles.snapshot();
+        assert_eq!(snap.len(), 6);
+        for toggle in [
+            OmarchyToggle::DarkLight,
+            OmarchyToggle::Animations,
+            OmarchyToggle::Nightlight,
+            OmarchyToggle::MicMute,
+        ] {
+            assert!(snap.iter().any(|(t, on)| *t == toggle && *on));
+        }
+        assert!(snap.iter().any(|(t, on)| *t == OmarchyToggle::Wifi && !*on));
     }
 }
