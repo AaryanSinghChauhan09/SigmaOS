@@ -98,15 +98,19 @@ def render_component(name: str, records: list[dict], page_slugs: dict[str, str])
     return "\n".join(lines)
 
 
-def render_index(groups: dict[str, list[str]], page_slugs: dict[str, str]) -> str:
+def render_index(
+    groups: dict[str, list[str]], page_slugs: dict[str, str], entries: list[dict]
+) -> str:
     count = sum(map(len, groups.values()))
+    duplicate_names = sum(len(names) > 1 for names in groups.values())
+    repo_count = len({str(entry.get("repo", "")) for entry in entries if entry.get("repo")})
     lines = [
         "# SigmaOS component index",
         "",
         "This index and the linked pages are generated from `COMPONENTS.toml` in the SigmaOS umbrella repository.",
         "Each registered component has a dedicated wiki page. Component implementation and releases remain owned by its linked repository.",
         "",
-        f"Registered component names: **{count}**.",
+        f"Registry snapshot: **{len(entries)} declarations**, **{count} distinct component names**, **{duplicate_names} names with repeated declarations**, and **{repo_count} distinct repository URLs**.",
         "",
     ]
     for category in sorted(groups, key=str.casefold):
@@ -146,7 +150,7 @@ def generated_content() -> dict[str, str]:
         category_values = unique_values(records, "category")
         category = str(category_values[0]) if len(category_values) == 1 else "Registry metadata conflicts"
         categories[category].append(name)
-    files["Components.md"] = render_index(categories, page_slugs)
+    files["Components.md"] = render_index(categories, page_slugs, entries)
     return files
 
 
