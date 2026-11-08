@@ -2168,6 +2168,152 @@ fn hex_decode_str(s: &str) -> Option<Vec<u8>> {
 }
 
 // ============================================================================
+// 23. NamcapEngine (namcap parity)
+// ============================================================================
+
+/// Severity for namcap findings
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NamcapSeverity {
+    Error,
+    Warning,
+    Info,
+}
+
+/// A single namcap diagnostic
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NamcapFinding {
+    pub severity: NamcapSeverity,
+    pub message: String,
+}
+
+/// Lints the *contents* of a built package — the `namcap` tool that
+/// checkpkg doesn't cover. Operates on a file list plus optional
+/// metadata, matching namcap's PKGBUILD+package-file analysis.
+#[derive(Debug)]
+pub struct NamcapEngine;
+
+/// File entry metadata supplied for linting
+#[derive(Debug, Clone)]
+pub struct NamcapFile {
+    /// path inside the package, e.g. "/usr/bin/foo"
+    pub path: String,
+    /// file size in bytes
+    pub size: u64,
+    /// whether the file is a symlink
+    pub is_symlink: bool,
+    /// whether the file is executable
+    pub is_executable: bool,
+    /// whether the file has been stripped of symbols
+    pub is_stripped: bool,
+}
+
+impl NamcapEngine {
+    /// Analyze package contents. `pkgbuild_backup` is the PKGBUILD backup
+    /// array (files the package manages that should exist on upgrade).
+    pub fn analyze(
+        &self,
+        name: &str,
+        files: &[NamcapFile],
+        pkgbuild_backup: &[String],
+    ) -> Vec<NamcapFinding> {
+        let mut findings = Vec::new();
+
+        // E: absolute path or path traversal in file list
+        for f in files {
+            if f.path.contains("..") {
+                findings.push(NamcapFinding {
+                    severity: NamcapSeverity::Error,
+                    message: format!("{}: path traversal in package file {}", name, f.path),
+                });
+            }
+        }
+
+        // W: files in /etc not listed in backup
+        for f in files {
+            if f.path.starts_with("/etc/") && !f.path.ends_with('/') {
+                let covered = pkgbuild_backup.iter().any(|b| {
+                    f.path == format!("/{}", b.trim_start_matches('/'))
+                        || f.path
+                            .starts_with(&format!("/{}", b.trim_start_matches('/')))
+                });
+                if !covered {
+                    findings.push(NamcapFinding {
+                        severity: NamcapSeverity::Warning,
+                        message: format!("{}: {} in /etc not listed in backup array", name, f.path),
+                    });
+                }
+            }
+        }
+
+        // W: unstripped executables in /usr/bin|/usr/lib
+        for f in files {
+            if (f.path.starts_with("/usr/bin/") || f.path.starts_with("/usr/lib/"))
+                && f.is_executable
+                && !f.is_stripped
+                && !f.is_symlink
+            {
+                findings.push(NamcapFinding {
+                    severity: NamcapSeverity::Warning,
+                    message: format!("{}: unstripped binary {}", name, f.path),
+                });
+            }
+        }
+
+        // W: empty files
+        for f in files {
+            if f.size == 0 && !f.is_symlink {
+                findings.push(NamcapFinding {
+                    severity: NamcapSeverity::Warning,
+                    message: format!("{}: empty file {}", name, f.path),
+                });
+            }
+        }
+
+        // W: missing common metadata files
+        let has_docs = files.iter().any(|f| {
+            f.path.starts_with("/usr/share/doc/") || f.path.starts_with("/usr/share/man/")
+        });
+        if !has_docs && files.iter().any(|f| f.path.starts_with("/usr/bin/")) {
+            findings.push(NamcapFinding {
+                severity: NamcapSeverity::Info,
+                message: format!("{}: package ships binaries but no docs/man pages", name),
+            });
+        }
+
+        // E: no files at all
+        if files.is_empty() {
+            findings.push(NamcapFinding {
+                severity: NamcapSeverity::Error,
+                message: format!("{}: package contains no files", name),
+            });
+        }
+
+        findings
+    }
+
+    /// Count findings by severity for summary output
+    pub fn summarize(&self, findings: &[NamcapFinding]) -> (usize, usize, usize) {
+        let mut e = 0;
+        let mut w = 0;
+        let mut i = 0;
+        for f in findings {
+            match f.severity {
+                NamcapSeverity::Error => e += 1,
+                NamcapSeverity::Warning => w += 1,
+                NamcapSeverity::Info => i += 1,
+            }
+        }
+        (e, w, i)
+    }
+}
+
+impl Default for NamcapEngine {
+    fn default() -> Self {
+        Self
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -2839,5 +2985,48 @@ sha256sums=('sum')
         let plan = ring.refresh_plan();
         assert_eq!(plan.len(), servers.len());
         assert!(plan.iter().all(|c| c.contains("--refresh-keys")));
+    }
+
+    #[test]
+    fn test_namcap_engine() {
+        let engine = NamcapEngine;
+        let files = vec![
+            NamcapFile {
+                path: "/usr/bin/tool".into(),
+                size: 100,
+                is_symlink: false,
+                is_executable: true,
+                is_stripped: false,
+            },
+            NamcapFile {
+                path: "/etc/tool.conf".into(),
+                size: 50,
+                is_symlink: false,
+                is_executable: false,
+                is_stripped: true,
+            },
+            NamcapFile {
+                path: "/usr/share/doc/tool/README".into(),
+                size: 10,
+                is_symlink: false,
+                is_executable: false,
+                is_stripped: true,
+            },
+        ];
+        let backup = vec!["etc/tool.conf".to_string()];
+        let findings = engine.analyze("tool", &files, &backup);
+        // unstripped binary warning only (etc covered by backup, docs present)
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].severity, NamcapSeverity::Warning);
+        assert!(findings[0].message.contains("unstripped"));
+        assert_eq!(engine.summarize(&findings), (0, 1, 0));
+
+        // empty package -> error
+        let empty = engine.analyze("empty", &[], &[]);
+        assert_eq!(empty[0].severity, NamcapSeverity::Error);
+
+        // /etc file not in backup -> warning
+        let findings2 = engine.analyze("tool", &files, &[]);
+        assert!(findings2.iter().any(|f| f.message.contains("backup array")));
     }
 }

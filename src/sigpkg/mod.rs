@@ -244,8 +244,9 @@ pub use package_snapshot_rollback::{
 pub use pacman_contrib::{
     CheckUpdatesEngine, CheckpkgEngine, CheckpkgFinding, CheckpkgSeverity, ChrootBuildResult,
     ChrootBuildStage, ChrootBuilderProfile, DevelPackage, DevelUpdateChecker, ExpacFormatter,
-    InstalledPackage, MakechrootpkgOrchestrator, OwnedPackageFile, PacCacheResult, PacCacheTrimmer,
-    PacCheckVerifier, PacDiffAction, PacDiffCandidate, PacDiffConfigResolver, PacFilesDb,
+    InstalledPackage, MakechrootpkgOrchestrator, NamcapEngine, NamcapFile, NamcapFinding,
+    NamcapSeverity, OwnedPackageFile, PacCacheResult, PacCacheTrimmer, PacCheckVerifier,
+    PacDiffAction, PacDiffCandidate, PacDiffConfigResolver, PacFilesDb,
     PacGraphRenderer, PacListRepoFilter, PacLogAction, PacLogAuditor, PacLogEntry, PacNewsItem,
     PacNewsParser, PacReport, PacReportAnalyzer, PacTreeRenderer, PackageCacheEntry,
     PackageVerificationReport, PacmanDbMarker, PacmanKey, PacmanKeyring, PacmanKeyserver,
