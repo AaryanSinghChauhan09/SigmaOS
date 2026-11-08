@@ -241,11 +241,13 @@ pub use package_snapshot_rollback::{
     SovereignPackageSnapshotRollbackEngine,
 };
 pub use pacman_contrib::{
-    CheckUpdatesEngine, InstalledPackage, OwnedPackageFile, PacCacheResult, PacCacheTrimmer,
-    PacCheckVerifier, PacDiffAction, PacDiffCandidate, PacDiffConfigResolver, PacFilesDb,
-    PacListRepoFilter, PacLogAction, PacLogAuditor, PacLogEntry, PacReport, PacReportAnalyzer,
-    PackageCacheEntry, PackageVerificationReport, PacmanQueryFormatter, PendingUpdate,
-    PkgFileSearcher, SyncFileEntry, SyncPackage, TrackedPackageFile, UpdPkgSumsGenerator,
+    CheckUpdatesEngine, DevelPackage, DevelUpdateChecker, ExpacFormatter, InstalledPackage,
+    OwnedPackageFile, PacCacheResult, PacCacheTrimmer, PacCheckVerifier, PacDiffAction,
+    PacDiffCandidate, PacDiffConfigResolver, PacFilesDb, PacGraphRenderer, PacListRepoFilter,
+    PacLogAction, PacLogAuditor, PacLogEntry, PacmanDbMarker, PacNewsItem, PacNewsParser,
+    PacReport, PacReportAnalyzer, PacTreeRenderer, PackageCacheEntry, PackageVerificationReport,
+    PacmanQueryFormatter, PendingUpdate, PkgFileSearcher, SyncFileEntry, SyncPackage,
+    TrackedPackageFile, UpdPkgSumsGenerator,
 };
 pub use portage::{EbuildSpec, PortageResolver, Slot, UseFlag};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};

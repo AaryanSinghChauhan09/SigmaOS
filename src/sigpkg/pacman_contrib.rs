@@ -1000,6 +1000,426 @@ impl Default for PacmanQueryFormatter {
 }
 
 // ============================================================================
+// 12. PacTreeRenderer (pactree deep-tree parity)
+// ============================================================================
+
+/// Recursive dependency tree renderer (`pactree` parity).
+/// Unlike the shallow `DependencyTreeVisualizer`, this walks the full
+/// dependency graph with cycle detection.
+pub struct PacTreeRenderer;
+
+impl PacTreeRenderer {
+    pub fn new() -> Self {
+        Self
+    }
+
+    fn find<'a>(installed: &'a [ArchPacmanPackage], name: &str) -> Option<&'a ArchPacmanPackage> {
+        installed.iter().find(|p| p.name == name)
+    }
+
+    fn deps_of(pkg: &ArchPacmanPackage) -> Vec<String> {
+        pkg.depends
+            .iter()
+            .map(|d| dep_spec_base_name(d).to_string())
+            .filter(|d| !d.is_empty())
+            .collect()
+    }
+
+    fn reverse_deps_of<'a>(
+        installed: &'a [ArchPacmanPackage],
+        name: &str,
+    ) -> Vec<&'a ArchPacmanPackage> {
+        installed
+            .iter()
+            .filter(|p| p.depends.iter().any(|d| dep_spec_base_name(d) == name))
+            .collect()
+    }
+
+    fn render_node(
+        &self,
+        name: &str,
+        installed: &[ArchPacmanPackage],
+        reverse: bool,
+        path: &mut Vec<String>,
+        lines: &mut Vec<String>,
+        prefix: &str,
+        is_last: bool,
+        is_root: bool,
+    ) {
+        let connector = if is_root {
+            String::new()
+        } else if is_last {
+            "└── ".to_string()
+        } else {
+            "├── ".to_string()
+        };
+        let cyclic = path.iter().any(|n| n == name);
+        let suffix = if cyclic { " (*)" } else { "" };
+        lines.push(format!("{}{}{}{}", prefix, connector, name, suffix));
+        if cyclic {
+            return;
+        }
+
+        path.push(name.to_string());
+        let children: Vec<String> = if reverse {
+            Self::reverse_deps_of(installed, name)
+                .into_iter()
+                .map(|p| p.name.clone())
+                .collect()
+        } else {
+            Self::find(installed, name)
+                .map(Self::deps_of)
+                .unwrap_or_default()
+        };
+
+        let child_prefix = if is_root {
+            prefix.to_string()
+        } else {
+            format!("{}{}", prefix, if is_last { "    " } else { "│   " })
+        };
+        let last_idx = children.len().saturating_sub(1);
+        for (i, child) in children.iter().enumerate() {
+            self.render_node(
+                child,
+                installed,
+                reverse,
+                path,
+                lines,
+                &child_prefix,
+                i == last_idx,
+                false,
+            );
+        }
+        path.pop();
+    }
+
+    /// Render the full dependency tree for `pkg_name`.
+    /// `reverse = true` renders the "required by" tree instead.
+    /// Cycles are marked with `(*)` like real pactree output.
+    pub fn render(&self, pkg_name: &str, installed: &[ArchPacmanPackage], reverse: bool) -> String {
+        let mut lines = Vec::new();
+        let mut path = Vec::new();
+        self.render_node(
+            pkg_name, installed, reverse, &mut path, &mut lines, "", true, true,
+        );
+        lines.join("\n") + "\n"
+    }
+}
+
+impl Default for PacTreeRenderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 13. ExpacFormatter (expac parity)
+// ============================================================================
+
+/// Format-string expander for package database records (`expac` parity).
+/// Supported tokens: %n name, %v version, %l licenses, %d depends,
+/// %o optdepends, %s installed size, %a architecture, %u url,
+/// %p packager, %g groups, %r repository (sync only), %% literal percent.
+pub struct ExpacFormatter;
+
+impl ExpacFormatter {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Expand `fmt` against `pkg`. `repository` fills `%r` for sync records.
+    pub fn format(&self, pkg: &ArchPacmanPackage, fmt: &str, repository: Option<&str>) -> String {
+        let mut out = String::new();
+        let mut chars = fmt.chars().peekable();
+        while let Some(c) = chars.next() {
+            if c != '%' {
+                out.push(c);
+                continue;
+            }
+            match chars.next() {
+                None => out.push('%'),
+                Some('%') => out.push('%'),
+                Some('n') => out.push_str(&pkg.name),
+                Some('v') => out.push_str(&pkg.version),
+                Some('l') => out.push_str(&pkg.license.join(" ")),
+                Some('d') => out.push_str(&pkg.depends.join(" ")),
+                Some('o') => out.push_str(&pkg.optdepends.join(" ")),
+                Some('s') => out.push_str(&pkg.installed_size.to_string()),
+                Some('S') => out.push_str(&(pkg.installed_size / 1024).to_string()),
+                Some('a') => out.push_str(&pkg.architecture),
+                Some('u') => out.push_str(&pkg.url),
+                Some('p') => out.push_str(&pkg.packager),
+                Some('g') => out.push_str(&pkg.groups.join(" ")),
+                Some('r') => out.push_str(repository.unwrap_or("")),
+                Some(other) => {
+                    out.push('%');
+                    out.push(other);
+                }
+            }
+        }
+        out
+    }
+}
+
+impl Default for ExpacFormatter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 14. PacGraphRenderer (pacgraph / pactree --graph parity)
+// ============================================================================
+
+/// Renders the package dependency graph in Graphviz DOT format
+/// (`pacgraph` / `pactree --graph` parity)
+pub struct PacGraphRenderer;
+
+impl PacGraphRenderer {
+    pub fn new() -> Self {
+        Self
+    }
+
+    fn dot_id(name: &str) -> String {
+        format!("\"{}\"", name.replace('\\', "\\\\").replace('"', "\\\""))
+    }
+
+    /// Generate a DOT digraph of hard dependencies. When
+    /// `include_optdepends` is set, optional dependencies are emitted as
+    /// dotted edges, mirroring `pactree --graph --optdeps`.
+    pub fn to_dot(&self, installed: &[ArchPacmanPackage], include_optdepends: bool) -> String {
+        let mut out = String::from("digraph packages {\n");
+        out.push_str("    rankdir=LR;\n");
+        for pkg in installed {
+            out.push_str(&format!(
+                "    {} [label=\"{}\"];\n",
+                Self::dot_id(&pkg.name),
+                pkg.name
+            ));
+            for dep in &pkg.depends {
+                let base = dep_spec_base_name(dep);
+                if installed.iter().any(|p| p.name == base) {
+                    out.push_str(&format!(
+                        "    {} -> {};\n",
+                        Self::dot_id(&pkg.name),
+                        Self::dot_id(base)
+                    ));
+                }
+            }
+            if include_optdepends {
+                for optdep in &pkg.optdepends {
+                    let base = optdep_spec_name(optdep);
+                    if installed.iter().any(|p| p.name == base) {
+                        out.push_str(&format!(
+                            "    {} -> {} [style=dotted];\n",
+                            Self::dot_id(&pkg.name),
+                            Self::dot_id(base)
+                        ));
+                    }
+                }
+            }
+        }
+        out.push_str("}\n");
+        out
+    }
+}
+
+impl Default for PacGraphRenderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 15. DevelUpdateChecker (yay -Y --devel parity)
+// ============================================================================
+
+/// A VCS-tracked (devel) package with its local and upstream revisions
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DevelPackage {
+    pub name: String,
+    pub local_revision: String,
+    pub latest_revision: String,
+}
+
+/// Detects pending updates for devel/VCS packages (`yay -Y --devel` parity)
+#[derive(Debug, Default)]
+pub struct DevelUpdateChecker;
+
+impl DevelUpdateChecker {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Returns packages whose upstream revision differs from the local one
+    pub fn pending_updates<'a>(&self, packages: &'a [DevelPackage]) -> Vec<&'a DevelPackage> {
+        packages
+            .iter()
+            .filter(|p| p.local_revision != p.latest_revision)
+            .collect()
+    }
+}
+
+// ============================================================================
+// 16. PacNewsParser (pacnews parity)
+// ============================================================================
+
+/// A parsed Arch news announcement (`pacnews` parity)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PacNewsItem {
+    pub date: String,
+    pub title: String,
+    pub packages: Vec<String>,
+}
+
+/// Parses pacman-contrib `pacnews` output. Accepts both the JSON-ish news
+/// feed format and the plain `YYYY-MM-DD title` headline format.
+#[derive(Debug)]
+pub struct PacNewsParser;
+
+impl PacNewsParser {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Parse one news record. `header` is the headline line, `body` may
+    /// contain a `packages: a, b` line listing affected packages.
+    pub fn parse_record(header: &str, body: &str) -> Option<PacNewsItem> {
+        let header = header.trim();
+        let (date, title) = if let Some(rest) = header.strip_prefix('[') {
+            let (d, t) = rest.split_once(']')?;
+            (d.trim().to_string(), t.trim().to_string())
+        } else {
+            let (d, t) = header.split_once(' ')?;
+            (d.to_string(), t.to_string())
+        };
+        if date.is_empty() || title.is_empty() {
+            return None;
+        }
+
+        let mut packages = Vec::new();
+        for line in body.lines() {
+            let line = line.trim();
+            if let Some(list) = line
+                .strip_prefix("packages:")
+                .or_else(|| line.strip_prefix("Packages:"))
+            {
+                packages = list
+                    .split(',')
+                    .map(|p| p.trim().to_string())
+                    .filter(|p| !p.is_empty())
+                    .collect();
+            }
+        }
+
+        Some(PacNewsItem {
+            date,
+            title,
+            packages,
+        })
+    }
+
+    /// Parse a full news feed into items, one record per non-empty header
+    /// line followed by optional `packages:` body lines.
+    pub fn parse_feed(&self, feed: &str) -> Vec<PacNewsItem> {
+        let mut items = Vec::new();
+        let mut current_header: Option<String> = None;
+        let mut current_body = String::new();
+
+        for line in feed.lines() {
+            let trimmed = line.trim();
+            let looks_like_header = trimmed.starts_with('[')
+                || trimmed.split_once(' ').map_or(false, |(d, _)| {
+                    d.len() == 10 && d.chars().nth(4) == Some('-')
+                });
+            if looks_like_header {
+                if let Some(header) = current_header.take() {
+                    if let Some(item) = Self::parse_record(&header, &current_body) {
+                        items.push(item);
+                    }
+                }
+                current_header = Some(trimmed.to_string());
+                current_body.clear();
+            } else if current_header.is_some() {
+                current_body.push_str(line);
+                current_body.push('\n');
+            }
+        }
+        if let Some(header) = current_header {
+            if let Some(item) = Self::parse_record(&header, &current_body) {
+                items.push(item);
+            }
+        }
+        items
+    }
+}
+
+impl Default for PacNewsParser {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 17. PacmanDbMarker (pacman -D --asexplicit/--asdeps parity)
+// ============================================================================
+
+/// Marks installed packages as explicitly or dependency installed
+/// (`pacman -D --asexplicit` / `--asdeps` parity)
+pub struct PacmanDbMarker;
+
+impl PacmanDbMarker {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Set `is_explicit` on matching installed packages.
+    /// Returns the names of packages whose flag actually changed;
+    /// unknown names are ignored like pacman does with `-D`.
+    pub fn set_explicit(
+        &self,
+        installed: &mut [ArchPacmanPackage],
+        names: &[&str],
+        explicit: bool,
+    ) -> Vec<String> {
+        let mut changed = Vec::new();
+        for name in names {
+            if let Some(pkg) = installed.iter_mut().find(|p| p.name == *name) {
+                if pkg.is_explicit != explicit {
+                    pkg.is_explicit = explicit;
+                    changed.push(pkg.name.clone());
+                }
+            }
+        }
+        changed
+    }
+
+    /// `pacman -Qe` parity: list explicitly installed package names
+    pub fn explicit_packages<'a>(installed: &'a [ArchPacmanPackage]) -> Vec<&'a str> {
+        installed
+            .iter()
+            .filter(|p| p.is_explicit)
+            .map(|p| p.name.as_str())
+            .collect()
+    }
+
+    /// `pacman -Qd` parity: list dependency-installed package names
+    pub fn dependency_packages<'a>(installed: &'a [ArchPacmanPackage]) -> Vec<&'a str> {
+        installed
+            .iter()
+            .filter(|p| !p.is_explicit)
+            .map(|p| p.name.as_str())
+            .collect()
+    }
+}
+
+impl Default for PacmanDbMarker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
 // Unit Tests
 // ============================================================================
 
@@ -1307,5 +1727,137 @@ mod tests {
         let sync = formatter.format_sync(&pkg, "core");
         assert!(sync.contains("Repository      : core"));
         assert!(sync.contains("Download Size   : 1 KiB"));
+    }
+
+    #[test]
+    fn test_pactree_renderer() {
+        let renderer = PacTreeRenderer::new();
+        let mut a = sample_pkg("a");
+        a.depends = vec!["b>=1.0".to_string(), "c".to_string()];
+        let mut b = sample_pkg("b");
+        b.depends = vec!["c".to_string()];
+        let c = sample_pkg("c"); // no deps
+        let installed = vec![a, b, c];
+
+        let tree = renderer.render("a", &installed, false);
+        assert!(tree.starts_with("a\n"));
+        assert!(tree.contains("├── b"));
+        assert!(tree.contains("│   └── c"));
+        assert!(tree.contains("└── c"));
+
+        // reverse tree: who requires c
+        let rev = renderer.render("c", &installed, true);
+        assert!(rev.contains("├── a") || rev.contains("└── a"));
+        assert!(rev.contains("b"));
+    }
+
+    #[test]
+    fn test_pactree_cycle_detection() {
+        let renderer = PacTreeRenderer::new();
+        let mut a = sample_pkg("a");
+        a.depends = vec!["b".to_string()];
+        let mut b = sample_pkg("b");
+        b.depends = vec!["a".to_string()];
+        let installed = vec![a, b];
+
+        let tree = renderer.render("a", &installed, false);
+        assert!(tree.contains("(*)"));
+        // must terminate: only a bounded number of lines
+        assert!(tree.lines().count() <= 6);
+    }
+
+    #[test]
+    fn test_expac_formatter() {
+        let fmt = ExpacFormatter::new();
+        let mut pkg = sample_pkg("firefox");
+        pkg.depends = vec!["gtk3".to_string(), "nss>=3.0".to_string()];
+        pkg.optdepends = vec!["zenity: file dialogs".to_string()];
+
+        assert_eq!(fmt.format(&pkg, "%n %v", None), "firefox 1.0.0-1");
+        assert_eq!(fmt.format(&pkg, "%d", None), "gtk3 nss>=3.0");
+        assert_eq!(fmt.format(&pkg, "%o", None), "zenity: file dialogs");
+        assert_eq!(fmt.format(&pkg, "100%% %a", None), "100% x86_64");
+        assert_eq!(fmt.format(&pkg, "%n@%r", Some("extra")), "firefox@extra");
+        // unknown tokens pass through literally
+        assert_eq!(fmt.format(&pkg, "%z", None), "%z");
+    }
+
+    #[test]
+    fn test_pacgraph_dot() {
+        let renderer = PacGraphRenderer::new();
+        let mut a = sample_pkg("a");
+        a.depends = vec!["b>=1".to_string(), "missing-dep".to_string()];
+        a.optdepends = vec!["c: optional".to_string()];
+        let b = sample_pkg("b");
+        let c = sample_pkg("c");
+        let installed = vec![a, b, c];
+
+        let dot = renderer.to_dot(&installed, true);
+        assert!(dot.starts_with("digraph packages {"));
+        assert!(dot.contains("\"a\" -> \"b\";"));
+        assert!(dot.contains("\"a\" -> \"c\" [style=dotted];"));
+        // deps not installed are excluded
+        assert!(!dot.contains("missing-dep\";"));
+        // without optdeps flag, dotted edges are absent
+        let dot2 = renderer.to_dot(&installed, false);
+        assert!(!dot2.contains("style=dotted"));
+    }
+
+    #[test]
+    fn test_devel_update_checker() {
+        let checker = DevelUpdateChecker::new();
+        let pkgs = vec![
+            DevelPackage {
+                name: "neovim-git".to_string(),
+                local_revision: "abc123".to_string(),
+                latest_revision: "def456".to_string(),
+            },
+            DevelPackage {
+                name: "linux-git".to_string(),
+                local_revision: "aaa".to_string(),
+                latest_revision: "aaa".to_string(),
+            },
+        ];
+        let pending = checker.pending_updates(&pkgs);
+        assert_eq!(pending.len(), 1);
+        assert_eq!(pending[0].name, "neovim-git");
+    }
+
+    #[test]
+    fn test_pacnews_parser() {
+        let parser = PacNewsParser::new();
+        let feed = "[2026-11-01] linux 6.17 upgrade\npackages: linux, linux-headers\n\n2026-10-30 openssl security fix\npackages: openssl\n";
+        let items = parser.parse_feed(feed);
+        assert_eq!(items.len(), 2);
+        assert_eq!(items[0].date, "2026-11-01");
+        assert_eq!(items[0].title, "linux 6.17 upgrade");
+        assert_eq!(items[0].packages, vec!["linux", "linux-headers"]);
+        assert_eq!(items[1].title, "openssl security fix");
+    }
+
+    #[test]
+    fn test_pacman_db_marker() {
+        let marker = PacmanDbMarker::new();
+        let mut a = sample_pkg("a");
+        a.is_explicit = false;
+        let mut b = sample_pkg("b");
+        b.is_explicit = true;
+        let mut installed = vec![a, b];
+
+        // pacman -D --asexplicit a
+        let changed = marker.set_explicit(&mut installed, &["a", "nonexistent"], true);
+        assert_eq!(changed, vec!["a".to_string()]);
+        assert!(installed[0].is_explicit);
+
+        // pacman -Qe / -Qd listings
+        assert_eq!(
+            PacmanDbMarker::explicit_packages(&installed),
+            vec!["a", "b"]
+        );
+        assert!(PacmanDbMarker::dependency_packages(&installed).is_empty());
+
+        let changed2 = marker.set_explicit(&mut installed, &["b"], false);
+        assert_eq!(changed2, vec!["b".to_string()]);
+        assert_eq!(PacmanDbMarker::dependency_packages(&installed), vec!["b"]);
     }
 }
