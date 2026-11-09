@@ -284,6 +284,8 @@ struct proc {
     int      used;
     int      killed;     /* SIGKILL-style: freed at next schedule point */
     int      nice;       /* -20..19, lower = higher priority */
+    uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
+    uint32_t out_pipe;   /* 0 or pipe idx+1 — stdout sink */
     int      started;    /* 0 = needs enter_user, 1 = resume via ctx */
     uint32_t pid;
     uint32_t base;       /* user region base (4MiB aligned) */
@@ -4318,6 +4320,7 @@ static int proc_claim(uint32_t base, const char* name,
     if (!pd) return -1;
     struct proc* p = &g_procs[idx];
     p->used = 1; p->started = 0; p->nice = 0;
+    p->in_pipe = p->out_pipe = 0;
     p->pid = (uint32_t)g_next_pid++;
     p->base = base; p->pd = pd;
     p->entry = entry; p->esp0 = esp0;
@@ -4362,6 +4365,13 @@ static void proc_run(int idx) {
     g_user_active = 0;
     g_preempt_pending = 0;
     if (g_user_dead || p->killed) {
+        /* pipeline teardown: kill other procs sharing this proc's pipes */
+        for (int j = 0; j < MAX_PROCS; j++) {
+            if (j == idx || !g_procs[j].used) continue;
+            if ((p->out_pipe && g_procs[j].in_pipe == p->out_pipe) ||
+                (p->in_pipe  && g_procs[j].out_pipe == p->in_pipe))
+                g_procs[j].killed = 1;
+        }
         int z = 0;
         for (int i = 0; i < MAX_ZOMBIES; i++)
             if (!g_zombies[i].used) { z = i; break; }
@@ -4439,6 +4449,8 @@ static void sched_loop(int fg_idx) {
     }
 }
 
+static void exec_spawn(const char* args, int bg, uint32_t in_pipe, uint32_t out_pipe);
+static int pipe_alloc(void);
 static void show_exec(const char* args) {
     char argbuf[256];
     int al2 = 0;
@@ -4450,6 +4462,30 @@ static void show_exec(const char* args) {
         bg = 1; argbuf[--al2] = 0;
         while (al2 > 0 && (argbuf[al2-1] == ' ' || argbuf[al2-1] == '\t')) argbuf[--al2] = 0;
     }
+    /* pipeline: "A | B" — A's stdout feeds B's stdin */
+    char* bar = 0;
+    for (int i = 0; argbuf[i]; i++)
+        if (argbuf[i] == '|') { bar = argbuf + i; break; }
+    if (bar) {
+        *bar = 0;
+        char* right = bar + 1;
+        while (*right == ' ') right++;
+        if (kcmd_is(right, "exec ")) right += 5;
+        else if (kstrcmp(right, "exec") == 0) { kputs("exec: empty right side\n"); return; }
+        int pi = pipe_alloc();
+        if (pi < 0) { kputs("exec: no free pipe\n"); return; }
+        exec_spawn(argbuf, 1, 0, (uint32_t)pi + 1);          /* left: bg, out->pipe */
+        exec_spawn(right, bg, (uint32_t)pi + 1, 0);          /* right: stdin<-pipe */
+        return;
+    }
+    exec_spawn(argbuf, bg, 0, 0);
+}
+
+static void exec_spawn(const char* args, int bg, uint32_t in_pipe, uint32_t out_pipe) {
+    char argbuf[256];
+    int al2 = 0;
+    while (args[al2] && al2 < 255) { argbuf[al2] = args[al2]; al2++; }
+    argbuf[al2] = 0;
     const char* p = argbuf;
     while (*p == ' ') p++;
     if (!*p) { kputs("usage: exec <file> [&]\n"); return; }
@@ -4587,6 +4623,8 @@ static void show_exec(const char* args) {
 
     int pidx = proc_claim(g_user_base, namebuf, entry, (uint32_t)(size_t)sp);
     if (pidx < 0) { kputs("exec: process table full or PD alloc failed.\n"); return; }
+    g_procs[pidx].in_pipe  = in_pipe;
+    g_procs[pidx].out_pipe = out_pipe;
     kputs("exec: pid ");
     kprint_dec64(g_procs[pidx].pid);
     kputs(bg ? " [bg]\n" : " [fg]\n");
@@ -6360,6 +6398,15 @@ static int fat_ensure_mounted(void) {
 #define PIPE_SZ   4096
 struct pipe { char buf[PIPE_SZ]; uint32_t head, tail; int wopen, ropen; };
 static struct pipe g_pipes[MAX_PIPES];
+static int pipe_alloc(void) {
+    for (int i = 0; i < MAX_PIPES; i++)
+        if (!g_pipes[i].ropen && !g_pipes[i].wopen) {
+            g_pipes[i].head = g_pipes[i].tail = 0;
+            g_pipes[i].wopen = g_pipes[i].ropen = 1;
+            return i;
+        }
+    return -1;
+}
 static uint32_t pipe_read(uint32_t pi, uint8_t* dst, uint32_t len) {
     struct pipe* p = &g_pipes[pi];
     uint32_t n = 0;
@@ -6530,6 +6577,17 @@ static int user_range_ok(const void* p, uint32_t len) {
 void syscall_handler(uint32_t* regs) {
     uint32_t nr  = regs[7];
     uint32_t ret = 0;
+    if (nr == SYS_WRITE || nr == SYS_WRITE_LEN) {
+        /* stdout redirection: proc->out_pipe sinks writes into a pipe */
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used
+            && g_procs[g_cur_proc].out_pipe) {
+            uint32_t len = (nr == SYS_WRITE) ? kstrlen((const char*)(size_t)regs[1]) : regs[2];
+            if (nr == SYS_WRITE) regs[2] = len;
+            regs[7] = pipe_write(g_procs[g_cur_proc].out_pipe - 1,
+                                 (const uint8_t*)(size_t)regs[1], len);
+            return;
+        }
+    }
     if (nr == SYS_WRITE) {
         volatile char* s = (volatile char*)(size_t)regs[4];
         uint32_t limit = g_user_base ? g_user_base + 0x400000u : 0;
@@ -6549,6 +6607,18 @@ void syscall_handler(uint32_t* regs) {
             kputc(s[i]);
         }
     } else if (nr == SYS_GETCHAR) {
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used
+            && g_procs[g_cur_proc].in_pipe) {
+            struct pipe* pp = &g_pipes[g_procs[g_cur_proc].in_pipe - 1];
+            if (pp->head == pp->tail) {
+                regs[7] = pp->wopen ? 0xFFFFFFFFu : (uint32_t)-2;  /* -2 = EOF */
+                return;
+            }
+            uint8_t ch;
+            regs[7] = pipe_read(g_procs[g_cur_proc].in_pipe - 1, &ch, 1);
+            regs[7] = regs[7] ? ch : 0xFFFFFFFFu;
+            return;
+        }
         ret = (uint8_t)kgetc();
     } else if (nr == SYS_TICKS) {
         ret = g_tick_count;
