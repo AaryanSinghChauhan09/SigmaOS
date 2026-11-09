@@ -391,6 +391,7 @@ static void show_timer(void);
 static void show_uptime(void);
 static void show_ver(void);
 static void show_fastfetch(void);
+static void show_whoami(void);
 static void show_memalloc(void);
 static void show_sched(void);
 static void show_ps(void);
@@ -3422,6 +3423,7 @@ void kernel_shell(void) {
             kputs("  wc      - Count lines/words/bytes: wc <file>\n");
             kputs("  uptime  - Seconds since boot\n");
             kputs("  fastfetch - System summary screen\n");
+            kputs("  whoami  - Show user identity\n");
             kputs("  ver     - Kernel version\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
@@ -3502,6 +3504,8 @@ void kernel_shell(void) {
             show_ver();
         } else if (kcmd_is(cmd, "fastfetch")) {
             show_fastfetch();
+        } else if (kcmd_is(cmd, "whoami")) {
+            show_whoami();
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
@@ -4601,6 +4605,11 @@ static void show_ver(void) {
     kputs("  x86 32-bit, Multiboot1, paging(GDT/TSS/IDT/PIC/PIT)\n");
     kputs("  ring-3 exec + int 0x80 syscalls + preemptive sched\n");
     kputs("  FAT12/16/32 rw, LFN, cwd, ELF32 loader\n");
+}
+
+static void show_whoami(void) {
+    kputs("uid=0(root) gid=0(root) groups=0(root)\n");
+    kputs("SigmaOS sovereign kernel — ring-0 shell\n");
 }
 
 /* fastfetch — Omarchy-style one-screen system summary. */
