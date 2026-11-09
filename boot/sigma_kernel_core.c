@@ -285,6 +285,7 @@ struct proc {
     int      killed;     /* SIGKILL-style: freed at next schedule point */
     int      nice;       /* -20..19, lower = higher priority */
     uint32_t rlim_cur, rlim_max; /* RLIMIT_NOFILE soft/hard fd limit */
+    uint32_t brk;        /* program break (heap top), user VA */
     uint32_t ppid;       /* parent pid, 0 = kernel shell */
     uint32_t ticks;      /* scheduler ticks consumed (instrumentation) */
     uint32_t io_r, io_w; /* bytes read/written via syscalls (instrumentation) */
@@ -4345,6 +4346,7 @@ static int proc_claim(uint32_t base, const char* name, const char* cmdline,
     p->in_file = 0; p->in_len = p->in_pos = 0;
     p->io_r = p->io_w = 0;
     p->rlim_cur = p->rlim_max = MAX_FDS;
+    p->brk = base + 0x40000u;   /* heap starts above load area */
     p->pending_mask = 0; p->sig_mask = 0;
     for (int si = 0; si < 32; si++) p->handler[si] = 0;
     p->pid = (uint32_t)g_next_pid++;
@@ -4468,6 +4470,7 @@ static int proc_fork(uint32_t* regs) {
     ch->ticks = par->ticks;
     ch->io_r = par->io_r; ch->io_w = par->io_w;
     ch->rlim_cur = par->rlim_cur; ch->rlim_max = par->rlim_max;
+    ch->brk = par->brk;
     ch->pid = (uint32_t)g_next_pid++;
     ch->base = base; ch->pd = pd;
     ch->entry = par->entry; ch->esp0 = par->esp0;
@@ -6182,6 +6185,7 @@ static void idt_init(void) {
 #define SYS_GETTIME   44 /* eax=uptime seconds, edx=milliseconds */
 #define SYS_GETRLIMIT 45 /* ebx=res(0=NOFILE), ecx=user u32[2]{cur,max} -> eax=0/-1 */
 #define SYS_SETRLIMIT 46 /* ebx=res(0=NOFILE), ecx=user u32[2]{cur,max} -> eax=0/-1 */
+#define SYS_BRK      47 /* ebx=new break (user VA) or 0=query -> eax=break/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7551,6 +7555,19 @@ void syscall_handler(uint32_t* regs) {
             rp->rlim_cur = nc; rp->rlim_max = nm;
         }
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_BRK) {
+        if (g_cur_proc < 0 || g_cur_proc >= MAX_PROCS || !g_procs[g_cur_proc].used) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        struct proc* bp = &g_procs[g_cur_proc];
+        uint32_t heap_lo = bp->base + 0x40000u;
+        uint32_t heap_hi = bp->base + EXEC_STACK_OFF - 0x2000u;
+        uint32_t nb = regs[4];
+        if (nb == 0) { regs[7] = bp->brk; return; }
+        if (nb < heap_lo || nb > heap_hi) { regs[7] = 0xFFFFFFFFu; return; }
+        bp->brk = nb;
+        regs[7] = nb;
         return;
     } else if (nr == SYS_GETTIME) {
         uint32_t t = g_tick_count;

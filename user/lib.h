@@ -43,6 +43,7 @@ enum {
     SYS_GETTIME = 44,
     SYS_GETRLIMIT = 45,
     SYS_SETRLIMIT = 46,
+    SYS_BRK = 47,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 
