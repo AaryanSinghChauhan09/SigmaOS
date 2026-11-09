@@ -5453,6 +5453,7 @@ static void idt_init(void) {
 #define SYS_RMDIR    25 /* ebx=name — remove empty dir, eax=0/-1 */
 #define SYS_TRUNC    26 /* ebx=name, ecx=newsize — shrink file, eax=0/-1 */
 #define SYS_CHMOD    27 /* ebx=name, ecx=mode — 0=clear RO, 1=set RO, eax=0/-1 */
+#define SYS_SLEEP    28 /* ebx=ticks — busy-wait sleep, eax=0 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6252,6 +6253,12 @@ void syscall_handler(uint32_t* regs) {
         if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
+        regs[7] = 0;
+        return;
+    } else if (nr == SYS_SLEEP) {
+        /* ebx=ticks — spin until PIT tick count advances (cooperative) */
+        uint32_t target = g_tick_count + (uint32_t)regs[4];
+        while (g_tick_count < target) { __asm__ volatile("pause"); }
         regs[7] = 0;
         return;
     } else if (nr == SYS_CREAT) {
