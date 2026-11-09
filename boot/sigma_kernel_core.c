@@ -276,11 +276,16 @@ struct proc {
     uint32_t pd;         /* private user page directory (phys) */
     uint32_t entry, esp0;/* initial eip/esp for first run */
     char     name[32];
+    int      exit_code;
     uint32_t ctx[8];     /* pushal-order regs at preempt point */
     uint32_t eip, cs, eflags, esp, ss;
 };
 static struct proc g_procs[MAX_PROCS];
-static int  g_cur_proc = -1;
+/* reaped-exit records so `wait` can report status (job control) */
+#define MAX_ZOMBIES 8
+struct zombie { int used; uint32_t pid; int code; char name[32]; };
+static struct zombie g_zombies[MAX_ZOMBIES];
+static int g_cur_proc = -1;
 static int  g_next_pid  = 1;
 static void sched_loop(int fg_idx);
 
@@ -4338,6 +4343,17 @@ static void proc_run(int idx) {
     g_user_active = 0;
     g_preempt_pending = 0;
     if (g_user_dead || p->killed) {
+        int z = 0;
+        for (int i = 0; i < MAX_ZOMBIES; i++)
+            if (!g_zombies[i].used) { z = i; break; }
+        if (g_zombies[z].used == 0 || 1) {
+            g_zombies[z].used = 1;
+            g_zombies[z].pid  = p->pid;
+            g_zombies[z].code = p->killed ? -1 : p->exit_code;
+            int zi = 0;
+            while (p->name[zi] && zi < 31) { g_zombies[z].name[zi] = p->name[zi]; zi++; }
+            g_zombies[z].name[zi] = 0;
+        }
         p->used = 0; p->killed = 0;
         g_user_dead = 0;
         klog("sched: proc exit\n");
@@ -5194,6 +5210,42 @@ void kernel_shell(void) {
             while (*kp >= '0' && *kp <= '9') { kpid = kpid * 10 + (*kp - '0'); kp++; }
             if (proc_kill(kpid) == 0) kputs("kill: sent\n");
             else kputs("kill: no such pid\n");
+        } else if (kcmd_is(cmd, "wait")) {
+            const char* wp = cmd + 4;
+            while (*wp == ' ') wp++;
+            uint32_t want = 0;
+            int have_pid = 0;
+            while (*wp >= '0' && *wp <= '9') { want = want * 10 + (*wp - '0'); wp++; have_pid = 1; }
+            int guard = 0;
+            for (;;) {
+                int found = -1;
+                for (int i = 0; i < MAX_ZOMBIES; i++)
+                    if (g_zombies[i].used && (!have_pid || g_zombies[i].pid == want)) { found = i; break; }
+                if (found >= 0) {
+                    kputs("wait: pid ");
+                    kprint_dec64(g_zombies[found].pid);
+                    kputs(g_zombies[found].name[0] ? " (" : " (");
+                    kputs(g_zombies[found].name[0] ? g_zombies[found].name : "?");
+                    kputs(") exited, code ");
+                    kprint_dec64(g_zombies[found].code);
+                    kputs("\n");
+                    g_zombies[found].used = 0;
+                    if (have_pid) break;
+                    continue;
+                }
+                if (have_pid) {
+                    int alive = 0;
+                    for (int i = 0; i < MAX_PROCS; i++)
+                        if (g_procs[i].used && g_procs[i].pid == want) alive = 1;
+                    if (!alive) { kputs("wait: no such child\n"); break; }
+                } else {
+                    int alive = 0;
+                    for (int i = 0; i < MAX_PROCS; i++) if (g_procs[i].used) alive = 1;
+                    if (!alive) { kputs("wait: no running children\n"); break; }
+                }
+                if (guard++ > 2000000) { kputs("wait: timeout\n"); break; }
+                sched_loop(-1);   /* one timeslice, then re-check */
+            }
         } else if (kstrcmp(cmd, "ps") == 0) {
             show_ps();
         } else if (kstrcmp(cmd, "dmesg") == 0) {
@@ -6416,6 +6468,8 @@ void syscall_handler(uint32_t* regs) {
         ret = g_tick_count;
     } else if (nr == SYS_EXIT) {
         kputs("\n[user] exit syscall\n");
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS)
+            g_procs[g_cur_proc].exit_code = (int)regs[1];
         g_user_dead = 1;      /* syscall_entry will iret back to kernel */
         g_user_active = 0;
     } else if (nr == SYS_OPEN) {
