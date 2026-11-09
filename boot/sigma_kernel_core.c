@@ -208,6 +208,8 @@ static int serial_has_data(void) {
     return inb(COM1_PORT + 5) & 1;
 }
 
+static int skip_ext = 0;
+
 char kgetc(void) {
     while (1) {
         /* Check Serial port first */
@@ -220,6 +222,15 @@ char kgetc(void) {
         /* Check PS/2 Keyboard port */
         if (inb(0x64) & 1) {
             uint8_t scancode = inb(0x60);
+            /* Extended-key prefix: swallow it AND the following scancode */
+            if (scancode == 0xE0 || scancode == 0xE1 || scancode == 0xF0) {
+                skip_ext = 1;
+                continue;
+            }
+            if (skip_ext) {
+                skip_ext = 0;
+                continue;
+            }
             /* Check key down (top bit clear) */
             if (!(scancode & 0x80)) {
                 char c = scancode_ascii[scancode & 0x7F];
@@ -411,6 +422,113 @@ static void show_cmdline(void) {
 }
 
 /* --------------------------------------------------------------------------
+ * CMOS Real-Time Clock (ports 0x70/0x71)
+ * -------------------------------------------------------------------------- */
+static uint8_t cmos_read(uint8_t reg) {
+    outb(0x70, reg);
+    io_wait();
+    return inb(0x71);
+}
+
+static uint8_t bcd2bin(uint8_t v) {
+    return (uint8_t)((v >> 4) * 10 + (v & 0x0F));
+}
+
+static void kprint_2dig(uint8_t v) {
+    if (v < 10) kputc('0');
+    kprint_dec64(v);
+}
+
+static void show_rtc(void) {
+    uint8_t reg_b = cmos_read(0x0B);
+    int is_bcd  = !(reg_b & 0x04);
+    int is_24hr = (reg_b & 0x02) != 0;
+
+    /* Wait for update cycle to finish (UIP flag, reg A bit 7) */
+    uint8_t spins = 0;
+    while ((cmos_read(0x0A) & 0x80) && spins++ < 100) { }
+
+    uint8_t sec = cmos_read(0x00);
+    uint8_t min = cmos_read(0x02);
+    uint8_t hr  = cmos_read(0x04);
+    uint8_t dow = cmos_read(0x06);
+    uint8_t dom = cmos_read(0x07);
+    uint8_t mon = cmos_read(0x08);
+    uint8_t yr  = cmos_read(0x09);
+
+    if (is_bcd) {
+        sec = bcd2bin(sec); min = bcd2bin(min); hr = bcd2bin(hr);
+        dow = bcd2bin(dow); dom = bcd2bin(dom); mon = bcd2bin(mon); yr = bcd2bin(yr);
+    }
+
+    kputs("RTC: 20");
+    kprint_2dig(yr);
+    kputc('-'); kprint_2dig(mon);
+    kputc('-'); kprint_2dig(dom);
+    kputs(" ");
+    kprint_2dig(hr);
+    kputc(':'); kprint_2dig(min);
+    kputc(':'); kprint_2dig(sec);
+    if (!is_24hr) {
+        int pm = hr >= 12;
+        hr = hr % 12;
+        if (hr == 0) hr = 12;
+        kputs(pm ? " PM" : " AM");
+    }
+    kputs(" (dow=");
+    kprint_dec64(dow);
+    kputs(")\n");
+}
+
+/* --------------------------------------------------------------------------
+ * CPU Identification (CPUID)
+ * -------------------------------------------------------------------------- */
+static void show_cpu(void) {
+    uint32_t eax, ebx, ecx, edx;
+    char vendor[13];
+
+    __asm__ volatile (
+        "cpuid"
+        : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+        : "a"(0), "c"(0)
+    );
+    vendor[0] = (char)(ebx & 0xFF);
+    vendor[1] = (char)((ebx >> 8) & 0xFF);
+    vendor[2] = (char)((ebx >> 16) & 0xFF);
+    vendor[3] = (char)((ebx >> 24) & 0xFF);
+    vendor[4] = (char)(edx & 0xFF);
+    vendor[5] = (char)((edx >> 8) & 0xFF);
+    vendor[6] = (char)((edx >> 16) & 0xFF);
+    vendor[7] = (char)((edx >> 24) & 0xFF);
+    vendor[8] = (char)(ecx & 0xFF);
+    vendor[9] = (char)((ecx >> 8) & 0xFF);
+    vendor[10] = (char)((ecx >> 16) & 0xFF);
+    vendor[11] = (char)((ecx >> 24) & 0xFF);
+    vendor[12] = '\0';
+
+    kputs("CPU vendor: ");
+    kputs(vendor);
+    kputs("\n");
+
+    __asm__ volatile (
+        "cpuid"
+        : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+        : "a"(1), "c"(0)
+    );
+    uint32_t family = ((eax >> 8) & 0xF) + (((eax >> 20) & 0xFF) == 0xF ? ((eax >> 16) & 0xFF) : 0);
+    uint32_t model  = ((eax >> 4) & 0xF) | (((eax >> 16) & 0xF) << 4);
+    kputs("CPU family=");
+    kprint_dec64(family);
+    kputs(" model=");
+    kprint_dec64(model);
+    kputs(" stepping=");
+    kprint_dec64(eax & 0xF);
+    kputs(" features_ecx=");
+    kprint_hex64(ecx);
+    kputs("\n");
+}
+
+/* --------------------------------------------------------------------------
  * Information Displays
  * -------------------------------------------------------------------------- */
 void show_banner(void) {
@@ -509,6 +627,8 @@ void kernel_shell(void) {
             kputs("  mem     - Show memory size and memory map\n");
             kputs("  modules - List Multiboot modules\n");
             kputs("  cmdline - Show kernel command line\n");
+            kputs("  date    - Show hardware clock (RTC)\n");
+            kputs("  cpu     - Show CPU vendor and features\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -524,6 +644,10 @@ void kernel_shell(void) {
             show_modules();
         } else if (kstrcmp(cmd, "cmdline") == 0) {
             show_cmdline();
+        } else if (kstrcmp(cmd, "date") == 0 || kstrcmp(cmd, "time") == 0) {
+            show_rtc();
+        } else if (kstrcmp(cmd, "cpu") == 0) {
+            show_cpu();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
