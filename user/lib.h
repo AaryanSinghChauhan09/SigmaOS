@@ -5,6 +5,7 @@
 #define SIGMAOS_USERLIB_H
 
 typedef unsigned int u32;
+typedef unsigned long long u64;
 
 /* raw 3-arg syscall */
 static int sc3(u32 n, u32 a, u32 b, u32 c) {
