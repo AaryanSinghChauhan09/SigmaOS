@@ -2558,19 +2558,10 @@ static void show_cp(const char* args) {
 
 /* append <name> <text> — extend an existing file. Walks the cluster chain
  * to the write offset, allocates+links clusters as needed, updates size. */
-static void show_append(const char* args) {
-    char name[64];
-    int nl = 0;
-    const char* p = args;
-    while (*p == ' ') p++;
-    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
-    name[nl] = 0;
-    while (*p == ' ') p++;
-    if (!nl || !*p) { kputs("usage: append <name> <text>\n"); return; }
-    uint32_t tlen = kstrlen(p);
-    if (tlen > 0x100000u) { kputs("append: text too large.\n"); return; }
+static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen) {
+    if (!name[0] || !tlen || tlen > 0x100000u) return -1;
 
-    if (fat_ensure_mounted() != 0) { kputs("append: no FAT volume.\n"); return; }
+    if (fat_ensure_mounted() != 0) { return -1; }
     int kind = g_vol_kind;
 
     /* resolve parent dir (same policy as write/cp) */
@@ -2580,7 +2571,7 @@ static void show_append(const char* args) {
         struct fat_hit dh;
         int dr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
                             g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &dh);
-        if (dr <= 0 || !dh.is_dir) { kputs("append: cwd not a directory.\n"); return; }
+        if (dr <= 0 || !dh.is_dir) { return -1; }
         in_root = 0; dir_cluster = dh.cluster;
     }
     uint8_t want[11];
@@ -2589,13 +2580,13 @@ static void show_append(const char* args) {
     fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
                       g_vol_root_secs, dir_cluster, g_vol_fat_lba,
                       g_vol_data_lba, g_vol_spc, want, &slot);
-    if (slot.status != -1) { kputs("append: not found.\n"); return; }
+    if (slot.status != -1) { return -1; }
 
     if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
-        kputs("append: read error.\n"); return;
+        return -1;
     }
     uint8_t* de = g_file_buf + slot.off;
-    if (de[11] & 0x10) { kputs("append: is a directory.\n"); return; }
+    if (de[11] & 0x10) { return -1; }
     uint32_t fsize = (uint32_t)de[28] | ((uint32_t)de[29] << 8)
                    | ((uint32_t)de[30] << 16) | ((uint32_t)de[31] << 24);
     uint32_t clus = fat_dirent_cluster(kind, de);
@@ -2607,7 +2598,7 @@ static void show_append(const char* args) {
     if (maxc < 16) maxc = 16;
     if (maxc > 8192) maxc = 8192;
     uint32_t* chain = (uint32_t*)kmalloc(maxc * 4);
-    if (!chain) { kputs("append: out of memory.\n"); return; }
+    if (!chain) { return -1; }
     uint32_t ncl = 0;
     uint32_t c = clus;
     int guard = 0;
@@ -2634,7 +2625,7 @@ static void show_append(const char* args) {
     }
     if (fail || have_bytes < need_bytes) {
         kfree(chain);
-        kputs("append: disk full or alloc failed.\n"); return;
+        return -1;
     }
 
     /* write appended bytes sector-by-sector at absolute file offset fsize */
@@ -2655,13 +2646,13 @@ static void show_append(const char* args) {
         uint32_t chunk = 512 - soff;
         if (chunk > remaining) chunk = remaining;
         for (uint32_t i = 0; i < chunk; i++)
-            g_file_buf[soff + i] = (uint8_t)p[tlen - remaining + i];
+            g_file_buf[soff + i] = text[tlen - remaining + i];
         if (ata_write_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { fail = 1; break; }
         remaining -= chunk;
         file_off += chunk;
     }
     kfree(chain);
-    if (fail) { kputs("append: write failed.\n"); return; }
+    if (fail) { return -1; }
 
 
     /* update dirent size + persist */
@@ -2670,7 +2661,7 @@ static void show_append(const char* args) {
     de[30] = (uint8_t)((fsize >> 16) & 0xFF); de[31] = (uint8_t)(fsize >> 24);
     /* re-read sector: g_file_buf clobbered */
     if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
-        kputs("append: read error.\n"); return;
+        return -1;
     }
     uint8_t* de2 = g_file_buf + slot.off;
     de2[28] = de[28]; de2[29] = de[29]; de2[30] = de[30]; de2[31] = de[31];
@@ -2678,14 +2669,27 @@ static void show_append(const char* args) {
     for (int i = 20; i <= 21; i++) de2[i] = de[i];
     if (kind == 2) { de2[26] = de[26]; de2[27] = de[27]; }
     if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) != 1) {
-        kputs("append: dirent write failed.\n"); return;
+        return -1;
     }
-    kputs("append: /");
-    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
-    kputs(name);
-    kputs(" -> ");
-    kprint_dec64(fsize);
-    kputs(" bytes\n");
+    return 0;
+}
+
+static void show_append(const char* args) {
+    char name[64];
+    int nl = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = 0;
+    while (*p == ' ') p++;
+    if (!nl || !*p) { kputs("usage: append <name> <text>\n"); return; }
+    uint32_t tlen = kstrlen(p);
+    if (tlen > 0x100000u) { kputs("append: text too large.\n"); return; }
+    if (fat_append_impl(name, (const uint8_t*)p, tlen) == 0) {
+        kputs("append: /");
+        if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+        kputs(name); kputs(" ok\n");
+    } else kputs("append: failed.\n");
 }
 
 /* hex <file> — hexdump a file (up to 4KB) for binary inspection. */
@@ -4284,6 +4288,7 @@ static void idt_init(void) {
 #define SYS_CREAT    11 /* ebx=ptr to name — create empty file in cwd */
 #define SYS_WRITE_FILE 12 /* ebx=name, ecx=buf, edx=len — create/overwrite */
 #define SYS_RENAME   13 /* ebx=old name, ecx=new name — rename in cwd */
+#define SYS_APPEND   14 /* ebx=name, ecx=buf, edx=len — append to file in cwd */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -4736,6 +4741,27 @@ void syscall_handler(uint32_t* regs) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         ret = 0;
+    } else if (nr == SYS_APPEND) {
+        /* ebx=name ptr, ecx=data ptr, edx=len — append to file in cwd */
+        volatile char* un = (volatile char*)(size_t)regs[4];
+        volatile uint8_t* ub = (volatile uint8_t*)(size_t)regs[6];
+        uint32_t ulen = (uint32_t)regs[7];
+        char kname[64];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base || ulen > 0x100000u) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 63 && (uint32_t)(size_t)(un + nl) < limit && un[nl]
+               && un[nl] != '/' && un[nl] != '\\') { kname[nl] = (char)un[nl]; nl++; }
+        kname[nl] = 0;
+        if (!nl || (uint32_t)(size_t)ub < g_user_base
+            || (uint32_t)(size_t)ub + ulen > limit) { regs[7] = 0xFFFFFFFFu; return; }
+        /* stage user bytes into kernel memory, then reuse impl */
+        uint8_t* kbuf = (uint8_t*)kmalloc(ulen ? ulen : 1);
+        if (!kbuf) { regs[7] = 0xFFFFFFFFu; return; }
+        for (uint32_t i = 0; i < ulen; i++) kbuf[i] = ub[i];
+        regs[7] = (fat_append_impl(kname, kbuf, ulen) == 0) ? 0 : 0xFFFFFFFFu;
+        kfree(kbuf);
+        return;
     } else {
         kputs("\n[syscall] unknown nr=");
         kprint_dec64(nr);
