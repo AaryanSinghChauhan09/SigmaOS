@@ -225,9 +225,16 @@ static int serial_has_data(void) {
 }
 
 static int skip_ext = 0;
+static int kbd_buf_pop(char* out);   /* defined with IRQ section below */
 
 char kgetc(void) {
     while (1) {
+        /* Interrupt-driven keyboard buffer first */
+        char k;
+        if (kbd_buf_pop(&k)) {
+            if (k == '\r') return '\n';
+            return k;
+        }
         /* Check Serial port first */
         if (serial_has_data()) {
             char c = inb(COM1_PORT);
@@ -1984,6 +1991,7 @@ __asm__(
     /* IRQ stubs: vectors 32-47, no error code, return via iret */
     ".globl irq_common_entry\n"
     "irq_common_entry:\n"
+    "    cli\n"               /* mask IRQs in handler; iret restores IF from stack */
     "    movl %esp, %eax\n"
     "    pushl %eax\n"
     "    call irq_handler\n"
@@ -1992,7 +2000,7 @@ __asm__(
     "    iret\n"
     ".macro IRQ_STUB n\n"
     "irq_\\n:\n"
-    "    pushl $\\n\n"
+    "    pushl $(32+\\n)\n"    /* push real IDT vector (32..47), not IRQ index */
     "    jmp irq_common_entry\n"
     ".endm\n"
     "IRQ_STUB 0\n" "IRQ_STUB 1\n" "IRQ_STUB 2\n" "IRQ_STUB 3\n"
@@ -2103,12 +2111,33 @@ static void pic_init(void) {
     /* ICW4: 8086 mode */
     outb(0x21, 0x01);
     outb(0xA1, 0x01);
-    /* OCW1: mask all except IRQ0 (PIT timer) on master; mask all on slave */
-    outb(0x21, 0xFE);
+    /* OCW1: unmask IRQ0 (PIT) + IRQ1 (PS/2 kbd) on master; mask all on slave */
+    outb(0x21, 0xFC);
     outb(0xA1, 0xFF);
 }
 
-void irq_handler(uint32_t* frame) {
+/* PS/2 keyboard IRQ1 -> char ring buffer (interrupt-driven input).
+ * Polled serial/keyboard remains as fallback in kgetc(). */
+#define KBD_BUF_SIZE 256
+static volatile char     g_kbd_buf[KBD_BUF_SIZE];
+static volatile uint32_t g_kbd_head = 0, g_kbd_tail = 0;
+
+static int kbd_buf_push(char c) {
+    uint32_t next = (g_kbd_head + 1) % KBD_BUF_SIZE;
+    if (next == g_kbd_tail) return 0;
+    g_kbd_buf[g_kbd_head] = c;
+    g_kbd_head = next;
+    return 1;
+}
+
+static int kbd_buf_pop(char* out) {
+    if (g_kbd_tail == g_kbd_head) return 0;
+    *out = g_kbd_buf[g_kbd_tail];
+    g_kbd_tail = (g_kbd_tail + 1) % KBD_BUF_SIZE;
+    return 1;
+}
+
+void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry asm */
     uint32_t vec = frame[0];
     if (vec == 32) { /* IRQ0: PIT timer ~18.2 Hz */
         g_tick_count++;
@@ -2119,6 +2148,19 @@ void irq_handler(uint32_t* frame) {
             kprint_dec64(g_tick_count / 18);
             kputs("s)\n");
         }
+    } else if (vec == 33) {
+        /* IRQ1: PS/2 keyboard — translate scancode, push to buffer */
+        uint8_t sc = inb(0x60);
+        static int irq_skip_ext = 0;
+        int c = 0;
+        if (sc == 0xE0 || sc == 0xE1 || sc == 0xF0) {
+            irq_skip_ext = 1;
+        } else if (irq_skip_ext) {
+            irq_skip_ext = 0;
+        } else if (!(sc & 0x80)) {
+            c = scancode_ascii[sc & 0x7F];
+        }
+        if (c) kbd_buf_push((char)c);
     }
     /* EOI: non-specific to master; slave EOI only for IRQ8-15 (vec>=40) */
     if (vec >= 40) outb(0xA0, 0x20);
