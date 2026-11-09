@@ -394,6 +394,7 @@ static void show_fastfetch(void);
 static void show_whoami(void);
 static void show_uname(void);
 static void show_memalloc(void);
+static void show_free(void);
 static void show_sched(void);
 static void show_ps(void);
 static void show_exec(const char* args);
@@ -3316,7 +3317,7 @@ static const char* const g_cmd_names[] = {
     "cpu","pci","disk","read","part","fs","ls","cat","cd","pwd","df",
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
-    "sched","ps","dmesg","memalloc","history","clear","reboot","halt",
+    "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
     "fastfetch","whoami","uname",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
@@ -3681,6 +3682,7 @@ void kernel_shell(void) {
             kputs("  ps      - Process list\n");
             kputs("  dmesg   - Show kernel log\n");
             kputs("  memalloc- Page allocator test/status\n");
+            kputs("  free    - Memory usage (total/used/free)\n");
             kputs("  history - Show command history\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
@@ -3781,6 +3783,8 @@ void kernel_shell(void) {
             show_dmesg();
         } else if (kstrcmp(cmd, "memalloc") == 0) {
             show_memalloc();
+        } else if (kstrcmp(cmd, "free") == 0) {
+            show_free();
         } else if (kstrcmp(cmd, "history") == 0) {
             show_history();
         } else if (kstrcmp(cmd, "clear") == 0) {
@@ -4899,6 +4903,7 @@ static void show_fastfetch(void) {
 
 static uint32_t g_page_bitmap[BITMAP_WORDS] __attribute__((section(".bss")));
 static uint32_t g_alloc_count = 0;
+static uint32_t g_total_pages = 0;
 static int      g_mm_ready  = 0;
 
 static void mm_init(void) {
@@ -4918,6 +4923,11 @@ static void mm_init(void) {
         uint64_t base = ((uint64_t)*(volatile uint32_t*)(p + 8) << 32) | *(volatile uint32_t*)(p + 4);
         uint64_t len  = ((uint64_t)*(volatile uint32_t*)(p + 16) << 32) | *(volatile uint32_t*)(p + 12);
         uint32_t type = *(volatile uint32_t*)(p + 20);
+        if (type == 1) {
+            uint64_t fb = base / PAGE_SIZE;
+            uint64_t fe = (base + len + PAGE_SIZE - 1) / PAGE_SIZE;
+            if (fe > fb && fe - fb < 1048576) g_total_pages += (uint32_t)(fe - fb);
+        }
         if (type != 1) {
             /* mark used */
             uint64_t first = base / PAGE_SIZE;
@@ -4969,7 +4979,11 @@ static uint32_t pmm_alloc(void) {
 
 static void pmm_free(uint32_t phys) {
     uint32_t pg = phys / PAGE_SIZE;
-    if (pg < 1048576) g_page_bitmap[pg >> 5] &= ~(1u << (pg & 31));
+    if (pg < 1048576) {
+        if ((g_page_bitmap[pg >> 5] & (1u << (pg & 31))) && g_alloc_count)
+            g_alloc_count--;
+        g_page_bitmap[pg >> 5] &= ~(1u << (pg & 31));
+    }
 }
 
 /* ---- kernel heap: page-granular kmalloc over pmm ----
@@ -5048,6 +5062,19 @@ static void show_memalloc(void) {
     kputs(" allocs, ready=");
     kputs(g_mm_ready ? "yes" : "no");
     kputs("\n");
+}
+
+static void show_free(void) {
+    if (!g_mm_ready) mm_init();
+    uint64_t total_kb = (uint64_t)g_total_pages * 4u;
+    uint64_t used_kb  = (uint64_t)g_alloc_count * 4u;
+    kputs("              total        used        free\n");
+    kputs("Mem:    ");
+    kprint_dec64(total_kb); kputs(" KiB   ");
+    kprint_dec64(used_kb);  kputs(" KiB   ");
+    kprint_dec64(total_kb > used_kb ? total_kb - used_kb : 0);
+    kputs(" KiB\n");
+    kputs("Swap:   0 KiB        0 KiB        0 KiB\n");
 }
 
 /* --------------------------------------------------------------------------
