@@ -2817,6 +2817,10 @@ static void show_tail(const char* args) {
     kfree(buf);
 }
 
+/* true / false / : — POSIX no-op exit-status commands. */
+static void show_true(void) {}
+static void show_false(void) { kputs("false\n"); }
+
 /* id / arch / hostname — identity queries. */
 static void show_id(void)   { kputs("uid=0(root) gid=0(root) groups=0(root)\n"); }
 static void show_arch(void) { kputs("i386\n"); }
@@ -3437,7 +3441,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
