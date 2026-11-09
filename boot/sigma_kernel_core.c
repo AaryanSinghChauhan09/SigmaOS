@@ -2993,6 +2993,79 @@ static void show_sort(const char* args) {
     kfree(buf);
 }
 
+/* rev / tac <file> — reverse chars per line / reverse line order. */
+static void show_rev(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: rev <file>\n"); return; }
+    char namebuf[64]; int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+    if (fat_ensure_mounted() != 0) { kputs("rev: no FAT volume.\n"); return; }
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("rev: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("rev: not found.\n"); return; }
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("rev: out of memory.\n"); return; }
+    int got = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                              g_vol_spc, hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs("rev: read error.\n"); return; }
+    uint32_t i = 0;
+    while (i < (uint32_t)got) {
+        uint32_t ls = i;
+        while (i < (uint32_t)got && buf[i] != '\n') i++;
+        uint32_t ll = i - ls;
+        if (i < (uint32_t)got) i++;
+        for (uint32_t j = ll; j > 0; j--) kputc((char)buf[ls + j - 1]);
+        kputc('\n');
+    }
+    kfree(buf);
+}
+static void show_tac(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: tac <file>\n"); return; }
+    char namebuf[64]; int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+    if (fat_ensure_mounted() != 0) { kputs("tac: no FAT volume.\n"); return; }
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("tac: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("tac: not found.\n"); return; }
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("tac: out of memory.\n"); return; }
+    int got = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                              g_vol_spc, hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs("tac: read error.\n"); return; }
+    /* collect line offsets, print reversed */
+    uint32_t offs[512]; int n = 0;
+    uint32_t i = 0;
+    while (i < (uint32_t)got && n < 512) { offs[n++] = i;
+        while (i < (uint32_t)got && buf[i] != '\n') i++;
+        if (i < (uint32_t)got) i++; }
+    for (int j = n - 1; j >= 0; j--) {
+        uint32_t s = offs[j], e = s;
+        while (e < (uint32_t)got && buf[e] != '\n') e++;
+        for (uint32_t k = s; k < e; k++) kputc((char)buf[k]);
+        kputc('\n');
+    }
+    kfree(buf);
+}
+
 /* nl <file> — print lines with numbers (6-wide, tab). */
 static void show_nl(const char* args) {
     const char* p = args;
@@ -3930,7 +4003,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
