@@ -3262,6 +3262,33 @@ void kernel_shell(void) {
             if (g_hist_count < 16) g_hist_count++;
         }
 
+        /* history expansion: !! = last cmd, !N = Nth most recent (1=latest) */
+        if (cmd[0] == '!' && g_hist_count > 0) {
+            int idx = -1;
+            if (cmd[1] == '!' || cmd[1] == 0) {
+                idx = (g_hist_next - 1 + 16) % 16;
+            } else {
+                int n = 0, i = 1;
+                while (cmd[i] >= '0' && cmd[i] <= '9' && i < 8) {
+                    n = n * 10 + (cmd[i] - '0'); i++;
+                }
+                if (n >= 1 && n <= g_hist_count)
+                    idx = (g_hist_next - n + 16) % 16;
+            }
+            if (idx >= 0) {
+                char exp[128];
+                int el = kstrlen(g_history[idx]);
+                if (el > 127) el = 127;
+                for (int i = 0; i < el; i++) exp[i] = g_history[idx][i];
+                exp[el] = 0;
+                kputs("! "); kputs(exp); kputs("\n");
+                for (int i = 0; i <= el; i++) cmd[i] = exp[i];
+            } else {
+                kputs("history: bad reference.\n");
+                continue;
+            }
+        }
+
         if (kstrcmp(cmd, "help") == 0 || kstrcmp(cmd, "?") == 0) {
             kputs("Commands:\n");
             kputs("  help    - Show available commands\n");
