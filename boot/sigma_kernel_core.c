@@ -4164,7 +4164,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr","expand","unexpand","tree","du","ls-r","find",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr","expand","unexpand","tree","du","ls-r","find","type",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
@@ -5547,6 +5547,53 @@ static void show_find(const char* args) {
         pat[tl < 63 ? tl : 63] = 0; rpath[0] = 0;
     }
     find_walk(rpath, pat, 0);
+}
+
+/* cmd_is_builtin — scan g_cmd_names. */
+static int cmd_is_builtin(const char* name) {
+    for (uint32_t i = 0; i < NUM_CMDS; i++)
+        if (kstrcmp(name, g_cmd_names[i]) == 0) return 1;
+    return 0;
+}
+/* which <cmd> — builtin vs on-disk lookup. */
+static void show_which(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char name[64]; int nl = 0;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = 0;
+    if (!nl) { kputs("usage: which <command>\n"); return; }
+    if (cmd_is_builtin(name)) { kputs(name); kputs(": builtin\n"); return; }
+    if (fat_ensure_mounted() != 0) return;
+    char path[160]; int pl = 0;
+    for (const char* q = g_cwd; *q && pl < 150; q++) path[pl++] = *q;
+    if (pl && path[pl-1] != '/') path[pl++] = '/';
+    for (int k = 0; k < nl && pl < 156; k++) path[pl++] = name[k];
+    path[pl] = 0;
+    struct fat_hit h;
+    int r = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                       g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                       g_vol_spc, path, &h);
+    if (r > 0) { kputs(path); kputs(": on-disk\n"); }
+    else kputs(name); kputs(": not found\n");
+}
+/* type <cmd> — alias -> builtin -> on-disk resolution. */
+static void show_type(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char name[64]; int nl = 0;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = 0;
+    if (!nl) { kputs("usage: type <command>\n"); return; }
+    for (uint32_t i = 0; i < NUM_ALIASES; i++) {
+        if (kstrcmp(name, g_aliases[i].alias) == 0) {
+            kputs(name); kputs(" is aliased to `");
+            kputs(g_aliases[i].target); kputs("'\n"); return;
+        }
+    }
+    if (cmd_is_builtin(name)) { kputs(name); kputs(" is a shell builtin\n"); return; }
+    /* fall through to disk check */
+    show_which(name);
 }
 
 #define SYS_GETCWD   17 /* ebx=buf, ecx=len -> cwd string, eax=len or -1 */
