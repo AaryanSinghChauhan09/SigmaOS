@@ -288,6 +288,7 @@ struct proc {
     uint32_t brk;        /* program break (heap top), user VA */
     uint32_t ppid;       /* parent pid, 0 = kernel shell */
     uint32_t pgid;       /* process group id (job control) */
+    uint32_t sid;        /* session id (job control) */
     uint32_t ticks;      /* scheduler ticks consumed (instrumentation) */
     uint32_t io_r, io_w; /* bytes read/written via syscalls (instrumentation) */
     uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
@@ -4342,7 +4343,7 @@ static int proc_claim(uint32_t base, const char* name, const char* cmdline,
     if (!pd) return -1;
     struct proc* p = &g_procs[idx];
     p->used = 1; p->started = 0; p->nice = 0; p->ppid = 0; p->ticks = 0;
-    p->pgid = 0;
+    p->pgid = 0; p->sid = 0;
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
@@ -4470,6 +4471,7 @@ static int proc_fork(uint32_t* regs) {
     ch->nice = par->nice;
     ch->ppid = par->pid;
     ch->pgid = par->pgid ? par->pgid : par->pid;
+    ch->sid = par->sid ? par->sid : par->pid;
     ch->ticks = par->ticks;
     ch->io_r = par->io_r; ch->io_w = par->io_w;
     ch->rlim_cur = par->rlim_cur; ch->rlim_max = par->rlim_max;
@@ -6191,6 +6193,7 @@ static void idt_init(void) {
 #define SYS_BRK      47 /* ebx=new break (user VA) or 0=query -> eax=break/-1 */
 #define SYS_GETPGID  48 /* ebx=pid(0=self) -> eax=pgid/-1 */
 #define SYS_SETPGID  49 /* ebx=pid(0=self), ecx=pgid(0=new group=pid) -> eax=pgid/-1 */
+#define SYS_SETSID   50 /* self only -> eax=new sid(pid)/-1 if already group leader */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7563,6 +7566,17 @@ void syscall_handler(uint32_t* regs) {
             rp->rlim_cur = nc; rp->rlim_max = nm;
         }
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_SETSID) {
+        if (g_cur_proc < 0 || g_cur_proc >= MAX_PROCS || !g_procs[g_cur_proc].used) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        struct proc* sp = &g_procs[g_cur_proc];
+        uint32_t curpg = sp->pgid ? sp->pgid : sp->pid;
+        if (curpg == sp->pid) { regs[7] = 0xFFFFFFFFu; return; }  /* already leader */
+        sp->pgid = sp->pid;
+        sp->sid  = sp->pid;
+        regs[7] = sp->pid;
         return;
     } else if (nr == SYS_GETPGID || nr == SYS_SETPGID) {
         uint32_t want = regs[4];
