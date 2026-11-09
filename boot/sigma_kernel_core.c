@@ -3390,6 +3390,14 @@ static const struct { const char* alias; const char* target; } g_aliases[] = {
 };
 #define NUM_ALIASES (sizeof(g_aliases)/sizeof(g_aliases[0]))
 
+/* alias — list built-in command aliases. */
+static void show_alias(void) {
+    for (uint32_t i = 0; i < NUM_ALIASES; i++) {
+        kputs("  "); kputs(g_aliases[i].alias);
+        kputs(" -> "); kputs(g_aliases[i].target); kputs("\n");
+    }
+}
+
 /* Command history ring (last 16 commands). */
 static char g_history[16][128];
 static int  g_hist_next, g_hist_count;
@@ -3416,7 +3424,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
