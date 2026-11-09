@@ -2212,15 +2212,116 @@ static void idt_init(void) {
 #define SYS_WRITE    1   /* ebx=ptr to NUL-terminated user string */
 #define SYS_GETCHAR  2   /* returns char in eax */
 #define SYS_TICKS    3   /* returns PIT tick count in eax */
+#define SYS_OPEN     4   /* ebx=path -> fd in eax (-1 err) */
+#define SYS_READ     5   /* ebx=fd, ecx=buf, edx=len -> bytes read */
+#define SYS_CLOSE    6   /* ebx=fd */
+#define SYS_SEEK     7   /* ebx=fd, ecx=offset -> 0/-1 (absolute) */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
+
+/* ---- cached FAT volume mount (computed once, shared by syscalls) ---- */
+static int      g_vol_kind = -1;        /* -1 = not mounted */
+static uint32_t g_vol_fat_lba, g_vol_data_lba;
+static uint32_t g_vol_root_clus, g_vol_root_lba, g_vol_root_secs;
+static uint8_t  g_vol_spc;
+
+static int fat_ensure_mounted(void) {
+    if (g_vol_kind >= 0) return 0;
+    if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) return -1;
+    uint8_t* me = g_sector_buf + 446;
+    uint32_t lba = (uint32_t)me[8] | ((uint32_t)me[9] << 8)
+                 | ((uint32_t)me[10] << 16) | ((uint32_t)me[11] << 24);
+    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) return -1;
+    uint8_t* b = g_sector_buf;
+    uint16_t bps   = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
+    uint8_t  spc   = b[13];
+    uint16_t rsvd  = (uint16_t)b[14] | ((uint16_t)b[15] << 8);
+    uint8_t  nfats = b[16];
+    uint16_t rent  = (uint16_t)b[17] | ((uint16_t)b[18] << 8);
+    uint16_t fsz16 = (uint16_t)b[22] | ((uint16_t)b[23] << 8);
+    uint32_t fsz32 = (uint32_t)b[36] | ((uint32_t)b[37] << 8)
+                   | ((uint32_t)b[38] << 16) | ((uint32_t)b[39] << 24);
+    uint32_t fatsz = fsz16 ? fsz16 : fsz32;
+    int is_fat32 = (rent == 0);
+    if (bps != 512 || spc == 0 || nfats == 0) return -1;
+    g_vol_spc = spc;
+    g_vol_fat_lba  = lba + rsvd;
+    g_vol_data_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+    if (is_fat32) {
+        g_vol_kind = 2;
+        g_vol_root_clus = (uint32_t)b[44] | ((uint32_t)b[45] << 8)
+                        | ((uint32_t)b[46] << 16) | ((uint32_t)b[47] << 24);
+        if (g_vol_root_clus < 2) { g_vol_kind = -1; return -1; }
+    } else {
+        uint32_t tot16 = (uint16_t)b[19] | ((uint16_t)b[20] << 8);
+        uint32_t tot32 = (uint32_t)b[32] | ((uint32_t)b[33] << 8)
+                       | ((uint32_t)b[34] << 16) | ((uint32_t)b[35] << 24);
+        uint32_t tot = tot16 ? tot16 : tot32;
+        uint32_t root_dir_secs = (uint32_t)((rent * 32 + bps - 1) / bps);
+        uint32_t data_clusters = (tot - rsvd - nfats * fatsz - root_dir_secs) / spc;
+        g_vol_kind = data_clusters < 4085 ? 0 : 1;
+        g_vol_data_lba += root_dir_secs;
+        g_vol_root_lba  = lba + rsvd + (uint32_t)nfats * fatsz;
+        g_vol_root_secs = root_dir_secs;
+    }
+    return 0;
+}
+
+/* ---- file descriptor table ---- */
+#define MAX_FDS 8
+struct fdesc {
+    int      used;
+    uint32_t start;     /* first data cluster (for seek rewind) */
+    uint32_t cluster;   /* cluster containing current position */
+    uint32_t size;
+    uint32_t pos;       /* absolute file offset */
+    uint32_t coff;      /* byte offset within current cluster's data */
+};
+static struct fdesc g_fds[MAX_FDS];
+
+static uint32_t fd_read(struct fdesc* f, uint8_t* buf, uint32_t len) {
+    uint32_t got = 0;
+    while (got < len && f->pos < f->size) {
+        if (fat_eoc_any(g_vol_kind, f->cluster)) break;  /* EOC marker */
+        uint32_t clus_lba = g_vol_data_lba + (f->cluster - 2) * g_vol_spc;
+        uint32_t in_clus  = f->coff & 511u;
+        uint32_t sec_off  = f->coff >> 9;
+        if (sec_off >= g_vol_spc) {                     /* crossed cluster */
+            f->cluster = fat_next_any(g_vol_fat_lba, g_vol_kind, f->cluster);
+            f->coff = 0;
+            continue;
+        }
+        if (ata_read_lba28(0x1F0, 0, clus_lba + sec_off, g_file_buf, 1) < 0) break;
+        uint32_t avail = 512 - in_clus;
+        uint32_t want  = len - got;
+        uint32_t n     = want < avail ? want : avail;
+        uint32_t left  = f->size - f->pos;
+        if (n > left) n = left;
+        for (uint32_t i = 0; i < n; i++) buf[got + i] = g_file_buf[in_clus + i];
+        got += n; f->pos += n; f->coff += n;
+        if (f->coff >= (uint32_t)g_vol_spc * 512u) {     /* cluster exhausted */
+            f->cluster = fat_next_any(g_vol_fat_lba, g_vol_kind, f->cluster);
+            f->coff = 0;
+        }
+    }
+    return got;
+}
+
+static int user_range_ok(const void* p, uint32_t len) {
+    if (!g_user_base) return 0;
+    uint32_t a = (uint32_t)(size_t)p;
+    uint32_t end = g_user_base + 0x400000u;
+    return a >= g_user_base && a + len <= end && a + len >= a;
+}
 
 void syscall_handler(uint32_t* regs) {
     uint32_t nr  = regs[7];
     uint32_t ret = 0;
     if (nr == SYS_WRITE) {
         volatile char* s = (volatile char*)(size_t)regs[4];
+        uint32_t limit = g_user_base ? g_user_base + 0x400000u : 0;
         for (uint32_t i = 0; i < 512; i++) {
+            if ((uint32_t)(size_t)(s + i) >= limit) break;
             char c = s[i];
             if (c == 0) break;
             kputc(c);
@@ -2231,6 +2332,68 @@ void syscall_handler(uint32_t* regs) {
         ret = g_tick_count;
     } else if (nr == SYS_EXIT) {
         kputs("\n[user] exit syscall\n");
+    } else if (nr == SYS_OPEN) {
+        volatile char* up = (volatile char*)(size_t)regs[4];
+        char path[256];
+        int pl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (pl < 255 && (uint32_t)(size_t)(up + pl) < limit && up[pl]) {
+            path[pl] = (char)up[pl]; pl++;
+        }
+        path[pl] = 0;
+        if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        struct fat_hit hit;
+        int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, path, &hit);
+        if (lr <= 0 || hit.is_dir || hit.cluster < 2 || hit.size == 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        int fd = -1;
+        for (int i = 0; i < MAX_FDS; i++) if (!g_fds[i].used) { fd = i; break; }
+        if (fd < 0) { regs[7] = 0xFFFFFFFFu; return; }
+        g_fds[fd].used = 1;
+        g_fds[fd].start = hit.cluster;
+        g_fds[fd].cluster = hit.cluster;
+        g_fds[fd].size = hit.size;
+        g_fds[fd].pos = 0;
+        g_fds[fd].coff = 0;
+        ret = (uint32_t)fd;
+    } else if (nr == SYS_READ) {
+        int fd = (int)regs[4];
+        uint8_t* buf = (uint8_t*)(size_t)regs[5];
+        uint32_t len = regs[6];
+        if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used || len > 65536
+            || !user_range_ok(buf, len)) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        ret = fd_read(&g_fds[fd], buf, len);
+    } else if (nr == SYS_CLOSE) {
+        int fd = (int)regs[4];
+        if (fd >= 0 && fd < MAX_FDS && g_fds[fd].used) {
+            g_fds[fd].used = 0;
+            ret = 0;
+        } else ret = 0xFFFFFFFFu;
+    } else if (nr == SYS_SEEK) {
+        int fd = (int)regs[4];
+        uint32_t off = regs[5];
+        if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used || off > g_fds[fd].size) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        struct fdesc* f = &g_fds[fd];
+        uint32_t csz = (uint32_t)g_vol_spc * 512u;
+        uint32_t idx = off / csz;
+        f->cluster = f->start;
+        for (uint32_t i = 0; i < idx; i++) {
+            f->cluster = fat_next_any(g_vol_fat_lba, g_vol_kind, f->cluster);
+            if (fat_eoc_any(g_vol_kind, f->cluster)) {
+                regs[7] = 0xFFFFFFFFu; return;
+            }
+        }
+        f->pos = off;
+        f->coff = off % csz;
+        ret = 0;
     } else {
         kputs("\n[syscall] unknown nr=");
         kprint_dec64(nr);
