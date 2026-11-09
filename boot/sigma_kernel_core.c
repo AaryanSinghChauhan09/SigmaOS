@@ -3200,6 +3200,19 @@ void show_distro_parity(void) {
     kputs(" * OpenBSD      : pledge() & unveil() security enforcement, W^X pages\n\n");
 }
 
+/* Command aliases — Omarchy-style opinionated shortcuts. */
+static const struct { const char* alias; const char* target; } g_aliases[] = {
+    { "ll",     "ls" },
+    { "la",     "ls" },
+    { "cls",    "clear" },
+    { "quit",   "halt" },
+    { "q",      "quit" },
+    { "sys",    "status" },
+    { "ver",    "ver" },
+    { "rm-rf",  "rm" },
+};
+#define NUM_ALIASES (sizeof(g_aliases)/sizeof(g_aliases[0]))
+
 /* Command history ring (last 16 commands). */
 static char g_history[16][128];
 static int  g_hist_next, g_hist_count;
@@ -3298,6 +3311,30 @@ void kernel_shell(void) {
             } else {
                 kputs("history: bad reference.\n");
                 continue;
+            }
+        }
+
+        /* alias expansion: first word lookup */
+        {
+            char wbuf[32];
+            int wl = 0;
+            while (cmd[wl] && cmd[wl] != ' ' && wl < 31) { wbuf[wl] = cmd[wl]; wl++; }
+            wbuf[wl] = 0;
+            for (size_t ai = 0; ai < NUM_ALIASES; ai++) {
+                if (kstrcmp(wbuf, g_aliases[ai].alias) == 0) {
+                    char exp2[160];
+                    int tl = kstrlen(g_aliases[ai].target);
+                    int cl = kstrlen(cmd);
+                    int skip = wl;
+                    while (cmd[skip] == ' ') skip++;
+                    int rest = cl - skip;
+                    if (tl + 1 + rest > 159) break;
+                    for (int i = 0; i < tl; i++) exp2[i] = g_aliases[ai].target[i];
+                    exp2[tl] = ' ';
+                    for (int i = 0; i <= rest; i++) exp2[tl + 1 + i] = cmd[skip + i];
+                    for (int i = 0; i <= tl + 1 + rest; i++) cmd[i] = exp2[i];
+                    break;
+                }
             }
         }
 
