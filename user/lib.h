@@ -44,6 +44,8 @@ enum {
     SYS_GETRLIMIT = 45,
     SYS_SETRLIMIT = 46,
     SYS_BRK = 47,
+    SYS_GETPGID = 48,
+    SYS_SETPGID = 49,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

@@ -287,6 +287,7 @@ struct proc {
     uint32_t rlim_cur, rlim_max; /* RLIMIT_NOFILE soft/hard fd limit */
     uint32_t brk;        /* program break (heap top), user VA */
     uint32_t ppid;       /* parent pid, 0 = kernel shell */
+    uint32_t pgid;       /* process group id (job control) */
     uint32_t ticks;      /* scheduler ticks consumed (instrumentation) */
     uint32_t io_r, io_w; /* bytes read/written via syscalls (instrumentation) */
     uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
@@ -4341,6 +4342,7 @@ static int proc_claim(uint32_t base, const char* name, const char* cmdline,
     if (!pd) return -1;
     struct proc* p = &g_procs[idx];
     p->used = 1; p->started = 0; p->nice = 0; p->ppid = 0; p->ticks = 0;
+    p->pgid = 0;
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
@@ -4467,6 +4469,7 @@ static int proc_fork(uint32_t* regs) {
     ch->used = 1; ch->started = 1; ch->killed = 0;
     ch->nice = par->nice;
     ch->ppid = par->pid;
+    ch->pgid = par->pgid ? par->pgid : par->pid;
     ch->ticks = par->ticks;
     ch->io_r = par->io_r; ch->io_w = par->io_w;
     ch->rlim_cur = par->rlim_cur; ch->rlim_max = par->rlim_max;
@@ -6186,6 +6189,8 @@ static void idt_init(void) {
 #define SYS_GETRLIMIT 45 /* ebx=res(0=NOFILE), ecx=user u32[2]{cur,max} -> eax=0/-1 */
 #define SYS_SETRLIMIT 46 /* ebx=res(0=NOFILE), ecx=user u32[2]{cur,max} -> eax=0/-1 */
 #define SYS_BRK      47 /* ebx=new break (user VA) or 0=query -> eax=break/-1 */
+#define SYS_GETPGID  48 /* ebx=pid(0=self) -> eax=pgid/-1 */
+#define SYS_SETPGID  49 /* ebx=pid(0=self), ecx=pgid(0=new group=pid) -> eax=pgid/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7555,6 +7560,29 @@ void syscall_handler(uint32_t* regs) {
             rp->rlim_cur = nc; rp->rlim_max = nm;
         }
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_GETPGID || nr == SYS_SETPGID) {
+        uint32_t want = regs[4];
+        int idx = -1;
+        if (want == 0) {
+            if (g_cur_proc < 0 || g_cur_proc >= MAX_PROCS) { regs[7] = 0xFFFFFFFFu; return; }
+            idx = g_cur_proc;
+        } else {
+            for (int i = 0; i < MAX_PROCS; i++)
+                if (g_procs[i].used && g_procs[i].pid == want) { idx = i; break; }
+        }
+        if (idx < 0) { regs[7] = 0xFFFFFFFFu; return; }
+        struct proc* gp = &g_procs[idx];
+        if (nr == SYS_GETPGID) { regs[7] = gp->pgid ? gp->pgid : gp->pid; return; }
+        uint32_t npg = regs[6];
+        if (npg == 0) npg = gp->pid;
+        /* pgid must reference an existing live proc (group leader exists) */
+        int leader = 0;
+        for (int i = 0; i < MAX_PROCS; i++)
+            if (g_procs[i].used && g_procs[i].pid == npg) { leader = 1; break; }
+        if (!leader) { regs[7] = 0xFFFFFFFFu; return; }
+        gp->pgid = npg;
+        regs[7] = npg;
         return;
     } else if (nr == SYS_BRK) {
         if (g_cur_proc < 0 || g_cur_proc >= MAX_PROCS || !g_procs[g_cur_proc].used) {
