@@ -49,6 +49,12 @@ static inline uint32_t inl(uint16_t port) {
     return ret;
 }
 
+static inline uint16_t inw(uint16_t port) {
+    uint16_t ret;
+    __asm__ volatile ("inw %1, %0" : "=a"(ret) : "Nd"(port));
+    return ret;
+}
+
 static inline void io_wait(void) {
     outb(0x80, 0);
 }
@@ -598,6 +604,66 @@ static void show_pci(void) {
 }
 
 /* --------------------------------------------------------------------------
+ * ATA Disk Detection (PIO IDENTIFY, ports 0x1F0/0x170)
+ * -------------------------------------------------------------------------- */
+static void ata_identify_model(uint16_t base, int slave, char out[41]) {
+    out[0] = '\0';
+    outb(base + 6, (uint8_t)(0xA0 | (slave << 4))); /* select master/slave */
+    io_wait();
+    for (volatile int i = 0; i < 1000; i++) { }     /* settle */
+
+    uint8_t st = inb(base + 7);
+    if (st == 0xFF) return;                          /* no device on this channel */
+
+    outb(base + 7, 0xEC);                            /* IDENTIFY DEVICE */
+    int ready = 0;
+    for (int spins = 0; spins < 200000; spins++) {
+        st = inb(base + 7);
+        if (st & 0x01 || st & 0x20) return;          /* ERR or DF */
+        if (!(st & 0x80) && (st & 0x08)) { ready = 1; break; } /* !BSY && DRQ */
+    }
+    if (!ready) return;
+
+    uint16_t buf[256];
+    for (int i = 0; i < 256; i++) buf[i] = inw(base);
+
+    /* Model string: words 27..46, byte-swapped pairs */
+    for (int i = 0; i < 20; i++) {
+        uint16_t w = buf[27 + i];
+        out[i * 2]     = (char)(w >> 8);
+        out[i * 2 + 1] = (char)(w & 0xFF);
+    }
+    out[40] = '\0';
+    for (int i = 39; i >= 0 && out[i] == ' '; i--) out[i] = '\0';
+    if (out[0] == '\0' || out[0] == ' ') {
+        /* all-space model means no drive responded meaningfully */
+        for (int i = 0; i < 40; i++) if (out[i] != ' ') return;
+        out[0] = '\0';
+    }
+}
+
+static void show_disk(void) {
+    static const uint16_t bases[2] = { 0x1F0, 0x170 };
+    static const char* chan[2] = { "primary", "secondary" };
+    int found = 0;
+    char model[41];
+    for (int b = 0; b < 2; b++) {
+        for (int s = 0; s < 2; s++) {
+            ata_identify_model(bases[b], s, model);
+            if (model[0] == '\0') continue;
+            kputs("disk ");
+            kputs(chan[b]);
+            kputs(s ? " slave: " : " master: ");
+            kputs(model);
+            kputs("\n");
+            found++;
+        }
+    }
+    if (!found) kputs("No ATA disks detected.\n");
+    else { kputs("ATA scan complete: "); kprint_dec64(found); kputs(" drive(s).\n"); }
+}
+
+/* --------------------------------------------------------------------------
  * Information Displays
  * -------------------------------------------------------------------------- */
 void show_banner(void) {
@@ -699,6 +765,7 @@ void kernel_shell(void) {
             kputs("  date    - Show hardware clock (RTC)\n");
             kputs("  cpu     - Show CPU vendor and features\n");
             kputs("  pci     - Scan PCI buses for devices\n");
+            kputs("  disk    - Detect ATA disks (IDENTIFY)\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -720,6 +787,8 @@ void kernel_shell(void) {
             show_cpu();
         } else if (kstrcmp(cmd, "pci") == 0) {
             show_pci();
+        } else if (kstrcmp(cmd, "disk") == 0) {
+            show_disk();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
