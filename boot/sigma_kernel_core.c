@@ -302,6 +302,16 @@ static int kcmd_is(const char* s, const char* prefix) {
     return *s == '\0' || *s == ' ';
 }
 
+/* True if s starts with prefix (no boundary requirement). */
+static int kprefix(const char* s, const char* prefix) {
+    while (*prefix) {
+        if (*s != *prefix) return 0;
+        s++;
+        prefix++;
+    }
+    return 1;
+}
+
 /* --------------------------------------------------------------------------
  * Multiboot1 Boot Information
  * -------------------------------------------------------------------------- */
@@ -793,7 +803,7 @@ static void show_fs(const char* args) {
     uint32_t lba = 0;
     const char* p = args;
     while (*p == ' ') p++;
-    if (kcmd_is(p, "lba:")) {
+    if (kprefix(p, "lba:")) {
         lba = kstrtoul(p + 4);
     } else {
         /* default: first partition's start LBA from MBR */
@@ -865,6 +875,100 @@ static void show_fs(const char* args) {
     kputs("  backup_boot="); kprint_dec64(bk_boot);
     if (root_entries == 0) { kputs("  root_cluster="); kprint_dec64(root_clus); }
     kputs("\n  detected: "); kputs(kind); kputs("\n");
+}
+
+/* --------------------------------------------------------------------------
+ * FAT12/16 Root Directory Listing
+ * -------------------------------------------------------------------------- */
+static uint8_t g_fs_buf[512 * 8]; /* up to 8 sectors of dir data */
+
+static void fat_print_name(const uint8_t* e) {
+    char name[13];
+    int n = 0;
+    for (int i = 0; i < 8 && e[i] != ' '; i++) name[n++] = (char)e[i];
+    if (e[8] != ' ') {
+        name[n++] = '.';
+        for (int i = 8; i < 11 && e[i] != ' '; i++) name[n++] = (char)e[i];
+    }
+    name[n] = '\0';
+    /* lowercase extension for readability */
+    for (int i = 0; i < n; i++) {
+        char c = name[i];
+        if (c >= 'A' && c <= 'Z') name[i] = (char)(c + 32);
+    }
+    kputs(name);
+}
+
+static void show_ls(const char* args) {
+    /* "ls [lba:<n>]" — list root dir of FAT12/16 volume (FAT32 unsupported yet) */
+    uint32_t lba = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (kprefix(p, "lba:")) {
+        lba = kstrtoul(p + 4);
+    } else {
+        /* default: first partition's start LBA from MBR */
+        if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("ls: no MBR.\n"); return; }
+        uint8_t* e = g_sector_buf + 446;
+        lba = (uint32_t)e[8] | ((uint32_t)e[9] << 8) | ((uint32_t)e[10] << 16) | ((uint32_t)e[11] << 24);
+    }
+    (void)p;
+
+    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) { kputs("ls: cannot read boot sector.\n"); return; }
+    uint8_t* b = g_sector_buf;
+    uint16_t bps   = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
+    uint8_t  spc   = b[13];
+    uint16_t rsvd  = (uint16_t)b[14] | ((uint16_t)b[15] << 8);
+    uint8_t  nfats = b[16];
+    uint16_t rent  = (uint16_t)b[17] | ((uint16_t)b[18] << 8);
+    uint16_t fsz16 = (uint16_t)b[22] | ((uint16_t)b[23] << 8);
+    uint32_t fsz32 = (uint32_t)b[36] | ((uint32_t)b[37] << 8) | ((uint32_t)b[38] << 16) | ((uint32_t)b[39] << 24);
+    uint32_t fatsz = fsz16 ? fsz16 : fsz32;
+
+    if (rent == 0) { kputs("ls: FAT32 root dir not supported yet (use fs to inspect).\n"); return; }
+    if (bps != 512) { kputs("ls: non-512-byte sectors unsupported.\n"); return; }
+    if (spc == 0) { kputs("ls: invalid sectors/cluster.\n"); return; }
+
+    uint32_t root_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+    uint32_t root_secs = ((uint32_t)rent * 32 + bps - 1) / bps;
+    if (root_secs > 8) root_secs = 8; /* cap at 4KB buffer */
+
+    /* ata_read_lba28 handles max 4 sectors per command — chunk the reads */
+    uint8_t* dst = g_fs_buf;
+    uint32_t done = 0;
+    while (done < root_secs) {
+        int chunk = (root_secs - done > 4) ? 4 : (int)(root_secs - done);
+        int n = ata_read_lba28(0x1F0, 0, root_lba + done, dst, chunk);
+        if (n < 0) { kputs("ls: cannot read root directory.\n"); return; }
+        dst += n * 512;
+        done += (uint32_t)n;
+    }
+    int total = (int)done;
+
+    int count = 0;
+    for (int i = 0; i < total * 16; i++) {
+        uint8_t* e = g_fs_buf + i * 32;
+        if (e[0] == 0x00) break;                 /* end of directory */
+        if (e[0] == 0xE5) continue;              /* deleted */
+        if (e[11] == 0x0F) continue;             /* LFN entry */
+        uint8_t attr = e[11];
+        kputs("  ");
+        if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
+        fat_print_name(e);
+        /* file size for non-dirs (offset 28, u32) */
+        if (!(attr & 0x10)) {
+            uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
+            kputs("  ");
+            kprint_dec64(sz);
+            kputs(" B");
+        }
+        kputs("\n");
+        count++;
+        if (count >= 64) { kputs("  ... (truncated)\n"); break; }
+    }
+    kputs("ls: ");
+    kprint_dec64(count);
+    kputs(" entrie(s) in FAT12/16 root dir.\n");
 }
 
 static void show_disk(void) {
@@ -994,6 +1098,7 @@ void kernel_shell(void) {
             kputs("  read    - Read disk sectors: read <lba> [n] [bus]\n");
             kputs("  part    - Show MBR partition table\n");
             kputs("  fs      - Detect FAT filesystem on partition\n");
+            kputs("  ls      - List FAT12/16 root directory\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -1023,6 +1128,8 @@ void kernel_shell(void) {
             show_partitions();
         } else if (kcmd_is(cmd, "fs")) {
             show_fs(cmd + 2);
+        } else if (kcmd_is(cmd, "ls")) {
+            show_ls(cmd + 2);
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
