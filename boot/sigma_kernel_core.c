@@ -2817,6 +2817,26 @@ static void show_tail(const char* args) {
     kfree(buf);
 }
 
+/* cowsay <msg> — classic cow message bubble. */
+static void show_cowsay(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: cowsay <msg>\n"); return; }
+    uint32_t len = kstrlen(p);
+    if (len > 200) len = 200;
+    kputs(" ");
+    for (uint32_t i = 0; i < len; i++) kputc('-');
+    kputs("\n < ");
+    for (uint32_t i = 0; i < len; i++) kputc(p[i]);
+    kputs(" >\n ");
+    for (uint32_t i = 0; i < len; i++) kputc('-');
+    kputs("\n        \\   ^__^\n"
+          "         \\  (oo)\\_______\n"
+          "            (__)\\       )\\/\\\n"
+          "                ||----w |\n"
+          "                ||     ||\n");
+}
+
 /* cal [year] [month] — Gregorian calendar via Zeller's congruence. */
 static void show_cal(const char* args) {
     const char* p = args;
@@ -3482,7 +3502,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
