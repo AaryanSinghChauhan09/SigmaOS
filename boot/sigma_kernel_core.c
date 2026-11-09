@@ -4290,6 +4290,7 @@ static void idt_init(void) {
 #define SYS_RENAME   13 /* ebx=old name, ecx=new name — rename in cwd */
 #define SYS_APPEND   14 /* ebx=name, ecx=buf, edx=len — append to file in cwd */
 #define SYS_FSTAT    15 /* ebx=fd -> eax=file size or -1 */
+#define SYS_STAT     16 /* ebx=name -> eax=file size, -1 err */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -4768,6 +4769,30 @@ void syscall_handler(uint32_t* regs) {
         int fd = (int)regs[4];
         if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used) { regs[7] = 0xFFFFFFFFu; return; }
         regs[7] = g_fds[fd].size;
+        return;
+    } else if (nr == SYS_STAT) {
+        /* ebx=name ptr -> eax=file size, -1 on error/not found */
+        volatile char* un = (volatile char*)(size_t)regs[4];
+        char kname[64];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 63 && (uint32_t)(size_t)(un + nl) < limit && un[nl]
+               && un[nl] != '/' && un[nl] != '\\') { kname[nl] = (char)un[nl]; nl++; }
+        kname[nl] = 0;
+        if (!nl || fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        /* build "cwd/name" full path for fat_lookup */
+        char full[128];
+        int fl = 0;
+        if (g_cwd[0]) { for (const char* q = g_cwd; *q && fl < 120; q++) full[fl++] = *q; }
+        if (fl && full[fl-1] != '/') full[fl++] = '/';
+        for (int i = 0; i < nl && fl < 126; i++) full[fl++] = kname[i];
+        full[fl] = 0;
+        struct fat_hit hit;
+        int r = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                           g_vol_fat_lba, g_vol_data_lba, g_vol_spc, full, &hit);
+        if (r <= 0 || hit.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
+        regs[7] = hit.size;
         return;
     } else {
         kputs("\n[syscall] unknown nr=");
