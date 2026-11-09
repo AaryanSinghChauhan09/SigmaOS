@@ -5599,6 +5599,7 @@ static void show_type(const char* args) {
 #define SYS_GETCWD   17 /* ebx=buf, ecx=len -> cwd string, eax=len or -1 */
 #define SYS_CHDIR    18 /* ebx=name -> chdir, eax=0/-1 */
 #define SYS_READDIR  19 /* ebx=buf, ecx=len -> "name\n" list, eax=bytes */
+#define SYS_READDIRX 20 /* ebx=buf, ecx=len -> "T name size\n" records, eax=bytes */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -6178,6 +6179,68 @@ void syscall_handler(uint32_t* regs) {
         for (uint32_t i = 0; i < got; i++) ub[i] = kbuf[i];
         kfree(kbuf);
         regs[7] = got;
+        return;
+    } else if (nr == SYS_READDIRX) {
+        /* ebx=buf, ecx=len -> "d|f name size\n" records for cwd entries */
+        volatile uint8_t* ub = (volatile uint8_t*)(size_t)regs[4];
+        uint32_t ulen = (uint32_t)regs[6];
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base || (uint32_t)(size_t)ub < g_user_base
+            || (uint32_t)(size_t)ub + ulen > limit || ulen < 16) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        int kind = g_vol_kind;
+        int in_root = 1;
+        uint32_t dir_cluster = 0;
+        if (g_cwd[0]) {
+            struct fat_hit dh;
+            int dr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                                g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                                g_vol_spc, g_cwd, &dh);
+            if (dr <= 0 || !dh.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
+            in_root = 0; dir_cluster = dh.cluster;
+        } else if (kind == 2) {
+            dir_cluster = g_vol_root_clus;
+        }
+        uint8_t* kbuf = (uint8_t*)kmalloc(8192);
+        if (!kbuf) { regs[7] = 0xFFFFFFFFu; return; }
+        uint32_t n = fat_collect_names(kind, in_root, dir_cluster, kbuf, 8192);
+        uint32_t out = 0, pos = 0;
+        while (pos < n && out + 160 < ulen) {
+            uint32_t ls = pos;
+            while (pos < n && kbuf[pos] != '\n') pos++;
+            uint32_t ll = pos - ls;
+            if (pos < n) pos++;
+            if (!ll) continue;
+            char nm[128];
+            if (ll > 120) ll = 120;
+            for (uint32_t k = 0; k < ll; k++) nm[k] = (char)kbuf[ls+k];
+            nm[ll] = 0;
+            char full[192]; int fl = 0;
+            for (const char* q = g_cwd; *q && fl < 180; q++) full[fl++] = *q;
+            if (fl && full[fl-1] != '/') full[fl++] = '/';
+            for (uint32_t k = 0; k < ll && fl < 188; k++) full[fl++] = nm[k];
+            full[fl] = 0;
+            struct fat_hit ch;
+            int cr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                                g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                                g_vol_spc, full, &ch);
+            int isdir = (cr > 0 && ch.is_dir);
+            uint32_t sz = (cr > 0) ? ch.size : 0;
+            /* "T name size\n" */
+            ub[out++] = isdir ? 'd' : 'f';
+            ub[out++] = ' ';
+            for (uint32_t k = 0; k < ll; k++) ub[out++] = (uint8_t)nm[k];
+            ub[out++] = ' ';
+            char num[12]; int nd = 0;
+            if (!sz) num[nd++] = '0';
+            while (sz) { num[nd++] = (char)('0' + sz % 10); sz /= 10; }
+            while (nd) ub[out++] = (uint8_t)num[--nd];
+            ub[out++] = '\n';
+        }
+        kfree(kbuf);
+        regs[7] = out;
         return;
     } else {
         kputs("\n[syscall] unknown nr=");
