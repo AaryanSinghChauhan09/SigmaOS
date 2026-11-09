@@ -349,6 +349,11 @@ static void pic_init(void);
 static void pit_init(void);
 static void show_timer(void);
 static void show_memalloc(void);
+static void show_exec(const char* args);
+static uint32_t find_user_region(void);
+static void enter_user(uint32_t eip, uint32_t esp);
+static uint32_t g_user_base;
+static uint32_t g_page_dir[1024];
 static uint32_t g_map_mb;
 
 #define MBI_FLAGS       0
@@ -1474,6 +1479,104 @@ static void show_cat(const char* args) {
     kputs(" shown)\n");
 }
 
+/* exec <path> — load a flat binary from FAT into the user region and
+ * enter ring 3 at its first byte. Entry = base+0x1000, stack near top.
+ * File format: raw position-dependent code, max ~2 MiB. */
+#define EXEC_LOAD_OFF 0x1000u
+#define EXEC_STACK_OFF 0x300000u
+#define EXEC_MAX_SIZE  0x200000u
+
+static void show_exec(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: exec <file>\n"); return; }
+    char namebuf[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = '\0';
+
+    /* --- resolve FAT volume (same geometry logic as cat) --- */
+    uint32_t lba = 0;
+    if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("exec: no MBR.\n"); return; }
+    uint8_t* me = g_sector_buf + 446;
+    lba = (uint32_t)me[8] | ((uint32_t)me[9] << 8) | ((uint32_t)me[10] << 16) | ((uint32_t)me[11] << 24);
+    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) { kputs("exec: cannot read boot sector.\n"); return; }
+    uint8_t* b = g_sector_buf;
+    uint16_t bps   = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
+    uint8_t  spc   = b[13];
+    uint16_t rsvd  = (uint16_t)b[14] | ((uint16_t)b[15] << 8);
+    uint8_t  nfats = b[16];
+    uint16_t rent  = (uint16_t)b[17] | ((uint16_t)b[18] << 8);
+    uint16_t fsz16 = (uint16_t)b[22] | ((uint16_t)b[23] << 8);
+    uint32_t fsz32 = (uint32_t)b[36] | ((uint32_t)b[37] << 8) | ((uint32_t)b[38] << 16) | ((uint32_t)b[39] << 24);
+    uint32_t fatsz = fsz16 ? fsz16 : fsz32;
+    int is_fat32 = (rent == 0);
+    if (bps != 512 || spc == 0) { kputs("exec: unsupported geometry.\n"); return; }
+    uint32_t fat_lba  = lba + rsvd;
+    uint32_t data_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+    int kind;
+    uint32_t root_clus = 0, root_lba = 0, root_secs = 0;
+    if (is_fat32) {
+        kind = 2;
+        root_clus = (uint32_t)b[44] | ((uint32_t)b[45] << 8) | ((uint32_t)b[46] << 16) | ((uint32_t)b[47] << 24);
+        if (root_clus < 2) { kputs("exec: invalid FAT32 root cluster.\n"); return; }
+    } else {
+        uint32_t tot16 = (uint16_t)b[19] | ((uint16_t)b[20] << 8);
+        uint32_t tot32 = (uint32_t)b[32] | ((uint32_t)b[33] << 8) | ((uint32_t)b[34] << 16) | ((uint32_t)b[35] << 24);
+        uint32_t tot = tot16 ? tot16 : tot32;
+        uint32_t root_dir_secs = (uint32_t)((rent * 32 + bps - 1) / bps);
+        uint32_t data_clusters = (tot - rsvd - nfats * fatsz - root_dir_secs) / spc;
+        kind = data_clusters < 4085 ? 0 : 1;
+        data_lba += root_dir_secs;
+        root_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+        root_secs = root_dir_secs;
+    }
+
+    struct fat_hit hit;
+    int lr = fat_lookup(kind, root_clus, root_lba, root_secs,
+                        fat_lba, data_lba, spc, namebuf, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("exec: file not found.\n"); return; }
+    if (hit.size == 0 || hit.size > EXEC_MAX_SIZE) {
+        kputs("exec: bad size (0 or >2MiB).\n"); return;
+    }
+
+    /* --- user region --- */
+    if (!g_user_base) {
+        g_user_base = find_user_region();
+        if (!g_user_base) { kputs("exec: no free user region.\n"); return; }
+    }
+    uint32_t pde = g_user_base >> 22;
+    g_page_dir[pde] |= 0x4u;
+    __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
+
+    /* --- copy file cluster chain into user memory at base+0x1000 --- */
+    uint8_t* dst = (uint8_t*)(size_t)(g_user_base + EXEC_LOAD_OFF);
+    uint32_t remaining = hit.size;
+    uint32_t clus = hit.cluster;
+    int guard = 0;
+    while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 1024 && remaining > 0) {
+        uint32_t clus_lba = data_lba + (clus - 2) * spc;
+        for (uint32_t s = 0; s < spc && remaining > 0; s++) {
+            if (ata_read_lba28(0x1F0, 0, clus_lba + s, g_file_buf, 1) < 0) {
+                kputs("exec: read error.\n"); return;
+            }
+            uint32_t chunk = remaining > 512 ? 512 : remaining;
+            for (uint32_t i = 0; i < chunk; i++) dst[i] = g_file_buf[i];
+            dst += chunk;
+            remaining -= chunk;
+        }
+        clus = fat_next_any(fat_lba, kind, clus);
+    }
+
+    kputs("exec: loaded ");
+    kprint_dec64(hit.size - remaining);
+    kputs(" bytes -> ring3 @");
+    kprint_hex32(g_user_base + EXEC_LOAD_OFF);
+    kputs("\n");
+
+    enter_user(g_user_base + EXEC_LOAD_OFF, g_user_base + EXEC_STACK_OFF);
+}
+
 static void show_disk(void) {
     static const uint16_t bases[2] = { 0x1F0, 0x170 };
     static const char* chan[2] = { "primary", "secondary" };
@@ -1607,6 +1710,7 @@ void kernel_shell(void) {
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
             kputs("  user    - Drop to ring 3 test program\n");
+            kputs("  exec    - Run flat binary: exec <file>\n");
             kputs("  timer   - Show PIT tick count\n");
             kputs("  memalloc- Page allocator test/status\n");
             kputs("  clear   - Clear the console screen\n");
@@ -1650,6 +1754,8 @@ void kernel_shell(void) {
             show_gdt();
         } else if (kstrcmp(cmd, "user") == 0) {
             show_user();
+        } else if (kcmd_is(cmd, "exec")) {
+            show_exec(cmd + 4);
         } else if (kstrcmp(cmd, "timer") == 0) {
             show_timer();
         } else if (kstrcmp(cmd, "memalloc") == 0) {
