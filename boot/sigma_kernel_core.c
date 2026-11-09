@@ -1254,15 +1254,12 @@ static void show_cd(const char* args) {
     kputs("\n");
 }
 
-/* df — filesystem usage: scan FAT for free (zero) cluster entries. */
-static void show_df(void) {
-    if (fat_ensure_mounted() != 0) { kputs("df: no FAT volume.\n"); return; }
+/* fat_free_clusters — count free FAT entries (0 on read error). */
+static uint32_t fat_free_clusters(void) {
     uint32_t fat_bytes = g_vol_fatsz * 512u;
-    if (fat_bytes == 0 || fat_bytes > 0x400000u) {
-        kputs("df: FAT too large to scan.\n"); return;
-    }
+    if (fat_bytes == 0 || fat_bytes > 0x400000u) return 0;
     uint8_t* fat = (uint8_t*)kmalloc(fat_bytes);
-    if (!fat) { kputs("df: out of memory.\n"); return; }
+    if (!fat) return 0;
     uint32_t done = 0;
     int fail = 0;
     while (done < g_vol_fatsz) {
@@ -1271,22 +1268,21 @@ static void show_df(void) {
         if (n < 0) { fail = 1; break; }
         done += (uint32_t)n;
     }
-    if (fail) { kfree(fat); kputs("df: FAT read error.\n"); return; }
-
+    if (fail) { kfree(fat); return 0; }
     uint32_t free_clusters = 0;
     uint32_t limit = g_vol_total_clusters < 2 ? 0 : g_vol_total_clusters;
-    if (g_vol_kind == 2) {           /* FAT32: u32 entries, mask 0x0FFFFFFF */
+    if (g_vol_kind == 2) {
         for (uint32_t c = 2; c < limit; c++) {
             uint32_t v = (uint32_t)fat[c*4] | ((uint32_t)fat[c*4+1] << 8)
                        | ((uint32_t)fat[c*4+2] << 16) | ((uint32_t)fat[c*4+3] << 24);
             if ((v & 0x0FFFFFFFu) == 0) free_clusters++;
         }
-    } else if (g_vol_kind == 1) {    /* FAT16: u16 entries */
+    } else if (g_vol_kind == 1) {
         for (uint32_t c = 2; c < limit; c++) {
             uint16_t v = (uint16_t)fat[c*2] | ((uint16_t)fat[c*2+1] << 8);
             if (v == 0) free_clusters++;
         }
-    } else {                          /* FAT12: packed 12-bit entries */
+    } else {
         for (uint32_t c = 2; c < limit; c++) {
             uint32_t off = c + (c >> 1);
             if (off + 1 >= fat_bytes) break;
@@ -1297,7 +1293,14 @@ static void show_df(void) {
         }
     }
     kfree(fat);
+    return free_clusters;
+}
 
+/* df — filesystem usage: free clusters via fat_free_clusters(). */
+static void show_df(void) {
+    if (fat_ensure_mounted() != 0) { kputs("df: no FAT volume.\n"); return; }
+    uint32_t free_clusters = fat_free_clusters();
+    uint32_t limit = g_vol_total_clusters < 2 ? 0 : g_vol_total_clusters;
     uint64_t clus_bytes = (uint64_t)g_vol_spc * 512u;
     uint64_t total_b = (uint64_t)(limit > 2 ? limit - 2 : 0) * clus_bytes;
     uint64_t free_b  = (uint64_t)free_clusters * clus_bytes;
@@ -5600,6 +5603,7 @@ static void show_type(const char* args) {
 #define SYS_CHDIR    18 /* ebx=name -> chdir, eax=0/-1 */
 #define SYS_READDIR  19 /* ebx=buf, ecx=len -> "name\n" list, eax=bytes */
 #define SYS_READDIRX 20 /* ebx=buf, ecx=len -> "T name size\n" records, eax=bytes */
+#define SYS_STATFS   21 /* ebx=buf -> 3xu32 {free,total,clus_bytes}, eax=12/-1 */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -6241,6 +6245,23 @@ void syscall_handler(uint32_t* regs) {
         }
         kfree(kbuf);
         regs[7] = out;
+        return;
+    } else if (nr == SYS_STATFS) {
+        /* ebx=buf -> u32 free_clusters, u32 total_clusters, u32 clus_bytes */
+        volatile uint8_t* ub = (volatile uint8_t*)(size_t)regs[4];
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base || (uint32_t)(size_t)ub < g_user_base
+            || (uint32_t)(size_t)ub + 12 > limit) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        uint32_t total = g_vol_total_clusters > 2 ? g_vol_total_clusters - 2 : 0;
+        uint32_t freec = fat_free_clusters();
+        uint32_t cb = (uint32_t)g_vol_spc * 512u;
+        ub[0]=freec&0xFF; ub[1]=(freec>>8)&0xFF; ub[2]=(freec>>16)&0xFF; ub[3]=(freec>>24)&0xFF;
+        ub[4]=total&0xFF; ub[5]=(total>>8)&0xFF; ub[6]=(total>>16)&0xFF; ub[7]=(total>>24)&0xFF;
+        ub[8]=cb&0xFF;   ub[9]=(cb>>8)&0xFF;   ub[10]=(cb>>16)&0xFF; ub[11]=(cb>>24)&0xFF;
+        regs[7] = 12;
         return;
     } else {
         kputs("\n[syscall] unknown nr=");
