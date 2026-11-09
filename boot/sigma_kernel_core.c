@@ -2767,6 +2767,48 @@ static void show_head(const char* args) {
     kfree(buf);
 }
 
+/* tail <file> [n] — print last n lines (default 10, ≤4KB file). */
+static void show_tail(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: tail <file> [n]\n"); return; }
+    char namebuf[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+    while (*p == ' ') p++;
+    uint32_t want = *p ? kstrtoul(p) : 10;
+    if (!want || want > 1000) want = 10;
+
+    if (fat_ensure_mounted() != 0) { kputs("tail: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("tail: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                        g_vol_fat_lba, g_vol_data_lba, g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("tail: not found.\n"); return; }
+
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("tail: out of memory.\n"); return; }
+    int got = fat_read_to_buf(kind, g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
+                              hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs("tail: read error.\n"); return; }
+
+    /* find start of last `want` lines: scan backwards for nth '\n' */
+    int start = got;
+    uint32_t seen = 0;
+    for (int i = got - 1; i >= 0 && seen < want; i--) {
+        if (buf[i] == '\n') { seen++; if (seen == want) { start = i + 1; break; } }
+    }
+    if (seen < want) start = 0;
+    for (int i = start; i < got; i++) kputc((char)buf[i]);
+    kfree(buf);
+}
+
 /* wc <file> — line/word/byte counts (≤4KB file). */
 static void show_wc(const char* args) {
     const char* p = args;
@@ -3361,7 +3403,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head",
+    "fastfetch","whoami","uname","which","sleep","head","tail",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
