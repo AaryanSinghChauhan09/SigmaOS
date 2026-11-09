@@ -286,6 +286,9 @@ struct proc {
     int      nice;       /* -20..19, lower = higher priority */
     uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
     uint32_t out_pipe;   /* 0 or pipe idx+1 — stdout sink */
+    char     out_name[64];      /* '>'/'>>' target, empty = console */
+    uint32_t out_len;           /* bytes captured in out_buf */
+    char     out_buf[8192];     /* capture buffer, flushed on exit */
     int      started;    /* 0 = needs enter_user, 1 = resume via ctx */
     uint32_t pid;
     uint32_t base;       /* user region base (4MiB aligned) */
@@ -4321,6 +4324,7 @@ static int proc_claim(uint32_t base, const char* name,
     struct proc* p = &g_procs[idx];
     p->used = 1; p->started = 0; p->nice = 0;
     p->in_pipe = p->out_pipe = 0;
+    p->out_name[0] = 0; p->out_len = 0;
     p->pid = (uint32_t)g_next_pid++;
     p->base = base; p->pd = pd;
     p->entry = entry; p->esp0 = esp0;
@@ -4344,6 +4348,69 @@ static void proc_load_ctx(struct proc* p) {
     for (int i = 0; i < 8; i++) g_user_ctx[i] = p->ctx[i];
     g_user_eip = p->eip; g_user_cs = p->cs; g_user_eflags = p->eflags;
     g_user_esp = p->esp; g_user_ss = p->ss;
+}
+
+/* create/overwrite a file in cwd from a kernel buffer (redirect flush).
+ * Mirrors SYS_WRITE_FILE semantics but takes a kernel-side buffer. */
+static int kernel_write_file(const char* name, const uint8_t* data, uint32_t len) {
+    if (!name[0] || len > 0x100000u) return -1;
+    if (fat_ensure_mounted() != 0) return -1;
+    int kind = g_vol_kind;
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit dh;
+        int dlr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                             g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                             g_vol_spc, g_cwd, &dh);
+        if (dlr <= 0 || !dh.is_dir) return -1;
+        in_root = 0; dir_cluster = dh.cluster;
+    }
+    uint8_t want[11];
+    fat_name_to_83(name, want);
+    struct slot_res slot;
+    int sr = fat_find_dir_slot(kind, in_root, g_vol_root_clus,
+                               g_vol_root_lba, g_vol_root_secs, dir_cluster,
+                               g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
+                               want, &slot);
+    if (sr < 0 && slot.status == -1) return -1;
+    uint32_t clus_bytes = (uint32_t)g_vol_spc * 512u;
+    uint32_t nclus = (len + clus_bytes - 1) / clus_bytes;
+    uint32_t clus;
+    if (slot.status == 1) {
+        clus = fat_alloc_chain(kind, nclus);
+        if (!clus) return -1;
+    } else {
+        if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) return -1;
+        uint8_t* e = g_file_buf + slot.off;
+        if (e[11] & 0x10) return -1;
+        uint32_t old = fat_dirent_cluster(kind, e);
+        if (old >= 2) fat_free_chain(kind, old);
+        clus = fat_alloc_chain(kind, nclus);
+        if (!clus) return -1;
+    }
+    uint32_t remaining = len, boff = 0;
+    uint32_t cur = clus;
+    while (remaining > 0 && cur >= 2) {
+        uint32_t lba = g_vol_data_lba + (cur - 2) * g_vol_spc + boff / 512;
+        uint32_t soff = boff % 512;
+        if (blk_read_lba(lba, g_file_buf, 1) < 0) return -1;
+        uint32_t chunk = 512 - soff;
+        if (chunk > remaining) chunk = remaining;
+        for (uint32_t i = 0; i < chunk; i++)
+            g_file_buf[soff + i] = data[(len - remaining) + i];
+        if (blk_write_lba(lba, g_file_buf, 1) < 0) return -1;
+        boff += chunk; remaining -= chunk;
+        if (boff >= clus_bytes) { boff = 0; cur = fat_next_any(g_vol_fat_lba, kind, cur); }
+    }
+    /* fix dirent size + timestamp (same layout as SYS_WRITE_FILE tail) */
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) return -1;
+    uint8_t* e = g_file_buf + slot.off;
+    e[28] = (uint8_t)len; e[29] = (uint8_t)(len >> 8);
+    e[30] = (uint8_t)(len >> 16); e[31] = (uint8_t)(len >> 24);
+    e[20] = 0x20; /* archive */
+    if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) return -1;
+    return 0;
 }
 
 /* run proc idx until it exits or is preempted; returns on either */
@@ -4382,6 +4449,12 @@ static void proc_run(int idx) {
             int zi = 0;
             while (p->name[zi] && zi < 31) { g_zombies[z].name[zi] = p->name[zi]; zi++; }
             g_zombies[z].name[zi] = 0;
+        }
+        if (p->out_name[0] && p->out_len) {
+            if (kernel_write_file(p->out_name, (const uint8_t*)p->out_buf, p->out_len) == 0)
+                klog("sched: redirect flushed\n");
+            else
+                klog("sched: redirect flush failed\n");
         }
         p->used = 0; p->killed = 0;
         g_user_dead = 0;
@@ -4486,6 +4559,28 @@ static void exec_spawn(const char* args, int bg, uint32_t in_pipe, uint32_t out_
     int al2 = 0;
     while (args[al2] && al2 < 255) { argbuf[al2] = args[al2]; al2++; }
     argbuf[al2] = 0;
+    /* output redirect: rightmost '>' or '>>' splits target filename */
+    char out_name[64]; int out_append = 0;
+    out_name[0] = 0;
+    {
+        int gt = -1, app = 0;
+        for (int i = 0; argbuf[i]; i++) {
+            if (argbuf[i] == '>' ) {
+                if (argbuf[i+1] == '>') { gt = i; app = 1; i++; }
+                else { gt = i; app = 0; }
+            }
+        }
+        if (gt >= 0) {
+            char* fn = argbuf + gt + (app ? 2 : 1);
+            while (*fn == ' ') fn++;
+            int fl = 0;
+            while (fn[fl] && fn[fl] != ' ' && fl < 63) { out_name[fl] = fn[fl]; fl++; }
+            out_name[fl] = 0;
+            argbuf[gt] = 0;
+            out_append = app;
+            if (!out_name[0]) { kputs("exec: missing redirect target\n"); return; }
+        }
+    }
     const char* p = argbuf;
     while (*p == ' ') p++;
     if (!*p) { kputs("usage: exec <file> [&]\n"); return; }
@@ -4625,6 +4720,26 @@ static void exec_spawn(const char* args, int bg, uint32_t in_pipe, uint32_t out_
     if (pidx < 0) { kputs("exec: process table full or PD alloc failed.\n"); return; }
     g_procs[pidx].in_pipe  = in_pipe;
     g_procs[pidx].out_pipe = out_pipe;
+    if (out_name[0]) {
+        int oi = 0;
+        while (out_name[oi] && oi < 63) { g_procs[pidx].out_name[oi] = out_name[oi]; oi++; }
+        g_procs[pidx].out_name[oi] = 0;
+        /* '>>' preloads existing file content (bounded by capture cap) */
+        if (out_append && fat_ensure_mounted() == 0) {
+            struct fat_hit eh;
+            char rp[160];
+            if (fs_resolve(out_name, rp, (int)sizeof rp) == 0 &&
+                fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                           g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                           g_vol_spc, rp, &eh) > 0 && !eh.is_dir && eh.size > 0) {
+                uint32_t pre = eh.size < 8192 ? eh.size : 8192;
+                if (fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                                    g_vol_spc, eh.cluster, pre,
+                                    (uint8_t*)g_procs[pidx].out_buf) == (int)pre)
+                    g_procs[pidx].out_len = pre;
+            }
+        }
+    }
     kputs("exec: pid ");
     kprint_dec64(g_procs[pidx].pid);
     kputs(bg ? " [bg]\n" : " [fg]\n");
@@ -6585,6 +6700,19 @@ void syscall_handler(uint32_t* regs) {
             if (nr == SYS_WRITE) regs[2] = len;
             regs[7] = pipe_write(g_procs[g_cur_proc].out_pipe - 1,
                                  (const uint8_t*)(size_t)regs[1], len);
+            return;
+        }
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used
+            && g_procs[g_cur_proc].out_name[0]) {
+            struct proc* op = &g_procs[g_cur_proc];
+            uint32_t len = (nr == SYS_WRITE) ? kstrlen((const char*)(size_t)regs[1]) : regs[2];
+            uint32_t room = 8192 - op->out_len;
+            uint32_t n = len < room ? len : room;
+            const uint8_t* src = (const uint8_t*)(size_t)regs[1];
+            if (!user_range_ok((const void*)(size_t)regs[1], len < room ? len : room)) n = 0;
+            for (uint32_t i = 0; i < n; i++) op->out_buf[op->out_len + i] = (char)src[i];
+            op->out_len += n;
+            regs[7] = len;   /* report full len; overflow silently capped */
             return;
         }
     }
