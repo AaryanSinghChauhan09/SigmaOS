@@ -4715,9 +4715,22 @@ static void load_boot_script(void) {
     kputs("[boot] running BOOT.CMD (startup script)\n");
 }
 
+static void shell_erase_line(char* cmd, size_t* len) {
+    while (*len > 0) { (*len)--; kputc('\b'); kputc(' '); kputc('\b'); }
+    cmd[0] = 0;
+}
+static void shell_load_hist(char* cmd, size_t* len, int idx) {
+    shell_erase_line(cmd, len);
+    int i = 0;
+    while (g_history[idx][i] && i < 127) { cmd[i] = g_history[idx][i]; kputc(cmd[i]); i++; }
+    cmd[i] = 0;
+    *len = (size_t)i;
+}
+
 void kernel_shell(void) {
     char cmd[128];
     size_t len = 0;
+    int hist_nav = -1;   /* -1 = not browsing; else history slot index */
 
     vga_set_color(0x0A, 0x00);
     kputs("Welcome to SigmaOS Sovereign Kernel. Type 'help' for commands.\n\n");
@@ -4756,7 +4769,29 @@ void kernel_shell(void) {
                 kputs("^C\n");
                 len = 0;
                 break;
+            } else if (c == 1) {           /* Up: older history */
+                if (g_hist_count > 0) {
+                    if (hist_nav < 0) hist_nav = (g_hist_next - 1 + 16) % 16;
+                    else {
+                        int oldest = (g_hist_next - g_hist_count + 16) % 16;
+                        if (hist_nav != oldest)
+                            hist_nav = (hist_nav - 1 + 16) % 16;
+                    }
+                    shell_load_hist(cmd, &len, hist_nav);
+                }
+            } else if (c == 2) {           /* Down: newer history */
+                if (hist_nav >= 0) {
+                    int nxt = (hist_nav + 1) % 16;
+                    if (nxt == g_hist_next) {
+                        hist_nav = -1;
+                        shell_erase_line(cmd, &len);
+                    } else {
+                        hist_nav = nxt;
+                        shell_load_hist(cmd, &len, hist_nav);
+                    }
+                }
             } else if (c >= 32 && c <= 126 && len < sizeof(cmd) - 1) {
+                hist_nav = -1;
                 cmd[len++] = c;
                 kputc(c);
             }
@@ -4764,6 +4799,7 @@ void kernel_shell(void) {
 
         if (len == 0) continue;
 
+        hist_nav = -1;
         /* history ring buffer (last 16 commands) */
         {
             int n = kstrlen(cmd);
@@ -7041,6 +7077,13 @@ void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry
             irq_skip_ext = 1;
         } else if (irq_skip_ext) {
             irq_skip_ext = 0;
+            /* extended keys: arrows -> sentinels for line editor */
+            if (!(sc & 0x80)) {
+                if (sc == 0x48) c = 1;        /* Up    */
+                else if (sc == 0x50) c = 2;   /* Down  */
+                else if (sc == 0x4B) c = 3;   /* Left  */
+                else if (sc == 0x4D) c = 4;   /* Right */
+            }
         } else if (!(sc & 0x80)) {
             c = scancode_ascii[sc & 0x7F];
         }
