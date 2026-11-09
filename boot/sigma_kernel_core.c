@@ -285,6 +285,7 @@ struct proc {
     int      killed;     /* SIGKILL-style: freed at next schedule point */
     int      nice;       /* -20..19, lower = higher priority */
     uint32_t ppid;       /* parent pid, 0 = kernel shell */
+    uint32_t ticks;      /* scheduler ticks consumed (instrumentation) */
     uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
     uint32_t out_pipe;   /* 0 or pipe idx+1 — stdout sink */
     char     out_name[64];      /* '>'/'>>' target, empty = console */
@@ -4332,7 +4333,7 @@ static int proc_claim(uint32_t base, const char* name,
     uint32_t pd = proc_build_pd(base);
     if (!pd) return -1;
     struct proc* p = &g_procs[idx];
-    p->used = 1; p->started = 0; p->nice = 0; p->ppid = 0;
+    p->used = 1; p->started = 0; p->nice = 0; p->ppid = 0; p->ticks = 0;
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
@@ -4448,6 +4449,7 @@ static int proc_fork(uint32_t* regs) {
     ch->used = 1; ch->started = 1; ch->killed = 0;
     ch->nice = par->nice;
     ch->ppid = par->pid;
+    ch->ticks = par->ticks;
     ch->pid = (uint32_t)g_next_pid++;
     ch->base = base; ch->pd = pd;
     ch->entry = par->entry; ch->esp0 = par->esp0;
@@ -8021,6 +8023,8 @@ void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry
             g_user_eflags = frame[11];
             g_user_esp    = frame[12];
             g_user_ss     = frame[13];
+            if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS)
+                g_procs[g_cur_proc].ticks++;
             g_preempt_pending = 1;
             klog("sched: user preempted\n");
             kputs("\n[sched] user preempted — 'fg' to resume\n");
