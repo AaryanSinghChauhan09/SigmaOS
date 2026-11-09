@@ -35,12 +35,21 @@ void _start(void) {
     }
     u32 eip = regs[8];
     u32 word = ptrace3(1, child, eip, 0);  /* PEEKTEXT at child eip */
+    /* SINGLESTEP: child is stopped; step one insn -> auto-stops via #DB */
+    u32 step_ok = 0;
+    if (ptrace3(6, child, 0, 0) == 0) {
+        sc3(SYS_SLEEP, 30, 0, 0);
+        u32 r2[10];
+        if (ptrace3(3, child, (u32)r2, 0) == 0 && r2[8] != eip) step_ok = 1;
+    }
     ptrace3(5, child, 0, 0);               /* CONT before exit */
     int ok = (eip != 0 && word != 0 && word != 0xFFFFFFFFu);
     outs("ptrace: child eip=0x");
     /* print eip hex */
     { char hx[9]; for (int d = 7; d >= 0; d--) { int nib=(eip>>(d*4))&15; hx[7-d]=(char)(nib<10?'0'+nib:'a'+nib-10); } hx[8]=0; outs(hx); }
-    outs(ok ? " word ok\n" : " word BAD\n");
+    outs(ok ? " word ok" : " word BAD");
+    outs(step_ok ? " step ok\n" : " step FAIL\n");
+    ok = ok && step_ok;
     sc3(SYS_KILL, child, 0, 0);
     sc3(SYS_EXIT, ok ? 0 : 1, 0, 0); __builtin_unreachable();
 }

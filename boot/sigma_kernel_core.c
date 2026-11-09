@@ -291,6 +291,7 @@ struct proc {
     uint32_t sid;        /* session id (job control) */
     int      traced;     /* ptrace: being traced by parent */
     int      stopped;    /* ptrace: suspended by tracer (scheduler skips) */
+    int      sstep;     /* ptrace: single-step armed (TF set on resume) */
     uint32_t ticks;      /* scheduler ticks consumed (instrumentation) */
     uint32_t io_r, io_w; /* bytes read/written via syscalls (instrumentation) */
     uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
@@ -4345,7 +4346,7 @@ static int proc_claim(uint32_t base, const char* name, const char* cmdline,
     if (!pd) return -1;
     struct proc* p = &g_procs[idx];
     p->used = 1; p->started = 0; p->nice = 0; p->ppid = 0; p->ticks = 0;
-    p->pgid = 0; p->sid = 0; p->traced = 0; p->stopped = 0;
+    p->pgid = 0; p->sid = 0; p->traced = 0; p->stopped = 0; p->sstep = 0;
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
@@ -4475,7 +4476,7 @@ static int proc_fork(uint32_t* regs) {
     ch->pgid = par->pgid ? par->pgid : par->pid;
     ch->sid = par->sid ? par->sid : par->pid;
     ch->traced = par->traced;
-    ch->stopped = 0;
+    ch->stopped = 0; ch->sstep = 0;
     ch->ticks = par->ticks;
     ch->io_r = par->io_r; ch->io_w = par->io_w;
     ch->rlim_cur = par->rlim_cur; ch->rlim_max = par->rlim_max;
@@ -5953,6 +5954,8 @@ static idt_entry_t g_idt[256] __attribute__((section(".bss")));
 static idtr_t      g_idtr __attribute__((section(".bss")));
 
 void isr_common(uint32_t* frame);
+static volatile uint32_t g_isr_kernel = 0;    /* set by isr_common: return to kernel ctx */
+static volatile uint32_t g_isr_frame_dw = 5;  /* exception frame size in dwords */
 
 __asm__(
     ".section .text\n"
@@ -5961,6 +5964,20 @@ __asm__(
     "    movl %esp, %eax\n"
     "    pushl %eax\n"
     "    call isr_common\n"
+    "    cmpl $0, g_isr_kernel\n"
+    "    je 1f\n"
+    "    addl $4, %esp\n"               /* drop saved frame ptr */
+    "    movl g_isr_frame_dw, %eax\n"
+    "    lea (%esp,%eax,4), %esp\n"     /* drop whole exception frame */
+    "    pushl $0x10\n"
+    "    movl g_resume_esp, %eax\n"
+    "    pushl %eax\n"
+    "    pushl $0x202\n"
+    "    pushl $0x08\n"
+    "    movl g_resume_eip, %eax\n"
+    "    pushl %eax\n"
+    "    iret\n"
+    "1:\n"
     "    cli\n"
     "    hlt\n"
     "    jmp .\n"
@@ -5976,7 +5993,16 @@ __asm__(
     "    jmp isr_common_entry\n"
     ".endm\n"
     /* vectors without CPU error code */
-    "ISR_NOERR 0\n" "ISR_NOERR 1\n" "ISR_NOERR 2\n" "ISR_NOERR 3\n"
+    "ISR_NOERR 0\n"
+    /* #DB: save full user context for ptrace single-step.
+     * pushal first -> frame[2..9] = ctx regs, frame[10..12] = eip/cs/eflags */
+    ".globl isr_1\n"
+    "isr_1:\n"
+    "    pushal\n"
+    "    pushl $0\n"
+    "    pushl $1\n"
+    "    jmp isr_common_entry\n"
+    "ISR_NOERR 2\n" "ISR_NOERR 3\n"
     "ISR_NOERR 4\n" "ISR_NOERR 5\n" "ISR_NOERR 6\n" "ISR_NOERR 7\n"
     "ISR_ERR   8\n"
     "ISR_NOERR 9\n"
@@ -6082,6 +6108,24 @@ void isr_common(uint32_t* frame) {
         "#VC VMM comm", "#SX security"
     };
     uint32_t vec = frame[0];
+    g_isr_frame_dw = 5;
+    /* ptrace single-step: #DB after one instruction in a traced proc.
+     * isr_1 pushed full ctx: frame[2..9]=regs, frame[10]=eip, 11=cs, 12=eflags */
+    if (vec == 1 && g_cur_proc >= 0 && g_cur_proc < MAX_PROCS
+        && g_procs[g_cur_proc].used && g_procs[g_cur_proc].sstep) {
+        struct proc* sp = &g_procs[g_cur_proc];
+        sp->sstep = 0;
+        for (int i = 0; i < 8; i++) sp->ctx[i] = frame[2 + i];
+        sp->eip    = frame[10];
+        sp->cs     = frame[11];
+        sp->eflags = frame[12] & ~0x100u;   /* clear TF */
+        sp->esp    = frame[5];               /* pushal esp slot = user esp */
+        sp->ss     = 0x23;
+        sp->stopped = 1;
+        g_isr_kernel = 1;
+        g_isr_frame_dw = 13;
+        return;
+    }
     uint32_t err = frame[1];
     uint32_t eip = frame[2];
     uint32_t cs  = frame[3];
@@ -7602,6 +7646,21 @@ void syscall_handler(uint32_t* regs) {
             for (int i = 0; i < 8; i++) o[i] = tp->ctx[i];
             o[8] = tp->started ? tp->eip : tp->entry;
             o[9] = tp->esp;
+            regs[7] = 0;
+            return;
+        }
+        if (req == 6) {                        /* SINGLESTEP: child must be stopped */
+            uint32_t tpid = regs[6];
+            int t = -1;
+            for (int i = 0; i < MAX_PROCS; i++)
+                if (g_procs[i].used && g_procs[i].pid == tpid) { t = i; break; }
+            if (t < 0) { regs[7] = 0xFFFFFFFFu; return; }
+            struct proc* tp = &g_procs[t];
+            if (tp->ppid != me->pid && tpid != me->pid) { regs[7] = 0xFFFFFFFFu; return; }
+            if (!tp->stopped) { regs[7] = 0xFFFFFFFFu; return; }
+            tp->sstep = 1;
+            tp->eflags |= 0x100u;               /* TF */
+            tp->stopped = 0;
             regs[7] = 0;
             return;
         }
