@@ -17890,14 +17890,14 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mintupdate"
-description = "SigmaOS software update manager inspired by mintupdate"
+description = "Mint-inspired update policy and backend-reported update lifecycle; no repository or package operations"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mintupdate"
 engine = "update_checker"
 category = "Package Management"
 language = "rust"
 visibility = "public"
 canonical_branch = "main"
-depends_on = ["SigmaOS-system"]
+depends_on = ["SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-ml"
