@@ -1856,7 +1856,10 @@ static int fat_find_dir_slot(int kind, int in_root,
                     if (!seen_free) { seen_free = 1; free_lba = lba; free_off = (uint32_t)(i * 32); }
                     continue;
                 }
-                if (fat_name_eq(e, want)) { r->status = -1; return -1; }
+                if (fat_name_eq(e, want)) {
+                    r->lba = lba; r->off = (uint32_t)(i * 32); r->status = -1;
+                    return -1;
+                }
             }
         }
         if (in_root && kind != 2) break;
@@ -2039,6 +2042,121 @@ static void show_write(const char* args) {
     kputs(" (");
     kprint_dec64(tlen);
     kputs(" bytes)\n");
+}
+
+/* Free an entire cluster chain: zero every FAT entry, write FAT back.
+ * Walks the chain on an in-memory copy of the FAT. Returns 0 ok, -1 fail. */
+static int fat_free_chain(int kind, uint32_t start) {
+    if (fat_ensure_mounted() != 0 || start < 2) return -1;
+    uint32_t fat_bytes = g_vol_fatsz * 512u;
+    if (fat_bytes == 0 || fat_bytes > 0x400000u) return -1;
+    uint8_t* fat = (uint8_t*)kmalloc(fat_bytes);
+    if (!fat) return -1;
+    uint32_t done = 0;
+    int fail = 0;
+    while (done < g_vol_fatsz) {
+        int chunk = (g_vol_fatsz - done > 4) ? 4 : (int)(g_vol_fatsz - done);
+        int n = ata_read_lba28(0x1F0, 0, g_vol_fat_lba + done, fat + done * 512u, chunk);
+        if (n < 0) { fail = 1; break; }
+        done += (uint32_t)n;
+    }
+    if (fail) { kfree(fat); return -1; }
+
+    /* next-cluster decode operating on the FAT image */
+    uint32_t clus = start;
+    int guard = 0;
+    while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 4096) {
+        uint32_t nxt;
+        if (kind == 2) {
+            uint32_t o = clus * 4;
+            nxt = ((uint32_t)fat[o] | ((uint32_t)fat[o+1] << 8)
+                 | ((uint32_t)fat[o+2] << 16) | ((uint32_t)fat[o+3] << 24))
+                  & 0x0FFFFFFFu;
+            fat[o] = fat[o+1] = fat[o+2] = fat[o+3] = 0;
+        } else if (kind == 1) {
+            uint32_t o = clus * 2;
+            nxt = (uint16_t)fat[o] | ((uint16_t)fat[o+1] << 8);
+            fat[o] = fat[o+1] = 0;
+        } else {
+            uint32_t o = clus + (clus >> 1);
+            uint16_t v = (uint16_t)fat[o] | ((uint16_t)fat[o+1] << 8);
+            nxt = (clus & 1) ? (uint16_t)((v >> 4) & 0x0FFF)
+                            : (uint16_t)(v & 0x0FFF);
+            /* zero the 12-bit entry, preserve the packed neighbour:
+             * even c: entry = fat[o] + low nibble of fat[o+1]
+             * odd  c: entry = high nibble of fat[o] + fat[o+1] */
+            if (clus & 1) { fat[o] &= 0x0F; fat[o+1] = 0; }
+            else           { fat[o] = 0;     fat[o+1] &= 0xF0; }
+        }
+        clus = nxt;
+    }
+
+    /* write entire FAT back (simplest correct policy for v1) */
+    done = 0;
+    while (done < g_vol_fatsz) {
+        int chunk = (g_vol_fatsz - done > 4) ? 4 : (int)(g_vol_fatsz - done);
+        if (ata_write_lba28(0x1F0, 0, g_vol_fat_lba + done, fat + done * 512u, chunk) < 0) {
+            kfree(fat); return -1;
+        }
+        done += (uint32_t)chunk;
+    }
+    kfree(fat);
+    return 0;
+}
+
+/* rm <name> — delete a file in the current directory: free its cluster
+ * chain and mark the directory entry deleted (0xE5). Files only. */
+static void show_rm(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char name[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = '\0';
+    if (!nl) { kputs("usage: rm <file>\n"); return; }
+
+    if (fat_ensure_mounted() != 0) { kputs("rm: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit hit;
+        int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &hit);
+        if (lr <= 0 || !hit.is_dir) { kputs("rm: cwd not a directory.\n"); return; }
+        in_root = 0;
+        dir_cluster = hit.cluster;
+    }
+
+    uint8_t want[11];
+    fat_name_to_83(name, want);
+    struct slot_res slot;
+    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                      g_vol_data_lba, g_vol_spc, want, &slot);
+    if (slot.status != -1) { kputs("rm: not found.\n"); return; }
+
+    /* read the dirent to get attr + cluster */
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("rm: read error.\n"); return;
+    }
+    uint8_t* e = g_file_buf + slot.off;
+    if (e[11] & 0x10) { kputs("rm: is a directory (rmdir not implemented).\n"); return; }
+    uint32_t clus = (uint32_t)e[20] | ((uint32_t)e[21] << 8);
+    if (kind == 2) clus |= ((uint32_t)e[26] << 16) | ((uint32_t)e[27] << 24);
+
+    if (clus >= 2 && fat_free_chain(kind, clus) != 0) {
+        kputs("rm: FAT update failed.\n"); return;
+    }
+    e[0] = 0xE5;                                     /* mark deleted */
+    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("rm: dirent write failed.\n"); return;
+    }
+    kputs("rm: deleted /");
+    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+    kputs(name);
+    kputs("\n");
 }
 
 static void show_cat(const char* args) {
@@ -2438,6 +2556,7 @@ void kernel_shell(void) {
             kputs("  df      - Show filesystem free space\n");
             kputs("  mkdir   - Create directory: mkdir <name>\n");
             kputs("  write   - Create file: write <name> <text>\n");
+            kputs("  rm      - Delete file: rm <name>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -2493,6 +2612,8 @@ void kernel_shell(void) {
             show_mkdir(cmd + 5);
         } else if (kcmd_is(cmd, "write")) {
             show_write(cmd + 5);
+        } else if (kcmd_is(cmd, "rm")) {
+            show_rm(cmd + 2);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
