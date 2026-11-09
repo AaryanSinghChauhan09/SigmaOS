@@ -50,11 +50,10 @@ impl PledgePromise {
 
     /// Activate the pledge (can only be done once)
     pub fn activate(&self) -> Result<(), PledgeError> {
-        if self.active.load(Ordering::SeqCst) {
-            return Err(PledgeError::AlreadyActive);
-        }
-        self.active.store(true, Ordering::SeqCst);
-        Ok(())
+        self.active
+            .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+            .map(|_| ())
+            .map_err(|_| PledgeError::AlreadyActive)
     }
 
     /// Check if permission is allowed
@@ -133,6 +132,16 @@ impl PledgeManager {
 
     /// Unveil filesystem paths to restrict access (sigma_unveil)
     pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), PledgeError> {
+        if !is_canonical_absolute_path(path) {
+            return Err(PledgeError::Violation);
+        }
+        if permissions.is_empty()
+            || !permissions
+                .bytes()
+                .all(|permission| matches!(permission, b'r' | b'w' | b'x'))
+        {
+            return Err(PledgeError::InvalidPermission);
+        }
         self.unveiled_paths.push(UnveilEntry {
             path: path.to_string(),
             permissions: permissions.to_string(),
@@ -150,6 +159,12 @@ impl PledgeManager {
     pub fn validate_unveil_access(&self, path: &str, requested_perm: char) -> bool {
         if self.unveiled_paths.is_empty() {
             return true; // No unveil restrictions — allow all.
+        }
+
+        if !is_canonical_absolute_path(path)
+            || !matches!(requested_perm, 'r' | 'w' | 'x')
+        {
+            return false;
         }
 
         // Reject null bytes — they can truncate paths in C-ABI syscall interop.
@@ -285,6 +300,19 @@ impl PledgeManager {
     pub fn gate(&self) -> &CapabilityGate {
         &self.gate
     }
+}
+
+/// Accept only canonical absolute paths so policy and request paths use the
+/// same spelling during prefix and boundary checks.
+fn is_canonical_absolute_path(path: &str) -> bool {
+    path.starts_with('/')
+        && !path.as_bytes().contains(&0)
+        && !path.contains('\\')
+        && !path.contains("//")
+        && (path == "/" || !path.ends_with('/'))
+        && !path
+            .split('/')
+            .any(|segment| segment == "." || segment == "..")
 }
 
 impl Default for PledgeManager {
