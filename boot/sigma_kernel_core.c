@@ -1001,6 +1001,79 @@ static void show_fs(const char* args) {
  * -------------------------------------------------------------------------- */
 static uint8_t g_fs_buf[512 * 8]; /* up to 8 sectors of dir data */
 
+/* ---- LFN (long filename) support ----
+ * LFN entries (attr 0x0F) precede their short entry, stored tail-first.
+ * ord = e[0]&0x1F (1-based fragment index); bit6 marks the last fragment.
+ * 13 UCS-2 chars per entry: idx0-4 @off1, idx5-10 @off14, idx11-12 @off28.
+ * Fragment ord n occupies name chars (n-1)*13 .. n*13-1. */
+static int fat_lfn_char(const uint8_t* e, int idx) {
+    uint32_t off = (idx < 5) ? (1 + idx * 2)
+                 : (idx < 11) ? (14 + (idx - 5) * 2)
+                 : (28 + (idx - 11) * 2);
+    uint16_t u = (uint16_t)e[off] | ((uint16_t)e[off + 1] << 8);
+    if (u == 0x0000 || u == 0xFFFF) return -1;
+    if (u > 0x7F) return '?';
+    return (u >= 'a' && u <= 'z') ? (int)(u - 32) : (int)u;
+}
+
+/* Short-name checksum used to bind LFN entries to their 8.3 entry. */
+static uint8_t fat_lfn_cksum(const uint8_t* s11) {
+    uint8_t sum = 0;
+    for (int i = 0; i < 11; i++) {
+        sum = (uint8_t)(((sum & 1) ? 0x80 : 0) + (sum >> 1) + s11[i]);
+    }
+    return sum;
+}
+
+/* Case-insensitive compare of assembled LFN (already upper-folded) vs raw name. */
+static int fat_lfn_match(const char* lfn, const char* name) {
+    int i = 0;
+    for (; name[i] && lfn[i]; i++) {
+        char c = name[i];
+        if (c >= 'a' && c <= 'z') c -= 32;
+        if (lfn[i] != c) return 0;
+    }
+    return name[i] == '\0' && lfn[i] == '\0';
+}
+
+/* Per-scan LFN accumulator state (resets after each short entry). */
+struct lfn_acc {
+    char     name[256];
+    uint8_t  ck;
+    int      active;
+};
+
+static void lfn_acc_reset(struct lfn_acc* a) {
+    for (int i = 0; i < 256; i++) a->name[i] = 0;
+    a->ck = 0;
+    a->active = 0;
+}
+
+/* Feed one dir entry; returns 1 if it was an LFN entry consumed. */
+static int lfn_acc_feed(struct lfn_acc* a, const uint8_t* e) {
+    if (e[11] != 0x0F) return 0;
+    if (e[0] & 0x80) return 1;              /* erased LFN: skip silently */
+    int ord = e[0] & 0x1F;
+    if (ord < 1 || ord > 20) return 1;
+    a->ck = e[13];
+    a->active = 1;
+    int base = (ord - 1) * 13;
+    for (int c = 0; c < 13 && base + c < 255; c++) {
+        int ch = fat_lfn_char(e, c);
+        if (ch < 0) break;
+        a->name[base + c] = (char)ch;
+    }
+    return 1;
+}
+
+/* Does the pending LFN match this short entry? Verifies checksum first. */
+static int lfn_acc_match(struct lfn_acc* a, const uint8_t* short_e,
+                         const char* want_name) {
+    if (!a->active || !want_name || !want_name[0]) return 0;
+    if (a->ck != fat_lfn_cksum(short_e)) return 0;
+    return fat_lfn_match(a->name, want_name);
+}
+
 static void fat_print_name(const uint8_t* e) {
     char name[13];
     int n = 0;
@@ -1106,6 +1179,8 @@ static void show_ls(const char* args) {
         int count = 0;
         uint32_t clus = root_clus;
         int guard = 0;
+        struct lfn_acc lfn;
+        lfn_acc_reset(&lfn);
         while (clus >= 2 && !fat_is_eoc32(clus) && guard++ < 64 && count < 128) {
             uint32_t clus_lba = data_lba + (clus - 2) * spc;
             /* read up to 8 sectors (one cluster max for typical spc<=8) */
@@ -1124,12 +1199,14 @@ static void show_ls(const char* args) {
             for (int i = 0; i < entries; i++) {
                 uint8_t* e = g_fs_buf + i * 32;
                 if (e[0] == 0x00) { stop = 1; break; }
-                if (e[0] == 0xE5) continue;
-                if (e[11] == 0x0F) continue;
+                if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+                if (lfn_acc_feed(&lfn, e)) continue;
                 uint8_t attr = e[11];
+                int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
                 kputs("  ");
                 if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
-                fat_print_name(e);
+                if (use_lfn) kputs(lfn.name); else fat_print_name(e);
+                lfn_acc_reset(&lfn);
                 if (!(attr & 0x10)) {
                     uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
                     kputs("  ");
@@ -1167,15 +1244,19 @@ static void show_ls(const char* args) {
     int total = (int)done;
 
     int count = 0;
+    struct lfn_acc lfn;
+    lfn_acc_reset(&lfn);
     for (int i = 0; i < total * 16; i++) {
         uint8_t* e = g_fs_buf + i * 32;
         if (e[0] == 0x00) break;                 /* end of directory */
-        if (e[0] == 0xE5) continue;              /* deleted */
-        if (e[11] == 0x0F) continue;             /* LFN entry */
+        if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+        if (lfn_acc_feed(&lfn, e)) continue;
         uint8_t attr = e[11];
+        int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
         kputs("  ");
         if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
-        fat_print_name(e);
+        if (use_lfn) kputs(lfn.name); else fat_print_name(e);
+        lfn_acc_reset(&lfn);
         /* file size for non-dirs (offset 28, u32) */
         if (!(attr & 0x10)) {
             uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
@@ -1267,78 +1348,6 @@ static int fat_eoc_any(int kind, uint32_t c) {
     return c >= (uint32_t)fat_eoc(kind == 0);
 }
 
-/* ---- LFN (long filename) support ----
- * LFN entries (attr 0x0F) precede their short entry, stored tail-first.
- * ord = e[0]&0x1F (1-based fragment index); bit6 marks the last fragment.
- * 13 UCS-2 chars per entry: idx0-4 @off1, idx5-10 @off14, idx11-12 @off28.
- * Fragment ord n occupies name chars (n-1)*13 .. n*13-1. */
-static int fat_lfn_char(const uint8_t* e, int idx) {
-    uint32_t off = (idx < 5) ? (1 + idx * 2)
-                 : (idx < 11) ? (14 + (idx - 5) * 2)
-                 : (28 + (idx - 11) * 2);
-    uint16_t u = (uint16_t)e[off] | ((uint16_t)e[off + 1] << 8);
-    if (u == 0x0000 || u == 0xFFFF) return -1;
-    if (u > 0x7F) return '?';
-    return (u >= 'a' && u <= 'z') ? (int)(u - 32) : (int)u;
-}
-
-/* Short-name checksum used to bind LFN entries to their 8.3 entry. */
-static uint8_t fat_lfn_cksum(const uint8_t* s11) {
-    uint8_t sum = 0;
-    for (int i = 0; i < 11; i++) {
-        sum = (uint8_t)(((sum & 1) ? 0x80 : 0) + (sum >> 1) + s11[i]);
-    }
-    return sum;
-}
-
-/* Case-insensitive compare of assembled LFN (already upper-folded) vs raw name. */
-static int fat_lfn_match(const char* lfn, const char* name) {
-    int i = 0;
-    for (; name[i] && lfn[i]; i++) {
-        char c = name[i];
-        if (c >= 'a' && c <= 'z') c -= 32;
-        if (lfn[i] != c) return 0;
-    }
-    return name[i] == '\0' && lfn[i] == '\0';
-}
-
-/* Per-scan LFN accumulator state (resets after each short entry). */
-struct lfn_acc {
-    char     name[256];
-    uint8_t  ck;
-    int      active;
-};
-
-static void lfn_acc_reset(struct lfn_acc* a) {
-    for (int i = 0; i < 256; i++) a->name[i] = 0;
-    a->ck = 0;
-    a->active = 0;
-}
-
-/* Feed one dir entry; returns 1 if it was an LFN entry consumed. */
-static int lfn_acc_feed(struct lfn_acc* a, const uint8_t* e) {
-    if (e[11] != 0x0F) return 0;
-    if (e[0] & 0x80) return 1;              /* erased LFN: skip silently */
-    int ord = e[0] & 0x1F;
-    if (ord < 1 || ord > 20) return 1;
-    a->ck = e[13];
-    a->active = 1;
-    int base = (ord - 1) * 13;
-    for (int c = 0; c < 13 && base + c < 255; c++) {
-        int ch = fat_lfn_char(e, c);
-        if (ch < 0) break;
-        a->name[base + c] = (char)ch;
-    }
-    return 1;
-}
-
-/* Does the pending LFN match this short entry? Verifies checksum first. */
-static int lfn_acc_match(struct lfn_acc* a, const uint8_t* short_e,
-                         const char* want_name) {
-    if (!a->active || !want_name || !want_name[0]) return 0;
-    if (a->ck != fat_lfn_cksum(short_e)) return 0;
-    return fat_lfn_match(a->name, want_name);
-}
 
 /* Scan a cluster-chain directory for an 8.3 or LFN name.
  * want_name: raw path component for LFN comparison (NULL = 8.3 only).
@@ -1391,6 +1400,8 @@ static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
                             uint32_t data_lba, uint8_t spc) {
     uint32_t clus = start_cluster;
     int count = 0, guard = 0;
+    struct lfn_acc lfn;
+    lfn_acc_reset(&lfn);
     while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 64 && count < 128) {
         uint32_t clus_lba = data_lba + (clus - 2) * spc;
         uint32_t secs = spc > 8 ? 8 : spc;
@@ -1408,12 +1419,15 @@ static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
         for (int i = 0; i < entries; i++) {
             uint8_t* e = g_fs_buf + i * 32;
             if (e[0] == 0x00) { stop = 1; break; }
-            if (e[0] == 0xE5) continue;
-            if (e[11] == 0x0F) continue;
+            if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+            if (lfn_acc_feed(&lfn, e)) continue;
             uint8_t attr = e[11];
+            /* prefer assembled LFN when checksum binds it to this entry */
+            int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
             kputs("  ");
             if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
-            fat_print_name(e);
+            if (use_lfn) kputs(lfn.name); else fat_print_name(e);
+            lfn_acc_reset(&lfn);
             if (!(attr & 0x10)) {
                 uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
                 kputs("  ");
