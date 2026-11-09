@@ -5604,6 +5604,7 @@ static void show_type(const char* args) {
 #define SYS_READDIR  19 /* ebx=buf, ecx=len -> "name\n" list, eax=bytes */
 #define SYS_READDIRX 20 /* ebx=buf, ecx=len -> "T name size\n" records, eax=bytes */
 #define SYS_STATFS   21 /* ebx=buf -> 3xu32 {free,total,clus_bytes}, eax=12/-1 */
+#define SYS_UNAME    22 /* ebx=buf, ecx=len -> uname string, eax=len/-1 */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -6262,6 +6263,21 @@ void syscall_handler(uint32_t* regs) {
         ub[4]=total&0xFF; ub[5]=(total>>8)&0xFF; ub[6]=(total>>16)&0xFF; ub[7]=(total>>24)&0xFF;
         ub[8]=cb&0xFF;   ub[9]=(cb>>8)&0xFF;   ub[10]=(cb>>16)&0xFF; ub[11]=(cb>>24)&0xFF;
         regs[7] = 12;
+        return;
+    } else if (nr == SYS_UNAME) {
+        /* ebx=buf, ecx=len -> "SigmaOS sigmaos 0.1.0 i386 GNU/Linux" */
+        static const char uname_str[] = "SigmaOS sigmaos 0.1.0 i386 GNU/Linux";
+        volatile uint8_t* ub = (volatile uint8_t*)(size_t)regs[4];
+        uint32_t ulen = (uint32_t)regs[6];
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base || (uint32_t)(size_t)ub < g_user_base
+            || (uint32_t)(size_t)ub + ulen > limit || ulen < 8) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        uint32_t n = sizeof(uname_str) - 1;
+        if (n > ulen) n = ulen;
+        for (uint32_t i = 0; i < n; i++) ub[i] = (uint8_t)uname_str[i];
+        regs[7] = (int)n;
         return;
     } else {
         kputs("\n[syscall] unknown nr=");
