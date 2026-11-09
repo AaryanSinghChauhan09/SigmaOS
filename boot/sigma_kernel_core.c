@@ -785,6 +785,88 @@ static void show_partitions(void) {
     if (!found) kputs("MBR present but no partitions defined.\n");
 }
 
+/* --------------------------------------------------------------------------
+ * FAT Boot-Sector Recognizer (FAT12/16/32 heuristics)
+ * -------------------------------------------------------------------------- */
+static void show_fs(const char* args) {
+    /* args: optional partition number 1-4 or LBA override "lba:<n>" — default: scan MBR part1 */
+    uint32_t lba = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (kcmd_is(p, "lba:")) {
+        lba = kstrtoul(p + 4);
+    } else {
+        /* default: first partition's start LBA from MBR */
+        if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) {
+            kputs("fs: cannot read MBR.\n");
+            return;
+        }
+        if (g_sector_buf[510] != 0x55 || g_sector_buf[511] != 0xAA) {
+            kputs("fs: no MBR; treating disk as superfloppy, using lba 0.\n");
+            lba = 0;
+        } else {
+            uint8_t* e = g_sector_buf + 446;
+            lba = (uint32_t)e[8] | ((uint32_t)e[9] << 8) | ((uint32_t)e[10] << 16) | ((uint32_t)e[11] << 24);
+            if (lba == 0) { kputs("fs: first partition empty; trying superfloppy lba 0.\n"); }
+        }
+    }
+
+    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) {
+        kputs("fs: cannot read boot sector at lba=");
+        kprint_dec64(lba);
+        kputs(".\n");
+        return;
+    }
+    uint8_t* b = g_sector_buf;
+    kputs("fs: boot sector @ lba=");
+    kprint_dec64(lba);
+    kputs("  jump=");
+    kprint_hex32pad(b[0], 2);
+    kprint_hex32pad(b[1], 2);
+    kputs("  oem='");
+    for (int i = 3; i < 11; i++) kputc((b[i] >= 32 && b[i] <= 126) ? (char)b[i] : '.');
+    kputs("'\n");
+
+    if (b[510] != 0x55 || b[511] != 0xAA) {
+        kputs("fs: WARNING no 0x55AA signature — probably not FAT.\n");
+        return;
+    }
+    uint16_t bytes_per_sec = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
+    uint8_t  sec_per_clus  = b[13];
+    uint16_t reserved      = (uint16_t)b[14] | ((uint16_t)b[15] << 8);
+    uint8_t  num_fats      = b[16];
+    uint16_t root_entries  = (uint16_t)b[17] | ((uint16_t)b[18] << 8);
+    uint16_t tot16         = (uint16_t)b[19] | ((uint16_t)b[20] << 8);
+    uint8_t  media         = b[21];
+    uint16_t fat_sz16      = (uint16_t)b[22] | ((uint16_t)b[23] << 8);
+    uint32_t tot32         = (uint32_t)b[32] | ((uint32_t)b[33] << 8) | ((uint32_t)b[34] << 16) | ((uint32_t)b[35] << 24);
+    uint32_t fat_sz32      = (uint32_t)b[36] | ((uint32_t)b[37] << 8) | ((uint32_t)b[38] << 16) | ((uint32_t)b[39] << 24);
+    uint16_t fs_ver        = (uint16_t)b[42] | ((uint16_t)b[43] << 8);
+    uint32_t root_clus     = (uint32_t)b[44] | ((uint32_t)b[45] << 8) | ((uint32_t)b[46] << 16) | ((uint32_t)b[47] << 24);
+    uint16_t fs_info       = (uint16_t)b[48] | ((uint16_t)b[49] << 8);
+    uint16_t bk_boot       = (uint16_t)b[50] | ((uint16_t)b[51] << 8);
+
+    const char* kind = "FAT12/16";
+    uint32_t tot = tot16 ? tot16 : tot32;
+    uint32_t fat_sz = fat_sz16 ? fat_sz16 : fat_sz32;
+    if (root_entries == 0 && fs_ver == 0) kind = "FAT32";
+    else if (root_entries == 0) kind = "FAT32?";
+    else if (tot > 65525) kind = "FAT32?";
+
+    kputs("  bytes/sec="); kprint_dec64(bytes_per_sec);
+    kputs("  sec/clus="); kprint_dec64(sec_per_clus);
+    kputs("  reserved="); kprint_dec64(reserved);
+    kputs("  fats="); kprint_dec64(num_fats);
+    kputs("  root_entries="); kprint_dec64(root_entries);
+    kputs("  media=0x"); kprint_hex32pad(media, 2);
+    kputs("\n  total_sectors="); kprint_dec64(tot);
+    kputs("  fat_size="); kprint_dec64(fat_sz);
+    kputs("  fs_info="); kprint_dec64(fs_info);
+    kputs("  backup_boot="); kprint_dec64(bk_boot);
+    if (root_entries == 0) { kputs("  root_cluster="); kprint_dec64(root_clus); }
+    kputs("\n  detected: "); kputs(kind); kputs("\n");
+}
+
 static void show_disk(void) {
     static const uint16_t bases[2] = { 0x1F0, 0x170 };
     static const char* chan[2] = { "primary", "secondary" };
@@ -911,6 +993,7 @@ void kernel_shell(void) {
             kputs("  disk    - Detect ATA disks (IDENTIFY)\n");
             kputs("  read    - Read disk sectors: read <lba> [n] [bus]\n");
             kputs("  part    - Show MBR partition table\n");
+            kputs("  fs      - Detect FAT filesystem on partition\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -938,6 +1021,8 @@ void kernel_shell(void) {
             show_read(cmd + 4);
         } else if (kstrcmp(cmd, "part") == 0 || kstrcmp(cmd, "fdisk") == 0) {
             show_partitions();
+        } else if (kcmd_is(cmd, "fs")) {
+            show_fs(cmd + 2);
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
