@@ -289,6 +289,9 @@ struct proc {
     char     out_name[64];      /* '>'/'>>' target, empty = console */
     uint32_t out_len;           /* bytes captured in out_buf */
     char     out_buf[8192];     /* capture buffer, flushed on exit */
+    int      in_file;           /* '<' redirect active */
+    uint32_t in_len, in_pos;    /* input buffer bounds/cursor */
+    char     in_buf[8192];      /* '<' file content, ≤8KiB */
     int      started;    /* 0 = needs enter_user, 1 = resume via ctx */
     uint32_t pid;
     uint32_t base;       /* user region base (4MiB aligned) */
@@ -4325,6 +4328,7 @@ static int proc_claim(uint32_t base, const char* name,
     p->used = 1; p->started = 0; p->nice = 0;
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
+    p->in_file = 0; p->in_len = p->in_pos = 0;
     p->pid = (uint32_t)g_next_pid++;
     p->base = base; p->pd = pd;
     p->entry = entry; p->esp0 = esp0;
@@ -4559,6 +4563,24 @@ static void exec_spawn(const char* args, int bg, uint32_t in_pipe, uint32_t out_
     int al2 = 0;
     while (args[al2] && al2 < 255) { argbuf[al2] = args[al2]; al2++; }
     argbuf[al2] = 0;
+    /* input redirect: rightmost '<' splits source filename */
+    char in_name[64]; in_name[0] = 0;
+    {
+        int lt = -1;
+        for (int i = 0; argbuf[i]; i++)
+            if (argbuf[i] == '<') { lt = i; break; }   /* first '<' wins */
+        if (lt >= 0) {
+            char* fn = argbuf + lt + 1;
+            while (*fn == ' ') fn++;
+            int fl = 0;
+            while (fn[fl] && fl < 63) { in_name[fl] = fn[fl]; fl++; }
+            in_name[fl] = 0;
+            /* strip trailing spaces inside captured name */
+            while (fl > 0 && in_name[fl-1] == ' ') in_name[--fl] = 0;
+            argbuf[lt] = 0;
+            if (!in_name[0]) { kputs("exec: missing input file\n"); return; }
+        }
+    }
     /* output redirect: rightmost '>' or '>>' splits target filename */
     char out_name[64]; int out_append = 0;
     out_name[0] = 0;
@@ -4720,6 +4742,23 @@ static void exec_spawn(const char* args, int bg, uint32_t in_pipe, uint32_t out_
     if (pidx < 0) { kputs("exec: process table full or PD alloc failed.\n"); return; }
     g_procs[pidx].in_pipe  = in_pipe;
     g_procs[pidx].out_pipe = out_pipe;
+    if (in_name[0]) {
+        g_procs[pidx].in_file = 1;
+        if (fat_ensure_mounted() == 0) {
+            struct fat_hit ih;
+            char irp[160];
+            if (fs_resolve(in_name, irp, (int)sizeof irp) == 0 &&
+                fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                           g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                           g_vol_spc, irp, &ih) > 0 && !ih.is_dir && ih.size > 0) {
+                uint32_t pre = ih.size < 8192 ? ih.size : 8192;
+                if (fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                                    g_vol_spc, ih.cluster, pre,
+                                    (uint8_t*)g_procs[pidx].in_buf) == (int)pre)
+                    g_procs[pidx].in_len = pre;
+            }
+        }
+    }
     if (out_name[0]) {
         int oi = 0;
         while (out_name[oi] && oi < 63) { g_procs[pidx].out_name[oi] = out_name[oi]; oi++; }
@@ -6745,6 +6784,13 @@ void syscall_handler(uint32_t* regs) {
             uint8_t ch;
             regs[7] = pipe_read(g_procs[g_cur_proc].in_pipe - 1, &ch, 1);
             regs[7] = regs[7] ? ch : 0xFFFFFFFFu;
+            return;
+        }
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used
+            && g_procs[g_cur_proc].in_file) {
+            struct proc* ip = &g_procs[g_cur_proc];
+            if (ip->in_pos >= ip->in_len) { regs[7] = (uint32_t)-2; return; }  /* EOF */
+            regs[7] = (uint8_t)ip->in_buf[ip->in_pos++];
             return;
         }
         ret = (uint8_t)kgetc();
