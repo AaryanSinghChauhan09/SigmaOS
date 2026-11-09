@@ -801,6 +801,152 @@ static void show_pci(void) {
 }
 
 /* --------------------------------------------------------------------------
+ * virtio-blk legacy PCI driver (transitional virtio-pci, polling queue).
+ * QEMU: -device virtio-blk-pci (legacy mode). Identity-mapped memory.
+ * -------------------------------------------------------------------------- */
+#define VIRTIO_VENDOR    0x1AF4u
+#define VIRTIO_DEV_BLK   0x1001u
+
+/* legacy virtio-pci register offsets (IO BAR) */
+#define VP_HOST_FEATS    0x00   /* u32 r  */
+#define VP_GUEST_FEATS   0x04   /* u32 w  */
+#define VP_QUEUE_PFN     0x08   /* u32 w  */
+#define VP_QUEUE_NUM_MAX 0x0C   /* u16 r  */
+#define VP_QUEUE_SEL     0x0E   /* u16 w  */
+#define VP_QUEUE_NOTIFY  0x10   /* u16 w  */
+#define VP_STATUS        0x12   /* u8  rw */
+#define VP_ISR           0x13   /* u8  r  */
+#define VP_DEV_CFG       0x14   /* device config */
+
+static uint16_t g_vio_port;
+static uint64_t g_vio_capacity;
+static int      g_vio_ok;
+
+/* virtqueue: 16 descs x 16B = 256B at base, avail after desc, used @4K.
+ * Using VQ_NUM=128 descriptors max per request. */
+#define VQ_NUM      128
+#define VQ_DESC_SZ  (VQ_NUM * 16)
+#define VQ_AVAIL_SZ (6 + VQ_NUM * 2)
+#define VQ_USED_OFF 4096
+static uint8_t g_vq[8192] __attribute__((aligned(4096), section(".bss")));
+
+static uint8_t  vp_inb(uint16_t o)  { return inb((uint16_t)(g_vio_port + o)); }
+static uint16_t vp_inw(uint16_t o)  { return inw((uint16_t)(g_vio_port + o)); }
+static uint32_t vp_inl(uint16_t o)  { return inl((uint16_t)(g_vio_port + o)); }
+static void vp_outb(uint16_t o, uint8_t v)  { outb((uint16_t)(g_vio_port + o), v); }
+static void vp_outw(uint16_t o, uint16_t v) { outw((uint16_t)(g_vio_port + o), v); }
+static void vp_outl(uint16_t o, uint32_t v) { outl((uint16_t)(g_vio_port + o), v); }
+
+static void virtio_probe(void) {
+    g_vio_ok = 0;
+    for (uint32_t bus = 0; bus < 256 && !g_vio_ok; bus++) {
+        for (uint32_t dev = 0; dev < 32 && !g_vio_ok; dev++) {
+            for (uint32_t fn = 0; fn < 8 && !g_vio_ok; fn++) {
+                if (fn > 0) {
+                    uint32_t h = pci_read32((uint8_t)bus, (uint8_t)dev, 0, 0x0C);
+                    if (!((h >> 16) & 0x80)) break;
+                }
+                uint32_t id = pci_read32((uint8_t)bus, (uint8_t)dev, (uint8_t)fn, 0x00);
+                if ((id & 0xFFFF) != VIRTIO_VENDOR) continue;
+                if (((id >> 16) & 0xFFFF) != VIRTIO_DEV_BLK) continue;
+                uint32_t bar0 = pci_read32((uint8_t)bus, (uint8_t)dev, (uint8_t)fn, 0x10);
+                if ((bar0 & 1) == 0) continue;
+                g_vio_port = (uint16_t)(bar0 & 0xFFFFFFFCu);
+                vp_outb(VP_STATUS, 0x03);              /* ACK | DRIVER */
+                uint32_t feats = vp_inl(VP_HOST_FEATS);
+                vp_outl(VP_GUEST_FEATS, feats);
+                vp_outw(VP_QUEUE_SEL, 0);
+                if (vp_inw(VP_QUEUE_NUM_MAX) < VQ_NUM) { g_vio_port = 0; break; }
+                for (int i = 0; i < (int)sizeof g_vq; i++) g_vq[i] = 0;
+                vp_outl(VP_QUEUE_PFN, (uint32_t)(size_t)g_vq >> 12);
+                vp_outb(VP_STATUS, 0x0B);              /* + FEATURES_OK */
+                if (!(vp_inb(VP_STATUS) & 0x08)) { g_vio_port = 0; break; }
+                vp_outb(VP_STATUS, 0x0F);              /* + DRIVER_OK */
+                g_vio_capacity = (uint64_t)vp_inl(VP_DEV_CFG + 4) << 32
+                               | (uint64_t)vp_inl(VP_DEV_CFG);
+                g_vio_ok = 1;
+                kputs("virtio-blk: port=0x"); kprint_hex32pad(g_vio_port, 4);
+                kputs(" capacity="); kprint_dec64(g_vio_capacity);
+                kputs(" sectors\n");
+            }
+        }
+    }
+    if (!g_vio_ok) kputs("virtio-blk: not found.\n");
+}
+
+/* one request: type 0=read 1=write; nsec <= VQ_NUM */
+static int virtio_xfer(uint32_t type, uint64_t sector, uint8_t* buf, uint32_t nsec) {
+    if (!g_vio_ok || nsec == 0 || nsec > VQ_NUM) return -1;
+    uint8_t* desc  = g_vq;
+    uint8_t* avail = g_vq + VQ_DESC_SZ;
+    uint8_t* used  = g_vq + VQ_USED_OFF;
+    static uint8_t hdr[16];
+    static uint8_t status;
+    hdr[0] = (uint8_t)type; hdr[1] = hdr[2] = hdr[3] = 0;
+    for (int i = 0; i < 4; i++) hdr[4 + i] = 0;
+    for (int i = 0; i < 8; i++) hdr[8 + i] = (uint8_t)(sector >> (i * 8));
+    status = 0xFF;
+    uint32_t dlen = nsec * 512u;
+    /* desc0: header (device reads it) */
+    *(uint32_t*)(desc + 0)  = (uint32_t)(size_t)hdr;
+    *(uint32_t*)(desc + 4)  = 16;
+    desc[8]  = 0x02;                              /* NEXT */
+    *(uint16_t*)(desc + 10) = 1;
+    /* desc1: data — NEXT|WRITE for write, NEXT|READ? flags: bit0 NEXT, bit1 WRITE(device writes) */
+    *(uint32_t*)(desc + 16) = (uint32_t)(size_t)buf;
+    *(uint32_t*)(desc + 20) = dlen;
+    desc[24] = (uint8_t)(0x02 | ((type == 1) ? 0x04 : 0x00));  /* NEXT | (device-write if writing) */
+    *(uint16_t*)(desc + 26) = 2;
+    /* desc2: status byte (device writes it) */
+    *(uint32_t*)(desc + 32) = (uint32_t)(size_t)&status;
+    *(uint32_t*)(desc + 36) = 1;
+    desc[40] = 0x06;                              /* NEXT|WRITE */
+    /* avail */
+    uint16_t idx = *(volatile uint16_t*)(avail + 4);
+    uint16_t slot = (uint16_t)(idx % VQ_NUM);
+    *(uint16_t*)(avail + 6 + slot * 2) = 0;
+    __asm__ volatile("" ::: "memory");
+    *(volatile uint16_t*)(avail + 2) = (uint16_t)(idx + 1);
+    __asm__ volatile("" ::: "memory");
+    vp_outw(VP_QUEUE_NOTIFY, 0);
+    uint16_t want = (uint16_t)(idx + 1);
+    int guard = 0;
+    while (*(volatile uint16_t*)(used + 2) != want && guard++ < 2000000) { }
+    if (*(volatile uint16_t*)(used + 2) != want) return -2;
+    return (status == 0) ? 0 : -3;
+}
+
+static int virtio_blk_read(uint64_t sector, uint8_t* buf, uint32_t nsec) {
+    return virtio_xfer(0, sector, buf, nsec);
+}
+static int virtio_blk_write(uint64_t sector, const uint8_t* buf, uint32_t nsec) {
+    return virtio_xfer(1, sector, (uint8_t*)(size_t)buf, nsec);
+}
+
+/* vdisk — virtio-blk status + sector-0 hexdump probe. */
+static void show_vdisk(void) {
+    if (!g_vio_ok) { kputs("vdisk: virtio-blk not present.\n"); return; }
+    kputs("virtio-blk: present, capacity=");
+    kprint_dec64(g_vio_capacity);
+    kputs(" sectors (512B each)\n");
+    static uint8_t vbuf[512];
+    if (virtio_blk_read(0, vbuf, 1) != 0) {
+        kputs("vdisk: sector-0 read failed.\n"); return;
+    }
+    kputs("sector 0 first 32 bytes: ");
+    for (int i = 0; i < 32; i++) {
+        uint8_t b = vbuf[i];
+        char h[3];
+        h[0] = "0123456789abcdef"[b >> 4];
+        h[1] = "0123456789abcdef"[b & 15];
+        h[2] = ' ';
+        kputs(h);
+    }
+    kputs("\n");
+}
+
+
+/* --------------------------------------------------------------------------
  * ATA Disk Detection (PIO IDENTIFY, ports 0x1F0/0x170)
  * -------------------------------------------------------------------------- */
 static void ata_identify_model(uint16_t base, int slave, char out[41]) {
@@ -4287,7 +4433,7 @@ static void show_history(void) {
  * -------------------------------------------------------------------------- */
 static const char* const g_cmd_names[] = {
     "help","status","craft","distro","mem","modules","cmdline","date",
-    "cpu","pci","disk","read","part","fs","ls","cat","cd","pwd","df",
+    "cpu","pci","disk","vdisk","read","part","fs","ls","cat","cd","pwd","df",
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
@@ -4680,6 +4826,8 @@ void kernel_shell(void) {
             show_pci();
         } else if (kstrcmp(cmd, "disk") == 0) {
             show_disk();
+        } else if (kstrcmp(cmd, "vdisk") == 0) {
+            show_vdisk();
         } else if (kcmd_is(cmd, "read")) {
             show_read(cmd + 4);
         } else if (kstrcmp(cmd, "part") == 0 || kstrcmp(cmd, "fdisk") == 0) {
@@ -4801,6 +4949,7 @@ void kernel_main(uint32_t magic, void* mb_info) {
     idt_init();
     pit_init();
     pic_init();
+    virtio_probe();
     klog("kernel: paging+gdt+idt+pit+pic armed\n");
     kputs("[kernel] Paging enabled: 4MiB-page identity map, ");
     kprint_dec64(g_map_mb);
