@@ -1,5 +1,6 @@
 /* SigmaOS ELF32 user program: comm — compare two sorted files.
- * Usage: exec COMM.ELF <file1> <file2>
+ * Usage: exec COMM.ELF [-1] [-2] [-3] <file1> <file2>
+ * Suppress column 1 (file1-only), 2 (file2-only), or 3 (common).
  * Output: col1=file1-only, col2=file2-only, col3=common (tab-indented).
  * Inputs must be sorted. Line cap: 1024 lines x 160 chars per file.
  * SYS_OPEN=4 SYS_READ=5 SYS_CLOSE=6 SYS_WRITE_LEN=8 ; EXIT=0 */
@@ -44,17 +45,29 @@ static int lc(const char* a, const char* b) {
 void _start(void) {
     u32* sp = uargs();
     u32 argc = sp[0];
-    if (argc < 3) { uputs("usage: comm <file1> <file2>\n"); sc3(SYS_EXIT,0,0,0); __builtin_unreachable(); }
-    if (load((const char*)sp[2], la, &na) != 0) { uputs("comm: cannot open file1\n"); sc3(SYS_EXIT,1,0,0); __builtin_unreachable(); }
-    if (load((const char*)sp[3], lb, &nb) != 0) { uputs("comm: cannot open file2\n"); sc3(SYS_EXIT,1,0,0); __builtin_unreachable(); }
+    /* flags may precede or follow files: scan all args for -1/-2/-3 */
+    int sup1 = 0, sup2 = 0, sup3 = 0;
+    const char* fa = 0, *fb = 0;
+    for (u32 i = 2; i <= argc; i++) {
+        const char* a = (const char*)sp[i];
+        if (!a) continue;
+        if (a[0] == '-' && a[1] == '1' && !a[2]) sup1 = 1;
+        else if (a[0] == '-' && a[1] == '2' && !a[2]) sup2 = 1;
+        else if (a[0] == '-' && a[1] == '3' && !a[2]) sup3 = 1;
+        else if (!fa) fa = a;
+        else if (!fb) fb = a;
+    }
+    if (!fa || !fb) { uputs("usage: comm [-123] <file1> <file2>\n"); sc3(SYS_EXIT,0,0,0); __builtin_unreachable(); }
+    if (load(fa, la, &na) != 0) { uputs("comm: cannot open file1\n"); sc3(SYS_EXIT,1,0,0); __builtin_unreachable(); }
+    if (load(fb, lb, &nb) != 0) { uputs("comm: cannot open file2\n"); sc3(SYS_EXIT,1,0,0); __builtin_unreachable(); }
     int i = 0, j = 0;
     while (i < na && j < nb) {
         int c = lc(la[i], lb[j]);
-        if (c < 0) { sc3(SYS_WRITE_LEN,(u32)la[i],(u32)u32strlen(la[i]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); i++; }
-        else if (c > 0) { sc3(SYS_WRITE_LEN,(u32)"\t",1,0); sc3(SYS_WRITE_LEN,(u32)lb[j],(u32)u32strlen(lb[j]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); j++; }
-        else { sc3(SYS_WRITE_LEN,(u32)"\t\t",2,0); sc3(SYS_WRITE_LEN,(u32)la[i],(u32)u32strlen(la[i]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); i++; j++; }
+        if (c < 0) { if (!sup1) { sc3(SYS_WRITE_LEN,(u32)la[i],(u32)u32strlen(la[i]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); } i++; }
+        else if (c > 0) { if (!sup2) { sc3(SYS_WRITE_LEN,(u32)"\t",1,0); sc3(SYS_WRITE_LEN,(u32)lb[j],(u32)u32strlen(lb[j]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); } j++; }
+        else { if (!sup3) { sc3(SYS_WRITE_LEN,(u32)"\t\t",2,0); sc3(SYS_WRITE_LEN,(u32)la[i],(u32)u32strlen(la[i]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); } i++; j++; }
     }
-    while (i < na) { sc3(SYS_WRITE_LEN,(u32)la[i],(u32)u32strlen(la[i]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); i++; }
-    while (j < nb) { sc3(SYS_WRITE_LEN,(u32)"\t",1,0); sc3(SYS_WRITE_LEN,(u32)lb[j],(u32)u32strlen(lb[j]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); j++; }
+    while (i < na) { if (!sup1) { sc3(SYS_WRITE_LEN,(u32)la[i],(u32)u32strlen(la[i]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); } i++; }
+    while (j < nb) { if (!sup2) { sc3(SYS_WRITE_LEN,(u32)"\t",1,0); sc3(SYS_WRITE_LEN,(u32)lb[j],(u32)u32strlen(lb[j]),0); sc3(SYS_WRITE_LEN,(u32)"\n",1,0); } j++; }
     sc3(SYS_EXIT, 0, 0, 0); __builtin_unreachable();
 }
