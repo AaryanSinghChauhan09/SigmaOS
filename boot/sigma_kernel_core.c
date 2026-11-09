@@ -2279,6 +2279,24 @@ void isr_common(uint32_t* frame) {
     kputs(" cs=");
     kprint_hex32(cs);
     kputs(" ***\n");
+    klog("exception: vec=");
+    /* log vec + eip compactly via static buffer */
+    {
+        char lb[48]; int n = 0;
+        const char* p = "vec=";
+        while (*p) lb[n++] = *p++;
+        uint32_t v = vec;
+        char tmp[12]; int t = 0;
+        do { tmp[t++] = '0' + (v % 10); v /= 10; } while (v);
+        while (t) lb[n++] = tmp[--t];
+        p = " eip=";
+        while (*p) lb[n++] = *p++;
+        v = eip; t = 0;
+        do { tmp[t++] = "0123456789abcdef"[v & 15]; v >>= 4; } while (v);
+        while (t) lb[n++] = tmp[--t];
+        lb[n++] = '\n'; lb[n] = 0;
+        klog(lb);
+    }
 }
 
 void syscall_handler(uint32_t* regs);
@@ -2603,6 +2621,7 @@ void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry
             g_user_esp    = frame[12];
             g_user_ss     = frame[13];
             g_preempt_pending = 1;
+            klog("sched: user preempted\n");
             kputs("\n[sched] user preempted — 'fg' to resume\n");
         }
     } else if (vec == 33) {
