@@ -350,6 +350,7 @@ static void pit_init(void);
 static void show_timer(void);
 static void show_memalloc(void);
 static void show_exec(const char* args);
+void resume_user(void);   /* naked asm: restore preempted user ctx */
 static uint32_t find_user_region(void);
 static void enter_user(uint32_t eip, uint32_t esp);
 static uint32_t g_user_base;
@@ -360,6 +361,11 @@ static uint32_t g_map_mb;
 int      g_user_dead   = 0;
 uint32_t g_resume_eip  = 0;
 uint32_t g_resume_esp  = 0;
+/* Preemptive scheduling state (timer-tick context switch) */
+int      g_preempt_pending = 0;
+int      g_user_active     = 0;
+uint32_t g_user_ctx[8];     /* pushal-order regs at preempt point */
+uint32_t g_user_eip, g_user_cs, g_user_eflags, g_user_esp, g_user_ss;
 
 #define MBI_FLAGS       0
 #define MBI_MEM_LOWER   4
@@ -1610,7 +1616,10 @@ static void show_exec(const char* args) {
     sp[4] = 0;                                /* envp terminator */
 
     g_user_dead = 0;
+    g_preempt_pending = 0;
+    g_user_active = 1;
     enter_user(g_user_base + EXEC_LOAD_OFF, (uint32_t)(size_t)sp);
+    g_user_active = 0;
     kputs("exec: program exited, back in kernel shell\n");
 }
 
@@ -1747,7 +1756,8 @@ void kernel_shell(void) {
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
             kputs("  user    - Drop to ring 3 test program\n");
-            kputs("  exec    - Run flat binary: exec <file>\n");
+            kputs("  exec    - Run flat binary: exec <file> [arg]\n");
+            kputs("  fg      - Resume preempted user program\n");
             kputs("  timer   - Show PIT tick count\n");
             kputs("  memalloc- Page allocator test/status\n");
             kputs("  clear   - Clear the console screen\n");
@@ -1793,6 +1803,14 @@ void kernel_shell(void) {
             show_user();
         } else if (kcmd_is(cmd, "exec")) {
             show_exec(cmd + 4);
+        } else if (kstrcmp(cmd, "fg") == 0 || kstrcmp(cmd, "resume") == 0) {
+            if (g_preempt_pending) {
+                g_preempt_pending = 0;
+                kputs("fg: resuming user context...\n");
+                resume_user();   /* irets to user; returns via exit/preempt */
+            } else {
+                kputs("fg: no preempted user program.\n");
+            }
         } else if (kstrcmp(cmd, "timer") == 0) {
             show_timer();
         } else if (kstrcmp(cmd, "memalloc") == 0) {
@@ -2151,11 +2169,27 @@ __asm__(
     ".globl irq_common_entry\n"
     "irq_common_entry:\n"
     "    cli\n"               /* mask IRQs in handler; iret restores IF from stack */
+    "    pushal\n"            /* regs[0..7] then vector then cpu iret frame */
     "    movl %esp, %eax\n"
     "    pushl %eax\n"
     "    call irq_handler\n"
     "    addl $4, %esp\n"
-    "    addl $4, %esp\n"      /* drop pushed vector number */
+    "    popal\n"
+    "    addl $4, %esp\n"      /* drop pushed vector number -> cpu frame top */
+    /* Preemption divert: handler may set g_preempt_pending (user-mode tick).
+     * Drop the 5-dword user iret frame, return to kernel resume context. */
+    "    cmpl $0, g_preempt_pending\n"
+    "    je 2f\n"
+    "    addl $20, %esp\n"
+    "    pushl $0x10\n"
+    "    movl g_resume_esp, %eax\n"
+    "    pushl %eax\n"
+    "    pushl $0x202\n"
+    "    pushl $0x08\n"
+    "    movl g_resume_eip, %eax\n"
+    "    pushl %eax\n"
+    "    iret\n"
+    "2:\n"
     "    iret\n"
     ".macro IRQ_STUB n\n"
     "irq_\\n:\n"
@@ -2381,7 +2415,8 @@ void syscall_handler(uint32_t* regs) {
         ret = g_tick_count;
     } else if (nr == SYS_EXIT) {
         kputs("\n[user] exit syscall\n");
-        g_user_dead = 1;   /* syscall_entry will iret back to kernel */
+        g_user_dead = 1;      /* syscall_entry will iret back to kernel */
+        g_user_active = 0;
     } else if (nr == SYS_OPEN) {
         volatile char* up = (volatile char*)(size_t)regs[4];
         char path[256];
@@ -2505,8 +2540,13 @@ static int kbd_buf_pop(char* out) {
     return 1;
 }
 
+/* IRQ frame layout (irq_common_entry does pushal first):
+ * frame[0..7] = pushal regs (edi..eax)
+ * frame[8]    = vector number
+ * frame[9]    = eip  frame[10]=cs  frame[11]=eflags
+ * frame[12..13]= user esp/ss (only when interrupted from ring 3) */
 void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry asm */
-    uint32_t vec = frame[0];
+    uint32_t vec = frame[8];
     if (vec == 32) { /* IRQ0: PIT timer @ PIT_HZ */
         g_tick_count++;
         if ((g_tick_count % PIT_HZ) == 0) {
@@ -2515,6 +2555,18 @@ void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry
             kputs(" (~");
             kprint_dec64(g_tick_count / PIT_HZ);
             kputs("s)\n");
+        }
+        /* Preempt every 10 ticks (100 ms) while ring-3 code runs */
+        if ((g_tick_count % 10) == 0 && g_user_active && !g_preempt_pending
+            && !g_user_dead && (frame[10] & 3) == 3) {
+            for (int i = 0; i < 8; i++) g_user_ctx[i] = frame[i];
+            g_user_eip    = frame[9];
+            g_user_cs     = frame[10];
+            g_user_eflags = frame[11];
+            g_user_esp    = frame[12];
+            g_user_ss     = frame[13];
+            g_preempt_pending = 1;
+            kputs("\n[sched] user preempted — 'fg' to resume\n");
         }
     } else if (vec == 33) {
         /* IRQ1: PS/2 keyboard — translate scancode, push to buffer */
@@ -2698,6 +2750,30 @@ static uint32_t find_user_region(void) {
     return 0;
 }
 
+/* Resume a preempted user context: rebuild the pushal block, popal,
+ * then iret with the saved user frame. Never returns to caller —
+ * control comes back via SYS_EXIT/preempt paths. */
+__attribute__((section(".text"), naked))
+void resume_user(void) {
+    __asm__ volatile(
+        "movl g_user_ctx+28, %%eax\n pushl %%eax\n"   /* eax */
+        "movl g_user_ctx+24, %%ecx\n pushl %%ecx\n"   /* ecx */
+        "movl g_user_ctx+20, %%edx\n pushl %%edx\n"   /* edx */
+        "movl g_user_ctx+16, %%ebx\n pushl %%ebx\n"   /* ebx */
+        "pushl $0\n"                                 /* esp slot (popal skips) */
+        "movl g_user_ctx+8,  %%ebp\n pushl %%ebp\n"   /* ebp */
+        "movl g_user_ctx+4,  %%esi\n pushl %%esi\n"   /* esi */
+        "movl g_user_ctx+0,  %%edi\n pushl %%edi\n"   /* edi */
+        "popal\n"
+        "pushl g_user_ss\n"
+        "pushl g_user_esp\n"
+        "pushl g_user_eflags\n"
+        "pushl g_user_cs\n"
+        "pushl g_user_eip\n"
+        "iret\n"
+        ::: "memory");
+}
+
 /* naked: build iret frame and drop to ring 3.
  * i386 cdecl: [esp]=ret [esp+4]=eip [esp+8]=user_esp at entry. */
 __attribute__((section(".text"), naked))
@@ -2760,8 +2836,11 @@ static void show_user(void) {
     uint32_t uesp = g_user_base + 0x80000; /* 512KiB into the region */
     kputs("user: dropping to ring 3 (cs=0x1B ss=0x23)...\n");
     g_user_dead = 0;
+    g_preempt_pending = 0;
+    g_user_active = 1;
     enter_user(g_user_base, uesp);
-    kputs("user: returned to kernel (exit or int3 handled)\n");
+    g_user_active = 0;
+    kputs("user: returned to kernel (exit or preempt)\n");
 }
 
 __attribute__((section(".text"), naked))
