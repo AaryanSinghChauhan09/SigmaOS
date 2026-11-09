@@ -404,6 +404,11 @@ static int fat_ensure_mounted(void);
 static void* kmalloc(uint32_t size);
 static void kfree(void* ptr);
 static uint32_t pmm_alloc(void);
+static void mm_init(void);
+static int g_mm_ready;
+static uint32_t g_total_pages, g_max_page, g_alloc_count;
+#define BITMAP_WORDS_FWD 32768
+static uint32_t g_page_bitmap[32768];
 static int fat_free_chain(int kind, uint32_t start);
 static uint32_t fat_alloc_chain(int kind, uint32_t count);
 static uint32_t fat_dirent_cluster(int kind, const uint8_t* e);
@@ -5454,6 +5459,7 @@ static void idt_init(void) {
 #define SYS_TRUNC    26 /* ebx=name, ecx=newsize — shrink file, eax=0/-1 */
 #define SYS_CHMOD    27 /* ebx=name, ecx=mode — 0=clear RO, 1=set RO, eax=0/-1 */
 #define SYS_SLEEP    28 /* ebx=ticks — busy-wait sleep, eax=0 */
+#define SYS_MEMINFO  29 /* ebx=user u32[3]: total_pages, free_pages, alloc_count; eax=0/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6261,6 +6267,32 @@ void syscall_handler(uint32_t* regs) {
         while (g_tick_count < target) { __asm__ volatile("pause"); }
         regs[7] = 0;
         return;
+    } else if (nr == SYS_MEMINFO) {
+        uint32_t* ub = (uint32_t*)(size_t)regs[4];
+        if (!ub || (uint32_t)(size_t)ub < g_user_base ||
+            (uint32_t)(size_t)ub + 12 > g_user_base + 0x100000) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        if (!g_mm_ready) mm_init();
+        /* free = zero bits in bitmap within [0, g_max_page) */
+        uint32_t freep = 0;
+        uint32_t words = (g_max_page + 31) / 32;
+        if (words > 32768) words = 32768;
+        for (uint32_t w = 0; w < words; w++) {
+            uint32_t word = ~g_page_bitmap[w];
+            /* mask off bits past g_max_page in last word */
+            uint32_t rem = g_max_page - w * 32;
+            if (rem < 32) word &= (rem >= 32) ? 0xFFFFFFFFu : ((1u << rem) - 1u);
+            word -= (word >> 1) & 0x55555555u;
+            word = (word & 0x33333333u) + ((word >> 2) & 0x33333333u);
+            word = (word + (word >> 4)) & 0x0F0F0F0Fu;
+            freep += (word * 0x01010101u) >> 24;
+        }
+        ub[0] = g_total_pages;
+        ub[1] = freep;
+        ub[2] = g_alloc_count;
+        regs[7] = 0;
+        return;
     } else if (nr == SYS_CREAT) {
         /* ebx = user ptr to NUL-terminated single-component name in cwd.
          * Creates an empty file (allocated cluster, size 0, attr 0x20). */
@@ -6995,6 +7027,7 @@ static void show_fastfetch(void) {
 static uint32_t g_page_bitmap[BITMAP_WORDS] __attribute__((section(".bss")));
 static uint32_t g_alloc_count = 0;
 static uint32_t g_total_pages = 0;
+static uint32_t g_max_page    = 0;   /* highest RAM page index + 1 */
 static int      g_mm_ready  = 0;
 
 static void mm_init(void) {
@@ -7017,7 +7050,10 @@ static void mm_init(void) {
         if (type == 1) {
             uint64_t fb = base / PAGE_SIZE;
             uint64_t fe = (base + len + PAGE_SIZE - 1) / PAGE_SIZE;
-            if (fe > fb && fe - fb < 1048576) g_total_pages += (uint32_t)(fe - fb);
+            if (fe > fb && fe - fb < 1048576) {
+                g_total_pages += (uint32_t)(fe - fb);
+                if (fe > g_max_page) g_max_page = (uint32_t)fe;
+            }
         }
         if (type != 1) {
             /* mark used */
@@ -7035,6 +7071,10 @@ static void mm_init(void) {
     extern uint8_t _end;
     uint32_t kern_end_pg = ((uint32_t)(size_t)&_end + PAGE_SIZE - 1) / PAGE_SIZE;
     for (uint32_t pg = 256; pg < kern_end_pg; pg++) g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
+    /* mark every page at/above the top of RAM as used so pmm_alloc
+     * can never hand out memory that does not exist */
+    for (uint32_t pg = g_max_page; pg < 1048576; pg++)
+        g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
     /* reserve Multiboot modules */
     if (g_mb_info) {
         uint32_t mcount = mbi_rd32(MBI_MODS_COUNT);
