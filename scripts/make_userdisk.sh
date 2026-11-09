@@ -94,6 +94,7 @@ mcopy -o -i "$IMG" "$USER_DIR/free.elf"      ::FREE.ELF
 mcopy -o -i "$IMG" "$USER_DIR/cksum.elf"     ::CKSUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/md5sum.elf"    ::MD5SUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/dmesg.elf"     ::DMESG.ELF
+mcopy -o -i "$IMG" "$ROOT_DIR/etc/BOOT.CMD" ::BOOT.CMD
 mcopy -o -i "$IMG" "$USER_DIR/ln.elf"      ::LN.ELF
 mcopy -o -i "$IMG" "$USER_DIR/rmdir.elf"   ::RMDIR.ELF
 mcopy -o -i "$IMG" "$USER_DIR/cp.elf"      ::CP.ELF
@@ -126,6 +127,7 @@ mcopy -o -i "$IMG" "$USER_DIR/free.elf"      ::FREE.ELF
 mcopy -o -i "$IMG" "$USER_DIR/cksum.elf"     ::CKSUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/md5sum.elf"    ::MD5SUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/dmesg.elf"     ::DMESG.ELF
+mcopy -o -i "$IMG" "$ROOT_DIR/etc/BOOT.CMD" ::BOOT.CMD
 
 echo "Built $IMG"
 mdir -i "$IMG" ::

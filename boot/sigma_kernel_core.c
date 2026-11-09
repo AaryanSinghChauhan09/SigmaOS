@@ -4689,12 +4689,39 @@ static int tab_complete(char* cmd, int len) {
 /* --------------------------------------------------------------------------
  * Interactive Shell REPL
  * -------------------------------------------------------------------------- */
+/* ---- boot script (LFS-style): run BOOT.CMD lines before first prompt ----
+ * SEPARATION OF MECHANISM & POLICY: kernel supplies queued input; the
+ * normal line editor/dispatch path executes each line unchanged. */
+#define BOOTQ_SIZE 8192
+static char     g_bootq[BOOTQ_SIZE];
+static uint32_t g_bootq_len = 0, g_bootq_pos = 0;
+
+static void load_boot_script(void) {
+    char rpath[160];
+    if (fs_resolve("BOOT.CMD", rpath, (int)sizeof rpath) != 0) return;
+    if (fat_ensure_mounted() != 0) return;
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir || hit.size == 0) return;
+    uint32_t want = hit.size < BOOTQ_SIZE - 2 ? hit.size : BOOTQ_SIZE - 2;
+    if (fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
+                        hit.cluster, want, (uint8_t*)g_bootq) != (int)want) return;
+    g_bootq_len = want;
+    /* ensure trailing newline so last line executes */
+    if (g_bootq[g_bootq_len - 1] != '\n') g_bootq[g_bootq_len++] = '\n';
+    g_bootq_pos = 0;
+    kputs("[boot] running BOOT.CMD (startup script)\n");
+}
+
 void kernel_shell(void) {
     char cmd[128];
     size_t len = 0;
 
     vga_set_color(0x0A, 0x00);
     kputs("Welcome to SigmaOS Sovereign Kernel. Type 'help' for commands.\n\n");
+    load_boot_script();
 
     while (1) {
         vga_set_color(0x03, 0x00); /* Cyan */
@@ -4705,7 +4732,8 @@ void kernel_shell(void) {
         len = 0;
 
         while (1) {
-            char c = kgetc();
+            char c = (g_bootq_pos < g_bootq_len)
+                   ? g_bootq[g_bootq_pos++] : kgetc();
             if (c == '\n') {
                 kputc('\n');
                 cmd[len] = '\0';

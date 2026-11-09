@@ -1,0 +1,2 @@
+echo === SigmaOS startup ===
+mem
