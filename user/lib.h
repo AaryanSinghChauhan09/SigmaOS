@@ -35,6 +35,7 @@ enum {
     SYS_NICE = 36,
     SYS_FORK = 37,
     SYS_EXEC = 38,
+    SYS_WAITPID = 39,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

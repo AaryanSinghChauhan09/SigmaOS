@@ -312,6 +312,7 @@ static struct zombie g_zombies[MAX_ZOMBIES];
 static int g_cur_proc = -1;
 static int  g_next_pid  = 1;
 static void sched_loop(int fg_idx);
+static int user_range_ok(const void* p, uint32_t len);
 
 char kgetc(void) {
     while (1) {
@@ -4559,6 +4560,29 @@ static int proc_set_nice(uint32_t ebx, uint32_t ecx) {
     return old;
 }
 
+/* reap a zombie: ebx pid (0 = any). eax = pid reaped, 0 = none exited,
+ * -1 = no such process, -2 = still running. status via ecx ptr. */
+static int proc_waitpid(uint32_t pid, uint32_t status_ptr) {
+    int zidx = -1;
+    for (int i = 0; i < MAX_ZOMBIES; i++)
+        if (g_zombies[i].used && (pid == 0 || g_zombies[i].pid == pid)) { zidx = i; break; }
+    if (zidx >= 0) {
+        uint32_t rp = g_zombies[zidx].pid;
+        int code = g_zombies[zidx].code;
+        g_zombies[zidx].used = 0;
+        if (status_ptr && user_range_ok((void*)(size_t)status_ptr, 4))
+            *(volatile uint32_t*)(size_t)status_ptr = (uint32_t)code;
+        return (int)rp;
+    }
+    /* not a zombie — does such a proc exist / is it running? */
+    int exists = 0;
+    for (int i = 0; i < MAX_PROCS; i++)
+        if (g_procs[i].used && (pid == 0 || g_procs[i].pid == pid)) { exists = 1; break; }
+    if (pid != 0 && !exists) return -1;
+    if (!exists && pid == 0) return -1;   /* no children at all */
+    return -2;                            /* still running */
+}
+
 /* mark proc killed; if it's the running one, force exit on return */
 static int proc_kill(uint32_t pid) {
     for (int i = 0; i < MAX_PROCS; i++) {
@@ -6078,6 +6102,7 @@ static void idt_init(void) {
 #define SYS_NICE     36 /* ebx=nice -20..19 for self, or ebx=pid|0x80000000,ecx=nice; eax=old/-1 */
 #define SYS_FORK     37 /* eax=child pid in parent, child resumes w/ eax=0; -1 err */
 #define SYS_EXEC     38 /* ebx=user path — replace proc image; never returns on success */
+#define SYS_WAITPID  39 /* ebx=pid(0=any), ecx=user u32* status — eax=pid/-1/-2(running) */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7222,6 +7247,9 @@ void syscall_handler(uint32_t* regs) {
         regs[7]  = 0;
         ep->entry = xentry; ep->esp0 = (uint32_t)(size_t)xsp;
         ep->started = 1;        /* ctx path irrelevant; frame patched directly */
+        return;
+    } else if (nr == SYS_WAITPID) {
+        regs[7] = (uint32_t)proc_waitpid(regs[1], regs[2]);
         return;
     } else if (nr == SYS_FORK) {
         regs[7] = (uint32_t)proc_fork(regs);
