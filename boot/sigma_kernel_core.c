@@ -2641,6 +2641,72 @@ static void show_hex(const char* args) {
     kfree(buf);
 }
 
+/* grep <pattern> <file> — print lines containing pattern (≤4KB file). */
+static void show_grep(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: grep <pattern> <file>\n"); return; }
+    char pat[32];
+    int pl = 0;
+    while (*p && *p != ' ' && pl < 31) pat[pl++] = *p++;
+    pat[pl] = 0;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: grep <pattern> <file>\n"); return; }
+    char namebuf[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+    if (!pl) { kputs("usage: grep <pattern> <file>\n"); return; }
+
+    if (fat_ensure_mounted() != 0) { kputs("grep: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("grep: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                        g_vol_fat_lba, g_vol_data_lba, g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("grep: file not found.\n"); return; }
+
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("grep: out of memory.\n"); return; }
+    int got = fat_read_to_buf(kind, g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
+                              hit.cluster, (uint32_t)cap, buf);
+    if (got < 0) { kfree(buf); kputs("grep: read error.\n"); return; }
+
+    /* scan line by line for substring */
+    int matches = 0;
+    uint32_t i = 0;
+    while (i < (uint32_t)got) {
+        uint32_t ls = i;
+        while (i < (uint32_t)got && buf[i] != '\n' && buf[i] != '\r') i++;
+        uint32_t le = i;
+        if (i < (uint32_t)got) i++;
+        /* substring search in [ls, le) */
+        int found = 0;
+        if (le - ls >= (uint32_t)pl) {
+            for (uint32_t a = ls; a + pl <= le && !found; a++) {
+                int eq = 1;
+                for (int b = 0; b < pl; b++)
+                    if (buf[a + b] != (uint8_t)pat[b]) { eq = 0; break; }
+                if (eq) found = 1;
+            }
+        }
+        if (found) {
+            kputs("  ");
+            for (uint32_t a = ls; a < le; a++) kputc(buf[a]);
+            kputs("\n");
+            matches++;
+        }
+    }
+    kfree(buf);
+    kputs("grep: ");
+    kprint_dec64((uint64_t)matches);
+    kputs(" match(es)\n");
+}
+
 /* stat <file> — file metadata: size, first cluster, type. */
 static void show_stat(const char* args) {
     const char* p = args;
@@ -3173,6 +3239,7 @@ void kernel_shell(void) {
             kputs("  append  - Append text: append <name> <text>\n");
             kputs("  hex     - Hexdump file: hex <file>\n");
             kputs("  stat    - File info: stat <file>\n");
+            kputs("  grep    - Search file: grep <pat> <file>\n");
             kputs("  uptime  - Seconds since boot\n");
             kputs("  ver     - Kernel version\n");
             kputs("  info    - System summary\n");
@@ -3244,6 +3311,8 @@ void kernel_shell(void) {
             show_hex(cmd + 3);
         } else if (kcmd_is(cmd, "stat")) {
             show_stat(cmd + 4);
+        } else if (kcmd_is(cmd, "grep")) {
+            show_grep(cmd + 4);
         } else if (kcmd_is(cmd, "uptime")) {
             show_uptime();
         } else if (kcmd_is(cmd, "ver")) {
