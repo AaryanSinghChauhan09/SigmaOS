@@ -4289,6 +4289,7 @@ static void idt_init(void) {
 #define SYS_WRITE_FILE 12 /* ebx=name, ecx=buf, edx=len — create/overwrite */
 #define SYS_RENAME   13 /* ebx=old name, ecx=new name — rename in cwd */
 #define SYS_APPEND   14 /* ebx=name, ecx=buf, edx=len — append to file in cwd */
+#define SYS_FSTAT    15 /* ebx=fd -> eax=file size or -1 */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -4761,6 +4762,12 @@ void syscall_handler(uint32_t* regs) {
         for (uint32_t i = 0; i < ulen; i++) kbuf[i] = ub[i];
         regs[7] = (fat_append_impl(kname, kbuf, ulen) == 0) ? 0 : 0xFFFFFFFFu;
         kfree(kbuf);
+        return;
+    } else if (nr == SYS_FSTAT) {
+        /* ebx=fd -> eax=file size, -1 on bad fd */
+        int fd = (int)regs[4];
+        if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used) { regs[7] = 0xFFFFFFFFu; return; }
+        regs[7] = g_fds[fd].size;
         return;
     } else {
         kputs("\n[syscall] unknown nr=");
