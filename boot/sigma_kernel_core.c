@@ -741,6 +741,50 @@ static void show_read(const char* args) {
     kprint_hexdump(g_sector_buf, (uint32_t)n * 512);
 }
 
+/* Parse MBR partition table from sector 0 (already in g_sector_buf via read). */
+static void show_partitions(void) {
+    int n = ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1);
+    if (n < 0) {
+        kputs("part: could not read sector 0.\n");
+        return;
+    }
+    /* MBR signature check */
+    if (g_sector_buf[510] != 0x55 || g_sector_buf[511] != 0xAA) {
+        kputs("part: no MBR signature (0x55AA) on primary master.\n");
+        return;
+    }
+    static const char* ptype_names[] = {
+        "empty", "FAT12", "?", "HPFS/NTFS", "FAT16<32M", "?", "FAT16", "?",
+        "FAT32", "?", "FAT32 LBA", "?", "FAT16 LBA", "?", "extended", "?"
+    };
+    int found = 0;
+    for (int i = 0; i < 4; i++) {
+        uint8_t* e = g_sector_buf + 446 + i * 16;
+        uint8_t status = e[0];
+        uint8_t type   = e[4];
+        uint32_t lba   = (uint32_t)e[8] | ((uint32_t)e[9] << 8) | ((uint32_t)e[10] << 16) | ((uint32_t)e[11] << 24);
+        uint32_t size  = (uint32_t)e[12] | ((uint32_t)e[13] << 8) | ((uint32_t)e[14] << 16) | ((uint32_t)e[15] << 24);
+        if (type == 0 && status == 0) continue;
+        kputs("  part");
+        kprint_dec64(i + 1);
+        kputs("  status=0x");
+        kprint_hex32pad(status, 2);
+        kputs("  type=");
+        kprint_dec64(type);
+        kputs(" (");
+        kputs((type < 16) ? ptype_names[type] : "unknown");
+        kputs(")  start_lba=");
+        kprint_dec64(lba);
+        kputs("  sectors=");
+        kprint_dec64(size);
+        kputs("  size_mib~");
+        kprint_dec64(((uint64_t)size * 512) >> 20);
+        kputs("\n");
+        found++;
+    }
+    if (!found) kputs("MBR present but no partitions defined.\n");
+}
+
 static void show_disk(void) {
     static const uint16_t bases[2] = { 0x1F0, 0x170 };
     static const char* chan[2] = { "primary", "secondary" };
@@ -866,6 +910,7 @@ void kernel_shell(void) {
             kputs("  pci     - Scan PCI buses for devices\n");
             kputs("  disk    - Detect ATA disks (IDENTIFY)\n");
             kputs("  read    - Read disk sectors: read <lba> [n] [bus]\n");
+            kputs("  part    - Show MBR partition table\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -891,6 +936,8 @@ void kernel_shell(void) {
             show_disk();
         } else if (kcmd_is(cmd, "read")) {
             show_read(cmd + 4);
+        } else if (kstrcmp(cmd, "part") == 0 || kstrcmp(cmd, "fdisk") == 0) {
+            show_partitions();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
