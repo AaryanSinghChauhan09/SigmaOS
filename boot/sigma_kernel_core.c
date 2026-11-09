@@ -328,6 +328,12 @@ static int kstrcmp(const char* s1, const char* s2) {
     return *(const unsigned char*)s1 - *(const unsigned char*)s2;
 }
 
+static int kstrlen(const char* s) {
+    int n = 0;
+    while (s[n]) n++;
+    return n;
+}
+
 /* True if s starts with prefix and is followed by NUL or space. */
 static int kcmd_is(const char* s, const char* prefix) {
     while (*prefix) {
@@ -382,6 +388,7 @@ static void show_memalloc(void);
 static void show_sched(void);
 static void show_ps(void);
 static void show_exec(const char* args);
+static int fat_ensure_mounted(void);
 void resume_user(void);   /* naked asm: restore preempted user ctx */
 static uint32_t find_user_region(void);
 static void enter_user(uint32_t eip, uint32_t esp);
@@ -1091,6 +1098,91 @@ static void fat_print_name(const uint8_t* e) {
     kputs(name);
 }
 
+/* ---- working directory (cwd) ----
+ * g_cwd holds a normalized absolute path without leading '/', e.g.
+ * "A/B/C". "" means volume root. All FAT path lookups go through
+ * fs_resolve() which joins cwd + arg and normalizes "." / "..". */
+static char g_cwd[160];
+
+/* Cached volume geometry (populated by fat_ensure_mounted). */
+static int      g_vol_kind = -1;        /* -1 = not mounted */
+static uint32_t g_vol_fat_lba, g_vol_data_lba;
+static uint32_t g_vol_root_clus, g_vol_root_lba, g_vol_root_secs;
+static uint8_t  g_vol_spc;
+
+/* Fetch next '/'-separated component; advances *pp past it. */
+static int fs_next_comp(const char** pp, char* comp, int csz) {
+    const char* p = *pp;
+    while (*p == '/') p++;
+    if (!*p) { *pp = p; return 0; }
+    int n = 0;
+    while (p[n] && p[n] != '/') n++;
+    int cl = n < csz - 1 ? n : csz - 1;
+    for (int i = 0; i < cl; i++) comp[i] = p[i];
+    comp[cl] = 0;
+    *pp = p + n;
+    return 1;
+}
+
+/* Resolve arg against g_cwd into normalized absolute path `out`.
+ * Absolute arg (leading '/') ignores cwd. Returns 0 ok, -1 overflow. */
+static int fs_resolve(const char* arg, char* out, int outsz) {
+    out[0] = 0;
+    const char* base = (arg[0] == '/') ? "" : g_cwd;
+    const char* srcs[2] = { base, arg };
+    for (int s = 0; s < 2; s++) {
+        const char* p = srcs[s];
+        char comp[64];
+        while (fs_next_comp(&p, comp, (int)sizeof comp)) {
+            if (comp[0] == '.' && comp[1] == 0) continue;
+            if (comp[0] == '.' && comp[1] == '.' && comp[2] == 0) {
+                int l = kstrlen(out);
+                while (l > 0 && out[l - 1] != '/') l--;
+                if (l > 0) l--;
+                out[l] = 0;
+                continue;
+            }
+            int ol = kstrlen(out), cl = kstrlen(comp);
+            if (ol + 1 + cl + 1 > outsz) return -1;
+            if (ol) out[ol++] = '/';
+            for (int i = 0; i < cl; i++) out[ol++] = comp[i];
+            out[ol] = 0;
+        }
+    }
+    return 0;
+}
+
+static void show_pwd(void) {
+    kputs("/");
+    if (g_cwd[0]) kputs(g_cwd);
+    kputs("\n");
+}
+
+static void show_cd(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char rpath[160];
+    if (fs_resolve(p, rpath, (int)sizeof rpath) != 0) {
+        kputs("cd: path too long.\n");
+        return;
+    }
+    if (!rpath[0]) { g_cwd[0] = 0; kputs("cd: / (volume root)\n"); return; }
+    if (fat_ensure_mounted() != 0) { kputs("cd: no FAT volume.\n"); return; }
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0) { kputs("cd: '"); kputs(rpath); kputs("' not found.\n"); return; }
+    if (!hit.is_dir) { kputs("cd: '"); kputs(rpath); kputs("' is not a directory.\n"); return; }
+    int l = kstrlen(rpath);
+    if (l > (int)sizeof g_cwd - 1) l = (int)sizeof g_cwd - 1;
+    for (int i = 0; i < l; i++) g_cwd[i] = rpath[i];
+    g_cwd[l] = 0;
+    kputs("cd: /");
+    kputs(g_cwd);
+    kputs("\n");
+}
+
 static void show_ls(const char* args) {
     /* "ls [lba:<n>]" or "ls <dir-path>" — list directory entries */
     uint32_t lba = 0;
@@ -1155,12 +1247,16 @@ static void show_ls(const char* args) {
             root_secs = rdir_secs;
         }
         struct fat_hit hit;
+        char rpath[160];
+        if (fs_resolve(dirname, rpath, (int)sizeof rpath) != 0) {
+            kputs("ls: path too long.\n"); return;
+        }
         int lr = fat_lookup(kind, root_clus, root_lba, root_secs,
-                            fat_lba, data_lba, spc, dirname, &hit);
+                            fat_lba, data_lba, spc, rpath, &hit);
         if (lr == -2) { kputs("ls: path component is not a directory.\n"); return; }
         if (lr <= 0) {
             kputs("ls: '");
-            kputs(dirname);
+            kputs(rpath);
             kputs("' not found.\n");
             return;
         }
@@ -1577,17 +1673,21 @@ static void show_cat(const char* args) {
         root_secs = root_dir_secs;
     }
 
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("cat: path too long.\n"); return;
+    }
     struct fat_hit hit;
     int lr = fat_lookup(kind, root_clus, root_lba, root_secs,
-                        fat_lba, data_lba, spc, namebuf, &hit);
+                        fat_lba, data_lba, spc, rpath, &hit);
     if (lr == -2) { kputs("cat: path component is not a directory.\n"); return; }
     if (lr <= 0) {
         kputs("cat: '");
-        kputs(namebuf);
+        kputs(rpath);
         kputs("' not found.\n");
         return;
     }
-    if (hit.is_dir) { kputs("cat: '"); kputs(namebuf); kputs("' is a directory (use ls).\n"); return; }
+    if (hit.is_dir) { kputs("cat: '"); kputs(rpath); kputs("' is a directory (use ls).\n"); return; }
     if (hit.cluster < 2) { kputs("cat: empty file.\n"); return; }
 
     /* walk cluster chain, print printable content (cap 4KB) */
@@ -1674,9 +1774,13 @@ static void show_exec(const char* args) {
         root_secs = root_dir_secs;
     }
 
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("exec: path too long.\n"); return;
+    }
     struct fat_hit hit;
     int lr = fat_lookup(kind, root_clus, root_lba, root_secs,
-                        fat_lba, data_lba, spc, namebuf, &hit);
+                        fat_lba, data_lba, spc, rpath, &hit);
     if (lr <= 0 || hit.is_dir) { kputs("exec: file not found.\n"); return; }
     if (hit.size == 0 || hit.size > EXEC_MAX_SIZE) {
         kputs("exec: bad size (0 or >2MiB).\n"); return;
@@ -1883,6 +1987,8 @@ void kernel_shell(void) {
             kputs("  fs      - Detect FAT filesystem on partition\n");
             kputs("  ls      - List FAT12/16/32 root directory\n");
             kputs("  cat     - Print file: cat <name>\n");
+            kputs("  cd      - Change directory: cd <dir>\n");
+            kputs("  pwd     - Print working directory\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -1927,6 +2033,10 @@ void kernel_shell(void) {
             show_ls(cmd + 2);
         } else if (kcmd_is(cmd, "cat")) {
             show_cat(cmd + 3);
+        } else if (kcmd_is(cmd, "cd")) {
+            show_cd(cmd + 2);
+        } else if (kstrcmp(cmd, "pwd") == 0) {
+            show_pwd();
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
@@ -2453,11 +2563,6 @@ static void idt_init(void) {
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
 /* ---- cached FAT volume mount (computed once, shared by syscalls) ---- */
-static int      g_vol_kind = -1;        /* -1 = not mounted */
-static uint32_t g_vol_fat_lba, g_vol_data_lba;
-static uint32_t g_vol_root_clus, g_vol_root_lba, g_vol_root_secs;
-static uint8_t  g_vol_spc;
-
 static int fat_ensure_mounted(void) {
     if (g_vol_kind >= 0) return 0;
     if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) return -1;
@@ -2587,10 +2692,14 @@ void syscall_handler(uint32_t* regs) {
         }
         path[pl] = 0;
         if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        char rpath[160];
+        if (fs_resolve(path, rpath, (int)sizeof rpath) != 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
         struct fat_hit hit;
         int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
                             g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
-                            g_vol_spc, path, &hit);
+                            g_vol_spc, rpath, &hit);
         if (lr <= 0 || hit.is_dir || hit.cluster < 2 || hit.size == 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
