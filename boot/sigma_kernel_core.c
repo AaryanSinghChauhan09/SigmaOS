@@ -2993,6 +2993,80 @@ static void show_sort(const char* args) {
     kfree(buf);
 }
 
+/* cut -c A-B <file> | cut -d D -f N <file> — extract chars/fields. */
+static void show_cut(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    int mode = 0;          /* 1=chars, 2=fields */
+    uint32_t a = 0, b = 0;  /* char range (1-based, b=0 -> eol) */
+    int field = 0;         /* field number */
+    char delim = '\t';
+    while (*p == '-') {
+        p++;
+        if (*p == 'c') {
+            mode = 1; p++;
+            while (*p == ' ') p++;
+            a = kstrtoul(p); while (*p && *p != '-' && *p != ' ') p++;
+            if (*p == '-') { p++; b = kstrtoul(p); }
+            while (*p && *p != ' ') p++;
+        } else if (*p == 'd') {
+            p++; while (*p == ' ') p++;
+            delim = *p ? *p : '\t'; p++;
+            while (*p == ' ') p++;
+            if (*p == 'f') { mode = 2; p++; while (*p == ' ') p++;
+                field = (int)kstrtoul(p); while (*p && *p != ' ') p++; }
+        } else break;
+        while (*p == ' ') p++;
+    }
+    char fname[64]; int lf = 0;
+    while (*p && *p != ' ' && lf < 63) fname[lf++] = *p++;
+    fname[lf] = 0;
+    if (!mode || !lf || (mode == 1 && !a) || (mode == 2 && !field)) {
+        kputs("usage: cut -c A-B <file> | cut -d D -f N <file>\n"); return;
+    }
+    if (fat_ensure_mounted() != 0) { kputs("cut: no FAT volume.\n"); return; }
+    char rpath[160];
+    if (fs_resolve(fname, rpath, (int)sizeof rpath) != 0) {
+        kputs("cut: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("cut: not found.\n"); return; }
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("cut: out of memory.\n"); return; }
+    int got = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                              g_vol_spc, hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs("cut: read error.\n"); return; }
+    uint32_t i = 0;
+    while (i < (uint32_t)got) {
+        uint32_t ls = i;
+        while (i < (uint32_t)got && buf[i] != '\n') i++;
+        uint32_t ll = i - ls;
+        if (i < (uint32_t)got) i++;
+        if (mode == 1) {
+            uint32_t s = a ? a - 1 : 0;
+            uint32_t e = b ? b : ll;
+            if (e > ll) e = ll;
+            for (uint32_t j = s; j < e; j++) kputc((char)buf[ls+j]);
+        } else {
+            /* field N delimited by delim */
+            uint32_t pos = ls, f = 1;
+            while (pos < ls + ll && f < (uint32_t)field) {
+                if (buf[pos] == (uint8_t)delim) f++;
+                pos++;
+            }
+            uint32_t fs = pos;
+            while (pos < ls + ll && buf[pos] != (uint8_t)delim) pos++;
+            for (uint32_t j = fs; j < pos; j++) kputc((char)buf[j]);
+        }
+        kputc('\n');
+    }
+    kfree(buf);
+}
+
 /* tr <from> <to> <file> | tr -d <set> <file> — char translate/delete. */
 static void tr_expand(const char* in, char* out, int max) {
     /* expand ranges a-z into out; returns length */
@@ -3817,7 +3891,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
