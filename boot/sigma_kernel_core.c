@@ -290,6 +290,7 @@ struct proc {
     uint32_t pgid;       /* process group id (job control) */
     uint32_t sid;        /* session id (job control) */
     int      traced;     /* ptrace: being traced by parent */
+    int      stopped;    /* ptrace: suspended by tracer (scheduler skips) */
     uint32_t ticks;      /* scheduler ticks consumed (instrumentation) */
     uint32_t io_r, io_w; /* bytes read/written via syscalls (instrumentation) */
     uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
@@ -4344,7 +4345,7 @@ static int proc_claim(uint32_t base, const char* name, const char* cmdline,
     if (!pd) return -1;
     struct proc* p = &g_procs[idx];
     p->used = 1; p->started = 0; p->nice = 0; p->ppid = 0; p->ticks = 0;
-    p->pgid = 0; p->sid = 0; p->traced = 0;
+    p->pgid = 0; p->sid = 0; p->traced = 0; p->stopped = 0;
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
@@ -4474,6 +4475,7 @@ static int proc_fork(uint32_t* regs) {
     ch->pgid = par->pgid ? par->pgid : par->pid;
     ch->sid = par->sid ? par->sid : par->pid;
     ch->traced = par->traced;
+    ch->stopped = 0;
     ch->ticks = par->ticks;
     ch->io_r = par->io_r; ch->io_w = par->io_w;
     ch->rlim_cur = par->rlim_cur; ch->rlim_max = par->rlim_max;
@@ -4572,11 +4574,11 @@ static int proc_pick_next(int after) {
     /* lowest nice value wins; round-robin among procs sharing it */
     int best = 99;
     for (int i = 0; i < MAX_PROCS; i++)
-        if (g_procs[i].used && g_procs[i].nice < best) best = g_procs[i].nice;
+        if (g_procs[i].used && !g_procs[i].stopped && g_procs[i].nice < best) best = g_procs[i].nice;
     if (best == 99) return -1;
     for (int k = 1; k <= MAX_PROCS; k++) {
         int i = (after + k) % MAX_PROCS;
-        if (g_procs[i].used && g_procs[i].nice == best) return i;
+        if (g_procs[i].used && !g_procs[i].stopped && g_procs[i].nice == best) return i;
     }
     return -1;
 }
@@ -6196,7 +6198,7 @@ static void idt_init(void) {
 #define SYS_GETPGID  48 /* ebx=pid(0=self) -> eax=pgid/-1 */
 #define SYS_SETPGID  49 /* ebx=pid(0=self), ecx=pgid(0=new group=pid) -> eax=pgid/-1 */
 #define SYS_SETSID   50 /* self only -> eax=new sid(pid)/-1 if already group leader */
-#define SYS_PTRACE   51 /* ebx=req(0=TRACEME,1=PEEKTEXT,2=POKETEXT,3=GETREGS), ecx=pid, edx=addr/buf, esi=data -> eax */
+#define SYS_PTRACE   51 /* ebx=req(0=TRACEME,1=PEEKTEXT,2=POKETEXT,3=GETREGS,4=STOP,5=CONT), ecx=pid, edx=addr/buf, esi=data -> eax */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7598,6 +7600,18 @@ void syscall_handler(uint32_t* regs) {
             for (int i = 0; i < 8; i++) o[i] = tp->ctx[i];
             o[8] = tp->started ? tp->eip : tp->entry;
             o[9] = tp->esp;
+            regs[7] = 0;
+            return;
+        }
+        if (req == 4 || req == 5) {            /* STOP / CONT on child */
+            uint32_t tpid = regs[6];
+            int t = -1;
+            for (int i = 0; i < MAX_PROCS; i++)
+                if (g_procs[i].used && g_procs[i].pid == tpid) { t = i; break; }
+            if (t < 0) { regs[7] = 0xFFFFFFFFu; return; }
+            struct proc* tp = &g_procs[t];
+            if (tp->ppid != me->pid && tpid != me->pid) { regs[7] = 0xFFFFFFFFu; return; }
+            tp->stopped = (req == 4) ? 1 : 0;
             regs[7] = 0;
             return;
         }

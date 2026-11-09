@@ -24,6 +24,10 @@ void _start(void) {
     }
     if (child == (u32)-1) { outs("ptrace: fork failed\n"); sc3(SYS_EXIT, 1, 0, 0); }
     sc3(SYS_SLEEP, 30, 0, 0);              /* let child get scheduled */
+    if (ptrace3(4, child, 0, 0) != 0) {    /* STOP the child */
+        outs("ptrace: stop failed\n"); sc3(SYS_KILL, child, 0, 0);
+        sc3(SYS_EXIT, 1, 0, 0);
+    }
     u32 regs[10];
     if (ptrace3(3, child, (u32)regs, 0) != 0) {
         outs("ptrace: getregs failed\n"); sc3(SYS_KILL, child, 0, 0);
@@ -31,6 +35,7 @@ void _start(void) {
     }
     u32 eip = regs[8];
     u32 word = ptrace3(1, child, eip, 0);  /* PEEKTEXT at child eip */
+    ptrace3(5, child, 0, 0);               /* CONT before exit */
     int ok = (eip != 0 && word != 0 && word != 0xFFFFFFFFu);
     outs("ptrace: child eip=0x");
     /* print eip hex */
