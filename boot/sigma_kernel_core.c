@@ -2878,6 +2878,64 @@ static void show_cal(const char* args) {
     }
 }
 
+/* ---- minimal environment: NAME=value table (16 slots, 64B each) ---- */
+#define ENV_MAX 16
+static char g_env[ENV_MAX][64];
+static int  g_env_used[ENV_MAX];
+
+static int env_find(const char* name) {
+    for (int i = 0; i < ENV_MAX; i++)
+        if (g_env_used[i] && kstrcmp(g_env[i], name) == 0) return i;
+    return -1;
+}
+static int env_set(const char* name, const char* val) {
+    int i = env_find(name);
+    if (i < 0) { for (i = 0; i < ENV_MAX; i++) if (!g_env_used[i]) break; }
+    if (i >= ENV_MAX) return -1;
+    int nl = 0;
+    while (name[nl] && nl < 31) { g_env[i][nl] = name[nl]; nl++; }
+    g_env[i][nl] = '=';
+    int vl = 0;
+    while (val[vl] && nl + 1 + vl < 63) { g_env[i][nl + 1 + vl] = val[vl]; vl++; }
+    g_env[i][nl + 1 + vl] = 0;
+    g_env_used[i] = 1;
+    return 0;
+}
+static int env_del(const char* name) {
+    int i = env_find(name);
+    if (i < 0) return -1;
+    g_env_used[i] = 0; g_env[i][0] = 0;
+    return 0;
+}
+static void show_env(void) {
+    int n = 0;
+    for (int i = 0; i < ENV_MAX; i++)
+        if (g_env_used[i]) { kputs(g_env[i]); kputs("\n"); n++; }
+    if (!n) kputs("(empty environment)\n");
+}
+static void show_export(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: export NAME=value\n"); return; }
+    char name[32]; int nl = 0;
+    while (*p && *p != '=' && nl < 31) name[nl++] = *p++;
+    name[nl] = 0;
+    if (*p != '=' || !nl) { kputs("export: NAME=value required\n"); return; }
+    p++;
+    if (env_set(name, p) == 0) { kputs("export: "); kputs(name); kputs("=ok\n"); }
+    else kputs("export: table full\n");
+}
+static void show_unset(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char name[32]; int nl = 0;
+    while (*p && *p != ' ' && nl < 31) name[nl++] = *p++;
+    name[nl] = 0;
+    if (!nl) { kputs("usage: unset NAME\n"); return; }
+    if (env_del(name) == 0) { kputs("unset: ok\n"); }
+    else kputs("unset: not found\n");
+}
+
 /* reset — clear screen and restore default VGA colors. */
 static void show_reset(void) {
     vga_set_color(0x0F, 0x00);
@@ -3512,7 +3570,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
