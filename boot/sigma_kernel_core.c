@@ -2951,6 +2951,36 @@ static void show_unset(const char* args) {
     else kputs("unset: not found\n");
 }
 
+/* echo [-n] [-e] <text> — print args joined by spaces. */
+static void show_echo(const char* args) {
+    int nonl = 0, esc = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    while (*p == '-') {
+        p++;
+        int consumed = 0;
+        while (*p && *p != ' ') {
+            if (*p == 'n') nonl = 1;
+            else if (*p == 'e') esc = 1;
+            else break;
+            p++; consumed = 1;
+        }
+        if (!consumed) break;
+        while (*p == ' ') p++;
+    }
+    for (; *p; p++) {
+        if (esc && *p == '\\' && p[1]) {
+            p++;
+            if (*p == 'n') kputc('\n');
+            else if (*p == 't') kputc('\t');
+            else if (*p == 'r') kputc('\r');
+            else if (*p == '0') kputc('\0');
+            else kputc(*p);
+        } else kputc(*p);
+    }
+    if (!nonl) kputc('\n');
+}
+
 /* printf <fmt> [args...] — %s %d %x %c %% \n \t escapes. */
 static void show_printf(const char* args) {
     char fmt[128];
@@ -3626,7 +3656,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
