@@ -6931,6 +6931,9 @@ static uint32_t proc_render(int fdidx, uint32_t id) {
             n += k_strcpy(b + n, "\nPPid:	");
             n += k_u32dec(q->ppid, tmp);
             for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, "\nPgid:\t");
+            n += k_u32dec(q->pgid ? q->pgid : q->pid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
             n += k_strcpy(b + n, "\nState:	");
             n += k_strcpy(b + n, (g_cur_proc == i) ? "running" : "ready");
             n += k_strcpy(b + n, "\nNice:	");
