@@ -392,7 +392,7 @@ static void show_uptime(void);
 static void show_ver(void);
 static void show_fastfetch(void);
 static void show_whoami(void);
-static void show_uname(void);
+static void show_uname(const char* args);
 static void show_memalloc(void);
 static void show_free(void);
 static void show_sched(void);
@@ -3865,7 +3865,7 @@ void kernel_shell(void) {
         } else if (kcmd_is(cmd, "whoami")) {
             show_whoami();
         } else if (kcmd_is(cmd, "uname")) {
-            show_uname();
+            show_uname(cmd + 5);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
@@ -5115,8 +5115,34 @@ static void show_whoami(void) {
     kputs("SigmaOS sovereign kernel — ring-0 shell\n");
 }
 
-static void show_uname(void) {
-    kputs("SigmaOS sigmaos 0.1.0 i386 GNU/Linux\n");
+static void show_uname(const char* args) {
+    int all = 0, sn = 0, gn = 0, rn = 0, mn = 0, vn = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) all = 1;
+    while (*p) {
+        while (*p == ' ') p++;
+        if (*p != '-') break;
+        p++;
+        while (*p && *p != ' ') {
+            if (*p == 'a') all = 1;
+            else if (*p == 's') sn = 1;
+            else if (*p == 'n') gn = 1;
+            else if (*p == 'r') rn = 1;
+            else if (*p == 'm') mn = 1;
+            else if (*p == 'v') vn = 1;
+            p++;
+        }
+    }
+    if (all || sn) kputs("SigmaOS ");
+    if (all || gn) kputs("sigmaos ");
+    if (all || rn) kputs("0.1.0 ");
+    if (all || mn) kputs("i386 ");
+    if (all || vn) kputs("#1 SMP PREEMPT ");
+    if (all) kputs("GNU/Linux");
+    if (!all && !sn && !gn && !rn && !mn && !vn)
+        kputs("SigmaOS sigmaos 0.1.0 i386 GNU/Linux");
+    kputs("\n");
 }
 
 /* fastfetch — Omarchy-style one-screen system summary. */
