@@ -4161,7 +4161,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr","expand","unexpand",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr","expand","unexpand","tree",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
@@ -5199,6 +5199,74 @@ static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
         clus = fat_next_any(g_vol_fat_lba, kind, clus);
     }
     return n;
+}
+
+/* tree [path] — recursive directory listing (depth<=6, ≤64 entries/dir). */
+static void tree_walk(const char* path, int depth) {
+    if (depth > 6) { kputs("  ...\n"); return; }
+    if (fat_ensure_mounted() != 0) return;
+    int kind = g_vol_kind;
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (path[0]) {
+        struct fat_hit dh;
+        int dr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, path, &dh);
+        if (dr <= 0 || !dh.is_dir) return;
+        in_root = 0; dir_cluster = dh.cluster;
+    } else if (kind == 2) {
+        dir_cluster = g_vol_root_clus;
+    }
+    uint8_t* names = (uint8_t*)kmalloc(4096);
+    if (!names) return;
+    uint32_t n = fat_collect_names(kind, in_root, dir_cluster, names, 4096);
+    /* split into lines */
+    uint32_t pos = 0;
+    while (pos < n) {
+        uint32_t ls = pos;
+        while (pos < n && names[pos] != '\n') pos++;
+        uint32_t ll = pos - ls;
+        if (pos < n) pos++;
+        if (!ll) continue;
+        char nm[128];
+        if (ll > 120) ll = 120;
+        for (uint32_t j = 0; j < ll; j++) nm[j] = (char)names[ls+j];
+        nm[ll] = 0;
+        /* indent */
+        for (int d = 0; d < depth; d++) kputs("  ");
+        /* check if dir */
+        char full[192]; int fl = 0;
+        if (path[0]) { for (const char* q = path; *q && fl < 180; q++) full[fl++] = *q; }
+        if (fl && full[fl-1] != '/') full[fl++] = '/';
+        for (uint32_t j = 0; j < ll && fl < 188; j++) full[fl++] = nm[j];
+        full[fl] = 0;
+        struct fat_hit ch;
+        int cr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, full, &ch);
+        int isdir = (cr > 0 && ch.is_dir);
+        kputs(nm);
+        if (isdir) {
+            kputs("/\n");
+            tree_walk(full, depth + 1);
+        } else kputs("\n");
+    }
+    kfree(names);
+}
+static void show_tree(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char rpath[160];
+    rpath[0] = 0;
+    if (*p) {
+        if (fs_resolve(p, rpath, (int)sizeof rpath) != 0) {
+            kputs("tree: path too long.\n"); return;
+        }
+    }
+    kputs(rpath[0] ? rpath : "/");
+    kputs("\n");
+    tree_walk(rpath, 0);
 }
 
 #define SYS_GETCWD   17 /* ebx=buf, ecx=len -> cwd string, eax=len or -1 */
