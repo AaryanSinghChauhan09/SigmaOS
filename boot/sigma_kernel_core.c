@@ -2699,6 +2699,49 @@ static void pmm_free(uint32_t phys) {
     if (pg < 1048576) g_page_bitmap[pg >> 5] &= ~(1u << (pg & 31));
 }
 
+/* ---- kernel heap: page-granular kmalloc over pmm ----
+ * SEPARATION OF MECHANISM & POLICY: pmm owns pages; kmalloc owns
+ * size-class policy. Sub-page slab allocator is a future refinement. */
+static void* kmalloc(uint32_t size) {
+    if (size == 0 || size > 0x100000) return 0;
+    if (!g_mm_ready) mm_init();
+    uint32_t pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+    uint32_t* hdr = 0;
+    /* first-fit contiguous run of free pages (identity-mapped phys) */
+    for (uint32_t i = 0; i + pages <= 1048576; i++) {
+        int ok = 1;
+        for (uint32_t j = 0; j < pages; j++) {
+            uint32_t pg = i + j;
+            if (g_page_bitmap[pg >> 5] & (1u << (pg & 31))) { ok = 0; break; }
+        }
+        if (!ok) continue;
+        for (uint32_t j = 0; j < pages; j++) {
+            uint32_t pg = i + j;
+            g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
+            g_alloc_count++;
+        }
+        hdr = (uint32_t*)(size_t)(i * PAGE_SIZE);
+        hdr[0] = pages;                 /* store page count in first dword */
+        /* zero the payload region */
+        uint8_t* p = (uint8_t*)(size_t)(i * PAGE_SIZE + 16);
+        for (uint32_t k = 16; k < pages * PAGE_SIZE; k++) p[k - 16] = 0;
+        return (void*)(size_t)((uint32_t)hdr + 16);
+    }
+    return 0;
+}
+
+static void kfree(void* ptr) {
+    if (!ptr) return;
+    uint32_t base = (uint32_t)(size_t)ptr - 16;
+    uint32_t pages = *(volatile uint32_t*)(size_t)base;
+    if (pages == 0 || pages > 256) return;   /* sanity */
+    uint32_t pg0 = base / PAGE_SIZE;
+    for (uint32_t j = 0; j < pages; j++) {
+        uint32_t pg = pg0 + j;
+        if (pg < 1048576) g_page_bitmap[pg >> 5] &= ~(1u << (pg & 31));
+    }
+}
+
 static void show_memalloc(void) {
     /* smoke test: allocate two pages, verify distinct, free them */
     uint32_t a = pmm_alloc();
@@ -2714,6 +2757,19 @@ static void show_memalloc(void) {
     } else {
         kputs("alloc test: allocation failed\n");
     }
+    /* kmalloc smoke test: 100-byte alloc, write/read, free */
+    uint8_t* k = (uint8_t*)kmalloc(100);
+    if (k) {
+        for (int i = 0; i < 100; i++) k[i] = (uint8_t)(i ^ 0x5A);
+        int ok = 1;
+        for (int i = 0; i < 100; i++) if (k[i] != (uint8_t)(i ^ 0x5A)) { ok = 0; break; }
+        kputs("kmalloc test: ");
+        kputs(ok ? "OK (100B write/read)\n" : "FAIL (data mismatch)\n");
+        kfree(k);
+    } else {
+        kputs("kmalloc test: allocation failed\n");
+    }
+    if (!g_mm_ready) mm_init();
     kputs("Page allocator: ");
     kprint_dec64(g_alloc_count);
     kputs(" allocs, ready=");
