@@ -388,6 +388,8 @@ static void show_user(void);
 static void pic_init(void);
 static void pit_init(void);
 static void show_timer(void);
+static void show_uptime(void);
+static void show_ver(void);
 static void show_memalloc(void);
 static void show_sched(void);
 static void show_ps(void);
@@ -3171,6 +3173,8 @@ void kernel_shell(void) {
             kputs("  append  - Append text: append <name> <text>\n");
             kputs("  hex     - Hexdump file: hex <file>\n");
             kputs("  stat    - File info: stat <file>\n");
+            kputs("  uptime  - Seconds since boot\n");
+            kputs("  ver     - Kernel version\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -3240,6 +3244,10 @@ void kernel_shell(void) {
             show_hex(cmd + 3);
         } else if (kcmd_is(cmd, "stat")) {
             show_stat(cmd + 4);
+        } else if (kcmd_is(cmd, "uptime")) {
+            show_uptime();
+        } else if (kcmd_is(cmd, "ver")) {
+            show_ver();
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
@@ -4109,6 +4117,23 @@ static void show_timer(void) {
     kputs("s @");
     kprint_dec64(PIT_HZ);
     kputs("Hz)\n");
+}
+
+static void show_uptime(void) {
+    kputs("Uptime: ");
+    kprint_dec64(g_tick_count / PIT_HZ);
+    kputs(" seconds (");
+    kprint_dec64(g_tick_count);
+    kputs(" ticks @ ");
+    kprint_dec64(PIT_HZ);
+    kputs(" Hz)\n");
+}
+
+static void show_ver(void) {
+    kputs("SIGMAOS SOVEREIGN KERNEL v0.1.0\n");
+    kputs("  x86 32-bit, Multiboot1, paging(GDT/TSS/IDT/PIC/PIT)\n");
+    kputs("  ring-3 exec + int 0x80 syscalls + preemptive sched\n");
+    kputs("  FAT12/16/32 rw, LFN, cwd, ELF32 loader\n");
 }
 
 /* --------------------------------------------------------------------------
