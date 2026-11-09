@@ -96,40 +96,13 @@ mcopy -o -i "$IMG" "$USER_DIR/md5sum.elf"    ::MD5SUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/dmesg.elf"     ::DMESG.ELF
 mcopy -o -i "$IMG" "$USER_DIR/pid.elf"       ::PID.ELF
 mcopy -o -i "$IMG" "$ROOT_DIR/etc/BOOT.CMD" ::BOOT.CMD
-mcopy -o -i "$IMG" "$USER_DIR/ln.elf"      ::LN.ELF
-mcopy -o -i "$IMG" "$USER_DIR/rmdir.elf"   ::RMDIR.ELF
-mcopy -o -i "$IMG" "$USER_DIR/cp.elf"      ::CP.ELF
-mcopy -o -i "$IMG" "$USER_DIR/true.elf"    ::TRUE.ELF
-mcopy -o -i "$IMG" "$USER_DIR/false.elf"   ::FALSE.ELF
-mcopy -o -i "$IMG" "$USER_DIR/uptime.elf"  ::UPTIME.ELF
-mcopy -o -i "$IMG" "$USER_DIR/hexdump.elf" ::HEXDUMP.ELF
-mcopy -o -i "$IMG" "$USER_DIR/truncate.elf" ::TRUNCATE.ELF
-mcopy -o -i "$IMG" "$USER_DIR/chmod.elf"    ::CHMOD.ELF
-mcopy -o -i "$IMG" "$USER_DIR/sum.elf"      ::SUM.ELF
-mcopy -o -i "$IMG" "$USER_DIR/shuf.elf"     ::SHUF.ELF
-mcopy -o -i "$IMG" "$USER_DIR/paste.elf"    ::PASTE.ELF
-mcopy -o -i "$IMG" "$USER_DIR/comm.elf"     ::COMM.ELF
-mcopy -o -i "$IMG" "$USER_DIR/join.elf"     ::JOIN.ELF
-mcopy -o -i "$IMG" "$USER_DIR/fmt.elf"      ::FMT.ELF
-mcopy -o -i "$IMG" "$USER_DIR/tsort.elf"    ::TSORT.ELF
-mcopy -o -i "$IMG" "$USER_DIR/diff.elf"     ::DIFF.ELF
-mcopy -o -i "$IMG" "$USER_DIR/bc.elf"       ::BC.ELF
-mcopy -o -i "$IMG" "$USER_DIR/split.elf"    ::SPLIT.ELF
-mcopy -o -i "$IMG" "$USER_DIR/numfmt.elf"   ::NUMFMT.ELF
-mcopy -o -i "$IMG" "$USER_DIR/unexpand.elf" ::UNEXPAND.ELF
-mcopy -o -i "$IMG" "$USER_DIR/pr.elf"        ::PR.ELF
-mcopy -o -i "$IMG" "$USER_DIR/column.elf"    ::COLUMN.ELF
-mcopy -o -i "$IMG" "$USER_DIR/csplit.elf"    ::CSPLIT.ELF
-mcopy -o -i "$IMG" "$USER_DIR/units.elf"     ::UNITS.ELF
-mcopy -o -i "$IMG" "$USER_DIR/ptx.elf"       ::PTX.ELF
-mcopy -o -i "$IMG" "$USER_DIR/look.elf"      ::LOOK.ELF
-mcopy -o -i "$IMG" "$USER_DIR/sleep.elf"     ::SLEEP.ELF
-mcopy -o -i "$IMG" "$USER_DIR/free.elf"      ::FREE.ELF
-mcopy -o -i "$IMG" "$USER_DIR/cksum.elf"     ::CKSUM.ELF
-mcopy -o -i "$IMG" "$USER_DIR/md5sum.elf"    ::MD5SUM.ELF
-mcopy -o -i "$IMG" "$USER_DIR/dmesg.elf"     ::DMESG.ELF
-mcopy -o -i "$IMG" "$USER_DIR/pid.elf"       ::PID.ELF
-mcopy -o -i "$IMG" "$ROOT_DIR/etc/BOOT.CMD" ::BOOT.CMD
+mcopy -o -i "$IMG" "$USER_DIR/kill.elf"      ::KILL.ELF
+mcopy -o -i "$IMG" "$USER_DIR/pipetest.elf"  ::PIPETEST.ELF
+mcopy -o -i "$IMG" "$USER_DIR/forkdemo.elf"  ::FORKDEMO.ELF
+mcopy -o -i "$IMG" "$USER_DIR/execve.elf"    ::EXECVE.ELF
+mcopy -o -i "$IMG" "$USER_DIR/waitpid.elf"   ::WAITPID.ELF
+mcopy -o -i "$IMG" "$USER_DIR/sigdemo.elf"   ::SIGDEMO.ELF
+mcopy -o -i "$IMG" "$USER_DIR/top.elf"       ::TOP.ELF
 
 echo "Built $IMG"
 mdir -i "$IMG" ::
