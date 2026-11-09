@@ -6198,6 +6198,7 @@ static void idt_init(void) {
 #define SYS_GETPGID  48 /* ebx=pid(0=self) -> eax=pgid/-1 */
 #define SYS_SETPGID  49 /* ebx=pid(0=self), ecx=pgid(0=new group=pid) -> eax=pgid/-1 */
 #define SYS_SETSID   50 /* self only -> eax=new sid(pid)/-1 if already group leader */
+#define SYS_GETSID   52 /* ebx=pid(0=self) -> eax=sid/-1 */
 #define SYS_PTRACE   51 /* ebx=req(0=TRACEME,1=PEEKTEXT,2=POKETEXT,3=GETREGS,4=STOP,5=CONT), ecx=pid, edx=addr/buf, esi=data -> eax */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
@@ -7646,6 +7647,20 @@ void syscall_handler(uint32_t* regs) {
         sp->pgid = sp->pid;
         sp->sid  = sp->pid;
         regs[7] = sp->pid;
+        return;
+    } else if (nr == SYS_GETSID) {
+        uint32_t want = regs[4];
+        int idx = -1;
+        if (want == 0) {
+            if (g_cur_proc < 0 || g_cur_proc >= MAX_PROCS) { regs[7] = 0xFFFFFFFFu; return; }
+            idx = g_cur_proc;
+        } else {
+            for (int i = 0; i < MAX_PROCS; i++)
+                if (g_procs[i].used && g_procs[i].pid == want) { idx = i; break; }
+        }
+        if (idx < 0) { regs[7] = 0xFFFFFFFFu; return; }
+        struct proc* gp = &g_procs[idx];
+        regs[7] = gp->sid ? gp->sid : gp->pid;
         return;
     } else if (nr == SYS_GETPGID || nr == SYS_SETPGID) {
         uint32_t want = regs[4];
