@@ -2119,6 +2119,71 @@ static int fat_rmdir_impl(const char* name) {
     return 0;
 }
 
+/* fat_truncate_impl — shrink a file to newsize bytes (no extend).
+ * Frees tail clusters, updates dirent size. Returns 0 ok, <0 err. */
+static int fat_truncate_impl(const char* name, uint32_t newsize) {
+    if (fat_ensure_mounted() != 0) return -1;
+    int kind = g_vol_kind;
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit dh;
+        int dlr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                             g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                             g_vol_spc, g_cwd, &dh);
+        if (dlr <= 0 || !dh.is_dir) return -1;
+        in_root = 0; dir_cluster = dh.cluster;
+    }
+    uint8_t want[11];
+    fat_name_to_83(name, want);
+    struct slot_res slot;
+    int sr = fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                               g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                               g_vol_data_lba, g_vol_spc, want, &slot);
+    if (slot.status != -1) return -2;
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) return -8;
+    uint8_t* e = g_file_buf + slot.off;
+    if (e[11] & 0x10) return -3;    /* dir */
+    uint32_t cur = (uint32_t)e[28] | ((uint32_t)e[29] << 8)
+                 | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
+    if (newsize >= cur) return 0;  /* no shrink needed */
+    uint32_t first = fat_dirent_cluster(kind, e);
+    uint32_t cb = (uint32_t)g_vol_spc * 512u;
+    uint32_t need = cb ? (newsize + cb - 1) / cb : 0;
+    /* collect chain */
+    uint32_t chain[512];
+    uint32_t cnt = 0;
+    uint32_t clus = first;
+    int guard = 0;
+    while (clus >= 2 && !fat_eoc_any(kind, clus) && cnt < 512 && guard++ < 4096) {
+        chain[cnt++] = clus;
+        clus = fat_next_any(g_vol_fat_lba, kind, clus);
+    }
+    /* free clusters beyond 'need' */
+    for (uint32_t i = need; i < cnt; i++) {
+        if (fat_set_entry(kind, chain[i], 0) != 0) return -8;
+    }
+    /* update dirent: size + first cluster (0 if empty) */
+    e[28] = (uint8_t)(newsize & 0xFF);
+    e[29] = (uint8_t)((newsize >> 8) & 0xFF);
+    e[30] = (uint8_t)((newsize >> 16) & 0xFF);
+    e[31] = (uint8_t)((newsize >> 24) & 0xFF);
+    if (need == 0) {
+        /* clear cluster field */
+        if (kind == 2) { e[26] = e[27] = e[20] = e[21] = 0; }
+        else { e[26] = e[27] = 0; }
+    } else if (need < cnt) {
+        /* last kept cluster's next pointer already points to freed one —
+         * mark it EOC so chain ends cleanly */
+        uint32_t last = chain[need - 1];
+        uint32_t eoc = (kind == 2) ? 0x0FFFFFF8u
+                    : (kind == 1) ? 0xFFF8u : 0xFF8u;
+        if (fat_set_entry(kind, last, eoc) != 0) return -8;
+    }
+    if (fat_write_dirent(slot.lba, slot.off, e) != 0) return -8;
+    return 0;
+}
+
 static void show_mkdir(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -5198,6 +5263,7 @@ static void idt_init(void) {
 #define SYS_STATX    23 /* ebx=name -> eax=(is_dir<<31)|size, -1 err */
 #define SYS_LINK     24 /* ebx=old, ecx=new — hardlink (same chain), eax=0/-1 */
 #define SYS_RMDIR    25 /* ebx=name — remove empty dir, eax=0/-1 */
+#define SYS_TRUNC    26 /* ebx=name, ecx=newsize — shrink file, eax=0/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -5942,6 +6008,20 @@ void syscall_handler(uint32_t* regs) {
         name[nl] = 0;
         if (!nl || kstrlen(name) > 12) { regs[7] = 0xFFFFFFFFu; return; }
         ret = fat_rmdir_impl(name) == 0 ? 0u : 0xFFFFFFFFu;
+    } else if (nr == SYS_TRUNC) {
+        /* ebx=name ptr, ecx=newsize — shrink file in cwd */
+        volatile char* up = (volatile char*)(size_t)regs[4];
+        char name[64];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 63 && (uint32_t)(size_t)(up + nl) < limit && up[nl]
+               && up[nl] != '/' && up[nl] != '\\') {
+            name[nl] = (char)up[nl]; nl++;
+        }
+        name[nl] = 0;
+        if (!nl || kstrlen(name) > 12) { regs[7] = 0xFFFFFFFFu; return; }
+        ret = fat_truncate_impl(name, (uint32_t)regs[6]) == 0 ? 0u : 0xFFFFFFFFu;
     } else if (nr == SYS_CREAT) {
         /* ebx = user ptr to NUL-terminated single-component name in cwd.
          * Creates an empty file (allocated cluster, size 0, attr 0x20). */
