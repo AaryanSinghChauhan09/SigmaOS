@@ -2993,6 +2993,82 @@ static void show_sort(const char* args) {
     kfree(buf);
 }
 
+/* tr <from> <to> <file> | tr -d <set> <file> — char translate/delete. */
+static void tr_expand(const char* in, char* out, int max) {
+    /* expand ranges a-z into out; returns length */
+    int o = 0;
+    for (int i = 0; in[i] && o < max - 1; i++) {
+        if (in[i+1] == '-' && in[i+2]) {
+            char a = in[i], b = in[i+2];
+            if (a <= b) { for (char c = a; c <= b && o < max-1; c++) out[o++] = c; }
+            else { for (char c = a; c >= b && o < max-1; c--) out[o++] = c; }
+            i += 2;
+        } else out[o++] = in[i];
+    }
+    out[o] = 0;
+}
+static int tr_has(const char* set, char c) {
+    for (int i = 0; set[i]; i++) {
+        if (set[i+1] == '-' && set[i+2]) {
+            if (c >= set[i] && c <= set[i+2]) return 1;
+            i += 2;
+        } else if (set[i] == c) return 1;
+    }
+    return 0;
+}
+static void show_tr(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    int del = 0;
+    if (p[0] == '-' && p[1] == 'd' && p[2] == ' ') { del = 1; p += 3; }
+    /* token1 = from/set, token2 = to (unless -d), token3 = file */
+    char t1[64], t2[64], fname[64];
+    int l1 = 0, l2 = 0, lf = 0;
+    while (*p && *p != ' ' && l1 < 63) t1[l1++] = *p++;
+    t1[l1] = 0;
+    while (*p == ' ') p++;
+    const char* filep = p;
+    if (!del) {
+        while (*p && *p != ' ' && l2 < 63) t2[l2++] = *p++;
+        t2[l2] = 0;
+        while (*p == ' ') p++;
+        filep = p;
+    }
+    while (*filep && *filep != ' ' && lf < 63) fname[lf++] = *filep++;
+    fname[lf] = 0;
+    if (!l1 || !lf || (!del && !l2)) { kputs("usage: tr <from> <to> <file> | tr -d <set> <file>\n"); return; }
+    if (fat_ensure_mounted() != 0) { kputs("tr: no FAT volume.\n"); return; }
+    char rpath[160];
+    if (fs_resolve(fname, rpath, (int)sizeof rpath) != 0) {
+        kputs("tr: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("tr: not found.\n"); return; }
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("tr: out of memory.\n"); return; }
+    int got = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                              g_vol_spc, hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs("tr: read error.\n"); return; }
+    char from[256], to[256];
+    tr_expand(t1, from, 256);
+    if (!del) tr_expand(t2, to, 256);
+    for (int i = 0; i < got; i++) {
+        char c = (char)buf[i];
+        if (del) { if (!tr_has(from, c)) kputc(c); }
+        else {
+            int j = 0;
+            for (; from[j]; j++) if (from[j] == c) break;
+            if (from[j]) { char r = to[j] ? to[j] : to[kstrlen(to)-1]; kputc(r); }
+            else kputc(c);
+        }
+    }
+    kfree(buf);
+}
+
 /* uniq <file> — drop adjacent duplicate lines (≤4KB). */
 static void show_uniq(const char* args) {
     const char* p = args;
@@ -3741,7 +3817,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
