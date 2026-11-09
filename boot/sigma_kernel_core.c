@@ -1362,23 +1362,26 @@ static void ls_print_dirent(int kind, const uint8_t* e, int use_lfn,
     kputs("\n");
 }
 
+static void show_ls_r(const char* args);
 static void show_ls(const char* args) {
     /* "ls [lba:<n>]" or "ls <dir-path>" — list directory entries */
     uint32_t lba = 0;
     char dirname[64];
     dirname[0] = '\0';
     const char* p = args;
-    g_ls_long = 0; g_ls_all = 0;
+    g_ls_long = 0; g_ls_all = 0; int rec = 0;
     while (*p == ' ') p++;
     while (*p == '-') {
         p++;
         while (*p && *p != ' ') {
             if (*p == 'l') g_ls_long = 1;
             else if (*p == 'a') g_ls_all = 1;
+            else if (*p == 'R') rec = 1;
             p++;
         }
         while (*p == ' ') p++;
     }
+    if (rec) { show_ls_r(p); return; }
     if (kprefix(p, "lba:")) {
         lba = kstrtoul(p + 4);
     } else if (*p) {
@@ -4161,7 +4164,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr","expand","unexpand","tree","du",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr","expand","unexpand","tree","du","ls-r",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
@@ -5341,6 +5344,130 @@ static void show_du(const char* args) {
     if (fat_ensure_mounted() != 0) return;
     uint32_t total = du_walk(rpath, 0);
     kputs("total: "); kprint_dec64(total); kputs(" bytes\n");
+}
+
+/* ls_r_walk — recursive listing with path headers. */
+static void ls_r_walk(const char* path, int depth) {
+    if (depth > 6 || fat_ensure_mounted() != 0) return;
+    int kind = g_vol_kind;
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (path[0]) {
+        struct fat_hit dh;
+        int dr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, path, &dh);
+        if (dr <= 0 || !dh.is_dir) return;
+        in_root = 0; dir_cluster = dh.cluster;
+    } else if (kind == 2) {
+        dir_cluster = g_vol_root_clus;
+    }
+    uint8_t* names = (uint8_t*)kmalloc(4096);
+    if (!names) return;
+    uint32_t n = fat_collect_names(kind, in_root, dir_cluster, names, 4096);
+    uint32_t pos = 0;
+    while (pos < n) {
+        uint32_t ls = pos;
+        while (pos < n && names[pos] != '\n') pos++;
+        uint32_t ll = pos - ls;
+        if (pos < n) pos++;
+        if (!ll) continue;
+        char nm[128];
+        if (ll > 120) ll = 120;
+        for (uint32_t k = 0; k < ll; k++) nm[k] = (char)names[ls+k];
+        nm[ll] = 0;
+        char full[192]; int fl = 0;
+        if (path[0]) { for (const char* q = path; *q && fl < 180; q++) full[fl++] = *q; }
+        if (fl && full[fl-1] != '/') full[fl++] = '/';
+        for (uint32_t k = 0; k < ll && fl < 188; k++) full[fl++] = nm[k];
+        full[fl] = 0;
+        struct fat_hit ch;
+        int cr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, full, &ch);
+        int isdir = (cr > 0 && ch.is_dir);
+        if (isdir) {
+            kputs("\n"); kputs(full); kputs(":\n");
+            ls_r_walk(full, depth + 1);
+        }
+    }
+    kfree(names);
+}
+static void show_ls_r(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char rpath[160]; rpath[0] = 0;
+    if (*p) {
+        if (fs_resolve(p, rpath, (int)sizeof rpath) != 0) {
+            kputs("ls -R: path too long.\n"); return;
+        }
+    }
+    /* print files in this dir first, then recurse into subdirs */
+    if (fat_ensure_mounted() != 0) return;
+    int kind = g_vol_kind;
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (rpath[0]) {
+        struct fat_hit dh;
+        int dr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, rpath, &dh);
+        if (dr <= 0 || !dh.is_dir) { kputs("ls -R: not a dir.\n"); return; }
+        in_root = 0; dir_cluster = dh.cluster;
+    } else if (kind == 2) {
+        dir_cluster = g_vol_root_clus;
+    }
+    uint8_t* names = (uint8_t*)kmalloc(4096);
+    if (!names) return;
+    uint32_t n = fat_collect_names(kind, in_root, dir_cluster, names, 4096);
+    uint32_t pos = 0;
+    while (pos < n) {
+        uint32_t ls = pos;
+        while (pos < n && names[pos] != '\n') pos++;
+        uint32_t ll = pos - ls;
+        if (pos < n) pos++;
+        if (!ll) continue;
+        char nm[128];
+        if (ll > 120) ll = 120;
+        for (uint32_t k = 0; k < ll; k++) nm[k] = (char)names[ls+k];
+        nm[ll] = 0;
+        char full[192]; int fl = 0;
+        if (rpath[0]) { for (const char* q = rpath; *q && fl < 180; q++) full[fl++] = *q; }
+        if (fl && full[fl-1] != '/') full[fl++] = '/';
+        for (uint32_t k = 0; k < ll && fl < 188; k++) full[fl++] = nm[k];
+        full[fl] = 0;
+        struct fat_hit ch;
+        int cr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, full, &ch);
+        if (!(cr > 0 && ch.is_dir)) { kputs(nm); kputs("\n"); }
+    }
+    pos = 0;
+    while (pos < n) {
+        uint32_t ls = pos;
+        while (pos < n && names[pos] != '\n') pos++;
+        uint32_t ll = pos - ls;
+        if (pos < n) pos++;
+        if (!ll) continue;
+        char nm[128];
+        if (ll > 120) ll = 120;
+        for (uint32_t k = 0; k < ll; k++) nm[k] = (char)names[ls+k];
+        nm[ll] = 0;
+        char full[192]; int fl = 0;
+        if (rpath[0]) { for (const char* q = rpath; *q && fl < 180; q++) full[fl++] = *q; }
+        if (fl && full[fl-1] != '/') full[fl++] = '/';
+        for (uint32_t k = 0; k < ll && fl < 188; k++) full[fl++] = nm[k];
+        full[fl] = 0;
+        struct fat_hit ch;
+        int cr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, full, &ch);
+        if (cr > 0 && ch.is_dir) {
+            kputs("\n"); kputs(full); kputs(":\n");
+            ls_r_walk(full, 1);
+        }
+    }
+    kfree(names);
 }
 
 #define SYS_GETCWD   17 /* ebx=buf, ecx=len -> cwd string, eax=len or -1 */
