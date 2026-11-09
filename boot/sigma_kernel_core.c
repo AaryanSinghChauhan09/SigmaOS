@@ -327,6 +327,11 @@ static int fat_scan_dir(uint32_t start_cluster, int kind, uint32_t fat_lba,
                         struct fat_hit* hit);
 static int fat_scan_root16(uint32_t root_lba, uint32_t root_secs,
                            const uint8_t want[11], struct fat_hit* hit);
+static int fat_lookup(int kind, uint32_t root_clus, uint32_t root_lba, uint32_t root_secs,
+                      uint32_t fat_lba, uint32_t data_lba, uint8_t spc,
+                      const char* path, struct fat_hit* hit);
+static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
+                            uint32_t data_lba, uint8_t spc);
 
 #define MBI_FLAGS       0
 #define MBI_MEM_LOWER   4
@@ -948,12 +953,22 @@ static void fat_print_name(const uint8_t* e) {
 }
 
 static void show_ls(const char* args) {
-    /* "ls [lba:<n>]" — list root dir of FAT12/16 volume (FAT32 unsupported yet) */
+    /* "ls [lba:<n>]" or "ls <dir-path>" — list directory entries */
     uint32_t lba = 0;
+    char dirname[64];
+    dirname[0] = '\0';
     const char* p = args;
     while (*p == ' ') p++;
     if (kprefix(p, "lba:")) {
         lba = kstrtoul(p + 4);
+    } else if (*p) {
+        int dl = 0;
+        while (*p && *p != ' ' && dl < 63) dirname[dl++] = *p++;
+        dirname[dl] = '\0';
+        /* default: first partition's start LBA from MBR */
+        if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("ls: no MBR.\n"); return; }
+        uint8_t* e = g_sector_buf + 446;
+        lba = (uint32_t)e[8] | ((uint32_t)e[9] << 8) | ((uint32_t)e[10] << 16) | ((uint32_t)e[11] << 24);
     } else {
         /* default: first partition's start LBA from MBR */
         if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("ls: no MBR.\n"); return; }
@@ -979,6 +994,41 @@ static void show_ls(const char* args) {
 
     uint32_t fat_lba  = lba + rsvd;
     uint32_t data_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+
+    if (dirname[0]) {
+        /* ls <dir-path>: resolve and list that directory's cluster chain */
+        int kind;
+        uint32_t root_clus = 0, root_lba = 0, root_secs = 0;
+        if (is_fat32) {
+            kind = 2;
+            root_clus = (uint32_t)b[44] | ((uint32_t)b[45] << 8)
+                      | ((uint32_t)b[46] << 16) | ((uint32_t)b[47] << 24);
+            if (root_clus < 2) { kputs("ls: invalid FAT32 root cluster.\n"); return; }
+        } else {
+            uint16_t tot16 = (uint16_t)b[19] | ((uint16_t)b[20] << 8);
+            uint32_t tot32 = (uint32_t)b[32] | ((uint32_t)b[33] << 8) | ((uint32_t)b[34] << 16) | ((uint32_t)b[35] << 24);
+            uint32_t tot = tot16 ? tot16 : tot32;
+            uint32_t rdir_secs = (uint32_t)((rent * 32 + bps - 1) / bps);
+            uint32_t data_clusters = (tot - rsvd - nfats * fatsz - rdir_secs) / spc;
+            kind = data_clusters < 4085 ? 0 : 1;
+            data_lba += rdir_secs;
+            root_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+            root_secs = rdir_secs;
+        }
+        struct fat_hit hit;
+        int lr = fat_lookup(kind, root_clus, root_lba, root_secs,
+                            fat_lba, data_lba, spc, dirname, &hit);
+        if (lr == -2) { kputs("ls: path component is not a directory.\n"); return; }
+        if (lr <= 0) {
+            kputs("ls: '");
+            kputs(dirname);
+            kputs("' not found.\n");
+            return;
+        }
+        if (!hit.is_dir) { kputs("ls: '"); kputs(dirname); kputs("' is a file.\n"); return; }
+        fat_print_chain(hit.cluster, kind, fat_lba, data_lba, spc);
+        return;
+    }
 
     if (is_fat32) {
         /* FAT32: root dir is a cluster chain starting at offset 44 */
@@ -1189,6 +1239,52 @@ static int fat_scan_dir(uint32_t start_cluster, int kind, uint32_t fat_lba,
         clus = fat_next_any(fat_lba, kind, clus);
     }
     return 0;
+}
+
+/* List all entries of a cluster-chain directory (subdir or FAT32 root). */
+static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
+                            uint32_t data_lba, uint8_t spc) {
+    uint32_t clus = start_cluster;
+    int count = 0, guard = 0;
+    while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 64 && count < 128) {
+        uint32_t clus_lba = data_lba + (clus - 2) * spc;
+        uint32_t secs = spc > 8 ? 8 : spc;
+        uint8_t* dst = g_fs_buf;
+        uint32_t done = 0;
+        while (done < secs) {
+            int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
+            int n = ata_read_lba28(0x1F0, 0, clus_lba + done, dst, chunk);
+            if (n < 0) { kputs("ls: read error.\n"); return; }
+            dst += n * 512;
+            done += (uint32_t)n;
+        }
+        int entries = (int)(secs * 16);
+        int stop = 0;
+        for (int i = 0; i < entries; i++) {
+            uint8_t* e = g_fs_buf + i * 32;
+            if (e[0] == 0x00) { stop = 1; break; }
+            if (e[0] == 0xE5) continue;
+            if (e[11] == 0x0F) continue;
+            uint8_t attr = e[11];
+            kputs("  ");
+            if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
+            fat_print_name(e);
+            if (!(attr & 0x10)) {
+                uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
+                kputs("  ");
+                kprint_dec64(sz);
+                kputs(" B");
+            }
+            kputs("\n");
+            count++;
+            if (count >= 128) { kputs("  ... (truncated)\n"); stop = 1; break; }
+        }
+        if (stop) break;
+        clus = fat_next_any(fat_lba, kind, clus);
+    }
+    kputs("ls: ");
+    kprint_dec64(count);
+    kputs(" entrie(s).\n");
 }
 
 /* Scan the fixed-size FAT12/16 root directory region for an 8.3 name. */
