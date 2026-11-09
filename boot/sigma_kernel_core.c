@@ -6834,6 +6834,41 @@ static uint32_t proc_render(int fdidx, uint32_t id) {
         if (!found) n += k_strcpy(b + n, "no such process\n");
         break;
     }
+    case 8: { /* SCHED — scheduler stats */
+        n += k_strcpy(b + n, "policy	round-robin+nice\nhz	100\n"
+                              "procs	");
+        int cnt = 0;
+        for (int i = 0; i < MAX_PROCS; i++) if (g_procs[i].used) cnt++;
+        n += k_u32dec((uint32_t)cnt, tmp);
+        for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+        n += k_strcpy(b + n, "\ncur	");
+        n += k_u32dec(g_cur_proc >= 0 ? g_procs[g_cur_proc].pid : 0, tmp);
+        for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+        n += k_strcpy(b + n, "\nticks	");
+        n += k_u32dec(g_tick_count, tmp);
+        for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+        n += k_strcpy(b + n, "\npid\tppid\tnice\tticks\tname\n");
+        for (int i = 0; i < MAX_PROCS && n < PROC_MAX - 60; i++) {
+            if (!g_procs[i].used) continue;
+            struct proc* q = &g_procs[i];
+            n += k_u32dec(q->pid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, "\t");
+            n += k_u32dec(q->ppid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, "\t");
+            { char nb[8]; int ni2=0,nv=q->nice; if(nv<0){nb[ni2++]='-';nv=-nv;}
+              char d[12]; int di=0; do{d[di++]='0'+nv%10;nv/=10;}while(nv);
+              while(di) nb[ni2++]=d[--di]; nb[ni2]=0; n += k_strcpy(b+n, nb); }
+            n += k_strcpy(b + n, "\t");
+            n += k_u32dec(q->ticks, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, "\t");
+            n += k_strcpy(b + n, q->name[0] ? q->name : "?");
+            n += k_strcpy(b + n, "\n");
+        }
+        break;
+    }
     case 7: { /* STATUS of PROC/<pid>/STATUS */
         int found = 0;
         for (int i = 0; i < MAX_PROCS; i++) {
@@ -6887,6 +6922,17 @@ static int proc_lookup(const char* rpath) {
         !(rpath[3] == 'C' || rpath[3] == 'c') ||
         rpath[4] != '/') return 0;
     const char* leaf = rpath + 5;
+    /* PROC/SCHED — scheduler stats */
+    {
+        const char* nm = "SCHED"; int j = 0;
+        while (nm[j] && leaf[j]) {
+            char lc = leaf[j];
+            if (lc >= 'a' && lc <= 'z') lc = (char)(lc - 32);
+            if (lc != nm[j]) break;
+            j++;
+        }
+        if (!nm[j] && !leaf[j]) return 8;
+    }
     /* PROC/<pid>/STAT — per-process stat file */
     {
         const char* q = leaf;
