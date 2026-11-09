@@ -55,6 +55,10 @@ static inline uint16_t inw(uint16_t port) {
     return ret;
 }
 
+static inline void outw(uint16_t port, uint16_t val) {
+    __asm__ volatile ("outw %0, %1" :: "a"(val), "Nd"(port));
+}
+
 static inline void io_wait(void) {
     outb(0x80, 0);
 }
@@ -848,6 +852,24 @@ static int ata_read_lba28(uint16_t base, int slave, uint32_t lba, uint8_t* buf, 
         if (ata_wait_drq(base) != 0) return -1;
         uint16_t* w = (uint16_t*)(buf + s * 512);
         for (int i = 0; i < 256; i++) w[i] = inw(base);
+    }
+    return sectors;
+}
+
+/* Write up to 4 sectors (LBA28). Returns sectors written or -1. */
+static int ata_write_lba28(uint16_t base, int slave, uint32_t lba, const uint8_t* buf, int sectors) {
+    if (sectors < 1 || sectors > 4) return -1;
+    outb(base + 6, (uint8_t)(0xE0 | (slave << 4) | ((lba >> 24) & 0x0F)));
+    io_wait();
+    outb(base + 2, (uint8_t)sectors);
+    outb(base + 3, (uint8_t)(lba & 0xFF));
+    outb(base + 4, (uint8_t)((lba >> 8) & 0xFF));
+    outb(base + 5, (uint8_t)((lba >> 16) & 0xFF));
+    outb(base + 7, 0x30);                          /* WRITE SECTORS */
+    for (int s = 0; s < sectors; s++) {
+        if (ata_wait_drq(base) != 0) return -1;
+        const uint16_t* w = (const uint16_t*)(buf + s * 512);
+        for (int i = 0; i < 256; i++) outw(base, w[i]);
     }
     return sectors;
 }
@@ -1720,6 +1742,223 @@ static int fat_lookup(int kind, uint32_t root_clus, uint32_t root_lba, uint32_t 
     return 0;
 }
 
+/* ---- FAT write support ----
+ * Minimal write path: allocate one cluster, create directory entries.
+ * SEPARATION OF MECHANISM & POLICY: ata_write moves sectors; fat_alloc_*
+ * owns FAT policy; show_* owns UX. */
+
+/* Allocate the first free cluster (FAT entry == 0), mark it EOC,
+ * write the FAT sector(s) back. Returns cluster number or 0. */
+static uint32_t fat_alloc_cluster(int kind) {
+    if (fat_ensure_mounted() != 0) return 0;
+    uint32_t fat_bytes = g_vol_fatsz * 512u;
+    if (fat_bytes == 0 || fat_bytes > 0x400000u) return 0;
+    uint8_t* fat = (uint8_t*)kmalloc(fat_bytes);
+    if (!fat) return 0;
+    uint32_t done = 0;
+    int fail = 0;
+    while (done < g_vol_fatsz) {
+        int chunk = (g_vol_fatsz - done > 4) ? 4 : (int)(g_vol_fatsz - done);
+        int n = ata_read_lba28(0x1F0, 0, g_vol_fat_lba + done, fat + done * 512u, chunk);
+        if (n < 0) { fail = 1; break; }
+        done += (uint32_t)n;
+    }
+    if (fail) { kfree(fat); return 0; }
+
+    uint32_t limit = g_vol_total_clusters;
+    uint32_t found = 0, byte_off = 0, width = 0;
+    for (uint32_t c = 2; c < limit; c++) {
+        int free_e = 0;
+        if (kind == 2) {
+            uint32_t v = (uint32_t)fat[c*4] | ((uint32_t)fat[c*4+1] << 8)
+                       | ((uint32_t)fat[c*4+2] << 16) | ((uint32_t)fat[c*4+3] << 24);
+            free_e = (v & 0x0FFFFFFFu) == 0;
+            byte_off = c * 4; width = 4;
+        } else if (kind == 1) {
+            uint16_t v = (uint16_t)fat[c*2] | ((uint16_t)fat[c*2+1] << 8);
+            free_e = (v == 0);
+            byte_off = c * 2; width = 2;
+        } else {
+            uint32_t off = c + (c >> 1);
+            if (off + 1 >= fat_bytes) break;
+            uint16_t v = (uint16_t)fat[off] | ((uint16_t)fat[off+1] << 8);
+            uint16_t e = (c & 1) ? (uint16_t)((v >> 4) & 0x0FFF)
+                                : (uint16_t)(v & 0x0FFF);
+            free_e = (e == 0);
+            byte_off = off; width = 2;
+        }
+        if (free_e) { found = c; break; }
+    }
+    if (!found) { kfree(fat); return 0; }
+
+    /* patch EOC marker */
+    if (kind == 2) {
+        fat[byte_off]   = 0xF8; fat[byte_off+1] = 0xFF;
+        fat[byte_off+2] = 0xFF; fat[byte_off+3] = 0x0F;
+    } else if (kind == 1) {
+        fat[byte_off] = 0xFF; fat[byte_off+1] = 0xFF;
+    } else {
+        uint16_t v = (uint16_t)fat[byte_off] | ((uint16_t)fat[byte_off+1] << 8);
+        if (found & 1) v = (uint16_t)((v & 0x000F) | (0x0FFFu << 4));
+        else           v = (uint16_t)((v & 0xF000) | 0x0FFFu);
+        fat[byte_off]   = (uint8_t)(v & 0xFF);
+        fat[byte_off+1] = (uint8_t)(v >> 8);
+    }
+
+    /* write back sectors covering the patched bytes */
+    uint32_t sec0 = byte_off / 512;
+    uint32_t sec1 = (byte_off + width - 1) / 512;
+    for (uint32_t s = sec0; s <= sec1; s += 4) {
+        int chunk = (int)(sec1 - s + 1 > 4 ? 4 : sec1 - s + 1);
+        if (ata_write_lba28(0x1F0, 0, g_vol_fat_lba + s, fat + s * 512u, chunk) < 0) {
+            kfree(fat); return 0;
+        }
+    }
+    kfree(fat);
+    return found;
+}
+
+struct slot_res { uint32_t lba; uint32_t off; int status; };
+/* status: 1=slot found, 0=dir full, -1=name exists, -2=io error */
+
+/* Scan a directory for a free 32-byte slot and check name collision.
+ * in_root=1 uses the fixed FAT12/16 root or FAT32 root cluster;
+ * otherwise dir_cluster is the chain start. */
+static int fat_find_dir_slot(int kind, int in_root,
+                             uint32_t root_clus, uint32_t root_lba, uint32_t root_secs,
+                             uint32_t dir_cluster, uint32_t fat_lba, uint32_t data_lba,
+                             uint8_t spc, const uint8_t want[11], struct slot_res* r) {
+    int seen_free = 0;
+    uint32_t free_lba = 0, free_off = 0;
+    uint32_t clus = dir_cluster;
+    int guard = 0;
+
+    for (;;) {
+        uint32_t sec_base, nsecs;
+        if (in_root && kind != 2) {
+            sec_base = root_lba; nsecs = root_secs;
+        } else {
+            if (clus < 2 || fat_eoc_any(kind, clus) || guard++ > 1024) break;
+            sec_base = data_lba + (clus - 2) * spc; nsecs = spc;
+        }
+        for (uint32_t s = 0; s < nsecs; s++) {
+            uint32_t lba = sec_base + s;
+            if (ata_read_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { r->status = -2; return -1; }
+            for (int i = 0; i < 16; i++) {
+                uint8_t* e = g_file_buf + i * 32;
+                if (e[0] == 0x0F) continue;              /* LFN entry */
+                if (e[0] == 0x00) {                       /* end of dir */
+                    if (seen_free) { r->lba = free_lba; r->off = free_off; }
+                    else           { r->lba = lba;      r->off = (uint32_t)(i * 32); }
+                    r->status = 1; return 1;
+                }
+                if (e[0] == 0xE5) {
+                    if (!seen_free) { seen_free = 1; free_lba = lba; free_off = (uint32_t)(i * 32); }
+                    continue;
+                }
+                if (fat_name_eq(e, want)) { r->status = -1; return -1; }
+            }
+        }
+        if (in_root && kind != 2) break;
+        clus = fat_next_any(fat_lba, kind, clus);
+    }
+    r->status = 0;
+    return 0;
+}
+
+/* Write a 32-byte directory entry at (lba, off). Caller fills `e`. */
+static int fat_write_dirent(uint32_t lba, uint32_t off, const uint8_t* e) {
+    if (ata_read_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) return -1;
+    for (int i = 0; i < 32; i++) g_file_buf[off + i] = e[i];
+    return ata_write_lba28(0x1F0, 0, lba, g_file_buf, 1);
+}
+
+static void show_mkdir(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char name[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = '\0';
+    if (!nl) { kputs("usage: mkdir <name>\n"); return; }
+    if (kstrlen(name) > 12) { kputs("mkdir: name too long (8.3 only).\n"); return; }
+    for (const char* q = name; *q; q++) {
+        if (*q == '/' || *q == '\\') { kputs("mkdir: single component only.\n"); return; }
+    }
+
+    if (fat_ensure_mounted() != 0) { kputs("mkdir: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+
+    /* resolve parent directory */
+    int in_root = 1;
+    uint32_t dir_cluster = 0, parent_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit hit;
+        int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
+                            g_cwd, &hit);
+        if (lr <= 0 || !hit.is_dir) { kputs("mkdir: cwd not a directory.\n"); return; }
+        in_root = 0;
+        dir_cluster = hit.cluster;
+        parent_cluster = hit.cluster;
+    } else {
+        parent_cluster = (kind == 2) ? g_vol_root_clus : 0;
+    }
+
+    uint8_t want[11];
+    fat_name_to_83(name, want);
+    struct slot_res slot;
+    int sr = fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                               g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                               g_vol_data_lba, g_vol_spc, want, &slot);
+    if (sr < 0 && slot.status == -1) { kputs("mkdir: name exists.\n"); return; }
+    if (slot.status != 1) { kputs("mkdir: directory full or IO error.\n"); return; }
+
+    uint32_t clus = fat_alloc_cluster(kind);
+    if (!clus) { kputs("mkdir: disk full or FAT alloc failed.\n"); return; }
+
+    /* write new dir entry into parent */
+    uint8_t e[32];
+    for (int i = 0; i < 32; i++) e[i] = 0;
+    for (int i = 0; i < 11; i++) e[i] = want[i];
+    e[11] = 0x10;                                 /* directory attr */
+    e[20] = (uint8_t)(clus & 0xFF); e[21] = (uint8_t)(clus >> 8);
+    if (kind == 2) { e[26] = (uint8_t)(clus >> 16); e[27] = (uint8_t)(clus >> 24); }
+    if (fat_write_dirent(slot.lba, slot.off, e) != 0) {
+        kputs("mkdir: dirent write failed.\n"); return;
+    }
+
+    /* initialise new cluster: "." and ".." entries, rest zero */
+    uint8_t* sec = g_file_buf;
+    for (int s = 0; s < (int)g_vol_spc; s++) {
+        for (int i = 0; i < 512; i++) sec[i] = 0;
+        if (s == 0) {
+            uint8_t* d = sec;
+            /* "." entry */
+            d[0] = '.'; for (int i = 1; i < 11; i++) d[i] = ' ';
+            d[11] = 0x10;
+            d[20] = (uint8_t)(clus & 0xFF); d[21] = (uint8_t)(clus >> 8);
+            if (kind == 2) { d[26] = (uint8_t)(clus >> 16); d[27] = (uint8_t)(clus >> 24); }
+            /* ".." entry at +32 */
+            uint8_t* u = sec + 32;
+            u[0] = '.'; u[1] = '.'; for (int i = 2; i < 11; i++) u[i] = ' ';
+            u[11] = 0x10;
+            u[20] = (uint8_t)(parent_cluster & 0xFF); u[21] = (uint8_t)(parent_cluster >> 8);
+            if (kind == 2) { u[26] = (uint8_t)(parent_cluster >> 16); u[27] = (uint8_t)(parent_cluster >> 24); }
+        }
+        uint32_t lba = g_vol_data_lba + (clus - 2) * g_vol_spc + (uint32_t)s;
+        int chunk = 1;
+        if (ata_write_lba28(0x1F0, 0, lba, sec, chunk) < 0) {
+            kputs("mkdir: cluster write failed.\n"); return;
+        }
+    }
+    kputs("mkdir: created /");
+    kputs(g_cwd[0] ? g_cwd : "");
+    if (g_cwd[0]) kputs("/");
+    kputs(name);
+    kputs("\n");
+}
+
 static void show_cat(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -2115,6 +2354,7 @@ void kernel_shell(void) {
             kputs("  cd      - Change directory: cd <dir>\n");
             kputs("  pwd     - Print working directory\n");
             kputs("  df      - Show filesystem free space\n");
+            kputs("  mkdir   - Create directory: mkdir <name>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -2166,6 +2406,8 @@ void kernel_shell(void) {
             show_pwd();
         } else if (kstrcmp(cmd, "df") == 0) {
             show_df();
+        } else if (kcmd_is(cmd, "mkdir")) {
+            show_mkdir(cmd + 5);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
