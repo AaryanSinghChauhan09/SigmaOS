@@ -1574,7 +1574,20 @@ static void show_exec(const char* args) {
     kprint_hex32(g_user_base + EXEC_LOAD_OFF);
     kputs("\n");
 
-    enter_user(g_user_base + EXEC_LOAD_OFF, g_user_base + EXEC_STACK_OFF);
+    /* _start ABI: [esp]=argc, [esp+4]=argv[0], [esp+8]=NULL.
+     * argv[0] points at a copy of the path inside the user region. */
+    uint32_t stack_top = g_user_base + EXEC_STACK_OFF;
+    uint8_t* argv0 = (uint8_t*)(size_t)(stack_top - 0x800);
+    int al = 0;
+    for (const char* s = namebuf; *s && al < 255; s++) argv0[al++] = (uint8_t)*s;
+    argv0[al] = 0;
+    uint32_t* sp = (uint32_t*)(size_t)(stack_top - 16);
+    sp[0] = 1;                                  /* argc */
+    sp[1] = (uint32_t)(size_t)argv0;            /* argv[0] */
+    sp[2] = 0;                                  /* NULL */
+    sp[3] = 0;                                  /* envp terminator */
+
+    enter_user(g_user_base + EXEC_LOAD_OFF, (uint32_t)(size_t)sp);
 }
 
 static void show_disk(void) {
