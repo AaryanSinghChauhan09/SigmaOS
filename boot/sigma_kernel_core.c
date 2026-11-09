@@ -304,6 +304,7 @@ struct proc {
     uint32_t pd;         /* private user page directory (phys) */
     uint32_t entry, esp0;/* initial eip/esp for first run */
     char     name[32];
+    char     cmdline[64];
     int      exit_code;
     uint32_t ctx[8];     /* pushal-order regs at preempt point */
     uint32_t eip, cs, eflags, esp, ss;
@@ -4324,7 +4325,7 @@ static uint32_t proc_build_pd(uint32_t base) {
 }
 
 /* claim an already-loaded region as a proc slot (post-load, no leak on fail) */
-static int proc_claim(uint32_t base, const char* name,
+static int proc_claim(uint32_t base, const char* name, const char* cmdline,
                       uint32_t entry, uint32_t esp0) {
     int idx = -1;
     for (int i = 0; i < MAX_PROCS; i++)
@@ -4350,6 +4351,11 @@ static int proc_claim(uint32_t base, const char* name,
     int i = 0;
     while (name[i] && i < 31) { p->name[i] = name[i]; i++; }
     p->name[i] = 0;
+    i = 0;
+    if (cmdline) {
+        while (cmdline[i] && i < (int)sizeof(p->cmdline) - 1) { p->cmdline[i] = cmdline[i]; i++; }
+    }
+    p->cmdline[i] = 0;
     return idx;
 }
 
@@ -4866,7 +4872,12 @@ static void exec_spawn(const char* args, int bg, uint32_t in_pipe, uint32_t out_
     sp[3] = 0;                                /* argv terminator */
     sp[4] = 0;                                /* envp terminator */
 
-    int pidx = proc_claim(g_user_base, namebuf, entry, (uint32_t)(size_t)sp);
+    char clbuf[80];
+    { int ci = 0;
+      for (const char* c = namebuf; *c && ci < 79; c++) clbuf[ci++] = *c;
+      if (*args) { clbuf[ci++] = ' '; for (const char* c = args; *c && ci < 79; c++) clbuf[ci++] = *c; }
+      clbuf[ci] = 0; }
+    int pidx = proc_claim(g_user_base, namebuf, clbuf, entry, (uint32_t)(size_t)sp);
     if (pidx < 0) { kputs("exec: process table full or PD alloc failed.\n"); return; }
     g_procs[pidx].in_pipe  = in_pipe;
     g_procs[pidx].out_pipe = out_pipe;
@@ -6947,8 +6958,11 @@ static int proc_lookup(const char* rpath) {
             /* STATUS = 7 chars */
             isstatus = (q[1]=='S'||q[1]=='s')&&(q[2]=='T'||q[2]=='t')&&(q[3]=='A'||q[3]=='a')
                     &&(q[4]=='T'||q[4]=='t')&&(q[5]=='U'||q[5]=='u')&&(q[6]=='S'||q[6]=='s')&&!q[7];
+            int iscmd = (q[1]=='C'||q[1]=='c')&&(q[2]=='M'||q[2]=='m')&&(q[3]=='D'||q[3]=='d')
+                     &&(q[4]=='L'||q[4]=='l')&&(q[5]=='I'||q[5]=='i')&&(q[6]=='N'||q[6]=='n')&&!q[7];
             if (isstat) { g_proc_stat_pid = pv; return 6; }
             if (isstatus) { g_proc_stat_pid = pv; return 7; }
+            if (iscmd) { g_proc_stat_pid = pv; return 9; }
         }
     }
     for (int k = 0; k < 5; k++) {
