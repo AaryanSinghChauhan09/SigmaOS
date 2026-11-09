@@ -2817,6 +2817,47 @@ static void show_tail(const char* args) {
     kfree(buf);
 }
 
+/* cal [year] [month] — Gregorian calendar via Zeller's congruence. */
+static void show_cal(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    int year = *p ? (int)kstrtoul(p) : 2026;
+    while (*p && *p != ' ') p++;
+    while (*p == ' ') p++;
+    int mon = *p ? (int)kstrtoul(p) : 0;
+    if (year < 1 || year > 9999 || mon < 0 || mon > 12) {
+        kputs("cal: usage: cal [year] [month]\n"); return;
+    }
+    static const char* mnames[] = {"","January","February","March","April",
+        "May","June","July","August","September","October","November","December"};
+    static const int mdays[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+    int m0 = mon ? mon : 1, m1 = mon ? mon : 12;
+    int y0 = mon ? year : year - 1;
+    if (mon == 2 && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0))
+        ; /* leap handled below */
+    for (int m = m0; m <= m1; m++) {
+        int yy = mon ? year : (m == 12 ? year : year - 1);
+        int dim = mdays[m];
+        if (m == 2 && ((yy % 4 == 0 && yy % 100 != 0) || yy % 400 == 0)) dim = 29;
+        /* Zeller: h = (q + 13(m+1)/5 + K + K/4 + J/4 + 5J) mod 7, 0=Sat */
+        int q = 1, mm = m < 3 ? m + 12 : m, K = yy % 100, J = yy / 100;
+        int h = (q + (13 * (mm + 1)) / 5 + K + K / 4 + J / 4 + 5 * J) % 7;
+        int first = (h + 6) % 7;   /* 0=Sun */
+        kputs("\n");
+        kputs(mnames[m]); kputs(" "); kprint_dec64(yy); kputs("\n");
+        kputs("Su Mo Tu We Th Fr Sa\n");
+        for (int i = 0; i < first; i++) kputs("   ");
+        for (int d = 1; d <= dim; d++) {
+            kprint_dec64(d);
+            if (d < 10) kputc(' ');
+            kputc(' ');
+            if ((first + d - 1) % 7 == 6) kputs("\n");
+        }
+        if ((first + dim - 1) % 7 != 6) kputs("\n");
+        if (mon) break;
+    }
+}
+
 /* true / false / : — POSIX no-op exit-status commands. */
 static void show_true(void) {}
 static void show_false(void) { kputs("false\n"); }
@@ -3441,7 +3482,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
