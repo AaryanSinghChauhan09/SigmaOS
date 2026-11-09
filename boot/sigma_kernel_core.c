@@ -971,6 +971,164 @@ static void show_ls(const char* args) {
     kputs(" entrie(s) in FAT12/16 root dir.\n");
 }
 
+/* --------------------------------------------------------------------------
+ * FAT12/16 File Read — `cat <name>`
+ * -------------------------------------------------------------------------- */
+static uint8_t g_file_buf[512 * 8];
+
+/* Convert "name.ext" to padded uppercase 8.3 in out[11]; returns 1 on success. */
+static int fat_name_to_83(const char* s, uint8_t out[11]) {
+    for (int i = 0; i < 11; i++) out[i] = ' ';
+    int dot = -1;
+    for (const char* p = s; *p; p++) if (*p == '.') { dot = (int)(p - s); break; }
+    int base_len = 0;
+    for (const char* p = s; *p && *p != '.'; p++) base_len++;
+    if (base_len > 8) base_len = 8;
+    for (int i = 0; i < base_len; i++) {
+        char c = s[i];
+        if (c >= 'a' && c <= 'z') c = (char)(c - 32);
+        out[i] = (uint8_t)c;
+    }
+    if (dot >= 0) {
+        const char* ext = s + dot + 1;
+        for (int i = 0; i < 3 && ext[i]; i++) {
+            char c = ext[i];
+            if (c >= 'a' && c <= 'z') c = (char)(c - 32);
+            out[8 + i] = (uint8_t)c;
+        }
+    }
+    return 1;
+}
+
+static int fat_name_eq(const uint8_t* e, const uint8_t want[11]) {
+    for (int i = 0; i < 11; i++) if (e[i] != want[i]) return 0;
+    return 1;
+}
+
+/* Read one FAT entry (cluster -> next cluster). fat12 or fat16. */
+static uint16_t fat_next_cluster(uint32_t fat_lba, int is_fat12, uint16_t cluster) {
+    uint32_t byte_off = is_fat12 ? ((uint32_t)cluster + (cluster >> 1)) : ((uint32_t)cluster * 2);
+    uint32_t sec = fat_lba + (byte_off / 512);
+    uint32_t off = byte_off % 512;
+    if (ata_read_lba28(0x1F0, 0, sec, g_fs_buf, 1) < 0) return 0xFFFF;
+    if (is_fat12) {
+        uint16_t v = (uint16_t)g_fs_buf[off] | ((uint16_t)g_fs_buf[off + 1] << 8);
+        return (cluster & 1) ? (uint16_t)((v >> 4) & 0x0FFF) : (uint16_t)(v & 0x0FFF);
+    }
+    return (uint16_t)g_fs_buf[off] | ((uint16_t)g_fs_buf[off + 1] << 8);
+}
+
+static uint16_t fat_eoc(int is_fat12) { return is_fat12 ? 0xFF8 : 0xFFF8; }
+
+static void show_cat(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: cat <filename>\n"); return; }
+    char namebuf[32];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 31) namebuf[nl++] = *p++;
+    namebuf[nl] = '\0';
+
+    uint8_t want[11];
+    fat_name_to_83(namebuf, want);
+
+    /* resolve volume root lba (same logic as ls) */
+    uint32_t lba = 0;
+    if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("cat: no MBR.\n"); return; }
+    uint8_t* me = g_sector_buf + 446;
+    lba = (uint32_t)me[8] | ((uint32_t)me[9] << 8) | ((uint32_t)me[10] << 16) | ((uint32_t)me[11] << 24);
+
+    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) { kputs("cat: cannot read boot sector.\n"); return; }
+    uint8_t* b = g_sector_buf;
+    uint16_t bps   = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
+    uint8_t  spc   = b[13];
+    uint16_t rsvd  = (uint16_t)b[14] | ((uint16_t)b[15] << 8);
+    uint8_t  nfats = b[16];
+    uint16_t rent  = (uint16_t)b[17] | ((uint16_t)b[18] << 8);
+    uint16_t fsz16 = (uint16_t)b[22] | ((uint16_t)b[23] << 8);
+    uint32_t fsz32 = (uint32_t)b[36] | ((uint32_t)b[37] << 8) | ((uint32_t)b[38] << 16) | ((uint32_t)b[39] << 24);
+    uint32_t fatsz = fsz16 ? fsz16 : fsz32;
+    if (rent == 0) { kputs("cat: FAT32 not supported yet.\n"); return; }
+    if (bps != 512 || spc == 0) { kputs("cat: unsupported geometry.\n"); return; }
+
+    /* FAT12 if data clusters < 4085 */
+    uint32_t tot16 = (uint16_t)b[19] | ((uint16_t)b[20] << 8);
+    uint32_t tot32 = (uint32_t)b[32] | ((uint32_t)b[33] << 8) | ((uint32_t)b[34] << 16) | ((uint32_t)b[35] << 24);
+    uint32_t tot = tot16 ? tot16 : tot32;
+    uint32_t data_clusters = (tot - rsvd - nfats * fatsz - ((rent * 32 + bps - 1) / bps)) / spc;
+    int is_fat12 = data_clusters < 4085;
+
+    uint32_t fat_lba  = lba + rsvd;
+    uint32_t data_lba = lba + rsvd + (uint32_t)nfats * fatsz + ((rent * 32 + bps - 1) / bps);
+
+    /* search root dir */
+    uint32_t root_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+    uint32_t root_secs = ((uint32_t)rent * 32 + bps - 1) / bps;
+    if (root_secs > 8) root_secs = 8;
+    uint8_t* dst = g_fs_buf;
+    uint32_t done = 0;
+    int found = 0;
+    uint16_t start_cluster = 0;
+    uint32_t file_size = 0;
+    while (done < root_secs && !found) {
+        int chunk = (root_secs - done > 4) ? 4 : (int)(root_secs - done);
+        int n = ata_read_lba28(0x1F0, 0, root_lba + done, dst, chunk);
+        if (n < 0) { kputs("cat: cannot read root dir.\n"); return; }
+        dst += n * 512;
+        done += (uint32_t)n;
+    }
+    int total_secs = (int)done;
+    for (int i = 0; i < total_secs * 16 && !found; i++) {
+        uint8_t* e = g_fs_buf + i * 32;
+        if (e[0] == 0x00) break;
+        if (e[0] == 0xE5 || e[11] == 0x0F) continue;
+        if (e[11] & 0x10) continue; /* skip directories for now */
+        if (!fat_name_eq(e, want)) continue;
+        start_cluster = (uint16_t)e[26] | ((uint16_t)e[27] << 8);
+        file_size = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
+        found = 1;
+    }
+    if (!found) {
+        kputs("cat: '");
+        kputs(namebuf);
+        kputs("' not found in root dir (FAT12/16, files only).\n");
+        return;
+    }
+    if (start_cluster < 2) { kputs("cat: empty file.\n"); return; }
+
+    /* walk cluster chain, print printable content (cap 4KB) */
+    uint16_t clus = start_cluster;
+    uint32_t printed = 0;
+    const uint32_t PRINT_CAP = 4096;
+    uint16_t eoc = fat_eoc(is_fat12);
+    int guard = 0;
+    while (clus >= 2 && clus < eoc && guard++ < 1024 && printed < PRINT_CAP) {
+        uint32_t clus_lba = data_lba + (uint32_t)(clus - 2) * spc;
+        /* read cluster sectors in <=4-sector chunks */
+        for (int s = 0; s < spc && printed < PRINT_CAP; s++) {
+            if (ata_read_lba28(0x1F0, 0, clus_lba + s, g_file_buf, 1) < 0) {
+                kputs("\ncat: read error mid-file.\n");
+                return;
+            }
+            for (int i = 0; i < 512 && printed < PRINT_CAP; i++) {
+                uint8_t c = g_file_buf[i];
+                if (c == '\n' || c == '\r' || c == '\t' || (c >= 32 && c <= 126)) {
+                    kputc((c == '\r') ? '\n' : (char)c);
+                } else {
+                    kputc('.');
+                }
+                printed++;
+            }
+        }
+        clus = fat_next_cluster(fat_lba, is_fat12, clus);
+    }
+    kputs("\ncat: done (");
+    kprint_dec64(file_size);
+    kputs(" bytes declared, ");
+    kprint_dec64(printed);
+    kputs(" shown)\n");
+}
+
 static void show_disk(void) {
     static const uint16_t bases[2] = { 0x1F0, 0x170 };
     static const char* chan[2] = { "primary", "secondary" };
@@ -1099,6 +1257,7 @@ void kernel_shell(void) {
             kputs("  part    - Show MBR partition table\n");
             kputs("  fs      - Detect FAT filesystem on partition\n");
             kputs("  ls      - List FAT12/16 root directory\n");
+            kputs("  cat     - Print file: cat <name>\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -1130,6 +1289,8 @@ void kernel_shell(void) {
             show_fs(cmd + 2);
         } else if (kcmd_is(cmd, "ls")) {
             show_ls(cmd + 2);
+        } else if (kcmd_is(cmd, "cat")) {
+            show_cat(cmd + 3);
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
