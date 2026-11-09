@@ -1942,20 +1942,10 @@ static int fat_write_dirent(uint32_t lba, uint32_t off, const uint8_t* e) {
     return ata_write_lba28(0x1F0, 0, lba, g_file_buf, 1);
 }
 
-static void show_mkdir(const char* args) {
-    const char* p = args;
-    while (*p == ' ') p++;
-    char name[64];
-    int nl = 0;
-    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
-    name[nl] = '\0';
-    if (!nl) { kputs("usage: mkdir <name>\n"); return; }
-    if (kstrlen(name) > 12) { kputs("mkdir: name too long (8.3 only).\n"); return; }
-    for (const char* q = name; *q; q++) {
-        if (*q == '/' || *q == '\\') { kputs("mkdir: single component only.\n"); return; }
-    }
+/* returns 0 ok, -1..-6 error (no printing) */
+static int fat_mkdir_impl(const char* name) {
 
-    if (fat_ensure_mounted() != 0) { kputs("mkdir: no FAT volume.\n"); return; }
+    if (fat_ensure_mounted() != 0) return -1;
     int kind = g_vol_kind;
 
     /* resolve parent directory */
@@ -1966,7 +1956,7 @@ static void show_mkdir(const char* args) {
         int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
                             g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
                             g_cwd, &hit);
-        if (lr <= 0 || !hit.is_dir) { kputs("mkdir: cwd not a directory.\n"); return; }
+        if (lr <= 0 || !hit.is_dir) return -2;
         in_root = 0;
         dir_cluster = hit.cluster;
         parent_cluster = hit.cluster;
@@ -1980,11 +1970,11 @@ static void show_mkdir(const char* args) {
     int sr = fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
                                g_vol_root_secs, dir_cluster, g_vol_fat_lba,
                                g_vol_data_lba, g_vol_spc, want, &slot);
-    if (sr < 0 && slot.status == -1) { kputs("mkdir: name exists.\n"); return; }
-    if (slot.status != 1) { kputs("mkdir: directory full or IO error.\n"); return; }
+    if (sr < 0 && slot.status == -1) return -3;
+    if (slot.status != 1) return -4;
 
     uint32_t clus = fat_alloc_cluster(kind);
-    if (!clus) { kputs("mkdir: disk full or FAT alloc failed.\n"); return; }
+    if (!clus) return -5;
 
     /* write new dir entry into parent */
     uint8_t e[32];
@@ -1993,9 +1983,7 @@ static void show_mkdir(const char* args) {
     e[11] = 0x10;                                 /* directory attr */
     e[20] = (uint8_t)(clus & 0xFF); e[21] = (uint8_t)(clus >> 8);
     if (kind == 2) { e[26] = (uint8_t)(clus >> 16); e[27] = (uint8_t)(clus >> 24); }
-    if (fat_write_dirent(slot.lba, slot.off, e) != 0) {
-        kputs("mkdir: dirent write failed.\n"); return;
-    }
+    if (fat_write_dirent(slot.lba, slot.off, e) != 0) return -6;
 
     /* initialise new cluster: "." and ".." entries, rest zero */
     uint8_t* sec = g_file_buf;
@@ -2017,15 +2005,34 @@ static void show_mkdir(const char* args) {
         }
         uint32_t lba = g_vol_data_lba + (clus - 2) * g_vol_spc + (uint32_t)s;
         int chunk = 1;
-        if (ata_write_lba28(0x1F0, 0, lba, sec, chunk) < 0) {
-            kputs("mkdir: cluster write failed.\n"); return;
-        }
+        if (ata_write_lba28(0x1F0, 0, lba, sec, chunk) < 0) return -6;
     }
-    kputs("mkdir: created /");
-    kputs(g_cwd[0] ? g_cwd : "");
-    if (g_cwd[0]) kputs("/");
-    kputs(name);
-    kputs("\n");
+    return 0;
+}
+
+static void show_mkdir(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char name[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = '\0';
+    if (!nl) { kputs("usage: mkdir <name>\n"); return; }
+    if (kstrlen(name) > 12) { kputs("mkdir: name too long (8.3 only).\n"); return; }
+    for (const char* q = name; *q; q++) {
+        if (*q == '/' || *q == '\\') { kputs("mkdir: single component only.\n"); return; }
+    }
+    int r = fat_mkdir_impl(name);
+    if (r == 0) {
+        kputs("mkdir: created /");
+        if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+        kputs(name);
+        kputs("\n");
+    } else {
+        kputs("mkdir: failed (");
+        kprint_dec64((uint64_t)(-r));
+        kputs(")\n");
+    }
 }
 
 /* write <name> <text> — create a small file (single cluster, <= spc*512 B)
@@ -3840,6 +3847,7 @@ static void idt_init(void) {
 #define SYS_SEEK     7   /* ebx=fd, ecx=offset -> 0/-1 (absolute) */
 #define SYS_WRITE_LEN 8  /* ebx=ptr, ecx=len — binary-safe write */
 #define SYS_UNLINK   9  /* ebx=ptr to name — delete file in cwd */
+#define SYS_MKDIR    10 /* ebx=ptr to name — create dir in cwd */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -4088,6 +4096,20 @@ void syscall_handler(uint32_t* regs) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         ret = 0;
+    } else if (nr == SYS_MKDIR) {
+        /* ebx = user ptr to NUL-terminated single-component name in cwd */
+        volatile char* up = (volatile char*)(size_t)regs[4];
+        char name[64];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 63 && (uint32_t)(size_t)(up + nl) < limit && up[nl]
+               && up[nl] != '/' && up[nl] != '\\') {
+            name[nl] = (char)up[nl]; nl++;
+        }
+        name[nl] = 0;
+        if (!nl || kstrlen(name) > 12) { regs[7] = 0xFFFFFFFFu; return; }
+        ret = fat_mkdir_impl(name) == 0 ? 0u : 0xFFFFFFFFu;
     } else {
         kputs("\n[syscall] unknown nr=");
         kprint_dec64(nr);
