@@ -95,6 +95,7 @@ mcopy -o -i "$IMG" "$USER_DIR/cksum.elf"     ::CKSUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/md5sum.elf"    ::MD5SUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/dmesg.elf"     ::DMESG.ELF
 mcopy -o -i "$IMG" "$USER_DIR/pid.elf"       ::PID.ELF
+mcopy -o -i "$IMG" "$USER_DIR/sysinfo.elf"   ::SYSINFO.ELF
 mcopy -o -i "$IMG" "$ROOT_DIR/etc/BOOT.CMD" ::BOOT.CMD
 mcopy -o -i "$IMG" "$USER_DIR/kill.elf"      ::KILL.ELF
 mcopy -o -i "$IMG" "$USER_DIR/pipetest.elf"  ::PIPETEST.ELF
