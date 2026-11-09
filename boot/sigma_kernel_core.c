@@ -260,6 +260,29 @@ static int serial_has_data(void) {
 static int skip_ext = 0;
 static int kbd_buf_pop(char* out);   /* defined with IRQ section below */
 
+/* --------------------------------------------------------------------------
+ * Process table — real per-process isolation.
+ * Each proc owns a 4 MiB user region and a private page directory in which
+ * ONLY its region is user-accessible; kernel/other-proc memory stays
+ * supervisor. Round-robin preemptive scheduling on the PIT tick.
+ * -------------------------------------------------------------------------- */
+#define MAX_PROCS 4
+struct proc {
+    int      used;
+    int      started;    /* 0 = needs enter_user, 1 = resume via ctx */
+    uint32_t pid;
+    uint32_t base;       /* user region base (4MiB aligned) */
+    uint32_t pd;         /* private user page directory (phys) */
+    uint32_t entry, esp0;/* initial eip/esp for first run */
+    char     name[32];
+    uint32_t ctx[8];     /* pushal-order regs at preempt point */
+    uint32_t eip, cs, eflags, esp, ss;
+};
+static struct proc g_procs[MAX_PROCS];
+static int  g_cur_proc = -1;
+static int  g_next_pid  = 1;
+static void sched_loop(int fg_idx);
+
 char kgetc(void) {
     while (1) {
         /* Interrupt-driven keyboard buffer first */
@@ -273,6 +296,14 @@ char kgetc(void) {
             char c = inb(COM1_PORT);
             if (c == '\r') return '\n';
             return c;
+        }
+
+        /* Idle scheduling: while kernel waits for input, give runnable
+         * user procs a timeslice. proc_run returns on preempt/exit. */
+        if (g_cur_proc < 0) {
+            for (int i = 0; i < MAX_PROCS; i++) {
+                if (g_procs[i].used) { sched_loop(-1); break; }
+            }
         }
 
         /* Check PS/2 Keyboard port */
@@ -4203,10 +4234,151 @@ static uint32_t exec_load_elf(const uint8_t* f, uint32_t size) {
     return bias + entry;
 }
 
+/* find a 4 MiB region not used by any proc or the legacy user test slot.
+ * Scans every 4MiB-aligned candidate inside each type-1 mmap region. */
+static uint32_t find_free_user_region(void) {
+    if (!g_mb_info) return 0;
+    uint32_t flags = mbi_rd32(MBI_FLAGS);
+    if (!(flags & MB_MMAP_FLAG)) return 0;
+    uint32_t size = mbi_rd32(MBI_MMAP_SIZE);
+    uint32_t addr = mbi_rd32(MBI_MMAP_ADDR);
+    volatile uint8_t* p = (volatile uint8_t*)(size_t)addr;
+    volatile uint8_t* end = p + size;
+    uint32_t mcount = mbi_rd32(MBI_MODS_COUNT);
+    uint32_t maddr  = mbi_rd32(MBI_MODS_ADDR);
+    while (p + 24 <= end) {
+        uint32_t esize = *(volatile uint32_t*)p;
+        if (esize < 24 || p + esize > end) break;
+        uint64_t base = ((uint64_t)*(volatile uint32_t*)(p + 8) << 32) | *(volatile uint32_t*)(p + 4);
+        uint64_t len  = ((uint64_t)*(volatile uint32_t*)(p + 16) << 32) | *(volatile uint32_t*)(p + 12);
+        uint32_t type = *(volatile uint32_t*)(p + 20);
+        if (type == 1 && len >= 0x400000) {
+            uint64_t first = (base + 0x3FFFFFu) & ~0x3FFFFFuLL;
+            for (uint64_t cand = first; cand + 0x400000ULL <= base + len; cand += 0x400000ULL) {
+                if (cand < 0x400000ULL) continue;
+                int busy = 0;
+                for (int i = 0; i < MAX_PROCS; i++)
+                    if (g_procs[i].used && g_procs[i].base == (uint32_t)cand) { busy = 1; break; }
+                if (busy || (uint32_t)cand == g_user_base) continue;
+                for (uint32_t m = 0; m < mcount && !busy; m++) {
+                    volatile uint8_t* mp = (volatile uint8_t*)(size_t)maddr + m * 16;
+                    uint32_t ms = *(volatile uint32_t*)(mp + 0);
+                    uint32_t me = *(volatile uint32_t*)(mp + 4);
+                    if (cand < (uint64_t)me && (uint64_t)ms < cand + 0x400000ULL) busy = 1;
+                }
+                if (!busy) return (uint32_t)cand;
+            }
+        }
+        p += esize;
+    }
+    return 0;
+}
+
+/* build a private user PD for base: copy kernel PD, clear U/S everywhere,
+ * set user bit only on base's PDE. Returns phys addr or 0. */
+static uint32_t proc_build_pd(uint32_t base) {
+    uint32_t pd = pmm_alloc();
+    if (!pd) return 0;
+    uint32_t* dst = (uint32_t*)(size_t)pd;
+    for (int i = 0; i < 1024; i++) dst[i] = g_page_dir[i] & ~0x4u;
+    dst[base >> 22] |= 0x4u;
+    return pd;
+}
+
+/* claim an already-loaded region as a proc slot (post-load, no leak on fail) */
+static int proc_claim(uint32_t base, const char* name,
+                      uint32_t entry, uint32_t esp0) {
+    int idx = -1;
+    for (int i = 0; i < MAX_PROCS; i++)
+        if (!g_procs[i].used) { idx = i; break; }
+    if (idx < 0) return -1;
+    uint32_t pd = proc_build_pd(base);
+    if (!pd) return -1;
+    struct proc* p = &g_procs[idx];
+    p->used = 1; p->started = 0;
+    p->pid = (uint32_t)g_next_pid++;
+    p->base = base; p->pd = pd;
+    p->entry = entry; p->esp0 = esp0;
+    for (int i = 0; i < 8; i++) p->ctx[i] = 0;
+    p->eip=p->cs=p->eflags=p->esp=p->ss=0;
+    int i = 0;
+    while (name[i] && i < 31) { p->name[i] = name[i]; i++; }
+    p->name[i] = 0;
+    return idx;
+}
+
+static void proc_save_ctx(struct proc* p) {
+    for (int i = 0; i < 8; i++) p->ctx[i] = g_user_ctx[i];
+    p->eip = g_user_eip; p->cs = g_user_cs; p->eflags = g_user_eflags;
+    p->esp = g_user_esp; p->ss = g_user_ss;
+}
+static void proc_load_ctx(struct proc* p) {
+    for (int i = 0; i < 8; i++) g_user_ctx[i] = p->ctx[i];
+    g_user_eip = p->eip; g_user_cs = p->cs; g_user_eflags = p->eflags;
+    g_user_esp = p->esp; g_user_ss = p->ss;
+}
+
+/* run proc idx until it exits or is preempted; returns on either */
+static void proc_run(int idx) {
+    struct proc* p = &g_procs[idx];
+    g_cur_proc = idx;
+    g_user_base = p->base;
+    g_user_pd   = p->pd;
+    g_user_dead = 0;
+    g_user_active = 1;
+    if (!p->started) {
+        p->started = 1;
+        enter_user(p->entry, p->esp0);
+    } else {
+        proc_load_ctx(p);
+        __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
+        resume_user();
+    }
+    g_user_active = 0;
+    g_preempt_pending = 0;
+    if (g_user_dead) {
+        p->used = 0;
+        g_user_dead = 0;
+        klog("sched: proc exit\n");
+    } else {
+        proc_save_ctx(p);
+    }
+    g_cur_proc = -1;
+}
+
+static int proc_pick_next(int after) {
+    for (int k = 1; k <= MAX_PROCS; k++) {
+        int i = (after + k) % MAX_PROCS;
+        if (g_procs[i].used) return i;
+    }
+    return -1;
+}
+
+static void sched_loop(int fg_idx) {
+    int guard = 0;
+    while (guard++ < 100000) {
+        int pick = proc_pick_next(g_cur_proc < 0 ? MAX_PROCS - 1 : g_cur_proc);
+        if (pick < 0) return;
+        proc_run(pick);
+        if (fg_idx >= 0 && !g_procs[fg_idx].used) return;
+        if (fg_idx < 0) return;
+    }
+}
+
 static void show_exec(const char* args) {
-    const char* p = args;
+    char argbuf[256];
+    int al2 = 0;
+    while (args[al2] && al2 < 255) { argbuf[al2] = args[al2]; al2++; }
+    argbuf[al2] = 0;
+    int bg = 0;
+    while (al2 > 0 && (argbuf[al2-1] == ' ' || argbuf[al2-1] == '\t')) argbuf[--al2] = 0;
+    if (al2 > 0 && argbuf[al2-1] == '&') {
+        bg = 1; argbuf[--al2] = 0;
+        while (al2 > 0 && (argbuf[al2-1] == ' ' || argbuf[al2-1] == '\t')) argbuf[--al2] = 0;
+    }
+    const char* p = argbuf;
     while (*p == ' ') p++;
-    if (!*p) { kputs("usage: exec <file>\n"); return; }
+    if (!*p) { kputs("usage: exec <file> [&]\n"); return; }
     char namebuf[64];
     int nl = 0;
     while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
@@ -4261,14 +4433,9 @@ static void show_exec(const char* args) {
         kputs("exec: bad size (0 or >2MiB).\n"); return;
     }
 
-    /* --- user region --- */
-    if (!g_user_base) {
-        g_user_base = find_user_region();
-        if (!g_user_base) { kputs("exec: no free user region.\n"); return; }
-    }
-    uint32_t pde = g_user_base >> 22;
-    g_page_dir[pde] |= 0x4u;
-    __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
+    /* --- user region: pick a 4MiB block not owned by any proc --- */
+    g_user_base = find_free_user_region();
+    if (!g_user_base) { kputs("exec: no free user region.\n"); return; }
 
     /* --- format detection: ELF32 or flat binary --- */
     uint32_t entry = 0;
@@ -4344,13 +4511,14 @@ static void show_exec(const char* args) {
     sp[3] = 0;                                /* argv terminator */
     sp[4] = 0;                                /* envp terminator */
 
-    if (user_pd_setup() != 0) { kputs("exec: page dir alloc failed.\n"); return; }
-    g_user_dead = 0;
-    g_preempt_pending = 0;
-    g_user_active = 1;
-    enter_user(entry, (uint32_t)(size_t)sp);
-    g_user_active = 0;
-    kputs("exec: program exited, back in kernel shell\n");
+    int pidx = proc_claim(g_user_base, namebuf, entry, (uint32_t)(size_t)sp);
+    if (pidx < 0) { kputs("exec: process table full or PD alloc failed.\n"); return; }
+    kputs("exec: pid ");
+    kprint_dec64(g_procs[pidx].pid);
+    kputs(bg ? " [bg]\n" : " [fg]\n");
+    if (bg) return;
+    sched_loop(pidx);
+    kputs("exec: foreground program finished\n");
 }
 
 static void show_disk(void) {
@@ -5525,6 +5693,8 @@ static void idt_init(void) {
 #define SYS_SLEEP    28 /* ebx=ticks — busy-wait sleep, eax=0 */
 #define SYS_MEMINFO  29 /* ebx=user u32[3]: total_pages, free_pages, alloc_count; eax=0/-1 */
 #define SYS_DMESG    30 /* ebx=user buf, ecx=max — copy klog, eax=len (0 if empty) */
+#define SYS_GETPID   31 /* eax=current proc pid, 0 in kernel */
+#define SYS_GETPPID  32 /* eax=parent pid (0 = kernel shell) */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6487,6 +6657,13 @@ void syscall_handler(uint32_t* regs) {
         for (uint32_t i = 0; i < n; i++) ub[i] = g_klog[i];
         regs[7] = n;
         return;
+    } else if (nr == SYS_GETPID) {
+        regs[7] = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+                  ? g_procs[g_cur_proc].pid : 0;
+        return;
+    } else if (nr == SYS_GETPPID) {
+        regs[7] = 0;
+        return;
     } else if (nr == SYS_CREAT) {
         /* ebx = user ptr to NUL-terminated single-component name in cwd.
          * Creates an empty file (allocated cluster, size 0, attr 0x20). */
@@ -7095,9 +7272,25 @@ void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry
 }
 
 static void show_ps(void) {
-    kputs("  PID STAT  EIP      ESP      INFO\n");
+    kputs("  PID STAT  EIP      ESP      NAME\n");
     kputs("    0 RUN   -        -        kernel shell\n");
-    if (g_user_active || g_preempt_pending) {
+    int any = 0;
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (!g_procs[i].used) continue;
+        any = 1;
+        kputs("    ");
+        kprint_dec64(g_procs[i].pid);
+        kputs(" ");
+        kputs((g_cur_proc == i) ? "RUN " : "RDY ");
+        kputs("  ");
+        kprint_hex32(g_procs[i].started ? g_procs[i].eip : g_procs[i].entry);
+        kputs("  ");
+        kprint_hex32(g_procs[i].started ? g_procs[i].esp : g_procs[i].esp0);
+        kputs("  ");
+        kputs(g_procs[i].name[0] ? g_procs[i].name : "?");
+        kputs("\n");
+    }
+    if (!any && (g_user_active || g_preempt_pending)) {
         kputs("    1 ");
         kputs(g_preempt_pending ? "STOP " : "RUN  ");
         kputs("  ");
@@ -7105,8 +7298,8 @@ static void show_ps(void) {
         kputs("  ");
         kprint_hex32(g_user_esp);
         kputs(g_preempt_pending ? "  preempted (fg)\n" : "  running\n");
-    } else {
-        kputs("    1 -     -        -        no user process\n");
+    } else if (!any) {
+        kputs("    - no user processes\n");
     }
 }
 

@@ -27,6 +27,8 @@ enum {
     SYS_SLEEP = 28,
     SYS_MEMINFO = 29,
     SYS_DMESG = 30,
+    SYS_GETPID = 31,
+    SYS_GETPPID = 32,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

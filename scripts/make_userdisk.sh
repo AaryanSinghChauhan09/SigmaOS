@@ -10,7 +10,7 @@ IMG="$USER_DIR/sigmaos-userdisk.img"
 for t in mformat mcopy; do
     command -v "$t" >/dev/null 2>&1 || { echo "ERROR: $t not found (install mtools)" >&2; exit 1; }
 done
-for f in hello.bin cat.bin rm.bin mkdir.bin touch.bin mv.bin append.bin stat.bin pwd.bin cd.bin ls.bin write.bin elfhello.elf find.elf tree.elf wc.elf grep.elf sort.elf head.elf uniq.elf nl.elf tail.elf rev.elf cut.elf tr.elf fold.elf tac.elf expand.elf seq.elf factor.elf expr.elf yes.elf printf.elf basename.elf dirname.elf test.elf realpath.elf ll.elf stat.elf df.elf uname.elf mkdir.elf rm.elf mv.elf du.elf ln.elf rmdir.elf cp.elf true.elf false.elf uptime.elf hexdump.elf truncate.elf chmod.elf sum.elf shuf.elf paste.elf comm.elf join.elf fmt.elf tsort.elf diff.elf bc.elf split.elf numfmt.elf unexpand.elf pr.elf column.elf csplit.elf units.elf ptx.elf look.elf sleep.elf free.elf cksum.elf md5sum.elf dmesg.elf README.TXT; do
+for f in hello.bin cat.bin rm.bin mkdir.bin touch.bin mv.bin append.bin stat.bin pwd.bin cd.bin ls.bin write.bin elfhello.elf find.elf tree.elf wc.elf grep.elf sort.elf head.elf uniq.elf nl.elf tail.elf rev.elf cut.elf tr.elf fold.elf tac.elf expand.elf seq.elf factor.elf expr.elf yes.elf printf.elf basename.elf dirname.elf test.elf realpath.elf ll.elf stat.elf df.elf uname.elf mkdir.elf rm.elf mv.elf du.elf ln.elf rmdir.elf cp.elf true.elf false.elf uptime.elf hexdump.elf truncate.elf chmod.elf sum.elf shuf.elf paste.elf comm.elf join.elf fmt.elf tsort.elf diff.elf bc.elf split.elf numfmt.elf unexpand.elf pr.elf column.elf csplit.elf units.elf ptx.elf look.elf sleep.elf free.elf cksum.elf md5sum.elf dmesg.elf pid.elf README.TXT; do
     [ -f "$USER_DIR/$f" ] || { echo "ERROR: missing $USER_DIR/$f — run make -C user first" >&2; exit 1; }
 done
 
@@ -94,6 +94,7 @@ mcopy -o -i "$IMG" "$USER_DIR/free.elf"      ::FREE.ELF
 mcopy -o -i "$IMG" "$USER_DIR/cksum.elf"     ::CKSUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/md5sum.elf"    ::MD5SUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/dmesg.elf"     ::DMESG.ELF
+mcopy -o -i "$IMG" "$USER_DIR/pid.elf"       ::PID.ELF
 mcopy -o -i "$IMG" "$ROOT_DIR/etc/BOOT.CMD" ::BOOT.CMD
 mcopy -o -i "$IMG" "$USER_DIR/ln.elf"      ::LN.ELF
 mcopy -o -i "$IMG" "$USER_DIR/rmdir.elf"   ::RMDIR.ELF
@@ -127,6 +128,7 @@ mcopy -o -i "$IMG" "$USER_DIR/free.elf"      ::FREE.ELF
 mcopy -o -i "$IMG" "$USER_DIR/cksum.elf"     ::CKSUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/md5sum.elf"    ::MD5SUM.ELF
 mcopy -o -i "$IMG" "$USER_DIR/dmesg.elf"     ::DMESG.ELF
+mcopy -o -i "$IMG" "$USER_DIR/pid.elf"       ::PID.ELF
 mcopy -o -i "$IMG" "$ROOT_DIR/etc/BOOT.CMD" ::BOOT.CMD
 
 echo "Built $IMG"
