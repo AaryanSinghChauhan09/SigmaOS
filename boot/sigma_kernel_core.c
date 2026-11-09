@@ -3244,6 +3244,16 @@ void kernel_shell(void) {
                     len--;
                     kputc('\b');
                 }
+            } else if (c == 21) {          /* Ctrl+U: clear line */
+                while (len > 0) { len--; kputc('\b'); }
+            } else if (c == 23) {          /* Ctrl+W: delete word */
+                while (len > 0 && cmd[len-1] == ' ') { len--; kputc('\b'); }
+                while (len > 0 && cmd[len-1] != ' ') { len--; kputc('\b'); }
+            } else if (c == 3) {           /* Ctrl+C: cancel line */
+                while (len > 0) { len--; kputc('\b'); }
+                kputs("^C\n");
+                len = 0;
+                break;
             } else if (c >= 32 && c <= 126 && len < sizeof(cmd) - 1) {
                 cmd[len++] = c;
                 kputc(c);
