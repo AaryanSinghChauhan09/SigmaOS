@@ -5,6 +5,7 @@ Contents:
   HELLO.BIN  ring-3 test: SYS_TICKS + SYS_WRITE + SYS_EXIT
   CAT.BIN    ring-3 file reader: open/read/close via int 0x80
   RM.BIN     ring-3 file delete: SYS_UNLINK via int 0x80
+  MKDIR.BIN  ring-3 dir create: SYS_MKDIR via int 0x80
   ELFHELLO.ELF  ELF32 C program (gcc -m32 -nostdlib), exec ELF path
   README.TXT this file
 
@@ -28,5 +29,6 @@ as the FAT volume. Then in the shell:
   write TEST.TXT hello && append TEST.TXT world
   cat TEST.TXT && hex TEST.TXT && stat TEST.TXT
   exec RM.BIN TEST.TXT
+  exec MKDIR.BIN MYDIR
 
 Rebuild this image:  scripts/make_userdisk.sh
