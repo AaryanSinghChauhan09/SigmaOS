@@ -337,6 +337,7 @@ static void show_paging(void);
 static void gdt_init(void);
 static void show_gdt(void);
 static void idt_init(void);
+static void show_user(void);
 static uint32_t g_map_mb;
 
 #define MBI_FLAGS       0
@@ -1594,6 +1595,7 @@ void kernel_shell(void) {
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
+            kputs("  user    - Drop to ring 3 test program\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -1633,6 +1635,8 @@ void kernel_shell(void) {
             show_paging();
         } else if (kstrcmp(cmd, "gdt") == 0) {
             show_gdt();
+        } else if (kstrcmp(cmd, "user") == 0) {
+            show_user();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
@@ -1909,7 +1913,7 @@ typedef struct __attribute__((packed)) {
     uint32_t base;
 } idtr_t;
 
-static idt_entry_t g_idt[32] __attribute__((section(".bss")));
+static idt_entry_t g_idt[256] __attribute__((section(".bss")));
 static idtr_t      g_idtr __attribute__((section(".bss")));
 
 void isr_common(uint32_t* frame);
@@ -1949,6 +1953,22 @@ __asm__(
     "ISR_NOERR 26\n" "ISR_NOERR 27\n" "ISR_NOERR 28\n"
     "ISR_ERR   29\n" "ISR_ERR   30\n"
     "ISR_NOERR 31\n"
+    /* syscall gate: int 0x80 is callable from ring 3 (DPL=3 in IDT) */
+    ".globl syscall_entry\n"
+    "syscall_entry:\n"
+    "    pushal\n"
+    "    movl %esp, %eax\n"
+    "    pushl %eax\n"
+    "    call syscall_handler\n"
+    "    addl $4, %esp\n"
+    "    popal\n"
+    "    iret\n"
+    /* catch-all for unhandled vectors 32-255 */
+    ".globl isr_spurious\n"
+    "isr_spurious:\n"
+    "    pushl $0\n"
+    "    pushl $255\n"
+    "    jmp isr_common_entry\n"
     ".section .data\n"
     ".globl isr_table\n"
     "isr_table:\n"
@@ -1988,20 +2008,136 @@ void isr_common(uint32_t* frame) {
     kputs(" ***\n");
 }
 
+void syscall_handler(uint32_t* regs);
+
+static void idt_set_gate(uint32_t vec, uint32_t handler, uint8_t type_attr) {
+    g_idt[vec].offset_low  = (uint16_t)(handler & 0xFFFF);
+    g_idt[vec].selector    = GDT_KCODE;
+    g_idt[vec].zero        = 0;
+    g_idt[vec].type_attr   = type_attr;
+    g_idt[vec].offset_high = (uint16_t)((handler >> 16) & 0xFFFF);
+    g_idt[vec].zero2       = 0;
+}
+
 static void idt_init(void) {
     extern void* isr_table[32];
+    extern void syscall_entry, isr_spurious;
     for (int i = 0; i < 32; i++) {
-        uint32_t addr = (uint32_t)(size_t)isr_table[i];
-        g_idt[i].offset_low  = (uint16_t)(addr & 0xFFFF);
-        g_idt[i].selector    = GDT_KCODE;
-        g_idt[i].zero        = 0;
-        g_idt[i].type_attr   = 0x8E;
-        g_idt[i].offset_high = (uint16_t)((addr >> 16) & 0xFFFF);
-        g_idt[i].zero2       = 0;
+        idt_set_gate((uint32_t)i, (uint32_t)(size_t)isr_table[i], 0x8E);
     }
+    /* vectors 32-255: catch-all (halts with diagnostic if ever hit) */
+    for (int i = 32; i < 256; i++) {
+        idt_set_gate((uint32_t)i, (uint32_t)(size_t)&isr_spurious, 0x8E);
+    }
+    /* int 0x80: DPL=3 interrupt gate — callable from ring 3, returns via iret */
+    idt_set_gate(0x80, (uint32_t)(size_t)&syscall_entry, 0xEE);
     g_idtr.limit = (uint16_t)(sizeof(g_idt) - 1);
     g_idtr.base  = (uint32_t)(size_t)&g_idt[0];
     __asm__ volatile("lidt %0" :: "m"(g_idtr) : "memory");
+}
+
+/* pusha frame order (top->bottom): edi,esi,ebp,esp,ebx,edx,ecx,eax */
+void syscall_handler(uint32_t* regs) {
+    uint32_t nr = regs[7]; /* eax */
+    kputs("\n[syscall] ring3 call nr=");
+    kprint_dec64(nr);
+    regs[7] = 0; /* return value in eax */
+    kputs(" -> ok\n");
+}
+
+/* --------------------------------------------------------------------------
+ * Ring-3 user-mode test — `user` command
+ * Finds a free 4 MiB-aligned RAM block from the Multiboot memory map,
+ * marks its PDE U/S, plants a tiny program that calls int 0x80 then int3.
+ * -------------------------------------------------------------------------- */
+static uint32_t g_user_base = 0;
+
+/* First-fit: 4 MiB-aligned physical block inside a type-1 (available) region. */
+static uint32_t find_user_region(void) {
+    if (!g_mb_info) return 0;
+    uint32_t flags = mbi_rd32(MBI_FLAGS);
+    if (!(flags & MB_MMAP_FLAG)) return 0;
+    uint32_t size = mbi_rd32(MBI_MMAP_SIZE);
+    uint32_t addr = mbi_rd32(MBI_MMAP_ADDR);
+    volatile uint8_t* p = (volatile uint8_t*)(size_t)addr;
+    volatile uint8_t* end = p + size;
+    /* kernel image occupies roughly [1MiB, 2MiB); start search at 4MiB */
+    while (p + 24 <= end) {
+        uint32_t esize = *(volatile uint32_t*)p;
+        if (esize < 24 || p + esize > end) break;
+        uint64_t base = ((uint64_t)*(volatile uint32_t*)(p + 8) << 32) | *(volatile uint32_t*)(p + 4);
+        uint64_t len  = ((uint64_t)*(volatile uint32_t*)(p + 16) << 32) | *(volatile uint32_t*)(p + 12);
+        uint32_t type = *(volatile uint32_t*)(p + 20);
+        if (type == 1 && len >= 4096) {
+            uint64_t aligned = (base + 0x3FFFFFu) & ~0x3FFFFFuLL;
+            /* whole 4 MiB PDE must be backed by available RAM */
+            if (aligned >= 0x400000ULL && aligned + 0x400000ULL <= base + len) {
+                /* reject if it overlaps any Multiboot module */
+                uint32_t mcount = mbi_rd32(MBI_MODS_COUNT);
+                uint32_t maddr  = mbi_rd32(MBI_MODS_ADDR);
+                int overlap = 0;
+                for (uint32_t m = 0; m < mcount; m++) {
+                    volatile uint8_t* mp = (volatile uint8_t*)(size_t)maddr + m * 16;
+                    uint32_t ms = *(volatile uint32_t*)(mp + 0);
+                    uint32_t me = *(volatile uint32_t*)(mp + 4);
+                    if (aligned < (uint64_t)me && (uint64_t)ms < aligned + 0x400000ULL) {
+                        overlap = 1;
+                        break;
+                    }
+                }
+                if (!overlap) return (uint32_t)aligned;
+            }
+        }
+        p += esize;
+    }
+    return 0;
+}
+
+/* naked: build iret frame and drop to ring 3.
+ * i386 cdecl: [esp]=ret [esp+4]=eip [esp+8]=user_esp at entry. */
+__attribute__((section(".text"), naked, noreturn))
+static void enter_user(uint32_t eip, uint32_t esp) {
+    __asm__ volatile(
+        "movl 8(%%esp), %%eax\n"     /* user esp arg */
+        "movl 4(%%esp), %%ecx\n"     /* user eip arg */
+        "pushl $0x23\n"            /* user data selector | RPL3 */
+        "pushl %%eax\n"
+        "pushl $0x202\n"           /* eflags: IF=1 */
+        "pushl $0x1B\n"            /* user code selector | RPL3 */
+        "pushl %%ecx\n"
+        "iret\n"
+        ::: "eax", "ecx", "memory");
+}
+
+static void show_user(void) {
+    if (!g_user_base) {
+        g_user_base = find_user_region();
+        if (!g_user_base) { kputs("user: no free 4MiB-aligned RAM region found.\n"); return; }
+        /* mark the covering PDE user-accessible (PTE_USER = 0x4) */
+        uint32_t pde = g_user_base >> 22;
+        g_page_dir[pde] |= 0x4u;
+        /* flush TLB for the new mapping */
+        __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
+
+        /* plant user program at region base:
+         *   mov eax, 1        ; B8 01 00 00 00
+         *   int 0x80          ; CD 80
+         *   int3              ; CC  -> #BP exception shows cs=0x1B */
+        uint8_t* code = (uint8_t*)(size_t)g_user_base;
+        code[0]=0xB8; code[1]=0x01; code[2]=0x00; code[3]=0x00; code[4]=0x00;
+        code[5]=0xCD; code[6]=0x80;
+        code[7]=0xCC;
+
+        kputs("user: region=");
+        kprint_hex32(g_user_base);
+        kputs(" pde=");
+        kprint_dec64(pde);
+        kputs(" marked U/S\n");
+    }
+    uint32_t uesp = g_user_base + 0x80000; /* 512KiB into the region */
+    kputs("user: dropping to ring 3 (cs=0x1B ss=0x23)...\n");
+    enter_user(g_user_base, uesp);
+    /* never returns — user int3 raises #BP which prints the fault frame */
 }
 
 __attribute__((section(".text"), naked))
