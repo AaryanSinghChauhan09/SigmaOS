@@ -2060,6 +2060,65 @@ static int fat_mkdir_impl(const char* name) {
     return 0;
 }
 
+/* fat_rmdir_impl — remove an EMPTY directory in cwd.
+ * Returns 0 ok, -1 generic, -3 exists-not-dir, -7 not empty, -8 io. */
+static int fat_rmdir_impl(const char* name) {
+    if (fat_ensure_mounted() != 0) return -1;
+    int kind = g_vol_kind;
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit dh;
+        int dlr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                             g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                             g_vol_spc, g_cwd, &dh);
+        if (dlr <= 0 || !dh.is_dir) return -1;
+        in_root = 0; dir_cluster = dh.cluster;
+    }
+    uint8_t want[11];
+    fat_name_to_83(name, want);
+    struct slot_res slot;
+    int sr = fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                               g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                               g_vol_data_lba, g_vol_spc, want, &slot);
+    if (slot.status != -1) return -2;   /* not found */
+    /* read parent sector, verify target is a directory */
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) return -8;
+    uint8_t* e = g_file_buf + slot.off;
+    if (!(e[11] & 0x10)) return -3;     /* not a dir */
+    uint32_t child_clus = fat_dirent_cluster(kind, e);
+    if (!child_clus || fat_eoc_any(kind, child_clus)) return -8;
+    /* scan child cluster chain: only "." and ".." allowed */
+    uint32_t clus = child_clus;
+    int guard = 0;
+    while (!fat_eoc_any(kind, clus) && guard++ < 1024) {
+        uint32_t sec_base = g_vol_data_lba + (clus - 2) * g_vol_spc;
+        for (uint32_t s = 0; s < g_vol_spc; s++) {
+            if (ata_read_lba28(0x1F0, 0, sec_base + s, g_file_buf, 1) < 0) return -8;
+            for (int i = 0; i < 16; i++) {
+                uint8_t* d = g_file_buf + i * 32;
+                if (d[0] == 0x00 || d[0] == 0xE5 || d[0] == 0x0F) continue;
+                /* is it "." or ".."? 8.3: ".       " / "..      " padded */
+                int dot = 1;
+                for (int j = 0; j < 11; j++) {
+                    char c = (char)d[j];
+                    int isdot = (c == '.');
+                    int ispad = (c == ' ');
+                    if (!isdot && !ispad) { dot = 0; break; }
+                }
+                if (!dot) return -7;   /* real entry -> not empty */
+            }
+        }
+        clus = fat_next_any(g_vol_fat_lba, kind, clus);
+    }
+    /* free the chain and mark dirent deleted */
+    fat_free_chain(kind, child_clus);
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) return -8;
+    g_file_buf[slot.off] = 0xE5;
+    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) return -8;
+    return 0;
+}
+
 static void show_mkdir(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -5138,6 +5197,7 @@ static void idt_init(void) {
 #define SYS_STAT     16 /* ebx=name -> eax=file size, -1 err */
 #define SYS_STATX    23 /* ebx=name -> eax=(is_dir<<31)|size, -1 err */
 #define SYS_LINK     24 /* ebx=old, ecx=new — hardlink (same chain), eax=0/-1 */
+#define SYS_RMDIR    25 /* ebx=name — remove empty dir, eax=0/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -5868,6 +5928,20 @@ void syscall_handler(uint32_t* regs) {
         name[nl] = 0;
         if (!nl || kstrlen(name) > 12) { regs[7] = 0xFFFFFFFFu; return; }
         ret = fat_mkdir_impl(name) == 0 ? 0u : 0xFFFFFFFFu;
+    } else if (nr == SYS_RMDIR) {
+        /* ebx = user ptr to single-component dir name in cwd */
+        volatile char* up = (volatile char*)(size_t)regs[4];
+        char name[64];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 63 && (uint32_t)(size_t)(up + nl) < limit && up[nl]
+               && up[nl] != '/' && up[nl] != '\\') {
+            name[nl] = (char)up[nl]; nl++;
+        }
+        name[nl] = 0;
+        if (!nl || kstrlen(name) > 12) { regs[7] = 0xFFFFFFFFu; return; }
+        ret = fat_rmdir_impl(name) == 0 ? 0u : 0xFFFFFFFFu;
     } else if (nr == SYS_CREAT) {
         /* ebx = user ptr to NUL-terminated single-component name in cwd.
          * Creates an empty file (allocated cluster, size 0, attr 0x20). */
