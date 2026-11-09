@@ -2018,6 +2018,23 @@ void show_distro_parity(void) {
     kputs(" * OpenBSD      : pledge() & unveil() security enforcement, W^X pages\n\n");
 }
 
+/* Command history ring (last 16 commands). */
+static char g_history[16][128];
+static int  g_hist_next, g_hist_count;
+
+static void show_history(void) {
+    if (g_hist_count == 0) { kputs("history: empty.\n"); return; }
+    int start = (g_hist_next - g_hist_count + 16) % 16;
+    for (int i = 0; i < g_hist_count; i++) {
+        int idx = (start + i) % 16;
+        kputs("  ");
+        kprint_dec64((uint64_t)(i + 1));
+        kputs("  ");
+        kputs(g_history[idx]);
+        kputs("\n");
+    }
+}
+
 /* --------------------------------------------------------------------------
  * Interactive Shell REPL
  * -------------------------------------------------------------------------- */
@@ -2053,6 +2070,16 @@ void kernel_shell(void) {
 
         if (len == 0) continue;
 
+        /* history ring buffer (last 16 commands) */
+        {
+            int n = kstrlen(cmd);
+            if (n > 127) n = 127;
+            for (int i = 0; i < n; i++) g_history[g_hist_next][i] = cmd[i];
+            g_history[g_hist_next][n] = 0;
+            g_hist_next = (g_hist_next + 1) % 16;
+            if (g_hist_count < 16) g_hist_count++;
+        }
+
         if (kstrcmp(cmd, "help") == 0 || kstrcmp(cmd, "?") == 0) {
             kputs("Commands:\n");
             kputs("  help    - Show available commands\n");
@@ -2085,6 +2112,7 @@ void kernel_shell(void) {
             kputs("  ps      - Process list\n");
             kputs("  dmesg   - Show kernel log\n");
             kputs("  memalloc- Page allocator test/status\n");
+            kputs("  history - Show command history\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -2152,6 +2180,8 @@ void kernel_shell(void) {
             show_dmesg();
         } else if (kstrcmp(cmd, "memalloc") == 0) {
             show_memalloc();
+        } else if (kstrcmp(cmd, "history") == 0) {
+            show_history();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
