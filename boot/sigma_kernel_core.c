@@ -3029,6 +3029,66 @@ static void show_expr(const char* args) {
     kputs("\n");
 }
 
+/* expand / unexpand <file> — tabs->spaces / spaces->tabs (tab=8). */
+static uint8_t* file_read_small(const char* tag, const char* namebuf,
+                                uint32_t* out_len) {
+    if (fat_ensure_mounted() != 0) { kputs(tag); kputs(": no FAT volume.\n"); return 0; }
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs(tag); kputs(": path too long.\n"); return 0;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs(tag); kputs(": not found.\n"); return 0; }
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs(tag); kputs(": out of memory.\n"); return 0; }
+    int got = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                              g_vol_spc, hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs(tag); kputs(": read error.\n"); return 0; }
+    *out_len = (uint32_t)got;
+    return buf;
+}
+static void show_expand(const char* args) {
+    const char* p = args; while (*p == ' ') p++;
+    char nb[64]; int nl = 0;
+    while (*p && *p != ' ' && nl < 63) nb[nl++] = *p++;
+    nb[nl] = 0;
+    if (!nl) { kputs("usage: expand <file>\n"); return; }
+    uint32_t len; uint8_t* buf = file_read_small("expand", nb, &len);
+    if (!buf) return;
+    uint32_t col = 0;
+    for (uint32_t i = 0; i < len; i++) {
+        if (buf[i] == '\t') {
+            uint32_t nsp = 8 - (col % 8);
+            while (nsp--) { kputc(' '); col++; }
+        } else { kputc((char)buf[i]); col = (buf[i]=='\n') ? 0 : col+1; }
+    }
+    kfree(buf);
+}
+static void show_unexpand(const char* args) {
+    const char* p = args; while (*p == ' ') p++;
+    char nb[64]; int nl = 0;
+    while (*p && *p != ' ' && nl < 63) nb[nl++] = *p++;
+    nb[nl] = 0;
+    if (!nl) { kputs("usage: unexpand <file>\n"); return; }
+    uint32_t len; uint8_t* buf = file_read_small("unexpand", nb, &len);
+    if (!buf) return;
+    uint32_t col = 0; int insp = 0;
+    for (uint32_t i = 0; i < len; i++) {
+        if (buf[i] == ' ') { insp++; col++; continue; }
+        if (insp >= 8 && (col % 8) == 0) {
+            kputc('\t');
+        } else while (insp--) kputc(' ');
+        insp = 0;
+        kputc((char)buf[i]); col = (buf[i]=='\n') ? 0 : col+1;
+    }
+    while (insp--) kputc(' ');
+    kfree(buf);
+}
+
 /* factor <n> — prime factorization (trial division, 32-bit). */
 static void show_factor(const char* args) {
     const char* p = args;
@@ -4101,7 +4161,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr","expand","unexpand",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
