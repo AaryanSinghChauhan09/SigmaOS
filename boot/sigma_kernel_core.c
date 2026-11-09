@@ -2639,6 +2639,37 @@ static void show_hex(const char* args) {
     kfree(buf);
 }
 
+/* stat <file> — file metadata: size, first cluster, type. */
+static void show_stat(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: stat <file>\n"); return; }
+    char namebuf[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+
+    if (fat_ensure_mounted() != 0) { kputs("stat: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("stat: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                        g_vol_fat_lba, g_vol_data_lba, g_vol_spc, rpath, &hit);
+    if (lr <= 0) { kputs("stat: not found.\n"); return; }
+    kputs("  File: ");
+    kputs(rpath);
+    kputs("\n    Type: ");
+    kputs(hit.is_dir ? "directory" : "regular file");
+    kputs("\n    Size: ");
+    kprint_dec64(hit.size);
+    kputs(" bytes\n    Cluster: ");
+    kprint_dec64((uint64_t)hit.cluster);
+    kputs("\n");
+}
+
 static void show_cat(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -3139,6 +3170,7 @@ void kernel_shell(void) {
             kputs("  cp      - Copy file: cp <src> <dst>\n");
             kputs("  append  - Append text: append <name> <text>\n");
             kputs("  hex     - Hexdump file: hex <file>\n");
+            kputs("  stat    - File info: stat <file>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -3206,6 +3238,8 @@ void kernel_shell(void) {
             show_append(cmd + 6);
         } else if (kcmd_is(cmd, "hex")) {
             show_hex(cmd + 3);
+        } else if (kcmd_is(cmd, "stat")) {
+            show_stat(cmd + 4);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
