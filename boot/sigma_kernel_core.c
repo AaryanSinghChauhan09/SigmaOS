@@ -340,6 +340,7 @@ static void idt_init(void);
 static void show_user(void);
 static void pic_init(void);
 static void show_timer(void);
+static void show_memalloc(void);
 static uint32_t g_map_mb;
 
 #define MBI_FLAGS       0
@@ -1599,6 +1600,7 @@ void kernel_shell(void) {
             kputs("  gdt     - Show GDT/TSS segment state\n");
             kputs("  user    - Drop to ring 3 test program\n");
             kputs("  timer   - Show PIT tick count\n");
+            kputs("  memalloc- Page allocator test/status\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -1642,6 +1644,8 @@ void kernel_shell(void) {
             show_user();
         } else if (kstrcmp(cmd, "timer") == 0) {
             show_timer();
+        } else if (kstrcmp(cmd, "memalloc") == 0) {
+            show_memalloc();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
@@ -2127,6 +2131,111 @@ static void show_timer(void) {
     kputs(" (~");
     kprint_dec64(g_tick_count / 18);
     kputs("s @18.2Hz)\n");
+}
+
+/* --------------------------------------------------------------------------
+ * Physical page allocator — 4 KiB pages over Multiboot type-1 regions.
+ * Bitmap lives in kernel BSS (128 KiB => 4 GiB coverage).
+ * SEPARATION OF CONCERNS: mechanism (alloc/free) vs policy (callers).
+ * -------------------------------------------------------------------------- */
+#define PAGE_SIZE      4096u
+#define BITMAP_WORDS   32768u   /* 1,048,576 pages * 4 KiB = 4 GiB coverage */
+
+static uint32_t g_page_bitmap[BITMAP_WORDS] __attribute__((section(".bss")));
+static uint32_t g_alloc_count = 0;
+static int      g_mm_ready  = 0;
+
+static void mm_init(void) {
+    if (g_mm_ready) return;
+    for (uint32_t i = 0; i < BITMAP_WORDS; i++) g_page_bitmap[i] = 0;
+    if (!g_mb_info) return;
+    uint32_t flags = mbi_rd32(MBI_FLAGS);
+    if (!(flags & MB_MMAP_FLAG)) return;
+    uint32_t size = mbi_rd32(MBI_MMAP_SIZE);
+    uint32_t addr = mbi_rd32(MBI_MMAP_ADDR);
+    volatile uint8_t* p = (volatile uint8_t*)(size_t)addr;
+    volatile uint8_t* end = p + size;
+    /* Reserve: mark all non-type-1 pages as used; type-1 as free (bit=0=free). */
+    while (p + 24 <= end) {
+        uint32_t esize = *(volatile uint32_t*)p;
+        if (esize < 24 || p + esize > end) break;
+        uint64_t base = ((uint64_t)*(volatile uint32_t*)(p + 8) << 32) | *(volatile uint32_t*)(p + 4);
+        uint64_t len  = ((uint64_t)*(volatile uint32_t*)(p + 16) << 32) | *(volatile uint32_t*)(p + 12);
+        uint32_t type = *(volatile uint32_t*)(p + 20);
+        if (type != 1) {
+            /* mark used */
+            uint64_t first = base / PAGE_SIZE;
+            uint64_t last  = (base + len + PAGE_SIZE - 1) / PAGE_SIZE;
+            for (uint64_t pg = first; pg < last && pg < 1048576; pg++) {
+                g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
+            }
+        }
+        p += esize;
+    }
+    /* Reserve first 1 MiB (real-mode/BIOS) and kernel image [1MiB, ~2MiB) */
+    for (uint32_t pg = 0; pg < 512; pg++) g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
+    /* reserve kernel image: from 1MiB to end of kernel (approx 2MiB) */
+    extern uint8_t _end;
+    uint32_t kern_end_pg = ((uint32_t)(size_t)&_end + PAGE_SIZE - 1) / PAGE_SIZE;
+    for (uint32_t pg = 256; pg < kern_end_pg; pg++) g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
+    /* reserve Multiboot modules */
+    if (g_mb_info) {
+        uint32_t mcount = mbi_rd32(MBI_MODS_COUNT);
+        uint32_t maddr  = mbi_rd32(MBI_MODS_ADDR);
+        for (uint32_t m = 0; m < mcount; m++) {
+            volatile uint8_t* mp = (volatile uint8_t*)(size_t)maddr + m * 16;
+            uint32_t ms = *(volatile uint32_t*)(mp + 0);
+            uint32_t me = *(volatile uint32_t*)(mp + 4);
+            for (uint32_t pg = ms / PAGE_SIZE; pg <= (me + PAGE_SIZE - 1) / PAGE_SIZE && pg < 1048576; pg++)
+                g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
+        }
+    }
+    g_mm_ready = 1;
+}
+
+/* Allocate one 4 KiB page. Returns physical==virtual addr (identity map) or 0. */
+static uint32_t pmm_alloc(void) {
+    if (!g_mm_ready) mm_init();
+    for (uint32_t w = 0; w < BITMAP_WORDS; w++) {
+        uint32_t word = g_page_bitmap[w];
+        if (word == 0xFFFFFFFFu) continue;
+        for (uint32_t b = 0; b < 32; b++) {
+            if (!(word & (1u << b))) {
+                uint32_t pg = w * 32 + b;
+                g_page_bitmap[w] |= (1u << b);
+                g_alloc_count++;
+                return pg * PAGE_SIZE;
+            }
+        }
+    }
+    return 0;
+}
+
+static void pmm_free(uint32_t phys) {
+    uint32_t pg = phys / PAGE_SIZE;
+    if (pg < 1048576) g_page_bitmap[pg >> 5] &= ~(1u << (pg & 31));
+}
+
+static void show_memalloc(void) {
+    /* smoke test: allocate two pages, verify distinct, free them */
+    uint32_t a = pmm_alloc();
+    uint32_t b = pmm_alloc();
+    if (a && b) {
+        kputs("alloc test: ");
+        kprint_hex32(a);
+        kputs(" + ");
+        kprint_hex32(b);
+        kputs(a != b ? " OK (distinct)\n" : " FAIL (same page!)\n");
+        pmm_free(a);
+        pmm_free(b);
+    } else {
+        kputs("alloc test: allocation failed\n");
+    }
+    kputs("Page allocator: ");
+    kprint_dec64(g_alloc_count);
+    kputs(" allocs, ready=");
+    kputs(g_mm_ready ? "yes" : "no");
+    kputs("\n");
 }
 
 /* --------------------------------------------------------------------------

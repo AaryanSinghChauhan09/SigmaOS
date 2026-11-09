@@ -43,6 +43,9 @@ SECTIONS {
         *(.bss.*)
     }
 
+    /* End of kernel image — used by the page allocator for reservations */
+    _end = .;
+
     /* Discard debug / comment sections to keep the ELF lean */
     /DISCARD/ : {
         *(.comment)
