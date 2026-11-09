@@ -7,6 +7,7 @@ Contents:
   RM.BIN     ring-3 file delete: SYS_UNLINK via int 0x80
   MKDIR.BIN  ring-3 dir create: SYS_MKDIR via int 0x80
   TOUCH.BIN  ring-3 file create: SYS_CREAT via int 0x80
+  MV.BIN     ring-3 file rename: SYS_RENAME via int 0x80
   ELFHELLO.ELF  ELF32 C program (gcc -m32 -nostdlib), exec ELF path
   README.TXT this file
 
@@ -32,5 +33,6 @@ as the FAT volume. Then in the shell:
   exec RM.BIN TEST.TXT
   exec MKDIR.BIN MYDIR
   exec TOUCH.BIN NEWFILE.TXT
+  exec MV.BIN NEWFILE.TXT RENAMED.TXT
 
 Rebuild this image:  scripts/make_userdisk.sh
