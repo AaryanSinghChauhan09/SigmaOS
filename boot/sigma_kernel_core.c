@@ -6108,6 +6108,7 @@ void isr_common(uint32_t* frame) {
         "#VC VMM comm", "#SX security"
     };
     uint32_t vec = frame[0];
+    g_isr_kernel = 0;
     g_isr_frame_dw = 5;
     /* ptrace single-step: #DB after one instruction in a traced proc.
      * isr_1 pushed full ctx: frame[2..9]=regs, frame[10]=eip, 11=cs, 12=eflags */
