@@ -6832,6 +6832,42 @@ static uint32_t proc_render(int fdidx, uint32_t id) {
         if (!found) n += k_strcpy(b + n, "no such process\n");
         break;
     }
+    case 7: { /* STATUS of PROC/<pid>/STATUS */
+        int found = 0;
+        for (int i = 0; i < MAX_PROCS; i++) {
+            if (!g_procs[i].used || g_procs[i].pid != g_proc_stat_pid) continue;
+            found = 1;
+            struct proc* q = &g_procs[i];
+            n += k_strcpy(b + n, "Name:	");
+            n += k_strcpy(b + n, q->name[0] ? q->name : "?");
+            n += k_strcpy(b + n, "\nPid:	");
+            n += k_u32dec(q->pid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, "\nPPid:	");
+            n += k_u32dec(q->ppid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, "\nState:	");
+            n += k_strcpy(b + n, (g_cur_proc == i) ? "running" : "ready");
+            n += k_strcpy(b + n, "\nNice:	");
+            { char nb[8]; int ni2 = 0; int nv = q->nice;
+              if (nv < 0) { nb[ni2++]='-'; nv=-nv; }
+              char d[12]; int di=0; do{d[di++]='0'+nv%10;nv/=10;}while(nv);
+              while(di) nb[ni2++]=d[--di]; nb[ni2]=0;
+              n += k_strcpy(b + n, nb); }
+            n += k_strcpy(b + n, "\nSigPnd:	0x");
+            { char hx[9]; uint32_t v = q->pending_mask;
+              for (int d = 7; d >= 0; d--) { int nib=(v>>(d*4))&15; hx[7-d]=(char)(nib<10?'0'+nib:'a'+nib-10); } hx[8]=0;
+              n += k_strcpy(b + n, hx); }
+            n += k_strcpy(b + n, "\nSigBlk:	0x");
+            { char hx[9]; uint32_t v = q->sig_mask;
+              for (int d = 7; d >= 0; d--) { int nib=(v>>(d*4))&15; hx[7-d]=(char)(nib<10?'0'+nib:'a'+nib-10); } hx[8]=0;
+              n += k_strcpy(b + n, hx); }
+            n += k_strcpy(b + n, "\n");
+            break;
+        }
+        if (!found) n += k_strcpy(b + n, "no such process\n");
+        break;
+    }
     default:
         return 0;
     }
@@ -6854,10 +6890,16 @@ static int proc_lookup(const char* rpath) {
         const char* q = leaf;
         uint32_t pv = 0; int nd = 0;
         while (*q >= '0' && *q <= '9') { pv = pv * 10 + (*q - '0'); q++; nd++; }
-        if (nd > 0 && q[0] == '/' &&
-            ((q[1]=='S'||q[1]=='s')&&(q[2]=='T'||q[2]=='t')&&(q[3]=='A'||q[3]=='a')&&(q[4]=='T'||q[4]=='t')&&!q[5])) {
-            g_proc_stat_pid = pv;
-            return 6;
+        if (nd > 0 && q[0] == '/') {
+            int isstat = (q[1]=='S'||q[1]=='s')&&(q[2]=='T'||q[2]=='t')&&(q[3]=='A'||q[3]=='a')&&(q[4]=='T'||q[4]=='t')&&!q[5];
+            int isstatus = !isstat && (q[1]=='S'||q[1]=='s')&&(q[2]=='T'||q[2]=='t')&&(q[3]=='A'||q[3]=='a')
+                        &&(q[4]=='T'||q[4]=='t')&&(q[5]=='U'||q[5]=='u')&&(q[6]=='S'||q[6]=='s')
+                        &&(q[7]==' '||q[7]=='\t')? 0 : 0;
+            /* STATUS = 7 chars */
+            isstatus = (q[1]=='S'||q[1]=='s')&&(q[2]=='T'||q[2]=='t')&&(q[3]=='A'||q[3]=='a')
+                    &&(q[4]=='T'||q[4]=='t')&&(q[5]=='U'||q[5]=='u')&&(q[6]=='S'||q[6]=='s')&&!q[7];
+            if (isstat) { g_proc_stat_pid = pv; return 6; }
+            if (isstatus) { g_proc_stat_pid = pv; return 7; }
         }
     }
     for (int k = 0; k < 5; k++) {
