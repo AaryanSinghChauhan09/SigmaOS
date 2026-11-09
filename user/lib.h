@@ -29,6 +29,7 @@ enum {
     SYS_DMESG = 30,
     SYS_GETPID = 31,
     SYS_GETPPID = 32,
+    SYS_KILL = 33,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

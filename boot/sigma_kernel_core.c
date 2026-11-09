@@ -269,6 +269,7 @@ static int kbd_buf_pop(char* out);   /* defined with IRQ section below */
 #define MAX_PROCS 4
 struct proc {
     int      used;
+    int      killed;     /* SIGKILL-style: freed at next schedule point */
     int      started;    /* 0 = needs enter_user, 1 = resume via ctx */
     uint32_t pid;
     uint32_t base;       /* user region base (4MiB aligned) */
@@ -4336,8 +4337,8 @@ static void proc_run(int idx) {
     }
     g_user_active = 0;
     g_preempt_pending = 0;
-    if (g_user_dead) {
-        p->used = 0;
+    if (g_user_dead || p->killed) {
+        p->used = 0; p->killed = 0;
         g_user_dead = 0;
         klog("sched: proc exit\n");
     } else {
@@ -4350,6 +4351,18 @@ static int proc_pick_next(int after) {
     for (int k = 1; k <= MAX_PROCS; k++) {
         int i = (after + k) % MAX_PROCS;
         if (g_procs[i].used) return i;
+    }
+    return -1;
+}
+
+/* mark proc killed; if it's the running one, force exit on return */
+static int proc_kill(uint32_t pid) {
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (g_procs[i].used && g_procs[i].pid == pid) {
+            g_procs[i].killed = 1;
+            if (g_cur_proc == i) g_user_dead = 1;
+            return 0;
+        }
     }
     return -1;
 }
@@ -5174,6 +5187,13 @@ void kernel_shell(void) {
             show_timer();
         } else if (kstrcmp(cmd, "sched") == 0) {
             show_sched();
+        } else if (kcmd_is(cmd, "kill")) {
+            const char* kp = cmd + 4;
+            while (*kp == ' ') kp++;
+            uint32_t kpid = 0;
+            while (*kp >= '0' && *kp <= '9') { kpid = kpid * 10 + (*kp - '0'); kp++; }
+            if (proc_kill(kpid) == 0) kputs("kill: sent\n");
+            else kputs("kill: no such pid\n");
         } else if (kstrcmp(cmd, "ps") == 0) {
             show_ps();
         } else if (kstrcmp(cmd, "dmesg") == 0) {
@@ -5695,6 +5715,7 @@ static void idt_init(void) {
 #define SYS_DMESG    30 /* ebx=user buf, ecx=max — copy klog, eax=len (0 if empty) */
 #define SYS_GETPID   31 /* eax=current proc pid, 0 in kernel */
 #define SYS_GETPPID  32 /* eax=parent pid (0 = kernel shell) */
+#define SYS_KILL     33 /* ebx=pid — terminate proc, eax=0/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6663,6 +6684,9 @@ void syscall_handler(uint32_t* regs) {
         return;
     } else if (nr == SYS_GETPPID) {
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_KILL) {
+        regs[7] = (uint32_t)proc_kill(regs[1]);
         return;
     } else if (nr == SYS_CREAT) {
         /* ebx = user ptr to NUL-terminated single-component name in cwd.
