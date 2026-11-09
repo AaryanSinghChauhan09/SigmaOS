@@ -9,6 +9,7 @@ Contents:
   TOUCH.BIN  ring-3 file create: SYS_CREAT via int 0x80
   MV.BIN     ring-3 file rename: SYS_RENAME via int 0x80
   APPEND.BIN ring-3 file append: SYS_APPEND via int 0x80
+  STAT.BIN   ring-3 file size: SYS_STAT via int 0x80
   ELFHELLO.ELF  ELF32 C program (gcc -m32 -nostdlib), exec ELF path
   README.TXT this file
 
@@ -36,5 +37,6 @@ as the FAT volume. Then in the shell:
   exec TOUCH.BIN NEWFILE.TXT
   exec MV.BIN NEWFILE.TXT RENAMED.TXT
   exec APPEND.BIN RENAMED.TXT
+  exec STAT.BIN RENAMED.TXT
 
 Rebuild this image:  scripts/make_userdisk.sh

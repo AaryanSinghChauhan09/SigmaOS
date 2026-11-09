@@ -10,7 +10,7 @@ IMG="$USER_DIR/sigmaos-userdisk.img"
 for t in mformat mcopy; do
     command -v "$t" >/dev/null 2>&1 || { echo "ERROR: $t not found (install mtools)" >&2; exit 1; }
 done
-for f in hello.bin cat.bin rm.bin mkdir.bin touch.bin mv.bin append.bin elfhello.elf README.TXT; do
+for f in hello.bin cat.bin rm.bin mkdir.bin touch.bin mv.bin append.bin stat.bin elfhello.elf README.TXT; do
     [ -f "$USER_DIR/$f" ] || { echo "ERROR: missing $USER_DIR/$f — run make -C user first" >&2; exit 1; }
 done
 
@@ -23,6 +23,7 @@ mcopy -o -i "$IMG" "$USER_DIR/mkdir.bin"   ::MKDIR.BIN
 mcopy -o -i "$IMG" "$USER_DIR/touch.bin"    ::TOUCH.BIN
 mcopy -o -i "$IMG" "$USER_DIR/mv.bin"       ::MV.BIN
 mcopy -o -i "$IMG" "$USER_DIR/append.bin"   ::APPEND.BIN
+mcopy -o -i "$IMG" "$USER_DIR/stat.bin"     ::STAT.BIN
 mcopy -o -i "$IMG" "$USER_DIR/README.TXT"  ::README.TXT
 mcopy -o -i "$IMG" "$USER_DIR/elfhello.elf" ::ELFHELLO.ELF
 
