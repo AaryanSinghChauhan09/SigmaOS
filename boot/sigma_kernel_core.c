@@ -2993,6 +2993,45 @@ static void show_sort(const char* args) {
     kfree(buf);
 }
 
+/* nl <file> — print lines with numbers (6-wide, tab). */
+static void show_nl(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: nl <file>\n"); return; }
+    char namebuf[64]; int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+    if (fat_ensure_mounted() != 0) { kputs("nl: no FAT volume.\n"); return; }
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("nl: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("nl: not found.\n"); return; }
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("nl: out of memory.\n"); return; }
+    int got = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                              g_vol_spc, hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs("nl: read error.\n"); return; }
+    uint32_t i = 0; int ln = 1;
+    while (i < (uint32_t)got) {
+        /* right-align line number in 6 chars */
+        char nb[8]; int nd = 0; int t = ln;
+        do { nb[nd++] = '0' + (t % 10); t /= 10; } while (t && nd < 7);
+        while (nd < 6) nb[nd++] = ' ';
+        for (int j = nd - 1; j >= 0; j--) kputc(nb[j]);
+        kputc('\t');
+        while (i < (uint32_t)got && buf[i] != '\n') { kputc((char)buf[i]); i++; }
+        if (i < (uint32_t)got) i++;
+        kputc('\n'); ln++;
+    }
+    kfree(buf);
+}
+
 /* cut -c A-B <file> | cut -d D -f N <file> — extract chars/fields. */
 static void show_cut(const char* args) {
     const char* p = args;
@@ -3891,7 +3930,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
