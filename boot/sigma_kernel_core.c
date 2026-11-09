@@ -2694,6 +2694,53 @@ static void show_hex(const char* args) {
     kfree(buf);
 }
 
+/* wc <file> — line/word/byte counts (≤4KB file). */
+static void show_wc(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: wc <file>\n"); return; }
+    char namebuf[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+
+    if (fat_ensure_mounted() != 0) { kputs("wc: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("wc: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                        g_vol_fat_lba, g_vol_data_lba, g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("wc: not found.\n"); return; }
+
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("wc: out of memory.\n"); return; }
+    int got = fat_read_to_buf(kind, g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
+                              hit.cluster, (uint32_t)cap, buf);
+    if (got < 0) { kfree(buf); kputs("wc: read error.\n"); return; }
+
+    uint32_t lines = 0, words = 0, bytes = (uint32_t)got;
+    int in_word = 0;
+    for (uint32_t i = 0; i < (uint32_t)got; i++) {
+        uint8_t c = buf[i];
+        if (c == '\n') lines++;
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+            in_word = 0;
+        } else if (!in_word) {
+            in_word = 1; words++;
+        }
+    }
+    kfree(buf);
+    kprint_dec64(lines); kputs(" ");
+    kprint_dec64(words);  kputs(" ");
+    kprint_dec64(bytes);  kputs(" ");
+    kputs(rpath);
+    kputs("\n");
+}
+
 /* grep <pattern> <file> — print lines containing pattern (≤4KB file). */
 static void show_grep(const char* args) {
     const char* p = args;
@@ -3369,6 +3416,7 @@ void kernel_shell(void) {
             kputs("  hex     - Hexdump file: hex <file>\n");
             kputs("  stat    - File info: stat <file>\n");
             kputs("  grep    - Search file: grep <pat> <file>\n");
+            kputs("  wc      - Count lines/words/bytes: wc <file>\n");
             kputs("  uptime  - Seconds since boot\n");
             kputs("  ver     - Kernel version\n");
             kputs("  info    - System summary\n");
@@ -3442,6 +3490,8 @@ void kernel_shell(void) {
             show_stat(cmd + 4);
         } else if (kcmd_is(cmd, "grep")) {
             show_grep(cmd + 4);
+        } else if (kcmd_is(cmd, "wc")) {
+            show_wc(cmd + 2);
         } else if (kcmd_is(cmd, "uptime")) {
             show_uptime();
         } else if (kcmd_is(cmd, "ver")) {
