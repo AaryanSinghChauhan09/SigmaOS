@@ -380,6 +380,7 @@ static void pit_init(void);
 static void show_timer(void);
 static void show_memalloc(void);
 static void show_sched(void);
+static void show_ps(void);
 static void show_exec(const char* args);
 void resume_user(void);   /* naked asm: restore preempted user ctx */
 static uint32_t find_user_region(void);
@@ -1876,6 +1877,7 @@ void kernel_shell(void) {
             kputs("  fg      - Resume preempted user program\n");
             kputs("  timer   - Show PIT tick count\n");
             kputs("  sched   - Scheduler/user-process status\n");
+            kputs("  ps      - Process list\n");
             kputs("  dmesg   - Show kernel log\n");
             kputs("  memalloc- Page allocator test/status\n");
             kputs("  clear   - Clear the console screen\n");
@@ -1933,6 +1935,8 @@ void kernel_shell(void) {
             show_timer();
         } else if (kstrcmp(cmd, "sched") == 0) {
             show_sched();
+        } else if (kstrcmp(cmd, "ps") == 0) {
+            show_ps();
         } else if (kstrcmp(cmd, "dmesg") == 0) {
             show_dmesg();
         } else if (kstrcmp(cmd, "memalloc") == 0) {
@@ -2727,6 +2731,22 @@ void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry
     /* EOI: non-specific to master; slave EOI only for IRQ8-15 (vec>=40) */
     if (vec >= 40) outb(0xA0, 0x20);
     outb(0x20, 0x20);
+}
+
+static void show_ps(void) {
+    kputs("  PID STAT  EIP      ESP      INFO\n");
+    kputs("    0 RUN   -        -        kernel shell\n");
+    if (g_user_active || g_preempt_pending) {
+        kputs("    1 ");
+        kputs(g_preempt_pending ? "STOP " : "RUN  ");
+        kputs("  ");
+        kprint_hex32(g_user_eip);
+        kputs("  ");
+        kprint_hex32(g_user_esp);
+        kputs(g_preempt_pending ? "  preempted (fg)\n" : "  running\n");
+    } else {
+        kputs("    1 -     -        -        no user process\n");
+    }
 }
 
 static void show_sched(void) {
