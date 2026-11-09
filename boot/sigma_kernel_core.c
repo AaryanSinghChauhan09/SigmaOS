@@ -363,6 +363,8 @@ static int kprefix(const char* s, const char* prefix) {
  * -------------------------------------------------------------------------- */
 static volatile uint8_t* g_mb_info = 0;
 static void ata_identify_model(uint16_t base, int slave, char out[41]);
+static int ata_read_lba28(uint16_t base, int slave, uint32_t lba, uint8_t* buf, int sectors);
+static int ata_write_lba28(uint16_t base, int slave, uint32_t lba, const uint8_t* buf, int sectors);
 static uint32_t fat_next_cluster32(uint32_t fat_lba, uint32_t cluster);
 static int fat_is_eoc32(uint32_t c);
 static uint32_t fat_next_any(uint32_t fat_lba, int kind, uint32_t cluster);
@@ -923,6 +925,43 @@ static int virtio_blk_write(uint64_t sector, const uint8_t* buf, uint32_t nsec) 
     return virtio_xfer(1, sector, (uint8_t*)(size_t)buf, nsec);
 }
 
+/* Block layer: virtio-blk when present, else ATA PIO master on 0x1F0.
+ * nsec chunked to VQ_NUM for virtio. Returns sectors read/written or <0. */
+static int blk_read_lba(uint32_t lba, uint8_t* buf, int nsec);
+static int blk_write_lba(uint32_t lba, const uint8_t* buf, int nsec);
+static int blk_read_lba(uint32_t lba, uint8_t* buf, int nsec) {
+    if (nsec <= 0) return 0;
+    if (g_vio_ok) {
+        int done = 0;
+        while (done < nsec) {
+            int chunk = nsec - done;
+            if (chunk > VQ_NUM) chunk = VQ_NUM;
+            if (virtio_blk_read((uint64_t)lba + (uint64_t)done,
+                                buf + (uint32_t)done * 512u, (uint32_t)chunk) != 0)
+                return done ? done : -1;
+            done += chunk;
+        }
+        return done;
+    }
+    return ata_read_lba28(0x1F0, 0, lba, buf, nsec);
+}
+static int blk_write_lba(uint32_t lba, const uint8_t* buf, int nsec) {
+    if (nsec <= 0) return 0;
+    if (g_vio_ok) {
+        int done = 0;
+        while (done < nsec) {
+            int chunk = nsec - done;
+            if (chunk > VQ_NUM) chunk = VQ_NUM;
+            if (virtio_blk_write((uint64_t)lba + (uint64_t)done,
+                                 buf + (uint32_t)done * 512u, (uint32_t)chunk) != 0)
+                return done ? done : -1;
+            done += chunk;
+        }
+        return done;
+    }
+    return ata_write_lba28(0x1F0, 0, lba, buf, nsec);
+}
+
 /* vdisk — virtio-blk status + sector-0 hexdump probe. */
 static void show_vdisk(void) {
     if (!g_vio_ok) { kputs("vdisk: virtio-blk not present.\n"); return; }
@@ -1094,7 +1133,7 @@ static void show_read(const char* args) {
 
 /* Parse MBR partition table from sector 0 (already in g_sector_buf via read). */
 static void show_partitions(void) {
-    int n = ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1);
+    int n = blk_read_lba(0, g_sector_buf, 1);
     if (n < 0) {
         kputs("part: could not read sector 0.\n");
         return;
@@ -1148,7 +1187,7 @@ static void show_fs(const char* args) {
         lba = kstrtoul(p + 4);
     } else {
         /* default: first partition's start LBA from MBR */
-        if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) {
+        if (blk_read_lba(0, g_sector_buf, 1) < 0) {
             kputs("fs: cannot read MBR.\n");
             return;
         }
@@ -1162,7 +1201,7 @@ static void show_fs(const char* args) {
         }
     }
 
-    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) {
+    if (blk_read_lba(lba, g_sector_buf, 1) < 0) {
         kputs("fs: cannot read boot sector at lba=");
         kprint_dec64(lba);
         kputs(".\n");
@@ -1410,7 +1449,7 @@ static uint32_t fat_free_clusters(void) {
     int fail = 0;
     while (done < g_vol_fatsz) {
         int chunk = (g_vol_fatsz - done > 4) ? 4 : (int)(g_vol_fatsz - done);
-        int n = ata_read_lba28(0x1F0, 0, g_vol_fat_lba + done, fat + done * 512u, chunk);
+        int n = blk_read_lba(g_vol_fat_lba + done, fat + done * 512u, chunk);
         if (n < 0) { fail = 1; break; }
         done += (uint32_t)n;
     }
@@ -1538,18 +1577,18 @@ static void show_ls(const char* args) {
         while (*p && *p != ' ' && dl < 63) dirname[dl++] = *p++;
         dirname[dl] = '\0';
         /* default: first partition's start LBA from MBR */
-        if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("ls: no MBR.\n"); return; }
+        if (blk_read_lba(0, g_sector_buf, 1) < 0) { kputs("ls: no MBR.\n"); return; }
         uint8_t* e = g_sector_buf + 446;
         lba = (uint32_t)e[8] | ((uint32_t)e[9] << 8) | ((uint32_t)e[10] << 16) | ((uint32_t)e[11] << 24);
     } else {
         /* default: first partition's start LBA from MBR */
-        if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("ls: no MBR.\n"); return; }
+        if (blk_read_lba(0, g_sector_buf, 1) < 0) { kputs("ls: no MBR.\n"); return; }
         uint8_t* e = g_sector_buf + 446;
         lba = (uint32_t)e[8] | ((uint32_t)e[9] << 8) | ((uint32_t)e[10] << 16) | ((uint32_t)e[11] << 24);
     }
     (void)p;
 
-    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) { kputs("ls: cannot read boot sector.\n"); return; }
+    if (blk_read_lba(lba, g_sector_buf, 1) < 0) { kputs("ls: cannot read boot sector.\n"); return; }
     uint8_t* b = g_sector_buf;
     uint16_t bps   = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
     uint8_t  spc   = b[13];
@@ -1627,7 +1666,7 @@ static void show_ls(const char* args) {
             int stop = 0;
             while (done < secs) {
                 int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
-                int n = ata_read_lba28(0x1F0, 0, clus_lba + done, dst, chunk);
+                int n = blk_read_lba(clus_lba + done, dst, chunk);
                 if (n < 0) { kputs("ls: cannot read root dir.\n"); return; }
                 dst += n * 512;
                 done += (uint32_t)n;
@@ -1662,7 +1701,7 @@ static void show_ls(const char* args) {
     uint32_t done = 0;
     while (done < root_secs) {
         int chunk = (root_secs - done > 4) ? 4 : (int)(root_secs - done);
-        int n = ata_read_lba28(0x1F0, 0, root_lba + done, dst, chunk);
+        int n = blk_read_lba(root_lba + done, dst, chunk);
         if (n < 0) { kputs("ls: cannot read root directory.\n"); return; }
         dst += n * 512;
         done += (uint32_t)n;
@@ -1745,7 +1784,7 @@ static uint16_t fat_next_cluster(uint32_t fat_lba, int is_fat12, uint16_t cluste
     uint32_t byte_off = is_fat12 ? ((uint32_t)cluster + (cluster >> 1)) : ((uint32_t)cluster * 2);
     uint32_t sec = fat_lba + (byte_off / 512);
     uint32_t off = byte_off % 512;
-    if (ata_read_lba28(0x1F0, 0, sec, g_fs_buf, 1) < 0) return 0xFFFF;
+    if (blk_read_lba(sec, g_fs_buf, 1) < 0) return 0xFFFF;
     if (is_fat12) {
         uint16_t v = (uint16_t)g_fs_buf[off] | ((uint16_t)g_fs_buf[off + 1] << 8);
         return (cluster & 1) ? (uint16_t)((v >> 4) & 0x0FFF) : (uint16_t)(v & 0x0FFF);
@@ -1758,7 +1797,7 @@ static uint32_t fat_next_cluster32(uint32_t fat_lba, uint32_t cluster) {
     uint32_t byte_off = cluster * 4;
     uint32_t sec = fat_lba + (byte_off / 512);
     uint32_t off = byte_off % 512;
-    if (ata_read_lba28(0x1F0, 0, sec, g_fs_buf, 1) < 0) return 0xFFFFFFFFu;
+    if (blk_read_lba(sec, g_fs_buf, 1) < 0) return 0xFFFFFFFFu;
     uint32_t v = (uint32_t)g_fs_buf[off]
                | ((uint32_t)g_fs_buf[off + 1] << 8)
                | ((uint32_t)g_fs_buf[off + 2] << 16)
@@ -1799,7 +1838,7 @@ static int fat_scan_dir(uint32_t start_cluster, int kind, uint32_t fat_lba,
         uint32_t done = 0;
         while (done < secs) {
             int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
-            int n = ata_read_lba28(0x1F0, 0, clus_lba + done, dst, chunk);
+            int n = blk_read_lba(clus_lba + done, dst, chunk);
             if (n < 0) return -1;
             dst += n * 512;
             done += (uint32_t)n;
@@ -1842,7 +1881,7 @@ static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
         uint32_t done = 0;
         while (done < secs) {
             int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
-            int n = ata_read_lba28(0x1F0, 0, clus_lba + done, dst, chunk);
+            int n = blk_read_lba(clus_lba + done, dst, chunk);
             if (n < 0) { kputs("ls: read error.\n"); return; }
             dst += n * 512;
             done += (uint32_t)n;
@@ -1876,7 +1915,7 @@ static int fat_scan_root16(uint32_t root_lba, uint32_t root_secs,
     uint32_t done = 0;
     while (done < root_secs) {
         int chunk = (root_secs - done > 4) ? 4 : (int)(root_secs - done);
-        int n = ata_read_lba28(0x1F0, 0, root_lba + done, dst, chunk);
+        int n = blk_read_lba(root_lba + done, dst, chunk);
         if (n < 0) return -1;
         dst += n * 512;
         done += (uint32_t)n;
@@ -1965,7 +2004,7 @@ static uint32_t fat_alloc_cluster(int kind) {
     int fail = 0;
     while (done < g_vol_fatsz) {
         int chunk = (g_vol_fatsz - done > 4) ? 4 : (int)(g_vol_fatsz - done);
-        int n = ata_read_lba28(0x1F0, 0, g_vol_fat_lba + done, fat + done * 512u, chunk);
+        int n = blk_read_lba(g_vol_fat_lba + done, fat + done * 512u, chunk);
         if (n < 0) { fail = 1; break; }
         done += (uint32_t)n;
     }
@@ -2016,7 +2055,7 @@ static uint32_t fat_alloc_cluster(int kind) {
     uint32_t sec1 = (byte_off + width - 1) / 512;
     for (uint32_t s = sec0; s <= sec1; s += 4) {
         int chunk = (int)(sec1 - s + 1 > 4 ? 4 : sec1 - s + 1);
-        if (ata_write_lba28(0x1F0, 0, g_vol_fat_lba + s, fat + s * 512u, chunk) < 0) {
+        if (blk_write_lba(g_vol_fat_lba + s, fat + s * 512u, chunk) < 0) {
             kfree(fat); return 0;
         }
     }
@@ -2040,7 +2079,7 @@ static int fat_set_entry(int kind, uint32_t clus, uint32_t val) {
      * up to 2 sectors into a contiguous buffer */
     uint8_t tmp[1024];
     int nsec = (off + width > 512) ? 2 : 1;
-    if (ata_read_lba28(0x1F0, 0, g_vol_fat_lba + sec, tmp, nsec) < 0) return -1;
+    if (blk_read_lba(g_vol_fat_lba + sec, tmp, nsec) < 0) return -1;
     if (kind == 2) {
         tmp[off]   = (uint8_t)(val & 0xFF);
         tmp[off+1] = (uint8_t)((val >> 8) & 0xFF);
@@ -2054,7 +2093,7 @@ static int fat_set_entry(int kind, uint32_t clus, uint32_t val) {
         else          v = (uint16_t)((v & 0xF000) | (val & 0x0FFFu));
         tmp[off] = (uint8_t)(v & 0xFF); tmp[off+1] = (uint8_t)(v >> 8);
     }
-    return ata_write_lba28(0x1F0, 0, g_vol_fat_lba + sec, tmp, nsec);
+    return blk_write_lba(g_vol_fat_lba + sec, tmp, nsec);
 }
 
 /* Allocate `count` clusters as a linked chain (last = EOC).
@@ -2108,7 +2147,7 @@ static int fat_find_dir_slot(int kind, int in_root,
         }
         for (uint32_t s = 0; s < nsecs; s++) {
             uint32_t lba = sec_base + s;
-            if (ata_read_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { r->status = -2; return -1; }
+            if (blk_read_lba(lba, g_file_buf, 1) < 0) { r->status = -2; return -1; }
             for (int i = 0; i < 16; i++) {
                 uint8_t* e = g_file_buf + i * 32;
                 if (e[0] == 0x0F) continue;              /* LFN entry */
@@ -2136,9 +2175,9 @@ static int fat_find_dir_slot(int kind, int in_root,
 
 /* Write a 32-byte directory entry at (lba, off). Caller fills `e`. */
 static int fat_write_dirent(uint32_t lba, uint32_t off, const uint8_t* e) {
-    if (ata_read_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) return -1;
+    if (blk_read_lba(lba, g_file_buf, 1) < 0) return -1;
     for (int i = 0; i < 32; i++) g_file_buf[off + i] = e[i];
-    return ata_write_lba28(0x1F0, 0, lba, g_file_buf, 1);
+    return blk_write_lba(lba, g_file_buf, 1);
 }
 
 /* returns 0 ok, -1..-6 error (no printing) */
@@ -2201,7 +2240,7 @@ static int fat_mkdir_impl(const char* name) {
         }
         uint32_t lba = g_vol_data_lba + (clus - 2) * g_vol_spc + (uint32_t)s;
         int chunk = 1;
-        if (ata_write_lba28(0x1F0, 0, lba, sec, chunk) < 0) return -6;
+        if (blk_write_lba(lba, sec, chunk) < 0) return -6;
     }
     return 0;
 }
@@ -2229,7 +2268,7 @@ static int fat_rmdir_impl(const char* name) {
                                g_vol_data_lba, g_vol_spc, want, &slot);
     if (slot.status != -1) return -2;   /* not found */
     /* read parent sector, verify target is a directory */
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) return -8;
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) return -8;
     uint8_t* e = g_file_buf + slot.off;
     if (!(e[11] & 0x10)) return -3;     /* not a dir */
     uint32_t child_clus = fat_dirent_cluster(kind, e);
@@ -2240,7 +2279,7 @@ static int fat_rmdir_impl(const char* name) {
     while (!fat_eoc_any(kind, clus) && guard++ < 1024) {
         uint32_t sec_base = g_vol_data_lba + (clus - 2) * g_vol_spc;
         for (uint32_t s = 0; s < g_vol_spc; s++) {
-            if (ata_read_lba28(0x1F0, 0, sec_base + s, g_file_buf, 1) < 0) return -8;
+            if (blk_read_lba(sec_base + s, g_file_buf, 1) < 0) return -8;
             for (int i = 0; i < 16; i++) {
                 uint8_t* d = g_file_buf + i * 32;
                 if (d[0] == 0x00 || d[0] == 0xE5 || d[0] == 0x0F) continue;
@@ -2259,9 +2298,9 @@ static int fat_rmdir_impl(const char* name) {
     }
     /* free the chain and mark dirent deleted */
     fat_free_chain(kind, child_clus);
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) return -8;
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) return -8;
     g_file_buf[slot.off] = 0xE5;
-    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) return -8;
+    if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) return -8;
     return 0;
 }
 
@@ -2287,7 +2326,7 @@ static int fat_truncate_impl(const char* name, uint32_t newsize) {
                                g_vol_root_secs, dir_cluster, g_vol_fat_lba,
                                g_vol_data_lba, g_vol_spc, want, &slot);
     if (slot.status != -1) return -2;
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) return -8;
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) return -8;
     uint8_t* e = g_file_buf + slot.off;
     if (e[11] & 0x10) return -3;    /* dir */
     uint32_t cur = (uint32_t)e[28] | ((uint32_t)e[29] << 8)
@@ -2411,7 +2450,7 @@ static void show_write(const char* args) {
         uint32_t chunk = tlen - written > 512 ? 512 : tlen - written;
         for (uint32_t i = 0; i < chunk; i++) sec[i] = (uint8_t)p[written + i];
         uint32_t lba = g_vol_data_lba + (clus - 2) * g_vol_spc + s;
-        if (ata_write_lba28(0x1F0, 0, lba, sec, 1) < 0) {
+        if (blk_write_lba(lba, sec, 1) < 0) {
             kputs("write: data write failed.\n"); return;
         }
         written += chunk;
@@ -2448,7 +2487,7 @@ static int fat_free_chain(int kind, uint32_t start) {
     int fail = 0;
     while (done < g_vol_fatsz) {
         int chunk = (g_vol_fatsz - done > 4) ? 4 : (int)(g_vol_fatsz - done);
-        int n = ata_read_lba28(0x1F0, 0, g_vol_fat_lba + done, fat + done * 512u, chunk);
+        int n = blk_read_lba(g_vol_fat_lba + done, fat + done * 512u, chunk);
         if (n < 0) { fail = 1; break; }
         done += (uint32_t)n;
     }
@@ -2487,7 +2526,7 @@ static int fat_free_chain(int kind, uint32_t start) {
     done = 0;
     while (done < g_vol_fatsz) {
         int chunk = (g_vol_fatsz - done > 4) ? 4 : (int)(g_vol_fatsz - done);
-        if (ata_write_lba28(0x1F0, 0, g_vol_fat_lba + done, fat + done * 512u, chunk) < 0) {
+        if (blk_write_lba(g_vol_fat_lba + done, fat + done * 512u, chunk) < 0) {
             kfree(fat); return -1;
         }
         done += (uint32_t)chunk;
@@ -2530,7 +2569,7 @@ static void show_rm(const char* args) {
     if (slot.status != -1) { kputs("rm: not found.\n"); return; }
 
     /* read the dirent to get attr + cluster */
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
         kputs("rm: read error.\n"); return;
     }
     uint8_t* e = g_file_buf + slot.off;
@@ -2541,7 +2580,7 @@ static void show_rm(const char* args) {
         kputs("rm: FAT update failed.\n"); return;
     }
     e[0] = 0xE5;                                     /* mark deleted */
-    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+    if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
         kputs("rm: dirent write failed.\n"); return;
     }
     kputs("rm: deleted /");
@@ -2583,7 +2622,7 @@ static void show_rmdir(const char* args) {
                       g_vol_data_lba, g_vol_spc, want, &slot);
     if (slot.status != -1) { kputs("rmdir: not found.\n"); return; }
 
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
         kputs("rmdir: read error.\n"); return;
     }
     uint8_t* e = g_file_buf + slot.off;
@@ -2597,7 +2636,7 @@ static void show_rmdir(const char* args) {
     while (c >= 2 && !fat_eoc_any(kind, c) && guard++ < 1024 && empty) {
         uint32_t base = g_vol_data_lba + (c - 2) * g_vol_spc;
         for (uint32_t s = 0; s < g_vol_spc && empty; s++) {
-            if (ata_read_lba28(0x1F0, 0, base + s, g_file_buf, 1) < 0) {
+            if (blk_read_lba(base + s, g_file_buf, 1) < 0) {
                 kputs("rmdir: read error.\n"); return;
             }
             for (int i = 0; i < 16; i++) {
@@ -2613,11 +2652,11 @@ static void show_rmdir(const char* args) {
 
     if (fat_free_chain(kind, clus) != 0) { kputs("rmdir: FAT update failed.\n"); return; }
     /* re-read sector: g_file_buf was clobbered by the emptiness scan */
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
         kputs("rmdir: read error.\n"); return;
     }
     g_file_buf[slot.off] = 0xE5;
-    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+    if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
         kputs("rmdir: dirent write failed.\n"); return;
     }
     kputs("rmdir: removed /");
@@ -2703,14 +2742,14 @@ static void show_mv(const char* args) {
                       g_vol_data_lba, g_vol_spc, want_old, &slot);
     if (slot.status != -1) { kputs("mv: not found.\n"); return; }
 
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
         kputs("mv: read error.\n"); return;
     }
 
     if (o_root == n_root && o_dir == n_dir) {
         /* same dir: rename in place */
         for (int i = 0; i < 11; i++) g_file_buf[slot.off + i] = want_new[i];
-        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
             kputs("mv: write failed.\n"); return;
         }
     } else {
@@ -2724,7 +2763,7 @@ static void show_mv(const char* args) {
         }
         /* mark source deleted */
         g_file_buf[slot.off] = 0xE5;
-        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
             kputs("mv: source delete failed.\n"); return;
         }
     }
@@ -2804,8 +2843,8 @@ static void show_cp(const char* args) {
         uint32_t sbase = g_vol_data_lba + (sc - 2) * g_vol_spc;
         uint32_t dbase = g_vol_data_lba + (dc - 2) * g_vol_spc;
         for (uint32_t s = 0; s < g_vol_spc && remaining > 0; s++) {
-            if (ata_read_lba28(0x1F0, 0, sbase + s, g_file_buf, 1) < 0 ||
-                ata_write_lba28(0x1F0, 0, dbase + s, g_file_buf, 1) < 0) {
+            if (blk_read_lba(sbase + s, g_file_buf, 1) < 0 ||
+                blk_write_lba(dbase + s, g_file_buf, 1) < 0) {
                 fail = 1; break;
             }
             remaining = remaining > 512 ? remaining - 512 : 0;
@@ -2866,7 +2905,7 @@ static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen)
                       g_vol_data_lba, g_vol_spc, want, &slot);
     if (slot.status != -1) { return -1; }
 
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
         return -1;
     }
     uint8_t* de = g_file_buf + slot.off;
@@ -2923,7 +2962,7 @@ static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen)
         uint32_t soff = coff % 512;
         int partial = (soff != 0) || (remaining < 512 - soff);
         if (partial || soff != 0) {
-            if (ata_read_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { fail = 1; break; }
+            if (blk_read_lba(lba, g_file_buf, 1) < 0) { fail = 1; break; }
         } else {
             for (int i = 0; i < 512; i++) g_file_buf[i] = 0;
         }
@@ -2931,7 +2970,7 @@ static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen)
         if (chunk > remaining) chunk = remaining;
         for (uint32_t i = 0; i < chunk; i++)
             g_file_buf[soff + i] = text[tlen - remaining + i];
-        if (ata_write_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { fail = 1; break; }
+        if (blk_write_lba(lba, g_file_buf, 1) < 0) { fail = 1; break; }
         remaining -= chunk;
         file_off += chunk;
     }
@@ -2944,7 +2983,7 @@ static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen)
     de[28] = (uint8_t)(fsize & 0xFF); de[29] = (uint8_t)((fsize >> 8) & 0xFF);
     de[30] = (uint8_t)((fsize >> 16) & 0xFF); de[31] = (uint8_t)(fsize >> 24);
     /* re-read sector: g_file_buf clobbered */
-    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+    if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
         return -1;
     }
     uint8_t* de2 = g_file_buf + slot.off;
@@ -2952,7 +2991,7 @@ static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen)
     /* also persist first-cluster field if file was empty */
     for (int i = 20; i <= 21; i++) de2[i] = de[i];
     if (kind == 2) { de2[26] = de[26]; de2[27] = de[27]; }
-    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) != 1) {
+    if (blk_write_lba(slot.lba, g_file_buf, 1) != 1) {
         return -1;
     }
     return 0;
@@ -3987,11 +4026,11 @@ static void show_cat(const char* args) {
 
     /* resolve volume root lba (same logic as ls) */
     uint32_t lba = 0;
-    if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("cat: no MBR.\n"); return; }
+    if (blk_read_lba(0, g_sector_buf, 1) < 0) { kputs("cat: no MBR.\n"); return; }
     uint8_t* me = g_sector_buf + 446;
     lba = (uint32_t)me[8] | ((uint32_t)me[9] << 8) | ((uint32_t)me[10] << 16) | ((uint32_t)me[11] << 24);
 
-    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) { kputs("cat: cannot read boot sector.\n"); return; }
+    if (blk_read_lba(lba, g_sector_buf, 1) < 0) { kputs("cat: cannot read boot sector.\n"); return; }
     uint8_t* b = g_sector_buf;
     uint16_t bps   = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
     uint8_t  spc   = b[13];
@@ -4051,7 +4090,7 @@ static void show_cat(const char* args) {
     while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 1024 && printed < PRINT_CAP) {
         uint32_t clus_lba = data_lba + (clus - 2) * spc;
         for (uint32_t s = 0; s < spc && printed < PRINT_CAP; s++) {
-            if (ata_read_lba28(0x1F0, 0, clus_lba + s, g_file_buf, 1) < 0) {
+            if (blk_read_lba(clus_lba + s, g_file_buf, 1) < 0) {
                 kputs("\ncat: read error mid-file.\n");
                 return;
             }
@@ -4093,7 +4132,7 @@ static int fat_read_to_buf(int kind, uint32_t fat_lba, uint32_t data_lba,
     while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 8192 && remaining > 0) {
         uint32_t clus_lba = data_lba + (clus - 2) * spc;
         for (uint32_t s = 0; s < spc && remaining > 0; s++) {
-            if (ata_read_lba28(0x1F0, 0, clus_lba + s, g_file_buf, 1) < 0) return -1;
+            if (blk_read_lba(clus_lba + s, g_file_buf, 1) < 0) return -1;
             uint32_t chunk = remaining > 512 ? 512 : remaining;
             for (uint32_t i = 0; i < chunk; i++) dst[i] = g_file_buf[i];
             dst += chunk;
@@ -4170,10 +4209,10 @@ static void show_exec(const char* args) {
 
     /* --- resolve FAT volume (same geometry logic as cat) --- */
     uint32_t lba = 0;
-    if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) { kputs("exec: no MBR.\n"); return; }
+    if (blk_read_lba(0, g_sector_buf, 1) < 0) { kputs("exec: no MBR.\n"); return; }
     uint8_t* me = g_sector_buf + 446;
     lba = (uint32_t)me[8] | ((uint32_t)me[9] << 8) | ((uint32_t)me[10] << 16) | ((uint32_t)me[11] << 24);
-    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) { kputs("exec: cannot read boot sector.\n"); return; }
+    if (blk_read_lba(lba, g_sector_buf, 1) < 0) { kputs("exec: cannot read boot sector.\n"); return; }
     uint8_t* b = g_sector_buf;
     uint16_t bps   = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
     uint8_t  spc   = b[13];
@@ -4251,7 +4290,7 @@ static void show_exec(const char* args) {
     while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 1024 && remaining > 0) {
         uint32_t clus_lba = data_lba + (clus - 2) * spc;
         for (uint32_t s = 0; s < spc && remaining > 0; s++) {
-            if (ata_read_lba28(0x1F0, 0, clus_lba + s, g_file_buf, 1) < 0) {
+            if (blk_read_lba(clus_lba + s, g_file_buf, 1) < 0) {
                 kputs("exec: read error.\n"); return;
             }
             uint32_t chunk = remaining > 512 ? 512 : remaining;
@@ -4511,7 +4550,7 @@ static int tab_file_matches(const char* prefix, int plen,
             uint32_t done = 0;
             while (done < secs) {
                 int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
-                if (ata_read_lba28(0x1F0, 0, g_vol_root_lba + done,
+                if (blk_read_lba(g_vol_root_lba + done,
                                    g_fs_buf + done * 512, chunk) < 0) return n;
                 done += (uint32_t)chunk;
             }
@@ -4544,7 +4583,7 @@ static int tab_file_matches(const char* prefix, int plen,
                 uint32_t done = 0;
                 while (done < secs) {
                     int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
-                    if (ata_read_lba28(0x1F0, 0, clus_lba + done,
+                    if (blk_read_lba(clus_lba + done,
                                        g_fs_buf + done * 512, chunk) < 0) return n;
                     done += (uint32_t)chunk;
                 }
@@ -5429,7 +5468,7 @@ static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
         uint8_t* dst = g_fs_buf; uint32_t done = 0;
         while (done < root_secs) {
             int chunk = (root_secs - done > 4) ? 4 : (int)(root_secs - done);
-            int r = ata_read_lba28(0x1F0, 0, root_lba + done, dst, chunk);
+            int r = blk_read_lba(root_lba + done, dst, chunk);
             if (r < 0) return n;
             dst += r * 512; done += (uint32_t)r;
         }
@@ -5460,7 +5499,7 @@ static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
         uint8_t* dst = g_fs_buf; uint32_t done = 0; int stop = 0;
         while (done < secs) {
             int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
-            int r = ata_read_lba28(0x1F0, 0, clus_lba + done, dst, chunk);
+            int r = blk_read_lba(clus_lba + done, dst, chunk);
             if (r < 0) return n;
             dst += r * 512; done += (uint32_t)r;
         }
@@ -5889,11 +5928,11 @@ static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 /* ---- cached FAT volume mount (computed once, shared by syscalls) ---- */
 static int fat_ensure_mounted(void) {
     if (g_vol_kind >= 0) return 0;
-    if (ata_read_lba28(0x1F0, 0, 0, g_sector_buf, 1) < 0) return -1;
+    if (blk_read_lba(0, g_sector_buf, 1) < 0) return -1;
     uint8_t* me = g_sector_buf + 446;
     uint32_t lba = (uint32_t)me[8] | ((uint32_t)me[9] << 8)
                  | ((uint32_t)me[10] << 16) | ((uint32_t)me[11] << 24);
-    if (ata_read_lba28(0x1F0, 0, lba, g_sector_buf, 1) < 0) return -1;
+    if (blk_read_lba(lba, g_sector_buf, 1) < 0) return -1;
     uint8_t* b = g_sector_buf;
     uint16_t bps   = (uint16_t)b[11] | ((uint16_t)b[12] << 8);
     uint8_t  spc   = b[13];
@@ -5964,7 +6003,7 @@ static uint32_t fd_read(struct fdesc* f, uint8_t* buf, uint32_t len) {
             f->coff = 0;
             continue;
         }
-        if (ata_read_lba28(0x1F0, 0, clus_lba + sec_off, g_file_buf, 1) < 0) break;
+        if (blk_read_lba(clus_lba + sec_off, g_file_buf, 1) < 0) break;
         uint32_t avail = 512 - in_clus;
         uint32_t want  = len - got;
         uint32_t n     = want < avail ? want : avail;
@@ -6116,7 +6155,7 @@ void syscall_handler(uint32_t* regs) {
                           g_vol_root_secs, dir_cluster, g_vol_fat_lba,
                           g_vol_data_lba, g_vol_spc, want, &slot);
         if (slot.status != -1) { regs[7] = 0xFFFFFFFFu; return; }
-        if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         uint8_t* e = g_file_buf + slot.off;
@@ -6126,7 +6165,7 @@ void syscall_handler(uint32_t* regs) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         e[0] = 0xE5;
-        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         ret = 0;
@@ -6205,12 +6244,12 @@ void syscall_handler(uint32_t* regs) {
                           g_vol_root_secs, dir_cluster, g_vol_fat_lba,
                           g_vol_data_lba, g_vol_spc, want, &slot);
         if (slot.status != -1) { regs[7] = 0xFFFFFFFFu; return; }
-        if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         uint8_t* e = g_file_buf + slot.off;
         if (regs[6] & 1) e[11] |= 0x01; else e[11] &= (uint8_t)~0x01;
-        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         regs[7] = 0;
@@ -6312,7 +6351,7 @@ void syscall_handler(uint32_t* regs) {
             if (!clus) { regs[7] = 0xFFFFFFFFu; return; }
         } else {
             /* existing entry: must be regular file; free old chain */
-            if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+            if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
                 regs[7] = 0xFFFFFFFFu; return;
             }
             uint8_t* e = g_file_buf + slot.off;
@@ -6331,12 +6370,12 @@ void syscall_handler(uint32_t* regs) {
         while (remaining > 0 && cur >= 2) {
             uint32_t lba = g_vol_data_lba + (cur - 2) * g_vol_spc + boff / 512;
             uint32_t soff = boff % 512;
-            if (ata_read_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { wok = 0; break; }
+            if (blk_read_lba(lba, g_file_buf, 1) < 0) { wok = 0; break; }
             uint32_t chunk = 512 - soff;
             if (chunk > remaining) chunk = remaining;
             for (uint32_t i = 0; i < chunk; i++)
                 g_file_buf[soff + i] = ubuf[(len - remaining) + i];
-            if (ata_write_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { wok = 0; break; }
+            if (blk_write_lba(lba, g_file_buf, 1) < 0) { wok = 0; break; }
             boff += chunk; remaining -= chunk;
             if (boff >= clus_bytes) {
                 boff = 0;
@@ -6347,7 +6386,7 @@ void syscall_handler(uint32_t* regs) {
         if (!wok) { regs[7] = 0xFFFFFFFFu; return; }
         /* dirent: create or update size+cluster */
         if (have_dirent) {
-            if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+            if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
                 regs[7] = 0xFFFFFFFFu; return;
             }
         }
@@ -6360,7 +6399,7 @@ void syscall_handler(uint32_t* regs) {
         fat_dirent_set_cluster(kind, de, clus);
         de[28] = (uint8_t)(len & 0xFF); de[29] = (uint8_t)((len >> 8) & 0xFF);
         de[30] = (uint8_t)((len >> 16) & 0xFF); de[31] = (uint8_t)(len >> 24);
-        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         ret = 0;
@@ -6404,11 +6443,11 @@ void syscall_handler(uint32_t* regs) {
                           g_vol_root_secs, dir_cluster, g_vol_fat_lba,
                           g_vol_data_lba, g_vol_spc, want_old, &slot);
         if (slot.status != -1) { regs[7] = 0xFFFFFFFFu; return; }  /* not found */
-        if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         for (int i = 0; i < 11; i++) g_file_buf[slot.off + i] = want_new[i];
-        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_write_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         ret = 0;
@@ -6454,17 +6493,17 @@ void syscall_handler(uint32_t* regs) {
                           g_vol_data_lba, g_vol_spc, want_old, &slot);
         if (slot.status != -1) { regs[7] = 0xFFFFFFFFu; return; } /* old missing */
         /* read old entry's sector, copy 32-byte entry to new slot */
-        if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         uint8_t ent[32];
         for (int i = 0; i < 32; i++) ent[i] = g_file_buf[slot.off + i];
-        if (ata_read_lba28(0x1F0, 0, chk.lba, g_file_buf, 1) < 0) {
+        if (blk_read_lba(chk.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         for (int i = 0; i < 32; i++) g_file_buf[chk.off + i] = ent[i];
         for (int i = 0; i < 11; i++) g_file_buf[chk.off + i] = want_new[i];
-        if (ata_write_lba28(0x1F0, 0, chk.lba, g_file_buf, 1) < 0) {
+        if (blk_write_lba(chk.lba, g_file_buf, 1) < 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         regs[7] = 0;
