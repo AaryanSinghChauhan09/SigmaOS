@@ -33,6 +33,7 @@ enum {
     SYS_PIPE = 34,
     SYS_WRITE_FD = 35,
     SYS_NICE = 36,
+    SYS_FORK = 37,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

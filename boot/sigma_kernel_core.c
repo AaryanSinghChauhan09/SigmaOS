@@ -4417,6 +4417,62 @@ static int kernel_write_file(const char* name, const uint8_t* data, uint32_t len
     return 0;
 }
 
+/* fork: duplicate the calling proc — copy its 4MiB image, fd table and
+ * I/O state; child resumes just after int 0x80 with eax=0. regs is the
+ * pushal block; regs[8..12] is the user iret frame (eip,cs,efl,esp,ss). */
+static int proc_fork(uint32_t* regs) {
+    if (g_cur_proc < 0 || g_cur_proc >= MAX_PROCS) return -1;
+    struct proc* par = &g_procs[g_cur_proc];
+    int idx = -1;
+    for (int i = 0; i < MAX_PROCS; i++)
+        if (!g_procs[i].used) { idx = i; break; }
+    if (idx < 0) return -1;
+    uint32_t base = find_free_user_region();
+    if (!base) return -1;
+    uint32_t pd = proc_build_pd(base);
+    if (!pd) return -1;
+    /* copy the whole user image (identity-mapped physical memory) */
+    uint8_t* dst = (uint8_t*)(size_t)base;
+    const uint8_t* src = (const uint8_t*)(size_t)par->base;
+    for (uint32_t i = 0; i < 0x400000u; i++) dst[i] = src[i];
+    struct proc* ch = &g_procs[idx];
+    ch->used = 1; ch->started = 1; ch->killed = 0;
+    ch->nice = par->nice;
+    ch->pid = (uint32_t)g_next_pid++;
+    ch->base = base; ch->pd = pd;
+    ch->entry = par->entry; ch->esp0 = par->esp0;
+    ch->exit_code = 0;
+    int ni = 0;
+    while (par->name[ni] && ni < 31) { ch->name[ni] = par->name[ni]; ni++; }
+    ch->name[ni] = 0;
+    /* child ctx = parent regs, eax forced to 0 (fork return in child) */
+    for (int i = 0; i < 7; i++) ch->ctx[i] = regs[i];
+    ch->ctx[7] = 0;
+    ch->eip     = regs[8] + 2;    /* skip int 0x80 */
+    ch->cs      = regs[9];
+    ch->eflags  = regs[10];
+    ch->esp     = regs[11];
+    ch->ss      = regs[12];
+    /* duplicate fd table + proc render buffers */
+    for (int i = 0; i < MAX_FDS; i++) {
+        ch->fds[i] = par->fds[i];
+        for (int j = 0; j < PROC_MAX; j++)
+            ch->proc_data[i][j] = par->proc_data[i][j];
+    }
+    /* share pipes / redirects (fork semantics) */
+    ch->in_pipe = par->in_pipe; ch->out_pipe = par->out_pipe;
+    ch->in_file = par->in_file; ch->in_len = par->in_len; ch->in_pos = par->in_pos;
+    for (int i = 0; i < 8192; i++) {
+        ch->in_buf[i] = par->in_buf[i];
+        ch->out_buf[i] = par->out_buf[i];
+    }
+    ch->out_len = par->out_len;
+    int oi = 0;
+    while (par->out_name[oi] && oi < 63) { ch->out_name[oi] = par->out_name[oi]; oi++; }
+    ch->out_name[oi] = 0;
+    return (int)ch->pid;
+}
+
 /* run proc idx until it exits or is preempted; returns on either */
 static void proc_run(int idx) {
     struct proc* p = &g_procs[idx];
@@ -6020,6 +6076,7 @@ static void idt_init(void) {
 #define SYS_PIPE     34 /* ebx=user u32[2] — read fd, write fd; eax=0/-1 */
 #define SYS_WRITE_FD 35 /* ebx=fd, ecx=buf, edx=len — write to pipe fd; eax=bytes */
 #define SYS_NICE     36 /* ebx=nice -20..19 for self, or ebx=pid|0x80000000,ecx=nice; eax=old/-1 */
+#define SYS_FORK     37 /* eax=child pid in parent, child resumes w/ eax=0; -1 err */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7100,6 +7157,9 @@ void syscall_handler(uint32_t* regs) {
         *(volatile uint32_t*)(size_t)up = (uint32_t)fr;
         *(volatile uint32_t*)(size_t)(up + 4) = (uint32_t)fw;
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_FORK) {
+        regs[7] = (uint32_t)proc_fork(regs);
         return;
     } else if (nr == SYS_NICE) {
         regs[7] = (uint32_t)proc_set_nice(regs[1], regs[2]);
