@@ -2993,6 +2993,26 @@ static void show_sort(const char* args) {
     kfree(buf);
 }
 
+/* factor <n> — prime factorization (trial division, 32-bit). */
+static void show_factor(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: factor <n>\n"); return; }
+    uint32_t n = kstrtoul(p);
+    if (!n) { kputs("factor: 0 has no factors\n"); return; }
+    kprint_dec64(n); kputs(" = ");
+    int first = 1;
+    for (uint32_t d = 2; d <= n / d; d++) {
+        while (n % d == 0) {
+            if (!first) kputs(" * ");
+            kprint_dec64(d); first = 0;
+            n /= d;
+        }
+    }
+    if (n > 1) { if (!first) kputs(" * "); kprint_dec64(n); }
+    kputs("\n");
+}
+
 /* fold [-w N] <file> — wrap lines at width N (default 80). */
 static void show_fold(const char* args) {
     const char* p = args;
@@ -4045,7 +4065,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
