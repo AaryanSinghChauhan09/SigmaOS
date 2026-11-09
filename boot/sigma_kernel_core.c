@@ -17,6 +17,7 @@
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
 typedef unsigned long size_t;
 
 #define VGA_WIDTH 80
@@ -265,6 +266,151 @@ static int kstrcmp(const char* s1, const char* s2) {
 }
 
 /* --------------------------------------------------------------------------
+ * Multiboot1 Boot Information
+ * -------------------------------------------------------------------------- */
+static volatile uint8_t* g_mb_info = 0;
+
+#define MBI_FLAGS       0
+#define MBI_MEM_LOWER   4
+#define MBI_MEM_UPPER   8
+#define MBI_CMDLINE     16
+#define MBI_MODS_COUNT  20
+#define MBI_MODS_ADDR   24
+#define MBI_MMAP_SIZE   28
+#define MBI_MMAP_ADDR   32
+#define MB_MMAP_FLAG    0x40
+
+static uint32_t mbi_rd32(uint32_t off) {
+    return *(volatile uint32_t*)(g_mb_info + off);
+}
+
+static void kprint_hex64(uint64_t v) {
+    char buf[17];
+    for (int i = 15; i >= 0; i--) {
+        uint8_t d = (uint8_t)(v & 0xF);
+        buf[i] = d < 10 ? '0' + d : 'a' + (d - 10);
+        v >>= 4;
+    }
+    buf[16] = '\0';
+    kputs("0x");
+    kputs(buf);
+}
+
+static void kprint_hex32(uint32_t v) {
+    kprint_hex64(v);
+}
+
+static void kprint_dec64(uint64_t v) {
+    char buf[24];
+    int i = 23;
+    buf[i] = '\0';
+    if (v == 0) {
+        kputc('0');
+        return;
+    }
+    while (v && i > 0) {
+        buf[--i] = '0' + (uint8_t)(v % 10);
+        v /= 10;
+    }
+    kputs(&buf[i]);
+}
+
+/* Multiboot module: start(u32) end(u32) string(u32) reserved(u32) */
+static void show_modules(void) {
+    if (!g_mb_info) {
+        kputs("No Multiboot info available.\n");
+        return;
+    }
+    uint32_t count = mbi_rd32(MBI_MODS_COUNT);
+    uint32_t addr  = mbi_rd32(MBI_MODS_ADDR);
+    kputs("Multiboot modules: ");
+    kprint_dec64(count);
+    kputs("\n");
+    for (uint32_t i = 0; i < count; i++) {
+        volatile uint8_t* m = (volatile uint8_t*)(size_t)addr + i * 16;
+        uint32_t start = *(volatile uint32_t*)(m + 0);
+        uint32_t end   = *(volatile uint32_t*)(m + 4);
+        uint32_t str   = *(volatile uint32_t*)(m + 8);
+        kputs("  [");
+        kprint_dec64(i);
+        kputs("] ");
+        if (str) {
+            kputs((const char*)(size_t)str);
+            kputs(" : ");
+        }
+        kprint_hex32(start);
+        kputs("-");
+        kprint_hex32(end);
+        kputs("\n");
+    }
+}
+
+static void show_memory_map(void) {
+    if (!g_mb_info) {
+        kputs("No Multiboot info available.\n");
+        return;
+    }
+    uint32_t flags = mbi_rd32(MBI_FLAGS);
+    uint32_t lower = mbi_rd32(MBI_MEM_LOWER);
+    uint32_t upper = mbi_rd32(MBI_MEM_UPPER);
+
+    kputs("Memory (KiB): lower=");
+    kprint_dec64(lower);
+    kputs(" upper=");
+    kprint_dec64(upper);
+    kputs(" total~");
+    kprint_dec64((uint64_t)lower + upper);
+    kputs("\n");
+
+    if (!(flags & MB_MMAP_FLAG)) {
+        kputs("(no memory map provided by bootloader)\n");
+        return;
+    }
+
+    uint32_t mmap_size = mbi_rd32(MBI_MMAP_SIZE);
+    uint32_t mmap_addr = mbi_rd32(MBI_MMAP_ADDR);
+    volatile uint8_t* p = (volatile uint8_t*)(size_t)mmap_addr;
+    volatile uint8_t* end = p + mmap_size;
+
+    kputs("Memory map entries:\n");
+    while (p + 4 <= end) {
+        uint32_t esize = *(volatile uint32_t*)p;
+        if (esize < 4 || p + esize > end) break;
+        uint64_t base = 0, len = 0;
+        uint32_t type = 0;
+        /* Multiboot mmap entry: size(u32) base(u64) length(u64) type(u32) = 24 bytes */
+        if (esize >= 24) {
+            base = ((uint64_t)*(volatile uint32_t*)(p + 8) << 32) | *(volatile uint32_t*)(p + 4);
+            len  = ((uint64_t)*(volatile uint32_t*)(p + 16) << 32) | *(volatile uint32_t*)(p + 12);
+            type = *(volatile uint32_t*)(p + 20);
+        }
+        kputs("  type=");
+        kprint_dec64(type);
+        kputs(" base=");
+        kprint_hex64(base);
+        kputs(" len=");
+        kprint_hex64(len);
+        kputs("\n");
+        p += esize;
+    }
+}
+
+static void show_cmdline(void) {
+    if (!g_mb_info) {
+        kputs("No Multiboot info available.\n");
+        return;
+    }
+    uint32_t ptr = mbi_rd32(MBI_CMDLINE);
+    if (!ptr) {
+        kputs("(empty kernel command line)\n");
+        return;
+    }
+    kputs("cmdline: ");
+    kputs((const char*)(size_t)ptr);
+    kputs("\n");
+}
+
+/* --------------------------------------------------------------------------
  * Information Displays
  * -------------------------------------------------------------------------- */
 void show_banner(void) {
@@ -360,6 +506,9 @@ void kernel_shell(void) {
             kputs("  status  - Display kernel and hardware status\n");
             kputs("  craft   - List 20-module Craft Creative Suite\n");
             kputs("  distro  - Display Linux (Arch/Cachy/Debian) & BSD parity\n");
+            kputs("  mem     - Show memory size and memory map\n");
+            kputs("  modules - List Multiboot modules\n");
+            kputs("  cmdline - Show kernel command line\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -369,6 +518,12 @@ void kernel_shell(void) {
             show_craft_suite();
         } else if (kstrcmp(cmd, "distro") == 0) {
             show_distro_parity();
+        } else if (kstrcmp(cmd, "mem") == 0) {
+            show_memory_map();
+        } else if (kstrcmp(cmd, "modules") == 0) {
+            show_modules();
+        } else if (kstrcmp(cmd, "cmdline") == 0) {
+            show_cmdline();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
@@ -389,11 +544,20 @@ void kernel_shell(void) {
  * -------------------------------------------------------------------------- */
 __attribute__((section(".text")))
 void kernel_main(uint32_t magic, void* mb_info) {
-    (void)magic;
-    (void)mb_info;
+    g_mb_info = (volatile uint8_t*)mb_info;
 
     serial_init();
     vga_clear();
+
+    /* Fail-fast: only continue under a real Multiboot loader */
+    if (magic != 0x2BADB002) {
+        vga_set_color(0x04, 0x00);
+        kputs("FATAL: invalid Multiboot magic 0x");
+        kprint_hex32(magic);
+        kputs(" - not booted via GRUB/Limine.\n");
+        khalt();
+    }
+
     show_banner();
 
     kputs("[kernel] Multiboot header validated.\n");
