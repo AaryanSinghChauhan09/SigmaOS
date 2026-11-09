@@ -389,6 +389,8 @@ static void show_sched(void);
 static void show_ps(void);
 static void show_exec(const char* args);
 static int fat_ensure_mounted(void);
+static void* kmalloc(uint32_t size);
+static void kfree(void* ptr);
 void resume_user(void);   /* naked asm: restore preempted user ctx */
 static uint32_t find_user_region(void);
 static void enter_user(uint32_t eip, uint32_t esp);
@@ -1109,6 +1111,8 @@ static int      g_vol_kind = -1;        /* -1 = not mounted */
 static uint32_t g_vol_fat_lba, g_vol_data_lba;
 static uint32_t g_vol_root_clus, g_vol_root_lba, g_vol_root_secs;
 static uint8_t  g_vol_spc;
+static uint32_t g_vol_fatsz;            /* FAT size in sectors */
+static uint32_t g_vol_total_clusters;   /* data clusters + 2 (0/1 reserved) */
 
 /* Fetch next '/'-separated component; advances *pp past it. */
 static int fs_next_comp(const char** pp, char* comp, int csz) {
@@ -1181,6 +1185,66 @@ static void show_cd(const char* args) {
     kputs("cd: /");
     kputs(g_cwd);
     kputs("\n");
+}
+
+/* df — filesystem usage: scan FAT for free (zero) cluster entries. */
+static void show_df(void) {
+    if (fat_ensure_mounted() != 0) { kputs("df: no FAT volume.\n"); return; }
+    uint32_t fat_bytes = g_vol_fatsz * 512u;
+    if (fat_bytes == 0 || fat_bytes > 0x400000u) {
+        kputs("df: FAT too large to scan.\n"); return;
+    }
+    uint8_t* fat = (uint8_t*)kmalloc(fat_bytes);
+    if (!fat) { kputs("df: out of memory.\n"); return; }
+    uint32_t done = 0;
+    int fail = 0;
+    while (done < g_vol_fatsz) {
+        int chunk = (g_vol_fatsz - done > 4) ? 4 : (int)(g_vol_fatsz - done);
+        int n = ata_read_lba28(0x1F0, 0, g_vol_fat_lba + done, fat + done * 512u, chunk);
+        if (n < 0) { fail = 1; break; }
+        done += (uint32_t)n;
+    }
+    if (fail) { kfree(fat); kputs("df: FAT read error.\n"); return; }
+
+    uint32_t free_clusters = 0;
+    uint32_t limit = g_vol_total_clusters < 2 ? 0 : g_vol_total_clusters;
+    if (g_vol_kind == 2) {           /* FAT32: u32 entries, mask 0x0FFFFFFF */
+        for (uint32_t c = 2; c < limit; c++) {
+            uint32_t v = (uint32_t)fat[c*4] | ((uint32_t)fat[c*4+1] << 8)
+                       | ((uint32_t)fat[c*4+2] << 16) | ((uint32_t)fat[c*4+3] << 24);
+            if ((v & 0x0FFFFFFFu) == 0) free_clusters++;
+        }
+    } else if (g_vol_kind == 1) {    /* FAT16: u16 entries */
+        for (uint32_t c = 2; c < limit; c++) {
+            uint16_t v = (uint16_t)fat[c*2] | ((uint16_t)fat[c*2+1] << 8);
+            if (v == 0) free_clusters++;
+        }
+    } else {                          /* FAT12: packed 12-bit entries */
+        for (uint32_t c = 2; c < limit; c++) {
+            uint32_t off = c + (c >> 1);
+            if (off + 1 >= fat_bytes) break;
+            uint16_t v = (uint16_t)fat[off] | ((uint16_t)fat[off+1] << 8);
+            uint16_t e = (c & 1) ? (uint16_t)((v >> 4) & 0x0FFF)
+                                : (uint16_t)(v & 0x0FFF);
+            if (e == 0) free_clusters++;
+        }
+    }
+    kfree(fat);
+
+    uint64_t clus_bytes = (uint64_t)g_vol_spc * 512u;
+    uint64_t total_b = (uint64_t)(limit > 2 ? limit - 2 : 0) * clus_bytes;
+    uint64_t free_b  = (uint64_t)free_clusters * clus_bytes;
+    kputs("df: FAT");
+    kprint_dec64((uint64_t)g_vol_kind == 2 ? 32 : (g_vol_kind == 1 ? 16 : 12));
+    kputs(", ");
+    kprint_dec64(limit > 2 ? limit - 2 : 0);
+    kputs(" clusters, ");
+    kprint_dec64(free_clusters);
+    kputs(" free (");
+    kprint_dec64(free_b);
+    kputs(" / ");
+    kprint_dec64(total_b);
+    kputs(" bytes)\n");
 }
 
 static void show_ls(const char* args) {
@@ -1989,6 +2053,7 @@ void kernel_shell(void) {
             kputs("  cat     - Print file: cat <name>\n");
             kputs("  cd      - Change directory: cd <dir>\n");
             kputs("  pwd     - Print working directory\n");
+            kputs("  df      - Show filesystem free space\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -2037,6 +2102,8 @@ void kernel_shell(void) {
             show_cd(cmd + 2);
         } else if (kstrcmp(cmd, "pwd") == 0) {
             show_pwd();
+        } else if (kstrcmp(cmd, "df") == 0) {
+            show_df();
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
@@ -2583,6 +2650,7 @@ static int fat_ensure_mounted(void) {
     int is_fat32 = (rent == 0);
     if (bps != 512 || spc == 0 || nfats == 0) return -1;
     g_vol_spc = spc;
+    g_vol_fatsz = fatsz;
     g_vol_fat_lba  = lba + rsvd;
     g_vol_data_lba = lba + rsvd + (uint32_t)nfats * fatsz;
     if (is_fat32) {
@@ -2598,9 +2666,19 @@ static int fat_ensure_mounted(void) {
         uint32_t root_dir_secs = (uint32_t)((rent * 32 + bps - 1) / bps);
         uint32_t data_clusters = (tot - rsvd - nfats * fatsz - root_dir_secs) / spc;
         g_vol_kind = data_clusters < 4085 ? 0 : 1;
+        g_vol_total_clusters = data_clusters + 2;
         g_vol_data_lba += root_dir_secs;
         g_vol_root_lba  = lba + rsvd + (uint32_t)nfats * fatsz;
         g_vol_root_secs = root_dir_secs;
+    }
+    if (is_fat32 && g_vol_total_clusters == 0) {
+        /* FAT32 total clusters = (total_secs - data_start) / spc */
+        uint32_t tot32 = (uint32_t)b[32] | ((uint32_t)b[33] << 8)
+                       | ((uint32_t)b[34] << 16) | ((uint32_t)b[35] << 24);
+        uint16_t tot16 = (uint16_t)b[19] | ((uint16_t)b[20] << 8);
+        uint32_t tot = tot16 ? tot16 : tot32;
+        uint32_t data_start = rsvd + nfats * fatsz;
+        g_vol_total_clusters = tot > data_start ? (tot - data_start) / spc : 0;
     }
     return 0;
 }
