@@ -1959,6 +1959,88 @@ static void show_mkdir(const char* args) {
     kputs("\n");
 }
 
+/* write <name> <text> — create a small file (single cluster, <= spc*512 B)
+ * in the current directory. First file-creation op on the FAT write path. */
+static void show_write(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char name[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = '\0';
+    while (*p == ' ') p++;
+    if (!nl || !*p) { kputs("usage: write <name> <text>\n"); return; }
+    if (kstrlen(name) > 12) { kputs("write: name too long (8.3 only).\n"); return; }
+    for (const char* q = name; *q; q++) {
+        if (*q == '/' || *q == '\\') { kputs("write: single component only.\n"); return; }
+    }
+    uint32_t tlen = kstrlen(p);
+
+    if (fat_ensure_mounted() != 0) { kputs("write: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+    uint32_t cap = (uint32_t)g_vol_spc * 512u;
+    if (tlen == 0 || tlen > cap) {
+        kputs("write: text empty or exceeds one cluster.\n"); return;
+    }
+
+    /* resolve parent (same policy as mkdir) */
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit hit;
+        int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &hit);
+        if (lr <= 0 || !hit.is_dir) { kputs("write: cwd not a directory.\n"); return; }
+        in_root = 0;
+        dir_cluster = hit.cluster;
+    }
+
+    uint8_t want[11];
+    fat_name_to_83(name, want);
+    struct slot_res slot;
+    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                      g_vol_data_lba, g_vol_spc, want, &slot);
+    if (slot.status == -1) { kputs("write: name exists.\n"); return; }
+    if (slot.status != 1) { kputs("write: directory full or IO error.\n"); return; }
+
+    uint32_t clus = fat_alloc_cluster(kind);
+    if (!clus) { kputs("write: disk full or FAT alloc failed.\n"); return; }
+
+    /* write file data: one cluster, zero-padded tail */
+    uint32_t written = 0;
+    for (uint32_t s = 0; s < g_vol_spc && written < tlen; s++) {
+        uint8_t* sec = g_file_buf;
+        for (int i = 0; i < 512; i++) sec[i] = 0;
+        uint32_t chunk = tlen - written > 512 ? 512 : tlen - written;
+        for (uint32_t i = 0; i < chunk; i++) sec[i] = (uint8_t)p[written + i];
+        uint32_t lba = g_vol_data_lba + (clus - 2) * g_vol_spc + s;
+        if (ata_write_lba28(0x1F0, 0, lba, sec, 1) < 0) {
+            kputs("write: data write failed.\n"); return;
+        }
+        written += chunk;
+    }
+
+    /* write dirent: attr 0x20 (archive), size = tlen */
+    uint8_t e[32];
+    for (int i = 0; i < 32; i++) e[i] = 0;
+    for (int i = 0; i < 11; i++) e[i] = want[i];
+    e[11] = 0x20;
+    e[20] = (uint8_t)(clus & 0xFF); e[21] = (uint8_t)(clus >> 8);
+    if (kind == 2) { e[26] = (uint8_t)(clus >> 16); e[27] = (uint8_t)(clus >> 24); }
+    e[28] = (uint8_t)(tlen & 0xFF); e[29] = (uint8_t)((tlen >> 8) & 0xFF);
+    e[30] = (uint8_t)((tlen >> 16) & 0xFF); e[31] = (uint8_t)(tlen >> 24);
+    if (fat_write_dirent(slot.lba, slot.off, e) != 0) {
+        kputs("write: dirent write failed.\n"); return;
+    }
+    kputs("write: created /");
+    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+    kputs(name);
+    kputs(" (");
+    kprint_dec64(tlen);
+    kputs(" bytes)\n");
+}
+
 static void show_cat(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -2355,6 +2437,7 @@ void kernel_shell(void) {
             kputs("  pwd     - Print working directory\n");
             kputs("  df      - Show filesystem free space\n");
             kputs("  mkdir   - Create directory: mkdir <name>\n");
+            kputs("  write   - Create file: write <name> <text>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -2408,6 +2491,8 @@ void kernel_shell(void) {
             show_df();
         } else if (kcmd_is(cmd, "mkdir")) {
             show_mkdir(cmd + 5);
+        } else if (kcmd_is(cmd, "write")) {
+            show_write(cmd + 5);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
