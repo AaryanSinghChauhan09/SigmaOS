@@ -8,7 +8,7 @@ OBJCOPY ?= objcopy
 ASFLAGS := -m32 -c
 LDFLAGS := -m32 -nostdlib -static -no-pie -Wl,--build-id=none -Wl,-e,_start
 
-PROGS := hello cat rm mkdir
+PROGS := hello cat rm mkdir touch
 
 .PHONY: all clean
 all: $(addsuffix .bin,$(PROGS))
