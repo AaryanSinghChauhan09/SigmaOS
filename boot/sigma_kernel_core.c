@@ -3894,6 +3894,7 @@ static void idt_init(void) {
 #define SYS_WRITE_LEN 8  /* ebx=ptr, ecx=len — binary-safe write */
 #define SYS_UNLINK   9  /* ebx=ptr to name — delete file in cwd */
 #define SYS_MKDIR    10 /* ebx=ptr to name — create dir in cwd */
+#define SYS_CREAT    11 /* ebx=ptr to name — create empty file in cwd */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -4156,6 +4157,54 @@ void syscall_handler(uint32_t* regs) {
         name[nl] = 0;
         if (!nl || kstrlen(name) > 12) { regs[7] = 0xFFFFFFFFu; return; }
         ret = fat_mkdir_impl(name) == 0 ? 0u : 0xFFFFFFFFu;
+    } else if (nr == SYS_CREAT) {
+        /* ebx = user ptr to NUL-terminated single-component name in cwd.
+         * Creates an empty file (allocated cluster, size 0, attr 0x20). */
+        volatile char* up = (volatile char*)(size_t)regs[4];
+        char name[64];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 63 && (uint32_t)(size_t)(up + nl) < limit && up[nl]
+               && up[nl] != '/' && up[nl] != '\\') {
+            name[nl] = (char)up[nl]; nl++;
+        }
+        name[nl] = 0;
+        if (!nl || kstrlen(name) > 12) { regs[7] = 0xFFFFFFFFu; return; }
+        if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        int kind = g_vol_kind;
+        int in_root = 1;
+        uint32_t dir_cluster = 0;
+        if (g_cwd[0]) {
+            struct fat_hit dh;
+            int dlr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                                 g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                                 g_vol_spc, g_cwd, &dh);
+            if (dlr <= 0 || !dh.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
+            in_root = 0; dir_cluster = dh.cluster;
+        }
+        uint8_t want[11];
+        fat_name_to_83(name, want);
+        struct slot_res slot;
+        int sr = fat_find_dir_slot(kind, in_root, g_vol_root_clus,
+                                   g_vol_root_lba, g_vol_root_secs, dir_cluster,
+                                   g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
+                                   want, &slot);
+        if (sr < 0 && slot.status == -1) { regs[7] = 0xFFFFFFFFu; return; }
+        if (slot.status != 1) { regs[7] = 0xFFFFFFFFu; return; }
+        uint32_t clus = fat_alloc_cluster(kind);
+        if (!clus) { regs[7] = 0xFFFFFFFFu; return; }
+        uint8_t e[32];
+        for (int i = 0; i < 32; i++) e[i] = 0;
+        for (int i = 0; i < 11; i++) e[i] = want[i];
+        e[11] = 0x20;                                /* archive */
+        e[20] = (uint8_t)(clus & 0xFF); e[21] = (uint8_t)(clus >> 8);
+        if (kind == 2) { e[26] = (uint8_t)(clus >> 16); e[27] = (uint8_t)(clus >> 24); }
+        /* size field stays 0 — empty file */
+        if (fat_write_dirent(slot.lba, slot.off, e) != 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        ret = 0;
     } else {
         kputs("\n[syscall] unknown nr=");
         kprint_dec64(nr);
