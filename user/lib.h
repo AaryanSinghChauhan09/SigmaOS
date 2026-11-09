@@ -41,6 +41,8 @@ enum {
     SYS_SIGMASK = 42,
     SYS_SYSINFO = 43,
     SYS_GETTIME = 44,
+    SYS_GETRLIMIT = 45,
+    SYS_SETRLIMIT = 46,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

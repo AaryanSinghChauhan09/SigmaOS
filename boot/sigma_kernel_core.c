@@ -284,6 +284,7 @@ struct proc {
     int      used;
     int      killed;     /* SIGKILL-style: freed at next schedule point */
     int      nice;       /* -20..19, lower = higher priority */
+    uint32_t rlim_cur, rlim_max; /* RLIMIT_NOFILE soft/hard fd limit */
     uint32_t ppid;       /* parent pid, 0 = kernel shell */
     uint32_t ticks;      /* scheduler ticks consumed (instrumentation) */
     uint32_t io_r, io_w; /* bytes read/written via syscalls (instrumentation) */
@@ -4343,6 +4344,7 @@ static int proc_claim(uint32_t base, const char* name, const char* cmdline,
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
     p->io_r = p->io_w = 0;
+    p->rlim_cur = p->rlim_max = MAX_FDS;
     p->pending_mask = 0; p->sig_mask = 0;
     for (int si = 0; si < 32; si++) p->handler[si] = 0;
     p->pid = (uint32_t)g_next_pid++;
@@ -4465,6 +4467,7 @@ static int proc_fork(uint32_t* regs) {
     ch->ppid = par->pid;
     ch->ticks = par->ticks;
     ch->io_r = par->io_r; ch->io_w = par->io_w;
+    ch->rlim_cur = par->rlim_cur; ch->rlim_max = par->rlim_max;
     ch->pid = (uint32_t)g_next_pid++;
     ch->base = base; ch->pd = pd;
     ch->entry = par->entry; ch->esp0 = par->esp0;
@@ -6177,6 +6180,8 @@ static void idt_init(void) {
 #define SYS_SIGMASK   42 /* ebx=mask, ecx=how(0=block,1=unblock,2=set) — eax=old mask */
 #define SYS_SYSINFO   43 /* ebx=user u32[6]: uptime_s, procs, mem_total_kb, mem_free_kb, ticks, pid — eax=0/-1 */
 #define SYS_GETTIME   44 /* eax=uptime seconds, edx=milliseconds */
+#define SYS_GETRLIMIT 45 /* ebx=res(0=NOFILE), ecx=user u32[2]{cur,max} -> eax=0/-1 */
+#define SYS_SETRLIMIT 46 /* ebx=res(0=NOFILE), ecx=user u32[2]{cur,max} -> eax=0/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6748,6 +6753,17 @@ static struct fdesc* cur_fds(void) {
         return g_procs[g_cur_proc].fds;
     return g_kfds;
 }
+static int cur_fd_limit(void) {
+    if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+        return (int)g_procs[g_cur_proc].rlim_cur;
+    return MAX_FDS;
+}
+static int cur_fd_used(void) {
+    int n = 0;
+    for (int i = 0; i < MAX_FDS; i++) if (cur_fds()[i].used) n++;
+    return n;
+}
+
 static char (*cur_procdata(void))[PROC_MAX] {
     if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
         return g_procs[g_cur_proc].proc_data;
@@ -7136,6 +7152,7 @@ void syscall_handler(uint32_t* regs) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         int pid = proc_lookup(rpath);
+        if (cur_fd_used() >= cur_fd_limit()) { regs[7] = 0xFFFFFFFFu; return; }
         int fd = -1;
         for (int i = 0; i < MAX_FDS; i++) if (!cur_fds()[i].used) { fd = i; break; }
         if (fd < 0) { regs[7] = 0xFFFFFFFFu; return; }
@@ -7407,6 +7424,7 @@ void syscall_handler(uint32_t* regs) {
         int pi = -1;
         for (int i = 0; i < MAX_PIPES; i++)
             if (!g_pipes[i].ropen && !g_pipes[i].wopen) { pi = i; break; }
+        if (cur_fd_used() + 2 > cur_fd_limit()) { regs[7] = 0xFFFFFFFFu; return; }
         int fr = -1, fw = -1;
         for (int i = 0; i < MAX_FDS; i++) if (!cur_fds()[i].used) { if (fr < 0) fr = i; else { fw = i; break; } }
         if (pi < 0 || fr < 0 || fw < 0) { regs[7] = 0xFFFFFFFFu; return; }
@@ -7513,6 +7531,25 @@ void syscall_handler(uint32_t* regs) {
         o[4] = g_tick_count;
         o[5] = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
                ? g_procs[g_cur_proc].pid : 0;
+        regs[7] = 0;
+        return;
+    } else if (nr == SYS_GETRLIMIT || nr == SYS_SETRLIMIT) {
+        if (regs[4] != 0) { regs[7] = 0xFFFFFFFFu; return; }   /* only RLIMIT_NOFILE */
+        uint32_t up = regs[6];
+        if (!user_range_ok((void*)(size_t)up, 8)) { regs[7] = 0xFFFFFFFFu; return; }
+        volatile uint32_t* o = (volatile uint32_t*)(size_t)up;
+        if (g_cur_proc < 0 || g_cur_proc >= MAX_PROCS || !g_procs[g_cur_proc].used) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        struct proc* rp = &g_procs[g_cur_proc];
+        if (nr == SYS_GETRLIMIT) {
+            o[0] = rp->rlim_cur; o[1] = rp->rlim_max;
+        } else {
+            uint32_t nc = o[0], nm = o[1];
+            if (nm > MAX_FDS) nm = MAX_FDS;
+            if (nc > nm) nc = nm;
+            rp->rlim_cur = nc; rp->rlim_max = nm;
+        }
         regs[7] = 0;
         return;
     } else if (nr == SYS_GETTIME) {
