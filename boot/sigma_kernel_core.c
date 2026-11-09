@@ -3229,7 +3229,9 @@ void kernel_shell(void) {
 
     while (1) {
         vga_set_color(0x03, 0x00); /* Cyan */
-        kputs("sigmaos# ");
+        kputs("sigmaos:");
+        if (g_cwd[0]) { kputs("/"); kputs(g_cwd); }
+        kputs("# ");
         vga_set_color(0x0F, 0x00); /* White */
         len = 0;
 
