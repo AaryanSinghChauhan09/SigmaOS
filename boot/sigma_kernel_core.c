@@ -5136,6 +5136,7 @@ static void idt_init(void) {
 #define SYS_APPEND   14 /* ebx=name, ecx=buf, edx=len — append to file in cwd */
 #define SYS_FSTAT    15 /* ebx=fd -> eax=file size or -1 */
 #define SYS_STAT     16 /* ebx=name -> eax=file size, -1 err */
+#define SYS_STATX    23 /* ebx=name -> eax=(is_dir<<31)|size, -1 err */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6113,6 +6114,27 @@ void syscall_handler(uint32_t* regs) {
                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, full, &hit);
         if (r <= 0 || hit.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
         regs[7] = hit.size;
+        return;
+    } else if (nr == SYS_STATX) {
+        /* ebx=name ptr -> eax=(is_dir<<31)|size (size=0 for dirs), -1 err */
+        volatile char* un = (volatile char*)(size_t)regs[4];
+        char kname[160];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 159 && (uint32_t)(size_t)(un + nl) < limit && un[nl]) {
+            kname[nl] = (char)un[nl]; nl++;
+        }
+        kname[nl] = 0;
+        if (!nl || fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        char rpath[192];
+        int rl = fs_resolve(kname, rpath, (int)sizeof rpath);
+        if (rl != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        struct fat_hit hit;
+        int r = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                           g_vol_fat_lba, g_vol_data_lba, g_vol_spc, rpath, &hit);
+        if (r <= 0) { regs[7] = 0xFFFFFFFFu; return; }
+        regs[7] = hit.is_dir ? 0x80000000u : hit.size;
         return;
     } else if (nr == SYS_GETCWD) {
         /* ebx=buf, ecx=len -> copies cwd string (NUL-term), eax=len or -1 */
