@@ -13,6 +13,7 @@ Contents:
   PWD.BIN    ring-3 cwd query: SYS_GETCWD via int 0x80
   CD.BIN     ring-3 chdir: SYS_CHDIR via int 0x80
   LS.BIN     ring-3 dir list: SYS_READDIR via int 0x80
+  WRITE.BIN  ring-3 file write: SYS_WRITE_FILE via int 0x80
   ELFHELLO.ELF  ELF32 C program (gcc -m32 -nostdlib), exec ELF path
   README.TXT this file
 
@@ -44,5 +45,6 @@ as the FAT volume. Then in the shell:
   exec PWD.BIN
   exec CD.BIN SUBDIR
   exec LS.BIN
+  exec WRITE.BIN NEWFILE.TXT
 
 Rebuild this image:  scripts/make_userdisk.sh
