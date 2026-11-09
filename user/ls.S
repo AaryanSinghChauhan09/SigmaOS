@@ -1,10 +1,10 @@
 /*
- * SigmaOS user program: ls — list cwd via int 0x80.
+ * SigmaOS user program: ls — list cwd (type+size) via int 0x80.
  *
  * Usage:  exec LS.BIN
  *
  * ABI: eax=nr, ebx/ecx/edx=args, ret in eax.
- *   SYS_READDIR=19 ebx=buf, ecx=len -> eax=bytes or -1
+ *   SYS_READDIRX=20 ebx=buf, ecx=len -> "d|f name size\n" records, eax=bytes
  *   SYS_WRITE_LEN=8 ebx=ptr ecx=len
  *   SYS_EXIT=0
  */
@@ -13,16 +13,16 @@
     .intel_syntax noprefix
 
 _start:
-    lea    ebx, [esp - 2048]     /* 2KB name buffer */
-    mov    ecx, 2048
-    mov    eax, 19               /* SYS_READDIR */
+    lea    ebx, [esp - 4096]     /* 4KB record buffer */
+    mov    ecx, 4096
+    mov    eax, 20               /* SYS_READDIRX */
     int    0x80
     cmp    eax, -1
     je     fail
     test   eax, eax
     jz     empty
     mov    ecx, eax
-    lea    ebx, [esp - 2048]
+    lea    ebx, [esp - 4096]
     mov    eax, 8                /* SYS_WRITE_LEN */
     int    0x80
     jmp    bye
