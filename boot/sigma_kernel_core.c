@@ -2159,6 +2159,83 @@ static void show_rm(const char* args) {
     kputs("\n");
 }
 
+/* rmdir <name> — remove an EMPTY directory: verify only "."/".." entries,
+ * free its cluster chain, mark the dirent deleted. */
+static void show_rmdir(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    char name[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = '\0';
+    if (!nl) { kputs("usage: rmdir <dir>\n"); return; }
+
+    if (fat_ensure_mounted() != 0) { kputs("rmdir: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit hit;
+        int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &hit);
+        if (lr <= 0 || !hit.is_dir) { kputs("rmdir: cwd not a directory.\n"); return; }
+        in_root = 0;
+        dir_cluster = hit.cluster;
+    }
+
+    uint8_t want[11];
+    fat_name_to_83(name, want);
+    struct slot_res slot;
+    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                      g_vol_data_lba, g_vol_spc, want, &slot);
+    if (slot.status != -1) { kputs("rmdir: not found.\n"); return; }
+
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("rmdir: read error.\n"); return;
+    }
+    uint8_t* e = g_file_buf + slot.off;
+    if (!(e[11] & 0x10)) { kputs("rmdir: not a directory (use rm).\n"); return; }
+    uint32_t clus = (uint32_t)e[20] | ((uint32_t)e[21] << 8);
+    if (kind == 2) clus |= ((uint32_t)e[26] << 16) | ((uint32_t)e[27] << 24);
+    if (clus < 2) { kputs("rmdir: bad cluster.\n"); return; }
+
+    /* verify empty: walk the dir's cluster chain, allow only . .. 00 E5 0F */
+    int empty = 1, guard = 0;
+    uint32_t c = clus;
+    while (c >= 2 && !fat_eoc_any(kind, c) && guard++ < 1024 && empty) {
+        uint32_t base = g_vol_data_lba + (c - 2) * g_vol_spc;
+        for (uint32_t s = 0; s < g_vol_spc && empty; s++) {
+            if (ata_read_lba28(0x1F0, 0, base + s, g_file_buf, 1) < 0) {
+                kputs("rmdir: read error.\n"); return;
+            }
+            for (int i = 0; i < 16; i++) {
+                uint8_t* d = g_file_buf + i * 32;
+                if (d[0] == 0x00 || d[0] == 0xE5 || d[11] == 0x0F) continue;
+                if (d[0] == '.' && (d[1] == ' ' || d[1] == '.')) continue;
+                empty = 0; break;
+            }
+        }
+        c = fat_next_any(g_vol_fat_lba, kind, c);
+    }
+    if (!empty) { kputs("rmdir: directory not empty.\n"); return; }
+
+    if (fat_free_chain(kind, clus) != 0) { kputs("rmdir: FAT update failed.\n"); return; }
+    /* re-read sector: g_file_buf was clobbered by the emptiness scan */
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("rmdir: read error.\n"); return;
+    }
+    g_file_buf[slot.off] = 0xE5;
+    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("rmdir: dirent write failed.\n"); return;
+    }
+    kputs("rmdir: removed /");
+    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+    kputs(name);
+    kputs("\n");
+}
+
 static void show_cat(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -2557,6 +2634,7 @@ void kernel_shell(void) {
             kputs("  mkdir   - Create directory: mkdir <name>\n");
             kputs("  write   - Create file: write <name> <text>\n");
             kputs("  rm      - Delete file: rm <name>\n");
+            kputs("  rmdir   - Remove empty dir: rmdir <name>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -2614,6 +2692,8 @@ void kernel_shell(void) {
             show_write(cmd + 5);
         } else if (kcmd_is(cmd, "rm")) {
             show_rm(cmd + 2);
+        } else if (kcmd_is(cmd, "rmdir")) {
+            show_rmdir(cmd + 5);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
