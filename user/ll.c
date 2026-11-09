@@ -1,6 +1,6 @@
 /* SigmaOS ELF32 user program: ll — long-format cwd listing.
  * Usage: exec LL.ELF
- * SYS_READDIRX=20 records "d|f name size\n" ; SYS_STAT=16 per-name size;
+ * SYS_READDIRX=20 records "d|f name size\n" ; SYS_STATX=23 packed stat;
  * SYS_GETCWD=17 ; SYS_WRITE_LEN=8 ; SYS_EXIT=0 */
 #include "lib.h"
 
@@ -42,10 +42,14 @@ void _start(void) {
         if (pl && path[pl-1] != '/') path[pl++] = '/';
         for (int i = 0; i < nl && pl < 378; i++) path[pl++] = nm[i];
         path[pl] = 0;
-        int sz = sc3(SYS_STAT, (u32)path, 0, 0);
-        if (sz < 0) {
+        int sx = sc3(SYS_STATX, (u32)path, 0, 0);
+        int sz;
+        if (sx < 0) {
             sz = 0;
             for (int i = ss; i < se; i++) if (buf[i] >= '0' && buf[i] <= '9') sz = sz * 10 + buf[i] - '0';
+        } else {
+            sz = sx & 0x7FFFFFFF;
+            if (sx & 0x80000000) type = 'd';
         }
         sc3(SYS_WRITE_LEN, (u32)&type, 1, 0);
         uputs("  ");
