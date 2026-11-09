@@ -6873,7 +6873,7 @@ static uint32_t proc_render(int fdidx, uint32_t id) {
             n += k_u32dec(g_procs[i].ppid, tmp);
             for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
             n += k_strcpy(b + n, " ");
-            n += k_strcpy(b + n, (g_cur_proc == i) ? "R" : "S");
+            n += k_strcpy(b + n, g_procs[i].stopped ? "T" : (g_cur_proc == i ? "R" : "S"));
             n += k_strcpy(b + n, " ");
             n += k_strcpy(b + n, g_procs[i].name[0] ? g_procs[i].name : "?");
             n += k_strcpy(b + n, " ");
@@ -6943,7 +6943,8 @@ static uint32_t proc_render(int fdidx, uint32_t id) {
             n += k_u32dec(q->pgid ? q->pgid : q->pid, tmp);
             for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
             n += k_strcpy(b + n, "\nState:	");
-            n += k_strcpy(b + n, (g_cur_proc == i) ? "running" : "ready");
+            n += k_strcpy(b + n, g_procs[i].stopped ? "stopped"
+                              : (g_cur_proc == i ? "running" : "ready"));
             n += k_strcpy(b + n, "\nNice:	");
             { char nb[8]; int ni2 = 0; int nv = q->nice;
               if (nv < 0) { nb[ni2++]='-'; nv=-nv; }
