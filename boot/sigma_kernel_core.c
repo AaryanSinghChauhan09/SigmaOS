@@ -2993,6 +2993,49 @@ static void show_sort(const char* args) {
     kfree(buf);
 }
 
+/* uniq <file> — drop adjacent duplicate lines (≤4KB). */
+static void show_uniq(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: uniq <file>\n"); return; }
+    char namebuf[64]; int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+    if (fat_ensure_mounted() != 0) { kputs("uniq: no FAT volume.\n"); return; }
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("uniq: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                        g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                        g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("uniq: not found.\n"); return; }
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("uniq: out of memory.\n"); return; }
+    int got = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                              g_vol_spc, hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs("uniq: read error.\n"); return; }
+    char prev[256]; prev[0] = 0;
+    uint32_t i = 0;
+    while (i < (uint32_t)got) {
+        uint32_t ls = i;
+        while (i < (uint32_t)got && buf[i] != '\n') i++;
+        uint32_t ll = i - ls;
+        if (i < (uint32_t)got) i++;
+        if (ll >= sizeof prev) ll = sizeof prev - 1;
+        int same = (ll == kstrlen(prev));
+        if (same) for (uint32_t j = 0; j < ll; j++)
+            if (buf[ls+j] != prev[j]) { same = 0; break; }
+        if (!same) {
+            for (uint32_t j = 0; j < ll; j++) { kputc((char)buf[ls+j]); prev[j] = (char)buf[ls+j]; }
+            prev[ll] = 0; kputc('\n');
+        }
+    }
+    kfree(buf);
+}
+
 /* echo [-n] [-e] <text> — print args joined by spaces. */
 static void show_echo(const char* args) {
     int nonl = 0, esc = 0;
@@ -3698,7 +3741,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
