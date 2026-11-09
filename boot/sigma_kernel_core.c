@@ -5137,6 +5137,7 @@ static void idt_init(void) {
 #define SYS_FSTAT    15 /* ebx=fd -> eax=file size or -1 */
 #define SYS_STAT     16 /* ebx=name -> eax=file size, -1 err */
 #define SYS_STATX    23 /* ebx=name -> eax=(is_dir<<31)|size, -1 err */
+#define SYS_LINK     24 /* ebx=old, ecx=new — hardlink (same chain), eax=0/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6064,6 +6065,63 @@ void syscall_handler(uint32_t* regs) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         ret = 0;
+    } else if (nr == SYS_LINK) {
+        /* ebx=old name ptr, ecx=new name ptr; cwd only; copies dir entry
+         * so both names share the same cluster chain (FAT hardlink). */
+        volatile char* up = (volatile char*)(size_t)regs[4];
+        volatile char* un = (volatile char*)(size_t)regs[6];
+        char oldn[64], newn[64];
+        int ol = 0, nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (ol < 63 && (uint32_t)(size_t)(up + ol) < limit && up[ol]
+               && up[ol] != '/' && up[ol] != '\\') { oldn[ol] = (char)up[ol]; ol++; }
+        while (nl < 63 && (uint32_t)(size_t)(un + nl) < limit && un[nl]
+               && un[nl] != '/' && un[nl] != '\\') { newn[nl] = (char)un[nl]; nl++; }
+        oldn[ol] = 0; newn[nl] = 0;
+        if (!ol || !nl || kstrlen(newn) > 12) { regs[7] = 0xFFFFFFFFu; return; }
+        if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        int kind = g_vol_kind;
+        int in_root = 1;
+        uint32_t dir_cluster = 0;
+        if (g_cwd[0]) {
+            struct fat_hit dh;
+            int dlr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                                 g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                                 g_vol_spc, g_cwd, &dh);
+            if (dlr <= 0 || !dh.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
+            in_root = 0; dir_cluster = dh.cluster;
+        }
+        uint8_t want_old[11], want_new[11];
+        fat_name_to_83(oldn, want_old);
+        fat_name_to_83(newn, want_new);
+        struct slot_res chk;
+        fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                          g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                          g_vol_data_lba, g_vol_spc, want_new, &chk);
+        if (chk.status == -1) { regs[7] = 0xFFFFFFFFu; return; }  /* new exists */
+        if (chk.status != 1) { regs[7] = 0xFFFFFFFFu; return; }   /* no free slot */
+        struct slot_res slot;
+        fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                          g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                          g_vol_data_lba, g_vol_spc, want_old, &slot);
+        if (slot.status != -1) { regs[7] = 0xFFFFFFFFu; return; } /* old missing */
+        /* read old entry's sector, copy 32-byte entry to new slot */
+        if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        uint8_t ent[32];
+        for (int i = 0; i < 32; i++) ent[i] = g_file_buf[slot.off + i];
+        if (ata_read_lba28(0x1F0, 0, chk.lba, g_file_buf, 1) < 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        for (int i = 0; i < 32; i++) g_file_buf[chk.off + i] = ent[i];
+        for (int i = 0; i < 11; i++) g_file_buf[chk.off + i] = want_new[i];
+        if (ata_write_lba28(0x1F0, 0, chk.lba, g_file_buf, 1) < 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        regs[7] = 0;
+        return;
     } else if (nr == SYS_APPEND) {
         /* ebx=name ptr, ecx=data ptr, edx=len — append to file in cwd */
         volatile char* un = (volatile char*)(size_t)regs[4];
