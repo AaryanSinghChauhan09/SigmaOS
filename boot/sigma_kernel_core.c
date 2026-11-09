@@ -392,6 +392,7 @@ static void show_uptime(void);
 static void show_ver(void);
 static void show_fastfetch(void);
 static void show_whoami(void);
+static void show_uname(void);
 static void show_memalloc(void);
 static void show_sched(void);
 static void show_ps(void);
@@ -3424,6 +3425,7 @@ void kernel_shell(void) {
             kputs("  uptime  - Seconds since boot\n");
             kputs("  fastfetch - System summary screen\n");
             kputs("  whoami  - Show user identity\n");
+            kputs("  uname   - Kernel name/version\n");
             kputs("  ver     - Kernel version\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
@@ -3506,6 +3508,8 @@ void kernel_shell(void) {
             show_fastfetch();
         } else if (kcmd_is(cmd, "whoami")) {
             show_whoami();
+        } else if (kcmd_is(cmd, "uname")) {
+            show_uname();
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
@@ -4610,6 +4614,10 @@ static void show_ver(void) {
 static void show_whoami(void) {
     kputs("uid=0(root) gid=0(root) groups=0(root)\n");
     kputs("SigmaOS sovereign kernel — ring-0 shell\n");
+}
+
+static void show_uname(void) {
+    kputs("SigmaOS sigmaos 0.1.0 i386 GNU/Linux\n");
 }
 
 /* fastfetch — Omarchy-style one-screen system summary. */
