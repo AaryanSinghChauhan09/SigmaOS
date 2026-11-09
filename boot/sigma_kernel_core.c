@@ -6154,6 +6154,7 @@ static void idt_init(void) {
 #define SYS_SIGNAL   40 /* ebx=signo 1..31, ecx=handler addr (0=default) — eax=0/-1 */
 #define SYS_SIGRETURN 41 /* internal: restore interrupted frame after handler */
 #define SYS_SIGMASK   42 /* ebx=mask, ecx=how(0=block,1=unblock,2=set) — eax=old mask */
+#define SYS_SYSINFO   43 /* ebx=user u32[6]: uptime_s, procs, mem_total_kb, mem_free_kb, ticks, pid — eax=0/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7445,6 +7446,35 @@ void syscall_handler(uint32_t* regs) {
         regs[7]  = 0;
         ep->entry = xentry; ep->esp0 = (uint32_t)(size_t)xsp;
         ep->started = 1;        /* ctx path irrelevant; frame patched directly */
+        return;
+    } else if (nr == SYS_SYSINFO) {
+        uint32_t up = regs[1];
+        if (!user_range_ok((void*)(size_t)up, 24)) { regs[7] = 0xFFFFFFFFu; return; }
+        volatile uint32_t* o = (volatile uint32_t*)(size_t)up;
+        int pc = 0;
+        for (int i = 0; i < MAX_PROCS; i++) if (g_procs[i].used) pc++;
+        uint32_t freep = 0;
+        if (g_mm_ready) {
+            uint32_t words = (g_max_page + 31) / 32;
+            if (words > 32768) words = 32768;
+            for (uint32_t w = 0; w < words; w++) {
+                uint32_t word = ~g_page_bitmap[w];
+                uint32_t rem = g_max_page - w * 32;
+                if (rem < 32) word &= (1u << rem) - 1u;
+                word -= (word >> 1) & 0x55555555u;
+                word = (word & 0x33333333u) + ((word >> 2) & 0x33333333u);
+                word = (word + (word >> 4)) & 0x0F0F0F0Fu;
+                freep += (word * 0x01010101u) >> 24;
+            }
+        }
+        o[0] = g_tick_count / 100u;
+        o[1] = (uint32_t)pc;
+        o[2] = g_total_pages * 4u;
+        o[3] = freep * 4u;
+        o[4] = g_tick_count;
+        o[5] = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+               ? g_procs[g_cur_proc].pid : 0;
+        regs[7] = 0;
         return;
     } else if (nr == SYS_SIGNAL) {
         int sig = (int)regs[1];
