@@ -3258,6 +3258,8 @@ static const struct { const char* alias; const char* target; } g_aliases[] = {
     { "sys",    "status" },
     { "ver",    "ver" },
     { "rm-rf",  "rm" },
+    { "neofetch", "fastfetch" },
+    { "fetch",  "fastfetch" },
 };
 #define NUM_ALIASES (sizeof(g_aliases)/sizeof(g_aliases[0]))
 
