@@ -5527,14 +5527,12 @@ void syscall_handler(uint32_t* regs) {
             name[nl] = (char)up[nl]; nl++;
         }
         name[nl] = 0;
-        if (!nl || kstrlen(name) > 12 || len == 0 || len > 65536
+        if (!nl || kstrlen(name) > 12 || len == 0 || len > 0x100000u
             || !user_range_ok(ubuf, len)) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
         int kind = g_vol_kind;
-        uint32_t clus_bytes = (uint32_t)g_vol_spc * 512u;
-        if (len > clus_bytes) { regs[7] = 0xFFFFFFFFu; return; }
         int in_root = 1;
         uint32_t dir_cluster = 0;
         if (g_cwd[0]) {
@@ -5557,8 +5555,10 @@ void syscall_handler(uint32_t* regs) {
         if (sr < 0 && slot.status == -1) {
             regs[7] = 0xFFFFFFFFu; return;      /* name exists -> fail (use append) */
         }
+        uint32_t clus_bytes = (uint32_t)g_vol_spc * 512u;
+        uint32_t nclus = (len + clus_bytes - 1) / clus_bytes;
         if (slot.status == 1) {
-            clus = fat_alloc_cluster(kind);
+            clus = fat_alloc_chain(kind, nclus);
             if (!clus) { regs[7] = 0xFFFFFFFFu; return; }
         } else {
             /* existing entry: must be regular file; free old chain */
@@ -5569,25 +5569,31 @@ void syscall_handler(uint32_t* regs) {
             if (e[11] & 0x10) { regs[7] = 0xFFFFFFFFu; return; }
             clus = fat_dirent_cluster(kind, e);
             if (clus >= 2) fat_free_chain(kind, clus);
-            clus = fat_alloc_cluster(kind);
+            clus = fat_alloc_chain(kind, nclus);
             if (!clus) { regs[7] = 0xFFFFFFFFu; return; }
             have_dirent = 1;
         }
-        /* write data into cluster sectors */
+        /* write data across the cluster chain */
         uint32_t remaining = len;
         uint32_t boff = 0;
+        uint32_t cur = clus;
         int wok = 1;
-        while (remaining > 0) {
-            uint32_t lba = g_vol_data_lba + (clus - 2) * g_vol_spc + boff / 512;
+        while (remaining > 0 && cur >= 2) {
+            uint32_t lba = g_vol_data_lba + (cur - 2) * g_vol_spc + boff / 512;
             uint32_t soff = boff % 512;
             if (ata_read_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { wok = 0; break; }
             uint32_t chunk = 512 - soff;
             if (chunk > remaining) chunk = remaining;
             for (uint32_t i = 0; i < chunk; i++)
-                g_file_buf[soff + i] = ubuf[boff + i];
+                g_file_buf[soff + i] = ubuf[(len - remaining) + i];
             if (ata_write_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { wok = 0; break; }
             boff += chunk; remaining -= chunk;
+            if (boff >= clus_bytes) {
+                boff = 0;
+                cur = fat_next_any(g_vol_fat_lba, kind, cur);
+            }
         }
+        if (remaining > 0) wok = 0;
         if (!wok) { regs[7] = 0xFFFFFFFFu; return; }
         /* dirent: create or update size+cluster */
         if (have_dirent) {
