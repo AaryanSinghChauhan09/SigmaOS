@@ -1,15 +1,15 @@
 # SigmaOS Component Registry
 # Generated single source of truth for the multi-repository ecosystem.
 # Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
-# Registry audit (2026-11-08): 1,643 declarations / 1,592 unique names.
+# Registry audit (2026-11-09): 1,645 declarations / 1,594 unique names.
 # 45 names have repeated declarations with conflicting metadata and remain
 # visible for explicit reconciliation; consumers must not silently choose one.
-# GitHub account audit (2026-11-08): 1,081 SigmaOS-prefixed repositories;
-# 325 of 1,563 declared repository URLs are published, 756 account repositories
-# lack registry records, and 1,238 declared URLs are not present in the account.
+# GitHub account audit (2026-11-09): 1,170 SigmaOS-prefixed repositories;
+# 330 of 1,565 declared SigmaOS-prefixed URLs are published, 840 account
+# repositories lack registry records, and 1,235 declared URLs are not present.
 # See `scripts/audit_component_fleet.py --github` for the read-only audit.
 #
-# Classification complete: All 1,635 components have explicit engine and category.
+# All 1,645 declarations have explicit engine and category metadata.
 # Last updated by classify.py (Phase 1 Task 1.2)
 
 
@@ -18074,3 +18074,23 @@ language = "rust"
 inspirations = ["https://github.com/linuxmint/drawing", "https://github.com/omacom/aether"]
 visibility = "public"
 depends_on = ["SigmaOS-core"]
+
+[[component]]
+name = "SigmaOS-main"
+description = "Top-level Rust workspace for SigmaOS runtime crates, boot, drivers, display, and feature-status tracking"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-main"
+engine = "os_root"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-alsa-utils"
+description = "Early CLI scaffold for planned ALSA utility integration; current API reports help, status, and version without device or ALSA command I/O"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-alsa-utils"
+engine = "utilities"
+category = "Utilities"
+language = "rust"
+visibility = "public"
+depends_on = []
