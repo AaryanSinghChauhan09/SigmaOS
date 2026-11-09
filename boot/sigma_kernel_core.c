@@ -4292,6 +4292,7 @@ static void idt_init(void) {
 #define SYS_FSTAT    15 /* ebx=fd -> eax=file size or -1 */
 #define SYS_STAT     16 /* ebx=name -> eax=file size, -1 err */
 #define SYS_GETCWD   17 /* ebx=buf, ecx=len -> cwd string, eax=len or -1 */
+#define SYS_CHDIR    18 /* ebx=name -> chdir, eax=0/-1 */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -4808,6 +4809,32 @@ void syscall_handler(uint32_t* regs) {
         while (i + 1 < ulen && g_cwd[i]) { ub[i] = g_cwd[i]; i++; }
         ub[i] = 0;
         regs[7] = i;
+        return;
+    } else if (nr == SYS_CHDIR) {
+        /* ebx=name ptr -> chdir (cwd is kernel-global); eax=0/-1 */
+        volatile char* un = (volatile char*)(size_t)regs[4];
+        char kname[160];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 159 && (uint32_t)(size_t)(un + nl) < limit && un[nl]) {
+            kname[nl] = (char)un[nl]; nl++;
+        }
+        kname[nl] = 0;
+        char rpath[160];
+        if (fs_resolve(kname, rpath, (int)sizeof rpath) != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        if (!rpath[0]) { g_cwd[0] = 0; regs[7] = 0; return; }
+        struct fat_hit hit;
+        int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                            g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                            g_vol_spc, rpath, &hit);
+        if (lr <= 0 || !hit.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
+        int l = kstrlen(rpath);
+        if (l > (int)sizeof g_cwd - 1) l = (int)sizeof g_cwd - 1;
+        for (int i = 0; i < l; i++) g_cwd[i] = rpath[i];
+        g_cwd[l] = 0;
+        regs[7] = 0;
         return;
     } else {
         kputs("\n[syscall] unknown nr=");
