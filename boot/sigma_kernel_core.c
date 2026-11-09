@@ -5460,6 +5460,7 @@ static void idt_init(void) {
 #define SYS_CHMOD    27 /* ebx=name, ecx=mode — 0=clear RO, 1=set RO, eax=0/-1 */
 #define SYS_SLEEP    28 /* ebx=ticks — busy-wait sleep, eax=0 */
 #define SYS_MEMINFO  29 /* ebx=user u32[3]: total_pages, free_pages, alloc_count; eax=0/-1 */
+#define SYS_DMESG    30 /* ebx=user buf, ecx=max — copy klog, eax=len (0 if empty) */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6292,6 +6293,18 @@ void syscall_handler(uint32_t* regs) {
         ub[1] = freep;
         ub[2] = g_alloc_count;
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_DMESG) {
+        char* ub = (char*)(size_t)regs[4];
+        uint32_t max = (uint32_t)regs[6];
+        if (!ub || max == 0 || (uint32_t)(size_t)ub < g_user_base ||
+            (uint32_t)(size_t)ub + max > g_user_base + 0x100000) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        uint32_t n = g_klog_len;
+        if (n > max) n = max;
+        for (uint32_t i = 0; i < n; i++) ub[i] = g_klog[i];
+        regs[7] = n;
         return;
     } else if (nr == SYS_CREAT) {
         /* ebx = user ptr to NUL-terminated single-component name in cwd.
