@@ -40,6 +40,7 @@ enum {
     SYS_SIGRETURN = 41,
     SYS_SIGMASK = 42,
     SYS_SYSINFO = 43,
+    SYS_GETTIME = 44,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

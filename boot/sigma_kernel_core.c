@@ -6176,6 +6176,7 @@ static void idt_init(void) {
 #define SYS_SIGRETURN 41 /* internal: restore interrupted frame after handler */
 #define SYS_SIGMASK   42 /* ebx=mask, ecx=how(0=block,1=unblock,2=set) — eax=old mask */
 #define SYS_SYSINFO   43 /* ebx=user u32[6]: uptime_s, procs, mem_total_kb, mem_free_kb, ticks, pid — eax=0/-1 */
+#define SYS_GETTIME   44 /* eax=uptime seconds, edx=milliseconds */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7513,6 +7514,11 @@ void syscall_handler(uint32_t* regs) {
         o[5] = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
                ? g_procs[g_cur_proc].pid : 0;
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_GETTIME) {
+        uint32_t t = g_tick_count;
+        regs[7] = t / 100u;          /* eax = seconds */
+        regs[5] = (t % 100u) * 10u;  /* edx = milliseconds */
         return;
     } else if (nr == SYS_SIGNAL) {
         int sig = (int)regs[1];
