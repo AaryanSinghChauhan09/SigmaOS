@@ -2466,6 +2466,140 @@ static void show_cp(const char* args) {
     kputs(" bytes)\n");
 }
 
+/* append <name> <text> — extend an existing file. Walks the cluster chain
+ * to the write offset, allocates+links clusters as needed, updates size. */
+static void show_append(const char* args) {
+    char name[64];
+    int nl = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
+    name[nl] = 0;
+    while (*p == ' ') p++;
+    if (!nl || !*p) { kputs("usage: append <name> <text>\n"); return; }
+    uint32_t tlen = kstrlen(p);
+    if (tlen > 0x100000u) { kputs("append: text too large.\n"); return; }
+
+    if (fat_ensure_mounted() != 0) { kputs("append: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+
+    /* resolve parent dir (same policy as write/cp) */
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit dh;
+        int dr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &dh);
+        if (dr <= 0 || !dh.is_dir) { kputs("append: cwd not a directory.\n"); return; }
+        in_root = 0; dir_cluster = dh.cluster;
+    }
+    uint8_t want[11];
+    fat_name_to_83(name, want);
+    struct slot_res slot;
+    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                      g_vol_data_lba, g_vol_spc, want, &slot);
+    if (slot.status != -1) { kputs("append: not found.\n"); return; }
+
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("append: read error.\n"); return;
+    }
+    uint8_t* de = g_file_buf + slot.off;
+    if (de[11] & 0x10) { kputs("append: is a directory.\n"); return; }
+    uint32_t fsize = (uint32_t)de[28] | ((uint32_t)de[29] << 8)
+                   | ((uint32_t)de[30] << 16) | ((uint32_t)de[31] << 24);
+    uint32_t clus = (uint32_t)de[20] | ((uint32_t)de[21] << 8);
+    if (kind == 2) clus |= ((uint32_t)de[26] << 16) | ((uint32_t)de[27] << 24);
+
+    uint32_t clus_bytes = (uint32_t)g_vol_spc * 512u;
+
+    /* collect existing cluster chain into a list (bounded) */
+    uint32_t maxc = (fsize + clus_bytes - 1) / clus_bytes + 8;
+    if (maxc < 16) maxc = 16;
+    if (maxc > 8192) maxc = 8192;
+    uint32_t* chain = (uint32_t*)kmalloc(maxc * 4);
+    if (!chain) { kputs("append: out of memory.\n"); return; }
+    uint32_t ncl = 0;
+    uint32_t c = clus;
+    int guard = 0;
+    while (c >= 2 && !fat_eoc_any(kind, c) && ncl < maxc && guard++ < 8192) {
+        chain[ncl++] = c;
+        c = fat_next_any(g_vol_fat_lba, kind, c);
+    }
+
+    /* ensure capacity: append clusters until chain covers fsize+tlen */
+    uint64_t need_bytes = (uint64_t)fsize + tlen;
+    uint64_t have_bytes = (uint64_t)ncl * clus_bytes;
+    int fail = 0;
+    while (have_bytes < need_bytes && ncl < maxc) {
+        uint32_t nc = fat_alloc_cluster(kind);
+        if (!nc) { fail = 1; break; }
+        if (ncl > 0) {
+            if (fat_set_entry(kind, chain[ncl - 1], nc) != 0) { fail = 1; break; }
+        } else {
+            /* empty file: first cluster goes into dirent */
+            de[20] = (uint8_t)(nc & 0xFF); de[21] = (uint8_t)(nc >> 8);
+            if (kind == 2) { de[26] = (uint8_t)(nc >> 16); de[27] = (uint8_t)(nc >> 24); }
+        }
+        chain[ncl++] = nc;
+        have_bytes += clus_bytes;
+    }
+    if (fail || have_bytes < need_bytes) {
+        kfree(chain);
+        kputs("append: disk full or alloc failed.\n"); return;
+    }
+
+    /* write appended bytes sector-by-sector at absolute file offset fsize */
+    uint32_t remaining = tlen;
+    uint32_t file_off = fsize;
+    guard = 0;
+    while (remaining > 0 && guard++ < 8192) {
+        uint32_t ci = file_off / clus_bytes;
+        uint32_t coff = file_off % clus_bytes;
+        uint32_t lba = g_vol_data_lba + (chain[ci] - 2) * g_vol_spc + coff / 512;
+        uint32_t soff = coff % 512;
+        int partial = (soff != 0) || (remaining < 512 - soff);
+        if (partial || soff != 0) {
+            if (ata_read_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { fail = 1; break; }
+        } else {
+            for (int i = 0; i < 512; i++) g_file_buf[i] = 0;
+        }
+        uint32_t chunk = 512 - soff;
+        if (chunk > remaining) chunk = remaining;
+        for (uint32_t i = 0; i < chunk; i++)
+            g_file_buf[soff + i] = (uint8_t)p[tlen - remaining + i];
+        if (ata_write_lba28(0x1F0, 0, lba, g_file_buf, 1) < 0) { fail = 1; break; }
+        remaining -= chunk;
+        file_off += chunk;
+    }
+    kfree(chain);
+    if (fail) { kputs("append: write failed.\n"); return; }
+
+
+    /* update dirent size + persist */
+    fsize += tlen - remaining;
+    de[28] = (uint8_t)(fsize & 0xFF); de[29] = (uint8_t)((fsize >> 8) & 0xFF);
+    de[30] = (uint8_t)((fsize >> 16) & 0xFF); de[31] = (uint8_t)(fsize >> 24);
+    /* re-read sector: g_file_buf clobbered */
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("append: read error.\n"); return;
+    }
+    uint8_t* de2 = g_file_buf + slot.off;
+    de2[28] = de[28]; de2[29] = de[29]; de2[30] = de[30]; de2[31] = de[31];
+    /* also persist first-cluster field if file was empty */
+    for (int i = 20; i <= 21; i++) de2[i] = de[i];
+    if (kind == 2) { de2[26] = de[26]; de2[27] = de[27]; }
+    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) != 1) {
+        kputs("append: dirent write failed.\n"); return;
+    }
+    kputs("append: /");
+    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+    kputs(name);
+    kputs(" -> ");
+    kprint_dec64(fsize);
+    kputs(" bytes\n");
+}
+
 static void show_cat(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -2964,6 +3098,7 @@ void kernel_shell(void) {
             kputs("  rmdir   - Remove empty dir: rmdir <name>\n");
             kputs("  mv      - Rename file: mv <old> <new>\n");
             kputs("  cp      - Copy file: cp <src> <dst>\n");
+            kputs("  append  - Append text: append <name> <text>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -3027,6 +3162,8 @@ void kernel_shell(void) {
             show_mv(cmd + 2);
         } else if (kcmd_is(cmd, "cp")) {
             show_cp(cmd + 2);
+        } else if (kcmd_is(cmd, "append")) {
+            show_append(cmd + 6);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
