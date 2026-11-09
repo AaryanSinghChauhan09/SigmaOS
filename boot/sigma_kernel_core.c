@@ -7878,8 +7878,10 @@ void syscall_handler(uint32_t* regs) {
             || (uint32_t)(size_t)ub + ulen > limit || ulen < 2) {
             regs[7] = 0xFFFFFFFFu; return;
         }
+        char* cwdbuf = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+                       ? g_procs[g_cur_proc].cwd : g_cwd;
         uint32_t i = 0;
-        while (i + 1 < ulen && g_cwd[i]) { ub[i] = g_cwd[i]; i++; }
+        while (i + 1 < ulen && cwdbuf[i]) { ub[i] = cwdbuf[i]; i++; }
         ub[i] = 0;
         regs[7] = i;
         return;
@@ -7897,16 +7899,18 @@ void syscall_handler(uint32_t* regs) {
         char rpath[160];
         if (fs_resolve(kname, rpath, (int)sizeof rpath) != 0) { regs[7] = 0xFFFFFFFFu; return; }
         if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
-        if (!rpath[0]) { g_cwd[0] = 0; regs[7] = 0; return; }
+        char* cwdbuf = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+                       ? g_procs[g_cur_proc].cwd : g_cwd;
+        if (!rpath[0]) { cwdbuf[0] = 0; regs[7] = 0; return; }
         struct fat_hit hit;
         int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
                             g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
                             g_vol_spc, rpath, &hit);
         if (lr <= 0 || !hit.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
         int l = kstrlen(rpath);
-        if (l > (int)sizeof g_cwd - 1) l = (int)sizeof g_cwd - 1;
-        for (int i = 0; i < l; i++) g_cwd[i] = rpath[i];
-        g_cwd[l] = 0;
+        if (l > 159) l = 159;
+        for (int i = 0; i < l; i++) cwdbuf[i] = rpath[i];
+        cwdbuf[l] = 0;
         regs[7] = 0;
         return;
     } else if (nr == SYS_READDIR) {
