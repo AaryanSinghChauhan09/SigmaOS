@@ -338,6 +338,8 @@ static void gdt_init(void);
 static void show_gdt(void);
 static void idt_init(void);
 static void show_user(void);
+static void pic_init(void);
+static void show_timer(void);
 static uint32_t g_map_mb;
 
 #define MBI_FLAGS       0
@@ -1596,6 +1598,7 @@ void kernel_shell(void) {
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
             kputs("  user    - Drop to ring 3 test program\n");
+            kputs("  timer   - Show PIT tick count\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -1637,6 +1640,8 @@ void kernel_shell(void) {
             show_gdt();
         } else if (kstrcmp(cmd, "user") == 0) {
             show_user();
+        } else if (kstrcmp(cmd, "timer") == 0) {
+            show_timer();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
@@ -1676,10 +1681,13 @@ void kernel_main(uint32_t magic, void* mb_info) {
     paging_init();
     gdt_init();
     idt_init();
+    pic_init();
     kputs("[kernel] Paging enabled: 4MiB-page identity map, ");
     kprint_dec64(g_map_mb);
     kputs(" MiB.\n");
     kputs("[kernel] GDT loaded: kernel+user segments, TSS ready.\n");
+    kputs("[kernel] IDT+PIC armed: exceptions, IRQs, int 0x80 gate.\n");
+    __asm__ volatile("sti");
 
     kputs("[kernel] Multiboot header validated.\n");
     kputs("[kernel] VGA console initialized at 0xB8000.\n");
@@ -1963,12 +1971,35 @@ __asm__(
     "    addl $4, %esp\n"
     "    popal\n"
     "    iret\n"
-    /* catch-all for unhandled vectors 32-255 */
+    /* catch-all for unhandled vectors 48-255 */
     ".globl isr_spurious\n"
     "isr_spurious:\n"
     "    pushl $0\n"
     "    pushl $255\n"
     "    jmp isr_common_entry\n"
+    /* IRQ stubs: vectors 32-47, no error code, return via iret */
+    ".globl irq_common_entry\n"
+    "irq_common_entry:\n"
+    "    movl %esp, %eax\n"
+    "    pushl %eax\n"
+    "    call irq_handler\n"
+    "    addl $4, %esp\n"
+    "    addl $4, %esp\n"      /* drop pushed vector number */
+    "    iret\n"
+    ".macro IRQ_STUB n\n"
+    "irq_\\n:\n"
+    "    pushl $\\n\n"
+    "    jmp irq_common_entry\n"
+    ".endm\n"
+    "IRQ_STUB 0\n" "IRQ_STUB 1\n" "IRQ_STUB 2\n" "IRQ_STUB 3\n"
+    "IRQ_STUB 4\n" "IRQ_STUB 5\n" "IRQ_STUB 6\n" "IRQ_STUB 7\n"
+    "IRQ_STUB 8\n" "IRQ_STUB 9\n" "IRQ_STUB 10\n" "IRQ_STUB 11\n"
+    "IRQ_STUB 12\n" "IRQ_STUB 13\n" "IRQ_STUB 14\n" "IRQ_STUB 15\n"
+    ".section .data\n"
+    ".globl irq_table\n"
+    "irq_table:\n"
+    "    .long irq_0, irq_1, irq_2, irq_3, irq_4, irq_5, irq_6, irq_7\n"
+    "    .long irq_8, irq_9, irq_10, irq_11, irq_12, irq_13, irq_14, irq_15\n"
     ".section .data\n"
     ".globl isr_table\n"
     "isr_table:\n"
@@ -2025,8 +2056,13 @@ static void idt_init(void) {
     for (int i = 0; i < 32; i++) {
         idt_set_gate((uint32_t)i, (uint32_t)(size_t)isr_table[i], 0x8E);
     }
-    /* vectors 32-255: catch-all (halts with diagnostic if ever hit) */
-    for (int i = 32; i < 256; i++) {
+    /* vectors 32-47: IRQ0-15 stubs (return via iret) */
+    extern void* irq_table[16];
+    for (int i = 0; i < 16; i++) {
+        idt_set_gate(32u + (uint32_t)i, (uint32_t)(size_t)irq_table[i], 0x8E);
+    }
+    /* vectors 48-255: catch-all (halts with diagnostic if ever hit) */
+    for (int i = 48; i < 256; i++) {
         idt_set_gate((uint32_t)i, (uint32_t)(size_t)&isr_spurious, 0x8E);
     }
     /* int 0x80: DPL=3 interrupt gate — callable from ring 3, returns via iret */
@@ -2043,6 +2079,54 @@ void syscall_handler(uint32_t* regs) {
     kprint_dec64(nr);
     regs[7] = 0; /* return value in eax */
     kputs(" -> ok\n");
+}
+
+/* --------------------------------------------------------------------------
+ * PIC + IRQ handling — 8259A remap to vectors 0x20/0x28, IRQ0 timer unmasked
+ * -------------------------------------------------------------------------- */
+static volatile uint32_t g_tick_count = 0;
+
+static void pic_init(void) {
+    /* ICW1: edge-triggered, cascade, ICW4 needed */
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+    /* ICW2: vector offsets */
+    outb(0x21, 0x20);   /* master -> IRQ0-7 = vectors 32-39 */
+    outb(0xA1, 0x28);   /* slave  -> IRQ8-15 = vectors 40-47 */
+    /* ICW3: cascade wiring (slave on master IRQ2) */
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+    /* ICW4: 8086 mode */
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    /* OCW1: mask all except IRQ0 (PIT timer) on master; mask all on slave */
+    outb(0x21, 0xFE);
+    outb(0xA1, 0xFF);
+}
+
+void irq_handler(uint32_t* frame) {
+    uint32_t vec = frame[0];
+    if (vec == 32) { /* IRQ0: PIT timer ~18.2 Hz */
+        g_tick_count++;
+        if ((g_tick_count % 18) == 0) {
+            kputs("\n[timer] tick=");
+            kprint_dec64(g_tick_count);
+            kputs(" (~");
+            kprint_dec64(g_tick_count / 18);
+            kputs("s)\n");
+        }
+    }
+    /* EOI: non-specific to master; slave EOI only for IRQ8-15 (vec>=40) */
+    if (vec >= 40) outb(0xA0, 0x20);
+    outb(0x20, 0x20);
+}
+
+static void show_timer(void) {
+    kputs("Timer: PIT IRQ0 ticks=");
+    kprint_dec64(g_tick_count);
+    kputs(" (~");
+    kprint_dec64(g_tick_count / 18);
+    kputs("s @18.2Hz)\n");
 }
 
 /* --------------------------------------------------------------------------
