@@ -6077,6 +6077,7 @@ static void idt_init(void) {
 #define SYS_WRITE_FD 35 /* ebx=fd, ecx=buf, edx=len — write to pipe fd; eax=bytes */
 #define SYS_NICE     36 /* ebx=nice -20..19 for self, or ebx=pid|0x80000000,ecx=nice; eax=old/-1 */
 #define SYS_FORK     37 /* eax=child pid in parent, child resumes w/ eax=0; -1 err */
+#define SYS_EXEC     38 /* ebx=user path — replace proc image; never returns on success */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7157,6 +7158,70 @@ void syscall_handler(uint32_t* regs) {
         *(volatile uint32_t*)(size_t)up = (uint32_t)fr;
         *(volatile uint32_t*)(size_t)(up + 4) = (uint32_t)fw;
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_EXEC) {
+        /* execve-lite: load a new image into the CURRENT proc's region and
+         * patch the user iret frame so syscall_entry resumes at the new
+         * entry point. fd table / pipes / redirects survive (Unix semantics).
+         * regs[8..12] = user eip/cs/eflags/esp/ss. */
+        if (g_cur_proc < 0 || g_cur_proc >= MAX_PROCS) { regs[7] = 0xFFFFFFFFu; return; }
+        struct proc* ep = &g_procs[g_cur_proc];
+        volatile char* up = (volatile char*)(size_t)regs[1];
+        char xpath[160];
+        int xl = 0;
+        uint32_t xlim = ep->base + 0x400000u;
+        while (xl < 159 && (uint32_t)(size_t)(up + xl) < xlim && up[xl]
+               && up[xl] != ' ' && up[xl] != '\t') {
+            xpath[xl] = (char)up[xl]; xl++;
+        }
+        xpath[xl] = 0;
+        if (!xl || fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        char xrp[160];
+        if (fs_resolve(xpath, xrp, (int)sizeof xrp) != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        struct fat_hit xh;
+        if (fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
+                       g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                       g_vol_spc, xrp, &xh) <= 0 || xh.is_dir
+            || xh.size == 0 || xh.size > EXEC_MAX_SIZE) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        /* read whole file into kernel buf */
+        uint8_t* fbuf = (uint8_t*)kmalloc(xh.size);
+        if (!fbuf) { regs[7] = 0xFFFFFFFFu; return; }
+        int got = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                                  g_vol_spc, xh.cluster, xh.size, fbuf);
+        if (got != (int)xh.size) { kfree(fbuf); regs[7] = 0xFFFFFFFFu; return; }
+        /* wipe old image, load new one at same base */
+        uint8_t* ubase = (uint8_t*)(size_t)ep->base;
+        for (uint32_t i = 0; i < 0x400000u; i++) ubase[i] = 0;
+        uint32_t xentry = 0;
+        if (fbuf[0] == 0x7F && fbuf[1] == 'E' && fbuf[2] == 'L' && fbuf[3] == 'F'
+            && xh.size <= EXEC_ELF_MAX) {
+            xentry = exec_load_elf(fbuf, xh.size);
+        } else {
+            /* flat binary at LOAD_OFF */
+            int wok = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
+                                      g_vol_spc, xh.cluster, xh.size,
+                                      ubase + EXEC_LOAD_OFF) == (int)xh.size;
+            xentry = wok ? ep->base + EXEC_LOAD_OFF : 0;
+        }
+        kfree(fbuf);
+        if (!xentry) { regs[7] = 0xFFFFFFFFu; return; }
+        /* fresh argc=1 stack: argv[0]=path */
+        uint32_t stack_top = ep->base + EXEC_STACK_OFF;
+        uint8_t* str_base = (uint8_t*)(size_t)(stack_top - 0x1000);
+        int al = 0;
+        for (const char* cp = xpath; *cp && al < 255; cp++) str_base[al++] = (uint8_t)*cp;
+        str_base[al] = 0;
+        uint32_t* xsp = (uint32_t*)(size_t)(stack_top - 24);
+        xsp[0] = 1; xsp[1] = (uint32_t)(size_t)str_base;
+        xsp[2] = 0; xsp[3] = 0; xsp[4] = 0;
+        /* patch iret frame: jump to new entry with new stack */
+        regs[8]  = xentry;      /* eip  */
+        regs[11] = (uint32_t)(size_t)xsp;  /* esp  */
+        regs[7]  = 0;
+        ep->entry = xentry; ep->esp0 = (uint32_t)(size_t)xsp;
+        ep->started = 1;        /* ctx path irrelevant; frame patched directly */
         return;
     } else if (nr == SYS_FORK) {
         regs[7] = (uint32_t)proc_fork(regs);
