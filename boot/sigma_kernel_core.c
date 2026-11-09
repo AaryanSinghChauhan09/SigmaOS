@@ -2951,6 +2951,47 @@ static void show_unset(const char* args) {
     else kputs("unset: not found\n");
 }
 
+/* printf <fmt> [args...] — %s %d %x %c %% \n \t escapes. */
+static void show_printf(const char* args) {
+    char fmt[128];
+    int fl = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    while (*p && *p != ' ' && fl < 127) fmt[fl++] = *p++;
+    fmt[fl] = 0;
+    if (!fl) { kputs("usage: printf <fmt> [args]\n"); return; }
+    const char* av[8]; int na = 0;
+    while (*p) {
+        while (*p == ' ') p++;
+        if (!*p) break;
+        if (na < 8) av[na++] = p;
+        while (*p && *p != ' ') p++;
+        if (*p) { *(char*)p = 0; p++; }
+    }
+    int ai = 0;
+    for (int i = 0; fmt[i]; i++) {
+        if (fmt[i] == '\\' && fmt[i+1]) {
+            i++;
+            if (fmt[i] == 'n') kputc('\n');
+            else if (fmt[i] == 't') kputc('\t');
+            else kputc(fmt[i]);
+        } else if (fmt[i] == '%' && fmt[i+1]) {
+            i++;
+            if (fmt[i] == '%') kputc('%');
+            else if (fmt[i] == 's' && ai < na) { kputs(av[ai++]); }
+            else if (fmt[i] == 'd' && ai < na) { kprint_dec64(kstrtoul(av[ai++])); }
+            else if (fmt[i] == 'x' && ai < na) {
+                uint32_t v = kstrtoul(av[ai++]);
+                char hb[9]; int h = 8;
+                do { int d = v & 0xF; hb[--h] = d < 10 ? '0'+d : 'a'+d-10; v >>= 4; } while (v);
+                for (; h < 8; h++) kputc(hb[h]);
+            }
+            else if (fmt[i] == 'c' && ai < na) { kputc(av[ai++][0]); }
+            else kputc('%'), kputc(fmt[i]);
+        } else kputc(fmt[i]);
+    }
+}
+
 /* reset — clear screen and restore default VGA colors. */
 static void show_reset(void) {
     vga_set_color(0x0F, 0x00);
@@ -3585,7 +3626,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
