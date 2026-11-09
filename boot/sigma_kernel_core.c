@@ -39,6 +39,16 @@ static inline uint8_t inb(uint16_t port) {
     return ret;
 }
 
+static inline void outl(uint16_t port, uint32_t val) {
+    __asm__ volatile ("outl %0, %1" : : "a"(val), "Nd"(port));
+}
+
+static inline uint32_t inl(uint16_t port) {
+    uint32_t ret;
+    __asm__ volatile ("inl %1, %0" : "=a"(ret) : "Nd"(port));
+    return ret;
+}
+
 static inline void io_wait(void) {
     outb(0x80, 0);
 }
@@ -529,6 +539,65 @@ static void show_cpu(void) {
 }
 
 /* --------------------------------------------------------------------------
+ * PCI Configuration Space Scan (ports 0xCF8/0xCFC)
+ * -------------------------------------------------------------------------- */
+static uint32_t pci_read32(uint8_t bus, uint8_t dev, uint8_t func, uint8_t reg) {
+    uint32_t addr = 0x80000000u | ((uint32_t)bus << 16) | ((uint32_t)dev << 11)
+                  | ((uint32_t)func << 8) | (reg & 0xFC);
+    outl(0xCF8, addr);
+    return inl(0xCFC);
+}
+
+static void kprint_hex32pad(uint32_t v, int digits) {
+    char buf[9];
+    for (int i = 7; i >= 0; i--) {
+        uint8_t d = (uint8_t)(v & 0xF);
+        buf[i] = d < 10 ? '0' + d : 'a' + (d - 10);
+        v >>= 4;
+    }
+    buf[8] = '\0';
+    kputs(&buf[8 - digits]);
+}
+
+static void show_pci(void) {
+    uint32_t count = 0;
+    for (uint32_t bus = 0; bus < 256; bus++) {
+        for (uint32_t dev = 0; dev < 32; dev++) {
+            for (uint32_t func = 0; func < 8; func++) {
+                /* Only probe func>0 if func 0 reports a multi-function header */
+                if (func > 0) {
+                    uint32_t h = pci_read32((uint8_t)bus, (uint8_t)dev, 0, 0x0C);
+                    if (!((h >> 16) & 0x80)) break;
+                }
+                uint32_t id = pci_read32((uint8_t)bus, (uint8_t)dev, (uint8_t)func, 0x00);
+                uint16_t vendor = (uint16_t)(id & 0xFFFF);
+                if (vendor == 0xFFFF || vendor == 0x0000) continue;
+                uint16_t device = (uint16_t)(id >> 16);
+                uint32_t cls = pci_read32((uint8_t)bus, (uint8_t)dev, (uint8_t)func, 0x08);
+                kputs("pci ");
+                kprint_hex32pad(bus, 2);
+                kputc(':');
+                kprint_hex32pad(dev, 2);
+                kputc('.');
+                kprint_hex32pad(func, 1);
+                kputs("  vendor=");
+                kprint_hex32pad(vendor, 4);
+                kputs(" device=");
+                kprint_hex32pad(device, 4);
+                kputs(" class=");
+                kprint_hex32pad((cls >> 8) & 0xFFFFFF, 6);
+                kputs("\n");
+                count++;
+                if (count >= 64) { kputs("... (truncated at 64 devices)\n"); return; }
+            }
+        }
+    }
+    kputs("PCI scan complete: ");
+    kprint_dec64(count);
+    kputs(" device(s).\n");
+}
+
+/* --------------------------------------------------------------------------
  * Information Displays
  * -------------------------------------------------------------------------- */
 void show_banner(void) {
@@ -629,6 +698,7 @@ void kernel_shell(void) {
             kputs("  cmdline - Show kernel command line\n");
             kputs("  date    - Show hardware clock (RTC)\n");
             kputs("  cpu     - Show CPU vendor and features\n");
+            kputs("  pci     - Scan PCI buses for devices\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -648,6 +718,8 @@ void kernel_shell(void) {
             show_rtc();
         } else if (kstrcmp(cmd, "cpu") == 0) {
             show_cpu();
+        } else if (kstrcmp(cmd, "pci") == 0) {
+            show_pci();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
