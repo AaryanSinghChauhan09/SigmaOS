@@ -47,6 +47,7 @@ enum {
     SYS_GETPGID = 48,
     SYS_SETPGID = 49,
     SYS_SETSID = 50,
+    SYS_PTRACE = 51,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 
