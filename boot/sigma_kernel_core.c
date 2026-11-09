@@ -210,6 +210,35 @@ void kputs(const char* str) {
 }
 
 /* --------------------------------------------------------------------------
+ * Kernel log — fixed ring buffer for boot/event diagnostics (dmesg).
+ * INSTRUMENTATION: cheap, always-on, no allocation.
+ * -------------------------------------------------------------------------- */
+#define KLOG_SIZE 4096
+static char     g_klog[KLOG_SIZE];
+static uint32_t g_klog_len = 0;
+
+void klog(const char* str) {
+    while (*str && g_klog_len < KLOG_SIZE - 1) {
+        g_klog[g_klog_len++] = *str++;
+    }
+    g_klog[g_klog_len] = '\0';
+}
+
+void klog(const char* str);
+static void kprint_dec64(uint64_t v);
+static void kprint_hex32(uint32_t v);
+static void show_dmesg(void);
+
+static void show_dmesg(void) {
+    if (g_klog_len == 0) { kputs("dmesg: log empty.\n"); return; }
+    kputs("--- kernel log ---\n");
+    kputs(g_klog);
+    kputs("\n--- end (" );
+    kprint_dec64(g_klog_len);
+    kputs(" bytes) ---\n");
+}
+
+/* --------------------------------------------------------------------------
  * PS/2 Keyboard Driver
  * -------------------------------------------------------------------------- */
 static const char scancode_ascii[128] = {
@@ -1761,6 +1790,7 @@ void kernel_shell(void) {
             kputs("  fg      - Resume preempted user program\n");
             kputs("  timer   - Show PIT tick count\n");
             kputs("  sched   - Scheduler/user-process status\n");
+            kputs("  dmesg   - Show kernel log\n");
             kputs("  memalloc- Page allocator test/status\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
@@ -1817,6 +1847,8 @@ void kernel_shell(void) {
             show_timer();
         } else if (kstrcmp(cmd, "sched") == 0) {
             show_sched();
+        } else if (kstrcmp(cmd, "dmesg") == 0) {
+            show_dmesg();
         } else if (kstrcmp(cmd, "memalloc") == 0) {
             show_memalloc();
         } else if (kstrcmp(cmd, "clear") == 0) {
@@ -1860,6 +1892,7 @@ void kernel_main(uint32_t magic, void* mb_info) {
     idt_init();
     pit_init();
     pic_init();
+    klog("kernel: paging+gdt+idt+pit+pic armed\n");
     kputs("[kernel] Paging enabled: 4MiB-page identity map, ");
     kprint_dec64(g_map_mb);
     kputs(" MiB.\n");
