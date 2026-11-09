@@ -457,6 +457,19 @@ static void kprint_hex32(uint32_t v) {
     kprint_hex64(v);
 }
 
+/* u64 / 10 via shift-subtract — keeps the kernel free of libgcc
+ * helpers (__udivmoddi4) in a -nostdlib link. */
+static uint64_t u64_div10(uint64_t v, uint8_t* rem) {
+    uint64_t q = 0, r = 0;
+    for (int i = 63; i >= 0; i--) {
+        r = (r << 1) | (uint64_t)((v >> i) & 1u);
+        q <<= 1;
+        if (r >= 10) { r -= 10; q |= 1; }
+    }
+    *rem = (uint8_t)r;
+    return q;
+}
+
 static void kprint_dec64(uint64_t v) {
     char buf[24];
     int i = 23;
@@ -466,8 +479,9 @@ static void kprint_dec64(uint64_t v) {
         return;
     }
     while (v && i > 0) {
-        buf[--i] = '0' + (uint8_t)(v % 10);
-        v /= 10;
+        uint8_t d;
+        v = u64_div10(v, &d);
+        buf[--i] = '0' + d;
     }
     kputs(&buf[i]);
 }
