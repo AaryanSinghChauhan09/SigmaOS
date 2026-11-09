@@ -2600,6 +2600,42 @@ static void show_append(const char* args) {
     kputs(" bytes\n");
 }
 
+/* hex <file> — hexdump a file (up to 4KB) for binary inspection. */
+static void show_hex(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: hex <file>\n"); return; }
+    char namebuf[64];
+    int nl = 0;
+    while (*p && *p != ' ' && nl < 63) namebuf[nl++] = *p++;
+    namebuf[nl] = 0;
+
+    if (fat_ensure_mounted() != 0) { kputs("hex: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+    char rpath[160];
+    if (fs_resolve(namebuf, rpath, (int)sizeof rpath) != 0) {
+        kputs("hex: path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                        g_vol_fat_lba, g_vol_data_lba, g_vol_spc, rpath, &hit);
+    if (lr <= 0 || hit.is_dir) { kputs("hex: not found.\n"); return; }
+
+    uint32_t cap = hit.size > 4096 ? 4096 : hit.size;
+    uint8_t* buf = (uint8_t*)kmalloc(cap ? cap : 1);
+    if (!buf) { kputs("hex: out of memory.\n"); return; }
+    int got = fat_read_to_buf(kind, g_vol_fat_lba, g_vol_data_lba, g_vol_spc,
+                              hit.cluster, cap, buf);
+    if (got < 0) { kfree(buf); kputs("hex: read error.\n"); return; }
+    kputs("hex: ");
+    kputs(rpath);
+    kputs(" (");
+    kprint_dec64((uint64_t)got);
+    kputs(" bytes)\n");
+    kprint_hexdump(buf, (uint32_t)got);
+    kfree(buf);
+}
+
 static void show_cat(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -3099,6 +3135,7 @@ void kernel_shell(void) {
             kputs("  mv      - Rename file: mv <old> <new>\n");
             kputs("  cp      - Copy file: cp <src> <dst>\n");
             kputs("  append  - Append text: append <name> <text>\n");
+            kputs("  hex     - Hexdump file: hex <file>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -3164,6 +3201,8 @@ void kernel_shell(void) {
             show_cp(cmd + 2);
         } else if (kcmd_is(cmd, "append")) {
             show_append(cmd + 6);
+        } else if (kcmd_is(cmd, "hex")) {
+            show_hex(cmd + 3);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
