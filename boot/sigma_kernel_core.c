@@ -317,6 +317,8 @@ static int kprefix(const char* s, const char* prefix) {
  * -------------------------------------------------------------------------- */
 static volatile uint8_t* g_mb_info = 0;
 static void ata_identify_model(uint16_t base, int slave, char out[41]);
+static uint32_t fat_next_cluster32(uint32_t fat_lba, uint32_t cluster);
+static int fat_is_eoc32(uint32_t c);
 
 #define MBI_FLAGS       0
 #define MBI_MEM_LOWER   4
@@ -962,12 +964,69 @@ static void show_ls(const char* args) {
     uint16_t fsz16 = (uint16_t)b[22] | ((uint16_t)b[23] << 8);
     uint32_t fsz32 = (uint32_t)b[36] | ((uint32_t)b[37] << 8) | ((uint32_t)b[38] << 16) | ((uint32_t)b[39] << 24);
     uint32_t fatsz = fsz16 ? fsz16 : fsz32;
+    int is_fat32 = (rent == 0);
 
-    if (rent == 0) { kputs("ls: FAT32 root dir not supported yet (use fs to inspect).\n"); return; }
     if (bps != 512) { kputs("ls: non-512-byte sectors unsupported.\n"); return; }
     if (spc == 0) { kputs("ls: invalid sectors/cluster.\n"); return; }
 
+    uint32_t fat_lba  = lba + rsvd;
+    uint32_t data_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+
+    if (is_fat32) {
+        /* FAT32: root dir is a cluster chain starting at offset 44 */
+        uint32_t root_clus = (uint32_t)b[44] | ((uint32_t)b[45] << 8)
+                           | ((uint32_t)b[46] << 16) | ((uint32_t)b[47] << 24);
+        if (root_clus < 2) { kputs("ls: invalid FAT32 root cluster.\n"); return; }
+        data_lba += 0; /* data area starts right after FATs for FAT32 */
+
+        int count = 0;
+        uint32_t clus = root_clus;
+        int guard = 0;
+        while (clus >= 2 && !fat_is_eoc32(clus) && guard++ < 64 && count < 128) {
+            uint32_t clus_lba = data_lba + (clus - 2) * spc;
+            /* read up to 8 sectors (one cluster max for typical spc<=8) */
+            uint32_t secs = spc > 8 ? 8 : spc;
+            uint8_t* dst = g_fs_buf;
+            uint32_t done = 0;
+            int stop = 0;
+            while (done < secs) {
+                int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
+                int n = ata_read_lba28(0x1F0, 0, clus_lba + done, dst, chunk);
+                if (n < 0) { kputs("ls: cannot read root dir.\n"); return; }
+                dst += n * 512;
+                done += (uint32_t)n;
+            }
+            int entries = (int)(secs * 16);
+            for (int i = 0; i < entries; i++) {
+                uint8_t* e = g_fs_buf + i * 32;
+                if (e[0] == 0x00) { stop = 1; break; }
+                if (e[0] == 0xE5) continue;
+                if (e[11] == 0x0F) continue;
+                uint8_t attr = e[11];
+                kputs("  ");
+                if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
+                fat_print_name(e);
+                if (!(attr & 0x10)) {
+                    uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
+                    kputs("  ");
+                    kprint_dec64(sz);
+                    kputs(" B");
+                }
+                kputs("\n");
+                count++;
+                if (count >= 128) { kputs("  ... (truncated)\n"); stop = 1; break; }
+            }
+            if (stop) break;
+            clus = fat_next_cluster32(fat_lba, clus);
+        }
+        kputs("ls: ");
+        kprint_dec64(count);
+        kputs(" entrie(s) in FAT32 root dir.\n");
+        return;
+    }
+
     uint32_t root_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+    data_lba += (uint32_t)((rent * 32 + bps - 1) / bps); /* skip fixed root dir */
     uint32_t root_secs = ((uint32_t)rent * 32 + bps - 1) / bps;
     if (root_secs > 8) root_secs = 8; /* cap at 4KB buffer */
 
@@ -1056,6 +1115,21 @@ static uint16_t fat_next_cluster(uint32_t fat_lba, int is_fat12, uint16_t cluste
     return (uint16_t)g_fs_buf[off] | ((uint16_t)g_fs_buf[off + 1] << 8);
 }
 
+/* FAT32: 32-bit FAT entry lookup (cluster -> next cluster). */
+static uint32_t fat_next_cluster32(uint32_t fat_lba, uint32_t cluster) {
+    uint32_t byte_off = cluster * 4;
+    uint32_t sec = fat_lba + (byte_off / 512);
+    uint32_t off = byte_off % 512;
+    if (ata_read_lba28(0x1F0, 0, sec, g_fs_buf, 1) < 0) return 0xFFFFFFFFu;
+    uint32_t v = (uint32_t)g_fs_buf[off]
+               | ((uint32_t)g_fs_buf[off + 1] << 8)
+               | ((uint32_t)g_fs_buf[off + 2] << 16)
+               | ((uint32_t)g_fs_buf[off + 3] << 24);
+    return v & 0x0FFFFFFFu;
+}
+
+static int fat_is_eoc32(uint32_t c) { return c >= 0x0FFFFFF8u; }
+
 static uint16_t fat_eoc(int is_fat12) { return is_fat12 ? 0xFF8 : 0xFFF8; }
 
 static void show_cat(const char* args) {
@@ -1086,8 +1160,91 @@ static void show_cat(const char* args) {
     uint16_t fsz16 = (uint16_t)b[22] | ((uint16_t)b[23] << 8);
     uint32_t fsz32 = (uint32_t)b[36] | ((uint32_t)b[37] << 8) | ((uint32_t)b[38] << 16) | ((uint32_t)b[39] << 24);
     uint32_t fatsz = fsz16 ? fsz16 : fsz32;
-    if (rent == 0) { kputs("cat: FAT32 not supported yet.\n"); return; }
+    int is_fat32 = (rent == 0);
     if (bps != 512 || spc == 0) { kputs("cat: unsupported geometry.\n"); return; }
+
+    uint32_t fat_lba  = lba + rsvd;
+    uint32_t data_lba = lba + rsvd + (uint32_t)nfats * fatsz;
+
+    uint32_t start_cluster = 0;
+    uint32_t file_size = 0;
+    int found = 0;
+
+    if (is_fat32) {
+        /* FAT32: root dir = cluster chain from offset 44; no fixed root region */
+        uint32_t root_clus = (uint32_t)b[44] | ((uint32_t)b[45] << 8)
+                           | ((uint32_t)b[46] << 16) | ((uint32_t)b[47] << 24);
+        if (root_clus < 2) { kputs("cat: invalid FAT32 root cluster.\n"); return; }
+        uint32_t clus = root_clus;
+        int guard = 0;
+        while (clus >= 2 && !fat_is_eoc32(clus) && guard++ < 64 && !found) {
+            uint32_t clus_lba = data_lba + (clus - 2) * spc;
+            uint32_t secs = spc > 8 ? 8 : spc;
+            uint8_t* dst = g_fs_buf;
+            uint32_t done = 0;
+            int stop = 0;
+            while (done < secs) {
+                int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
+                int n = ata_read_lba28(0x1F0, 0, clus_lba + done, dst, chunk);
+                if (n < 0) { kputs("cat: cannot read root dir.\n"); return; }
+                dst += n * 512;
+                done += (uint32_t)n;
+            }
+            int entries = (int)(secs * 16);
+            for (int i = 0; i < entries; i++) {
+                uint8_t* e = g_fs_buf + i * 32;
+                if (e[0] == 0x00) { stop = 1; break; }
+                if (e[0] == 0xE5 || e[11] == 0x0F) continue;
+                if (e[11] & 0x10) continue;
+                if (!fat_name_eq(e, want)) continue;
+                start_cluster = ((uint32_t)e[20] | ((uint32_t)e[21] << 8)) << 16
+                              | (uint32_t)e[26] | ((uint32_t)e[27] << 8);
+                file_size = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
+                found = 1;
+                break;
+            }
+            if (stop || found) break;
+            clus = fat_next_cluster32(fat_lba, clus);
+        }
+        if (!found) {
+            kputs("cat: '");
+            kputs(namebuf);
+            kputs("' not found in FAT32 root dir.\n");
+            return;
+        }
+        if (start_cluster < 2) { kputs("cat: empty file.\n"); return; }
+
+        /* walk 32-bit cluster chain, print printable content (cap 4KB) */
+        clus = start_cluster;
+        uint32_t printed = 0;
+        const uint32_t PRINT_CAP = 4096;
+        int guard2 = 0;
+        while (clus >= 2 && !fat_is_eoc32(clus) && guard2++ < 1024 && printed < PRINT_CAP) {
+            uint32_t clus_lba = data_lba + (clus - 2) * spc;
+            for (uint32_t s = 0; s < spc && printed < PRINT_CAP; s++) {
+                if (ata_read_lba28(0x1F0, 0, clus_lba + s, g_file_buf, 1) < 0) {
+                    kputs("\ncat: read error mid-file.\n");
+                    return;
+                }
+                for (int i = 0; i < 512 && printed < PRINT_CAP; i++) {
+                    uint8_t c = g_file_buf[i];
+                    if (c == '\n' || c == '\r' || c == '\t' || (c >= 32 && c <= 126)) {
+                        kputc((c == '\r') ? '\n' : (char)c);
+                    } else {
+                        kputc('.');
+                    }
+                    printed++;
+                }
+            }
+            clus = fat_next_cluster32(fat_lba, clus);
+        }
+        kputs("\ncat: done (");
+        kprint_dec64(file_size);
+        kputs(" bytes declared, ");
+        kprint_dec64(printed);
+        kputs(" shown)\n");
+        return;
+    }
 
     /* FAT12 if data clusters < 4085 */
     uint32_t tot16 = (uint16_t)b[19] | ((uint16_t)b[20] << 8);
@@ -1096,8 +1253,7 @@ static void show_cat(const char* args) {
     uint32_t data_clusters = (tot - rsvd - nfats * fatsz - ((rent * 32 + bps - 1) / bps)) / spc;
     int is_fat12 = data_clusters < 4085;
 
-    uint32_t fat_lba  = lba + rsvd;
-    uint32_t data_lba = lba + rsvd + (uint32_t)nfats * fatsz + ((rent * 32 + bps - 1) / bps);
+    data_lba += (uint32_t)((rent * 32 + bps - 1) / bps); /* skip fixed root dir */
 
     /* search root dir */
     uint32_t root_lba = lba + rsvd + (uint32_t)nfats * fatsz;
@@ -1105,9 +1261,6 @@ static void show_cat(const char* args) {
     if (root_secs > 8) root_secs = 8;
     uint8_t* dst = g_fs_buf;
     uint32_t done = 0;
-    int found = 0;
-    uint16_t start_cluster = 0;
-    uint32_t file_size = 0;
     while (done < root_secs && !found) {
         int chunk = (root_secs - done > 4) ? 4 : (int)(root_secs - done);
         int n = ata_read_lba28(0x1F0, 0, root_lba + done, dst, chunk);
@@ -1294,7 +1447,7 @@ void kernel_shell(void) {
             kputs("  read    - Read disk sectors: read <lba> [n] [bus]\n");
             kputs("  part    - Show MBR partition table\n");
             kputs("  fs      - Detect FAT filesystem on partition\n");
-            kputs("  ls      - List FAT12/16 root directory\n");
+            kputs("  ls      - List FAT12/16/32 root directory\n");
             kputs("  cat     - Print file: cat <name>\n");
             kputs("  info    - System summary\n");
             kputs("  clear   - Clear the console screen\n");
