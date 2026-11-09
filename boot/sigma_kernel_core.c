@@ -2087,12 +2087,37 @@ static void idt_init(void) {
 }
 
 /* pusha frame order (top->bottom): edi,esi,ebp,esp,ebx,edx,ecx,eax */
+/* int 0x80 ABI: eax=nr, ebx=arg1, ecx=arg2, edx=arg3. regs[] = pushal frame:
+ * [0]=edi [1]=esi [2]=ebp [3]=esp0 [4]=ebx [5]=edx [6]=ecx [7]=eax */
+#define SYS_EXIT     0
+#define SYS_WRITE    1   /* ebx=ptr to NUL-terminated user string */
+#define SYS_GETCHAR  2   /* returns char in eax */
+#define SYS_TICKS    3   /* returns PIT tick count in eax */
+
+static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
+
 void syscall_handler(uint32_t* regs) {
-    uint32_t nr = regs[7]; /* eax */
-    kputs("\n[syscall] ring3 call nr=");
-    kprint_dec64(nr);
-    regs[7] = 0; /* return value in eax */
-    kputs(" -> ok\n");
+    uint32_t nr  = regs[7];
+    uint32_t ret = 0;
+    if (nr == SYS_WRITE) {
+        volatile char* s = (volatile char*)(size_t)regs[4];
+        for (uint32_t i = 0; i < 512; i++) {
+            char c = s[i];
+            if (c == 0) break;
+            kputc(c);
+        }
+    } else if (nr == SYS_GETCHAR) {
+        ret = (uint8_t)kgetc();
+    } else if (nr == SYS_TICKS) {
+        ret = g_tick_count;
+    } else if (nr == SYS_EXIT) {
+        kputs("\n[user] exit syscall\n");
+    } else {
+        kputs("\n[syscall] unknown nr=");
+        kprint_dec64(nr);
+        kputs("\n");
+    }
+    regs[7] = ret;
 }
 
 /* --------------------------------------------------------------------------
@@ -2368,13 +2393,26 @@ static void show_user(void) {
         __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
 
         /* plant user program at region base:
-         *   mov eax, 1        ; B8 01 00 00 00
-         *   int 0x80          ; CD 80
-         *   int3              ; CC  -> #BP exception shows cs=0x1B */
+         *   mov eax,3 ; int 0x80      -> SYS_TICKS
+         *   mov eax,1 ; mov ebx,msg  ; int 0x80  -> SYS_WRITE
+         *   mov eax,0 ; int 0x80      -> SYS_EXIT
+         *   int3                       -> #BP shows cs=0x1B */
         uint8_t* code = (uint8_t*)(size_t)g_user_base;
-        code[0]=0xB8; code[1]=0x01; code[2]=0x00; code[3]=0x00; code[4]=0x00;
-        code[5]=0xCD; code[6]=0x80;
-        code[7]=0xCC;
+        uint32_t msg_off = 32;
+        char* msg = (char*)(code + msg_off);
+        const char* m = "hello from ring3!\n";
+        for (int i = 0; i <= 18; i++) msg[i] = m[i];
+        uint32_t msg_addr = g_user_base + msg_off;
+
+        code[0]=0xB8; code[1]=0x03; code[2]=0x00; code[3]=0x00; code[4]=0x00; /* mov eax,3 */
+        code[5]=0xCD; code[6]=0x80;                                                  /* int 0x80 */
+        code[7]=0xB8; code[8]=0x01; code[9]=0x00; code[10]=0x00; code[11]=0x00;     /* mov eax,1 */
+        code[12]=0xBB; code[13]=(uint8_t)(msg_addr); code[14]=(uint8_t)(msg_addr>>8);
+        code[15]=(uint8_t)(msg_addr>>16); code[16]=(uint8_t)(msg_addr>>24);         /* mov ebx,msg */
+        code[17]=0xCD; code[18]=0x80;                                                /* int 0x80 */
+        code[19]=0xB8; code[20]=0x00; code[21]=0x00; code[22]=0x00; code[23]=0x00;  /* mov eax,0 */
+        code[24]=0xCD; code[25]=0x80;                                                /* int 0x80 */
+        code[26]=0xCC;                                                               /* int3 */
 
         kputs("user: region=");
         kprint_hex32(g_user_base);
