@@ -2878,6 +2878,13 @@ static void show_cal(const char* args) {
     }
 }
 
+/* reset — clear screen and restore default VGA colors. */
+static void show_reset(void) {
+    vga_set_color(0x0F, 0x00);
+    kputs("\x1b[2J\x1b[H");
+    kputs("[reset] terminal restored\n");
+}
+
 /* true / false / : — POSIX no-op exit-status commands. */
 static void show_true(void) {}
 static void show_false(void) { kputs("false\n"); }
@@ -3460,6 +3467,9 @@ static const struct { const char* alias; const char* target; } g_aliases[] = {
     { "cls",    "clear" },
     { "quit",   "halt" },
     { "q",      "quit" },
+    { "exit",   "quit" },
+    { "logout", "quit" },
+    { "logoff", "quit" },
     { "sys",    "status" },
     { "ver",    "ver" },
     { "rm-rf",  "rm" },
@@ -3502,7 +3512,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
