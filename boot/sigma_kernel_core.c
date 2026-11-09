@@ -286,6 +286,7 @@ struct proc {
     int      nice;       /* -20..19, lower = higher priority */
     uint32_t ppid;       /* parent pid, 0 = kernel shell */
     uint32_t ticks;      /* scheduler ticks consumed (instrumentation) */
+    uint32_t io_r, io_w; /* bytes read/written via syscalls (instrumentation) */
     uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
     uint32_t out_pipe;   /* 0 or pipe idx+1 — stdout sink */
     char     out_name[64];      /* '>'/'>>' target, empty = console */
@@ -4341,6 +4342,7 @@ static int proc_claim(uint32_t base, const char* name, const char* cmdline,
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
+    p->io_r = p->io_w = 0;
     p->pending_mask = 0; p->sig_mask = 0;
     for (int si = 0; si < 32; si++) p->handler[si] = 0;
     p->pid = (uint32_t)g_next_pid++;
@@ -4462,6 +4464,7 @@ static int proc_fork(uint32_t* regs) {
     ch->nice = par->nice;
     ch->ppid = par->pid;
     ch->ticks = par->ticks;
+    ch->io_r = par->io_r; ch->io_w = par->io_w;
     ch->pid = (uint32_t)g_next_pid++;
     ch->base = base; ch->pd = pd;
     ch->entry = par->entry; ch->esp0 = par->esp0;
@@ -6970,6 +6973,8 @@ static int proc_lookup(const char* rpath) {
             if (isstat) { g_proc_stat_pid = pv; return 6; }
             if (isstatus) { g_proc_stat_pid = pv; return 7; }
             if (iscmd) { g_proc_stat_pid = pv; return 9; }
+            int isio = (q[1]=='I'||q[1]=='i')&&(q[2]=='O'||q[2]=='o')&&!q[3];
+            if (isio) { g_proc_stat_pid = pv; return 10; }
         }
     }
     for (int k = 0; k < 5; k++) {
@@ -7041,6 +7046,7 @@ void syscall_handler(uint32_t* regs) {
             if (nr == SYS_WRITE) regs[2] = len;
             regs[7] = pipe_write(g_procs[g_cur_proc].out_pipe - 1,
                                  (const uint8_t*)(size_t)regs[1], len);
+            g_procs[g_cur_proc].io_w += regs[7];
             return;
         }
         if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used
@@ -7053,6 +7059,7 @@ void syscall_handler(uint32_t* regs) {
             if (!user_range_ok((const void*)(size_t)regs[1], len < room ? len : room)) n = 0;
             for (uint32_t i = 0; i < n; i++) op->out_buf[op->out_len + i] = (char)src[i];
             op->out_len += n;
+            op->io_w += n;
             regs[7] = len;   /* report full len; overflow silently capped */
             return;
         }
@@ -7066,15 +7073,23 @@ void syscall_handler(uint32_t* regs) {
             if (c == 0) break;
             kputc(c);
         }
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used) {
+            uint32_t iw = 0; volatile char* s2 = (volatile char*)(size_t)regs[4];
+            while (iw < 512 && s2[iw] && iw < (uint32_t)(g_user_base + 0x400000u - (uint32_t)(size_t)s2)) { iw++; }
+            g_procs[g_cur_proc].io_w += iw;
+        }
     } else if (nr == SYS_WRITE_LEN) {
         volatile char* s = (volatile char*)(size_t)regs[4];
         uint32_t len = regs[6];   /* ecx */
         uint32_t limit = g_user_base ? g_user_base + 0x400000u : 0;
         if (len > 65536) len = 65536;
+        uint32_t written = 0;
         for (uint32_t i = 0; i < len; i++) {
             if ((uint32_t)(size_t)(s + i) >= limit) break;
-            kputc(s[i]);
+            kputc(s[i]); written++;
         }
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+            g_procs[g_cur_proc].io_w += written;
     } else if (nr == SYS_GETCHAR) {
         if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used
             && g_procs[g_cur_proc].in_pipe) {
@@ -7159,6 +7174,8 @@ void syscall_handler(uint32_t* regs) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         ret = fd_read(&cur_fds()[fd], buf, len);
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used
+            && ret != 0xFFFFFFFFu) g_procs[g_cur_proc].io_r += ret;
     } else if (nr == SYS_CLOSE) {
         int fd = (int)regs[4];
         if (fd >= 0 && fd < MAX_FDS && cur_fds()[fd].used) {
