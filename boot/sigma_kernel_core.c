@@ -1532,6 +1532,25 @@ static int fat_name_eq(const uint8_t* e, const uint8_t want[11]) {
     return 1;
 }
 
+/* Dirent cluster field — spec layout:
+ *   FAT12/16: u16 cluster at bytes 26-27 (20-21 reserved)
+ *   FAT32:    high u16 at 20-21, low u16 at 26-27 */
+static uint32_t fat_dirent_cluster(int kind, const uint8_t* e) {
+    if (kind == 2)
+        return (((uint32_t)e[20] | ((uint32_t)e[21] << 8)) << 16)
+             | ((uint32_t)e[26] | ((uint32_t)e[27] << 8));
+    return (uint32_t)e[26] | ((uint32_t)e[27] << 8);
+}
+
+static void fat_dirent_set_cluster(int kind, uint8_t* e, uint32_t clus) {
+    if (kind == 2) {
+        e[20] = (uint8_t)(clus >> 16); e[21] = (uint8_t)(clus >> 24);
+        e[26] = (uint8_t)(clus & 0xFF); e[27] = (uint8_t)(clus >> 8);
+    } else {
+        e[26] = (uint8_t)(clus & 0xFF); e[27] = (uint8_t)(clus >> 8);
+    }
+}
+
 /* Read one FAT entry (cluster -> next cluster). fat12 or fat16. */
 static uint16_t fat_next_cluster(uint32_t fat_lba, int is_fat12, uint16_t cluster) {
     uint32_t byte_off = is_fat12 ? ((uint32_t)cluster + (cluster >> 1)) : ((uint32_t)cluster * 2);
@@ -1984,8 +2003,7 @@ static int fat_mkdir_impl(const char* name) {
     for (int i = 0; i < 32; i++) e[i] = 0;
     for (int i = 0; i < 11; i++) e[i] = want[i];
     e[11] = 0x10;                                 /* directory attr */
-    e[20] = (uint8_t)(clus & 0xFF); e[21] = (uint8_t)(clus >> 8);
-    if (kind == 2) { e[26] = (uint8_t)(clus >> 16); e[27] = (uint8_t)(clus >> 24); }
+    fat_dirent_set_cluster(kind, e, clus);
     if (fat_write_dirent(slot.lba, slot.off, e) != 0) return -6;
 
     /* initialise new cluster: "." and ".." entries, rest zero */
@@ -1997,14 +2015,12 @@ static int fat_mkdir_impl(const char* name) {
             /* "." entry */
             d[0] = '.'; for (int i = 1; i < 11; i++) d[i] = ' ';
             d[11] = 0x10;
-            d[20] = (uint8_t)(clus & 0xFF); d[21] = (uint8_t)(clus >> 8);
-            if (kind == 2) { d[26] = (uint8_t)(clus >> 16); d[27] = (uint8_t)(clus >> 24); }
+            fat_dirent_set_cluster(kind, d, clus);
             /* ".." entry at +32 */
             uint8_t* u = sec + 32;
             u[0] = '.'; u[1] = '.'; for (int i = 2; i < 11; i++) u[i] = ' ';
             u[11] = 0x10;
-            u[20] = (uint8_t)(parent_cluster & 0xFF); u[21] = (uint8_t)(parent_cluster >> 8);
-            if (kind == 2) { u[26] = (uint8_t)(parent_cluster >> 16); u[27] = (uint8_t)(parent_cluster >> 24); }
+            fat_dirent_set_cluster(kind, u, parent_cluster);
         }
         uint32_t lba = g_vol_data_lba + (clus - 2) * g_vol_spc + (uint32_t)s;
         int chunk = 1;
@@ -2105,8 +2121,7 @@ static void show_write(const char* args) {
     for (int i = 0; i < 32; i++) e[i] = 0;
     for (int i = 0; i < 11; i++) e[i] = want[i];
     e[11] = 0x20;
-    e[20] = (uint8_t)(clus & 0xFF); e[21] = (uint8_t)(clus >> 8);
-    if (kind == 2) { e[26] = (uint8_t)(clus >> 16); e[27] = (uint8_t)(clus >> 24); }
+    fat_dirent_set_cluster(kind, e, clus);
     e[28] = (uint8_t)(tlen & 0xFF); e[29] = (uint8_t)((tlen >> 8) & 0xFF);
     e[30] = (uint8_t)((tlen >> 16) & 0xFF); e[31] = (uint8_t)(tlen >> 24);
     if (fat_write_dirent(slot.lba, slot.off, e) != 0) {
@@ -2219,8 +2234,7 @@ static void show_rm(const char* args) {
     }
     uint8_t* e = g_file_buf + slot.off;
     if (e[11] & 0x10) { kputs("rm: is a directory (rmdir not implemented).\n"); return; }
-    uint32_t clus = (uint32_t)e[20] | ((uint32_t)e[21] << 8);
-    if (kind == 2) clus |= ((uint32_t)e[26] << 16) | ((uint32_t)e[27] << 24);
+    uint32_t clus = fat_dirent_cluster(kind, e);
 
     if (clus >= 2 && fat_free_chain(kind, clus) != 0) {
         kputs("rm: FAT update failed.\n"); return;
@@ -2273,8 +2287,7 @@ static void show_rmdir(const char* args) {
     }
     uint8_t* e = g_file_buf + slot.off;
     if (!(e[11] & 0x10)) { kputs("rmdir: not a directory (use rm).\n"); return; }
-    uint32_t clus = (uint32_t)e[20] | ((uint32_t)e[21] << 8);
-    if (kind == 2) clus |= ((uint32_t)e[26] << 16) | ((uint32_t)e[27] << 24);
+    uint32_t clus = fat_dirent_cluster(kind, e);
     if (clus < 2) { kputs("rmdir: bad cluster.\n"); return; }
 
     /* verify empty: walk the dir's cluster chain, allow only . .. 00 E5 0F */
@@ -2511,8 +2524,7 @@ static void show_cp(const char* args) {
     for (int i = 0; i < 32; i++) e[i] = 0;
     for (int i = 0; i < 11; i++) e[i] = want[i];
     e[11] = 0x20;
-    e[20] = (uint8_t)(first & 0xFF); e[21] = (uint8_t)(first >> 8);
-    if (kind == 2) { e[26] = (uint8_t)(first >> 16); e[27] = (uint8_t)(first >> 24); }
+    fat_dirent_set_cluster(kind, e, first);
     uint32_t sz = hit.size;
     e[28] = (uint8_t)(sz & 0xFF); e[29] = (uint8_t)((sz >> 8) & 0xFF);
     e[30] = (uint8_t)((sz >> 16) & 0xFF); e[31] = (uint8_t)(sz >> 24);
@@ -2569,8 +2581,7 @@ static void show_append(const char* args) {
     if (de[11] & 0x10) { kputs("append: is a directory.\n"); return; }
     uint32_t fsize = (uint32_t)de[28] | ((uint32_t)de[29] << 8)
                    | ((uint32_t)de[30] << 16) | ((uint32_t)de[31] << 24);
-    uint32_t clus = (uint32_t)de[20] | ((uint32_t)de[21] << 8);
-    if (kind == 2) clus |= ((uint32_t)de[26] << 16) | ((uint32_t)de[27] << 24);
+    uint32_t clus = fat_dirent_cluster(kind, de);
 
     uint32_t clus_bytes = (uint32_t)g_vol_spc * 512u;
 
@@ -2599,8 +2610,7 @@ static void show_append(const char* args) {
             if (fat_set_entry(kind, chain[ncl - 1], nc) != 0) { fail = 1; break; }
         } else {
             /* empty file: first cluster goes into dirent */
-            de[20] = (uint8_t)(nc & 0xFF); de[21] = (uint8_t)(nc >> 8);
-            if (kind == 2) { de[26] = (uint8_t)(nc >> 16); de[27] = (uint8_t)(nc >> 24); }
+            fat_dirent_set_cluster(kind, de, nc);
         }
         chain[ncl++] = nc;
         have_bytes += clus_bytes;
@@ -4274,8 +4284,7 @@ void syscall_handler(uint32_t* regs) {
         }
         uint8_t* e = g_file_buf + slot.off;
         if (e[11] & 0x10) { regs[7] = 0xFFFFFFFFu; return; }   /* dir */
-        uint32_t clus = (uint32_t)e[20] | ((uint32_t)e[21] << 8);
-        if (kind == 2) clus |= ((uint32_t)e[26] << 16) | ((uint32_t)e[27] << 24);
+        uint32_t clus = fat_dirent_cluster(kind, e);
         if (clus >= 2 && fat_free_chain(kind, clus) != 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
@@ -4339,8 +4348,7 @@ void syscall_handler(uint32_t* regs) {
         for (int i = 0; i < 32; i++) e[i] = 0;
         for (int i = 0; i < 11; i++) e[i] = want[i];
         e[11] = 0x20;                                /* archive */
-        e[20] = (uint8_t)(clus & 0xFF); e[21] = (uint8_t)(clus >> 8);
-        if (kind == 2) { e[26] = (uint8_t)(clus >> 16); e[27] = (uint8_t)(clus >> 24); }
+        fat_dirent_set_cluster(kind, e, clus);
         /* size field stays 0 — empty file */
         if (fat_write_dirent(slot.lba, slot.off, e) != 0) {
             regs[7] = 0xFFFFFFFFu; return;
@@ -4401,8 +4409,7 @@ void syscall_handler(uint32_t* regs) {
             }
             uint8_t* e = g_file_buf + slot.off;
             if (e[11] & 0x10) { regs[7] = 0xFFFFFFFFu; return; }
-            clus = (uint32_t)e[20] | ((uint32_t)e[21] << 8);
-            if (kind == 2) clus |= ((uint32_t)e[26] << 16) | ((uint32_t)e[27] << 24);
+            clus = fat_dirent_cluster(kind, e);
             if (clus >= 2) fat_free_chain(kind, clus);
             clus = fat_alloc_cluster(kind);
             if (!clus) { regs[7] = 0xFFFFFFFFu; return; }
@@ -4436,8 +4443,7 @@ void syscall_handler(uint32_t* regs) {
             for (int i = 0; i < 11; i++) de[i] = want[i];
             de[11] = 0x20;
         }
-        de[20] = (uint8_t)(clus & 0xFF); de[21] = (uint8_t)(clus >> 8);
-        if (kind == 2) { de[26] = (uint8_t)(clus >> 16); de[27] = (uint8_t)(clus >> 24); }
+        fat_dirent_set_cluster(kind, de, clus);
         de[28] = (uint8_t)(len & 0xFF); de[29] = (uint8_t)((len >> 8) & 0xFF);
         de[30] = (uint8_t)((len >> 16) & 0xFF); de[31] = (uint8_t)(len >> 24);
         if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
