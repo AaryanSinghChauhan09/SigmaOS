@@ -2809,6 +2809,19 @@ static void show_tail(const char* args) {
     kfree(buf);
 }
 
+/* seq <n> — print 1..n (bounded 10000). */
+static void show_seq(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: seq <n>\n"); return; }
+    uint32_t n = kstrtoul(p);
+    if (!n || n > 10000) { kputs("seq: 1..10000\n"); return; }
+    for (uint32_t i = 1; i <= n; i++) {
+        kprint_dec64(i);
+        kputc('\n');
+    }
+}
+
 /* wc <file> — line/word/byte counts (≤4KB file). */
 static void show_wc(const char* args) {
     const char* p = args;
@@ -3403,7 +3416,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
