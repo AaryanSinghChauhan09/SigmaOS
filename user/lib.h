@@ -36,6 +36,8 @@ enum {
     SYS_FORK = 37,
     SYS_EXEC = 38,
     SYS_WAITPID = 39,
+    SYS_SIGNAL = 40,
+    SYS_SIGRETURN = 41,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

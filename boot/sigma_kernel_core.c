@@ -290,6 +290,9 @@ struct proc {
     char     out_name[64];      /* '>'/'>>' target, empty = console */
     uint32_t out_len;           /* bytes captured in out_buf */
     char     out_buf[8192];     /* capture buffer, flushed on exit */
+    uint32_t handler[32];       /* signal handlers, 0 = default(terminate) */
+    int      pending_sig;       /* signal awaiting delivery at ctx switch */
+    uint32_t sig_eip, sig_cs, sig_eflags, sig_esp, sig_ss; /* interrupted frame */
     int      in_file;           /* '<' redirect active */
     uint32_t in_len, in_pos;    /* input buffer bounds/cursor */
     char     in_buf[8192];      /* '<' file content, ≤8KiB */
@@ -314,6 +317,7 @@ static int g_cur_proc = -1;
 static int  g_next_pid  = 1;
 static void sched_loop(int fg_idx);
 static int user_range_ok(const void* p, uint32_t len);
+static void proc_deliver_sig(struct proc* p);
 
 char kgetc(void) {
     while (1) {
@@ -4331,6 +4335,8 @@ static int proc_claim(uint32_t base, const char* name,
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
+    p->pending_sig = 0;
+    for (int si = 0; si < 32; si++) p->handler[si] = 0;
     p->pid = (uint32_t)g_next_pid++;
     p->base = base; p->pd = pd;
     p->entry = entry; p->esp0 = esp0;
@@ -4488,6 +4494,8 @@ static void proc_run(int idx) {
         p->started = 1;
         enter_user(p->entry, p->esp0);
     } else {
+        if (p->pending_sig) proc_deliver_sig(p);
+        if (p->killed) { p->used = 0; g_cur_proc = -1; return; }
         proc_load_ctx(p);
         __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
         resume_user();
@@ -4586,15 +4594,47 @@ static int proc_waitpid(uint32_t pid, uint32_t status_ptr) {
 }
 
 /* mark proc killed; if it's the running one, force exit on return */
-static int proc_kill(uint32_t pid) {
+static int proc_kill(uint32_t pid, int sig) {
+    if (sig <= 0 || sig > 31) sig = 9;
     for (int i = 0; i < MAX_PROCS; i++) {
-        if (g_procs[i].used && g_procs[i].pid == pid) {
-            g_procs[i].killed = 1;
+        if (!g_procs[i].used || g_procs[i].pid != pid) continue;
+        struct proc* t = &g_procs[i];
+        /* SIGKILL(9)/SIGSTOP(19) uncatchable; others need a handler */
+        if (sig == 9 || sig == 19 || !t->handler[sig]) {
+            t->killed = 1;
             if (g_cur_proc == i) g_user_dead = 1;
-            return 0;
+        } else {
+            t->pending_sig = sig;   /* delivered at next schedule-in */
         }
+        return 0;
     }
     return -1;
+}
+
+/* deliver pending signal: build trampoline in user scratch page and
+ * redirect the proc's resume frame to the handler. */
+static void proc_deliver_sig(struct proc* p) {
+    int sig = p->pending_sig;
+    p->pending_sig = 0;
+    uint32_t h = p->handler[sig & 31];
+    if (!h) { p->killed = 1; return; }
+    /* save interrupted frame for SIGRETURN */
+    p->sig_eip = p->eip; p->sig_cs = p->cs; p->sig_eflags = p->eflags;
+    p->sig_esp = p->esp; p->sig_ss = p->ss;
+    /* trampoline @ base+0x3FF000:
+     *   push sig ; mov eax,handler ; call eax ; add esp,4 ;
+     *   mov eax,SYS_SIGRETURN ; int 0x80 */
+    uint8_t* t = (uint8_t*)(size_t)(p->base + 0x3FF000u);
+    int o = 0;
+    t[o++] = 0x6A; t[o++] = (uint8_t)sig;                    /* push imm8 */
+    t[o++] = 0xB8; *(uint32_t*)(t + o) = h; o += 4;           /* mov eax,h */
+    t[o++] = 0xFF; t[o++] = 0xD0;                             /* call eax */
+    t[o++] = 0x83; t[o++] = 0xC4; t[o++] = 0x04;              /* add esp,4 */
+    t[o++] = 0xB8; *(uint32_t*)(t + o) = 41; o += 4;          /* mov eax,41 */
+    t[o++] = 0xCD; t[o++] = 0x80;                             /* int 0x80 */
+    p->eip    = p->base + 0x3FF000u;
+    p->esp    = p->base + 0x3FF800u;   /* fresh stack below trampoline */
+    p->cs     = 0x1B; p->ss = 0x23; p->eflags = 0x202;
 }
 
 static void sched_loop(int fg_idx) {
@@ -5539,7 +5579,7 @@ void kernel_shell(void) {
             while (*kp == ' ') kp++;
             uint32_t kpid = 0;
             while (*kp >= '0' && *kp <= '9') { kpid = kpid * 10 + (*kp - '0'); kp++; }
-            if (proc_kill(kpid) == 0) kputs("kill: sent\n");
+            if (proc_kill(kpid, 9) == 0) kputs("kill: sent\n");
             else kputs("kill: no such pid\n");
         } else if (kcmd_is(cmd, "wait")) {
             const char* wp = cmd + 4;
@@ -6105,6 +6145,8 @@ static void idt_init(void) {
 #define SYS_FORK     37 /* eax=child pid in parent, child resumes w/ eax=0; -1 err */
 #define SYS_EXEC     38 /* ebx=user path — replace proc image; never returns on success */
 #define SYS_WAITPID  39 /* ebx=pid(0=any), ecx=user u32* status — eax=pid/-1/-2(running) */
+#define SYS_SIGNAL   40 /* ebx=signo 1..31, ecx=handler addr (0=default) — eax=0/-1 */
+#define SYS_SIGRETURN 41 /* internal: restore interrupted frame after handler */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7181,7 +7223,7 @@ void syscall_handler(uint32_t* regs) {
                   ? g_procs[g_cur_proc].ppid : 0;
         return;
     } else if (nr == SYS_KILL) {
-        regs[7] = (uint32_t)proc_kill(regs[1]);
+        regs[7] = (uint32_t)proc_kill(regs[1], (int)regs[2]);
         return;
     } else if (nr == SYS_PIPE) {
         /* ebx -> user u32[2]; allocate pipe + two fds */
@@ -7268,6 +7310,26 @@ void syscall_handler(uint32_t* regs) {
         regs[7]  = 0;
         ep->entry = xentry; ep->esp0 = (uint32_t)(size_t)xsp;
         ep->started = 1;        /* ctx path irrelevant; frame patched directly */
+        return;
+    } else if (nr == SYS_SIGNAL) {
+        int sig = (int)regs[1];
+        if (g_cur_proc < 0 || sig < 1 || sig > 31 || sig == 9 || sig == 19) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        g_procs[g_cur_proc].handler[sig] = regs[2];
+        regs[7] = 0;
+        return;
+    } else if (nr == SYS_SIGRETURN) {
+        /* restore the frame saved at signal delivery */
+        if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS) {
+            struct proc* sp2 = &g_procs[g_cur_proc];
+            regs[8]  = sp2->sig_eip;
+            regs[9]  = sp2->sig_cs;
+            regs[10] = sp2->sig_eflags;
+            regs[11] = sp2->sig_esp;
+            regs[12] = sp2->sig_ss;
+        }
+        regs[7] = 0;
         return;
     } else if (nr == SYS_WAITPID) {
         regs[7] = (uint32_t)proc_waitpid(regs[1], regs[2]);
