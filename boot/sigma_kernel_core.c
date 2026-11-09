@@ -291,7 +291,8 @@ struct proc {
     uint32_t out_len;           /* bytes captured in out_buf */
     char     out_buf[8192];     /* capture buffer, flushed on exit */
     uint32_t handler[32];       /* signal handlers, 0 = default(terminate) */
-    int      pending_sig;       /* signal awaiting delivery at ctx switch */
+    uint32_t pending_mask;      /* bitmask of signals awaiting delivery */
+    uint32_t sig_mask;          /* blocked signals (sigprocmask) */
     uint32_t sig_eip, sig_cs, sig_eflags, sig_esp, sig_ss; /* interrupted frame */
     int      in_file;           /* '<' redirect active */
     uint32_t in_len, in_pos;    /* input buffer bounds/cursor */
@@ -4335,7 +4336,7 @@ static int proc_claim(uint32_t base, const char* name,
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
-    p->pending_sig = 0;
+    p->pending_mask = 0; p->sig_mask = 0;
     for (int si = 0; si < 32; si++) p->handler[si] = 0;
     p->pid = (uint32_t)g_next_pid++;
     p->base = base; p->pd = pd;
@@ -4494,7 +4495,7 @@ static void proc_run(int idx) {
         p->started = 1;
         enter_user(p->entry, p->esp0);
     } else {
-        if (p->pending_sig) proc_deliver_sig(p);
+        if (p->pending_mask) proc_deliver_sig(p);
         if (p->killed) { p->used = 0; g_cur_proc = -1; return; }
         proc_load_ctx(p);
         __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
@@ -4604,7 +4605,7 @@ static int proc_kill(uint32_t pid, int sig) {
             t->killed = 1;
             if (g_cur_proc == i) g_user_dead = 1;
         } else {
-            t->pending_sig = sig;   /* delivered at next schedule-in */
+            t->pending_mask |= (1u << sig);   /* delivered when unblocked */
         }
         return 0;
     }
@@ -4614,8 +4615,11 @@ static int proc_kill(uint32_t pid, int sig) {
 /* deliver pending signal: build trampoline in user scratch page and
  * redirect the proc's resume frame to the handler. */
 static void proc_deliver_sig(struct proc* p) {
-    int sig = p->pending_sig;
-    p->pending_sig = 0;
+    uint32_t avail = p->pending_mask & ~p->sig_mask;
+    if (!avail) return;
+    int sig = 0;
+    while (!((avail >> sig) & 1)) sig++;
+    p->pending_mask &= ~(1u << sig);
     uint32_t h = p->handler[sig & 31];
     if (!h) { p->killed = 1; return; }
     /* save interrupted frame for SIGRETURN */
@@ -6147,6 +6151,7 @@ static void idt_init(void) {
 #define SYS_WAITPID  39 /* ebx=pid(0=any), ecx=user u32* status — eax=pid/-1/-2(running) */
 #define SYS_SIGNAL   40 /* ebx=signo 1..31, ecx=handler addr (0=default) — eax=0/-1 */
 #define SYS_SIGRETURN 41 /* internal: restore interrupted frame after handler */
+#define SYS_SIGMASK   42 /* ebx=mask, ecx=how(0=block,1=unblock,2=set) — eax=old mask */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7358,6 +7363,16 @@ void syscall_handler(uint32_t* regs) {
         }
         g_procs[g_cur_proc].handler[sig] = regs[2];
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_SIGMASK) {
+        if (g_cur_proc < 0) { regs[7] = 0xFFFFFFFFu; return; }
+        struct proc* mp = &g_procs[g_cur_proc];
+        uint32_t old = mp->sig_mask;
+        uint32_t m = regs[1] & 0xFFFFFFFEu;   /* bits 1..31 */
+        if (regs[2] == 0)      mp->sig_mask |= m;
+        else if (regs[2] == 1) mp->sig_mask &= ~m;
+        else                   mp->sig_mask = m;
+        regs[7] = old;
         return;
     } else if (nr == SYS_SIGRETURN) {
         /* restore the frame saved at signal delivery */

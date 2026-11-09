@@ -38,6 +38,7 @@ enum {
     SYS_WAITPID = 39,
     SYS_SIGNAL = 40,
     SYS_SIGRETURN = 41,
+    SYS_SIGMASK = 42,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 
