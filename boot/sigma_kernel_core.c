@@ -346,6 +346,7 @@ static void show_gdt(void);
 static void idt_init(void);
 static void show_user(void);
 static void pic_init(void);
+static void pit_init(void);
 static void show_timer(void);
 static void show_memalloc(void);
 static uint32_t g_map_mb;
@@ -1692,6 +1693,7 @@ void kernel_main(uint32_t magic, void* mb_info) {
     paging_init();
     gdt_init();
     idt_init();
+    pit_init();
     pic_init();
     kputs("[kernel] Paging enabled: 4MiB-page identity map, ");
     kprint_dec64(g_map_mb);
@@ -2098,6 +2100,15 @@ void syscall_handler(uint32_t* regs) {
  * -------------------------------------------------------------------------- */
 static volatile uint32_t g_tick_count = 0;
 
+/* Program PIT channel 0 to HZ ticks/sec (default BIOS rate is ~18.2 Hz). */
+#define PIT_HZ 100u
+static void pit_init(void) {
+    uint16_t div = (uint16_t)(1193182u / PIT_HZ);   /* ~11932 for 100 Hz */
+    outb(0x43, 0x36);          /* ch0, lobyte/hibyte, mode 3 (square wave) */
+    outb(0x40, (uint8_t)(div & 0xFF));
+    outb(0x40, (uint8_t)(div >> 8));
+}
+
 static void pic_init(void) {
     /* ICW1: edge-triggered, cascade, ICW4 needed */
     outb(0x20, 0x11);
@@ -2139,13 +2150,13 @@ static int kbd_buf_pop(char* out) {
 
 void irq_handler(uint32_t* frame) {  /* non-static: called from irq_common_entry asm */
     uint32_t vec = frame[0];
-    if (vec == 32) { /* IRQ0: PIT timer ~18.2 Hz */
+    if (vec == 32) { /* IRQ0: PIT timer @ PIT_HZ */
         g_tick_count++;
-        if ((g_tick_count % 18) == 0) {
+        if ((g_tick_count % PIT_HZ) == 0) {
             kputs("\n[timer] tick=");
             kprint_dec64(g_tick_count);
             kputs(" (~");
-            kprint_dec64(g_tick_count / 18);
+            kprint_dec64(g_tick_count / PIT_HZ);
             kputs("s)\n");
         }
     } else if (vec == 33) {
@@ -2171,8 +2182,10 @@ static void show_timer(void) {
     kputs("Timer: PIT IRQ0 ticks=");
     kprint_dec64(g_tick_count);
     kputs(" (~");
-    kprint_dec64(g_tick_count / 18);
-    kputs("s @18.2Hz)\n");
+    kprint_dec64(g_tick_count / PIT_HZ);
+    kputs("s @");
+    kprint_dec64(PIT_HZ);
+    kputs("Hz)\n");
 }
 
 /* --------------------------------------------------------------------------
