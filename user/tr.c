@@ -6,8 +6,36 @@
  * SYS_OPEN=4 SYS_READ=5 SYS_CLOSE=6 SYS_WRITE_LEN=8 SYS_EXIT=0 */
 #include "lib.h"
 
+/* set supports ranges: "a-z" matches any char in [a,z]; "-" literal at ends */
 static int in_set(const char* set, char c) {
-    for (const char* p = set; *p; p++) if (*p == c) return 1;
+    for (const char* p = set; *p; p++) {
+        if (p[1] == '-' && p[2] && p[2] != '-') {
+            char lo = *p, hi = p[2];
+            if (c >= lo && c <= hi) return 1;
+            p += 2;
+        } else if (*p == c) return 1;
+    }
+    return 0;
+}
+static int set_len(const char* set) {
+    int n = 0;
+    for (const char* p = set; *p; p++) {
+        if (p[1] == '-' && p[2] && p[2] != '-') { n += (unsigned char)p[2] - (unsigned char)*p + 1; p += 2; }
+        else n++;
+    }
+    return n;
+}
+static char set_at(const char* set, int idx) {
+    for (const char* p = set; *p; p++) {
+        if (p[1] == '-' && p[2] && p[2] != '-') {
+            int cnt = (unsigned char)p[2] - (unsigned char)*p + 1;
+            if (idx < cnt) return (char)((unsigned char)*p + idx);
+            idx -= cnt; p += 2;
+        } else {
+            if (idx == 0) return *p;
+            idx--;
+        }
+    }
     return 0;
 }
 
@@ -36,10 +64,15 @@ void _start(void) {
             if (del && in_set(set, c)) continue;
             if (sqz && in_set(set, c) && c == last) continue;
             if (trans) {
-                int idx = 0;
-                while (set[idx]) {
-                    if (set[idx] == c) { c = toset[idx] ? toset[idx] : toset[0]; break; }
-                    idx++;
+                /* map through expanded sets; toset shorter => repeat last char */
+                int slen = set_len(set), tlen = set_len(toset);
+                if (tlen == 0) tlen = 1;
+                for (int k = 0; k < slen; k++) {
+                    if (set_at(set, k) == c) {
+                        int ti = k < tlen ? k : tlen - 1;
+                        c = set_at(toset, ti);
+                        break;
+                    }
                 }
             }
             last = c;
