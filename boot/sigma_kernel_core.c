@@ -355,6 +355,11 @@ static void enter_user(uint32_t eip, uint32_t esp);
 static uint32_t g_user_base;
 static uint32_t g_page_dir[1024];
 static uint32_t g_map_mb;
+/* Process-exit support: enter_user saves the kernel return context here;
+ * SYS_EXIT sets g_user_dead and syscall_entry irets back to kernel. */
+int      g_user_dead   = 0;
+uint32_t g_resume_eip  = 0;
+uint32_t g_resume_esp  = 0;
 
 #define MBI_FLAGS       0
 #define MBI_MEM_LOWER   4
@@ -1604,7 +1609,9 @@ static void show_exec(const char* args) {
     sp[3] = 0;                                /* argv terminator */
     sp[4] = 0;                                /* envp terminator */
 
+    g_user_dead = 0;
     enter_user(g_user_base + EXEC_LOAD_OFF, (uint32_t)(size_t)sp);
+    kputs("exec: program exited, back in kernel shell\n");
 }
 
 static void show_disk(void) {
@@ -2119,6 +2126,20 @@ __asm__(
     "    call syscall_handler\n"
     "    addl $4, %esp\n"
     "    popal\n"
+    /* If the user program exited, discard the user iret frame (5 dwords)
+     * and return to the saved kernel context instead. */
+    "    cmpl $0, g_user_dead\n"
+    "    je 1f\n"
+    "    addl $20, %esp\n"
+    "    pushl $0x10\n"               /* kernel data selector */
+    "    movl g_resume_esp, %eax\n"
+    "    pushl %eax\n"
+    "    pushl $0x202\n"              /* eflags: IF=1 */
+    "    pushl $0x08\n"               /* kernel code selector */
+    "    movl g_resume_eip, %eax\n"
+    "    pushl %eax\n"
+    "    iret\n"
+    "1:\n"
     "    iret\n"
     /* catch-all for unhandled vectors 48-255 */
     ".globl isr_spurious\n"
@@ -2360,6 +2381,7 @@ void syscall_handler(uint32_t* regs) {
         ret = g_tick_count;
     } else if (nr == SYS_EXIT) {
         kputs("\n[user] exit syscall\n");
+        g_user_dead = 1;   /* syscall_entry will iret back to kernel */
     } else if (nr == SYS_OPEN) {
         volatile char* up = (volatile char*)(size_t)regs[4];
         char path[256];
@@ -2678,9 +2700,14 @@ static uint32_t find_user_region(void) {
 
 /* naked: build iret frame and drop to ring 3.
  * i386 cdecl: [esp]=ret [esp+4]=eip [esp+8]=user_esp at entry. */
-__attribute__((section(".text"), naked, noreturn))
+__attribute__((section(".text"), naked))
 static void enter_user(uint32_t eip, uint32_t esp) {
     __asm__ volatile(
+        "movl (%%esp), %%eax\n"       /* return address -> resume eip */
+        "movl %%eax, g_resume_eip\n"
+        "movl %%esp, %%eax\n"
+        "addl $4, %%eax\n"            /* caller esp after ret -> resume esp */
+        "movl %%eax, g_resume_esp\n"
         "movl 8(%%esp), %%eax\n"     /* user esp arg */
         "movl 4(%%esp), %%ecx\n"     /* user eip arg */
         "pushl $0x23\n"            /* user data selector | RPL3 */
@@ -2732,8 +2759,9 @@ static void show_user(void) {
     }
     uint32_t uesp = g_user_base + 0x80000; /* 512KiB into the region */
     kputs("user: dropping to ring 3 (cs=0x1B ss=0x23)...\n");
+    g_user_dead = 0;
     enter_user(g_user_base, uesp);
-    /* never returns — user int3 raises #BP which prints the fault frame */
+    kputs("user: returned to kernel (exit or int3 handled)\n");
 }
 
 __attribute__((section(".text"), naked))
