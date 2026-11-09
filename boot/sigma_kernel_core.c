@@ -332,6 +332,9 @@ static int fat_lookup(int kind, uint32_t root_clus, uint32_t root_lba, uint32_t 
                       const char* path, struct fat_hit* hit);
 static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
                             uint32_t data_lba, uint8_t spc);
+#define MAP_SIZE_MB   16
+static void paging_init(void);
+static void show_paging(void);
 
 #define MBI_FLAGS       0
 #define MBI_MEM_LOWER   4
@@ -1586,6 +1589,7 @@ void kernel_shell(void) {
             kputs("  ls      - List FAT12/16/32 root directory\n");
             kputs("  cat     - Print file: cat <name>\n");
             kputs("  info    - System summary\n");
+            kputs("  paging  - Show paging/CR state\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -1621,6 +1625,8 @@ void kernel_shell(void) {
             show_cat(cmd + 3);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
+        } else if (kstrcmp(cmd, "paging") == 0) {
+            show_paging();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
@@ -1657,6 +1663,11 @@ void kernel_main(uint32_t magic, void* mb_info) {
 
     show_banner();
 
+    paging_init();
+    kputs("[kernel] Paging enabled: identity map 0-");
+    kprint_dec64(MAP_SIZE_MB);
+    kputs(" MiB.\n");
+
     kputs("[kernel] Multiboot header validated.\n");
     kputs("[kernel] VGA console initialized at 0xB8000.\n");
     kputs("[kernel] Serial COM1 initialized at 115200 8N1.\n");
@@ -1669,6 +1680,62 @@ void kernel_main(uint32_t magic, void* mb_info) {
 /* --------------------------------------------------------------------------
  * Assembly Entry (sets up stack and calls kernel_main)
  * -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+ * Paging — identity-map first 16 MiB, enable CR0.PG
+ * Each page table covers 4 MiB; 4 tables cover 16 MiB.
+ * Kernel sits at 1 MiB; VGA text buffer (0xB8000) and low MMIO are included.
+ * -------------------------------------------------------------------------- */
+#define PT_COUNT      (MAP_SIZE_MB / 4)
+#define PTE_PRESENT   0x001u
+#define PTE_RW        0x002u
+#define PTE_USER      0x004u
+#define PTE_PS        0x080u
+
+static uint32_t g_page_dir[1024] __attribute__((aligned(4096), section(".bss")));
+static uint32_t g_page_tables[PT_COUNT][1024] __attribute__((aligned(4096), section(".bss")));
+
+static void paging_init(void) {
+    /* BSS is not zeroed by the loader — clear structures explicitly. */
+    for (uint32_t i = 0; i < 1024; i++) g_page_dir[i] = 0;
+    /* Build identity map: virt == phys for [0, MAP_SIZE_MB) */
+    for (uint32_t i = 0; i < PT_COUNT; i++) {
+        for (uint32_t j = 0; j < 1024; j++) {
+            uint32_t pa = (i * 1024 + j) * 4096u;
+            g_page_tables[i][j] = pa | PTE_PRESENT | PTE_RW;
+        }
+        g_page_dir[i] = (uint32_t)(size_t)&g_page_tables[i][0] | PTE_PRESENT | PTE_RW;
+    }
+    /* Kernel is identity-mapped pre-paging, so &g_page_dir is its physical addr. */
+    uint32_t pd_phys = (uint32_t)(size_t)&g_page_dir[0];
+
+    __asm__ volatile(
+        "movl %0, %%cr3\n"
+        "movl %%cr0, %%eax\n"
+        "orl $0x80000000, %%eax\n"   /* PG */
+        "movl %%eax, %%cr0\n"
+        "movl %%cr3, %%eax\n"
+        "movl %%eax, %%cr3\n"        /* TLB flush */
+        :: "r"(pd_phys) : "eax", "memory");
+}
+
+static void show_paging(void) {
+    uint32_t cr0, cr3, cr4;
+    __asm__ volatile("movl %%cr0, %0" : "=r"(cr0));
+    __asm__ volatile("movl %%cr3, %0" : "=r"(cr3));
+    __asm__ volatile("movl %%cr4, %0" : "=r"(cr4));
+    kputs("Paging: CR0.PG=");
+    kputs((cr0 & 0x80000000u) ? "on" : "off");
+    kputs(" CR0.WP=");
+    kputs((cr0 & 0x00010000u) ? "on" : "off");
+    kputs(" CR4.PAE=");
+    kputs((cr4 & 0x20u) ? "on" : "off");
+    kputs("\nCR3=");
+    kprint_hex32(cr3);
+    kputs(" (identity map 0-");
+    kprint_dec64(MAP_SIZE_MB);
+    kputs(" MiB)\n");
+}
+
 __attribute__((section(".text"), naked))
 void _start(void) {
     __asm__ volatile (
