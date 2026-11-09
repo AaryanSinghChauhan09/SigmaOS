@@ -391,11 +391,30 @@ static void show_exec(const char* args);
 static int fat_ensure_mounted(void);
 static void* kmalloc(uint32_t size);
 static void kfree(void* ptr);
+static uint32_t pmm_alloc(void);
 void resume_user(void);   /* naked asm: restore preempted user ctx */
 static uint32_t find_user_region(void);
 static void enter_user(uint32_t eip, uint32_t esp);
 static uint32_t g_user_base;
-static uint32_t g_page_dir[1024];
+static uint32_t g_user_pd;   /* phys addr of user page directory, 0 = none */
+static uint32_t g_page_dir[1024] __attribute__((aligned(4096), section(".bss")));
+
+/* Build the user page directory: a copy of the kernel PD in which ONLY
+ * the user region's PDE is user-accessible; all other RAM stays
+ * supervisor so ring-3 code faults on kernel/foreign memory. */
+static int user_pd_setup(void) {
+    if (g_user_pd) return 0;
+    if (!g_user_base) return -1;
+    uint32_t pd = pmm_alloc();
+    if (!pd) return -1;
+    uint32_t* dst = (uint32_t*)(size_t)pd;
+    for (int i = 0; i < 1024; i++) dst[i] = g_page_dir[i] & ~0x4u;
+    dst[g_user_base >> 22] |= 0x4u;
+    g_user_pd = pd;
+    /* cr3 reload flushes TLB so U/S changes take effect */
+    __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
+    return 0;
+}
 static uint32_t g_map_mb;
 /* Process-exit support: enter_user saves the kernel return context here;
  * SYS_EXIT sets g_user_dead and syscall_entry irets back to kernel. */
@@ -1914,6 +1933,7 @@ static void show_exec(const char* args) {
     sp[3] = 0;                                /* argv terminator */
     sp[4] = 0;                                /* envp terminator */
 
+    if (user_pd_setup() != 0) { kputs("exec: page dir alloc failed.\n"); return; }
     g_user_dead = 0;
     g_preempt_pending = 0;
     g_user_active = 1;
@@ -2201,8 +2221,6 @@ void kernel_main(uint32_t magic, void* mb_info) {
 #define PTE_PRESENT   0x001u
 #define PTE_RW        0x002u
 #define PDE_PS        0x080u   /* page size: 4 MiB when set in a PDE */
-
-static uint32_t g_page_dir[1024] __attribute__((aligned(4096), section(".bss")));
 
 static uint32_t paging_map_mb(void) {
     /* Total RAM in MiB from Multiboot info; clamp to sane bounds. */
@@ -3225,6 +3243,11 @@ static void enter_user(uint32_t eip, uint32_t esp) {
         "pushl $0x202\n"           /* eflags: IF=1 */
         "pushl $0x1B\n"            /* user code selector | RPL3 */
         "pushl %%ecx\n"
+        "movl g_user_pd, %%eax\n"  /* switch to user page directory */
+        "testl %%eax, %%eax\n"
+        "jz 1f\n"
+        "movl %%eax, %%cr3\n"
+        "1:\n"
         "iret\n"
         ::: "eax", "ecx", "memory");
 }
@@ -3268,6 +3291,7 @@ static void show_user(void) {
         kputs(" marked U/S\n");
     }
     uint32_t uesp = g_user_base + 0x80000; /* 512KiB into the region */
+    if (user_pd_setup() != 0) { kputs("user: page dir alloc failed.\n"); return; }
     kputs("user: dropping to ring 3 (cs=0x1B ss=0x23)...\n");
     g_user_dead = 0;
     g_preempt_pending = 0;
