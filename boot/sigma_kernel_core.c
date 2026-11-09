@@ -1315,12 +1315,16 @@ static void show_df(void) {
 }
 
 static int g_ls_long;
+static int g_ls_all;
 
 /* shared dirent printer: normal "<DIR>/size" or `ls -l` long format
  * (attr, write date/time, cluster, size). kind: 0/1/2 FAT kind. */
 static void ls_print_dirent(int kind, const uint8_t* e, int use_lfn,
                             struct lfn_acc* lfn) {
     uint8_t attr = e[11];
+    if (!g_ls_all && e[0] == '.' && (e[1] == ' ' || e[1] == '.')) {
+        lfn_acc_reset(lfn); return;
+    }
     if (!g_ls_long) {
         kputs("  ");
         if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
@@ -1364,11 +1368,15 @@ static void show_ls(const char* args) {
     char dirname[64];
     dirname[0] = '\0';
     const char* p = args;
-    g_ls_long = 0;
+    g_ls_long = 0; g_ls_all = 0;
     while (*p == ' ') p++;
-    if (p[0] == '-' && p[1] == 'l' && (p[2] == 0 || p[2] == ' ')) {
-        g_ls_long = 1;
-        p += 2;
+    while (*p == '-') {
+        p++;
+        while (*p && *p != ' ') {
+            if (*p == 'l') g_ls_long = 1;
+            else if (*p == 'a') g_ls_all = 1;
+            p++;
+        }
         while (*p == ' ') p++;
     }
     if (kprefix(p, "lba:")) {
