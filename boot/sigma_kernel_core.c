@@ -2311,64 +2311,110 @@ static void show_rmdir(const char* args) {
 
 /* mv <old> <new> — rename within the current directory by rewriting the
  * dirent's 8.3 name field. Cross-directory moves are not yet supported. */
+/* resolve a directory path to (in_root, dir_cluster) for dir-slot scans.
+ * parent "" means cwd; "/" or resolved root means in_root=1. */
+static int dir_target(const char* parent, int* in_root, uint32_t* dir_cluster) {
+    char rpath[160];
+    if (fs_resolve(parent, rpath, (int)sizeof rpath) != 0) return -1;
+    if (rpath[0] == 0 || (rpath[0] == '/' && rpath[1] == 0)) {
+        *in_root = 1; *dir_cluster = 0; return 0;
+    }
+    int kind = g_vol_kind;
+    struct fat_hit hit;
+    int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                        g_vol_fat_lba, g_vol_data_lba, g_vol_spc, rpath, &hit);
+    if (lr <= 0 || !hit.is_dir) return -1;
+    *in_root = 0; *dir_cluster = hit.cluster;
+    return 0;
+}
+
+/* split "dir/name" or "name" -> parent path + basename; returns basename ptr */
+static const char* split_parent(const char* arg, char* parent, int psize) {
+    const char* slash = 0;
+    for (const char* q = arg; *q; q++) if (*q == '/') slash = q;
+    if (!slash) { parent[0] = 0; return arg; }
+    int pl = (int)(slash - arg);
+    if (pl >= psize) pl = psize - 1;
+    for (int i = 0; i < pl; i++) parent[i] = arg[i];
+    parent[pl] = 0;
+    return slash + 1;
+}
+
 static void show_mv(const char* args) {
-    char old[64], newn[64];
+    char oldbuf[160], newbuf[160];
     int oi = 0, ni = 0;
     const char* p = args;
     while (*p == ' ') p++;
-    while (*p && *p != ' ' && oi < 63) old[oi++] = *p++;
-    old[oi] = 0;
+    while (*p && *p != ' ' && oi < 159) oldbuf[oi++] = *p++;
+    oldbuf[oi] = 0;
     while (*p == ' ') p++;
-    while (*p && *p != ' ' && ni < 63) newn[ni++] = *p++;
-    newn[ni] = 0;
+    while (*p && *p != ' ' && ni < 159) newbuf[ni++] = *p++;
+    newbuf[ni] = 0;
     if (!oi || !ni) { kputs("usage: mv <old> <new>\n"); return; }
-    if (kstrlen(newn) > 12) { kputs("mv: new name too long (8.3 only).\n"); return; }
 
     if (fat_ensure_mounted() != 0) { kputs("mv: no FAT volume.\n"); return; }
     int kind = g_vol_kind;
 
-    int in_root = 1;
-    uint32_t dir_cluster = 0;
-    if (g_cwd[0]) {
-        struct fat_hit hit;
-        int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
-                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &hit);
-        if (lr <= 0 || !hit.is_dir) { kputs("mv: cwd not a directory.\n"); return; }
-        in_root = 0;
-        dir_cluster = hit.cluster;
-    }
+    char opar[160], npar[160];
+    const char* oname = split_parent(oldbuf, opar, (int)sizeof opar);
+    const char* nname = split_parent(newbuf, npar, (int)sizeof npar);
+    if (kstrlen(nname) > 12) { kputs("mv: new name too long (8.3 only).\n"); return; }
+
+    int o_root, n_root;
+    uint32_t o_dir = 0, n_dir = 0;
+    if (dir_target(opar, &o_root, &o_dir) != 0) { kputs("mv: bad source dir.\n"); return; }
+    if (dir_target(npar, &n_root, &n_dir) != 0) { kputs("mv: bad target dir.\n"); return; }
 
     uint8_t want_old[11], want_new[11];
-    fat_name_to_83(old, want_old);
-    fat_name_to_83(newn, want_new);
-    if (fat_name_eq(want_old, want_new)) { kputs("mv: same name.\n"); return; }
+    fat_name_to_83(oname, want_old);
+    fat_name_to_83(nname, want_new);
+    if (fat_name_eq(want_old, want_new) && o_root == n_root && o_dir == n_dir) {
+        kputs("mv: same name.\n"); return;
+    }
 
-    /* collision check for the new name */
+    /* collision check in target dir */
     struct slot_res chk;
-    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
-                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+    fat_find_dir_slot(kind, n_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, n_dir, g_vol_fat_lba,
                       g_vol_data_lba, g_vol_spc, want_new, &chk);
     if (chk.status == -1) { kputs("mv: target name exists.\n"); return; }
 
-    /* locate old dirent */
+    /* locate source dirent */
     struct slot_res slot;
-    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
-                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+    fat_find_dir_slot(kind, o_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, o_dir, g_vol_fat_lba,
                       g_vol_data_lba, g_vol_spc, want_old, &slot);
     if (slot.status != -1) { kputs("mv: not found.\n"); return; }
 
     if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
         kputs("mv: read error.\n"); return;
     }
-    for (int i = 0; i < 11; i++) g_file_buf[slot.off + i] = want_new[i];
-    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
-        kputs("mv: write failed.\n"); return;
+
+    if (o_root == n_root && o_dir == n_dir) {
+        /* same dir: rename in place */
+        for (int i = 0; i < 11; i++) g_file_buf[slot.off + i] = want_new[i];
+        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+            kputs("mv: write failed.\n"); return;
+        }
+    } else {
+        /* cross-dir: copy 32-byte dirent to a free slot in target dir */
+        if (chk.status != 1) { kputs("mv: target dir full or IO error.\n"); return; }
+        uint8_t e[32];
+        for (int i = 0; i < 32; i++) e[i] = g_file_buf[slot.off + i];
+        for (int i = 0; i < 11; i++) e[i] = want_new[i];
+        if (fat_write_dirent(chk.lba, chk.off, e) != 0) {
+            kputs("mv: dirent write failed.\n"); return;
+        }
+        /* mark source deleted */
+        g_file_buf[slot.off] = 0xE5;
+        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+            kputs("mv: source delete failed.\n"); return;
+        }
     }
-    kputs("mv: /");
-    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
-    kputs(old);
+    kputs("mv: ");
+    kputs(oldbuf);
     kputs(" -> ");
-    kputs(newn);
+    kputs(newbuf);
     kputs("\n");
 }
 
