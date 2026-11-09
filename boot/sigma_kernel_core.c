@@ -3309,6 +3309,220 @@ static void show_history(void) {
 }
 
 /* --------------------------------------------------------------------------
+ * Tab completion — command names + filenames in cwd.
+ * -------------------------------------------------------------------------- */
+static const char* const g_cmd_names[] = {
+    "help","status","craft","distro","mem","modules","cmdline","date",
+    "cpu","pci","disk","read","part","fs","ls","cat","cd","pwd","df",
+    "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
+    "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
+    "sched","ps","dmesg","memalloc","history","clear","reboot","halt",
+    "fastfetch","whoami","uname",
+    "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
+};
+#define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
+
+/* 8.3 dirent -> "NAME.EXT" string (uppercase, space-trimmed). */
+static int fat_83_str(const uint8_t* e, char* out) {
+    int o = 0;
+    for (int i = 0; i < 8; i++) {
+        char c = (char)e[i];
+        if (c == ' ') break;
+        out[o++] = (c >= 'a' && c <= 'z') ? (char)(c - 32) : c;
+    }
+    int has_ext = 0;
+    for (int i = 8; i < 11; i++) if (e[i] != ' ') { has_ext = 1; break; }
+    if (has_ext) {
+        out[o++] = '.';
+        for (int i = 8; i < 11; i++) {
+            char c = (char)e[i];
+            if (c == ' ') break;
+            out[o++] = (c >= 'a' && c <= 'z') ? (char)(c - 32) : c;
+        }
+    }
+    out[o] = 0;
+    return o;
+}
+
+/* case-insensitive prefix match */
+static int tab_prefix_match(const char* name, const char* prefix, int plen) {
+    for (int i = 0; i < plen; i++) {
+        char a = name[i], b = prefix[i];
+        if (a >= 'A' && a <= 'Z') a += 32;
+        if (b >= 'A' && b <= 'Z') b += 32;
+        if (a != b || !name[i]) return 0;
+    }
+    return 1;
+}
+
+/* scan current directory; collect names matching prefix into matches[][48].
+ * Returns count (<=maxm). Uses g_fs_buf; safe to call from shell loop. */
+static int tab_file_matches(const char* prefix, int plen,
+                            char matches[][48], int maxm) {
+    if (fat_ensure_mounted() != 0) return 0;
+    int kind = g_vol_kind;
+    int n = 0;
+
+    /* determine directory to scan */
+    int is_root16 = (kind != 2 && g_cwd[0] == 0);
+    uint32_t scan_clus = 0;
+    if (!is_root16) {
+        if (kind == 2 && g_cwd[0] == 0) {
+            /* FAT32 root = cluster chain from volume root cluster */
+            scan_clus = g_vol_root_clus;
+        } else {
+            struct fat_hit hit;
+            int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                                g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                                g_vol_spc, g_cwd, &hit);
+            if (lr <= 0 || !hit.is_dir) return 0;
+            scan_clus = hit.cluster;
+        }
+    }
+
+    struct lfn_acc lfn;
+    lfn_acc_reset(&lfn);
+
+    /* iterate directory sectors: fixed root region or cluster chain */
+    for (int pass = 0; pass < 2 && n < maxm; pass++) {
+        if (pass == 0 && is_root16) {
+            /* FAT12/16 root: fixed sector region */
+            uint32_t secs = g_vol_root_secs > 8 ? 8 : g_vol_root_secs;
+            uint32_t done = 0;
+            while (done < secs) {
+                int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
+                if (ata_read_lba28(0x1F0, 0, g_vol_root_lba + done,
+                                   g_fs_buf + done * 512, chunk) < 0) return n;
+                done += (uint32_t)chunk;
+            }
+            for (uint32_t i = 0; i < done * 16 && n < maxm; i++) {
+                uint8_t* e = g_fs_buf + i * 32;
+                if (e[0] == 0x00) goto root16_done;
+                if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+                if (lfn_acc_feed(&lfn, e)) continue;
+                int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
+                char nm[48]; int nl = 0;
+                if (use_lfn) { for (int j = 0; j < 47 && lfn.name[j]; j++) nm[j] = lfn.name[j], nl = j + 1; }
+                else nl = fat_83_str(e, nm);
+                nm[nl] = 0;
+                lfn_acc_reset(&lfn);
+                if (nl == 0 || (nm[0] == '.' && (nm[1] == 0 || (nm[1] == '.' && nm[2] == 0)))) continue;
+                if (tab_prefix_match(nm, prefix, plen) && n < maxm) {
+                    for (int j = 0; j <= nl && j < 47; j++) matches[n][j] = nm[j];
+                    matches[n][nl < 47 ? nl : 47] = 0;
+                    n++;
+                }
+            }
+        root16_done:;
+        } else {
+            /* cluster chain scan (subdir or FAT32 root) */
+            uint32_t clus = scan_clus;
+            int guard = 0;
+            while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 64 && n < maxm) {
+                uint32_t clus_lba = g_vol_data_lba + (clus - 2) * g_vol_spc;
+                uint32_t secs = g_vol_spc > 8 ? 8 : g_vol_spc;
+                uint32_t done = 0;
+                while (done < secs) {
+                    int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
+                    if (ata_read_lba28(0x1F0, 0, clus_lba + done,
+                                       g_fs_buf + done * 512, chunk) < 0) return n;
+                    done += (uint32_t)chunk;
+                }
+                int stop = 0;
+                for (uint32_t i = 0; i < done * 16 && n < maxm; i++) {
+                    uint8_t* e = g_fs_buf + i * 32;
+                    if (e[0] == 0x00) { stop = 1; break; }
+                    if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+                    if (lfn_acc_feed(&lfn, e)) continue;
+                    int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
+                    char nm[48]; int nl = 0;
+                    if (use_lfn) { for (int j = 0; j < 47 && lfn.name[j]; j++) nm[j] = lfn.name[j], nl = j + 1; }
+                    else nl = fat_83_str(e, nm);
+                    nm[nl] = 0;
+                    lfn_acc_reset(&lfn);
+                    if (nl == 0 || (nm[0] == '.' && (nm[1] == 0 || (nm[1] == '.' && nm[2] == 0)))) continue;
+                    if (tab_prefix_match(nm, prefix, plen) && n < maxm) {
+                        for (int j = 0; j <= nl && j < 47; j++) matches[n][j] = nm[j];
+                        matches[n][nl < 47 ? nl : 47] = 0;
+                        n++;
+                    }
+                }
+                if (stop) break;
+                clus = fat_next_any(g_vol_fat_lba, kind, clus);
+            }
+        }
+        break;   /* single pass covers the directory */
+    }
+    return n;
+}
+
+/* erase `cnt` chars visually (backspaces) */
+static void tab_erase(int cnt) {
+    for (int i = 0; i < cnt; i++) kputc('\b');
+}
+
+/* TAB handler: complete word at end of cmd[0..len). Returns new len. */
+static int tab_complete(char* cmd, int len) {
+    /* find start of last word */
+    int ws = len;
+    while (ws > 0 && cmd[ws - 1] != ' ') ws--;
+    int plen = len - ws;
+    char prefix[48];
+    if (plen > 47) plen = 47;
+    for (int i = 0; i < plen; i++) prefix[i] = cmd[ws + i];
+    prefix[plen] = 0;
+    if (plen == 0) return len;
+
+    char matches[16][48];
+    int nm = 0;
+
+    if (ws == 0) {
+        /* command completion */
+        for (size_t i = 0; i < NUM_CMDS && nm < 16; i++) {
+            if (tab_prefix_match(g_cmd_names[i], prefix, plen)) {
+                int l = kstrlen(g_cmd_names[i]);
+                for (int j = 0; j <= l && j < 47; j++) matches[nm][j] = g_cmd_names[i][j];
+                nm++;
+            }
+        }
+    } else {
+        nm = tab_file_matches(prefix, plen, matches, 16);
+    }
+    if (nm == 0) { kputc('\t'); kputc('\a'); return len; }
+
+    /* longest common prefix of matches */
+    int lcp = 47;
+    for (int m = 1; m < nm && lcp > 0; m++) {
+        int j = 0;
+        while (j < lcp && matches[0][j] && matches[0][j] == matches[m][j]) j++;
+        lcp = j;
+    }
+    /* replace word with lcp (or full name if unique) */
+    int newlen = lcp;
+    if (nm == 1) newlen = kstrlen(matches[0]);
+    if (newlen > plen) {
+        /* erase typed word, retype completed word */
+        tab_erase(plen);
+        for (int i = 0; i < newlen; i++) kputc(matches[0][i]);
+        char tmp[160];
+        int tl = 0;
+        for (int i = 0; i < ws; i++) tmp[tl++] = cmd[i];
+        for (int i = 0; i < newlen; i++) tmp[tl++] = matches[0][i];
+        tmp[tl] = 0;
+        for (int i = 0; i <= tl; i++) cmd[i] = tmp[i];
+        return tl;
+    }
+    /* ambiguous: list matches */
+    kputs("\n");
+    for (int m = 0; m < nm; m++) { kputs("  "); kputs(matches[m]); kputs("\n"); }
+    kputs("sigmaos:");
+    if (g_cwd[0]) { kputs("/"); kputs(g_cwd); }
+    kputs("# ");
+    for (int i = 0; i < len; i++) kputc(cmd[i]);
+    return len;
+}
+
+/* --------------------------------------------------------------------------
  * Interactive Shell REPL
  * -------------------------------------------------------------------------- */
 void kernel_shell(void) {
@@ -3342,6 +3556,9 @@ void kernel_shell(void) {
             } else if (c == 23) {          /* Ctrl+W: delete word */
                 while (len > 0 && cmd[len-1] == ' ') { len--; kputc('\b'); }
                 while (len > 0 && cmd[len-1] != ' ') { len--; kputc('\b'); }
+            } else if (c == 9) {           /* TAB: completion */
+                len = (size_t)tab_complete(cmd, (int)len);
+                cmd[len] = 0;
             } else if (c == 3) {           /* Ctrl+C: cancel line */
                 while (len > 0) { len--; kputc('\b'); }
                 kputs("^C\n");
