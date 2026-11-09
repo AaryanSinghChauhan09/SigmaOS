@@ -6196,7 +6196,7 @@ static void idt_init(void) {
 #define SYS_GETPGID  48 /* ebx=pid(0=self) -> eax=pgid/-1 */
 #define SYS_SETPGID  49 /* ebx=pid(0=self), ecx=pgid(0=new group=pid) -> eax=pgid/-1 */
 #define SYS_SETSID   50 /* self only -> eax=new sid(pid)/-1 if already group leader */
-#define SYS_PTRACE   51 /* ebx=req(0=TRACEME,1=PEEKTEXT,2=POKETEXT), ecx=pid, edx=addr, esi=data -> eax */
+#define SYS_PTRACE   51 /* ebx=req(0=TRACEME,1=PEEKTEXT,2=POKETEXT,3=GETREGS), ecx=pid, edx=addr/buf, esi=data -> eax */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -7581,6 +7581,23 @@ void syscall_handler(uint32_t* regs) {
         struct proc* me = &g_procs[g_cur_proc];
         if (req == 0) {                       /* PTRACE_TRACEME */
             me->traced = 1;
+            regs[7] = 0;
+            return;
+        }
+        if (req == 3) {                       /* GETREGS: edx=user buf[10] */
+            uint32_t tpid = regs[6];
+            uint32_t ubuf = regs[5];
+            if (!user_range_ok((void*)(size_t)ubuf, 40)) { regs[7] = 0xFFFFFFFFu; return; }
+            int t = -1;
+            for (int i = 0; i < MAX_PROCS; i++)
+                if (g_procs[i].used && g_procs[i].pid == tpid) { t = i; break; }
+            if (t < 0) { regs[7] = 0xFFFFFFFFu; return; }
+            struct proc* tp = &g_procs[t];
+            if (tp->ppid != me->pid && tpid != me->pid) { regs[7] = 0xFFFFFFFFu; return; }
+            volatile uint32_t* o = (volatile uint32_t*)(size_t)ubuf;
+            for (int i = 0; i < 8; i++) o[i] = tp->ctx[i];
+            o[8] = tp->started ? tp->eip : tp->entry;
+            o[9] = tp->esp;
             regs[7] = 0;
             return;
         }

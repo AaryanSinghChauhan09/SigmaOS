@@ -98,6 +98,7 @@ mcopy -o -i "$IMG" "$USER_DIR/pid.elf"       ::PID.ELF
 mcopy -o -i "$IMG" "$USER_DIR/sysinfo.elf"   ::SYSINFO.ELF
 mcopy -o -i "$IMG" "$USER_DIR/date.elf"       ::DATE.ELF
 mcopy -o -i "$IMG" "$USER_DIR/heaptest.elf"   ::HEAPTEST.ELF
+mcopy -o -i "$IMG" "$USER_DIR/ptrace.elf"      ::PTRACE.ELF
 mcopy -o -i "$IMG" "$ROOT_DIR/etc/BOOT.CMD" ::BOOT.CMD
 mcopy -o -i "$IMG" "$USER_DIR/kill.elf"      ::KILL.ELF
 mcopy -o -i "$IMG" "$USER_DIR/pipetest.elf"  ::PIPETEST.ELF
