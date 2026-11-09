@@ -403,6 +403,7 @@ static void kfree(void* ptr);
 static uint32_t pmm_alloc(void);
 static int fat_free_chain(int kind, uint32_t start);
 static uint32_t fat_alloc_chain(int kind, uint32_t count);
+static uint32_t fat_dirent_cluster(int kind, const uint8_t* e);
 static int fat_read_to_buf(int kind, uint32_t fat_lba, uint32_t data_lba,
                            uint8_t spc, uint32_t cluster, uint32_t size,
                            uint8_t* dst);
@@ -1312,13 +1313,63 @@ static void show_df(void) {
     kputs(" bytes)\n");
 }
 
+static int g_ls_long;
+
+/* shared dirent printer: normal "<DIR>/size" or `ls -l` long format
+ * (attr, write date/time, cluster, size). kind: 0/1/2 FAT kind. */
+static void ls_print_dirent(int kind, const uint8_t* e, int use_lfn,
+                            struct lfn_acc* lfn) {
+    uint8_t attr = e[11];
+    if (!g_ls_long) {
+        kputs("  ");
+        if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
+        if (use_lfn) kputs(lfn->name); else fat_print_name(e);
+        lfn_acc_reset(lfn);
+        if (!(attr & 0x10)) {
+            uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8)
+                        | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
+            kputs("  "); kprint_dec64(sz); kputs(" B");
+        }
+        kputs("\n");
+        return;
+    }
+    /* long format: "  <attr> <date> <time> <cluster> <size> <name>" */
+    kputs("  ");
+    kputc((attr & 0x10) ? 'd' : '-');
+    kputs(" ");
+    uint16_t wt = (uint16_t)e[22] | ((uint16_t)e[23] << 8);
+    uint16_t wd = (uint16_t)e[24] | ((uint16_t)e[25] << 8);
+    kprint_dec64(1980u + ((uint64_t)(wd >> 9) & 0x7F)); kputs("-");
+    kprint_dec64((uint64_t)((wd >> 5) & 0xF)); kputs("-");
+    kprint_dec64((uint64_t)(wd & 0x1F)); kputs(" ");
+    kprint_dec64((uint64_t)((wt >> 11) & 0x1F)); kputs(":");
+    kprint_dec64((uint64_t)((wt >> 5) & 0x3F)); kputs(" ");
+    kprint_dec64((uint64_t)fat_dirent_cluster(kind, e)); kputs(" ");
+    if (attr & 0x10) {
+        kputs("      - ");
+    } else {
+        uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8)
+                    | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
+        kprint_dec64(sz); kputs(" B ");
+    }
+    if (use_lfn) kputs(lfn->name); else fat_print_name(e);
+    lfn_acc_reset(lfn);
+    kputs("\n");
+}
+
 static void show_ls(const char* args) {
     /* "ls [lba:<n>]" or "ls <dir-path>" — list directory entries */
     uint32_t lba = 0;
     char dirname[64];
     dirname[0] = '\0';
     const char* p = args;
+    g_ls_long = 0;
     while (*p == ' ') p++;
+    if (p[0] == '-' && p[1] == 'l' && (p[2] == 0 || p[2] == ' ')) {
+        g_ls_long = 1;
+        p += 2;
+        while (*p == ' ') p++;
+    }
     if (kprefix(p, "lba:")) {
         lba = kstrtoul(p + 4);
     } else if (*p) {
@@ -1426,19 +1477,8 @@ static void show_ls(const char* args) {
                 if (e[0] == 0x00) { stop = 1; break; }
                 if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
                 if (lfn_acc_feed(&lfn, e)) continue;
-                uint8_t attr = e[11];
                 int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
-                kputs("  ");
-                if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
-                if (use_lfn) kputs(lfn.name); else fat_print_name(e);
-                lfn_acc_reset(&lfn);
-                if (!(attr & 0x10)) {
-                    uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
-                    kputs("  ");
-                    kprint_dec64(sz);
-                    kputs(" B");
-                }
-                kputs("\n");
+                ls_print_dirent(2, e, use_lfn, &lfn);
                 count++;
                 if (count >= 128) { kputs("  ... (truncated)\n"); stop = 1; break; }
             }
@@ -1476,20 +1516,8 @@ static void show_ls(const char* args) {
         if (e[0] == 0x00) break;                 /* end of directory */
         if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
         if (lfn_acc_feed(&lfn, e)) continue;
-        uint8_t attr = e[11];
         int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
-        kputs("  ");
-        if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
-        if (use_lfn) kputs(lfn.name); else fat_print_name(e);
-        lfn_acc_reset(&lfn);
-        /* file size for non-dirs (offset 28, u32) */
-        if (!(attr & 0x10)) {
-            uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
-            kputs("  ");
-            kprint_dec64(sz);
-            kputs(" B");
-        }
-        kputs("\n");
+        ls_print_dirent(1, e, use_lfn, &lfn);
         count++;
         if (count >= 64) { kputs("  ... (truncated)\n"); break; }
     }
@@ -1665,20 +1693,8 @@ static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
             if (e[0] == 0x00) { stop = 1; break; }
             if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
             if (lfn_acc_feed(&lfn, e)) continue;
-            uint8_t attr = e[11];
-            /* prefer assembled LFN when checksum binds it to this entry */
             int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
-            kputs("  ");
-            if (attr & 0x10) kputs("<DIR>  "); else kputs("       ");
-            if (use_lfn) kputs(lfn.name); else fat_print_name(e);
-            lfn_acc_reset(&lfn);
-            if (!(attr & 0x10)) {
-                uint32_t sz = (uint32_t)e[28] | ((uint32_t)e[29] << 8) | ((uint32_t)e[30] << 16) | ((uint32_t)e[31] << 24);
-                kputs("  ");
-                kprint_dec64(sz);
-                kputs(" B");
-            }
-            kputs("\n");
+            ls_print_dirent(kind, e, use_lfn, &lfn);
             count++;
             if (count >= 128) { kputs("  ... (truncated)\n"); stop = 1; break; }
         }
