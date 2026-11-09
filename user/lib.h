@@ -37,6 +37,7 @@ static void uputn(u32 v) {
     uputs(b + i);
 }
 static int ulower(int c) { return (c >= 'A' && c <= 'Z') ? c + 32 : c; }
+static u32 u32strlen(const char* s) { u32 n = 0; while (s[n]) n++; return n; }
 
 /* argc/argv from initial stack */
 static u32* uargs(void) {
