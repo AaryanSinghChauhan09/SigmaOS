@@ -6735,6 +6735,7 @@ static int k_u32dec(uint32_t v, char* o) {
 static int k_strcpy(char* d, const char* s) {
     int n = 0; while (*s) d[n++] = *s++; d[n] = 0; return n;
 }
+static uint32_t g_proc_stat_pid;   /* set by proc_lookup for PROC/<pid>/STAT */
 static uint32_t proc_render(int fdidx, uint32_t id) {
     char* b = cur_procdata()[fdidx];
     uint32_t n = 0;
@@ -6798,6 +6799,34 @@ static uint32_t proc_render(int fdidx, uint32_t id) {
         }
         break;
     }
+    case 6: { /* STAT of PROC/<pid>/STAT */
+        int found = 0;
+        for (int i = 0; i < MAX_PROCS; i++) {
+            if (!g_procs[i].used || g_procs[i].pid != g_proc_stat_pid) continue;
+            found = 1;
+            n += k_u32dec(g_procs[i].pid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, " ");
+            n += k_u32dec(g_procs[i].ppid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, " ");
+            n += k_strcpy(b + n, (g_cur_proc == i) ? "R" : "S");
+            n += k_strcpy(b + n, " ");
+            n += k_strcpy(b + n, g_procs[i].name[0] ? g_procs[i].name : "?");
+            n += k_strcpy(b + n, " ");
+            /* eip as hex */
+            { char hx[9]; uint32_t v = g_procs[i].started ? g_procs[i].eip : g_procs[i].entry;
+              for (int d = 7; d >= 0; d--) { int nib = (v >> (d*4)) & 15; hx[7-d] = (char)(nib < 10 ? '0'+nib : 'a'+nib-10); } hx[8]=0;
+              n += k_strcpy(b + n, hx); }
+            n += k_strcpy(b + n, " ");
+            n += k_u32dec((uint32_t)g_procs[i].nice, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, "\n");
+            break;
+        }
+        if (!found) n += k_strcpy(b + n, "no such process\n");
+        break;
+    }
     default:
         return 0;
     }
@@ -6815,6 +6844,17 @@ static int proc_lookup(const char* rpath) {
         !(rpath[3] == 'C' || rpath[3] == 'c') ||
         rpath[4] != '/') return 0;
     const char* leaf = rpath + 5;
+    /* PROC/<pid>/STAT — per-process stat file */
+    {
+        const char* q = leaf;
+        uint32_t pv = 0; int nd = 0;
+        while (*q >= '0' && *q <= '9') { pv = pv * 10 + (*q - '0'); q++; nd++; }
+        if (nd > 0 && q[0] == '/' &&
+            ((q[1]=='S'||q[1]=='s')&&(q[2]=='T'||q[2]=='t')&&(q[3]=='A'||q[3]=='a')&&(q[4]=='T'||q[4]=='t')&&!q[5])) {
+            g_proc_stat_pid = pv;
+            return 6;
+        }
+    }
     for (int k = 0; k < 5; k++) {
         const char* nm = names[k]; int j = 0;
         while (nm[j] && leaf[j]) {
