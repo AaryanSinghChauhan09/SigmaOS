@@ -332,9 +332,9 @@ static int fat_lookup(int kind, uint32_t root_clus, uint32_t root_lba, uint32_t 
                       const char* path, struct fat_hit* hit);
 static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
                             uint32_t data_lba, uint8_t spc);
-#define MAP_SIZE_MB   16
 static void paging_init(void);
 static void show_paging(void);
+static uint32_t g_map_mb;
 
 #define MBI_FLAGS       0
 #define MBI_MEM_LOWER   4
@@ -1664,8 +1664,8 @@ void kernel_main(uint32_t magic, void* mb_info) {
     show_banner();
 
     paging_init();
-    kputs("[kernel] Paging enabled: identity map 0-");
-    kprint_dec64(MAP_SIZE_MB);
+    kputs("[kernel] Paging enabled: 4MiB-page identity map, ");
+    kprint_dec64(g_map_mb);
     kputs(" MiB.\n");
 
     kputs("[kernel] Multiboot header validated.\n");
@@ -1681,41 +1681,56 @@ void kernel_main(uint32_t magic, void* mb_info) {
  * Assembly Entry (sets up stack and calls kernel_main)
  * -------------------------------------------------------------------------- */
 /* --------------------------------------------------------------------------
- * Paging — identity-map first 16 MiB, enable CR0.PG
- * Each page table covers 4 MiB; 4 tables cover 16 MiB.
- * Kernel sits at 1 MiB; VGA text buffer (0xB8000) and low MMIO are included.
+ * Paging — 4 MiB large pages (PSE), identity-map all RAM reported by
+ * Multiboot (capped at 4 GiB address space). One page directory covers
+ * 1024 × 4 MiB = 4 GiB; no page tables needed.
  * -------------------------------------------------------------------------- */
-#define PT_COUNT      (MAP_SIZE_MB / 4)
 #define PTE_PRESENT   0x001u
 #define PTE_RW        0x002u
-#define PTE_USER      0x004u
-#define PTE_PS        0x080u
+#define PDE_PS        0x080u   /* page size: 4 MiB when set in a PDE */
 
 static uint32_t g_page_dir[1024] __attribute__((aligned(4096), section(".bss")));
-static uint32_t g_page_tables[PT_COUNT][1024] __attribute__((aligned(4096), section(".bss")));
+
+static uint32_t paging_map_mb(void) {
+    /* Total RAM in MiB from Multiboot info; clamp to sane bounds. */
+    uint64_t kb = 0;
+    if (g_mb_info) {
+        uint32_t lower = mbi_rd32(MBI_MEM_LOWER);
+        uint32_t upper = mbi_rd32(MBI_MEM_UPPER);
+        kb = (uint64_t)lower + upper;
+    }
+    uint32_t mb = (uint32_t)(kb / 1024);
+    if (mb < 16) mb = 16;
+    if (mb > 4096) mb = 4096;
+    return mb;
+}
 
 static void paging_init(void) {
-    /* BSS is not zeroed by the loader — clear structures explicitly. */
+    uint32_t map_mb = paging_map_mb();
+    uint32_t pde_count = (map_mb + 3) / 4; /* 4 MiB per PDE */
+
+    /* BSS is not zeroed by the loader — clear page directory explicitly. */
     for (uint32_t i = 0; i < 1024; i++) g_page_dir[i] = 0;
-    /* Build identity map: virt == phys for [0, MAP_SIZE_MB) */
-    for (uint32_t i = 0; i < PT_COUNT; i++) {
-        for (uint32_t j = 0; j < 1024; j++) {
-            uint32_t pa = (i * 1024 + j) * 4096u;
-            g_page_tables[i][j] = pa | PTE_PRESENT | PTE_RW;
-        }
-        g_page_dir[i] = (uint32_t)(size_t)&g_page_tables[i][0] | PTE_PRESENT | PTE_RW;
+
+    /* Identity map with 4 MiB pages: virt == phys */
+    for (uint32_t i = 0; i < pde_count; i++) {
+        g_page_dir[i] = (i * 4u * 1024u * 1024u) | PTE_PRESENT | PTE_RW | PDE_PS;
     }
-    /* Kernel is identity-mapped pre-paging, so &g_page_dir is its physical addr. */
     uint32_t pd_phys = (uint32_t)(size_t)&g_page_dir[0];
 
     __asm__ volatile(
         "movl %0, %%cr3\n"
+        "movl %%cr4, %%eax\n"
+        "orl $0x20, %%eax\n"          /* CR4.PSE — enable 4 MiB pages */
+        "movl %%eax, %%cr4\n"
         "movl %%cr0, %%eax\n"
-        "orl $0x80000000, %%eax\n"   /* PG */
+        "orl $0x80000000, %%eax\n"    /* CR0.PG */
         "movl %%eax, %%cr0\n"
         "movl %%cr3, %%eax\n"
-        "movl %%eax, %%cr3\n"        /* TLB flush */
+        "movl %%eax, %%cr3\n"         /* TLB flush */
         :: "r"(pd_phys) : "eax", "memory");
+
+    g_map_mb = map_mb;
 }
 
 static void show_paging(void) {
@@ -1727,12 +1742,12 @@ static void show_paging(void) {
     kputs((cr0 & 0x80000000u) ? "on" : "off");
     kputs(" CR0.WP=");
     kputs((cr0 & 0x00010000u) ? "on" : "off");
-    kputs(" CR4.PAE=");
+    kputs(" CR4.PSE=");
     kputs((cr4 & 0x20u) ? "on" : "off");
     kputs("\nCR3=");
     kprint_hex32(cr3);
-    kputs(" (identity map 0-");
-    kprint_dec64(MAP_SIZE_MB);
+    kputs(" (4MiB-page identity map, ");
+    kprint_dec64(g_map_mb);
     kputs(" MiB)\n");
 }
 
