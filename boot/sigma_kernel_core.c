@@ -2236,6 +2236,69 @@ static void show_rmdir(const char* args) {
     kputs("\n");
 }
 
+/* mv <old> <new> — rename within the current directory by rewriting the
+ * dirent's 8.3 name field. Cross-directory moves are not yet supported. */
+static void show_mv(const char* args) {
+    char old[64], newn[64];
+    int oi = 0, ni = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    while (*p && *p != ' ' && oi < 63) old[oi++] = *p++;
+    old[oi] = 0;
+    while (*p == ' ') p++;
+    while (*p && *p != ' ' && ni < 63) newn[ni++] = *p++;
+    newn[ni] = 0;
+    if (!oi || !ni) { kputs("usage: mv <old> <new>\n"); return; }
+    if (kstrlen(newn) > 12) { kputs("mv: new name too long (8.3 only).\n"); return; }
+
+    if (fat_ensure_mounted() != 0) { kputs("mv: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit hit;
+        int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &hit);
+        if (lr <= 0 || !hit.is_dir) { kputs("mv: cwd not a directory.\n"); return; }
+        in_root = 0;
+        dir_cluster = hit.cluster;
+    }
+
+    uint8_t want_old[11], want_new[11];
+    fat_name_to_83(old, want_old);
+    fat_name_to_83(newn, want_new);
+    if (fat_name_eq(want_old, want_new)) { kputs("mv: same name.\n"); return; }
+
+    /* collision check for the new name */
+    struct slot_res chk;
+    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                      g_vol_data_lba, g_vol_spc, want_new, &chk);
+    if (chk.status == -1) { kputs("mv: target name exists.\n"); return; }
+
+    /* locate old dirent */
+    struct slot_res slot;
+    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                      g_vol_data_lba, g_vol_spc, want_old, &slot);
+    if (slot.status != -1) { kputs("mv: not found.\n"); return; }
+
+    if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("mv: read error.\n"); return;
+    }
+    for (int i = 0; i < 11; i++) g_file_buf[slot.off + i] = want_new[i];
+    if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+        kputs("mv: write failed.\n"); return;
+    }
+    kputs("mv: /");
+    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+    kputs(old);
+    kputs(" -> ");
+    kputs(newn);
+    kputs("\n");
+}
+
 static void show_cat(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -2635,6 +2698,7 @@ void kernel_shell(void) {
             kputs("  write   - Create file: write <name> <text>\n");
             kputs("  rm      - Delete file: rm <name>\n");
             kputs("  rmdir   - Remove empty dir: rmdir <name>\n");
+            kputs("  mv      - Rename file: mv <old> <new>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -2694,6 +2758,8 @@ void kernel_shell(void) {
             show_rm(cmd + 2);
         } else if (kcmd_is(cmd, "rmdir")) {
             show_rmdir(cmd + 5);
+        } else if (kcmd_is(cmd, "mv")) {
+            show_mv(cmd + 2);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
