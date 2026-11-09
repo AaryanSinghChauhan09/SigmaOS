@@ -305,6 +305,7 @@ struct proc {
     uint32_t entry, esp0;/* initial eip/esp for first run */
     char     name[32];
     char     cmdline[64];
+    char     cwd[160];
     int      exit_code;
     uint32_t ctx[8];     /* pushal-order regs at preempt point */
     uint32_t eip, cs, eflags, esp, ss;
@@ -1459,7 +1460,9 @@ static int fs_next_comp(const char** pp, char* comp, int csz) {
  * Absolute arg (leading '/') ignores cwd. Returns 0 ok, -1 overflow. */
 static int fs_resolve(const char* arg, char* out, int outsz) {
     out[0] = 0;
-    const char* base = (arg[0] == '/') ? "" : g_cwd;
+    const char* cwd = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+                      ? g_procs[g_cur_proc].cwd : g_cwd;
+    const char* base = (arg[0] == '/') ? "" : cwd;
     const char* srcs[2] = { base, arg };
     for (int s = 0; s < 2; s++) {
         const char* p = srcs[s];
@@ -4356,6 +4359,9 @@ static int proc_claim(uint32_t base, const char* name, const char* cmdline,
         while (cmdline[i] && i < (int)sizeof(p->cmdline) - 1) { p->cmdline[i] = cmdline[i]; i++; }
     }
     p->cmdline[i] = 0;
+    { int ci = 0;
+      while (g_cwd[ci] && ci < (int)sizeof(p->cwd) - 1) { p->cwd[ci] = g_cwd[ci]; ci++; }
+      p->cwd[ci] = 0; }
     return idx;
 }
 
@@ -4479,6 +4485,7 @@ static int proc_fork(uint32_t* regs) {
     }
     /* share pipes / redirects (fork semantics) */
     ch->in_pipe = par->in_pipe; ch->out_pipe = par->out_pipe;
+    { int ci = 0; while (par->cwd[ci] && ci < (int)sizeof(ch->cwd) - 1) { ch->cwd[ci] = par->cwd[ci]; ci++; } ch->cwd[ci] = 0; }
     ch->in_file = par->in_file; ch->in_len = par->in_len; ch->in_pos = par->in_pos;
     for (int i = 0; i < 8192; i++) {
         ch->in_buf[i] = par->in_buf[i];
