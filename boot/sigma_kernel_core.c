@@ -2570,6 +2570,84 @@ static void show_cat(const char* args) {
 #define EXEC_LOAD_OFF 0x1000u
 #define EXEC_STACK_OFF 0x300000u
 #define EXEC_MAX_SIZE  0x200000u
+#define EXEC_ELF_MAX   0x100000u   /* kmalloc cap */
+
+/* Read a whole file's cluster chain into a kernel buffer. Returns bytes
+ * read or -1. */
+static int fat_read_to_buf(int kind, uint32_t fat_lba, uint32_t data_lba,
+                           uint8_t spc, uint32_t cluster, uint32_t size,
+                           uint8_t* dst) {
+    uint32_t remaining = size;
+    uint32_t clus = cluster;
+    int guard = 0;
+    while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 8192 && remaining > 0) {
+        uint32_t clus_lba = data_lba + (clus - 2) * spc;
+        for (uint32_t s = 0; s < spc && remaining > 0; s++) {
+            if (ata_read_lba28(0x1F0, 0, clus_lba + s, g_file_buf, 1) < 0) return -1;
+            uint32_t chunk = remaining > 512 ? 512 : remaining;
+            for (uint32_t i = 0; i < chunk; i++) dst[i] = g_file_buf[i];
+            dst += chunk;
+            remaining -= chunk;
+        }
+        clus = fat_next_any(fat_lba, kind, clus);
+    }
+    return (int)(size - remaining);
+}
+
+/* ELF32 loader: parse header + PT_LOAD segments, relocate by bias so any
+ * linked vaddr lands inside the user region. Returns entry vaddr or 0. */
+static uint32_t exec_load_elf(const uint8_t* f, uint32_t size) {
+    if (size < 52) return 0;
+    if (!(f[0] == 0x7F && f[1] == 'E' && f[2] == 'L' && f[3] == 'F')) return 0;
+    if (f[4] != 1 || f[5] != 1) return 0;              /* 32-bit, little-endian */
+    uint16_t machine = (uint16_t)f[18] | ((uint16_t)f[19] << 8);
+    if (machine != 3) return 0;                        /* EM_386 */
+    uint32_t entry  = (uint32_t)f[24] | ((uint32_t)f[25] << 8)
+                    | ((uint32_t)f[26] << 16) | ((uint32_t)f[27] << 24);
+    uint32_t phoff  = (uint32_t)f[28] | ((uint32_t)f[29] << 8)
+                    | ((uint32_t)f[30] << 16) | ((uint32_t)f[31] << 24);
+    uint16_t phentsz = (uint16_t)f[42] | ((uint16_t)f[43] << 8);
+    uint16_t phnum   = (uint16_t)f[44] | ((uint16_t)f[45] << 8);
+    if (phentsz < 32 || phnum == 0 || phnum > 32) return 0;
+    if ((uint64_t)phoff + (uint64_t)phentsz * phnum > size) return 0;
+
+    /* find lowest PT_LOAD vaddr */
+    uint32_t minva = 0xFFFFFFFFu;
+    for (int i = 0; i < phnum; i++) {
+        const uint8_t* ph = f + phoff + (uint32_t)i * phentsz;
+        uint32_t type = (uint32_t)ph[0] | ((uint32_t)ph[1] << 8)
+                      | ((uint32_t)ph[2] << 16) | ((uint32_t)ph[3] << 24);
+        if (type != 1) continue;                       /* PT_LOAD */
+        uint32_t va = (uint32_t)ph[8] | ((uint32_t)ph[9] << 8)
+                    | ((uint32_t)ph[10] << 16) | ((uint32_t)ph[11] << 24);
+        if (va < minva) minva = va;
+    }
+    if (minva == 0xFFFFFFFFu) return 0;
+    uint32_t bias = g_user_base - (minva & ~0xFFFu);
+
+    /* load segments */
+    for (int i = 0; i < phnum; i++) {
+        const uint8_t* ph = f + phoff + (uint32_t)i * phentsz;
+        uint32_t type = (uint32_t)ph[0] | ((uint32_t)ph[1] << 8)
+                      | ((uint32_t)ph[2] << 16) | ((uint32_t)ph[3] << 24);
+        if (type != 1) continue;
+        uint32_t off   = (uint32_t)ph[4] | ((uint32_t)ph[5] << 8)
+                       | ((uint32_t)ph[6] << 16) | ((uint32_t)ph[7] << 24);
+        uint32_t va    = (uint32_t)ph[8] | ((uint32_t)ph[9] << 8)
+                       | ((uint32_t)ph[10] << 16) | ((uint32_t)ph[11] << 24);
+        uint32_t fsz   = (uint32_t)ph[16] | ((uint32_t)ph[17] << 8)
+                       | ((uint32_t)ph[18] << 16) | ((uint32_t)ph[19] << 24);
+        uint32_t msz   = (uint32_t)ph[20] | ((uint32_t)ph[21] << 8)
+                       | ((uint32_t)ph[22] << 16) | ((uint32_t)ph[23] << 24);
+        if (off + fsz > size || msz < fsz) return 0;
+        uint32_t dst = bias + va;
+        if (dst < g_user_base || dst + msz > g_user_base + 0x400000u) return 0;
+        uint8_t* d = (uint8_t*)(size_t)dst;
+        for (uint32_t j = 0; j < fsz; j++) d[j] = f[off + j];
+        for (uint32_t j = fsz; j < msz; j++) d[j] = 0;   /* bss */
+    }
+    return bias + entry;
+}
 
 static void show_exec(const char* args) {
     const char* p = args;
@@ -2638,6 +2716,23 @@ static void show_exec(const char* args) {
     g_page_dir[pde] |= 0x4u;
     __asm__ volatile("movl %%cr3, %%eax\n\tmovl %%eax, %%cr3" ::: "eax", "memory");
 
+    /* --- format detection: ELF32 or flat binary --- */
+    uint32_t entry = 0;
+    int elf_seen = 0, elf_bad = 0;
+    if (hit.size <= EXEC_ELF_MAX) {
+        uint8_t* fbuf = (uint8_t*)kmalloc(hit.size);
+        if (fbuf && fat_read_to_buf(kind, fat_lba, data_lba, spc,
+                                    hit.cluster, hit.size, fbuf) == (int)hit.size
+            && fbuf[0] == 0x7F && fbuf[1] == 'E' && fbuf[2] == 'L' && fbuf[3] == 'F') {
+            elf_seen = 1;
+            entry = exec_load_elf(fbuf, hit.size);
+            if (!entry) elf_bad = 1;
+        }
+        if (fbuf) kfree(fbuf);
+    }
+    if (elf_bad) { kputs("exec: malformed ELF32.\n"); return; }
+
+    if (!elf_seen) {
     /* --- copy file cluster chain into user memory at base+0x1000 --- */
     uint8_t* dst = (uint8_t*)(size_t)(g_user_base + EXEC_LOAD_OFF);
     uint32_t remaining = hit.size;
@@ -2656,11 +2751,13 @@ static void show_exec(const char* args) {
         }
         clus = fat_next_any(fat_lba, kind, clus);
     }
+    entry = g_user_base + EXEC_LOAD_OFF;
+    }
 
     kputs("exec: loaded ");
-    kprint_dec64(hit.size - remaining);
+    kprint_dec64(hit.size);
     kputs(" bytes -> ring3 @");
-    kprint_hex32(g_user_base + EXEC_LOAD_OFF);
+    kprint_hex32(entry);
     kputs("\n");
 
     /* _start ABI: [esp]=argc, argv[0..], NULL, envp=NULL.
@@ -2697,7 +2794,7 @@ static void show_exec(const char* args) {
     g_user_dead = 0;
     g_preempt_pending = 0;
     g_user_active = 1;
-    enter_user(g_user_base + EXEC_LOAD_OFF, (uint32_t)(size_t)sp);
+    enter_user(entry, (uint32_t)(size_t)sp);
     g_user_active = 0;
     kputs("exec: program exited, back in kernel shell\n");
 }

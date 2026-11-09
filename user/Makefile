@@ -24,3 +24,6 @@ all: $(addsuffix .bin,$(PROGS))
 
 clean:
 	rm -f *.o *.elf *.bin
+
+elfhello.elf: elfhello.c
+	$(CC) -m32 -nostdlib -static -fno-stack-protector -fno-pie -no-pie -Os $< -o $@
