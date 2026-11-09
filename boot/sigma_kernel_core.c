@@ -398,6 +398,9 @@ static void kfree(void* ptr);
 static uint32_t pmm_alloc(void);
 static int fat_free_chain(int kind, uint32_t start);
 static uint32_t fat_alloc_chain(int kind, uint32_t count);
+static int fat_read_to_buf(int kind, uint32_t fat_lba, uint32_t data_lba,
+                           uint8_t spc, uint32_t cluster, uint32_t size,
+                           uint8_t* dst);
 void resume_user(void);   /* naked asm: restore preempted user ctx */
 static uint32_t find_user_region(void);
 static void enter_user(uint32_t eip, uint32_t esp);
