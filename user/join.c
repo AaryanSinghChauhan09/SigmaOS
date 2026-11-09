@@ -1,5 +1,6 @@
 /* SigmaOS ELF32 user program: join — equijoin two sorted files on field 1.
- * Usage: exec JOIN.ELF <file1> <file2>
+ * Usage: exec JOIN.ELF <file1> <file2> [-a1|-a2|-e <str>]
+ * -a1/-a2: also print unpaired lines from file1/file2.
  * Lines "key rest..."; matching keys emit "key f1rest f2rest".
  * SYS_OPEN=4 SYS_READ=5 SYS_CLOSE=6 SYS_WRITE_LEN=8 ; EXIT=0 */
 #include "lib.h"
@@ -50,19 +51,27 @@ static void out(const char* s) { sc3(SYS_WRITE_LEN, (u32)s, u32strlen(s), 0); }
 void _start(void) {
     u32* sp = uargs();
     u32 argc = sp[0];
-    if (argc < 3) { uputs("usage: join <file1> <file2>\n"); sc3(SYS_EXIT,0,0,0); __builtin_unreachable(); }
+    if (argc < 3) { uputs("usage: join <file1> <file2> [-a1|-a2]\n"); sc3(SYS_EXIT,0,0,0); __builtin_unreachable(); }
+    int a1 = 0, a2 = 0;
+    for (u32 i = 4; i < argc; i++) {
+        const char* o = (const char*)sp[2 + i];
+        if (o[0] == '-' && o[1] == 'a' && o[2] == '1') a1 = 1;
+        else if (o[0] == '-' && o[1] == 'a' && o[2] == '2') a2 = 1;
+    }
     if (load((const char*)sp[2], la, &na) != 0 || load((const char*)sp[3], lb, &nb) != 0) {
         uputs("join: cannot open input\n"); sc3(SYS_EXIT,1,0,0); __builtin_unreachable();
     }
     int i = 0, j = 0;
     while (i < na && j < nb) {
         int c = keycmp(la[i], lb[j]);
-        if (c < 0) i++;
-        else if (c > 0) j++;
-        else {
-            /* emit: key + rest1 + rest2 */
+        if (c < 0) {
+            if (a1) { out(la[i]); out("\n"); }
+            i++;
+        } else if (c > 0) {
+            if (a2) { out(lb[j]); out("\n"); }
+            j++;
+        } else {
             const char* ka = la[i]; const char* kb = lb[j];
-            /* print key (up to first space) */
             const char* p = ka;
             while (*p && *p != ' ' && *p != '\t') { char ch[2] = {*p, 0}; out(ch); p++; }
             const char* r1 = rest(ka); const char* r2 = rest(kb);
@@ -72,5 +81,7 @@ void _start(void) {
             i++; j++;
         }
     }
+    while (i < na) { if (a1) { out(la[i]); out("\n"); } i++; }
+    while (j < nb) { if (a2) { out(lb[j]); out("\n"); } j++; }
     sc3(SYS_EXIT, 0, 0, 0); __builtin_unreachable();
 }
