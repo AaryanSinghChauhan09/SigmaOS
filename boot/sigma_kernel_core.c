@@ -5130,8 +5130,80 @@ static void idt_init(void) {
 #define SYS_APPEND   14 /* ebx=name, ecx=buf, edx=len — append to file in cwd */
 #define SYS_FSTAT    15 /* ebx=fd -> eax=file size or -1 */
 #define SYS_STAT     16 /* ebx=name -> eax=file size, -1 err */
+/* Collect directory entry names ("name\n" each, skip . ..) into buf.
+ * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
+static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
+                                  uint8_t* out, uint32_t cap) {
+    uint32_t n = 0;
+    struct lfn_acc lfn; lfn_acc_reset(&lfn);
+    uint32_t clus = dir_cluster;
+    int guard = 0;
+    /* root16: iterate fixed region once */
+    if (in_root && kind != 2) {
+        uint32_t root_lba = g_vol_root_lba;
+        uint32_t root_secs = g_vol_root_secs > 8 ? 8 : g_vol_root_secs;
+        uint8_t* dst = g_fs_buf; uint32_t done = 0;
+        while (done < root_secs) {
+            int chunk = (root_secs - done > 4) ? 4 : (int)(root_secs - done);
+            int r = ata_read_lba28(0x1F0, 0, root_lba + done, dst, chunk);
+            if (r < 0) return n;
+            dst += r * 512; done += (uint32_t)r;
+        }
+        for (uint32_t i = 0; i < done * 16 && n < cap - 16; i++) {
+            uint8_t* e = g_fs_buf + i * 32;
+            if (e[0] == 0x00) break;
+            if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+            if (lfn_acc_feed(&lfn, e)) continue;
+            int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
+            const char* nm = use_lfn ? lfn.name : 0;
+            char n83[16]; int n83l = 0;
+            if (!use_lfn) n83l = fat_83_str(e, n83);
+            /* skip . and .. */
+            if (!use_lfn && e[0] == '.' && (e[1] == ' ' || e[1] == '.')) { lfn_acc_reset(&lfn); continue; }
+            const char* s = use_lfn ? nm : n83;
+            int sl = use_lfn ? kstrlen(nm) : n83l;
+            if (!sl) { lfn_acc_reset(&lfn); continue; }
+            for (int j = 0; j < sl && n < cap - 1; j++) out[n++] = (uint8_t)s[j];
+            if (n < cap - 1) out[n++] = '\n';
+            lfn_acc_reset(&lfn);
+        }
+        return n;
+    }
+    /* cluster chain */
+    while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 64 && n < cap - 16) {
+        uint32_t clus_lba = g_vol_data_lba + (clus - 2) * g_vol_spc;
+        uint32_t secs = g_vol_spc > 8 ? 8 : g_vol_spc;
+        uint8_t* dst = g_fs_buf; uint32_t done = 0; int stop = 0;
+        while (done < secs) {
+            int chunk = (secs - done > 4) ? 4 : (int)(secs - done);
+            int r = ata_read_lba28(0x1F0, 0, clus_lba + done, dst, chunk);
+            if (r < 0) return n;
+            dst += r * 512; done += (uint32_t)r;
+        }
+        for (uint32_t i = 0; i < secs * 16 && n < cap - 16; i++) {
+            uint8_t* e = g_fs_buf + i * 32;
+            if (e[0] == 0x00) { stop = 1; break; }
+            if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+            if (lfn_acc_feed(&lfn, e)) continue;
+            int use_lfn = lfn.active && lfn.ck == fat_lfn_cksum(e) && lfn.name[0];
+            if (!use_lfn && e[0] == '.' && (e[1] == ' ' || e[1] == '.')) { lfn_acc_reset(&lfn); continue; }
+            char n83[16]; int n83l = use_lfn ? 0 : fat_83_str(e, n83);
+            const char* s = use_lfn ? lfn.name : n83;
+            int sl = use_lfn ? kstrlen(lfn.name) : n83l;
+            if (!sl) { lfn_acc_reset(&lfn); continue; }
+            for (int j = 0; j < sl && n < cap - 1; j++) out[n++] = (uint8_t)s[j];
+            if (n < cap - 1) out[n++] = '\n';
+            lfn_acc_reset(&lfn);
+        }
+        if (stop) break;
+        clus = fat_next_any(g_vol_fat_lba, kind, clus);
+    }
+    return n;
+}
+
 #define SYS_GETCWD   17 /* ebx=buf, ecx=len -> cwd string, eax=len or -1 */
 #define SYS_CHDIR    18 /* ebx=name -> chdir, eax=0/-1 */
+#define SYS_READDIR  19 /* ebx=buf, ecx=len -> "name\n" list, eax=bytes */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -5674,6 +5746,37 @@ void syscall_handler(uint32_t* regs) {
         for (int i = 0; i < l; i++) g_cwd[i] = rpath[i];
         g_cwd[l] = 0;
         regs[7] = 0;
+        return;
+    } else if (nr == SYS_READDIR) {
+        /* ebx=buf, ecx=len -> newline-separated names in cwd, eax=bytes */
+        volatile uint8_t* ub = (volatile uint8_t*)(size_t)regs[4];
+        uint32_t ulen = (uint32_t)regs[6];
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base || (uint32_t)(size_t)ub < g_user_base
+            || (uint32_t)(size_t)ub + ulen > limit || ulen < 8) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        int kind = g_vol_kind;
+        int in_root = 1;
+        uint32_t dir_cluster = 0;
+        if (g_cwd[0]) {
+            struct fat_hit dh;
+            int dr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                                g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                                g_vol_spc, g_cwd, &dh);
+            if (dr <= 0 || !dh.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
+            in_root = 0; dir_cluster = dh.cluster;
+        } else if (kind == 2) {
+            /* FAT32 root is a cluster chain */
+            dir_cluster = g_vol_root_clus;
+        }
+        uint8_t* kbuf = (uint8_t*)kmalloc(ulen);
+        if (!kbuf) { regs[7] = 0xFFFFFFFFu; return; }
+        uint32_t got = fat_collect_names(kind, in_root, dir_cluster, kbuf, ulen);
+        for (uint32_t i = 0; i < got; i++) ub[i] = kbuf[i];
+        kfree(kbuf);
+        regs[7] = got;
         return;
     } else {
         kputs("\n[syscall] unknown nr=");
