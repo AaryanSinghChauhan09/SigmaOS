@@ -266,6 +266,19 @@ static int kbd_buf_pop(char* out);   /* defined with IRQ section below */
  * ONLY its region is user-accessible; kernel/other-proc memory stays
  * supervisor. Round-robin preemptive scheduling on the PIT tick.
  * -------------------------------------------------------------------------- */
+#define MAX_FDS 8
+struct fdesc {
+    int      used;
+    uint32_t start;     /* first data cluster (for seek rewind) */
+    uint32_t cluster;   /* cluster containing current position */
+    uint32_t size;
+    uint32_t pos;       /* absolute file offset */
+    uint32_t coff;      /* byte offset within current cluster's data */
+    uint32_t proc_id;   /* 0 = FAT file, else PROC/ virtual file id */
+    uint32_t pipe;      /* 0 = none, else pipe index + 1 */
+};
+#define PROC_MAX 2048
+
 #define MAX_PROCS 4
 struct proc {
     int      used;
@@ -279,6 +292,8 @@ struct proc {
     int      exit_code;
     uint32_t ctx[8];     /* pushal-order regs at preempt point */
     uint32_t eip, cs, eflags, esp, ss;
+    struct fdesc fds[MAX_FDS];          /* per-process descriptor table */
+    char proc_data[MAX_FDS][PROC_MAX];  /* per-fd PROC/ render buffers */
 };
 static struct proc g_procs[MAX_PROCS];
 /* reaped-exit records so `wait` can report status (job control) */
@@ -4307,6 +4322,9 @@ static int proc_claim(uint32_t base, const char* name,
     p->entry = entry; p->esp0 = esp0;
     for (int i = 0; i < 8; i++) p->ctx[i] = 0;
     p->eip=p->cs=p->eflags=p->esp=p->ss=0;
+    for (int fi = 0; fi < MAX_FDS; fi++) {
+        p->fds[fi].used = 0; p->fds[fi].pipe = 0; p->fds[fi].proc_id = 0;
+    }
     int i = 0;
     while (name[i] && i < 31) { p->name[i] = name[i]; i++; }
     p->name[i] = 0;
@@ -6297,17 +6315,6 @@ static int fat_ensure_mounted(void) {
 }
 
 /* ---- file descriptor table ---- */
-#define MAX_FDS 8
-struct fdesc {
-    int      used;
-    uint32_t start;     /* first data cluster (for seek rewind) */
-    uint32_t cluster;   /* cluster containing current position */
-    uint32_t size;
-    uint32_t pos;       /* absolute file offset */
-    uint32_t coff;      /* byte offset within current cluster's data */
-    uint32_t proc_id;   /* 0 = FAT file, else PROC/ virtual file id */
-    uint32_t pipe;      /* 0 = none, else pipe index + 1 */
-};
 /* kernel pipes: 4KiB ring buffers, non-blocking I/O */
 #define MAX_PIPES 4
 #define PIPE_SZ   4096
@@ -6334,10 +6341,20 @@ static uint32_t pipe_write(uint32_t pi, const uint8_t* src, uint32_t len) {
     return n;
 }
 /* LFS-style procfs: PROC/<name> virtual files rendered into per-fd
- * buffers at open time (snapshot semantics, bounded 2 KiB each). */
-#define PROC_MAX 2048
-static char g_proc_data[MAX_FDS][PROC_MAX];
-static struct fdesc g_fds[MAX_FDS];
+ * buffers at open time (snapshot semantics, bounded 2 KiB each).
+ * Tables are per-process; kernel context uses g_kfds fallback. */
+static char g_kproc_data[MAX_FDS][PROC_MAX];
+static struct fdesc g_kfds[MAX_FDS];
+static struct fdesc* cur_fds(void) {
+    if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+        return g_procs[g_cur_proc].fds;
+    return g_kfds;
+}
+static char (*cur_procdata(void))[PROC_MAX] {
+    if (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+        return g_procs[g_cur_proc].proc_data;
+    return g_kproc_data;
+}
 
 static int k_u32dec(uint32_t v, char* o) {
     char t[12]; int i = 0;
@@ -6351,7 +6368,7 @@ static int k_strcpy(char* d, const char* s) {
     int n = 0; while (*s) d[n++] = *s++; d[n] = 0; return n;
 }
 static uint32_t proc_render(int fdidx, uint32_t id) {
-    char* b = g_proc_data[fdidx];
+    char* b = cur_procdata()[fdidx];
     uint32_t n = 0;
     char tmp[16];
     switch (id) {
@@ -6428,8 +6445,8 @@ static int proc_lookup(const char* rpath) {
 static uint32_t fd_read(struct fdesc* f, uint8_t* buf, uint32_t len) {
     if (f->pipe) return pipe_read(f->pipe - 1, buf, len);
     if (f->proc_id) {
-        int idx = (int)(f - g_fds);
-        const char* src = g_proc_data[idx];
+        int idx = (int)(f - cur_fds());
+        const char* src = cur_procdata()[idx];
         uint32_t avail = f->size - f->pos;
         uint32_t n = len < avail ? len : avail;
         for (uint32_t i = 0; i < n; i++) buf[i] = (uint8_t)src[f->pos + i];
@@ -6518,16 +6535,16 @@ void syscall_handler(uint32_t* regs) {
         }
         int pid = proc_lookup(rpath);
         int fd = -1;
-        for (int i = 0; i < MAX_FDS; i++) if (!g_fds[i].used) { fd = i; break; }
+        for (int i = 0; i < MAX_FDS; i++) if (!cur_fds()[i].used) { fd = i; break; }
         if (fd < 0) { regs[7] = 0xFFFFFFFFu; return; }
         if (pid) {
-            g_fds[fd].used = 1;
-            g_fds[fd].proc_id = (uint32_t)pid;
-            g_fds[fd].pipe = 0;
-            g_fds[fd].start = g_fds[fd].cluster = 0;
-            g_fds[fd].coff = 0; g_fds[fd].pos = 0;
-            g_fds[fd].size = proc_render(fd, (uint32_t)pid);
-            if (g_fds[fd].size == 0) { g_fds[fd].used = 0; regs[7] = 0xFFFFFFFFu; return; }
+            cur_fds()[fd].used = 1;
+            cur_fds()[fd].proc_id = (uint32_t)pid;
+            cur_fds()[fd].pipe = 0;
+            cur_fds()[fd].start = cur_fds()[fd].cluster = 0;
+            cur_fds()[fd].coff = 0; cur_fds()[fd].pos = 0;
+            cur_fds()[fd].size = proc_render(fd, (uint32_t)pid);
+            if (cur_fds()[fd].size == 0) { cur_fds()[fd].used = 0; regs[7] = 0xFFFFFFFFu; return; }
             ret = (uint32_t)fd;
             return;
         }
@@ -6538,42 +6555,42 @@ void syscall_handler(uint32_t* regs) {
         if (lr <= 0 || hit.is_dir || hit.cluster < 2 || hit.size == 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
-        g_fds[fd].used = 1;
-        g_fds[fd].proc_id = 0;
-        g_fds[fd].pipe = 0;
-        g_fds[fd].start = hit.cluster;
-        g_fds[fd].cluster = hit.cluster;
-        g_fds[fd].size = hit.size;
-        g_fds[fd].pos = 0;
-        g_fds[fd].coff = 0;
+        cur_fds()[fd].used = 1;
+        cur_fds()[fd].proc_id = 0;
+        cur_fds()[fd].pipe = 0;
+        cur_fds()[fd].start = hit.cluster;
+        cur_fds()[fd].cluster = hit.cluster;
+        cur_fds()[fd].size = hit.size;
+        cur_fds()[fd].pos = 0;
+        cur_fds()[fd].coff = 0;
         ret = (uint32_t)fd;
     } else if (nr == SYS_READ) {
         int fd = (int)regs[4];
         uint8_t* buf = (uint8_t*)(size_t)regs[6];   /* ecx */
         uint32_t len = regs[5];                     /* edx */
-        if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used || len > 65536
+        if (fd < 0 || fd >= MAX_FDS || !cur_fds()[fd].used || len > 65536
             || !user_range_ok(buf, len)) {
             regs[7] = 0xFFFFFFFFu; return;
         }
-        ret = fd_read(&g_fds[fd], buf, len);
+        ret = fd_read(&cur_fds()[fd], buf, len);
     } else if (nr == SYS_CLOSE) {
         int fd = (int)regs[4];
-        if (fd >= 0 && fd < MAX_FDS && g_fds[fd].used) {
-            if (g_fds[fd].pipe) {
-                struct pipe* pp = &g_pipes[g_fds[fd].pipe - 1];
-                if (g_fds[fd].start == 1) pp->ropen = 0;
+        if (fd >= 0 && fd < MAX_FDS && cur_fds()[fd].used) {
+            if (cur_fds()[fd].pipe) {
+                struct pipe* pp = &g_pipes[cur_fds()[fd].pipe - 1];
+                if (cur_fds()[fd].start == 1) pp->ropen = 0;
                 else pp->wopen = 0;
             }
-            g_fds[fd].used = 0; g_fds[fd].pipe = 0;
+            cur_fds()[fd].used = 0; cur_fds()[fd].pipe = 0;
             ret = 0;
         } else ret = 0xFFFFFFFFu;
     } else if (nr == SYS_SEEK) {
         int fd = (int)regs[4];
         uint32_t off = regs[6];   /* ecx */
-        if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used || off > g_fds[fd].size) {
+        if (fd < 0 || fd >= MAX_FDS || !cur_fds()[fd].used || off > cur_fds()[fd].size) {
             regs[7] = 0xFFFFFFFFu; return;
         }
-        struct fdesc* f = &g_fds[fd];
+        struct fdesc* f = &cur_fds()[fd];
         if (f->proc_id) {
             f->pos = off;
             ret = 0;
@@ -6786,16 +6803,16 @@ void syscall_handler(uint32_t* regs) {
         for (int i = 0; i < MAX_PIPES; i++)
             if (!g_pipes[i].ropen && !g_pipes[i].wopen) { pi = i; break; }
         int fr = -1, fw = -1;
-        for (int i = 0; i < MAX_FDS; i++) if (!g_fds[i].used) { if (fr < 0) fr = i; else { fw = i; break; } }
+        for (int i = 0; i < MAX_FDS; i++) if (!cur_fds()[i].used) { if (fr < 0) fr = i; else { fw = i; break; } }
         if (pi < 0 || fr < 0 || fw < 0) { regs[7] = 0xFFFFFFFFu; return; }
         g_pipes[pi].head = g_pipes[pi].tail = 0;
         g_pipes[pi].wopen = g_pipes[pi].ropen = 1;
-        g_fds[fr].used = 1; g_fds[fr].pipe = (uint32_t)pi + 1;
-        g_fds[fr].proc_id = 0; g_fds[fr].pos = g_fds[fr].size = 0;
-        g_fds[fr].start = 1;   /* read end */
-        g_fds[fw].used = 1; g_fds[fw].pipe = (uint32_t)pi + 1;
-        g_fds[fw].proc_id = 0; g_fds[fw].pos = g_fds[fw].size = 0;
-        g_fds[fw].start = 2;   /* write end */
+        cur_fds()[fr].used = 1; cur_fds()[fr].pipe = (uint32_t)pi + 1;
+        cur_fds()[fr].proc_id = 0; cur_fds()[fr].pos = cur_fds()[fr].size = 0;
+        cur_fds()[fr].start = 1;   /* read end */
+        cur_fds()[fw].used = 1; cur_fds()[fw].pipe = (uint32_t)pi + 1;
+        cur_fds()[fw].proc_id = 0; cur_fds()[fw].pos = cur_fds()[fw].size = 0;
+        cur_fds()[fw].start = 2;   /* write end */
         *(volatile uint32_t*)(size_t)up = (uint32_t)fr;
         *(volatile uint32_t*)(size_t)(up + 4) = (uint32_t)fw;
         regs[7] = 0;
@@ -6803,9 +6820,9 @@ void syscall_handler(uint32_t* regs) {
     } else if (nr == SYS_WRITE_FD) {
         int fd = (int)regs[1];
         uint32_t buf = regs[2], len = regs[3];
-        if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used || !g_fds[fd].pipe
+        if (fd < 0 || fd >= MAX_FDS || !cur_fds()[fd].used || !cur_fds()[fd].pipe
             || !user_range_ok((void*)(size_t)buf, len)) { regs[7] = 0xFFFFFFFFu; return; }
-        regs[7] = pipe_write(g_fds[fd].pipe - 1, (const uint8_t*)(size_t)buf, len);
+        regs[7] = pipe_write(cur_fds()[fd].pipe - 1, (const uint8_t*)(size_t)buf, len);
         return;
     } else if (nr == SYS_CREAT) {
         /* ebx = user ptr to NUL-terminated single-component name in cwd.
@@ -7085,8 +7102,8 @@ void syscall_handler(uint32_t* regs) {
     } else if (nr == SYS_FSTAT) {
         /* ebx=fd -> eax=file size, -1 on bad fd */
         int fd = (int)regs[4];
-        if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used) { regs[7] = 0xFFFFFFFFu; return; }
-        regs[7] = g_fds[fd].size;
+        if (fd < 0 || fd >= MAX_FDS || !cur_fds()[fd].used) { regs[7] = 0xFFFFFFFFu; return; }
+        regs[7] = cur_fds()[fd].size;
         return;
     } else if (nr == SYS_STAT) {
         /* ebx=name ptr -> eax=file size, -1 on error/not found */
