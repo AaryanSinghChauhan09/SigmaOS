@@ -316,6 +316,7 @@ static int kprefix(const char* s, const char* prefix) {
  * Multiboot1 Boot Information
  * -------------------------------------------------------------------------- */
 static volatile uint8_t* g_mb_info = 0;
+static void ata_identify_model(uint16_t base, int slave, char out[41]);
 
 #define MBI_FLAGS       0
 #define MBI_MEM_LOWER   4
@@ -440,6 +441,43 @@ static void show_memory_map(void) {
         kputs("\n");
         p += esize;
     }
+}
+
+static void show_info(void) {
+    kputs("=== SigmaOS system info ===\n");
+    kputs("OS     : SigmaOS boot kernel (x86, 32-bit protected mode)\n");
+    kputs("Loader : Multiboot1 via GRUB\n");
+    kputs("Arch   : i386\n");
+
+    if (g_mb_info) {
+        uint32_t lower = mbi_rd32(MBI_MEM_LOWER);
+        uint32_t upper = mbi_rd32(MBI_MEM_UPPER);
+        kputs("Memory : ");
+        kprint_dec64((uint64_t)lower + upper);
+        kputs(" KiB (lower=");
+        kprint_dec64(lower);
+        kputs(" upper=");
+        kprint_dec64(upper);
+        kputs(")\n");
+    } else {
+        kputs("Memory : no Multiboot info\n");
+    }
+
+    char model[41];
+    uint16_t bases[2] = {0x1F0, 0x170};
+    int disks = 0;
+    for (int b = 0; b < 2; b++) {
+        for (int s = 0; s < 2; s++) {
+            ata_identify_model(bases[b], s, model);
+            if (model[0]) {
+                kputs("Disk   : ");
+                kputs(model);
+                kputs("\n");
+                disks++;
+            }
+        }
+    }
+    if (!disks) kputs("Disk   : no ATA disk detected\n");
 }
 
 static void show_cmdline(void) {
@@ -1258,6 +1296,7 @@ void kernel_shell(void) {
             kputs("  fs      - Detect FAT filesystem on partition\n");
             kputs("  ls      - List FAT12/16 root directory\n");
             kputs("  cat     - Print file: cat <name>\n");
+            kputs("  info    - System summary\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -1291,6 +1330,8 @@ void kernel_shell(void) {
             show_ls(cmd + 2);
         } else if (kcmd_is(cmd, "cat")) {
             show_cat(cmd + 3);
+        } else if (kstrcmp(cmd, "info") == 0) {
+            show_info();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
