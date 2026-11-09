@@ -292,6 +292,16 @@ static int kstrcmp(const char* s1, const char* s2) {
     return *(const unsigned char*)s1 - *(const unsigned char*)s2;
 }
 
+/* True if s starts with prefix and is followed by NUL or space. */
+static int kcmd_is(const char* s, const char* prefix) {
+    while (*prefix) {
+        if (*s != *prefix) return 0;
+        s++;
+        prefix++;
+    }
+    return *s == '\0' || *s == ' ';
+}
+
 /* --------------------------------------------------------------------------
  * Multiboot1 Boot Information
  * -------------------------------------------------------------------------- */
@@ -642,6 +652,95 @@ static void ata_identify_model(uint16_t base, int slave, char out[41]) {
     }
 }
 
+/* Wait for !BSY && DRQ (data ready) or error. Returns 0 on success. */
+static int ata_wait_drq(uint16_t base) {
+    for (int spins = 0; spins < 500000; spins++) {
+        uint8_t st = inb(base + 7);
+        if (st & 0x01 || st & 0x20) return -1;              /* ERR or DF */
+        if (!(st & 0x80) && (st & 0x08)) return 0;          /* !BSY && DRQ */
+    }
+    return -1;
+}
+
+/* Read up to 4 sectors (LBA28) from an ATA channel into buf. Returns sectors read or -1. */
+static int ata_read_lba28(uint16_t base, int slave, uint32_t lba, uint8_t* buf, int sectors) {
+    if (sectors < 1 || sectors > 4) return -1;
+    outb(base + 6, (uint8_t)(0xE0 | (slave << 4) | ((lba >> 24) & 0x0F))); /* LBA mode select */
+    io_wait();
+    outb(base + 2, (uint8_t)sectors);                        /* sector count */
+    outb(base + 3, (uint8_t)(lba & 0xFF));                   /* LBA low  */
+    outb(base + 4, (uint8_t)((lba >> 8) & 0xFF));            /* LBA mid  */
+    outb(base + 5, (uint8_t)((lba >> 16) & 0xFF));           /* LBA high */
+    outb(base + 7, 0x20);                                    /* READ SECTORS */
+
+    for (int s = 0; s < sectors; s++) {
+        if (ata_wait_drq(base) != 0) return -1;
+        uint16_t* w = (uint16_t*)(buf + s * 512);
+        for (int i = 0; i < 256; i++) w[i] = inw(base);
+    }
+    return sectors;
+}
+
+static uint32_t kstrtoul(const char* s) {
+    uint32_t v = 0;
+    while (*s >= '0' && *s <= '9') { v = v * 10 + (uint32_t)(*s - '0'); s++; }
+    return v;
+}
+
+static void kprint_hexdump(const uint8_t* buf, uint32_t len) {
+    for (uint32_t off = 0; off < len; off += 16) {
+        kprint_hex32pad(off, 8);
+        kputs("  ");
+        for (uint32_t i = 0; i < 16; i++) {
+            if (off + i < len) kprint_hex32pad(buf[off + i], 2);
+            else kputs("  ");
+            kputc(' ');
+        }
+        kputs(" |");
+        for (uint32_t i = 0; i < 16 && off + i < len; i++) {
+            uint8_t c = buf[off + i];
+            kputc((c >= 32 && c <= 126) ? (char)c : '.');
+        }
+        kputs("|\n");
+    }
+}
+
+static uint8_t g_sector_buf[512 * 4];
+
+static void show_read(const char* args) {
+    /* args: "<lba> [sectors] [bus]" — bus: 0=primary,1=secondary; slave flag via +1000 lba? keep simple */
+    uint32_t lba = 0;
+    int sectors = 1;
+    int bus = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    lba = kstrtoul(p);
+    while (*p >= '0' && *p <= '9') p++;
+    while (*p == ' ') p++;
+    if (*p) sectors = (int)kstrtoul(p);
+    while (*p >= '0' && *p <= '9') p++;
+    while (*p == ' ') p++;
+    if (*p) bus = (int)kstrtoul(p);
+    if (sectors < 1) sectors = 1;
+    if (sectors > 4) sectors = 4;
+    if (bus < 0 || bus > 1) bus = 0;
+
+    static const uint16_t bases[2] = { 0x1F0, 0x170 };
+    int n = ata_read_lba28(bases[bus], 0, lba, g_sector_buf, sectors);
+    if (n < 0) {
+        kputs("read: I/O error or no device at that LBA.\n");
+        return;
+    }
+    kputs("read ");
+    kprint_dec64(n);
+    kputs(" sector(s) from lba=");
+    kprint_dec64(lba);
+    kputs(" (bus ");
+    kputs(bus ? "secondary" : "primary");
+    kputs("):\n");
+    kprint_hexdump(g_sector_buf, (uint32_t)n * 512);
+}
+
 static void show_disk(void) {
     static const uint16_t bases[2] = { 0x1F0, 0x170 };
     static const char* chan[2] = { "primary", "secondary" };
@@ -766,6 +865,7 @@ void kernel_shell(void) {
             kputs("  cpu     - Show CPU vendor and features\n");
             kputs("  pci     - Scan PCI buses for devices\n");
             kputs("  disk    - Detect ATA disks (IDENTIFY)\n");
+            kputs("  read    - Read disk sectors: read <lba> [n] [bus]\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -789,6 +889,8 @@ void kernel_shell(void) {
             show_pci();
         } else if (kstrcmp(cmd, "disk") == 0) {
             show_disk();
+        } else if (kcmd_is(cmd, "read")) {
+            show_read(cmd + 4);
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
