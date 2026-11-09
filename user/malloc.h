@@ -18,7 +18,7 @@ static mhdr_t* heap_grow(u32 need) {
     u32 cur = sys_brk2(0);
     if (!cur || cur == 0xFFFFFFFFu) return 0;
     u32 total = (need + sizeof(mhdr_t) + 15u) & ~15u;
-    mhdr_t* nb = (mhdr_t*)(size_t)cur;
+    mhdr_t* nb = (mhdr_t*)(u32)cur;
     if (sys_brk2(cur + total) == 0xFFFFFFFFu) return 0;
     nb->cap = total - sizeof(mhdr_t); nb->is_free = 1; nb->next = 0;
     if (!g_heap) { g_heap = nb; return nb; }
@@ -31,7 +31,7 @@ static int heap_init(void) {
     if (g_heap) return 1;
     u32 b = sys_brk2(0);
     if (!b || b == 0xFFFFFFFFu) return 0;
-    mhdr_t* h = (mhdr_t*)(size_t)b;
+    mhdr_t* h = (mhdr_t*)(u32)b;
     h->cap = 0; h->is_free = 0; h->next = 0;   /* sentinel at brk start */
     g_heap = h;
     return 1;
@@ -45,32 +45,32 @@ void* malloc(u32 n) {
         if (p->is_free && p->cap >= n) {
             if (p->cap >= n + sizeof(mhdr_t) + 16) {
                 /* split: carve tail into a new free block */
-                mhdr_t* nb = (mhdr_t*)((u32)(size_t)p + sizeof(mhdr_t) + n);
+                mhdr_t* nb = (mhdr_t*)((u32)(u32)p + sizeof(mhdr_t) + n);
                 nb->cap = p->cap - n - sizeof(mhdr_t);
                 nb->is_free = 1; nb->next = p->next;
                 p->next = nb;
                 p->cap = n;
             }
             p->is_free = 0;
-            return (void*)((u32)(size_t)p + sizeof(mhdr_t));
+            return (void*)((u32)(u32)p + sizeof(mhdr_t));
         }
         p = p->next;
     }
     mhdr_t* g = heap_grow(n);
     if (!g) return 0;
     if (g->cap >= n + sizeof(mhdr_t) + 16) {
-        mhdr_t* nb = (mhdr_t*)((u32)(size_t)g + sizeof(mhdr_t) + n);
+        mhdr_t* nb = (mhdr_t*)((u32)(u32)g + sizeof(mhdr_t) + n);
         nb->cap = g->cap - n - sizeof(mhdr_t);
         nb->is_free = 1; nb->next = g->next;
         g->next = nb;
         g->cap = n;
     }
     g->is_free = 0;
-    return (void*)((u32)(size_t)g + sizeof(mhdr_t));
+    return (void*)((u32)(u32)g + sizeof(mhdr_t));
 }
 void free(void* ptr) {
     if (!ptr) return;
-    mhdr_t* p = (mhdr_t*)((u32)(size_t)ptr - sizeof(mhdr_t));
+    mhdr_t* p = (mhdr_t*)((u32)(u32)ptr - sizeof(mhdr_t));
     if (!p->is_free) p->is_free = 1;
     /* coalesce forward */
     while (p->next && p->next->is_free) {
