@@ -4291,6 +4291,7 @@ static void idt_init(void) {
 #define SYS_APPEND   14 /* ebx=name, ecx=buf, edx=len — append to file in cwd */
 #define SYS_FSTAT    15 /* ebx=fd -> eax=file size or -1 */
 #define SYS_STAT     16 /* ebx=name -> eax=file size, -1 err */
+#define SYS_GETCWD   17 /* ebx=buf, ecx=len -> cwd string, eax=len or -1 */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -4793,6 +4794,20 @@ void syscall_handler(uint32_t* regs) {
                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, full, &hit);
         if (r <= 0 || hit.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
         regs[7] = hit.size;
+        return;
+    } else if (nr == SYS_GETCWD) {
+        /* ebx=buf, ecx=len -> copies cwd string (NUL-term), eax=len or -1 */
+        volatile char* ub = (volatile char*)(size_t)regs[4];
+        uint32_t ulen = (uint32_t)regs[6];
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base || (uint32_t)(size_t)ub < g_user_base
+            || (uint32_t)(size_t)ub + ulen > limit || ulen < 2) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        uint32_t i = 0;
+        while (i + 1 < ulen && g_cwd[i]) { ub[i] = g_cwd[i]; i++; }
+        ub[i] = 0;
+        regs[7] = i;
         return;
     } else {
         kputs("\n[syscall] unknown nr=");
