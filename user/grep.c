@@ -14,13 +14,33 @@ static int contains(const char* h, int hlen, const char* n) {
     return 0;
 }
 
+static void uitoa(unsigned int v, char* o) {
+    char t[12]; int i = 0;
+    do { t[i++] = (char)('0' + v % 10); v /= 10; } while (v);
+    while (i) *o++ = t[--i];
+    *o = 0;
+}
+static void emit(const char* l, int ll, int num, int want_n) {
+    if (want_n) { char n[12]; uitoa(num, n); uputs(n); uputs(":"); }
+    uputs(l); uputs("\n");
+}
 void _start(void) {
     u32* sp = uargs();
     u32 argc = sp[0];
-    const char* pat = (argc > 1) ? (const char*)sp[2] : 0;
-    const char* path = (argc > 2) ? (const char*)sp[3] : 0;
+    int want_n = 0, invert = 0;
+    /* argv[k] == sp[k+1]; flags start at argv[1] */
+    u32 fi = 1;
+    while (fi + 1 < argc) {
+        const char* a = (const char*)sp[fi + 1];
+        if (!a) break;
+        if (a[0] == '-' && a[1] == 'n' && !a[2]) { want_n = 1; fi++; }
+        else if (a[0] == '-' && a[1] == 'v' && !a[2]) { invert = 1; fi++; }
+        else break;
+    }
+    const char* pat = (fi + 1 < argc) ? (const char*)sp[fi + 1] : 0;
+    const char* path = (fi + 2 < argc) ? (const char*)sp[fi + 2] : 0;
     if (!pat || !path) {
-        uputs("usage: grep <pattern> <file>\n");
+        uputs("usage: grep [-n] [-v] <pattern> <file>\n");
         sc3(SYS_EXIT, 0, 0, 0);
         __builtin_unreachable();
     }
@@ -28,7 +48,7 @@ void _start(void) {
     if (fd < 0) { uputs("grep: open failed\n"); sc3(SYS_EXIT,0,0,0); __builtin_unreachable(); }
     static char buf[4096];
     static char line[1024];
-    int ll = 0, matched = 0;
+    int ll = 0, matched = 0, lineno = 0;
     for (;;) {
         int n = sc3(SYS_READ, fd, (u32)buf, sizeof buf);
         if (n <= 0) break;
@@ -36,18 +56,19 @@ void _start(void) {
             char c = buf[i];
             if (c == '\n' || ll >= 1000) {
                 line[ll] = 0;
-                if (contains(line, ll, pat)) {
+                lineno++;
+                if (contains(line, ll, pat) != invert) {
                     matched++;
-                    uputs(line); uputs("\n");
+                    emit(line, ll, lineno, want_n);
                 }
                 ll = 0;
-                if (c != '\n') { /* line too long: skip rest handled by ll cap */ }
             } else line[ll++] = c;
         }
     }
     if (ll > 0) {
         line[ll] = 0;
-        if (contains(line, ll, pat)) { matched++; uputs(line); uputs("\n"); }
+        lineno++;
+        if (contains(line, ll, pat) != invert) { matched++; emit(line, ll, lineno, want_n); }
     }
     sc3(SYS_CLOSE, fd, 0, 0);
     (void)matched;
