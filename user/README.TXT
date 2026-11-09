@@ -11,6 +11,7 @@ Contents:
   APPEND.BIN ring-3 file append: SYS_APPEND via int 0x80
   STAT.BIN   ring-3 file size: SYS_STAT via int 0x80
   PWD.BIN    ring-3 cwd query: SYS_GETCWD via int 0x80
+  CD.BIN     ring-3 chdir: SYS_CHDIR via int 0x80
   ELFHELLO.ELF  ELF32 C program (gcc -m32 -nostdlib), exec ELF path
   README.TXT this file
 
@@ -40,5 +41,6 @@ as the FAT volume. Then in the shell:
   exec APPEND.BIN RENAMED.TXT
   exec STAT.BIN RENAMED.TXT
   exec PWD.BIN
+  exec CD.BIN SUBDIR
 
 Rebuild this image:  scripts/make_userdisk.sh
