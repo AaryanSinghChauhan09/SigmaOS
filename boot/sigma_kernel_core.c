@@ -2925,6 +2925,21 @@ static void show_export(const char* args) {
     if (env_set(name, p) == 0) { kputs("export: "); kputs(name); kputs("=ok\n"); }
     else kputs("export: table full\n");
 }
+static void show_printenv(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { show_env(); return; }
+    char name[32]; int nl = 0;
+    while (*p && *p != ' ' && nl < 31) name[nl++] = *p++;
+    name[nl] = 0;
+    int i = env_find(name);
+    if (i < 0) { kputs("printenv: not found\n"); return; }
+    char* eq = g_env[i];
+    while (*eq && *eq != '=') eq++;
+    if (*eq == '=') kputs(eq + 1);
+    kputs("\n");
+}
+static void show_tty(void) { kputs("/dev/tty\n"); }
 static void show_unset(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -3570,7 +3585,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
