@@ -336,6 +336,7 @@ static void paging_init(void);
 static void show_paging(void);
 static void gdt_init(void);
 static void show_gdt(void);
+static void idt_init(void);
 static uint32_t g_map_mb;
 
 #define MBI_FLAGS       0
@@ -1670,6 +1671,7 @@ void kernel_main(uint32_t magic, void* mb_info) {
 
     paging_init();
     gdt_init();
+    idt_init();
     kputs("[kernel] Paging enabled: 4MiB-page identity map, ");
     kprint_dec64(g_map_mb);
     kputs(" MiB.\n");
@@ -1886,6 +1888,120 @@ static void show_gdt(void) {
     kputs(" selector=0x");
     kprint_hex32(GDT_TSS);
     kputs("\n");
+}
+
+/* --------------------------------------------------------------------------
+ * IDT — 32 exception vectors. Stubs push vector (+dummy error word where
+ * the CPU doesn't supply one), then jump to isr_common_entry which calls
+ * isr_common(frame). Frame layout: [vec][err][eip][cs][eflags].
+ * -------------------------------------------------------------------------- */
+typedef struct __attribute__((packed)) {
+    uint16_t offset_low;
+    uint16_t selector;
+    uint8_t  zero;
+    uint8_t  type_attr;   /* P=1 DPL=0 type=32-bit interrupt gate = 0x8E */
+    uint16_t offset_high;
+    uint32_t zero2;
+} idt_entry_t;
+
+typedef struct __attribute__((packed)) {
+    uint16_t limit;
+    uint32_t base;
+} idtr_t;
+
+static idt_entry_t g_idt[32] __attribute__((section(".bss")));
+static idtr_t      g_idtr __attribute__((section(".bss")));
+
+static void isr_common(uint32_t* frame);
+
+__asm__(
+    ".section .text\n"
+    ".globl isr_common_entry\n"
+    "isr_common_entry:\n"
+    "    movl %esp, %eax\n"
+    "    pushl %eax\n"
+    "    call isr_common\n"
+    "    cli\n"
+    "    hlt\n"
+    "    jmp .\n"
+    ".macro ISR_NOERR n\n"
+    "isr_\\n:\n"
+    "    pushl $0\n"
+    "    pushl $\\n\n"
+    "    jmp isr_common_entry\n"
+    ".endm\n"
+    ".macro ISR_ERR n\n"
+    "isr_\\n:\n"
+    "    pushl $\\n\n"
+    "    jmp isr_common_entry\n"
+    ".endm\n"
+    /* vectors without CPU error code */
+    "ISR_NOERR 0\n" "ISR_NOERR 1\n" "ISR_NOERR 2\n" "ISR_NOERR 3\n"
+    "ISR_NOERR 4\n" "ISR_NOERR 5\n" "ISR_NOERR 6\n" "ISR_NOERR 7\n"
+    "ISR_ERR   8\n"
+    "ISR_NOERR 9\n"
+    "ISR_ERR   10\n" "ISR_ERR   11\n" "ISR_ERR   12\n" "ISR_ERR   13\n" "ISR_ERR   14\n"
+    "ISR_NOERR 15\n" "ISR_NOERR 16\n"
+    "ISR_ERR   17\n"
+    "ISR_NOERR 18\n" "ISR_NOERR 19\n" "ISR_NOERR 20\n"
+    "ISR_ERR   21\n"
+    "ISR_NOERR 22\n" "ISR_NOERR 23\n" "ISR_NOERR 24\n" "ISR_NOERR 25\n"
+    "ISR_NOERR 26\n" "ISR_NOERR 27\n" "ISR_NOERR 28\n"
+    "ISR_ERR   29\n" "ISR_ERR   30\n"
+    "ISR_NOERR 31\n"
+    ".section .data\n"
+    ".globl isr_table\n"
+    "isr_table:\n"
+    "    .long isr_0, isr_1, isr_2, isr_3, isr_4, isr_5, isr_6, isr_7\n"
+    "    .long isr_8, isr_9, isr_10, isr_11, isr_12, isr_13, isr_14, isr_15\n"
+    "    .long isr_16, isr_17, isr_18, isr_19, isr_20, isr_21, isr_22, isr_23\n"
+    "    .long isr_24, isr_25, isr_26, isr_27, isr_28, isr_29, isr_30, isr_31\n"
+    ".section .text\n"
+);
+
+static void isr_common(uint32_t* frame) {
+    static const char* names[32] = {
+        "#DE divide error", "#DB debug", "NMI", "#BP breakpoint", "#OF overflow",
+        "#BR bound", "#UD invalid opcode", "#NM device not avail", "#DF double fault",
+        "#CS coproc seg overrun", "#TS invalid TSS", "#NP seg not present",
+        "#SS stack fault", "#GP general protection", "#PF page fault",
+        "#(reserved15)", "#MF x87 FP", "#AC alignment check", "#MC machine check",
+        "#XM SIMD", "#VE virtualization", "#CP control protection",
+        "#(reserved22)", "#(reserved23)", "#(reserved24)", "#(reserved25)",
+        "#(reserved26)", "#(reserved27)", "#(reserved28)", "#HV hypervisor",
+        "#VC VMM comm", "#SX security"
+    };
+    uint32_t vec = frame[0];
+    uint32_t err = frame[1];
+    uint32_t eip = frame[2];
+    uint32_t cs  = frame[3];
+    kputs("\n*** EXCEPTION ");
+    kputs(vec < 32 ? names[vec] : "#??");
+    kputs(" vec=");
+    kprint_dec64(vec);
+    kputs(" err=");
+    kprint_hex32(err);
+    kputs(" eip=");
+    kprint_hex32(eip);
+    kputs(" cs=");
+    kprint_hex32(cs);
+    kputs(" ***\n");
+}
+
+static void idt_init(void) {
+    extern void* isr_table[32];
+    for (int i = 0; i < 32; i++) {
+        uint32_t addr = (uint32_t)(size_t)isr_table[i];
+        g_idt[i].offset_low  = (uint16_t)(addr & 0xFFFF);
+        g_idt[i].selector    = GDT_KCODE;
+        g_idt[i].zero        = 0;
+        g_idt[i].type_attr   = 0x8E;
+        g_idt[i].offset_high = (uint16_t)((addr >> 16) & 0xFFFF);
+        g_idt[i].zero2       = 0;
+    }
+    g_idtr.limit = (uint16_t)(sizeof(g_idt) - 1);
+    g_idtr.base  = (uint32_t)(size_t)&g_idt[0];
+    __asm__ volatile("lidt %0" :: "m"(g_idtr) : "memory");
 }
 
 __attribute__((section(".text"), naked))
