@@ -1912,7 +1912,7 @@ typedef struct __attribute__((packed)) {
 static idt_entry_t g_idt[32] __attribute__((section(".bss")));
 static idtr_t      g_idtr __attribute__((section(".bss")));
 
-static void isr_common(uint32_t* frame);
+void isr_common(uint32_t* frame);
 
 __asm__(
     ".section .text\n"
@@ -1959,7 +1959,7 @@ __asm__(
     ".section .text\n"
 );
 
-static void isr_common(uint32_t* frame) {
+void isr_common(uint32_t* frame) {
     static const char* names[32] = {
         "#DE divide error", "#DB debug", "NMI", "#BP breakpoint", "#OF overflow",
         "#BR bound", "#UD invalid opcode", "#NM device not avail", "#DF double fault",
