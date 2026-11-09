@@ -334,6 +334,8 @@ static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
                             uint32_t data_lba, uint8_t spc);
 static void paging_init(void);
 static void show_paging(void);
+static void gdt_init(void);
+static void show_gdt(void);
 static uint32_t g_map_mb;
 
 #define MBI_FLAGS       0
@@ -1590,6 +1592,7 @@ void kernel_shell(void) {
             kputs("  cat     - Print file: cat <name>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
+            kputs("  gdt     - Show GDT/TSS segment state\n");
             kputs("  clear   - Clear the console screen\n");
             kputs("  reboot  - Restart the computer\n");
             kputs("  halt    - Halt the CPU safely\n\n");
@@ -1627,6 +1630,8 @@ void kernel_shell(void) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
             show_paging();
+        } else if (kstrcmp(cmd, "gdt") == 0) {
+            show_gdt();
         } else if (kstrcmp(cmd, "clear") == 0) {
             vga_clear();
             show_banner();
@@ -1664,9 +1669,11 @@ void kernel_main(uint32_t magic, void* mb_info) {
     show_banner();
 
     paging_init();
+    gdt_init();
     kputs("[kernel] Paging enabled: 4MiB-page identity map, ");
     kprint_dec64(g_map_mb);
     kputs(" MiB.\n");
+    kputs("[kernel] GDT loaded: kernel+user segments, TSS ready.\n");
 
     kputs("[kernel] Multiboot header validated.\n");
     kputs("[kernel] VGA console initialized at 0xB8000.\n");
@@ -1751,6 +1758,136 @@ static void show_paging(void) {
     kputs(" MiB)\n");
 }
 
+/* --------------------------------------------------------------------------
+ * GDT + TSS — ring-0/ring-3 segment setup
+ * Layout: 0x00 null | 0x08 kcode | 0x10 kdata | 0x18 ucode(DPL3)
+ *         0x20 udata(DPL3) | 0x28 TSS (16-byte descriptor)
+ * -------------------------------------------------------------------------- */
+typedef struct __attribute__((packed)) {
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t  base_mid;
+    uint8_t  access;
+    uint8_t  granularity;
+    uint8_t  base_high;
+} gdt_entry_t;
+
+typedef struct __attribute__((packed)) {
+    uint16_t limit;
+    uint32_t base;
+} gdtr_t;
+
+typedef struct __attribute__((packed)) {
+    uint32_t back_link;
+    uint32_t esp0, ss0, esp1, ss1, esp2, ss2;
+    uint32_t cr3;
+    uint32_t eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi;
+    uint32_t es, cs, ss, ds, fs, gs;
+    uint32_t ldt;
+    uint16_t debug_flag, io_map_base;
+} tss_t;
+
+static gdt_entry_t g_gdt[7] __attribute__((aligned(16), section(".bss")));
+static tss_t       g_tss            __attribute__((section(".bss")));
+static gdtr_t      g_gdtr           __attribute__((section(".bss")));
+
+#define GDT_KCODE 0x08
+#define GDT_KDATA 0x10
+#define GDT_UCODE 0x18
+#define GDT_UDATA 0x20
+#define GDT_TSS   0x28
+
+static gdt_entry_t gdt_make(uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
+    gdt_entry_t e;
+    e.limit_low  = (uint16_t)(limit & 0xFFFF);
+    e.base_low   = (uint16_t)(base & 0xFFFF);
+    e.base_mid   = (uint8_t)((base >> 16) & 0xFF);
+    e.access     = access;
+    e.granularity= gran;
+    e.base_high  = (uint8_t)((base >> 24) & 0xFF);
+    return e;
+}
+
+static void gdt_init(void) {
+    /* clear first (BSS may be garbage) */
+    for (int i = 0; i < 7; i++) {
+        g_gdt[i].limit_low = 0; g_gdt[i].base_low = 0; g_gdt[i].base_mid = 0;
+        g_gdt[i].access = 0; g_gdt[i].granularity = 0; g_gdt[i].base_high = 0;
+    }
+    for (uint32_t i = 0; i < sizeof(g_tss); i++) ((uint8_t*)&g_tss)[i] = 0;
+
+    const uint8_t code_acc = 0x9A; /* P=1 DPL=0 S=1 type=exec/read */
+    const uint8_t data_acc = 0x92; /* P=1 DPL=0 S=1 type=rw */
+    const uint8_t ucode_acc = 0xFA;/* P=1 DPL=3 S=1 type=exec/read */
+    const uint8_t udata_acc = 0xF2;/* P=1 DPL=3 S=1 type=rw */
+    const uint8_t gran_4g   = 0xCF;/* G=1 D/B=1 limit-hi=0xF -> 4GiB */
+
+    g_gdt[1] = gdt_make(0, 0xFFFFF, code_acc, gran_4g);
+    g_gdt[2] = gdt_make(0, 0xFFFFF, data_acc, gran_4g);
+    g_gdt[3] = gdt_make(0, 0xFFFFF, ucode_acc, gran_4g);
+    g_gdt[4] = gdt_make(0, 0xFFFFF, udata_acc, gran_4g);
+
+    /* TSS: esp0 = kernel stack top so interrupts from ring 3 land safely */
+    extern uint8_t* stack_top;
+    g_tss.esp0 = (uint32_t)(size_t)stack_top;
+    g_tss.ss0  = GDT_KDATA;
+    g_tss.cr3  = (uint32_t)(size_t)&g_page_dir[0];
+
+    /* TSS descriptor occupies g_gdt[5..6] (16 bytes) */
+    uint32_t tss_base = (uint32_t)(size_t)&g_tss;
+    uint32_t tss_lim  = (uint32_t)sizeof(g_tss) - 1;
+    g_gdt[5] = gdt_make(tss_base, tss_lim, 0x89, 0x00); /* avail 32-bit TSS, byte granular */
+    g_gdt[5].granularity = (uint8_t)((tss_lim >> 16) & 0x0F);
+    /* second half of TSS descriptor: base bits 32-63 = 0 in 32-bit mode */
+    for (uint32_t i = 0; i < sizeof(gdt_entry_t); i++)
+        ((uint8_t*)&g_gdt[6])[i] = 0;
+
+    g_gdtr.limit = (uint16_t)(sizeof(g_gdt) - 1);
+    g_gdtr.base  = (uint32_t)(size_t)&g_gdt[0];
+
+    __asm__ volatile(
+        "lgdt %0\n"
+        "movw %1, %%ax\n"
+        "movw %%ax, %%ds\n"
+        "movw %%ax, %%es\n"
+        "movw %%ax, %%fs\n"
+        "movw %%ax, %%gs\n"
+        "movw %%ax, %%ss\n"
+        "pushl $0x08\n"
+        "pushl $1f\n"
+        "lret\n"
+        "1:\n"
+        "movw %2, %%ax\n"
+        "ltr %%ax\n"
+        :: "m"(g_gdtr), "i"(GDT_KDATA), "i"(GDT_TSS)
+        : "eax", "memory");
+}
+
+static void show_gdt(void) {
+    uint16_t cs, ds, ss, es;
+    __asm__ volatile("movw %%cs, %0\nmovw %%ds, %1\nmovw %%ss, %2\nmovw %%es, %3"
+                     : "=r"(cs), "=r"(ds), "=r"(ss), "=r"(es));
+    kputs("GDT: base=");
+    kprint_hex32(g_gdtr.base);
+    kputs(" limit=");
+    kprint_dec64(g_gdtr.limit);
+    kputs("\nCS=");
+    kprint_hex32(cs);
+    kputs(" DS=");
+    kprint_hex32(ds);
+    kputs(" SS=");
+    kprint_hex32(ss);
+    kputs(" ES=");
+    kprint_hex32(es);
+    kputs("\nTSS: base=");
+    kprint_hex32((uint32_t)(size_t)&g_tss);
+    kputs(" esp0=");
+    kprint_hex32(g_tss.esp0);
+    kputs(" selector=0x");
+    kprint_hex32(GDT_TSS);
+    kputs("\n");
+}
+
 __attribute__((section(".text"), naked))
 void _start(void) {
     __asm__ volatile (
@@ -1767,5 +1904,4 @@ void _start(void) {
 /* 32 KiB Kernel Stack */
 __attribute__((section(".bss"), aligned(16)))
 static uint8_t stack[32768];
-__attribute__((used))
-static uint8_t* stack_top = stack + sizeof(stack);
+uint8_t* stack_top = stack + sizeof(stack);
