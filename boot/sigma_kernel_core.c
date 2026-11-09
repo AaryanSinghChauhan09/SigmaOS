@@ -396,6 +396,8 @@ static int fat_ensure_mounted(void);
 static void* kmalloc(uint32_t size);
 static void kfree(void* ptr);
 static uint32_t pmm_alloc(void);
+static int fat_free_chain(int kind, uint32_t start);
+static uint32_t fat_alloc_chain(int kind, uint32_t count);
 void resume_user(void);   /* naked asm: restore preempted user ctx */
 static uint32_t find_user_region(void);
 static void enter_user(uint32_t eip, uint32_t esp);
@@ -1818,6 +1820,65 @@ static uint32_t fat_alloc_cluster(int kind) {
     return found;
 }
 
+/* Patch a single FAT entry (read-modify-write its sector).
+ * val semantics per kind: raw next-cluster value (EOC markers included). */
+static int fat_set_entry(int kind, uint32_t clus, uint32_t val) {
+    if (fat_ensure_mounted() != 0) return -1;
+    uint32_t byte_off, width;
+    if (kind == 2)      { byte_off = clus * 4; width = 4; }
+    else if (kind == 1) { byte_off = clus * 2; width = 2; }
+    else {
+        byte_off = clus + (clus >> 1); width = 2;
+        if (byte_off + 1 >= g_vol_fatsz * 512u) return -1;
+    }
+    uint32_t sec = byte_off / 512, off = byte_off % 512;
+    /* FAT12 entries can straddle a sector boundary — handle by loading
+     * up to 2 sectors into a contiguous buffer */
+    uint8_t tmp[1024];
+    int nsec = (off + width > 512) ? 2 : 1;
+    if (ata_read_lba28(0x1F0, 0, g_vol_fat_lba + sec, tmp, nsec) < 0) return -1;
+    if (kind == 2) {
+        tmp[off]   = (uint8_t)(val & 0xFF);
+        tmp[off+1] = (uint8_t)((val >> 8) & 0xFF);
+        tmp[off+2] = (uint8_t)((val >> 16) & 0xFF);
+        tmp[off+3] = (uint8_t)((val >> 24) & 0xFF);
+    } else if (kind == 1) {
+        tmp[off] = (uint8_t)(val & 0xFF); tmp[off+1] = (uint8_t)(val >> 8);
+    } else {
+        uint16_t v = (uint16_t)tmp[off] | ((uint16_t)tmp[off+1] << 8);
+        if (clus & 1) v = (uint16_t)((v & 0x000F) | ((val & 0x0FFFu) << 4));
+        else          v = (uint16_t)((v & 0xF000) | (val & 0x0FFFu));
+        tmp[off] = (uint8_t)(v & 0xFF); tmp[off+1] = (uint8_t)(v >> 8);
+    }
+    return ata_write_lba28(0x1F0, 0, g_vol_fat_lba + sec, tmp, nsec);
+}
+
+/* Allocate `count` clusters as a linked chain (last = EOC).
+ * Returns first cluster or 0. */
+static uint32_t fat_alloc_chain(int kind, uint32_t count) {
+    if (count == 0 || count > 4096) return 0;
+    uint32_t* cl = (uint32_t*)kmalloc(count * 4);
+    if (!cl) return 0;
+    uint32_t n = 0;
+    for (uint32_t i = 0; i < count; i++) {
+        uint32_t c = fat_alloc_cluster(kind);
+        if (!c) break;
+        cl[n++] = c;
+    }
+    if (n == 0) { kfree(cl); return 0; }
+    /* link them: entry[i] = cl[i+1], last stays EOC from alloc */
+    for (uint32_t i = 0; i + 1 < n; i++) {
+        if (fat_set_entry(kind, cl[i], cl[i+1]) != 0) {
+            /* rollback: free what we allocated */
+            fat_free_chain(kind, cl[0]);
+            kfree(cl); return 0;
+        }
+    }
+    uint32_t first = cl[0];
+    kfree(cl);
+    return first;
+}
+
 struct slot_res { uint32_t lba; uint32_t off; int status; };
 /* status: 1=slot found, 0=dir full, -1=name exists, -2=io error */
 
@@ -2299,6 +2360,112 @@ static void show_mv(const char* args) {
     kputs("\n");
 }
 
+/* cp <src> <dst-name> — copy a file into the current directory.
+ * Src may be a cwd-relative or absolute path; dst is a single 8.3 name.
+ * Multi-cluster files supported via fat_alloc_chain. */
+static void show_cp(const char* args) {
+    char src[160], dst[64];
+    int si = 0, di = 0;
+    const char* p = args;
+    while (*p == ' ') p++;
+    while (*p && *p != ' ' && si < 159) src[si++] = *p++;
+    src[si] = 0;
+    while (*p == ' ') p++;
+    while (*p && *p != ' ' && di < 63) dst[di++] = *p++;
+    dst[di] = 0;
+    if (!si || !di) { kputs("usage: cp <src> <dst>\n"); return; }
+    if (kstrlen(dst) > 12) { kputs("cp: dst name too long (8.3 only).\n"); return; }
+    for (const char* q = dst; *q; q++) {
+        if (*q == '/' || *q == '\\') { kputs("cp: dst must be a plain name.\n"); return; }
+    }
+
+    if (fat_ensure_mounted() != 0) { kputs("cp: no FAT volume.\n"); return; }
+    int kind = g_vol_kind;
+
+    /* resolve source path against cwd */
+    char rpath[160];
+    if (fs_resolve(src, rpath, (int)sizeof rpath) != 0) {
+        kputs("cp: src path too long.\n"); return;
+    }
+    struct fat_hit hit;
+    int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                        g_vol_fat_lba, g_vol_data_lba, g_vol_spc, rpath, &hit);
+    if (lr <= 0) { kputs("cp: source not found.\n"); return; }
+    if (hit.is_dir) { kputs("cp: source is a directory.\n"); return; }
+    if (hit.cluster < 2 || hit.size == 0) { kputs("cp: empty file.\n"); return; }
+    if (hit.size > 0x400000u) { kputs("cp: file too large (>4MiB).\n"); return; }
+
+    /* dst parent = cwd (same policy as write) */
+    int in_root = 1;
+    uint32_t dir_cluster = 0;
+    if (g_cwd[0]) {
+        struct fat_hit dh;
+        int dr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
+                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &dh);
+        if (dr <= 0 || !dh.is_dir) { kputs("cp: cwd not a directory.\n"); return; }
+        in_root = 0;
+        dir_cluster = dh.cluster;
+    }
+    uint8_t want[11];
+    fat_name_to_83(dst, want);
+    struct slot_res slot;
+    fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                      g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                      g_vol_data_lba, g_vol_spc, want, &slot);
+    if (slot.status == -1) { kputs("cp: dst name exists.\n"); return; }
+    if (slot.status != 1) { kputs("cp: directory full or IO error.\n"); return; }
+
+    uint32_t clus_bytes = (uint32_t)g_vol_spc * 512u;
+    uint32_t need = (hit.size + clus_bytes - 1) / clus_bytes;
+    uint32_t first = fat_alloc_chain(kind, need);
+    if (!first) { kputs("cp: disk full or alloc failed.\n"); return; }
+
+    /* copy data cluster-by-cluster, sector-by-sector */
+    uint32_t remaining = hit.size;
+    uint32_t sc = hit.cluster, dc = first;
+    int guard = 0, fail = 0;
+    while (sc >= 2 && !fat_eoc_any(kind, sc) && guard++ < 8192 && remaining > 0) {
+        if (dc < 2 || fat_eoc_any(kind, dc)) { fail = 1; break; }
+        uint32_t sbase = g_vol_data_lba + (sc - 2) * g_vol_spc;
+        uint32_t dbase = g_vol_data_lba + (dc - 2) * g_vol_spc;
+        for (uint32_t s = 0; s < g_vol_spc && remaining > 0; s++) {
+            if (ata_read_lba28(0x1F0, 0, sbase + s, g_file_buf, 1) < 0 ||
+                ata_write_lba28(0x1F0, 0, dbase + s, g_file_buf, 1) < 0) {
+                fail = 1; break;
+            }
+            remaining = remaining > 512 ? remaining - 512 : 0;
+        }
+        if (fail) break;
+        sc = fat_next_any(g_vol_fat_lba, kind, sc);
+        dc = fat_next_any(g_vol_fat_lba, kind, dc);
+        if (dc < 2 || fat_eoc_any(kind, dc)) dc = 0;
+    }
+    if (fail || remaining > 0) {
+        fat_free_chain(kind, first);
+        kputs("cp: copy failed mid-file.\n"); return;
+    }
+
+    /* dst dirent */
+    uint8_t e[32];
+    for (int i = 0; i < 32; i++) e[i] = 0;
+    for (int i = 0; i < 11; i++) e[i] = want[i];
+    e[11] = 0x20;
+    e[20] = (uint8_t)(first & 0xFF); e[21] = (uint8_t)(first >> 8);
+    if (kind == 2) { e[26] = (uint8_t)(first >> 16); e[27] = (uint8_t)(first >> 24); }
+    uint32_t sz = hit.size;
+    e[28] = (uint8_t)(sz & 0xFF); e[29] = (uint8_t)((sz >> 8) & 0xFF);
+    e[30] = (uint8_t)((sz >> 16) & 0xFF); e[31] = (uint8_t)(sz >> 24);
+    if (fat_write_dirent(slot.lba, slot.off, e) != 0) {
+        kputs("cp: dirent write failed.\n"); return;
+    }
+    kputs("cp: /");
+    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+    kputs(dst);
+    kputs(" (");
+    kprint_dec64(hit.size);
+    kputs(" bytes)\n");
+}
+
 static void show_cat(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
@@ -2699,6 +2866,7 @@ void kernel_shell(void) {
             kputs("  rm      - Delete file: rm <name>\n");
             kputs("  rmdir   - Remove empty dir: rmdir <name>\n");
             kputs("  mv      - Rename file: mv <old> <new>\n");
+            kputs("  cp      - Copy file: cp <src> <dst>\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
             kputs("  gdt     - Show GDT/TSS segment state\n");
@@ -2760,6 +2928,8 @@ void kernel_shell(void) {
             show_rmdir(cmd + 5);
         } else if (kcmd_is(cmd, "mv")) {
             show_mv(cmd + 2);
+        } else if (kcmd_is(cmd, "cp")) {
+            show_cp(cmd + 2);
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
