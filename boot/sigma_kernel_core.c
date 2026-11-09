@@ -360,9 +360,10 @@ static int fat_eoc_any(int kind, uint32_t c);
 struct fat_hit { uint32_t cluster; uint32_t size; int is_dir; };
 static int fat_scan_dir(uint32_t start_cluster, int kind, uint32_t fat_lba,
                         uint32_t data_lba, uint8_t spc, const uint8_t want[11],
-                        struct fat_hit* hit);
+                        const char* want_name, struct fat_hit* hit);
 static int fat_scan_root16(uint32_t root_lba, uint32_t root_secs,
-                           const uint8_t want[11], struct fat_hit* hit);
+                           const uint8_t want[11], const char* want_name,
+                           struct fat_hit* hit);
 static int fat_lookup(int kind, uint32_t root_clus, uint32_t root_lba, uint32_t root_secs,
                       uint32_t fat_lba, uint32_t data_lba, uint8_t spc,
                       const char* path, struct fat_hit* hit);
@@ -1265,13 +1266,89 @@ static int fat_eoc_any(int kind, uint32_t c) {
     return c >= (uint32_t)fat_eoc(kind == 0);
 }
 
-/* Scan a cluster-chain directory for an 8.3 name.
+/* ---- LFN (long filename) support ----
+ * LFN entries (attr 0x0F) precede their short entry, stored tail-first.
+ * ord = e[0]&0x1F (1-based fragment index); bit6 marks the last fragment.
+ * 13 UCS-2 chars per entry: idx0-4 @off1, idx5-10 @off14, idx11-12 @off28.
+ * Fragment ord n occupies name chars (n-1)*13 .. n*13-1. */
+static int fat_lfn_char(const uint8_t* e, int idx) {
+    uint32_t off = (idx < 5) ? (1 + idx * 2)
+                 : (idx < 11) ? (14 + (idx - 5) * 2)
+                 : (28 + (idx - 11) * 2);
+    uint16_t u = (uint16_t)e[off] | ((uint16_t)e[off + 1] << 8);
+    if (u == 0x0000 || u == 0xFFFF) return -1;
+    if (u > 0x7F) return '?';
+    return (u >= 'a' && u <= 'z') ? (int)(u - 32) : (int)u;
+}
+
+/* Short-name checksum used to bind LFN entries to their 8.3 entry. */
+static uint8_t fat_lfn_cksum(const uint8_t* s11) {
+    uint8_t sum = 0;
+    for (int i = 0; i < 11; i++) {
+        sum = (uint8_t)(((sum & 1) ? 0x80 : 0) + (sum >> 1) + s11[i]);
+    }
+    return sum;
+}
+
+/* Case-insensitive compare of assembled LFN (already upper-folded) vs raw name. */
+static int fat_lfn_match(const char* lfn, const char* name) {
+    int i = 0;
+    for (; name[i] && lfn[i]; i++) {
+        char c = name[i];
+        if (c >= 'a' && c <= 'z') c -= 32;
+        if (lfn[i] != c) return 0;
+    }
+    return name[i] == '\0' && lfn[i] == '\0';
+}
+
+/* Per-scan LFN accumulator state (resets after each short entry). */
+struct lfn_acc {
+    char     name[256];
+    uint8_t  ck;
+    int      active;
+};
+
+static void lfn_acc_reset(struct lfn_acc* a) {
+    for (int i = 0; i < 256; i++) a->name[i] = 0;
+    a->ck = 0;
+    a->active = 0;
+}
+
+/* Feed one dir entry; returns 1 if it was an LFN entry consumed. */
+static int lfn_acc_feed(struct lfn_acc* a, const uint8_t* e) {
+    if (e[11] != 0x0F) return 0;
+    if (e[0] & 0x80) return 1;              /* erased LFN: skip silently */
+    int ord = e[0] & 0x1F;
+    if (ord < 1 || ord > 20) return 1;
+    a->ck = e[13];
+    a->active = 1;
+    int base = (ord - 1) * 13;
+    for (int c = 0; c < 13 && base + c < 255; c++) {
+        int ch = fat_lfn_char(e, c);
+        if (ch < 0) break;
+        a->name[base + c] = (char)ch;
+    }
+    return 1;
+}
+
+/* Does the pending LFN match this short entry? Verifies checksum first. */
+static int lfn_acc_match(struct lfn_acc* a, const uint8_t* short_e,
+                         const char* want_name) {
+    if (!a->active || !want_name || !want_name[0]) return 0;
+    if (a->ck != fat_lfn_cksum(short_e)) return 0;
+    return fat_lfn_match(a->name, want_name);
+}
+
+/* Scan a cluster-chain directory for an 8.3 or LFN name.
+ * want_name: raw path component for LFN comparison (NULL = 8.3 only).
  * Returns 1=found, 0=not found, -1=read error. */
 static int fat_scan_dir(uint32_t start_cluster, int kind, uint32_t fat_lba,
                         uint32_t data_lba, uint8_t spc, const uint8_t want[11],
-                        struct fat_hit* hit) {
+                        const char* want_name, struct fat_hit* hit) {
     uint32_t clus = start_cluster;
     int guard = 0;
+    struct lfn_acc lfn;
+    lfn_acc_reset(&lfn);
     while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 64) {
         uint32_t clus_lba = data_lba + (clus - 2) * spc;
         uint32_t secs = spc > 8 ? 8 : spc;
@@ -1288,8 +1365,11 @@ static int fat_scan_dir(uint32_t start_cluster, int kind, uint32_t fat_lba,
         for (int i = 0; i < entries; i++) {
             uint8_t* e = g_fs_buf + i * 32;
             if (e[0] == 0x00) return 0;
-            if (e[0] == 0xE5 || e[11] == 0x0F) continue;
-            if (!fat_name_eq(e, want)) continue;
+            if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+            if (lfn_acc_feed(&lfn, e)) continue;
+            int match = fat_name_eq(e, want) || lfn_acc_match(&lfn, e, want_name);
+            lfn_acc_reset(&lfn);
+            if (!match) continue;
             hit->is_dir = (e[11] & 0x10) != 0;
             if (kind == 2)
                 hit->cluster = (((uint32_t)e[20] | ((uint32_t)e[21] << 8)) << 16)
@@ -1351,9 +1431,10 @@ static void fat_print_chain(uint32_t start_cluster, int kind, uint32_t fat_lba,
     kputs(" entrie(s).\n");
 }
 
-/* Scan the fixed-size FAT12/16 root directory region for an 8.3 name. */
+/* Scan the fixed-size FAT12/16 root directory region for an 8.3 or LFN name. */
 static int fat_scan_root16(uint32_t root_lba, uint32_t root_secs,
-                           const uint8_t want[11], struct fat_hit* hit) {
+                           const uint8_t want[11], const char* want_name,
+                           struct fat_hit* hit) {
     if (root_secs > 8) root_secs = 8;
     uint8_t* dst = g_fs_buf;
     uint32_t done = 0;
@@ -1364,11 +1445,16 @@ static int fat_scan_root16(uint32_t root_lba, uint32_t root_secs,
         dst += n * 512;
         done += (uint32_t)n;
     }
+    struct lfn_acc lfn;
+    lfn_acc_reset(&lfn);
     for (uint32_t i = 0; i < done * 16; i++) {
         uint8_t* e = g_fs_buf + i * 32;
         if (e[0] == 0x00) return 0;
-        if (e[0] == 0xE5 || e[11] == 0x0F) continue;
-        if (!fat_name_eq(e, want)) continue;
+        if (e[0] == 0xE5) { lfn_acc_reset(&lfn); continue; }
+        if (lfn_acc_feed(&lfn, e)) continue;
+        int match = fat_name_eq(e, want) || lfn_acc_match(&lfn, e, want_name);
+        lfn_acc_reset(&lfn);
+        if (!match) continue;
         hit->is_dir = (e[11] & 0x10) != 0;
         hit->cluster = (uint32_t)e[26] | ((uint32_t)e[27] << 8);
         hit->size = (uint32_t)e[28] | ((uint32_t)e[29] << 8)
@@ -1409,11 +1495,11 @@ static int fat_lookup(int kind, uint32_t root_clus, uint32_t root_lba, uint32_t 
         int r;
         if (in_root) {
             if (kind == 2)
-                r = fat_scan_dir(root_clus, kind, fat_lba, data_lba, spc, want, &cur);
+                r = fat_scan_dir(root_clus, kind, fat_lba, data_lba, spc, want, comp, &cur);
             else
-                r = fat_scan_root16(root_lba, root_secs, want, &cur);
+                r = fat_scan_root16(root_lba, root_secs, want, comp, &cur);
         } else {
-            r = fat_scan_dir(cur_cluster, kind, fat_lba, data_lba, spc, want, &cur);
+            r = fat_scan_dir(cur_cluster, kind, fat_lba, data_lba, spc, want, comp, &cur);
         }
         if (r <= 0) return r;
         if (last) { *hit = cur; return 1; }
