@@ -2993,6 +2993,42 @@ static void show_sort(const char* args) {
     kfree(buf);
 }
 
+/* expr <a> <op> <b> — integer arithmetic: + - * / % = != < <= > >=. */
+static void show_expr(const char* args) {
+    const char* p = args;
+    while (*p == ' ') p++;
+    if (!*p) { kputs("usage: expr <a> <op> <b>\n"); return; }
+    char ta[32], to[8], tb[32];
+    int la = 0, lo = 0, lb = 0;
+    while (*p && *p != ' ' && la < 31) ta[la++] = *p++;
+    ta[la] = 0;
+    while (*p == ' ') p++;
+    while (*p && *p != ' ' && lo < 7) to[lo++] = *p++;
+    to[lo] = 0;
+    while (*p == ' ') p++;
+    while (*p && lb < 31) tb[lb++] = *p++;
+    tb[lb] = 0;
+    if (!la || !lo || !lb) { kputs("usage: expr <a> <op> <b>\n"); return; }
+    long long a = (long long)kstrtoul(ta), b = (long long)kstrtoul(tb);
+    long long r = 0; int ok = 1;
+    if (kstrcmp(to, "+") == 0) r = a + b;
+    else if (kstrcmp(to, "-") == 0) r = a - b;
+    else if (kstrcmp(to, "*") == 0) r = a * b;
+    else if (kstrcmp(to, "/") == 0) { if (!b) ok = 0; else r = a / b; }
+    else if (kstrcmp(to, "%") == 0) { if (!b) ok = 0; else r = a % b; }
+    else if (kstrcmp(to, "=") == 0) r = (a == b);
+    else if (kstrcmp(to, "!=") == 0) r = (a != b);
+    else if (kstrcmp(to, "<") == 0) r = (a < b);
+    else if (kstrcmp(to, "<=") == 0) r = (a <= b);
+    else if (kstrcmp(to, ">") == 0) r = (a > b);
+    else if (kstrcmp(to, ">=") == 0) r = (a >= b);
+    else ok = 0;
+    if (!ok) { kputs("expr: bad op or div by zero\n"); return; }
+    if (r < 0) { kputc('-'); kprint_dec64((uint64_t)(-r)); }
+    else kprint_dec64((uint64_t)r);
+    kputs("\n");
+}
+
 /* factor <n> — prime factorization (trial division, 32-bit). */
 static void show_factor(const char* args) {
     const char* p = args;
@@ -4065,7 +4101,7 @@ static const char* const g_cmd_names[] = {
     "mkdir","write","rm","rmdir","mv","cp","append","hex","stat","grep",
     "wc","uptime","ver","info","paging","gdt","user","exec","fg","timer",
     "sched","ps","dmesg","memalloc","free","history","clear","reboot","halt",
-    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor",
+    "fastfetch","whoami","uname","which","sleep","head","tail","seq","alias","id","arch","hostname","true","false",":","cal","cowsay","reset","export","env","unset","printenv","tty","printf","echo","sort","uniq","tr","cut","nl","rev","tac","fold","factor","expr",
     "ll","la","cls","quit","q","sys","neofetch","fetch","rm-rf",
 };
 #define NUM_CMDS (sizeof(g_cmd_names)/sizeof(g_cmd_names[0]))
