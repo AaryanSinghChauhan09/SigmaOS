@@ -20,14 +20,16 @@ static void uitoa(unsigned int v, char* o) {
     while (i) *o++ = t[--i];
     *o = 0;
 }
+static int g_count_only;
 static void emit(const char* l, int ll, int num, int want_n) {
+    if (g_count_only) return;
     if (want_n) { char n[12]; uitoa(num, n); uputs(n); uputs(":"); }
     uputs(l); uputs("\n");
 }
 void _start(void) {
     u32* sp = uargs();
     u32 argc = sp[0];
-    int want_n = 0, invert = 0;
+    int want_n = 0, invert = 0, want_c = 0;
     /* argv[k] == sp[k+1]; flags start at argv[1] */
     u32 fi = 1;
     while (fi + 1 < argc) {
@@ -35,15 +37,17 @@ void _start(void) {
         if (!a) break;
         if (a[0] == '-' && a[1] == 'n' && !a[2]) { want_n = 1; fi++; }
         else if (a[0] == '-' && a[1] == 'v' && !a[2]) { invert = 1; fi++; }
+        else if (a[0] == '-' && a[1] == 'c' && !a[2]) { want_c = 1; fi++; }
         else break;
     }
     const char* pat = (fi + 1 < argc) ? (const char*)sp[fi + 1] : 0;
     const char* path = (fi + 2 < argc) ? (const char*)sp[fi + 2] : 0;
     if (!pat || !path) {
-        uputs("usage: grep [-n] [-v] <pattern> <file>\n");
+        uputs("usage: grep [-nvc] <pattern> <file>\n");
         sc3(SYS_EXIT, 0, 0, 0);
         __builtin_unreachable();
     }
+    g_count_only = want_c;
     int fd = sc3(SYS_OPEN, (u32)path, 0, 0);
     if (fd < 0) { uputs("grep: open failed\n"); sc3(SYS_EXIT,0,0,0); __builtin_unreachable(); }
     static char buf[4096];
@@ -71,7 +75,7 @@ void _start(void) {
         if (contains(line, ll, pat) != invert) { matched++; emit(line, ll, lineno, want_n); }
     }
     sc3(SYS_CLOSE, fd, 0, 0);
-    (void)matched;
-    sc3(SYS_EXIT, 0, 0, 0);
+    if (want_c) { char nb[12]; uitoa(matched, nb); uputs(nb); uputs("\n"); }
+    sc3(SYS_EXIT, matched ? 0 : 1, 0, 0);
     __builtin_unreachable();
 }
