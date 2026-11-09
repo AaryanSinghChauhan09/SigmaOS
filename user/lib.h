@@ -30,6 +30,8 @@ enum {
     SYS_GETPID = 31,
     SYS_GETPPID = 32,
     SYS_KILL = 33,
+    SYS_PIPE = 34,
+    SYS_WRITE_FD = 35,
     SYS_READDIR = 19, SYS_READDIRX = 20
 };
 

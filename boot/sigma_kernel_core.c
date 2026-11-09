@@ -5768,6 +5768,8 @@ static void idt_init(void) {
 #define SYS_GETPID   31 /* eax=current proc pid, 0 in kernel */
 #define SYS_GETPPID  32 /* eax=parent pid (0 = kernel shell) */
 #define SYS_KILL     33 /* ebx=pid — terminate proc, eax=0/-1 */
+#define SYS_PIPE     34 /* ebx=user u32[2] — read fd, write fd; eax=0/-1 */
+#define SYS_WRITE_FD 35 /* ebx=fd, ecx=buf, edx=len — write to pipe fd; eax=bytes */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6304,7 +6306,33 @@ struct fdesc {
     uint32_t pos;       /* absolute file offset */
     uint32_t coff;      /* byte offset within current cluster's data */
     uint32_t proc_id;   /* 0 = FAT file, else PROC/ virtual file id */
+    uint32_t pipe;      /* 0 = none, else pipe index + 1 */
 };
+/* kernel pipes: 4KiB ring buffers, non-blocking I/O */
+#define MAX_PIPES 4
+#define PIPE_SZ   4096
+struct pipe { char buf[PIPE_SZ]; uint32_t head, tail; int wopen, ropen; };
+static struct pipe g_pipes[MAX_PIPES];
+static uint32_t pipe_read(uint32_t pi, uint8_t* dst, uint32_t len) {
+    struct pipe* p = &g_pipes[pi];
+    uint32_t n = 0;
+    while (n < len && p->head != p->tail) {
+        dst[n++] = (uint8_t)p->buf[p->head];
+        p->head = (p->head + 1) % PIPE_SZ;
+    }
+    return n;
+}
+static uint32_t pipe_write(uint32_t pi, const uint8_t* src, uint32_t len) {
+    struct pipe* p = &g_pipes[pi];
+    uint32_t n = 0;
+    while (n < len) {
+        uint32_t used = (p->tail + PIPE_SZ - p->head) % PIPE_SZ;
+        if (used == PIPE_SZ) break;             /* full */
+        p->buf[p->tail] = (char)src[n++];
+        p->tail = (p->tail + 1) % PIPE_SZ;
+    }
+    return n;
+}
 /* LFS-style procfs: PROC/<name> virtual files rendered into per-fd
  * buffers at open time (snapshot semantics, bounded 2 KiB each). */
 #define PROC_MAX 2048
@@ -6398,6 +6426,7 @@ static int proc_lookup(const char* rpath) {
 }
 
 static uint32_t fd_read(struct fdesc* f, uint8_t* buf, uint32_t len) {
+    if (f->pipe) return pipe_read(f->pipe - 1, buf, len);
     if (f->proc_id) {
         int idx = (int)(f - g_fds);
         const char* src = g_proc_data[idx];
@@ -6494,6 +6523,7 @@ void syscall_handler(uint32_t* regs) {
         if (pid) {
             g_fds[fd].used = 1;
             g_fds[fd].proc_id = (uint32_t)pid;
+            g_fds[fd].pipe = 0;
             g_fds[fd].start = g_fds[fd].cluster = 0;
             g_fds[fd].coff = 0; g_fds[fd].pos = 0;
             g_fds[fd].size = proc_render(fd, (uint32_t)pid);
@@ -6510,6 +6540,7 @@ void syscall_handler(uint32_t* regs) {
         }
         g_fds[fd].used = 1;
         g_fds[fd].proc_id = 0;
+        g_fds[fd].pipe = 0;
         g_fds[fd].start = hit.cluster;
         g_fds[fd].cluster = hit.cluster;
         g_fds[fd].size = hit.size;
@@ -6528,7 +6559,12 @@ void syscall_handler(uint32_t* regs) {
     } else if (nr == SYS_CLOSE) {
         int fd = (int)regs[4];
         if (fd >= 0 && fd < MAX_FDS && g_fds[fd].used) {
-            g_fds[fd].used = 0;
+            if (g_fds[fd].pipe) {
+                struct pipe* pp = &g_pipes[g_fds[fd].pipe - 1];
+                if (g_fds[fd].start == 1) pp->ropen = 0;
+                else pp->wopen = 0;
+            }
+            g_fds[fd].used = 0; g_fds[fd].pipe = 0;
             ret = 0;
         } else ret = 0xFFFFFFFFu;
     } else if (nr == SYS_SEEK) {
@@ -6741,6 +6777,35 @@ void syscall_handler(uint32_t* regs) {
         return;
     } else if (nr == SYS_KILL) {
         regs[7] = (uint32_t)proc_kill(regs[1]);
+        return;
+    } else if (nr == SYS_PIPE) {
+        /* ebx -> user u32[2]; allocate pipe + two fds */
+        uint32_t up = regs[1];
+        if (!g_user_base || !user_range_ok((void*)(size_t)up, 8)) { regs[7] = 0xFFFFFFFFu; return; }
+        int pi = -1;
+        for (int i = 0; i < MAX_PIPES; i++)
+            if (!g_pipes[i].ropen && !g_pipes[i].wopen) { pi = i; break; }
+        int fr = -1, fw = -1;
+        for (int i = 0; i < MAX_FDS; i++) if (!g_fds[i].used) { if (fr < 0) fr = i; else { fw = i; break; } }
+        if (pi < 0 || fr < 0 || fw < 0) { regs[7] = 0xFFFFFFFFu; return; }
+        g_pipes[pi].head = g_pipes[pi].tail = 0;
+        g_pipes[pi].wopen = g_pipes[pi].ropen = 1;
+        g_fds[fr].used = 1; g_fds[fr].pipe = (uint32_t)pi + 1;
+        g_fds[fr].proc_id = 0; g_fds[fr].pos = g_fds[fr].size = 0;
+        g_fds[fr].start = 1;   /* read end */
+        g_fds[fw].used = 1; g_fds[fw].pipe = (uint32_t)pi + 1;
+        g_fds[fw].proc_id = 0; g_fds[fw].pos = g_fds[fw].size = 0;
+        g_fds[fw].start = 2;   /* write end */
+        *(volatile uint32_t*)(size_t)up = (uint32_t)fr;
+        *(volatile uint32_t*)(size_t)(up + 4) = (uint32_t)fw;
+        regs[7] = 0;
+        return;
+    } else if (nr == SYS_WRITE_FD) {
+        int fd = (int)regs[1];
+        uint32_t buf = regs[2], len = regs[3];
+        if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used || !g_fds[fd].pipe
+            || !user_range_ok((void*)(size_t)buf, len)) { regs[7] = 0xFFFFFFFFu; return; }
+        regs[7] = pipe_write(g_fds[fd].pipe - 1, (const uint8_t*)(size_t)buf, len);
         return;
     } else if (nr == SYS_CREAT) {
         /* ebx = user ptr to NUL-terminated single-component name in cwd.
