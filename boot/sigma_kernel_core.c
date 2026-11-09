@@ -3839,6 +3839,7 @@ static void idt_init(void) {
 #define SYS_CLOSE    6   /* ebx=fd */
 #define SYS_SEEK     7   /* ebx=fd, ecx=offset -> 0/-1 (absolute) */
 #define SYS_WRITE_LEN 8  /* ebx=ptr, ecx=len — binary-safe write */
+#define SYS_UNLINK   9  /* ebx=ptr to name — delete file in cwd */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -4037,6 +4038,55 @@ void syscall_handler(uint32_t* regs) {
         }
         f->pos = off;
         f->coff = off % csz;
+        ret = 0;
+    } else if (nr == SYS_UNLINK) {
+        /* ebx = user ptr to NUL-terminated name in cwd; deletes file.
+         * Same semantics as shell `rm`: regular files only. */
+        volatile char* up = (volatile char*)(size_t)regs[4];
+        char name[64];
+        int nl = 0;
+        uint32_t limit = g_user_base + 0x400000u;
+        if (!g_user_base) { regs[7] = 0xFFFFFFFFu; return; }
+        while (nl < 63 && (uint32_t)(size_t)(up + nl) < limit && up[nl]
+               && up[nl] != '/') {
+            name[nl] = (char)up[nl]; nl++;
+        }
+        name[nl] = 0;
+        if (!nl) { regs[7] = 0xFFFFFFFFu; return; }
+        if (fat_ensure_mounted() != 0) { regs[7] = 0xFFFFFFFFu; return; }
+        int kind = g_vol_kind;
+        int in_root = 1;
+        uint32_t dir_cluster = 0;
+        if (g_cwd[0]) {
+            struct fat_hit dh;
+            int dlr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba,
+                                 g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
+                                 g_vol_spc, g_cwd, &dh);
+            if (dlr <= 0 || !dh.is_dir) { regs[7] = 0xFFFFFFFFu; return; }
+            in_root = 0;
+            dir_cluster = dh.cluster;
+        }
+        uint8_t want[11];
+        fat_name_to_83(name, want);
+        struct slot_res slot;
+        fat_find_dir_slot(kind, in_root, g_vol_root_clus, g_vol_root_lba,
+                          g_vol_root_secs, dir_cluster, g_vol_fat_lba,
+                          g_vol_data_lba, g_vol_spc, want, &slot);
+        if (slot.status != -1) { regs[7] = 0xFFFFFFFFu; return; }
+        if (ata_read_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        uint8_t* e = g_file_buf + slot.off;
+        if (e[11] & 0x10) { regs[7] = 0xFFFFFFFFu; return; }   /* dir */
+        uint32_t clus = (uint32_t)e[20] | ((uint32_t)e[21] << 8);
+        if (kind == 2) clus |= ((uint32_t)e[26] << 16) | ((uint32_t)e[27] << 24);
+        if (clus >= 2 && fat_free_chain(kind, clus) != 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
+        e[0] = 0xE5;
+        if (ata_write_lba28(0x1F0, 0, slot.lba, g_file_buf, 1) < 0) {
+            regs[7] = 0xFFFFFFFFu; return;
+        }
         ret = 0;
     } else {
         kputs("\n[syscall] unknown nr=");
