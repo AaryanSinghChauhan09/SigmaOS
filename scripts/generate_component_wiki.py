@@ -13,8 +13,9 @@ import hashlib
 import re
 import sys
 import tomllib
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
+from urllib.parse import urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,6 +25,24 @@ FIELDS = ("description", "repo", "engine", "category", "language", "visibility")
 
 def slug(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9-]+", "-", name).strip("-")
+
+
+def normalize_repo_url(value: object) -> str:
+    """Count HTTPS and SSH spellings of one GitHub repository once."""
+    remote = str(value).strip()
+    if remote.startswith("git@github.com:"):
+        host = "github.com"
+        path = remote.removeprefix("git@github.com:")
+    else:
+        parsed = urlsplit(remote)
+        host = parsed.hostname or ""
+        path = parsed.path
+    path = path.strip("/")
+    if path.endswith(".git"):
+        path = path[:-4]
+    if host and path:
+        return f"{host.casefold()}/{path.casefold()}"
+    return remote.casefold()
 
 
 def inline(value: object) -> str:
@@ -102,8 +121,15 @@ def render_index(
     groups: dict[str, list[str]], page_slugs: dict[str, str], entries: list[dict]
 ) -> str:
     count = sum(map(len, groups.values()))
-    duplicate_names = sum(len(names) > 1 for names in groups.values())
-    repo_count = len({str(entry.get("repo", "")) for entry in entries if entry.get("repo")})
+    name_counts = Counter(str(entry.get("name", "")) for entry in entries)
+    duplicate_names = sum(count > 1 for count in name_counts.values())
+    repo_count = len(
+        {
+            normalize_repo_url(entry["repo"])
+            for entry in entries
+            if entry.get("repo")
+        }
+    )
     lines = [
         "# SigmaOS component index",
         "",
