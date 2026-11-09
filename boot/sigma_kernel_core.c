@@ -283,6 +283,7 @@ struct fdesc {
 struct proc {
     int      used;
     int      killed;     /* SIGKILL-style: freed at next schedule point */
+    int      nice;       /* -20..19, lower = higher priority */
     int      started;    /* 0 = needs enter_user, 1 = resume via ctx */
     uint32_t pid;
     uint32_t base;       /* user region base (4MiB aligned) */
@@ -4316,7 +4317,7 @@ static int proc_claim(uint32_t base, const char* name,
     uint32_t pd = proc_build_pd(base);
     if (!pd) return -1;
     struct proc* p = &g_procs[idx];
-    p->used = 1; p->started = 0;
+    p->used = 1; p->started = 0; p->nice = 0;
     p->pid = (uint32_t)g_next_pid++;
     p->base = base; p->pd = pd;
     p->entry = entry; p->esp0 = esp0;
@@ -4382,11 +4383,37 @@ static void proc_run(int idx) {
 }
 
 static int proc_pick_next(int after) {
+    /* lowest nice value wins; round-robin among procs sharing it */
+    int best = 99;
+    for (int i = 0; i < MAX_PROCS; i++)
+        if (g_procs[i].used && g_procs[i].nice < best) best = g_procs[i].nice;
+    if (best == 99) return -1;
     for (int k = 1; k <= MAX_PROCS; k++) {
         int i = (after + k) % MAX_PROCS;
-        if (g_procs[i].used) return i;
+        if (g_procs[i].used && g_procs[i].nice == best) return i;
     }
     return -1;
+}
+
+/* set nice: ebx encodes target — high bit set means pid in low bits +
+ * nice in ecx; otherwise nice applies to calling proc. Returns old nice. */
+static int proc_set_nice(uint32_t ebx, uint32_t ecx) {
+    int idx = -1;
+    if (ebx & 0x80000000u) {
+        uint32_t pid = ebx & 0x7FFFFFFFu;
+        for (int i = 0; i < MAX_PROCS; i++)
+            if (g_procs[i].used && g_procs[i].pid == pid) { idx = i; break; }
+        if (idx < 0) return -1;
+        int v = (int)ecx;
+        if (v < -20) v = -20; if (v > 19) v = 19;
+        int old = g_procs[idx].nice; g_procs[idx].nice = v;
+        return old;
+    }
+    if (g_cur_proc < 0) return -1;
+    int v = (int)ebx;
+    if (v < -20) v = -20; if (v > 19) v = 19;
+    int old = g_procs[g_cur_proc].nice; g_procs[g_cur_proc].nice = v;
+    return old;
 }
 
 /* mark proc killed; if it's the running one, force exit on return */
@@ -5221,6 +5248,18 @@ void kernel_shell(void) {
             show_timer();
         } else if (kstrcmp(cmd, "sched") == 0) {
             show_sched();
+        } else if (kcmd_is(cmd, "nice")) {
+            const char* np = cmd + 4;
+            while (*np == ' ') np++;
+            uint32_t pid = 0, val = 0;
+            while (*np >= '0' && *np <= '9') { pid = pid * 10 + (*np - '0'); np++; }
+            while (*np == ' ') np++;
+            while (*np >= '0' && *np <= '9') { val = val * 10 + (*np - '0'); np++; }
+            int old = proc_set_nice(0x80000000u | pid, val);
+            if (old < 0) kputs("nice: no such pid\n");
+            else { kputs("nice: pid "); kprint_dec64(pid);
+                   kputs(" nice "); kprint_dec64((uint32_t)old);
+                   kputs(" -> "); kprint_dec64(val); kputs("\n"); }
         } else if (kcmd_is(cmd, "kill")) {
             const char* kp = cmd + 4;
             while (*kp == ' ') kp++;
@@ -5788,6 +5827,7 @@ static void idt_init(void) {
 #define SYS_KILL     33 /* ebx=pid — terminate proc, eax=0/-1 */
 #define SYS_PIPE     34 /* ebx=user u32[2] — read fd, write fd; eax=0/-1 */
 #define SYS_WRITE_FD 35 /* ebx=fd, ecx=buf, edx=len — write to pipe fd; eax=bytes */
+#define SYS_NICE     36 /* ebx=nice -20..19 for self, or ebx=pid|0x80000000,ecx=nice; eax=old/-1 */
 /* Collect directory entry names ("name\n" each, skip . ..) into buf.
  * Handles FAT12/16 fixed root and cluster-chain dirs (incl. FAT32 root). */
 static uint32_t fat_collect_names(int kind, int in_root, uint32_t dir_cluster,
@@ -6817,6 +6857,9 @@ void syscall_handler(uint32_t* regs) {
         *(volatile uint32_t*)(size_t)(up + 4) = (uint32_t)fw;
         regs[7] = 0;
         return;
+    } else if (nr == SYS_NICE) {
+        regs[7] = (uint32_t)proc_set_nice(regs[1], regs[2]);
+        return;
     } else if (nr == SYS_WRITE_FD) {
         int fd = (int)regs[1];
         uint32_t buf = regs[2], len = regs[3];
@@ -7442,6 +7485,7 @@ static void show_ps(void) {
         kprint_dec64(g_procs[i].pid);
         kputs(" ");
         kputs((g_cur_proc == i) ? "RUN " : "RDY ");
+        if (g_procs[i].nice) { kputs("n"); kprint_dec64((uint32_t)g_procs[i].nice); kputs(" "); }
         kputs("  ");
         kprint_hex32(g_procs[i].started ? g_procs[i].eip : g_procs[i].entry);
         kputs("  ");
