@@ -284,6 +284,7 @@ struct proc {
     int      used;
     int      killed;     /* SIGKILL-style: freed at next schedule point */
     int      nice;       /* -20..19, lower = higher priority */
+    uint32_t ppid;       /* parent pid, 0 = kernel shell */
     uint32_t in_pipe;    /* 0 or pipe idx+1 — stdin source */
     uint32_t out_pipe;   /* 0 or pipe idx+1 — stdout sink */
     char     out_name[64];      /* '>'/'>>' target, empty = console */
@@ -4326,7 +4327,7 @@ static int proc_claim(uint32_t base, const char* name,
     uint32_t pd = proc_build_pd(base);
     if (!pd) return -1;
     struct proc* p = &g_procs[idx];
-    p->used = 1; p->started = 0; p->nice = 0;
+    p->used = 1; p->started = 0; p->nice = 0; p->ppid = 0;
     p->in_pipe = p->out_pipe = 0;
     p->out_name[0] = 0; p->out_len = 0;
     p->in_file = 0; p->in_len = p->in_pos = 0;
@@ -4439,6 +4440,7 @@ static int proc_fork(uint32_t* regs) {
     struct proc* ch = &g_procs[idx];
     ch->used = 1; ch->started = 1; ch->killed = 0;
     ch->nice = par->nice;
+    ch->ppid = par->pid;
     ch->pid = (uint32_t)g_next_pid++;
     ch->base = base; ch->pd = pd;
     ch->entry = par->entry; ch->esp0 = par->esp0;
@@ -6736,6 +6738,24 @@ static uint32_t proc_render(int fdidx, uint32_t id) {
     case 4: /* VERSION */
         n += k_strcpy(b + n, "SigmaOS 0.1.0 (synthetic kernel)\n");
         break;
+    case 5: { /* PROCS — process table */
+        n += k_strcpy(b + n, "  PID PPID STAT  NAME\n");
+        n += k_strcpy(b + n, "    0    0 RUN   kernel\n");
+        for (int i = 0; i < MAX_PROCS && n < PROC_MAX - 48; i++) {
+            if (!g_procs[i].used) continue;
+            n += k_strcpy(b + n, "    ");
+            n += k_u32dec(g_procs[i].pid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, "    ");
+            n += k_u32dec(g_procs[i].ppid, tmp);
+            for (int j = 0; tmp[j]; j++) b[n++] = tmp[j];
+            n += k_strcpy(b + n, " ");
+            n += k_strcpy(b + n, (g_cur_proc == i) ? "RUN  " : "RDY  ");
+            n += k_strcpy(b + n, g_procs[i].name[0] ? g_procs[i].name : "?");
+            n += k_strcpy(b + n, "\n");
+        }
+        break;
+    }
     default:
         return 0;
     }
@@ -6745,7 +6765,7 @@ static uint32_t proc_render(int fdidx, uint32_t id) {
 }
 static int proc_lookup(const char* rpath) {
     /* match "PROC/<NAME>" case-insensitively; returns id or 0 */
-    static const char* names[] = {"MEMINFO", "CPUINFO", "UPTIME", "VERSION"};
+    static const char* names[] = {"MEMINFO", "CPUINFO", "UPTIME", "VERSION", "PROCS"};
     /* rpath must be exactly "PROC/<name>" */
     if (!(rpath[0] == 'P' || rpath[0] == 'p') ||
         !(rpath[1] == 'R' || rpath[1] == 'r') ||
@@ -6753,7 +6773,7 @@ static int proc_lookup(const char* rpath) {
         !(rpath[3] == 'C' || rpath[3] == 'c') ||
         rpath[4] != '/') return 0;
     const char* leaf = rpath + 5;
-    for (int k = 0; k < 4; k++) {
+    for (int k = 0; k < 5; k++) {
         const char* nm = names[k]; int j = 0;
         while (nm[j] && leaf[j]) {
             char lc = leaf[j];
@@ -7157,7 +7177,8 @@ void syscall_handler(uint32_t* regs) {
                   ? g_procs[g_cur_proc].pid : 0;
         return;
     } else if (nr == SYS_GETPPID) {
-        regs[7] = 0;
+        regs[7] = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+                  ? g_procs[g_cur_proc].ppid : 0;
         return;
     } else if (nr == SYS_KILL) {
         regs[7] = (uint32_t)proc_kill(regs[1]);
