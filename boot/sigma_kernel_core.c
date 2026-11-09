@@ -1574,18 +1574,35 @@ static void show_exec(const char* args) {
     kprint_hex32(g_user_base + EXEC_LOAD_OFF);
     kputs("\n");
 
-    /* _start ABI: [esp]=argc, [esp+4]=argv[0], [esp+8]=NULL.
-     * argv[0] points at a copy of the path inside the user region. */
+    /* _start ABI: [esp]=argc, argv[0..], NULL, envp=NULL.
+     * argv[0] = program path, argv[1] = optional argument string
+     * (rest of the exec command line). Strings copied into user region. */
     uint32_t stack_top = g_user_base + EXEC_STACK_OFF;
-    uint8_t* argv0 = (uint8_t*)(size_t)(stack_top - 0x800);
+    uint8_t* str_base = (uint8_t*)(size_t)(stack_top - 0x1000);
     int al = 0;
-    for (const char* s = namebuf; *s && al < 255; s++) argv0[al++] = (uint8_t)*s;
-    argv0[al] = 0;
-    uint32_t* sp = (uint32_t*)(size_t)(stack_top - 16);
-    sp[0] = 1;                                  /* argc */
-    sp[1] = (uint32_t)(size_t)argv0;            /* argv[0] */
-    sp[2] = 0;                                  /* NULL */
-    sp[3] = 0;                                  /* envp terminator */
+    for (const char* s = namebuf; *s && al < 255; s++) str_base[al++] = (uint8_t)*s;
+    str_base[al] = 0;
+    uint32_t argv0 = (uint32_t)(size_t)str_base;
+    al++;
+
+    /* skip spaces after program name; capture remainder as argv[1] */
+    const char* argp = args;
+    while (*argp && *argp != ' ') argp++;
+    while (*argp == ' ') argp++;
+    uint32_t argv1 = 0;
+    if (*argp) {
+        argv1 = (uint32_t)(size_t)(str_base + al);
+        int bl = 0;
+        while (*argp && bl < 255) str_base[al + bl++] = (uint8_t)*argp++;
+        str_base[al + bl] = 0;
+    }
+
+    uint32_t* sp = (uint32_t*)(size_t)(stack_top - 24);
+    sp[0] = argv1 ? 2 : 1;                    /* argc */
+    sp[1] = argv0;                            /* argv[0] */
+    sp[2] = argv1;                            /* argv[1] or NULL */
+    sp[3] = 0;                                /* argv terminator */
+    sp[4] = 0;                                /* envp terminator */
 
     enter_user(g_user_base + EXEC_LOAD_OFF, (uint32_t)(size_t)sp);
 }
@@ -2205,9 +2222,10 @@ static void idt_init(void) {
     __asm__ volatile("lidt %0" :: "m"(g_idtr) : "memory");
 }
 
-/* pusha frame order (top->bottom): edi,esi,ebp,esp,ebx,edx,ecx,eax */
-/* int 0x80 ABI: eax=nr, ebx=arg1, ecx=arg2, edx=arg3. regs[] = pushal frame:
- * [0]=edi [1]=esi [2]=ebp [3]=esp0 [4]=ebx [5]=edx [6]=ecx [7]=eax */
+/* int 0x80 ABI: eax=nr; args ebx,ecx,edx; ret in eax.
+ * regs[] = pushal frame (edi pushed last -> lowest addr):
+ * [0]=edi [1]=esi [2]=ebp [3]=esp0 [4]=ebx [5]=edx [6]=ecx [7]=eax
+ * => arg1=regs[4] arg2=regs[6](ecx) arg3=regs[5](edx) */
 #define SYS_EXIT     0
 #define SYS_WRITE    1   /* ebx=ptr to NUL-terminated user string */
 #define SYS_GETCHAR  2   /* returns char in eax */
@@ -2216,6 +2234,7 @@ static void idt_init(void) {
 #define SYS_READ     5   /* ebx=fd, ecx=buf, edx=len -> bytes read */
 #define SYS_CLOSE    6   /* ebx=fd */
 #define SYS_SEEK     7   /* ebx=fd, ecx=offset -> 0/-1 (absolute) */
+#define SYS_WRITE_LEN 8  /* ebx=ptr, ecx=len — binary-safe write */
 
 static volatile uint32_t g_tick_count;  /* defined in IRQ section below */
 
@@ -2326,6 +2345,15 @@ void syscall_handler(uint32_t* regs) {
             if (c == 0) break;
             kputc(c);
         }
+    } else if (nr == SYS_WRITE_LEN) {
+        volatile char* s = (volatile char*)(size_t)regs[4];
+        uint32_t len = regs[6];   /* ecx */
+        uint32_t limit = g_user_base ? g_user_base + 0x400000u : 0;
+        if (len > 65536) len = 65536;
+        for (uint32_t i = 0; i < len; i++) {
+            if ((uint32_t)(size_t)(s + i) >= limit) break;
+            kputc(s[i]);
+        }
     } else if (nr == SYS_GETCHAR) {
         ret = (uint8_t)kgetc();
     } else if (nr == SYS_TICKS) {
@@ -2362,8 +2390,8 @@ void syscall_handler(uint32_t* regs) {
         ret = (uint32_t)fd;
     } else if (nr == SYS_READ) {
         int fd = (int)regs[4];
-        uint8_t* buf = (uint8_t*)(size_t)regs[5];
-        uint32_t len = regs[6];
+        uint8_t* buf = (uint8_t*)(size_t)regs[6];   /* ecx */
+        uint32_t len = regs[5];                     /* edx */
         if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used || len > 65536
             || !user_range_ok(buf, len)) {
             regs[7] = 0xFFFFFFFFu; return;
@@ -2377,7 +2405,7 @@ void syscall_handler(uint32_t* regs) {
         } else ret = 0xFFFFFFFFu;
     } else if (nr == SYS_SEEK) {
         int fd = (int)regs[4];
-        uint32_t off = regs[5];
+        uint32_t off = regs[6];   /* ecx */
         if (fd < 0 || fd >= MAX_FDS || !g_fds[fd].used || off > g_fds[fd].size) {
             regs[7] = 0xFFFFFFFFu; return;
         }

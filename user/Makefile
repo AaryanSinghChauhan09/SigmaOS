@@ -8,16 +8,18 @@ OBJCOPY ?= objcopy
 ASFLAGS := -m32 -c
 LDFLAGS := -m32 -nostdlib -static -no-pie -Wl,--build-id=none -Wl,-e,_start
 
-.PHONY: all clean
-all: hello.bin
+PROGS := hello cat
 
-hello.bin: hello.elf
+.PHONY: all clean
+all: $(addsuffix .bin,$(PROGS))
+
+%.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
 
-hello.elf: hello.o
+%.elf: %.o
 	$(CC) $(LDFLAGS) $< -o $@
 
-hello.o: hello.S
+%.o: %.S
 	$(CC) -m32 -c $< -o $@
 
 clean:
