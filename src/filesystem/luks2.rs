@@ -228,7 +228,7 @@ pub struct Luks2Metadata {
 }
 
 // ---------------------------------------------------------------------------
-// PBKDF2 (stub implementation)
+// PBKDF2
 // ---------------------------------------------------------------------------
 
 /// Perform PBKDF2-HMAC-SHA256 key derivation.
@@ -240,15 +240,14 @@ pub struct Luks2Metadata {
 /// - `key_len`  — desired output length in bytes
 ///
 /// # Returns
-/// A derived key of `key_len` bytes.
-///
-/// # TODO
-/// Replace the stub with a real PBKDF2 implementation (or call into
-/// the `crypto` subsystem).
-pub fn pbkdf2_sha256(password: &[u8], salt: &[u8], iterations: u32, key_len: usize) -> Vec<u8> {
-    let _ = (password, salt, iterations);
-    // TODO: implement PBKDF2-HMAC-SHA256
-    alloc::vec![0u8; key_len]
+/// Returns an error until a real, audited PBKDF2 implementation is connected.
+pub fn pbkdf2_sha256(
+    _password: &[u8],
+    _salt: &[u8],
+    _iterations: u32,
+    _key_len: usize,
+) -> Result<Vec<u8>, Luks2Error> {
+    Err(Luks2Error::CryptoUnavailable)
 }
 
 // ---------------------------------------------------------------------------
@@ -262,10 +261,13 @@ pub fn pbkdf2_sha256(password: &[u8], salt: &[u8], iterations: u32, key_len: usi
 /// - `salt`     — random salt from the keyslot
 /// - `params`   — Argon2 cost parameters
 /// - `key_len`  — desired output length in bytes
-pub fn argon2id(password: &[u8], salt: &[u8], params: &Argon2Params, key_len: usize) -> Vec<u8> {
-    let _ = (password, salt, params);
-    // TODO: implement Argon2id (see RFC 9106)
-    alloc::vec![0u8; key_len]
+pub fn argon2id(
+    _password: &[u8],
+    _salt: &[u8],
+    _params: &Argon2Params,
+    _key_len: usize,
+) -> Result<Vec<u8>, Luks2Error> {
+    Err(Luks2Error::CryptoUnavailable)
 }
 
 // ---------------------------------------------------------------------------
@@ -291,22 +293,29 @@ pub struct AesXtsKey {
 /// - `ciphertext`   — input ciphertext (must be a multiple of 512 bytes)
 /// - `plaintext`    — output buffer (same length as `ciphertext`)
 ///
-/// # Panics
-/// Panics if `ciphertext.len() != plaintext.len()` or lengths are not a
-/// multiple of the sector size.
-pub fn aes_xts_decrypt(key: &AesXtsKey, sector_num: u64, ciphertext: &[u8], plaintext: &mut [u8]) {
-    assert_eq!(ciphertext.len(), plaintext.len());
-    let _ = (key, sector_num);
-    // TODO: implement AES-XTS decryption (IEEE 1619-2007)
-    plaintext.copy_from_slice(ciphertext); // placeholder
+pub fn aes_xts_decrypt(
+    _key: &AesXtsKey,
+    _sector_num: u64,
+    ciphertext: &[u8],
+    plaintext: &mut [u8],
+) -> Result<(), Luks2Error> {
+    if ciphertext.len() != plaintext.len() {
+        return Err(Luks2Error::InvalidMetadata);
+    }
+    Err(Luks2Error::CryptoUnavailable)
 }
 
 /// Encrypt one or more 512-byte sectors using AES-XTS.
-pub fn aes_xts_encrypt(key: &AesXtsKey, sector_num: u64, plaintext: &[u8], ciphertext: &mut [u8]) {
-    assert_eq!(plaintext.len(), ciphertext.len());
-    let _ = (key, sector_num);
-    // TODO: implement AES-XTS encryption (IEEE 1619-2007)
-    ciphertext.copy_from_slice(plaintext); // placeholder
+pub fn aes_xts_encrypt(
+    _key: &AesXtsKey,
+    _sector_num: u64,
+    plaintext: &[u8],
+    ciphertext: &mut [u8],
+) -> Result<(), Luks2Error> {
+    if plaintext.len() != ciphertext.len() {
+        return Err(Luks2Error::InvalidMetadata);
+    }
+    Err(Luks2Error::CryptoUnavailable)
 }
 
 // ---------------------------------------------------------------------------
@@ -336,13 +345,13 @@ pub fn unlock_keyslot(
                     &keyslot.salt,
                     p.iterations,
                     keyslot.area_key_size as usize,
-                )
+                )?
             } else {
                 return Err(Luks2Error::KdfMismatch);
             }
         }
         KdfParams::Argon2(p) => {
-            argon2id(passphrase, &keyslot.salt, p, keyslot.area_key_size as usize)
+            argon2id(passphrase, &keyslot.salt, p, keyslot.area_key_size as usize)?
         }
     };
 
@@ -352,16 +361,13 @@ pub fn unlock_keyslot(
         key2: derived_key[derived_key.len() / 2..].to_vec(),
     };
     let mut plaintext = alloc::vec![0u8; key_area_ciphertext.len()];
-    aes_xts_decrypt(&xts_key, 0, key_area_ciphertext, &mut plaintext);
+    aes_xts_decrypt(&xts_key, 0, key_area_ciphertext, &mut plaintext)?;
 
     // Step 3: AF merge (anti-forensic split reversal)
     let master_key = af_merge(&plaintext, keyslot.af_stripes);
 
     // Step 4: Verify digest
-    if !verify_digest(&master_key, digest) {
-        return Err(Luks2Error::WrongPassphrase);
-    }
-
+    verify_digest(&master_key, digest)?;
     Ok(master_key)
 }
 
@@ -378,10 +384,8 @@ fn af_merge(data: &[u8], stripes: u32) -> Vec<u8> {
 }
 
 /// Verify a candidate master key against a LUKS2 digest entry.
-fn verify_digest(master_key: &[u8], digest: &Luks2Digest) -> bool {
-    // TODO: run the digest KDF over master_key + salt, compare to digest.digest
-    let _ = (master_key, digest);
-    true // placeholder
+fn verify_digest(_master_key: &[u8], _digest: &Luks2Digest) -> Result<(), Luks2Error> {
+    Err(Luks2Error::CryptoUnavailable)
 }
 
 // ---------------------------------------------------------------------------
@@ -409,6 +413,10 @@ pub enum Luks2Error {
     IoError,
     /// AES-XTS key size is not 32 or 64 bytes.
     InvalidKeySize,
+    /// Required cryptographic or header-integrity implementation is unavailable.
+    CryptoUnavailable,
+    /// Header checksum validation is not implemented; opening is refused.
+    HeaderValidationUnavailable,
 }
 
 impl fmt::Display for Luks2Error {
@@ -423,6 +431,12 @@ impl fmt::Display for Luks2Error {
             Luks2Error::KdfMismatch => write!(f, "KDF type mismatch"),
             Luks2Error::IoError => write!(f, "I/O error"),
             Luks2Error::InvalidKeySize => write!(f, "invalid AES-XTS key size"),
+            Luks2Error::CryptoUnavailable => {
+                write!(f, "required cryptographic operation is unavailable")
+            }
+            Luks2Error::HeaderValidationUnavailable => {
+                write!(f, "LUKS2 header checksum validation is unavailable")
+            }
         }
     }
 }
@@ -457,24 +471,18 @@ impl Luks2Device {
         if ver != LUKS2_VERSION {
             return Err(Luks2Error::UnsupportedVersion(ver));
         }
-        // TODO: validate checksum
-        Ok(Luks2Device {
-            header,
-            metadata: Luks2Metadata {
-                keyslots: Vec::new(),
-                segments: Vec::new(),
-                digests: Vec::new(),
-                tokens: Vec::new(),
-                config_json_version: String::new(),
-            },
-            master_key: None,
-            cipher_key: None,
-            active_segment: None,
-        })
+        // A valid magic and version do not establish header integrity. Refuse
+        // to treat this as an opened encrypted device until checksum support
+        // is implemented and verified.
+        Err(Luks2Error::HeaderValidationUnavailable)
     }
 
     /// Attempt to unlock the device using `passphrase`.
     pub fn unlock(&mut self, passphrase: &[u8], key_area_data: &[u8]) -> Result<(), Luks2Error> {
+        // A failed re-unlock must not leave a previously unlocked key active.
+        self.master_key = None;
+        self.cipher_key = None;
+        self.active_segment = None;
         for keyslot in &self.metadata.keyslots {
             let digest = self
                 .metadata
@@ -511,7 +519,6 @@ impl Luks2Device {
             .cipher_key
             .as_ref()
             .ok_or(Luks2Error::WrongPassphrase)?;
-        aes_xts_decrypt(key, sector_num, ciphertext, plaintext);
-        Ok(())
+        aes_xts_decrypt(key, sector_num, ciphertext, plaintext)
     }
 }
