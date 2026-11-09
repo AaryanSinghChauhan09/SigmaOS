@@ -6024,10 +6024,110 @@ struct fdesc {
     uint32_t size;
     uint32_t pos;       /* absolute file offset */
     uint32_t coff;      /* byte offset within current cluster's data */
+    uint32_t proc_id;   /* 0 = FAT file, else PROC/ virtual file id */
 };
+/* LFS-style procfs: PROC/<name> virtual files rendered into per-fd
+ * buffers at open time (snapshot semantics, bounded 2 KiB each). */
+#define PROC_MAX 2048
+static char g_proc_data[MAX_FDS][PROC_MAX];
 static struct fdesc g_fds[MAX_FDS];
 
+static int k_u32dec(uint32_t v, char* o) {
+    char t[12]; int i = 0;
+    do { t[i++] = (char)('0' + v % 10); v /= 10; } while (v);
+    int n = 0;
+    while (i) o[n++] = t[--i];
+    o[n] = 0;
+    return n;
+}
+static int k_strcpy(char* d, const char* s) {
+    int n = 0; while (*s) d[n++] = *s++; d[n] = 0; return n;
+}
+static uint32_t proc_render(int fdidx, uint32_t id) {
+    char* b = g_proc_data[fdidx];
+    uint32_t n = 0;
+    char tmp[16];
+    switch (id) {
+    case 1: { /* MEMINFO */
+        n += k_strcpy(b + n, "MemTotal: ");
+        n += k_u32dec(g_total_pages * 4, tmp); /* KiB */
+        for (int i = 0; tmp[i]; i++) b[n++] = tmp[i];
+        n += k_strcpy(b + n, " kB\nMemFree: ");
+        /* free pages: recount quickly via bitmap popcount */
+        uint32_t freep = 0;
+        uint32_t words = (g_max_page + 31) / 32;
+        if (words > 32768) words = 32768;
+        if (g_mm_ready) {
+            for (uint32_t w = 0; w < words; w++) {
+                uint32_t word = ~g_page_bitmap[w];
+                uint32_t rem = g_max_page - w * 32;
+                if (rem < 32) word &= (rem >= 32) ? 0xFFFFFFFFu : ((1u << rem) - 1u);
+                word -= (word >> 1) & 0x55555555u;
+                word = (word & 0x33333333u) + ((word >> 2) & 0x33333333u);
+                word = (word + (word >> 4)) & 0x0F0F0F0Fu;
+                freep += (word * 0x01010101u) >> 24;
+            }
+        }
+        n += k_u32dec(freep * 4, tmp);
+        for (int i = 0; tmp[i]; i++) b[n++] = tmp[i];
+        n += k_strcpy(b + n, " kB\n");
+        break;
+    }
+    case 2: /* CPUINFO */
+        n += k_strcpy(b + n, "processor\t: 0\nvendor_id\t: SigmaOS\n"
+                              "model name\t: i386 protected-mode\n"
+                              "cpu family\t: synthetic\n");
+        break;
+    case 3: { /* UPTIME */
+        n += k_strcpy(b + n, "uptime ");
+        n += k_u32dec(g_tick_count / 100u, tmp);
+        for (int i = 0; tmp[i]; i++) b[n++] = tmp[i];
+        n += k_strcpy(b + n, " seconds\n");
+        break;
+    }
+    case 4: /* VERSION */
+        n += k_strcpy(b + n, "SigmaOS 0.1.0 (synthetic kernel)\n");
+        break;
+    default:
+        return 0;
+    }
+    if (n >= PROC_MAX) n = PROC_MAX - 1;
+    b[n] = 0;
+    return n;
+}
+static int proc_lookup(const char* rpath) {
+    /* match "PROC/<NAME>" case-insensitively; returns id or 0 */
+    static const char* names[] = {"MEMINFO", "CPUINFO", "UPTIME", "VERSION"};
+    /* rpath must be exactly "PROC/<name>" */
+    if (!(rpath[0] == 'P' || rpath[0] == 'p') ||
+        !(rpath[1] == 'R' || rpath[1] == 'r') ||
+        !(rpath[2] == 'O' || rpath[2] == 'o') ||
+        !(rpath[3] == 'C' || rpath[3] == 'c') ||
+        rpath[4] != '/') return 0;
+    const char* leaf = rpath + 5;
+    for (int k = 0; k < 4; k++) {
+        const char* nm = names[k]; int j = 0;
+        while (nm[j] && leaf[j]) {
+            char lc = leaf[j];
+            if (lc >= 'a' && lc <= 'z') lc = (char)(lc - 32);
+            if (lc != nm[j]) break;
+            j++;
+        }
+        if (!nm[j] && !leaf[j]) return k + 1;
+    }
+    return 0;
+}
+
 static uint32_t fd_read(struct fdesc* f, uint8_t* buf, uint32_t len) {
+    if (f->proc_id) {
+        int idx = (int)(f - g_fds);
+        const char* src = g_proc_data[idx];
+        uint32_t avail = f->size - f->pos;
+        uint32_t n = len < avail ? len : avail;
+        for (uint32_t i = 0; i < n; i++) buf[i] = (uint8_t)src[f->pos + i];
+        f->pos += n;
+        return n;
+    }
     uint32_t got = 0;
     while (got < len && f->pos < f->size) {
         if (fat_eoc_any(g_vol_kind, f->cluster)) break;  /* EOC marker */
@@ -6106,6 +6206,20 @@ void syscall_handler(uint32_t* regs) {
         if (fs_resolve(path, rpath, (int)sizeof rpath) != 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
+        int pid = proc_lookup(rpath);
+        int fd = -1;
+        for (int i = 0; i < MAX_FDS; i++) if (!g_fds[i].used) { fd = i; break; }
+        if (fd < 0) { regs[7] = 0xFFFFFFFFu; return; }
+        if (pid) {
+            g_fds[fd].used = 1;
+            g_fds[fd].proc_id = (uint32_t)pid;
+            g_fds[fd].start = g_fds[fd].cluster = 0;
+            g_fds[fd].coff = 0; g_fds[fd].pos = 0;
+            g_fds[fd].size = proc_render(fd, (uint32_t)pid);
+            if (g_fds[fd].size == 0) { g_fds[fd].used = 0; regs[7] = 0xFFFFFFFFu; return; }
+            ret = (uint32_t)fd;
+            return;
+        }
         struct fat_hit hit;
         int lr = fat_lookup(g_vol_kind, g_vol_root_clus, g_vol_root_lba,
                             g_vol_root_secs, g_vol_fat_lba, g_vol_data_lba,
@@ -6113,10 +6227,8 @@ void syscall_handler(uint32_t* regs) {
         if (lr <= 0 || hit.is_dir || hit.cluster < 2 || hit.size == 0) {
             regs[7] = 0xFFFFFFFFu; return;
         }
-        int fd = -1;
-        for (int i = 0; i < MAX_FDS; i++) if (!g_fds[i].used) { fd = i; break; }
-        if (fd < 0) { regs[7] = 0xFFFFFFFFu; return; }
         g_fds[fd].used = 1;
+        g_fds[fd].proc_id = 0;
         g_fds[fd].start = hit.cluster;
         g_fds[fd].cluster = hit.cluster;
         g_fds[fd].size = hit.size;
@@ -6145,6 +6257,11 @@ void syscall_handler(uint32_t* regs) {
             regs[7] = 0xFFFFFFFFu; return;
         }
         struct fdesc* f = &g_fds[fd];
+        if (f->proc_id) {
+            f->pos = off;
+            ret = 0;
+            return;
+        }
         uint32_t csz = (uint32_t)g_vol_spc * 512u;
         uint32_t idx = off / csz;
         f->cluster = f->start;
