@@ -390,6 +390,7 @@ static void pit_init(void);
 static void show_timer(void);
 static void show_uptime(void);
 static void show_ver(void);
+static void show_fastfetch(void);
 static void show_memalloc(void);
 static void show_sched(void);
 static void show_ps(void);
@@ -3418,6 +3419,7 @@ void kernel_shell(void) {
             kputs("  grep    - Search file: grep <pat> <file>\n");
             kputs("  wc      - Count lines/words/bytes: wc <file>\n");
             kputs("  uptime  - Seconds since boot\n");
+            kputs("  fastfetch - System summary screen\n");
             kputs("  ver     - Kernel version\n");
             kputs("  info    - System summary\n");
             kputs("  paging  - Show paging/CR state\n");
@@ -3496,6 +3498,8 @@ void kernel_shell(void) {
             show_uptime();
         } else if (kcmd_is(cmd, "ver")) {
             show_ver();
+        } else if (kcmd_is(cmd, "fastfetch")) {
+            show_fastfetch();
         } else if (kstrcmp(cmd, "info") == 0) {
             show_info();
         } else if (kstrcmp(cmd, "paging") == 0) {
@@ -4595,6 +4599,36 @@ static void show_ver(void) {
     kputs("  x86 32-bit, Multiboot1, paging(GDT/TSS/IDT/PIC/PIT)\n");
     kputs("  ring-3 exec + int 0x80 syscalls + preemptive sched\n");
     kputs("  FAT12/16/32 rw, LFN, cwd, ELF32 loader\n");
+}
+
+/* fastfetch — Omarchy-style one-screen system summary. */
+static void show_fastfetch(void) {
+    kputs("\n");
+    vga_set_color(0x0A, 0x04);   /* green on blue-ish */
+    kputs("      _____                 _          ___   ___  _____ _____ \n");
+    kputs("     / ____|               | |        / \\ \\ / (_) |  __|_   _|\n");
+    kputs("    | (___   __ _ _ __ ___ | |_ ___  / _ \\ V /| |_| |_   _| | |  \n");
+    kputs("     \\___ \\ / _` | '_ ` _ \\| __/ _ \\| | | | | | | | | |   | |   \n");
+    kputs("     ____) | (_| | | | | | | || (_) | |_| | | | | |_| |_  _| | |   \n");
+    kputs("    |_____/ \\__,_|_| |_| |_|_|\\__\\___/ \\___/|_|_|_|_____| |_|   \n\n");
+    vga_set_color(0x0F, 0x00);
+    kputs("  OS      : SigmaOS Sovereign Kernel v0.1.0 (i386)\n");
+    kputs("  Host    : SigmaOS (bare metal / QEMU)\n");
+    kputs("  Kernel  : Multiboot1 -> paging -> GDT/TSS -> IDT -> PIC/PIT\n");
+    kputs("  Uptime  : ");
+    kprint_dec64(g_tick_count / PIT_HZ);
+    kputs("s\n");
+    if (g_mb_info) {
+        kputs("  Memory  : ");
+        kprint_dec64((uint64_t)mbi_rd32(MBI_MEM_LOWER) + mbi_rd32(MBI_MEM_UPPER));
+        kputs(" KiB\n");
+    }
+    kputs("  Shell   : sigma_kernel_core (38+ cmds, 13 syscalls)\n");
+    kputs("  FS      : FAT12/16/32 rw + LFN, cwd=");
+    kputs(g_cwd[0] ? g_cwd : "/");
+    kputs("\n");
+    kputs("  User    : ring-3 exec, preemptive sched, ELF32+flat\n");
+    kputs("\n");
 }
 
 /* --------------------------------------------------------------------------
