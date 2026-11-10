@@ -5706,12 +5706,19 @@ void kernel_main(uint32_t magic, void* mb_info) {
 
     show_banner();
 
+    kputs("[kernel] paging_init...\n");
     paging_init();
+    kputs("[kernel] gdt_init...\n");
     gdt_init();
+    kputs("[kernel] idt_init...\n");
     idt_init();
+    kputs("[kernel] pit_init...\n");
     pit_init();
+    kputs("[kernel] pic_init...\n");
     pic_init();
+    kputs("[kernel] virtio_probe...\n");
     virtio_probe();
+    kputs("[kernel] init done\n");
     klog("kernel: paging+gdt+idt+pit+pic armed\n");
     kputs("[kernel] Paging enabled: 4MiB-page identity map, ");
     kprint_dec64(g_map_mb);
@@ -5719,6 +5726,7 @@ void kernel_main(uint32_t magic, void* mb_info) {
     kputs("[kernel] GDT loaded: kernel+user segments, TSS ready.\n");
     kputs("[kernel] IDT+PIC armed: exceptions, IRQs, int 0x80 gate.\n");
     __asm__ volatile("sti");
+    kputs("[kernel] interrupts enabled\n");
 
     kputs("[kernel] Multiboot header validated.\n");
     kputs("[kernel] VGA console initialized at 0xB8000.\n");
@@ -5726,7 +5734,9 @@ void kernel_main(uint32_t magic, void* mb_info) {
     kputs("[kernel] PS/2 keyboard controller ready.\n");
     kputs("[kernel] Entering sovereign interactive shell.\n\n");
 
+    kputs("[kernel] entering kernel_shell\n");
     kernel_shell();
+    kputs("[kernel] kernel_shell returned\n");
 }
 
 /* --------------------------------------------------------------------------
@@ -5771,7 +5781,7 @@ static void paging_init(void) {
     __asm__ volatile(
         "movl %0, %%cr3\n"
         "movl %%cr4, %%eax\n"
-        "orl $0x20, %%eax\n"          /* CR4.PSE — enable 4 MiB pages */
+        "orl $0x10, %%eax\n"          /* CR4.PSE (bit4) — enable 4 MiB pages */
         "movl %%eax, %%cr4\n"
         "movl %%cr0, %%eax\n"
         "orl $0x80000000, %%eax\n"    /* CR0.PG */
@@ -5942,7 +5952,6 @@ typedef struct __attribute__((packed)) {
     uint8_t  zero;
     uint8_t  type_attr;   /* P=1 DPL=0 type=32-bit interrupt gate = 0x8E */
     uint16_t offset_high;
-    uint32_t zero2;
 } idt_entry_t;
 
 typedef struct __attribute__((packed)) {
@@ -6140,6 +6149,12 @@ void isr_common(uint32_t* frame) {
     kprint_hex32(eip);
     kputs(" cs=");
     kprint_hex32(cs);
+    if (vec == 14) {
+        uint32_t cr2;
+        __asm__ volatile("movl %%cr2, %0" : "=r"(cr2));
+        kputs(" cr2=");
+        kprint_hex32(cr2);
+    }
     kputs(" ***\n");
     klog("exception: vec=");
     /* log vec + eip compactly via static buffer */
@@ -6169,7 +6184,6 @@ static void idt_set_gate(uint32_t vec, uint32_t handler, uint8_t type_attr) {
     g_idt[vec].zero        = 0;
     g_idt[vec].type_attr   = type_attr;
     g_idt[vec].offset_high = (uint16_t)((handler >> 16) & 0xFFFF);
-    g_idt[vec].zero2       = 0;
 }
 
 static void idt_init(void) {
@@ -8905,9 +8919,19 @@ __attribute__((section(".text"), naked))
 void _start(void) {
     __asm__ volatile (
         "cli\n"
+        /* Zero .bss (loaders are not required to; the kernel stack lives
+         * inside .bss, so do this BEFORE switching esp to stack_top).
+         * rep stosl clobbers eax/ecx/edi only — magic saved in edx. */
+        "movl %eax, %edx\n"
+        "xorl %eax, %eax\n"
+        "movl $__bss_start, %edi\n"
+        "movl $_end, %ecx\n"
+        "subl %edi, %ecx\n"
+        "shrl $2, %ecx\n"
+        "rep stosl\n"
         "mov $stack_top, %esp\n"
         "push %ebx\n"          /* Multiboot info pointer */
-        "push %eax\n"          /* Multiboot magic */
+        "push %edx\n"          /* Multiboot magic */
         "call kernel_main\n"
         "1: hlt\n"
         "jmp 1b\n"

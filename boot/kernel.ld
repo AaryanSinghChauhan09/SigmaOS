@@ -36,6 +36,9 @@ SECTIONS {
         *(.data.*)
     }
 
+    /* BSS start marker (for explicit zeroing — loaders may not) */
+    __bss_start = .;
+
     /* BSS (zero-initialized — stack lives here) */
     .bss ALIGN(4K) : {
         *(COMMON)
