@@ -5443,6 +5443,10 @@ void kernel_shell(void) {
             while (cmd[wl] && cmd[wl] != ' ' && wl < 31) { wbuf[wl] = cmd[wl]; wl++; }
             wbuf[wl] = 0;
             for (size_t ai = 0; ai < NUM_ALIASES; ai++) {
+                /* .rodata/.data are writable under the identity map; a stray
+                 * write can corrupt pointer tables. Guard before deref. */
+                uint32_t ap = (uint32_t)(size_t)g_aliases[ai].alias;
+                if (ap < 0x100000u || ap >= 0x2000000u) continue;
                 if (kstrcmp(wbuf, g_aliases[ai].alias) == 0) {
                     char exp2[160];
                     int tl = kstrlen(g_aliases[ai].target);
@@ -8938,7 +8942,8 @@ void _start(void) {
     );
 }
 
-/* 32 KiB Kernel Stack */
+/* 128 KiB Kernel Stack — kernel_main's frame alone is ~11 KiB and IRQ
+ * frames nest on top; 32 KiB underflowed into adjacent .bss globals. */
 __attribute__((section(".bss"), aligned(16)))
-static uint8_t stack[32768];
+static uint8_t stack[131072];
 uint8_t* stack_top = stack + sizeof(stack);
