@@ -529,14 +529,15 @@ int      g_user_active     = 0;
 uint32_t g_user_ctx[8];     /* pushal-order regs at preempt point */
 uint32_t g_user_eip, g_user_cs, g_user_eflags, g_user_esp, g_user_ss;
 
+#define PAGE_SIZE       4096u
 #define MBI_FLAGS       0
 #define MBI_MEM_LOWER   4
 #define MBI_MEM_UPPER   8
 #define MBI_CMDLINE     16
 #define MBI_MODS_COUNT  20
 #define MBI_MODS_ADDR   24
-#define MBI_MMAP_SIZE   28
-#define MBI_MMAP_ADDR   32
+#define MBI_MMAP_SIZE   32   /* multiboot1: syms@28, mmap_length@32, mmap_addr@36 */
+#define MBI_MMAP_ADDR   36
 #define MB_MMAP_FLAG    0x40
 
 static uint32_t mbi_rd32(uint32_t off) {
@@ -4229,9 +4230,32 @@ static int fat_read_to_buf(int kind, uint32_t fat_lba, uint32_t data_lba,
     return (int)(size - remaining);
 }
 
-/* ELF32 loader: parse header + PT_LOAD segments, relocate by bias so any
- * linked vaddr lands inside the user region. Returns entry vaddr or 0. */
-static uint32_t exec_load_elf(const uint8_t* f, uint32_t size) {
+/* Lowest PT_LOAD vaddr of an ELF32 image, or 0 on parse failure. */
+static uint32_t elf_minva(const uint8_t* f, uint32_t size) {
+    if (size < 52) return 0;
+    uint32_t phoff  = (uint32_t)f[28] | ((uint32_t)f[29] << 8)
+                    | ((uint32_t)f[30] << 16) | ((uint32_t)f[31] << 24);
+    uint16_t phentsz = (uint16_t)f[42] | ((uint16_t)f[43] << 8);
+    uint16_t phnum   = (uint16_t)f[44] | ((uint16_t)f[45] << 8);
+    if (phentsz < 32 || phnum == 0 || phnum > 32) return 0;
+    if ((uint64_t)phoff + (uint64_t)phentsz * phnum > size) return 0;
+    uint32_t minva = 0xFFFFFFFFu;
+    for (int i = 0; i < phnum; i++) {
+        const uint8_t* ph = f + phoff + (uint32_t)i * phentsz;
+        uint32_t type = (uint32_t)ph[0] | ((uint32_t)ph[1] << 8)
+                      | ((uint32_t)ph[2] << 16) | ((uint32_t)ph[3] << 24);
+        if (type != 1) continue;
+        uint32_t va = (uint32_t)ph[8] | ((uint32_t)ph[9] << 8)
+                    | ((uint32_t)ph[10] << 16) | ((uint32_t)ph[11] << 24);
+        if (va < minva) minva = va;
+    }
+    return minva == 0xFFFFFFFFu ? 0 : minva;
+}
+
+/* ELF32 loader. natural=0: relocate by bias into g_user_base (ET_DYN).
+ * natural=1: load at linked vaddrs (ET_EXEC); caller must have placed
+ * g_user_base on the 4MiB block containing minva. Returns entry or 0. */
+static uint32_t exec_load_elf(const uint8_t* f, uint32_t size, int natural) {
     if (size < 52) return 0;
     if (!(f[0] == 0x7F && f[1] == 'E' && f[2] == 'L' && f[3] == 'F')) return 0;
     if (f[4] != 1 || f[5] != 1) return 0;              /* 32-bit, little-endian */
@@ -4258,7 +4282,7 @@ static uint32_t exec_load_elf(const uint8_t* f, uint32_t size) {
         if (va < minva) minva = va;
     }
     if (minva == 0xFFFFFFFFu) return 0;
-    uint32_t bias = g_user_base - (minva & ~0xFFFu);
+    uint32_t bias = natural ? 0u : (g_user_base - (minva & ~0xFFFu));
 
     /* load segments */
     for (int i = 0; i < phnum; i++) {
@@ -4276,7 +4300,8 @@ static uint32_t exec_load_elf(const uint8_t* f, uint32_t size) {
                        | ((uint32_t)ph[22] << 16) | ((uint32_t)ph[23] << 24);
         if (off + fsz > size || msz < fsz) return 0;
         uint32_t dst = bias + va;
-        if (dst < g_user_base || dst + msz > g_user_base + 0x400000u) return 0;
+        uint32_t lo = natural ? (minva & ~0x3FFFFFu) : g_user_base;
+        if (dst < lo || dst + msz > lo + 0x400000u) return 0;
         uint8_t* d = (uint8_t*)(size_t)dst;
         for (uint32_t j = 0; j < fsz; j++) d[j] = f[off + j];
         for (uint32_t j = fsz; j < msz; j++) d[j] = 0;   /* bss */
@@ -4286,40 +4311,23 @@ static uint32_t exec_load_elf(const uint8_t* f, uint32_t size) {
 
 /* find a 4 MiB region not used by any proc or the legacy user test slot.
  * Scans every 4MiB-aligned candidate inside each type-1 mmap region. */
+static int mm_page_range_free(uint32_t pg, uint32_t n);
+
 static uint32_t find_free_user_region(void) {
-    if (!g_mb_info) return 0;
-    uint32_t flags = mbi_rd32(MBI_FLAGS);
-    if (!(flags & MB_MMAP_FLAG)) return 0;
-    uint32_t size = mbi_rd32(MBI_MMAP_SIZE);
-    uint32_t addr = mbi_rd32(MBI_MMAP_ADDR);
-    volatile uint8_t* p = (volatile uint8_t*)(size_t)addr;
-    volatile uint8_t* end = p + size;
-    uint32_t mcount = mbi_rd32(MBI_MODS_COUNT);
-    uint32_t maddr  = mbi_rd32(MBI_MODS_ADDR);
-    while (p + 24 <= end) {
-        uint32_t esize = *(volatile uint32_t*)p;
-        if (esize < 24 || p + esize > end) break;
-        uint64_t base = ((uint64_t)*(volatile uint32_t*)(p + 8) << 32) | *(volatile uint32_t*)(p + 4);
-        uint64_t len  = ((uint64_t)*(volatile uint32_t*)(p + 16) << 32) | *(volatile uint32_t*)(p + 12);
-        uint32_t type = *(volatile uint32_t*)(p + 20);
-        if (type == 1 && len >= 0x400000) {
-            uint64_t first = (base + 0x3FFFFFu) & ~0x3FFFFFuLL;
-            for (uint64_t cand = first; cand + 0x400000ULL <= base + len; cand += 0x400000ULL) {
-                if (cand < 0x400000ULL) continue;
-                int busy = 0;
-                for (int i = 0; i < MAX_PROCS; i++)
-                    if (g_procs[i].used && g_procs[i].base == (uint32_t)cand) { busy = 1; break; }
-                if (busy || (uint32_t)cand == g_user_base) continue;
-                for (uint32_t m = 0; m < mcount && !busy; m++) {
-                    volatile uint8_t* mp = (volatile uint8_t*)(size_t)maddr + m * 16;
-                    uint32_t ms = *(volatile uint32_t*)(mp + 0);
-                    uint32_t me = *(volatile uint32_t*)(mp + 4);
-                    if (cand < (uint64_t)me && (uint64_t)ms < cand + 0x400000ULL) busy = 1;
-                }
-                if (!busy) return (uint32_t)cand;
-            }
-        }
-        p += esize;
+    /* Pick a 4 MiB-aligned run of 1024 free pages from the pmm bitmap.
+     * Scan top-down so user regions live in high memory, away from the
+     * kernel image and boot-time allocations. */
+    if (!g_mm_ready) mm_init();
+    if (!g_mm_ready || !g_max_page) return 0;
+    uint32_t top_pg = g_max_page & ~1023u;   /* round down to 4 MiB */
+    for (uint32_t base_pg = top_pg; base_pg >= 1024; base_pg -= 1024) {
+        uint32_t cand = base_pg * PAGE_SIZE;
+        if (cand < 0x400000u) break;
+        int busy = 0;
+        for (int i = 0; i < MAX_PROCS; i++)
+            if (g_procs[i].used && g_procs[i].base == cand) { busy = 1; break; }
+        if (busy || cand == g_user_base) continue;
+        if (mm_page_range_free(base_pg, 1024)) return cand;
     }
     return 0;
 }
@@ -4820,27 +4828,42 @@ static void exec_spawn(const char* args, int bg, uint32_t in_pipe, uint32_t out_
         kputs("exec: bad size (0 or >2MiB).\n"); return;
     }
 
-    /* --- user region: pick a 4MiB block not owned by any proc --- */
-    g_user_base = find_free_user_region();
-    if (!g_user_base) { kputs("exec: no free user region.\n"); return; }
-
     /* --- format detection: ELF32 or flat binary --- */
     uint32_t entry = 0;
-    int elf_seen = 0, elf_bad = 0;
-    if (hit.size <= EXEC_ELF_MAX) {
-        uint8_t* fbuf = (uint8_t*)kmalloc(hit.size);
-        if (fbuf && fat_read_to_buf(kind, fat_lba, data_lba, spc,
-                                    hit.cluster, hit.size, fbuf) == (int)hit.size
-            && fbuf[0] == 0x7F && fbuf[1] == 'E' && fbuf[2] == 'L' && fbuf[3] == 'F') {
-            elf_seen = 1;
-            entry = exec_load_elf(fbuf, hit.size);
-            if (!entry) elf_bad = 1;
+    int elf_seen = 0, elf_bad = 0, elf_natural = 0;
+    uint8_t* fbuf = (hit.size <= EXEC_ELF_MAX) ? (uint8_t*)kmalloc(hit.size) : 0;
+    if (fbuf && fat_read_to_buf(kind, fat_lba, data_lba, spc,
+                                hit.cluster, hit.size, fbuf) == (int)hit.size
+        && fbuf[0] == 0x7F && fbuf[1] == 'E' && fbuf[2] == 'L' && fbuf[3] == 'F') {
+        elf_seen = 1;
+        uint16_t etype = (uint16_t)fbuf[16] | ((uint16_t)fbuf[17] << 8);
+        if (etype == 2) {   /* ET_EXEC: absolute vaddrs — load naturally */
+            uint32_t minva = elf_minva(fbuf, hit.size);
+            uint32_t pref  = minva & ~0x3FFFFFu;
+            int ok = minva && pref >= 0x400000u;
+            if (ok) {
+                if (!g_mm_ready) mm_init();
+                ok = mm_page_range_free(pref / PAGE_SIZE, 1024);
+                for (int i = 0; ok && i < MAX_PROCS; i++)
+                    if (g_procs[i].used && g_procs[i].base == pref) ok = 0;
+            }
+            if (!ok) { kputs("exec: ET_EXEC address space busy.\n");
+                       if (fbuf) kfree(fbuf); return; }
+            g_user_base = pref;
+            elf_natural = 1;
+        } else {
+            g_user_base = find_free_user_region();
+            if (!g_user_base) { kputs("exec: no free user region.\n");
+                                if (fbuf) kfree(fbuf); return; }
         }
-        if (fbuf) kfree(fbuf);
+        entry = exec_load_elf(fbuf, hit.size, elf_natural);
+        if (!entry) elf_bad = 1;
     }
+    if (fbuf) kfree(fbuf);
     if (elf_bad) { kputs("exec: malformed ELF32.\n"); return; }
-
     if (!elf_seen) {
+        g_user_base = find_free_user_region();
+        if (!g_user_base) { kputs("exec: no free user region.\n"); return; }
     /* --- copy file cluster chain into user memory at base+0x1000 --- */
     uint8_t* dst = (uint8_t*)(size_t)(g_user_base + EXEC_LOAD_OFF);
     uint32_t remaining = hit.size;
@@ -5751,6 +5774,7 @@ void kernel_main(uint32_t magic, void* mb_info) {
  * Multiboot (capped at 4 GiB address space). One page directory covers
  * 1024 × 4 MiB = 4 GiB; no page tables needed.
  * -------------------------------------------------------------------------- */
+#define PAGE_SIZE     4096u
 #define PTE_PRESENT   0x001u
 #define PTE_RW        0x002u
 #define PDE_PS        0x080u   /* page size: 4 MiB when set in a PDE */
@@ -7563,7 +7587,14 @@ void syscall_handler(uint32_t* regs) {
         uint32_t xentry = 0;
         if (fbuf[0] == 0x7F && fbuf[1] == 'E' && fbuf[2] == 'L' && fbuf[3] == 'F'
             && xh.size <= EXEC_ELF_MAX) {
-            xentry = exec_load_elf(fbuf, xh.size);
+            uint16_t xet = (uint16_t)fbuf[16] | ((uint16_t)fbuf[17] << 8);
+            int xnat = 0;
+            if (xet == 2) {   /* ET_EXEC: base must already cover minva */
+                uint32_t xm = elf_minva(fbuf, xh.size);
+                xnat = (xm && ep->base == (xm & ~0x3FFFFFu));
+                if (!xnat) { kfree(fbuf); regs[7] = 0xFFFFFFFFu; return; }
+            }
+            xentry = exec_load_elf(fbuf, xh.size, xnat);
         } else {
             /* flat binary at LOAD_OFF */
             int wok = fat_read_to_buf(g_vol_kind, g_vol_fat_lba, g_vol_data_lba,
@@ -8585,7 +8616,6 @@ static void show_fastfetch(void) {
  * Bitmap lives in kernel BSS (128 KiB => 4 GiB coverage).
  * SEPARATION OF CONCERNS: mechanism (alloc/free) vs policy (callers).
  * -------------------------------------------------------------------------- */
-#define PAGE_SIZE      4096u
 #define BITMAP_WORDS   32768u   /* 1,048,576 pages * 4 KiB = 4 GiB coverage */
 
 static uint32_t g_page_bitmap[BITMAP_WORDS] __attribute__((section(".bss")));
@@ -8598,43 +8628,24 @@ static void mm_init(void) {
     if (g_mm_ready) return;
     for (uint32_t i = 0; i < BITMAP_WORDS; i++) g_page_bitmap[i] = 0;
     if (!g_mb_info) return;
-    uint32_t flags = mbi_rd32(MBI_FLAGS);
-    if (!(flags & MB_MMAP_FLAG)) return;
-    uint32_t size = mbi_rd32(MBI_MMAP_SIZE);
-    uint32_t addr = mbi_rd32(MBI_MMAP_ADDR);
-    volatile uint8_t* p = (volatile uint8_t*)(size_t)addr;
-    volatile uint8_t* end = p + size;
-    /* Reserve: mark all non-type-1 pages as used; type-1 as free (bit=0=free). */
-    while (p + 24 <= end) {
-        uint32_t esize = *(volatile uint32_t*)p;
-        if (esize < 24 || p + esize > end) break;
-        uint64_t base = ((uint64_t)*(volatile uint32_t*)(p + 8) << 32) | *(volatile uint32_t*)(p + 4);
-        uint64_t len  = ((uint64_t)*(volatile uint32_t*)(p + 16) << 32) | *(volatile uint32_t*)(p + 12);
-        uint32_t type = *(volatile uint32_t*)(p + 20);
-        if (type == 1) {
-            uint64_t fb = base / PAGE_SIZE;
-            uint64_t fe = (base + len + PAGE_SIZE - 1) / PAGE_SIZE;
-            if (fe > fb && fe - fb < 1048576) {
-                g_total_pages += (uint32_t)(fe - fb);
-                if (fe > g_max_page) g_max_page = (uint32_t)fe;
-            }
-        }
-        if (type != 1) {
-            /* mark used */
-            uint64_t first = base / PAGE_SIZE;
-            uint64_t last  = (base + len + PAGE_SIZE - 1) / PAGE_SIZE;
-            for (uint64_t pg = first; pg < last && pg < 1048576; pg++) {
-                g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
-            }
-        }
-        p += esize;
-    }
-    /* Reserve first 1 MiB (real-mode/BIOS) and kernel image [1MiB, ~2MiB) */
+    /* No Multiboot mmap needed: mem_upper = usable KiB above 1 MiB.
+     * Treat [1MiB, ram_top) as usable, then punch out reservations. */
+    uint32_t upper_kb = mbi_rd32(MBI_MEM_UPPER);
+    uint32_t ram_top  = 0x100000u + upper_kb * 1024u;
+    if (ram_top > 0x40000000u) ram_top = 0x40000000u;   /* cap 1 GiB */
+    if (ram_top < 0x2000000u)  ram_top = 0x2000000u;    /* floor 32 MiB */
+    g_max_page = ram_top / PAGE_SIZE;
+    g_total_pages = g_max_page > 512 ? g_max_page - 512 : 0;
+
+    /* Reserve: first 1 MiB (real-mode/BIOS) */
     for (uint32_t pg = 0; pg < 512; pg++) g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
-    /* reserve kernel image: from 1MiB to end of kernel (approx 2MiB) */
+    /* Reserve kernel image [_end of .text/.data/.bss] */
     extern uint8_t _end;
     uint32_t kern_end_pg = ((uint32_t)(size_t)&_end + PAGE_SIZE - 1) / PAGE_SIZE;
     for (uint32_t pg = 256; pg < kern_end_pg; pg++) g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
+    /* Reserve ISA hole 15-16 MiB (not backed by RAM on PC) */
+    for (uint32_t pg = 0xF00000u / PAGE_SIZE; pg < 0x1000000u / PAGE_SIZE; pg++)
+        g_page_bitmap[pg >> 5] |= (1u << (pg & 31));
     /* mark every page at/above the top of RAM as used so pmm_alloc
      * can never hand out memory that does not exist */
     for (uint32_t pg = g_max_page; pg < 1048576; pg++)
@@ -8679,6 +8690,17 @@ static void pmm_free(uint32_t phys) {
             g_alloc_count--;
         g_page_bitmap[pg >> 5] &= ~(1u << (pg & 31));
     }
+}
+
+/* True when pages [pg, pg+n) are all free in the bitmap. */
+static int mm_page_range_free(uint32_t pg, uint32_t n) {
+    if (!g_mm_ready) mm_init();
+    if (pg + n > g_max_page) return 0;
+    for (uint32_t i = 0; i < n; i++) {
+        uint32_t p = pg + i;
+        if (g_page_bitmap[p >> 5] & (1u << (p & 31))) return 0;
+    }
+    return 1;
 }
 
 /* ---- kernel heap: page-granular kmalloc over pmm ----
