@@ -26594,3 +26594,113 @@ category = "Unclassified"
 language = "rust"
 visibility = "public"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-inittab"
+description = "SysV inittab parser and runlevel action dispatcher for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-inittab"
+engine = "common_lib"
+category = "System"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-runlevel"
+description = "SysV runlevel state machine and transition rules for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-runlevel"
+engine = "common_lib"
+category = "System"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-job-control"
+description = "POSIX job-control table: fg/bg/stopped jobs and signals for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-job-control"
+engine = "common_lib"
+category = "System"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ethernet"
+description = "Ethernet II frame codec and ARP packet encode/decode for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ethernet"
+engine = "common_lib"
+category = "Network"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-qos"
+description = "Token-bucket policer and strict-priority/DRR schedulers for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qos"
+engine = "common_lib"
+category = "Network"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-traffic"
+description = "Interface traffic counters and rate derivation for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-traffic"
+engine = "common_lib"
+category = "Network"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-network-configuration"
+description = "Interface IP config model: CIDR, gateways, render/parse for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-configuration"
+engine = "common_lib"
+category = "Network"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-team"
+description = "Linux team driver model: runners, ports, link-watch failover for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-team"
+engine = "common_lib"
+category = "Network"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-network-setup"
+description = "Network bring-up orchestrator: link detect, addr/gw/mtu steps for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-setup"
+engine = "common_lib"
+category = "Network"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-modules"
+description = "Kernel module registry: deps, topo load order, refcounted unload for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-modules"
+engine = "common_lib"
+category = "Kernel"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
