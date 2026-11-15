@@ -65,7 +65,12 @@ fn run_script(script_name: &str) {
     let base = find_base_dir();
     let script_path = base.join("scripts").join(script_name);
     if script_path.exists() {
-        let _ = Command::new("bash")
+        let runner = if script_name.ends_with(".py") {
+            "python3"
+        } else {
+            "bash"
+        };
+        let _ = Command::new(runner)
             .arg(&script_path)
             .current_dir(&base)
             .status();
@@ -466,8 +471,8 @@ fn run_interactive_repl() {
                 println!();
             }
             "gui" | "desktop" => {
-                println!("\nLaunching SigmaOS Graphical Desktop Launcher...");
-                run_script("launch_gui.sh");
+                println!("\nLaunching SigmaOS Graphical Desktop Window...");
+                run_script("sigmaos_gui.py");
                 println!();
             }
             "boot" | "run" | "qemu" => {
@@ -588,7 +593,7 @@ fn main() {
                 run_script("launch_omarchy_persona.sh");
             }
             "--gui" | "gui" | "--desktop" | "desktop" => {
-                run_script("launch_gui.sh");
+                run_script("sigmaos_gui.py");
             }
             "--qemu" | "qemu" | "--boot" | "boot" | "--run" | "run" => {
                 let base = find_base_dir();

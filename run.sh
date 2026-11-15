@@ -54,7 +54,14 @@ case "$ACTION" in
         exec "$SCRIPT_DIR/bin/sigmaos" --status
         ;;
     --gui|gui|--desktop|desktop)
-        exec bash "$SCRIPT_DIR/scripts/launch_gui.sh"
+        exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py"
+        ;;
+    --cli|cli|--tui|tui)
+        if [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
+            exec "$SCRIPT_DIR/bin/sigmaos-launch"
+        else
+            exec "$SCRIPT_DIR/bin/sigmaos"
+        fi
         ;;
     --iso|iso)
         if [ ! -f "$SCRIPT_DIR/build/sigmaos-desktop-preview.iso" ]; then
@@ -71,14 +78,21 @@ case "$ACTION" in
             exec qemu-system-x86_64 -m 2048 -cdrom "$SCRIPT_DIR/build/sigmaos-desktop-preview.iso" -serial stdio -no-reboot
         else
             echo "==> QEMU not found in PATH. Launching native SigmaOS Workstation..."
-            exec "$SCRIPT_DIR/bin/sigmaos-launch"
+            if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+                exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py"
+            else
+                exec "$SCRIPT_DIR/bin/sigmaos-launch"
+            fi
         fi
         ;;
     --help|-h|help)
         exec "$SCRIPT_DIR/bin/sigmaos" --help
         ;;
     "")
-        if [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
+        # In a graphical desktop session (X11 or Wayland), launch the visible GUI desktop directly!
+        if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+            exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py"
+        elif [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
             exec "$SCRIPT_DIR/bin/sigmaos-launch"
         else
             exec "$SCRIPT_DIR/bin/sigmaos"

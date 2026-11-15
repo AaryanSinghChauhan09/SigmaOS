@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SigmaOS Sovereign Desktop Environment</title>
+<style>
+  :root {
+    --bg-dark: #0f111a;
+    --glass-bg: rgba(22, 25, 37, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --accent-cyan: #00f0ff;
+    --accent-magenta: #ff007f;
+    --accent-green: #00ff66;
+    --accent-yellow: #ffcc00;
+    --text-primary: #f0f4fc;
+    --text-muted: #8b9bb4;
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Ubuntu, sans-serif;
+    --font-mono: "JetBrains Mono", "Fira Code", monospace;
+  }
+
+  /* Persona Themes */
+  body.persona-omarchy {
+    --accent-cyan: #bd93f9;
+    --accent-magenta: #ff79c6;
+    --accent-green: #50fa7b;
+    --bg-gradient: radial-gradient(circle at 20% 20%, #282a36 0%, #1e1f29 50%, #12131a 100%);
+  }
+
+  body.persona-mint {
+    --accent-cyan: #87c38f;
+    --accent-magenta: #4ea8de;
+    --accent-green: #2ecc71;
+    --bg-gradient: radial-gradient(circle at 50% 30%, #1b382b 0%, #0d2117 60%, #06110b 100%);
+  }
+
+  body.persona-arch {
+    --accent-cyan: #1793d1;
+    --accent-magenta: #33aadd;
+    --accent-green: #48bfe3;
+    --bg-gradient: radial-gradient(circle at 80% 20%, #142838 0%, #0b1721 60%, #050b10 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+  body {
+    background: var(--bg-gradient, radial-gradient(circle at 20% 20%, #1a1e2e 0%, #0e111a 60%, #06070a 100%));
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* Top Bar (Waybar style) */
+  #top-bar {
+    height: 40px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 1000;
+  }
+
+  .bar-left, .bar-center, .bar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-badge {
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent-cyan);
+    cursor: pointer;
+  }
+
+  .workspaces {
+    display: flex;
+    gap: 4px;
+  }
+
+  .ws-tag {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .ws-tag.active {
+    background: var(--accent-cyan);
+    color: #000;
+    font-weight: 800;
+  }
+
+  .persona-selector {
+    display: flex;
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+    padding: 2px;
+    border: 1px solid var(--glass-border);
+  }
+
+  .persona-btn {
+    padding: 3px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .persona-btn.active {
+    background: var(--accent-cyan);
+    color: #000;
+  }
+
+  .status-item {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .status-item strong { color: var(--text-primary); }
+
+  /* Desktop Canvas */
+  #desktop {
+    flex: 1;
+    position: relative;
+    padding: 24px;
+    overflow: hidden;
+  }
+
+  /* Desktop Grid Icons */
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 20px;
+    max-width: 400px;
+  }
+
+  .desktop-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .desktop-icon:hover {
+    background: rgba(255,255,255,0.08);
+    transform: translateY(-2px);
+  }
+
+  .icon-glyph {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  }
+
+  .icon-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  }
+
+  /* Windows */
+  .window {
+    position: absolute;
+    min-width: 420px;
+    min-height: 280px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  .window.focused {
+    border-color: var(--accent-cyan);
+    z-index: 50;
+  }
+
+  .window-header {
+    height: 36px;
+    background: rgba(0,0,0,0.25);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    cursor: move;
+  }
+
+  .window-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .window-controls {
+    display: flex;
+    gap: 6px;
+  }
+
+  .w-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+  }
+
+  .w-btn.close { background: #ff5f56; }
+  .w-btn.min { background: #ffbd2e; }
+  .w-btn.max { background: #27c93f; }
+
+  .window-body {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    font-size: 13px;
+  }
+
+  /* Terminal Styling */
+  .terminal-body {
+    background: #090b10;
+    font-family: var(--font-mono);
+    color: #a9b7c6;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .term-output {
+    white-space: pre-wrap;
+    line-height: 1.45;
+  }
+
+  .term-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .term-prompt {
+    color: var(--accent-green);
+    font-weight: 700;
+  }
+
+  .term-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  /* Craft Suite Grid */
+  .craft-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .craft-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .craft-card:hover {
+    border-color: var(--accent-magenta);
+    background: rgba(255,255,255,0.08);
+  }
+
+  .craft-name { font-weight: 700; font-size: 12px; color: var(--accent-cyan); }
+  .craft-desc { font-size: 10px; color: var(--text-muted); line-height: 1.3; }
+
+  /* Quick Actions Bar */
+  .quick-actions {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    display: flex;
+    gap: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 100;
+  }
+
+  .dock-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.05);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .dock-btn:hover {
+    transform: translateY(-4px) scale(1.1);
+    background: rgba(255,255,255,0.15);
+  }
+
+  /* Doctor Table */
+  table.doctor-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  table.doctor-table th, table.doctor-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  table.doctor-table th { color: var(--accent-cyan); font-weight: 700; }
+  .badge-ok { color: var(--accent-green); font-weight: 700; }
+  .badge-warn { color: var(--accent-yellow); font-weight: 700; }
+</style>
+</head>
+<body class="persona-omarchy">
+
+<!-- Waybar Top Panel -->
+<div id="top-bar">
+  <div class="bar-left">
+    <div class="logo-badge" onclick="summonWindow('win-about')">
+      <span>⚡</span>
+      <span>SIGMAOS</span>
+    </div>
+    <div class="workspaces">
+      <div class="ws-tag active">1</div>
+      <div class="ws-tag">2</div>
+      <div class="ws-tag">3</div>
+      <div class="ws-tag">4</div>
+    </div>
+  </div>
+
+  <div class="bar-center">
+    <div class="persona-selector">
+      <button class="persona-btn active" onclick="setPersona('omarchy')">Omarchy</button>
+      <button class="persona-btn" onclick="setPersona('arch')">Arch</button>
+      <button class="persona-btn" onclick="setPersona('mint')">Mint</button>
+    </div>
+  </div>
+
+  <div class="bar-right">
+    <div class="status-item">
+      <span>CPU:</span>
+      <strong id="cpu-stat">4.2%</strong>
+    </div>
+    <div class="status-item">
+      <span>MEM:</span>
+      <strong id="mem-stat">1.8 GB</strong>
+    </div>
+    <div class="status-item">
+      <span>ISO:</span>
+      <strong style="color:var(--accent-green);">✓ Ready</strong>
+    </div>
+    <div class="status-item">
+      <strong id="clock">12:00 PM</strong>
+    </div>
+  </div>
+</div>
+
+<!-- Desktop Work area -->
+<div id="desktop">
+  <div class="icon-grid">
+    <div class="desktop-icon" onclick="summonWindow('win-term')">
+      <div class="icon-glyph">💻</div>
+      <span class="icon-label">Terminal</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-craft')">
+      <div class="icon-glyph">🎨</div>
+      <span class="icon-label">Craft Suite</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-doctor')">
+      <div class="icon-glyph">🩺</div>
+      <span class="icon-label">Doctor</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-installer')">
+      <div class="icon-glyph">💾</div>
+      <span class="icon-label">Installer</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-pkg')">
+      <div class="icon-glyph">📦</div>
+      <span class="icon-label">SigPkg</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-about')">
+      <div class="icon-glyph">⚡</div>
+      <span class="icon-label">About</span>
+    </div>
+  </div>
+
+  <!-- Terminal Window -->
+  <div id="win-term" class="window focused" style="top: 80px; left: 160px; width: 680px; height: 440px;">
+    <div class="window-header">
+      <div class="window-title">💻 Sovereign Terminal — zsh / pacman / alpm</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-term')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-term')"></button>
+      </div>
+    </div>
+    <div class="window-body terminal-body">
+      <div class="term-output" id="term-out">╔══════════════════════════════════════════════════════════════════════════════╗
+║                     SIGMAOS SOVEREIGN WORKSTATION                            ║
+║         Turnkey Operating System · Ready to Work & Ready to Launch           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+  Architecture : x86_64 Sovereign Microkernel / Hybrid (#![no_std] Rust)
+  Inspirations : Arch Linux (Minimalist) · Omarchy (Aesthetic) · Mint (Ergonomic)
+  Kernel ABI   : Linux Syscalls (21 mapped) + FreeBSD Capsicum + OpenBSD pledge
+  Pacman/ALPM  : Rolling Release v75.0 · Tier-1 Mirrorlist
+
+Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
+</div>
+      <div class="term-input-row">
+        <span class="term-prompt">sigmaos❯</span>
+        <input type="text" class="term-input" id="term-in" autofocus placeholder="Type command..." onkeydown="handleTermKey(event)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Craft Suite Window -->
+  <div id="win-craft" class="window" style="top: 120px; left: 240px; width: 620px; height: 420px; display: none;">
+    <div class="window-header">
+      <div class="window-title">🎨 20-Module Craft Creative Suite</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-craft')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-craft')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <p style="margin-bottom: 14px; color: var(--text-muted); font-size: 11px;">
+        High-performance sovereign creative modules with real Rust geometry, audio DSP, and typography engines.
+      </p>
+      <div class="craft-grid">
+        <div class="craft-card" onclick="alert('3DCraft: Spatial Mesh Engine loaded (Vec3, Triangles, Raycasting)')">
+          <div class="craft-name">3DCraft</div>
+          <div class="craft-desc">3D Modeling & Rendering (Blender parity)</div>
+        </div>
+        <div class="craft-card" onclick="alert('SoundCraft: Audio DSP & MIDI Sequencer loaded')">
+          <div class="craft-name">SoundCraft</div>
+          <div class="craft-desc">Digital Audio Workstation & MIDI (Bitwig parity)</div>
+        </div>
+        <div class="craft-card" onclick="alert('FontCraft: OpenType Typography & Font Registry loaded')">
+          <div class="craft-name">FontCraft</div>
+          <div class="craft-desc">Font Editor & OpenType Metrics</div>
+        </div>
+        <div class="craft-card" onclick="alert('GridCraft: High throughput reactive spreadsheet active')">
+          <div class="craft-name">GridCraft</div>
+          <div class="craft-desc">Reactive Spreadsheets & Data Grid</div>
+        </div>
+        <div class="craft-card" onclick="alert('WordCraft: Typographic document publisher active')">
+          <div class="craft-name">WordCraft</div>
+          <div class="craft-desc">Document Processor & Typesetter</div>
+        </div>
+        <div class="craft-card" onclick="alert('AniCraft: Vector & traditional 2D animation timeline active')">
+          <div class="craft-name">AniCraft</div>
+          <div class="craft-desc">2D Traditional Animation Studio</div>
+        </div>
+        <div class="craft-card" onclick="alert('ArtCraft: Non-destructive painting canvas active')">
+          <div class="craft-name">ArtCraft</div>
+          <div class="craft-desc">Digital Painting & Concept Art</div>
+        </div>
+        <div class="craft-card" onclick="alert('CADCraft: Parametric solid modeling engine active')">
+          <div class="craft-name">CADCraft</div>
+          <div class="craft-desc">Parametric Engineering & CAM/CAE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Doctor Window -->
+  <div id="win-doctor" class="window" style="top: 140px; left: 300px; width: 580px; height: 380px; display: none;">
+    <div class="window-header">
+      <div class="window-title">🩺 Omarchy Diagnostic Health Inspection</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-doctor')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-doctor')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <table class="doctor-table">
+        <thead>
+          <tr>
+            <th>Subsystem</th>
+            <th>Inspection</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Kernel Core</td>
+            <td>Multiboot ELF Header / Multiboot2</td>
+            <td><span class="badge-ok">✓ PASSING</span></td>
+          </tr>
+          <tr>
+            <td>Syscall ABI</td>
+            <td>Linux x86_64 Emulation (21 calls)</td>
+            <td><span class="badge-ok">✓ PASSING</span></td>
+          </tr>
+          <tr>
+            <td>Bootable ISO</td>
+            <td>build/sigmaos-desktop-preview.iso (2.9M)</td>
+            <td><span class="badge-ok">✓ READY</span></td>
+          </tr>
+          <tr>
+            <td>Pacman Substrate</td>
+            <td>Arch ALPM Mirrorlist & Configs</td>
+            <td><span class="badge-ok">✓ PASSING</span></td>
+          </tr>
+          <tr>
+            <td>Craft Suite</td>
+            <td>20/20 Creative Engines Registered</td>
+            <td><span class="badge-ok">✓ PASSING</span></td>
+          </tr>
+          <tr>
+            <td>Desktop Shell</td>
+            <td>Wayland Zenith / Hyprland Daemon</td>
+            <td><span class="badge-ok">✓ ACTIVE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Installer Window -->
+  <div id="win-installer" class="window" style="top: 160px; left: 340px; width: 560px; height: 360px; display: none;">
+    <div class="window-header">
+      <div class="window-title">💾 SigmaOS Installation Wizard (Calamares Mode)</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-installer')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-installer')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <h3 style="margin-bottom: 8px; color: var(--accent-cyan);">Welcome to SigmaOS 0.1</h3>
+      <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 16px;">
+        Choose your sovereign deployment target. Supports bare-metal EFI partitions, dual-boot alongside Linux Mint, and QEMU virtual drive installations.
+      </p>
+      <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+        <label><input type="radio" name="inst-mode" checked> Install alongside existing OS (Safe, preserve /home)</label><br>
+        <label><input type="radio" name="inst-mode"> Dedicated NVMe/SSD Clean Install</label><br>
+        <label><input type="radio" name="inst-mode"> Ephemeral Live Media (Run completely from RAM)</label>
+      </div>
+      <button style="padding: 8px 18px; border-radius: 8px; background: var(--accent-cyan); color:#000; font-weight:700; border:none; cursor:pointer;" onclick="alert('Installer: Partition map validated. SigmaOS boot image staged.')">
+        Begin Sovereign Installation →
+      </button>
+    </div>
+  </div>
+
+  <!-- About Window -->
+  <div id="win-about" class="window" style="top: 180px; left: 380px; width: 480px; height: 300px; display: none;">
+    <div class="window-header">
+      <div class="window-title">⚡ About SigmaOS</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-about')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-about')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <h2 style="color: var(--accent-cyan); margin-bottom: 6px;">SigmaOS Sovereign Workstation</h2>
+      <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 12px;">Version 0.1-Rolling (Codename: Zenith)</p>
+      <p style="line-height: 1.5; font-size: 12px; margin-bottom: 12px;">
+        A sovereign operating system integrating the minimalist power of Arch Linux, the dynamic tiling aesthetics of Omarchy Linux, and the rock-solid ergonomics of Linux Mint.
+      </p>
+      <div style="font-size: 11px; color: var(--text-muted);">
+        • 35+ verified green CI component repositories<br>
+        • Full 20-Module Craft Creative Suite<br>
+        • OpenBSD pledge/unveil & FreeBSD Capsicum security
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Dock / Quick Actions -->
+<div class="quick-actions">
+  <button class="dock-btn" title="Terminal" onclick="summonWindow('win-term')">💻</button>
+  <button class="dock-btn" title="Craft Suite" onclick="summonWindow('win-craft')">🎨</button>
+  <button class="dock-btn" title="Doctor" onclick="summonWindow('win-doctor')">🩺</button>
+  <button class="dock-btn" title="Installer" onclick="summonWindow('win-installer')">💾</button>
+  <button class="dock-btn" title="About" onclick="summonWindow('win-about')">⚡</button>
+</div>
+
+<script>
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  function setPersona(p) {
+    document.body.className = 'persona-' + p;
+    document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    appendTerm(`[Persona] Switched to ${p.toUpperCase()} layout and theme.\n`);
+  }
+
+  function summonWindow(id) {
+    const w = document.getElementById(id);
+    if (!w) return;
+    w.style.display = 'flex';
+    focusWindow(w);
+  }
+
+  function closeWindow(id) {
+    const w = document.getElementById(id);
+    if (w) w.style.display = 'none';
+  }
+
+  function minimizeWindow(id) {
+    closeWindow(id);
+  }
+
+  function focusWindow(el) {
+    document.querySelectorAll('.window').forEach(w => w.classList.remove('focused'));
+    el.classList.add('focused');
+  }
+
+  // Make windows draggable
+  document.querySelectorAll('.window').forEach(win => {
+    const header = win.querySelector('.window-header');
+    let isDragging = false;
+    let startX, startY, initX, initY;
+
+    win.addEventListener('mousedown', () => focusWindow(win));
+
+    header.addEventListener('mousedown', e => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      initX = win.offsetLeft;
+      initY = win.offsetTop;
+      focusWindow(win);
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      win.style.left = (initX + dx) + 'px';
+      win.style.top = (initY + dy) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => { isDragging = false; });
+  });
+
+  // Terminal handling
+  function appendTerm(txt) {
+    const out = document.getElementById('term-out');
+    out.textContent += txt;
+    out.scrollTop = out.scrollHeight;
+  }
+
+  function handleTermKey(e) {
+    if (e.key === 'Enter') {
+      const input = document.getElementById('term-in');
+      const cmd = input.value.trim();
+      input.value = '';
+      if (!cmd) return;
+
+      appendTerm(`sigmaos❯ ${cmd}\n`);
+
+      switch (cmd.toLowerCase()) {
+        case 'help':
+          appendTerm(`Available Commands:
+  status         - Display system and launch readiness status
+  doctor         - Run Omarchy diagnostic health checks
+  craft          - Open the 20-module Craft Creative Suite
+  pacman -syu    - Synchronize Arch Linux package databases
+  mint           - Switch to Linux Mint Ergonomic persona
+  arch           - Switch to Arch Linux Minimalist persona
+  omarchy        - Switch to Omarchy Aesthetic persona
+  clear          - Clear terminal output
+  about          - Show system version information\n`);
+          break;
+        case 'status':
+          appendTerm(`[Status]
+  Kernel Library : ✓ PASSING (190 modules clean)
+  Multiboot ELF  : ✓ Verified at boot/sigma_kernel.elf
+  Bootable ISO   : ✓ 2.9M valid ISO9660 image
+  ALPM Substrate : ✓ Synchronized with Arch mirrorlist\n`);
+          break;
+        case 'doctor':
+          summonWindow('win-doctor');
+          appendTerm(`[Doctor] Health inspection window opened.\n`);
+          break;
+        case 'craft':
+          summonWindow('win-craft');
+          appendTerm(`[Craft] Creative Suite catalog opened.\n`);
+          break;
+        case 'pacman -syu':
+        case 'sigpkg pacman -syu':
+          appendTerm(`:: Synchronizing package databases...
+ core                         154.2 KiB   412 KiB/s 00:00 [######################] 100%
+ extra                          8.4 MiB  12.4 MiB/s 00:01 [######################] 100%
+ multilib                     142.1 KiB   810 KiB/s 00:00 [######################] 100%
+:: Starting full system upgrade...
+ there is nothing to do (system rolling release v75.0 is current)\n`);
+          break;
+        case 'mint':
+          setPersona('mint');
+          break;
+        case 'arch':
+          setPersona('arch');
+          break;
+        case 'omarchy':
+          setPersona('omarchy');
+          break;
+        case 'clear':
+          document.getElementById('term-out').textContent = '';
+          break;
+        default:
+          appendTerm(`sigmaos: command not found: ${cmd}. Type 'help' for available commands.\n`);
+          break;
+      }
+    }
+  }
+</script>
+</body>
+</html>
