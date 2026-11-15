@@ -42,5 +42,27 @@ echo -e "\033[1mArch Linux Persona Active.\033[0m Native pacman syntax enabled."
 echo "Examples:"
 echo "  sigpkg pacman -Syu"
 echo "  sigpkg pacman -S neovim rust"
-echo "  sigpkg query kernel"
+echo "  sigpkg pacman -Qs kernel"
+echo "  sigpkg aur hyprland"
+echo "  omarchy-shell theme list"
 echo ""
+
+# Wire omarchy-shell keybinds refresh into Hyprland config directory
+OMARCHY_CONF_DIR="${HOME}/.config/sigmaos/omarchy/hyprland"
+mkdir -p "$OMARCHY_CONF_DIR"
+
+if command -v omarchy-shell &>/dev/null; then
+    echo "--> Refreshing Omarchy desktop binds..."
+    omarchy-shell binds 2>/dev/null > "${OMARCHY_CONF_DIR}/hyprland-binds.conf" || true
+    echo "  [✓] Keybinds written to ${OMARCHY_CONF_DIR}/hyprland-binds.conf"
+fi
+
+# Deploy Hyprland config if Hyprland is installed
+if command -v Hyprland &>/dev/null || [ -d "${HOME}/.config/hypr" ]; then
+    mkdir -p "${HOME}/.config/hypr"
+    HYPR_CONF="${ROOT_DIR}/config/omarchy/hyprland/hyprland.conf"
+    if [ -f "$HYPR_CONF" ]; then
+        cp "$HYPR_CONF" "${HOME}/.config/hypr/hyprland.conf"
+        echo "  [✓] Hyprland config deployed to ~/.config/hypr/hyprland.conf"
+    fi
+fi
