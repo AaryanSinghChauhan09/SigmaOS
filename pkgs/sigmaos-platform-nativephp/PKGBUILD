@@ -1,0 +1,23 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-platform-nativephp
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Desktop application runtime for PHP — SigmaOS Platform Integration"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-nativephp"
+license=('GPL-3.0-or-later')
+groups=('sigmaos-platform')
+makedepends=('rust' 'cargo')
+source=("${pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cd "${pkgname}-${pkgver}"
+  cargo build --release
+}
+
+package() {
+  cd "${pkgname}-${pkgver}"
+  install -Dm755 "target/release/sigmaos-platform-nativephp" \
+    "${pkgdir}/usr/bin/sigmaos-platform-nativephp"
+}

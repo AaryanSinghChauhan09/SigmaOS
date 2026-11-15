@@ -662,6 +662,33 @@ def test_platform_wave4_frameworks_parity_aaa():
         pkg_name = repo.lower()
         assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
 
+def test_platform_wave5_frameworks_parity_aaa():
+    """
+    AAA Pattern: Verify all 10 Platform GUI Wave 5 framework repositories exist locally,
+    contain real domain implementations, AAA tests, Cargo packages, and PKGBUILDs.
+    """
+    # Arrange
+    platforms_w5 = [
+        "SigmaOS-platform-gtk-rs", "SigmaOS-platform-iup", "SigmaOS-platform-nigui",
+        "SigmaOS-platform-nativephp", "SigmaOS-platform-vuido", "SigmaOS-platform-shiny",
+        "SigmaOS-platform-astrodon", "SigmaOS-platform-glimmer", "SigmaOS-platform-lazarus",
+        "SigmaOS-platform-pyloid"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in platforms_w5:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Platform Wave 5 repo: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -719,4 +746,6 @@ if __name__ == "__main__":
     print("✓ test_platform_wave3_frameworks_parity_aaa passed")
     test_platform_wave4_frameworks_parity_aaa()
     print("✓ test_platform_wave4_frameworks_parity_aaa passed")
-    print("\nALL 28 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_platform_wave5_frameworks_parity_aaa()
+    print("✓ test_platform_wave5_frameworks_parity_aaa passed")
+    print("\nALL 29 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
