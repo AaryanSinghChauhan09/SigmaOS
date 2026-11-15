@@ -1,0 +1,27 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@users.noreply.github.com>
+pkgname=sigmaos-desktop-meta
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Meta-package pulling in all sovereign Omarchy desktop components for SigmaOS"
+arch=('any')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('MIT')
+depends=(
+    'hyprland'
+    'waybar'
+    'wallust'
+    'foot'
+    'alacritty'
+    'kitty'
+    'rofi-wayland'
+    'mako'
+    'wlogout'
+    'sigmaos-omarchy-shell'
+    'starship'
+    'neovim'
+)
+
+package() {
+    mkdir -p "$pkgdir/usr/share/doc/$pkgname"
+    echo "SigmaOS Sovereign Desktop Meta Package installed." > "$pkgdir/usr/share/doc/$pkgname/README"
+}

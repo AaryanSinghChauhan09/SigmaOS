@@ -1,0 +1,20 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@users.noreply.github.com>
+pkgname=sigmaos-tools-ttfx
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Terminal text animation effects engine (omacom/ttfx parity)"
+arch=('x86_64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-tools-ttfx"
+license=('MIT')
+depends=('gcc-libs' 'glibc')
+makedepends=('rust' 'cargo')
+
+build() {
+    cd "$pkgname-$pkgver"
+    cargo build --release --locked
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    install -Dm755 "target/release/ttfx" "$pkgdir/usr/bin/ttfx"
+}

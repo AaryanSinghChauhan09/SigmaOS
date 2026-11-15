@@ -1,0 +1,14 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@users.noreply.github.com>
+pkgname=sigmaos-wallust-themes
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="16-color ANSI presets and templates for Wallust dynamic theming"
+arch=('any')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('MIT')
+depends=('wallust')
+
+package() {
+    mkdir -p "$pkgdir/usr/share/sigmaos/wallust/presets"
+    mkdir -p "$pkgdir/usr/share/sigmaos/wallust/templates"
+}

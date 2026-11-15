@@ -1812,6 +1812,75 @@ ORDER BY memory_gb DESC;</textarea>
   });
 </script>
 
+
+  <!-- Slide-out Notification Center Drawer (inspired by omacom/omarchy-notification-center-plugin) -->
+  <div id="notif-drawer">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px;">
+      <span style="font-weight:700; font-size:13px; color:var(--text);">🔔 Quick Settings & Notifications</span>
+      <button onclick="clearNotifications()" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:11px;">Clear All</button>
+    </div>
+
+    <!-- Quick Settings Matrix -->
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+      <div class="qs-btn active" id="qs-wifi" onclick="toggleQs('qs-wifi')">
+        <span style="font-size:16px;">📶</span>
+        <span>Wi-Fi</span>
+      </div>
+      <div class="qs-btn active" id="qs-bt" onclick="toggleQs('qs-bt')">
+        <span style="font-size:16px;">🖲️</span>
+        <span>Bluetooth</span>
+      </div>
+      <div class="qs-btn" id="qs-dnd" onclick="toggleQs('qs-dnd')">
+        <span style="font-size:16px;">🌙</span>
+        <span>DND</span>
+      </div>
+      <div class="qs-btn" id="qs-crt" onclick="toggleCrtMode()">
+        <span style="font-size:16px;">📺</span>
+        <span>CRT</span>
+      </div>
+    </div>
+
+    <!-- Sliders -->
+    <div style="display:flex; flex-direction:column; gap:8px; background:var(--bg-input); padding:10px; border-radius:8px; border:1px solid var(--border);">
+      <div style="display:flex; align-items:center; gap:8px; font-size:11px;">
+        <span>🔊</span>
+        <input type="range" min="0" max="100" value="75" style="flex:1;" oninput="updateSysVolume(this.value)">
+        <span id="qs-vol-label" style="width:28px; text-align:right;">75%</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:11px;">
+        <span>☀️</span>
+        <input type="range" min="10" max="100" value="85" style="flex:1;" oninput="updateSysBrightness(this.value)">
+        <span id="qs-bri-label" style="width:28px; text-align:right;">85%</span>
+      </div>
+    </div>
+
+    <!-- Active Notifications Stack -->
+    <div style="font-weight:700; font-size:11px; color:var(--text-muted); text-transform:uppercase; margin-top:4px;">Recent Alerts</div>
+    <div id="notif-stack" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+      <div class="notif-card">
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--accent);">
+          <span>🎨 Wallust Harmonizer</span>
+          <span style="font-size:9px; color:var(--text-muted);">Just now</span>
+        </div>
+        <div style="color:var(--text);">Dynamic theme colors synchronized with Hyprland and Waybar.</div>
+      </div>
+      <div class="notif-card">
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:#a6e3a1;">
+          <span>⚡ SigmaOS Rolling Engine</span>
+          <span style="font-size:9px; color:var(--text-muted);">2m ago</span>
+        </div>
+        <div style="color:var(--text);">Zero broken packages detected. System integrity: 100% Verified.</div>
+      </div>
+      <div class="notif-card">
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:#f9e2af;">
+          <span>🤖 Hermes Agent Daemon</span>
+          <span style="font-size:9px; color:var(--text-muted);">5m ago</span>
+        </div>
+        <div style="color:var(--text);">Autonomous task queue completed with 0 errors.</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Desktop Right-Click Context Menu -->
   <div id="desktop-context-menu" style="display:none; position:fixed; z-index:99999; background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.5); min-width:180px; padding:4px; font-size:12px;">
     <div class="ctx-item" onclick="summonWindow('win-wallust'); hideContextMenu();">🎨 Theme Harmonizer</div>

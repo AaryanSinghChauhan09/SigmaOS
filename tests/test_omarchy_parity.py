@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
 """
-test_omarchy_parity.py: AAA Automated Test Suite for Omarchy Parity in SigmaOS.
-Ensures full parity between SigmaOS and Omarchy Linux desktop configurations.
+test_omarchy_parity.py: AAA Automated Test Suite for Omarchy & Omacom Parity in SigmaOS.
+Ensures full parity between SigmaOS and Omarchy Linux desktop configurations, ISO pipelines,
+PKGBUILD packaging, and dynamic graphical UI suites.
 """
 
 import os
@@ -14,6 +15,8 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT_DIR / "config" / "omarchy"
 SCRIPTS_DIR = ROOT_DIR / "scripts"
 UI_INDEX = ROOT_DIR / "ui" / "desktop" / "index.html"
+ISO_DIR = ROOT_DIR / "iso" / "archiso"
+PKGS_DIR = ROOT_DIR / "pkgs"
 
 def test_hyprland_configs_exist_and_nonempty():
     """Arrange-Act-Assert: Verify all Hyprland suite configs exist and are non-empty."""
@@ -95,7 +98,7 @@ def test_apply_theme_orchestrator():
     assert "catppuccin-mocha" in res.stdout
 
 def test_desktop_gui_parity():
-    """Arrange-Act-Assert: Verify all 20 Craft modules, GW-BASIC, Tools suite, Folio, Omarchy shell, Plain editor, Marketplace, and context menu in index.html."""
+    """Arrange-Act-Assert: Verify all 20 Craft modules, GW-BASIC, Tools suite, Folio, Omarchy shell, Plain editor, Marketplace, and Notification Drawer."""
     assert UI_INDEX.is_file(), "Missing ui/desktop/index.html"
     with open(UI_INDEX, "r", encoding="utf-8") as f:
         html = f.read()
@@ -110,7 +113,7 @@ def test_desktop_gui_parity():
     for mod in craft_modules:
         assert mod in html, f"Missing Craft module: {mod}"
 
-    # Essential Sovereign Windows
+    # Essential Sovereign Windows & Drawers
     expected_windows = [
         'id="win-term"',
         'id="win-wallust"',
@@ -123,6 +126,7 @@ def test_desktop_gui_parity():
         'id="win-plain"',
         'id="win-marketplace"',
         'id="win-datascience"',
+        'id="notif-drawer"',
         'id="desktop-context-menu"'
     ]
     for win in expected_windows:
@@ -143,6 +147,28 @@ def test_plugins_and_omacom_parity():
         assert p.is_file(), f"Missing Omacom parity file: {p}"
         assert p.stat().st_size > 20, f"File {p} is empty or stub"
 
+def test_archiso_and_pkgs_parity():
+    """Arrange-Act-Assert: Verify archiso live ISO pipeline and PKGBUILD package definitions (omacom/omarchy-iso & omacom/omarchy-pkgs)."""
+    assert (ISO_DIR / "profiledef.sh").is_file()
+    assert (ISO_DIR / "packages.x86_64").is_file()
+    assert (ISO_DIR / "airootfs" / "etc" / "os-release").is_file()
+    assert (ISO_DIR / "airootfs" / "etc" / "motd").is_file()
+
+    expected_pkgs = [
+        PKGS_DIR / "sigmaos-omarchy-shell" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-desktop-meta" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-wallust-themes" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-tools-ttfx" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-tools-folio" / "PKGBUILD",
+    ]
+    for pkg in expected_pkgs:
+        assert pkg.is_file(), f"Missing PKGBUILD: {pkg}"
+        with open(pkg) as f:
+            c = f.read()
+            assert "pkgname=" in c
+            assert "pkgver=" in c
+            assert "package()" in c
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -162,4 +188,6 @@ if __name__ == "__main__":
     print("✓ test_desktop_gui_parity passed")
     test_plugins_and_omacom_parity()
     print("✓ test_plugins_and_omacom_parity passed")
-    print("\nALL 9 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_archiso_and_pkgs_parity()
+    print("✓ test_archiso_and_pkgs_parity passed")
+    print("\nALL 10 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")

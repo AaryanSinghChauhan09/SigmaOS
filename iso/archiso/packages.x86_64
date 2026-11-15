@@ -1,0 +1,65 @@
+# Base Arch / Linux System
+base
+base-devel
+linux
+linux-firmware
+systemd
+systemd-sysvcompat
+btrfs-progs
+e2fsprogs
+dosfstools
+xfsprogs
+
+# Networking & Connectivity
+networkmanager
+wireless_tools
+wpa_supplicant
+iwd
+bluez
+bluez-utils
+curl
+wget
+git
+openssh
+rsync
+
+# Wayland, Compositor & Graphics
+hyprland
+waybar
+wallust
+foot
+alacritty
+kitty
+rofi-wayland
+mako
+dunst
+wlogout
+grim
+slurp
+wl-clipboard
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+polkit-gnome
+brightnessctl
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+pavucontrol
+
+# Development, Shells & Modern Editors
+zsh
+fish
+starship
+neovim
+fzf
+ripgrep
+fd
+bat
+rust
+cargo
+python
+python-pip
+
+# SigmaOS & Omarchy Native Shims
+# (installed via local airootfs or overlay repository)
