@@ -26792,3 +26792,69 @@ language = "rust"
 inspirations = ["https://github.com/freebsd/freebsd", "https://www.freebsd.org/cgi/man.cgi?query=capsicum&sektion=2"]
 visibility = "public"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-drm-impl"
+description = "Direct Rendering Manager implementation with GPU driver support, mode setting, and framebuffer management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-drm-impl"
+engine = "graphics_driver"
+category = "Graphics"
+language = "rust"
+inspirations = ["https://github.com/torvalds/linux", "https://www.kernel.org/doc/html/latest/gpu/drm-uapi.html"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-input-impl"
+description = "Input device handling implementation with keyboard, mouse, touchpad, and tablet support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-input-impl"
+engine = "input_driver"
+category = "Input"
+language = "rust"
+inspirations = ["https://github.com/torvalds/linux", "https://www.freedesktop.org/wiki/Software/libinput/"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gpusched"
+description = "GPU scheduling and resource management with task prioritization and preemption"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gpusched"
+engine = "gpu_scheduler"
+category = "Graphics"
+language = "rust"
+inspirations = ["https://github.com/torvalds/linux", "https://docs.nvidia.com/cuda/cuda-c-programming-guide/"]
+visibility = "public"
+depends_on = ["SigmaOS-drm-impl"]
+
+[[component]]
+name = "SigmaOS-memory-balloon"
+description = "Dynamic memory ballooning and virtual memory management with page swapping and compression"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-memory-balloon"
+engine = "memory_manager"
+category = "Memory"
+language = "rust"
+inspirations = ["https://github.com/torvalds/linux", "https://www.kernel.org/doc/html/latest/admin-guide/mm/index.html"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kmem"
+description = "Kernel memory allocator with slab allocation, page management, and memory statistics"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kmem"
+engine = "memory_allocator"
+category = "Memory"
+language = "rust"
+inspirations = ["https://github.com/torvalds/linux", "https://www.kernel.org/doc/html/latest/core-api/slab.html"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-memory-shrinker"
+description = "Memory shrinking and cache management with page cache control and reclaim strategies"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-memory-shrinker"
+engine = "memory_manager"
+category = "Memory"
+language = "rust"
+inspirations = ["https://github.com/torvalds/linux", "https://www.kernel.org/doc/html/latest/admin-guide/mm/index.html"]
+visibility = "public"
+depends_on = []
