@@ -497,6 +497,61 @@ def test_wiki_documentation_conformance_parity_aaa():
         assert "Industry-Standard Rules" in content, f"Missing section in {plan}"
         assert "Governance and Merge Policy" in content, f"Missing section in {plan}"
 
+def test_craft_suite_parity_aaa():
+    """
+    AAA Pattern: Verify all 20 Craft suite repositories exist locally,
+    contain real domain logic, adhere to AAA testing, and have PKGBUILDs.
+    """
+    # Arrange
+    craft_repos = [
+        "SigmaOS-craft-3d", "SigmaOS-craft-ani", "SigmaOS-craft-art", "SigmaOS-craft-cad",
+        "SigmaOS-craft-craftlibs", "SigmaOS-craft-deck", "SigmaOS-craft-design", "SigmaOS-craft-effect",
+        "SigmaOS-craft-fig", "SigmaOS-craft-film", "SigmaOS-craft-font", "SigmaOS-craft-grid",
+        "SigmaOS-craft-light", "SigmaOS-craft-pdf", "SigmaOS-craft-photo", "SigmaOS-craft-print",
+        "SigmaOS-craft-sound", "SigmaOS-craft-vector", "SigmaOS-craft-voice", "SigmaOS-craft-word"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in craft_repos:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Craft repo: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
+def test_extended_tools_and_office_parity_aaa():
+    """
+    AAA Pattern: Verify DOS additions (free, ms), LibreOffice additions (calc, writer),
+    Tools additions (chromium, command-code), and Data Science additions (ms-access, ms-excel).
+    """
+    # Arrange
+    extended_repos = [
+        "SigmaOS-dos-free", "SigmaOS-dos-ms",
+        "SigmaOS-libreoffice-calc", "SigmaOS-libreoffice-writer",
+        "SigmaOS-tools-chromium", "SigmaOS-tools-command-code",
+        "SigmaOS-tools-ms-access", "SigmaOS-tools-ms-excel"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in extended_repos:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing extended repo: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -542,4 +597,8 @@ if __name__ == "__main__":
     print("✓ test_tools_wave3_and_datascience_parity_aaa passed")
     test_wiki_documentation_conformance_parity_aaa()
     print("✓ test_wiki_documentation_conformance_parity_aaa passed")
-    print("\nALL 22 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_craft_suite_parity_aaa()
+    print("✓ test_craft_suite_parity_aaa passed")
+    test_extended_tools_and_office_parity_aaa()
+    print("✓ test_extended_tools_and_office_parity_aaa passed")
+    print("\nALL 24 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
