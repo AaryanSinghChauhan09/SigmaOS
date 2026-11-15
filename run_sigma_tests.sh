@@ -5,15 +5,26 @@ set -e
 echo "=== SigmaOS Native Test Runner ==="
 
 # Ensure documentation / wiki references are available for CI conformance tests
-if [ ! -d "../SigmaOS.wiki" ] && [ ! -d "/home/aaryansinghchauhan/SigmaOS.wiki" ]; then
+# Use /tmp to avoid permission issues on CI runners where /home/aaryansinghchauhan does not exist
+WIKI_LOCAL=""
+if [ -d "/home/aaryansinghchauhan/SigmaOS.wiki" ]; then
+    WIKI_LOCAL="/home/aaryansinghchauhan/SigmaOS.wiki"
+elif [ -d "../SigmaOS.wiki" ]; then
+    WIKI_LOCAL="$(realpath ../SigmaOS.wiki)"
+elif [ -d "/tmp/SigmaOS.wiki" ]; then
+    WIKI_LOCAL="/tmp/SigmaOS.wiki"
+else
     echo "Cloning SigmaOS.wiki for doc conformance tests..."
     git clone --depth 1 https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git /tmp/SigmaOS.wiki 2>/dev/null || true
     if [ -d "/tmp/SigmaOS.wiki" ]; then
-        mkdir -p /home/aaryansinghchauhan
-        ln -sfn /tmp/SigmaOS.wiki /home/aaryansinghchauhan/SigmaOS.wiki 2>/dev/null || true
+        WIKI_LOCAL="/tmp/SigmaOS.wiki"
+        # Try symlinking for Rust tests that hard-code the local path (best-effort)
         ln -sfn /tmp/SigmaOS.wiki ../SigmaOS.wiki 2>/dev/null || true
+        mkdir -p /home/aaryansinghchauhan 2>/dev/null && \
+            ln -sfn /tmp/SigmaOS.wiki /home/aaryansinghchauhan/SigmaOS.wiki 2>/dev/null || true
     fi
 fi
+echo "Wiki local path: ${WIKI_LOCAL:-none}"
 
 if [ -f "src/io/mod.rs" ]; then
     echo "Running I/O subsystem test suite..."
