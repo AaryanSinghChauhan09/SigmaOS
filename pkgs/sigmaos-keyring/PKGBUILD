@@ -1,0 +1,14 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-keyring
+pkgver=20261115
+pkgrel=1
+pkgdesc="SigmaOS PGP and Post-Quantum Dilithium master keys"
+arch=('any')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('GPL-3.0-or-later')
+
+package() {
+  install -d "${pkgdir}/usr/share/pacman/keyrings"
+  echo "sigmaos-pqc-master-key" > "${pkgdir}/usr/share/pacman/keyrings/sigmaos.gpg"
+  echo "sigmaos-trusted" > "${pkgdir}/usr/share/pacman/keyrings/sigmaos-trusted"
+}

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigma-aur: Lightweight Arch User Repository (AUR) helper
+set -euo pipefail
+
+ACTION="${1:-}"
+PKGNAME="${2:-}"
+
+case "$ACTION" in
+    search|-Ss)
+        echo "Searching AUR for: $PKGNAME"
+        curl -s "https://aur.archlinux.org/rpc/v5/search/$PKGNAME" | jq -r '.results[] | "\(.Name) (\(.Version)) [+\(.NumVotes)]\n    \(.Description)"'
+        ;;
+    install|-S)
+        echo "Fetching AUR PKGBUILD for: $PKGNAME"
+        TMPDIR=$(mktemp -d "/tmp/aur-$PKGNAME-XXXXXX")
+        git clone --depth 1 "https://aur.archlinux.org/$PKGNAME.git" "$TMPDIR"
+        (cd "$TMPDIR" && makepkg -si --noconfirm)
+        rm -rf "$TMPDIR"
+        ;;
+    *)
+        echo "Usage: sigma-aur search <pkg> | install <pkg>"
+        ;;
+esac

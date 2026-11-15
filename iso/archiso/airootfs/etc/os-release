@@ -1,12 +1,11 @@
-NAME="SigmaOS"
-PRETTY_NAME="SigmaOS (Omarchy Rolling Release)"
+NAME="SigmaOS Linux"
+PRETTY_NAME="SigmaOS Arch Linux Sovereign Desktop"
 ID=sigmaos
 ID_LIKE=arch
 BUILD_ID=rolling
-ANSI_COLOR="38;2;137;180;250"
+ANSI_COLOR="38;2;23;147;209"
 HOME_URL="https://github.com/AaryanSinghChauhan09/SigmaOS"
-DOCUMENTATION_URL="https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git"
+DOCUMENTATION_URL="https://github.com/AaryanSinghChauhan09/SigmaOS/wiki"
 SUPPORT_URL="https://github.com/AaryanSinghChauhan09/SigmaOS/issues"
 BUG_REPORT_URL="https://github.com/AaryanSinghChauhan09/SigmaOS/issues"
-PRIVACY_POLICY_URL="https://github.com/AaryanSinghChauhan09/SigmaOS"
-LOGO=sigmaos-logo
+LOGO=archlinux

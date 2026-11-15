@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Initialize sound system on live media
+systemctl --user start pipewire wireplumber 2>/dev/null || true
+amixer set Master 75% unmute 2>/dev/null || true

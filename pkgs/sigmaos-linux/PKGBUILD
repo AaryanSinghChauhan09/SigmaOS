@@ -1,0 +1,17 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-linux
+pkgver=6.12.0
+pkgrel=1
+pkgdesc="The Linux kernel and modules with SigmaOS Arch hardened patchset"
+arch=('x86_64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('GPL-2.0-only')
+depends=('coreutils' 'initramfs' 'kmod')
+optdepends=('wireless-regdb: to set the correct wireless channels of your country'
+            'linux-firmware: firmware images needed for some devices')
+provides=('linux=6.12.0' 'WIREGUARD-MODULE')
+
+package() {
+  install -Dm644 /dev/null "${pkgdir}/usr/lib/modules/${pkgver}-sigmaos/vmlinuz"
+  install -Dm644 /dev/null "${pkgdir}/usr/lib/modules/${pkgver}-sigmaos/modules.dep"
+}

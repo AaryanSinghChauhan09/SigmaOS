@@ -1,0 +1,15 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-mirrorlist
+pkgver=20261115
+pkgrel=1
+pkgdesc="SigmaOS and Arch Linux mirror list for use by pacman"
+arch=('any')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('GPL-3.0-or-later')
+backup=('etc/pacman.d/mirrorlist' 'etc/pacman.d/sigmaos-mirrorlist')
+
+package() {
+  install -d "${pkgdir}/etc/pacman.d"
+  echo "Server = https://geo.mirror.pkgbuild.com/\$repo/os/\$arch" > "${pkgdir}/etc/pacman.d/mirrorlist"
+  echo "Server = https://raw.githubusercontent.com/AaryanSinghChauhan09/SigmaOS/main/repo/os/\$arch" > "${pkgdir}/etc/pacman.d/sigmaos-mirrorlist"
+}

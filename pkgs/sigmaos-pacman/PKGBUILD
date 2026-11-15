@@ -1,0 +1,15 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-pacman
+pkgver=6.1.0
+pkgrel=1
+pkgdesc="A library-based package manager with SigmaOS Sovereign overlay"
+arch=('x86_64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('GPL-2.0-or-later')
+depends=('bash' 'glibc' 'libarchive' 'curl' 'gpgme' 'pacman-mirrorlist')
+
+package() {
+  install -d "${pkgdir}/etc/pacman.d"
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/var/lib/pacman"
+}

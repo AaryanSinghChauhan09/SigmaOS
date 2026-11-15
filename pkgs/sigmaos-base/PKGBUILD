@@ -1,0 +1,20 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-base
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Minimal Arch Linux base package set for SigmaOS"
+arch=('any')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('GPL-3.0-or-later')
+groups=('base')
+depends=(
+  'filesystem' 'gcc-libs' 'glibc' 'bash' 'coreutils' 'file'
+  'findutils' 'gawk' 'grep' 'procps-ng' 'sed' 'tar' 'gettext'
+  'pciutils' 'psmisc' 'shadow' 'util-linux' 'bzip2' 'gzip' 'xz'
+  'zstd' 'licenses' 'pacman' 'systemd' 'systemd-sysvcompat' 'iproute2' 'iputils'
+)
+
+package() {
+  install -d "${pkgdir}/usr/share/doc/${pkgname}"
+  echo "SigmaOS Base Arch Distribution Meta Package" > "${pkgdir}/usr/share/doc/${pkgname}/README"
+}

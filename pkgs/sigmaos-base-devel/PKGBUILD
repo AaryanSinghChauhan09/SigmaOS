@@ -1,0 +1,20 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-base-devel
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Basic Arch Linux tools to build SigmaOS packages"
+arch=('any')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('GPL-3.0-or-later')
+groups=('base-devel')
+depends=(
+  'autoconf' 'automake' 'binutils' 'bison' 'fakeroot' 'file'
+  'findutils' 'flex' 'gawk' 'gcc' 'gettext' 'grep' 'groff' 'gzip'
+  'libtool' 'm4' 'make' 'pacman' 'patch' 'pkgconf' 'sed' 'sudo'
+  'texinfo' 'which'
+)
+
+package() {
+  install -d "${pkgdir}/usr/share/doc/${pkgname}"
+  echo "SigmaOS Base-Devel Arch Build System Meta Package" > "${pkgdir}/usr/share/doc/${pkgname}/README"
+}

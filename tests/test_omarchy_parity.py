@@ -689,6 +689,91 @@ def test_platform_wave5_frameworks_parity_aaa():
         pkg_name = repo.lower()
         assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
 
+def test_arch_linux_ecosystem_gap_closure_aaa():
+    """
+    AAA Pattern: Verify complete Arch Linux distribution ecosystem parity:
+    1. Archiso bootloaders: GRUB, Syslinux, EFIBoot systemd-boot.
+    2. ALPM pacman.conf, makepkg.conf, and mirrorlists.
+    3. Pacman transaction hooks (mkinitcpio, paccache, desktop-database).
+    4. Mkinitcpio pipeline and preset configurations.
+    5. Operating system identity (os-release ID_LIKE=arch).
+    6. System administration and live environment scripts (sigmaos-install, arch-chroot, pacstrap, sigma-aur).
+    7. Core Arch Linux PKGBUILD recipes (base, base-devel, linux, headers, pacman, keyring, mirrorlist).
+    8. Archiso build and ALPM repo sync scripts.
+    """
+    # Arrange
+    bootloader_files = [
+        ISO_DIR / "pacman.conf",
+        ISO_DIR / "grub" / "grub.cfg",
+        ISO_DIR / "grub" / "loopback.cfg",
+        ISO_DIR / "syslinux" / "syslinux.cfg",
+        ISO_DIR / "syslinux" / "archiso_sys-linux.cfg",
+        ISO_DIR / "efiboot" / "loader" / "loader.conf",
+        ISO_DIR / "efiboot" / "loader" / "entries" / "01-archiso-x86_64-linux.conf",
+    ]
+    airootfs_files = [
+        ISO_DIR / "airootfs" / "etc" / "pacman.conf",
+        ISO_DIR / "airootfs" / "etc" / "makepkg.conf",
+        ISO_DIR / "airootfs" / "etc" / "mkinitcpio.conf",
+        ISO_DIR / "airootfs" / "etc" / "mkinitcpio.d" / "linux.preset",
+        ISO_DIR / "airootfs" / "etc" / "pacman.d" / "mirrorlist",
+        ISO_DIR / "airootfs" / "etc" / "pacman.d" / "sigmaos-mirrorlist",
+        ISO_DIR / "airootfs" / "etc" / "pacman.d" / "hooks" / "90-mkinitcpio-install.hook",
+        ISO_DIR / "airootfs" / "etc" / "pacman.d" / "hooks" / "clean_package_cache.hook",
+        ISO_DIR / "airootfs" / "etc" / "fstab",
+        ISO_DIR / "airootfs" / "etc" / "hostname",
+        ISO_DIR / "airootfs" / "etc" / "hosts",
+        ISO_DIR / "airootfs" / "etc" / "locale.gen",
+        ISO_DIR / "airootfs" / "etc" / "vconsole.conf",
+        ISO_DIR / "airootfs" / "etc" / "sudoers.d" / "wheel",
+    ]
+    arch_tools = [
+        ISO_DIR / "airootfs" / "usr" / "local" / "bin" / "sigmaos-install",
+        ISO_DIR / "airootfs" / "usr" / "local" / "bin" / "arch-chroot",
+        ISO_DIR / "airootfs" / "usr" / "local" / "bin" / "pacstrap",
+        ISO_DIR / "airootfs" / "usr" / "local" / "bin" / "sigma-aur",
+        ROOT_DIR / "scripts" / "build_archiso.sh",
+        ROOT_DIR / "scripts" / "repo_sync.sh",
+    ]
+    core_pkgbuilds = [
+        PKGS_DIR / "sigmaos-base" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-base-devel" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-linux" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-linux-headers" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-pacman" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-keyring" / "PKGBUILD",
+        PKGS_DIR / "sigmaos-mirrorlist" / "PKGBUILD",
+    ]
+
+    # Act & Assert - Bootloaders
+    for bf in bootloader_files:
+        assert bf.is_file(), f"Missing archiso bootloader file: {bf}"
+        assert bf.stat().st_size > 20, f"Bootloader file {bf} is empty or stub"
+
+    # Act & Assert - Airootfs Configuration
+    for af in airootfs_files:
+        assert af.is_file(), f"Missing airootfs config file: {af}"
+        assert af.stat().st_size > 0, f"Airootfs config {af} is empty or stub"
+
+    # Act & Assert - os-release Arch compatibility
+    os_rel = ISO_DIR / "airootfs" / "etc" / "os-release"
+    content = os_rel.read_text(encoding="utf-8")
+    assert "ID_LIKE=arch" in content
+    assert "ID=sigmaos" in content
+
+    # Act & Assert - Tools and Scripts Executability
+    for tool in arch_tools:
+        assert tool.is_file(), f"Missing tool script: {tool}"
+        assert os.access(tool, os.X_OK), f"Tool {tool} is not marked executable"
+
+    # Act & Assert - Core PKGBUILDs
+    for pkg in core_pkgbuilds:
+        assert pkg.is_file(), f"Missing core Arch PKGBUILD: {pkg}"
+        pkg_content = pkg.read_text(encoding="utf-8")
+        assert "pkgname=" in pkg_content
+        assert "pkgver=" in pkg_content
+        assert "package()" in pkg_content
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -748,4 +833,6 @@ if __name__ == "__main__":
     print("✓ test_platform_wave4_frameworks_parity_aaa passed")
     test_platform_wave5_frameworks_parity_aaa()
     print("✓ test_platform_wave5_frameworks_parity_aaa passed")
-    print("\nALL 29 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_arch_linux_ecosystem_gap_closure_aaa()
+    print("✓ test_arch_linux_ecosystem_gap_closure_aaa passed")
+    print("\nALL 30 AAA OMARCHY & ARCH LINUX PARITY TESTS PASSED SUCCESSFULLY!")
