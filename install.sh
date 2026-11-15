@@ -36,6 +36,12 @@ if [ -f "$(dirname "$SCRIPT_DIR")/SigmaOS-linux-arch/target/release/sigmaos-arch
     chmod +x "$BIN_DEST/sigmaos-arch"
 fi
 
+# Install omarchy-shell engine if built
+if [ -f "$(dirname "$SCRIPT_DIR")/SigmaOS-linux-omarchy/target/release/omarchy-shell" ]; then
+    cp -f "$(dirname "$SCRIPT_DIR")/SigmaOS-linux-omarchy/target/release/omarchy-shell" "$BIN_DEST/omarchy-shell"
+    chmod +x "$BIN_DEST/omarchy-shell"
+fi
+
 # Symlink omarchy CLI alias
 ln -sf "$BIN_DEST/sigmaos" "$BIN_DEST/sigmaos-omarchy"
 
