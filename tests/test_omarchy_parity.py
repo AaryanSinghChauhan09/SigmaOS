@@ -33,7 +33,6 @@ def test_waybar_config_valid_json():
     assert wb_cfg.is_file(), f"Missing waybar config: {wb_cfg}"
     with open(wb_cfg, "r", encoding="utf-8") as f:
         content = f.read()
-    # Strip comments if any
     lines = [line for line in content.splitlines() if not line.strip().startswith("//")]
     parsed = json.loads("\n".join(lines))
     assert "layer" in parsed
@@ -96,7 +95,7 @@ def test_apply_theme_orchestrator():
     assert "catppuccin-mocha" in res.stdout
 
 def test_desktop_gui_parity():
-    """Arrange-Act-Assert: Verify all 20 Craft modules, GW-BASIC, Tools suite, Folio, Omarchy shell, and context menu in index.html."""
+    """Arrange-Act-Assert: Verify all 20 Craft modules, GW-BASIC, Tools suite, Folio, Omarchy shell, Plain editor, Marketplace, and context menu in index.html."""
     assert UI_INDEX.is_file(), "Missing ui/desktop/index.html"
     with open(UI_INDEX, "r", encoding="utf-8") as f:
         html = f.read()
@@ -121,11 +120,28 @@ def test_desktop_gui_parity():
         'id="win-tools"',
         'id="win-folio"',
         'id="win-omarchy-term"',
+        'id="win-plain"',
+        'id="win-marketplace"',
         'id="win-datascience"',
         'id="desktop-context-menu"'
     ]
     for win in expected_windows:
         assert win in html, f"Missing desktop window or component: {win}"
+
+def test_plugins_and_omacom_parity():
+    """Arrange-Act-Assert: Verify omacom-inspired plugins, shell configs, and Neovim themes."""
+    plugin_files = [
+        CONFIG_DIR / "plugins" / "theme-sync.js",
+        CONFIG_DIR / "plugins" / "local-ai-catalog.json",
+        CONFIG_DIR / "plugins" / "port-forward.json",
+        CONFIG_DIR / "zsh" / ".zshrc",
+        CONFIG_DIR / "fish" / "config.fish",
+        CONFIG_DIR / "nvim" / "colors" / "aether.lua",
+        CONFIG_DIR / "nvim" / "colors" / "lumon.lua",
+    ]
+    for p in plugin_files:
+        assert p.is_file(), f"Missing Omacom parity file: {p}"
+        assert p.stat().st_size > 20, f"File {p} is empty or stub"
 
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
@@ -144,4 +160,6 @@ if __name__ == "__main__":
     print("✓ test_apply_theme_orchestrator passed")
     test_desktop_gui_parity()
     print("✓ test_desktop_gui_parity passed")
-    print("\nALL 8 AAA OMARCHY PARITY TESTS PASSED SUCCESSFULLY!")
+    test_plugins_and_omacom_parity()
+    print("✓ test_plugins_and_omacom_parity passed")
+    print("\nALL 9 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")

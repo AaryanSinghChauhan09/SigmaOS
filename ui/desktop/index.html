@@ -1054,6 +1054,158 @@ Type 'help' for available Omarchy subsystem dispatch commands.
     </div>
   </div>
 
+
+  <!-- Plain Sovereign Text Editor (inspired by omacom/plain) -->
+  <div id="win-plain" class="window" style="top: 120px; left: 200px; width: 700px; height: 480px; display: none;">
+    <div class="window-header">
+      <div class="window-title">📝 Plain Sovereign Config Editor (`omacom/plain` parity)</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-plain')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-plain')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="display:flex; flex-direction:column; gap:8px; padding:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <select id="plain-file-select" onchange="loadPlainFile(this.value)" style="background:var(--bg-input); border:1px solid var(--border); color:var(--text); padding:4px 8px; border-radius:4px; font-family:var(--font-mono); font-size:12px;">
+          <option value="hypr">~/.config/hypr/hyprland.conf</option>
+          <option value="waybar">~/.config/waybar/config.jsonc</option>
+          <option value="wallust">~/.config/wallust/wallust.toml</option>
+          <option value="starship">~/.config/starship/starship.toml</option>
+          <option value="sigmaos">/etc/sigmaos/system.conf</option>
+        </select>
+        <div style="display:flex; gap:6px;">
+          <button onclick="savePlainFile()" style="background:var(--accent); color:var(--bg-primary); border:none; padding:4px 12px; border-radius:4px; font-weight:600; cursor:pointer;">💾 Save Config</button>
+        </div>
+      </div>
+      <textarea id="plain-editor" style="flex:1; background:#0d1117; border:1px solid var(--border); border-radius:6px; color:#c9d1d9; font-family:var(--font-mono); font-size:12px; padding:12px; line-height:1.5; outline:none; resize:none;"># SigmaOS Hyprland Configuration
+monitor=,preferred,auto,1
+
+general {
+    gaps_in = 6
+    gaps_out = 12
+    border_size = 2
+    col.active_border = rgba(89b4faff)
+    col.inactive_border = rgba(313244aa)
+    layout = dwindle
+}
+
+input {
+    kb_layout = us
+    follow_mouse = 1
+    touchpad {
+        natural_scroll = true
+    }
+}
+</textarea>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
+        <span id="plain-status">Editing ~/.config/hypr/hyprland.conf (UTF-8)</span>
+        <span>Omarchy Fast Text Editor</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plugin Marketplace & Agent Catalog (inspired by omacom/omarchy-plugin-marketplace & local-ai) -->
+  <div id="win-marketplace" class="window" style="top: 100px; left: 240px; width: 760px; height: 500px; display: none;">
+    <div class="window-header">
+      <div class="window-title">🧩 Plugin Marketplace & Local AI Agent Catalog</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-marketplace')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-marketplace')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; gap:8px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+        <button class="mkt-tab active" onclick="switchMktTab('plugins')" id="mtab-plugins">🧩 Desktop Plugins</button>
+        <button class="mkt-tab" onclick="switchMktTab('ai')" id="mtab-ai">🤖 Local AI Agents</button>
+        <button class="mkt-tab" onclick="switchMktTab('tunnels')" id="mtab-tunnels">🌐 SSH Tunnels</button>
+      </div>
+
+      <!-- Plugins Tab -->
+      <div id="mpane-plugins" class="mpane" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; overflow-y:auto;">
+        <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>Theme Sync Broadcaster</strong>
+            <span style="background:rgba(166,227,161,0.2); color:#a6e3a1; padding:2px 6px; border-radius:4px; font-size:10px;">INSTALLED</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin:6px 0;">Syncs active desktop Wallust colors with web apps via BroadcastChannel and CSS vars.</div>
+          <div style="font-size:10px; color:var(--accent);">Author: Omacom • v1.2.0</div>
+        </div>
+        <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>SSH Port Forward Drawer</strong>
+            <span style="background:rgba(166,227,161,0.2); color:#a6e3a1; padding:2px 6px; border-radius:4px; font-size:10px;">INSTALLED</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin:6px 0;">Toggle remote database and Ollama compute tunnels directly from the floating Waybar.</div>
+          <div style="font-size:10px; color:var(--accent);">Author: Omacom • v1.0.4</div>
+        </div>
+        <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>Speaker DSP Audio Tuner</strong>
+            <button onclick="installPlugin(this, 'audio-tuner')" style="background:var(--accent); color:var(--bg-primary); border:none; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; cursor:pointer;">INSTALL</button>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin:6px 0;">Acoustic calibration profiles and Pipewire parametric EQ curves for laptop speakers.</div>
+          <div style="font-size:10px; color:var(--accent);">Author: Omacom • v0.9.1</div>
+        </div>
+        <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>Hyprland Floating Titlebars</strong>
+            <button onclick="installPlugin(this, 'titlebars')" style="background:var(--accent); color:var(--bg-primary); border:none; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; cursor:pointer;">INSTALL</button>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin:6px 0;">Sleek macOS-inspired window titlebars for floating workspaces with close/min/max.</div>
+          <div style="font-size:10px; color:var(--accent);">Author: Omacom • v2.1.0</div>
+        </div>
+      </div>
+
+      <!-- AI Agents Tab -->
+      <div id="mpane-ai" class="mpane" style="display:none; flex-direction:column; gap:10px;">
+        <div style="font-size:12px; color:var(--text-muted);">Configured local model inference backends (`sigmaos-local-ai`):</div>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+          <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px;">
+            <div style="font-weight:700; color:var(--accent);">DeepSeek Coder V2</div>
+            <div style="font-size:10px; color:var(--text-muted); margin:4px 0;">16B Parameters • 32k Context</div>
+            <div style="font-size:11px; color:#a6e3a1;">● Ready on :11434</div>
+          </div>
+          <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px;">
+            <div style="font-weight:700; color:var(--accent);">Nous Hermes 3</div>
+            <div style="font-size:10px; color:var(--text-muted); margin:4px 0;">8B Parameters • 16k Context</div>
+            <div style="font-size:11px; color:#a6e3a1;">● Ready on :11434</div>
+          </div>
+          <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px;">
+            <div style="font-weight:700; color:var(--accent);">Qwen 2.5 Coder</div>
+            <div style="font-size:10px; color:var(--text-muted); margin:4px 0;">7B Parameters • 32k Context</div>
+            <div style="font-size:11px; color:#a6e3a1;">● Ready on :11434</div>
+          </div>
+        </div>
+        <div style="background:#0a0d14; border:1px solid var(--border); border-radius:6px; padding:10px; display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:11px; color:var(--text-muted);">Quick Agent Test Prompt:</div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="ai-test-prompt" value="Write a zero-allocation Rust parser for Hyprland IPC events" style="flex:1; background:var(--bg-input); border:1px solid var(--border); color:var(--text); padding:6px 10px; border-radius:4px; font-family:var(--font-mono); font-size:12px;">
+            <button onclick="testAiPrompt()" style="background:var(--accent); color:var(--bg-primary); border:none; padding:6px 14px; border-radius:4px; font-weight:600; cursor:pointer;">Generate</button>
+          </div>
+          <div id="ai-output" style="font-family:var(--font-mono); font-size:11px; color:#c9d1d9; max-height:100px; overflow-y:auto; white-space:pre-wrap; margin-top:4px;">Ready.</div>
+        </div>
+      </div>
+
+      <!-- Tunnels Tab -->
+      <div id="mpane-tunnels" class="mpane" style="display:none; flex-direction:column; gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); border:1px solid var(--border); border-radius:6px; padding:10px;">
+          <div>
+            <strong>Dev PostgreSQL</strong>: 127.0.0.1:5433 → db.internal:5432
+          </div>
+          <button onclick="toggleTunnel(this)" style="background:var(--accent); color:var(--bg-primary); border:none; padding:4px 10px; border-radius:4px; font-weight:600; cursor:pointer;">CONNECT</button>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); border:1px solid var(--border); border-radius:6px; padding:10px;">
+          <div>
+            <strong>Ollama Remote Cluster</strong>: 127.0.0.1:11434 → ai-node.lan:11434
+          </div>
+          <button onclick="toggleTunnel(this)" style="background:var(--accent); color:var(--bg-primary); border:none; padding:4px 10px; border-radius:4px; font-weight:600; cursor:pointer;">CONNECT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Doctor Window -->
   <div id="win-doctor" class="window" style="top: 140px; left: 300px; width: 600px; height: 400px; display: none;">
     <div class="window-header">
@@ -1496,6 +1648,12 @@ ORDER BY memory_gb DESC;</textarea>
 
   // Rofi Applications Database
   const ROFI_APPS = [
+    { name: "Plain Config Editor", sub: "Fast sovereign text editor for system configs", icon: "📝", action: () => summonWindow('win-plain') },
+    { name: "Plugin Marketplace & Local AI", sub: "Desktop plugins, SSH port forwards, and local AI catalog", icon: "🧩", action: () => summonWindow('win-marketplace') },
+    { name: "Folio File Manager", sub: "Keyboard-first sovereign directory explorer", icon: "📂", action: () => summonWindow('win-folio') },
+    { name: "Omarchy Tools Suite", sub: "ttfx, speedtest, omasnap, hype, and omacalc", icon: "🛠️", action: () => summonWindow('win-tools') },
+    { name: "GW-BASIC Interpreter", sub: "Interactive DOS real-mode BASIC runtime", icon: "📜", action: () => summonWindow('win-basic') },
+    { name: "Omarchy CLI Terminal", sub: "Subsystem dispatch shell for audio, battery, capture", icon: "⚡", action: () => summonWindow('win-omarchy-term') },
     // Core Desktop & Terminals
     { name: "Terminal (Foot / Kitty)", sub: "GPU-accelerated fast terminal", icon: "💻", action: () => summonWindow('win-term') },
     { name: "Wallust Theme Harmonizer", sub: "Dynamic palette switcher & config reloader", icon: "🎨", action: () => summonWindow('win-wallust') },
@@ -1665,6 +1823,8 @@ ORDER BY memory_gb DESC;</textarea>
     <div class="ctx-item" onclick="summonWindow('win-betteroffice'); hideContextMenu();">📑 BetterOffice</div>
     <div class="ctx-item" onclick="summonWindow('win-dos'); hideContextMenu();">💾 FreeDOS Subsystem</div>
     <div class="ctx-item" onclick="summonWindow('win-basic'); hideContextMenu();">📜 GW-BASIC</div>
+    <div class="ctx-item" onclick="summonWindow('win-plain'); hideContextMenu();">📝 Plain Config Editor</div>
+    <div class="ctx-item" onclick="summonWindow('win-marketplace'); hideContextMenu();">🧩 Plugins & Local AI</div>
     <div style="height:1px; background:var(--border); margin:4px 0;"></div>
     <div class="ctx-item" onclick="summonWindow('win-about'); hideContextMenu();">⚡ About SigmaOS</div>
   </div>

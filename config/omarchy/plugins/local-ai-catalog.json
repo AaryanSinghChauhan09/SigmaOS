@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "name": "SigmaOS Omarchy Local AI Model Catalog",
+  "description": "Pre-configured local language models and agent backends (Ollama, vLLM, TensorFold)",
+  "models": [
+    {
+      "id": "deepseek-coder-v2",
+      "name": "DeepSeek Coder V2 (16B / Q4)",
+      "family": "deepseek",
+      "context_window": 32768,
+      "recommended_vram_gb": 12,
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "purpose": "Autonomous coding, refactoring, and code review"
+    },
+    {
+      "id": "hermes-3-llama-8b",
+      "name": "Nous Hermes 3 (8B / Q8)",
+      "family": "llama",
+      "context_window": 16384,
+      "recommended_vram_gb": 8,
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "purpose": "General instruction following, tool calling, JSON schema output"
+    },
+    {
+      "id": "qwen2.5-coder-7b",
+      "name": "Qwen 2.5 Coder (7B / Q5_K_M)",
+      "family": "qwen",
+      "context_window": 32768,
+      "recommended_vram_gb": 6,
+      "endpoint": "http://127.0.0.1:11434/api/generate",
+      "purpose": "Fast inline syntax completion and CLI command generation"
+    },
+    {
+      "id": "nemotron-4-340b-bolt",
+      "name": "NVIDIA Nemotron 3.5 Bolt (TensorFold)",
+      "family": "nemotron",
+      "context_window": 4096,
+      "recommended_vram_gb": 16,
+      "endpoint": "http://127.0.0.1:8000/v1/chat/completions",
+      "purpose": "Enterprise synthetic data generation and reasoning"
+    }
+  ],
+  "agent_endpoints": {
+    "ollama": "http://127.0.0.1:11434",
+    "vllm": "http://127.0.0.1:8000/v1",
+    "openclaw": "http://127.0.0.1:9090"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "description": "Omarchy SSH Port Forwarding & Tunnel Configuration",
+  "tunnels": [
+    {
+      "name": "Dev PostgreSQL",
+      "local_port": 5433,
+      "remote_host": "db.internal.sigmaos.org",
+      "remote_port": 5432,
+      "ssh_gateway": "bastion.sigmaos.org",
+      "auto_start": false
+    },
+    {
+      "name": "Ollama Remote Node",
+      "local_port": 11434,
+      "remote_host": "ai-compute-01.lan",
+      "remote_port": 11434,
+      "ssh_gateway": "jump.lan",
+      "auto_start": false
+    },
+    {
+      "name": "Kubernetes Ingress Proxy",
+      "local_port": 8080,
+      "remote_host": "cluster-ingress.k8s",
+      "remote_port": 80,
+      "ssh_gateway": "k8s-node01.lan",
+      "auto_start": false
+    }
+  ]
+}
