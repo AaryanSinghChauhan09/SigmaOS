@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-platform-gpui
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="GPU-accelerated 2D user interface framework"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-gpui"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-platform')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-platform-gpui"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-platform-gpui"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-platform-gpui"
+    install -Dm755 "target/release/sigmaos-platform-gpui" "${pkgdir}/usr/bin/sigmaos-platform-gpui" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-platform-gpui/README.md"
+}

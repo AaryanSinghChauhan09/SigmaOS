@@ -552,6 +552,34 @@ def test_extended_tools_and_office_parity_aaa():
         pkg_name = repo.lower()
         assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
 
+def test_platform_frameworks_parity_aaa():
+    """
+    AAA Pattern: Verify all 13 Platform GUI framework repositories exist locally,
+    contain real domain implementations, AAA tests, Cargo packages, and PKGBUILDs.
+    """
+    # Arrange
+    platforms = [
+        "SigmaOS-platform-tauri", "SigmaOS-platform-wails", "SigmaOS-platform-neutralino",
+        "SigmaOS-platform-gpui", "SigmaOS-platform-imgui", "SigmaOS-platform-fyne",
+        "SigmaOS-platform-sciter", "SigmaOS-platform-ultralight", "SigmaOS-platform-waydroid",
+        "SigmaOS-platform-photino", "SigmaOS-platform-compose", "SigmaOS-platform-avalonia",
+        "SigmaOS-platform-slint"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in platforms:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Platform repo: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -601,4 +629,6 @@ if __name__ == "__main__":
     print("✓ test_craft_suite_parity_aaa passed")
     test_extended_tools_and_office_parity_aaa()
     print("✓ test_extended_tools_and_office_parity_aaa passed")
-    print("\nALL 24 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_platform_frameworks_parity_aaa()
+    print("✓ test_platform_frameworks_parity_aaa passed")
+    print("\nALL 25 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")

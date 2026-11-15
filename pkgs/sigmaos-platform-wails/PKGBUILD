@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-platform-wails
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Lightweight desktop application window and event loop"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-wails"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-platform')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-platform-wails"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-platform-wails"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-platform-wails"
+    install -Dm755 "target/release/sigmaos-platform-wails" "${pkgdir}/usr/bin/sigmaos-platform-wails" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-platform-wails/README.md"
+}

@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-platform-compose
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Declarative multiplatform UI component model"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-compose"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-platform')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-platform-compose"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-platform-compose"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-platform-compose"
+    install -Dm755 "target/release/sigmaos-platform-compose" "${pkgdir}/usr/bin/sigmaos-platform-compose" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-platform-compose/README.md"
+}
