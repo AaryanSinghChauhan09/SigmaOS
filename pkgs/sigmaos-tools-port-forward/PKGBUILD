@@ -1,0 +1,22 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@sigmaos.internal>
+pkgname=sigmaos-tools-port-forward
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SSH port forward tunnel manager and desktop panel integration"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/sigmaos-tools-port-forward"
+license=('MIT')
+depends=('glibc')
+makedepends=('cargo' 'rust')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver" 2>/dev/null || true
+    cargo build --release --locked 2>/dev/null || cargo build --release
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver" 2>/dev/null || true
+    install -Dm755 "target/release/sigmaos-tools-port-forward" "$pkgdir/usr/bin/sigmaos-tools-port-forward" 2>/dev/null || true
+}

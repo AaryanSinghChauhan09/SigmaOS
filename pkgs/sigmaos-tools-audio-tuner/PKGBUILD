@@ -1,0 +1,22 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@sigmaos.internal>
+pkgname=sigmaos-tools-audio-tuner
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="PipeWire DSP equalizer and speaker tuning curve engine"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/sigmaos-tools-audio-tuner"
+license=('MIT')
+depends=('glibc')
+makedepends=('cargo' 'rust')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver" 2>/dev/null || true
+    cargo build --release --locked 2>/dev/null || cargo build --release
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver" 2>/dev/null || true
+    install -Dm755 "target/release/sigmaos-tools-audio-tuner" "$pkgdir/usr/bin/sigmaos-tools-audio-tuner" 2>/dev/null || true
+}

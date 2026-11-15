@@ -1885,6 +1885,14 @@ ORDER BY memory_gb DESC;</textarea>
     { name: "Notepad++ Editor", sub: "Lightweight tabbed text editor with syntax highlighting", icon: "📝", action: () => summonWindow('win-term') },
     { name: "VLC Media Player", sub: "Universal audio and video decoder", icon: "📼", action: () => alert('Launching VLC...') },
     { name: "Warp Fast Terminal", sub: "Modern collaborative terminal with block execution", icon: "⚡", action: () => summonWindow('win-term') },
+    { name: "Plain Editor", sub: "Omarchy text editor for configuration files and dotfiles", icon: "📄", action: () => summonWindow('win-plain') },
+    { name: "Monologue", sub: "Webcam and microphone recorder with instant trimming", icon: "🎙️", action: () => { summonWindow('win-term'); appendTerm('[Monologue] Camera & Microphone bound. Press SPACE to record.\\n'); } },
+    { name: "Gliff Remote Desktop", sub: "Display streaming client for Hyprland sessions", icon: "🖥️", action: () => openGliffModal() },
+    { name: "Owe Wallpaper Engine", sub: "High-performance video, GIF & animated wallpaper engine", icon: "🎬", action: () => { summonWindow('win-term'); appendTerm('[Owe] Live wallpaper engine active on eDP-1.\\n'); } },
+    { name: "Omafind", sub: "Local on-device multimodal semantic file search (Super+Ctrl+G)", icon: "🔍", action: () => { summonWindow('win-term'); appendTerm('[Omafind] Semantic vector search index active.\\n'); } },
+    { name: "Local AI Catalog", sub: "DeepSeek & Llama rootless Podman model server manager", icon: "🤖", action: () => summonWindow('win-marketplace') },
+    { name: "Port Forward Plugin", sub: "SSH tunnel manager and Waybar connection status", icon: "🔌", action: () => { summonWindow('win-term'); appendTerm('[Port Forward] SSH tunnels active: db-prod:5432, redis:6379\\n'); } },
+    { name: "Audio Tuner", sub: "PipeWire DSP acoustic tuner & laptop speaker equalizer", icon: "🎛️", action: () => { summonWindow('win-term'); appendTerm('[Audio Tuner] PipeWire filter-chain loaded for laptop speakers.\\n'); } },
   ];
 
   let rofiActiveIdx = 0;
@@ -2832,7 +2840,7 @@ pub fn parse_event(raw: &str) -> Option<(&str, &str)> {
       }, 15);
     }
 
-    // Keybindings: Super + . for Gliff, Super + N for Notif Drawer
+    // Keybindings: Super + . for Gliff, Super + N for Notif Drawer, Super + Ctrl + G for Omafind
     document.addEventListener('keydown', e => {
       if ((e.metaKey || e.altKey) && e.key === '.') {
         e.preventDefault();
@@ -2841,6 +2849,11 @@ pub fn parse_event(raw: &str) -> Option<(&str, &str)> {
       if ((e.metaKey || e.altKey) && (e.key === 'n' || e.key === 'N')) {
         e.preventDefault();
         toggleNotifDrawer();
+      }
+      if ((e.metaKey || e.altKey) && e.ctrlKey && (e.key === 'g' || e.key === 'G')) {
+        e.preventDefault();
+        summonWindow('win-term');
+        appendTerm('[Omafind] On-Device Multimodal Semantic Search activated (Super+Ctrl+G)\\n');
       }
     });
   </script>

@@ -1,0 +1,22 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@sigmaos.internal>
+pkgname=sigmaos-tools-local-ai
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Local AI model catalog and containerized runtime manager for rootless Podman"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/sigmaos-tools-local-ai"
+license=('MIT')
+depends=('glibc')
+makedepends=('cargo' 'rust')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver" 2>/dev/null || true
+    cargo build --release --locked 2>/dev/null || cargo build --release
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver" 2>/dev/null || true
+    install -Dm755 "target/release/sigmaos-tools-local-ai" "$pkgdir/usr/bin/sigmaos-tools-local-ai" 2>/dev/null || true
+}

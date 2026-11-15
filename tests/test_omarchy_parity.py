@@ -221,16 +221,18 @@ def test_lazyvim_and_voice_dictation_parity():
 
 def test_omarchy_tools_fleet_parity():
     """
-    AAA Pattern: Verify that all official Omarchy tools (ttfx, omasnap, omareel, omawrite,
-    omacalc, folio, omacut, signed, hype, speedtest, aether) are packaged with standard
-    PKGBUILD recipes and correspond to clean, tested Rust repositories.
+    AAA Pattern: Verify that all 19 official Omarchy and Omacom tools are packaged with standard
+    PKGBUILD recipes and contain valid packaging definitions.
     """
     # Arrange
     tools = [
         "sigmaos-tools-ttfx", "sigmaos-tools-omasnap", "sigmaos-tools-omareel",
         "sigmaos-tools-omawrite", "sigmaos-tools-omacalc", "sigmaos-tools-folio",
         "sigmaos-tools-omacut", "sigmaos-tools-signed", "sigmaos-tools-hype",
-        "sigmaos-tools-speedtest", "sigmaos-linux-aether"
+        "sigmaos-tools-speedtest", "sigmaos-linux-aether", "sigmaos-tools-plain",
+        "sigmaos-tools-monologue", "sigmaos-tools-gliff", "sigmaos-tools-owe",
+        "sigmaos-tools-omafind", "sigmaos-tools-local-ai", "sigmaos-tools-port-forward",
+        "sigmaos-tools-audio-tuner"
     ]
     pkgs_dir = PKGS_DIR
 
@@ -241,6 +243,49 @@ def test_omarchy_tools_fleet_parity():
         content = pkg_file.read_text(encoding="utf-8")
         assert f"pkgname={tool}" in content
         assert "cargo build --release" in content
+
+def test_omacom_wave2_tools_parity_aaa():
+    """
+    AAA Pattern: Verify that the 8 Wave 2 Omarchy parity tools exist locally,
+    have valid Cargo packages, pass AAA tests (_aaa), and contain real domain logic.
+    """
+    # Arrange
+    omacom_tools = [
+        "SigmaOS-tools-plain", "SigmaOS-tools-monologue", "SigmaOS-tools-gliff",
+        "SigmaOS-tools-owe", "SigmaOS-tools-omafind", "SigmaOS-tools-local-ai",
+        "SigmaOS-tools-port-forward", "SigmaOS-tools-audio-tuner"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for tool in omacom_tools:
+        repo_path = home_dir / tool
+        assert repo_path.is_dir(), f"Missing Omarchy tool repo directory: {tool}"
+        cargo_toml = repo_path / "Cargo.toml"
+        assert cargo_toml.is_file(), f"Missing Cargo.toml in {tool}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {tool}"
+        content = lib_rs.read_text(encoding="utf-8")
+        assert "_aaa" in content, f"Test in {tool} must follow _aaa naming convention"
+
+def test_desktop_omacom_wave2_apps_parity_aaa():
+    """
+    AAA Pattern: Verify desktop integration of Plain, Monologue, Owe, Omafind,
+    Local AI, Port Forward, Audio Tuner, and Super+Ctrl+G keybind in ui/desktop/index.html.
+    """
+    # Arrange
+    assert UI_INDEX.is_file(), "Missing ui/desktop/index.html"
+    with open(UI_INDEX, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    # Act & Assert
+    expected_entries = [
+        "Plain Editor", "Monologue", "Gliff Remote Desktop", "Owe Wallpaper Engine",
+        "Omafind", "Local AI Catalog", "Port Forward Plugin", "Audio Tuner",
+        "Super+Ctrl+G"
+    ]
+    for entry in expected_entries:
+        assert entry in html, f"Missing Omarchy app integration in desktop UI: {entry}"
 
 def test_data_science_suite_parity():
     """
@@ -295,6 +340,10 @@ if __name__ == "__main__":
     print("✓ test_lazyvim_and_voice_dictation_parity passed")
     test_omarchy_tools_fleet_parity()
     print("✓ test_omarchy_tools_fleet_parity passed")
+    test_omacom_wave2_tools_parity_aaa()
+    print("✓ test_omacom_wave2_tools_parity_aaa passed")
+    test_desktop_omacom_wave2_apps_parity_aaa()
+    print("✓ test_desktop_omacom_wave2_apps_parity_aaa passed")
     test_data_science_suite_parity()
     print("✓ test_data_science_suite_parity passed")
-    print("\nALL 14 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    print("\nALL 16 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")

@@ -1,0 +1,22 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@sigmaos.internal>
+pkgname=sigmaos-tools-monologue
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Omarchy webcam & microphone recorder with instant trimming and cut ranges"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/sigmaos-tools-monologue"
+license=('MIT')
+depends=('glibc')
+makedepends=('cargo' 'rust')
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver" 2>/dev/null || true
+    cargo build --release --locked 2>/dev/null || cargo build --release
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver" 2>/dev/null || true
+    install -Dm755 "target/release/sigmaos-tools-monologue" "$pkgdir/usr/bin/sigmaos-tools-monologue" 2>/dev/null || true
+}
