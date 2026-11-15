@@ -28,7 +28,9 @@ git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git && cd SigmaOS && .
 ```bash
 ./install.sh
 # → Installs sigmaos CLI to ~/.local/bin/sigmaos
+# → Installs sigpkg and pacman bridge to ~/.local/bin/
 # → Deploys Omarchy dotfiles to ~/.config/sigmaos/omarchy/
+# → Deploys Arch Linux ALPM configs to ~/.config/sigmaos/ (pacman.conf, mirrorlist)
 # → Creates sigmaos.desktop entry
 ```
 
@@ -37,6 +39,33 @@ Then from anywhere:
 sigmaos --omarchy
 sigmaos --doctor
 sigmaos --arch
+pacman -Syu
+sigpkg aur hyprland
+```
+
+---
+
+## 🏛 Arch Linux Persona & ALPM Substrate
+
+SigmaOS closes the gap with upstream Arch Linux through full ALPM parity:
+
+- **Package Manager:** Native `pacman` and `sigpkg` ALPM bridge with `-Syu`, `-Ss`, `-Si`, `-Rns`, `-Q` syntax.
+- **AUR Integration:** Real-time query bridge to Arch User Repository v5 RPC (`sigpkg aur <query>`).
+- **ALPM Engine:** Version comparison (`AlpmVersion`), topological dependency resolution (`AlpmTransaction`), and sync database parsing.
+- **Arch Contrib Utilities:** Built-in `checkupdates`, `paccache` (cache cleaner), `pactree` (dependency trees), and `rankmirrors` (latency benchmark).
+- **Configuration Parity:** Production `pacman.conf` (ParallelDownloads, CheckSpace, Color, `[core]`, `[extra]`, `[multilib]`, `[sigmaos]`), `mirrorlist`, and `mkinitcpio.conf` hook pipeline.
+
+```bash
+# Launch Arch Persona
+./run.sh --arch
+
+# Pacman Operations
+pacman -Syu             # Full rolling upgrade
+pacman -Ss neovim       # Repository search
+sigpkg aur hyprland     # AUR package search
+sigpkg checkupdates     # Safe pending update check
+sigpkg tree hyprland    # View package dependency tree
+sigpkg doctor           # Verify Arch Linux substrate health
 ```
 
 ---

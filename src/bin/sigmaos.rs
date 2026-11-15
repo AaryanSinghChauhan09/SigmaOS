@@ -351,20 +351,37 @@ fn run_doctor() {
         warn += 1;
     }
 
-    // Check Package Manager
-    let pkg_mgr = base.join("src/bin/sigpkg.rs");
-    if pkg_mgr.exists() {
+    // Check Package Manager & Arch ALPM Substrate
+    let sigpkg_script = base.join("scripts/sigpkg");
+    if sigpkg_script.exists() {
         println!(
-            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m SigPkg Arch Linux translation gate present",
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m SigPkg Arch Linux ALPM translation gate present",
             "pkg-manager"
         );
         pass += 1;
     } else {
         println!(
-            "\x1b[31m[FAIL]\x1b[0m \x1b[1m{:<18}\x1b[0m sigpkg package manager missing",
+            "\x1b[31m[FAIL]\x1b[0m \x1b[1m{:<18}\x1b[0m scripts/sigpkg package manager missing",
             "pkg-manager"
         );
         fail += 1;
+    }
+
+    let pacman_conf = base.join("config/arch/pacman.conf");
+    let mirrorlist = base.join("config/arch/mirrorlist");
+    let mkinitcpio_conf = base.join("config/arch/mkinitcpio.conf");
+    if pacman_conf.exists() && mirrorlist.exists() && mkinitcpio_conf.exists() {
+        println!(
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m Arch Linux pacman.conf, mirrorlist, mkinitcpio verified",
+            "arch-substrate"
+        );
+        pass += 1;
+    } else {
+        println!(
+            "\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m Arch configuration files missing in config/arch/",
+            "arch-substrate"
+        );
+        warn += 1;
     }
 
     // Check Craft Suite
@@ -509,6 +526,26 @@ fn main() {
                 print!("{}", BANNER);
                 print_distro_parity();
             }
+            "--pacman" | "pacman" => {
+                let base = find_base_dir();
+                let sigpkg = base.join("scripts/sigpkg");
+                let status = Command::new("bash")
+                    .arg(&sigpkg)
+                    .arg("pacman")
+                    .args(&args[2..])
+                    .status();
+                if let Err(e) = status {
+                    eprintln!("Failed to invoke pacman bridge: {}", e);
+                }
+            }
+            "--sigpkg" | "sigpkg" => {
+                let base = find_base_dir();
+                let sigpkg = base.join("scripts/sigpkg");
+                let status = Command::new("bash").arg(&sigpkg).args(&args[2..]).status();
+                if let Err(e) = status {
+                    eprintln!("Failed to invoke sigpkg: {}", e);
+                }
+            }
             "--mint" | "mint" => {
                 run_script("launch_mint_persona.sh");
             }
@@ -531,6 +568,10 @@ fn main() {
                 println!(
                     "  --arch, arch       Launch Arch Linux Minimalist Persona (Pacman / Rolling)"
                 );
+                println!(
+                    "  --pacman, pacman   Execute native/ALPM pacman command (e.g. pacman -Syu)"
+                );
+                println!("  --sigpkg, sigpkg   Execute SigPkg package manager CLI");
                 println!("  --mint, mint       Launch Linux Mint Ergonomic Desktop Persona");
                 println!("  --doctor           Execute Omarchy system diagnostics health check");
                 println!("  --check            Execute launch readiness validation");

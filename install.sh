@@ -25,6 +25,17 @@ mkdir -p "$BIN_DEST"
 cp -f "$SCRIPT_DIR/bin/sigmaos" "$BIN_DEST/sigmaos"
 chmod +x "$BIN_DEST/sigmaos"
 
+# Install sigpkg and pacman bridge
+cp -f "$SCRIPT_DIR/scripts/sigpkg" "$BIN_DEST/sigpkg"
+chmod +x "$BIN_DEST/sigpkg"
+ln -sf "$BIN_DEST/sigpkg" "$BIN_DEST/pacman"
+
+# Install sigmaos-arch engine if built
+if [ -f "$(dirname "$SCRIPT_DIR")/SigmaOS-linux-arch/target/release/sigmaos-arch" ]; then
+    cp -f "$(dirname "$SCRIPT_DIR")/SigmaOS-linux-arch/target/release/sigmaos-arch" "$BIN_DEST/sigmaos-arch"
+    chmod +x "$BIN_DEST/sigmaos-arch"
+fi
+
 # Symlink omarchy CLI alias
 ln -sf "$BIN_DEST/sigmaos" "$BIN_DEST/sigmaos-omarchy"
 
@@ -33,6 +44,14 @@ echo "--> Deploying Omarchy configuration dotfiles to $CONFIG_DEST..."
 mkdir -p "$CONFIG_DEST/omarchy/hyprland"
 mkdir -p "$CONFIG_DEST/omarchy/waybar"
 mkdir -p "$CONFIG_DEST/omarchy/wallust"
+
+# Deploy Arch Linux ALPM configurations
+if [ -d "$SCRIPT_DIR/config/arch" ]; then
+    echo "--> Deploying Arch Linux ALPM configuration to $CONFIG_DEST..."
+    cp -f "$SCRIPT_DIR/config/arch/pacman.conf" "$CONFIG_DEST/pacman.conf"
+    cp -f "$SCRIPT_DIR/config/arch/mirrorlist" "$CONFIG_DEST/mirrorlist"
+    cp -f "$SCRIPT_DIR/config/arch/mkinitcpio.conf" "$CONFIG_DEST/mkinitcpio.conf"
+fi
 
 cat <<'EOF' > "$CONFIG_DEST/omarchy/hyprland/hyprland.conf"
 # SigmaOS Omarchy Linux Aesthetic Persona — Hyprland Configuration
@@ -97,6 +116,9 @@ echo "  sigmaos            # Interactive Workstation"
 echo "  sigmaos --omarchy  # Omarchy Aesthetic Persona"
 echo "  sigmaos --arch     # Arch Linux Minimalist Persona"
 echo "  sigmaos --doctor   # System Health Diagnostics"
+echo "  sigpkg pacman -Syu # Native Pacman System Upgrade"
+echo "  pacman -Ss <pkg>   # ALPM Package Search"
+echo "  sigpkg aur <pkg>   # Arch User Repository Search"
 echo ""
 if [[ ":$PATH:" != *":$BIN_DEST:"* ]]; then
     echo "Notice: Make sure $BIN_DEST is in your PATH, e.g.:"
