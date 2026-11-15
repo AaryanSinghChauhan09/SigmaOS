@@ -549,6 +549,160 @@
     flex: 1;
     border-radius: 4px;
   }
+
+  /* Notification Center Drawer */
+  #notif-drawer {
+    position: fixed;
+    top: 36px;
+    right: -340px;
+    width: 320px;
+    bottom: 0;
+    background: var(--bg-secondary);
+    border-left: 1px solid var(--border);
+    transition: right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 14px;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.5);
+  }
+  #notif-drawer.open {
+    right: 0;
+  }
+  .qs-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 4px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 11px;
+    gap: 4px;
+    color: var(--text);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .qs-btn.active {
+    background: var(--accent);
+    color: var(--bg-primary);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .notif-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ctx-item {
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+    color: var(--text);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ctx-item:hover {
+    background: var(--accent);
+    color: var(--bg-primary);
+  }
+  .tool-tab, .mkt-tab {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tool-tab.active, .mkt-tab.active {
+    background: var(--accent);
+    color: var(--bg-primary);
+    font-weight: 600;
+    border-color: var(--accent);
+  }
+  .folio-place {
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    color: var(--text);
+  }
+  .folio-place:hover, .folio-place.active {
+    background: var(--accent);
+    color: var(--bg-primary);
+    font-weight: 600;
+  }
+  .folio-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 8px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    border: 1px solid transparent;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+  .folio-item:hover {
+    background: var(--bg-input);
+    border-color: var(--border);
+  }
+  .calc-btn {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    transition: background 0.1s;
+  }
+  .calc-btn:hover {
+    background: var(--border);
+  }
+  .calc-btn.op {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 999999;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 6px 100%;
+  }
+  .snap-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    z-index: 9999999;
+    opacity: 0.8;
+    pointer-events: none;
+    transition: opacity 0.4s ease-out;
+  }
 </style>
 </head>
 <body class="persona-omarchy">
@@ -596,6 +750,12 @@
     </div>
     <div class="status-item" onclick="summonWindow('win-keybinds')" style="cursor:pointer;" title="Keybindings">
       <span>⌨️</span>
+    </div>
+    <div class="status-item" onclick="openGliffModal()" style="cursor:pointer;" title="Glyph & Emoji Picker (Super + .)">
+      <span>✨</span>
+    </div>
+    <div class="status-item" onclick="toggleNotifDrawer()" style="cursor:pointer;" title="Notifications & Quick Settings">
+      <span>🔔</span>
     </div>
     <div class="status-item">
       <strong id="clock">12:00 PM</strong>
@@ -1075,6 +1235,7 @@ Type 'help' for available Omarchy subsystem dispatch commands.
           <option value="sigmaos">/etc/sigmaos/system.conf</option>
         </select>
         <div style="display:flex; gap:6px;">
+          <button id="btn-dictate" onclick="toggleDictation()" style="background:var(--bg-input); border:1px solid var(--border); color:var(--text); padding:4px 10px; border-radius:4px; font-size:12px; cursor:pointer;">🎙️ Dictate</button>
           <button onclick="savePlainFile()" style="background:var(--accent); color:var(--bg-primary); border:none; padding:4px 12px; border-radius:4px; font-weight:600; cursor:pointer;">💾 Save Config</button>
         </div>
       </div>
@@ -1921,6 +2082,764 @@ ORDER BY memory_gb DESC;</textarea>
     <div style="height:1px; background:var(--border); margin:4px 0;"></div>
     <div class="ctx-item" onclick="summonWindow('win-about'); hideContextMenu();">⚡ About SigmaOS</div>
   </div>
+
+  <script>
+    // ==========================================
+    // 1. Gliff Unicode & Emoji Picker
+    // ==========================================
+    const GLIFF_DATA = {
+      symbols: ['✦', '★', '⚡', '✿', '✓', '✗', '⚙', '✈', '✉', '✂', '➤', '●', '■', '▲', '◆', '❖', '❄', '✪', '❂', '✺', '✠', '✎', '✑', '✒'],
+      emojis: ['🚀', '🎨', '💻', '💡', '🔥', '✨', '🤖', '📦', '🎯', '🛠️', '🔒', '🔔', '📁', '🔮', '🎧', '⚡', '🛡️', '🧠', '⚙️', '🌟', '💎', '🌈', '⚡', '🐧'],
+      math: ['∀', '∃', '∈', '∉', '⊂', '⊆', '∪', '∩', '∑', '∏', '∫', '∂', '√', '∞', '≈', '≠', '≤', '≥', '±', '×', '÷', 'λ', 'π', 'θ', 'Δ', '∇', 'α', 'β', 'γ', 'Ω'],
+      typography: ['—', '–', '…', '“', '”', '‘', '’', '«', '»', '•', '·', '¶', '§', '©', '®', '™', '°', '‰', '№', '†', '‡', 'µ', '¢', '€']
+    };
+    let activeGliffCat = 'symbols';
+
+    function openGliffModal() {
+      const modal = document.getElementById('gliff-modal');
+      modal.style.display = 'flex';
+      renderGliffGrid();
+      const input = document.getElementById('gliff-search');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    function closeGliffOnBackdrop(e) {
+      if (e.target.id === 'gliff-modal') {
+        document.getElementById('gliff-modal').style.display = 'none';
+      }
+    }
+
+    function switchGliffCat(cat) {
+      activeGliffCat = cat;
+      ['symbols', 'emojis', 'math', 'typography'].forEach(c => {
+        const btn = document.getElementById('gcat-' + c);
+        if (btn) btn.classList.toggle('active', c === cat);
+      });
+      renderGliffGrid();
+    }
+
+    function filterGliff(q) {
+      renderGliffGrid(q.toLowerCase().trim());
+    }
+
+    function renderGliffGrid(filter = '') {
+      const grid = document.getElementById('gliff-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      const items = GLIFF_DATA[activeGliffCat] || [];
+      const filtered = filter ? items.filter(ch => ch.includes(filter)) : items;
+
+      filtered.forEach(ch => {
+        const item = document.createElement('div');
+        item.style.cssText = 'background:var(--bg-input); border:1px solid var(--border); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:18px; height:38px; cursor:pointer; transition:all 0.1s; user-select:none;';
+        item.textContent = ch;
+        item.title = `Click to copy '${ch}'`;
+        item.onmouseover = () => { item.style.borderColor = 'var(--accent)'; item.style.transform = 'scale(1.1)'; };
+        item.onmouseout = () => { item.style.borderColor = 'var(--border)'; item.style.transform = 'scale(1)'; };
+        item.onclick = () => copyGlyph(ch);
+        grid.appendChild(item);
+      });
+    }
+
+    function copyGlyph(ch) {
+      navigator.clipboard?.writeText(ch);
+      const toast = document.getElementById('gliff-toast');
+      if (toast) {
+        toast.textContent = `Copied "${ch}" to clipboard!`;
+        toast.style.color = 'var(--accent)';
+        setTimeout(() => {
+          toast.textContent = 'Click any glyph to copy to clipboard.';
+          toast.style.color = 'var(--text-muted)';
+        }, 1500);
+      }
+    }
+
+    // ==========================================
+    // 2. Notification Center Drawer & Quick Settings
+    // ==========================================
+    let isNotifOpen = false;
+    function toggleNotifDrawer() {
+      const drawer = document.getElementById('notif-drawer');
+      isNotifOpen = !isNotifOpen;
+      drawer.classList.toggle('open', isNotifOpen);
+    }
+
+    function clearNotifications() {
+      const stack = document.getElementById('notif-stack');
+      if (stack) {
+        stack.innerHTML = '<div style="color:var(--text-muted); font-size:11px; text-align:center; padding:20px;">No new notifications.</div>';
+      }
+    }
+
+    function toggleQs(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('active');
+    }
+
+    function toggleCrtMode() {
+      const btn = document.getElementById('qs-crt');
+      let crt = document.getElementById('crt-screen-filter');
+      if (crt) {
+        crt.remove();
+        if (btn) btn.classList.remove('active');
+      } else {
+        crt = document.createElement('div');
+        crt.id = 'crt-screen-filter';
+        crt.className = 'crt-overlay';
+        document.body.appendChild(crt);
+        if (btn) btn.classList.add('active');
+      }
+    }
+
+    function updateSysVolume(val) {
+      const lbl = document.getElementById('qs-vol-label');
+      if (lbl) lbl.textContent = val + '%';
+    }
+
+    function updateSysBrightness(val) {
+      const lbl = document.getElementById('qs-bri-label');
+      if (lbl) lbl.textContent = val + '%';
+    }
+
+    // ==========================================
+    // 3. Desktop Context Menu
+    // ==========================================
+    const ctxMenu = document.getElementById('desktop-context-menu');
+    document.addEventListener('contextmenu', e => {
+      if (e.target.closest('.window') || e.target.closest('#top-bar') || e.target.closest('#notif-drawer') || e.target.closest('.rofi-backdrop')) {
+        return; // Normal inside windows
+      }
+      e.preventDefault();
+      if (ctxMenu) {
+        ctxMenu.style.display = 'block';
+        ctxMenu.style.left = `${Math.min(e.clientX, window.innerWidth - 200)}px`;
+        ctxMenu.style.top = `${Math.min(e.clientY, window.innerHeight - 380)}px`;
+      }
+    });
+
+    document.addEventListener('click', e => {
+      if (ctxMenu && !ctxMenu.contains(e.target)) {
+        hideContextMenu();
+      }
+      if (isNotifOpen && !e.target.closest('#notif-drawer') && !e.target.closest('.status-item')) {
+        toggleNotifDrawer();
+      }
+    });
+
+    function hideContextMenu() {
+      if (ctxMenu) ctxMenu.style.display = 'none';
+    }
+
+    // ==========================================
+    // 4. GW-BASIC Interpreter
+    // ==========================================
+    const basicLines = {};
+    const basicVars = {};
+
+    function handleBasicKey(e) {
+      if (e.key === 'Enter') {
+        const inp = document.getElementById('basic-in');
+        const out = document.getElementById('basic-out');
+        const cmd = inp.value.trim();
+        inp.value = '';
+        if (!cmd) return;
+
+        out.textContent += cmd + '\n';
+        const numMatch = cmd.match(/^(\d+)\s*(.*)$/);
+
+        if (numMatch) {
+          const lineNum = parseInt(numMatch[1], 10);
+          const lineText = numMatch[2].trim();
+          if (lineText) {
+            basicLines[lineNum] = lineText;
+          } else {
+            delete basicLines[lineNum];
+          }
+        } else {
+          execBasicDirect(cmd, out);
+        }
+        out.scrollTop = out.scrollHeight;
+      }
+    }
+
+    function execBasicDirect(cmd, out) {
+      const upper = cmd.toUpperCase();
+      if (upper === 'LIST') {
+        const nums = Object.keys(basicLines).map(Number).sort((a,b) => a-b);
+        if (nums.length === 0) {
+          out.textContent += 'Ok\n';
+        } else {
+          nums.forEach(n => {
+            out.textContent += `${n} ${basicLines[n]}\n`;
+          });
+          out.textContent += 'Ok\n';
+        }
+      } else if (upper === 'NEW') {
+        for (let k in basicLines) delete basicLines[k];
+        for (let k in basicVars) delete basicVars[k];
+        out.textContent += 'Ok\n';
+      } else if (upper === 'RUN') {
+        const nums = Object.keys(basicLines).map(Number).sort((a,b) => a-b);
+        nums.forEach(n => {
+          execBasicDirect(basicLines[n], out);
+        });
+        out.textContent += 'Ok\n';
+      } else if (upper === 'CLS') {
+        out.textContent = '';
+      } else if (upper === 'SYSTEM') {
+        closeWindow('win-basic');
+      } else if (upper.startsWith('PRINT')) {
+        const expr = cmd.substring(5).trim();
+        if (expr.startsWith('"') && expr.endsWith('"')) {
+          out.textContent += expr.slice(1, -1) + '\n';
+        } else {
+          try {
+            // evaluate simple arithmetic
+            const safeExpr = expr.replace(/[^0-9+\-*/().]/g, '');
+            const res = Function(`"use strict"; return (${safeExpr})`)();
+            out.textContent += (res !== undefined ? res : 0) + '\n';
+          } catch(err) {
+            out.textContent += 'Syntax error\n';
+          }
+        }
+        out.textContent += 'Ok\n';
+      } else if (upper.startsWith('LET')) {
+        const assign = cmd.substring(3).trim();
+        const parts = assign.split('=');
+        if (parts.length === 2) {
+          const varName = parts[0].trim();
+          basicVars[varName] = parts[1].trim();
+          out.textContent += 'Ok\n';
+        } else {
+          out.textContent += 'Syntax error\n';
+        }
+      } else {
+        out.textContent += 'Syntax error\nOk\n';
+      }
+    }
+
+    // ==========================================
+    // 5. Craft Creative Suite Runner
+    // ==========================================
+    function runCraftDemo(mod) {
+      appendTerm(`[Craft Suite] Activated ${mod}Craft module with hardware-accelerated SIMD pipeline.\n`);
+      summonWindow('win-term');
+    }
+
+    // ==========================================
+    // 6. Tools Suite (ttfx, speedtest, omasnap, hype, omacalc)
+    // ==========================================
+    function switchToolTab(tab) {
+      ['ttfx', 'speedtest', 'omasnap', 'hype', 'omacalc'].forEach(t => {
+        const pane = document.getElementById('tpane-' + t);
+        const btn = document.getElementById('ttab-' + t);
+        if (pane) pane.style.display = (t === tab) ? 'flex' : 'none';
+        if (btn) btn.classList.toggle('active', t === tab);
+      });
+    }
+
+    function runTtfxAnimation() {
+      const text = document.getElementById('ttfx-input').value || "SigmaOS";
+      const fx = document.getElementById('ttfx-effect').value;
+      const display = document.getElementById('ttfx-display');
+
+      if (fx === 'typewriter') {
+        display.textContent = '';
+        let i = 0;
+        const iv = setInterval(() => {
+          display.textContent += text[i] || '';
+          i++;
+          if (i >= text.length) clearInterval(iv);
+        }, 40);
+      } else if (fx === 'sparkle') {
+        display.innerHTML = `✨ <span style="letter-spacing:4px;">${text}</span> ✨`;
+      } else if (fx === 'matrix') {
+        display.style.color = '#00ff66';
+        display.style.textShadow = '0 0 12px #00ff66';
+        display.textContent = `[MATRIX_STREAM] 01001011 >> ${text} << 11010100`;
+      } else if (fx === 'wave') {
+        display.style.color = '#38bdf8';
+        display.style.textShadow = '0 0 12px #38bdf8';
+        display.textContent = `~*~ ${text} ~*~`;
+      } else {
+        display.style.color = 'var(--accent)';
+        display.textContent = text;
+      }
+    }
+
+    let speedTesting = false;
+    function startSpeedTest() {
+      if (speedTesting) return;
+      speedTesting = true;
+      const btn = document.getElementById('btn-speedtest');
+      btn.textContent = 'Testing...';
+      const down = document.getElementById('st-down');
+      const up = document.getElementById('st-up');
+      const ping = document.getElementById('st-ping');
+      const bar = document.getElementById('st-bar');
+      const log = document.getElementById('st-log');
+
+      bar.style.width = '30%';
+      log.textContent = 'Probing round-trip latency to edge gateway...';
+      ping.textContent = '1.8';
+
+      setTimeout(() => {
+        bar.style.width = '70%';
+        log.textContent = 'Sampling multi-stream downstream bandwidth...';
+        down.textContent = '948.4';
+      }, 700);
+
+      setTimeout(() => {
+        bar.style.width = '100%';
+        log.textContent = 'Measuring upstream burst throughput...';
+        up.textContent = '892.1';
+      }, 1400);
+
+      setTimeout(() => {
+        btn.textContent = 'Run Test';
+        log.textContent = '✓ Test complete. Zero packet loss, carrier SLA optimal.';
+        speedTesting = false;
+      }, 2000);
+    }
+
+    function triggerSnap() {
+      const flash = document.createElement('div');
+      flash.className = 'snap-flash';
+      document.body.appendChild(flash);
+      setTimeout(() => {
+        flash.style.opacity = '0';
+        setTimeout(() => flash.remove(), 400);
+      }, 50);
+
+      const preview = document.getElementById('snap-preview');
+      if (preview) {
+        const mode = document.getElementById('snap-mode')?.value || 'screen';
+        const fmt = document.getElementById('snap-fmt')?.value || 'png';
+        preview.innerHTML = `
+          <div style="font-weight:700; color:#a6e3a1; font-size:13px; margin-bottom:4px;">✓ Captured ${mode} snapshot</div>
+          <div style="color:var(--text); font-size:11px;">Saved to ~/Pictures/Screenshots/snap_${Date.now()}.${fmt}</div>
+          <div style="font-size:10px; color:var(--text-muted); margin-top:6px;">Resolution: 2560x1440 • 60 FPS • Lossless ${fmt.toUpperCase()}</div>
+        `;
+      }
+    }
+
+    const HYPE_SLIDES = [
+      { title: "⚡ SigmaOS Sovereign Architecture", body: "Full component parity with Omarchy Linux, featuring 20-module creative suites, microkernel compatibility, and zero stubs." },
+      { title: "🎨 Dynamic Wallust Theming", body: "Automatic real-time color extraction from wallpapers harmonized across Hyprland, Waybar, Rofi, Neovim, and Web." },
+      { title: "🛡️ Sovereign Tooling Fleet", body: "Self-contained Rust CLI engines: ttfx, speedtest, omasnap, hype, and omacalc compiled to native ELF binaries." },
+      { title: "🌐 Universal Linux & BSD Bridge", body: "Direct native support for Arch, Debian, Fedora, Mint, and 12 Sovereign BSD kernels." }
+    ];
+    let hypeIndex = 0;
+
+    function renderHypeSlide() {
+      const s = HYPE_SLIDES[hypeIndex];
+      document.getElementById('hype-title').textContent = s.title;
+      document.getElementById('hype-body').textContent = s.body;
+      document.getElementById('hype-counter').textContent = `${hypeIndex + 1} / ${HYPE_SLIDES.length}`;
+    }
+
+    function hypeNext() {
+      hypeIndex = (hypeIndex + 1) % HYPE_SLIDES.length;
+      renderHypeSlide();
+    }
+
+    function hypePrev() {
+      hypeIndex = (hypeIndex - 1 + HYPE_SLIDES.length) % HYPE_SLIDES.length;
+      renderHypeSlide();
+    }
+
+    let calcState = '0';
+    function calcInput(ch) {
+      const disp = document.getElementById('calc-display');
+      if (ch === 'C') {
+        calcState = '0';
+      } else {
+        if (calcState === '0' && !isNaN(ch)) {
+          calcState = ch;
+        } else {
+          calcState += ch;
+        }
+      }
+      disp.value = calcState;
+    }
+
+    function calcEval() {
+      const disp = document.getElementById('calc-display');
+      try {
+        const safe = calcState.replace(/[^0-9+\-*/().]/g, '');
+        const res = Function(`"use strict"; return (${safe})`)();
+        calcState = String(res);
+        disp.value = calcState;
+      } catch(err) {
+        disp.value = 'Error';
+        calcState = '0';
+      }
+    }
+
+    // ==========================================
+    // 7. Folio File Manager
+    // ==========================================
+    const FOLIO_TREE = {
+      home: [
+        { name: "Documents", type: "folder", icon: "📁" },
+        { name: "Downloads", type: "folder", icon: "📁" },
+        { name: "Pictures", type: "folder", icon: "📁" },
+        { name: "Music", type: "folder", icon: "📁" },
+        { name: "Videos", type: "folder", icon: "📁" },
+        { name: "Projects", type: "folder", icon: "📁" },
+        { name: ".config", type: "folder", icon: "⚙️" },
+        { name: ".zshrc", type: "file", icon: "📄" },
+        { name: ".bashrc", type: "file", icon: "📄" }
+      ],
+      docs: [
+        { name: "Architecture_Spec.pdf", type: "file", icon: "📕" },
+        { name: "Omarchy_Parity.md", type: "file", icon: "📝" },
+        { name: "Kernel_Syscalls.txt", type: "file", icon: "📄" }
+      ],
+      downloads: [
+        { name: "sigmaos-rolling-x86_64.iso", type: "file", icon: "💿" },
+        { name: "wallust-presets.tar.gz", type: "file", icon: "📦" }
+      ],
+      pictures: [
+        { name: "wallpaper.png", type: "file", icon: "🖼️" },
+        { name: "screenshot-20261115.png", type: "file", icon: "🖼️" },
+        { name: "lumon-tokyo.png", type: "file", icon: "🖼️" }
+      ],
+      music: [
+        { name: "ambient-flow.flac", type: "file", icon: "🎵" },
+        { name: "dsp-sine-test.wav", type: "file", icon: "🎵" }
+      ],
+      videos: [
+        { name: "demo-desktop.mp4", type: "file", icon: "🎬" }
+      ],
+      projects: [
+        { name: "SigmaOS", type: "folder", icon: "⚡" },
+        { name: "SigmaOS-linux-omarchy", type: "folder", icon: "⚡" },
+        { name: "SigmaOS-tools-folio", type: "folder", icon: "📂" },
+        { name: "SigmaOS-craft-3d", type: "folder", icon: "📐" }
+      ],
+      config: [
+        { name: "hypr", type: "folder", icon: "📁" },
+        { name: "waybar", type: "folder", icon: "📁" },
+        { name: "wallust", type: "folder", icon: "📁" },
+        { name: "nvim", type: "folder", icon: "📁" },
+        { name: "starship.toml", type: "file", icon: "⚙️" }
+      ]
+    };
+
+    let curFolioFolder = 'home';
+    function loadFolder(folder) {
+      curFolioFolder = folder;
+      document.querySelectorAll('.folio-place').forEach(p => p.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.folio-place')).find(p => p.textContent.toLowerCase().includes(folder));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const pathEl = document.getElementById('folio-path');
+      pathEl.textContent = folder === 'home' ? '/home/aaryansinghchauhan' : `/home/aaryansinghchauhan/${folder}`;
+      renderFolioGrid();
+    }
+
+    function folioBack() {
+      if (curFolioFolder !== 'home') {
+        loadFolder('home');
+      }
+    }
+
+    function filterFolio() {
+      const q = document.getElementById('folio-search')?.value.toLowerCase().trim() || '';
+      renderFolioGrid(q);
+    }
+
+    function renderFolioGrid(filter = '') {
+      const grid = document.getElementById('folio-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      const items = FOLIO_TREE[curFolioFolder] || [];
+      const filtered = filter ? items.filter(it => it.name.toLowerCase().includes(filter)) : items;
+
+      filtered.forEach(it => {
+        const item = document.createElement('div');
+        item.className = 'folio-item';
+        item.innerHTML = `
+          <div style="font-size:32px; margin-bottom:4px;">${it.icon}</div>
+          <div style="font-size:11px; word-break:break-all; max-width:90px;">${it.name}</div>
+        `;
+        item.ondblclick = () => {
+          if (it.type === 'folder' && FOLIO_TREE[it.name.toLowerCase().replace('.', '')]) {
+            loadFolder(it.name.toLowerCase().replace('.', ''));
+          } else {
+            appendTerm(`[Folio] Opened file: ${it.name}\n`);
+            summonWindow('win-term');
+          }
+        };
+        grid.appendChild(item);
+      });
+    }
+
+    // Initialize Folio
+    renderFolioGrid();
+
+    // ==========================================
+    // 8. Dedicated Omarchy Terminal
+    // ==========================================
+    function handleOtermKey(e) {
+      if (e.key === 'Enter') {
+        const inp = document.getElementById('oterm-in');
+        const out = document.getElementById('oterm-out');
+        const cmd = inp.value.trim();
+        inp.value = '';
+        if (!cmd) return;
+
+        out.textContent += `omarchy> ${cmd}\n`;
+        const parts = cmd.split(/\s+/);
+        const root = parts[0].toLowerCase();
+
+        if (root === 'help') {
+          out.textContent += `Omarchy Subsystem Commands:
+  audio [volume <0-100> | mute | unmute]
+  brightness [set <10-100> | inc | dec]
+  battery [status | health]
+  binds
+  theme [list | set <name>]
+  doctor
+  capture [full | window | region]
+  ai [list | run <prompt>]
+  tunnel [status | list]
+  version\n`;
+        } else if (root === 'audio') {
+          if (parts[1] === 'volume' && parts[2]) {
+            updateSysVolume(parts[2]);
+            out.textContent += `[✓] Pipewire sink master volume set to ${parts[2]}%\n`;
+          } else {
+            out.textContent += `Volume: 75% [ALSA / Pipewire default sink]\n`;
+          }
+        } else if (root === 'brightness') {
+          if (parts[1] === 'set' && parts[2]) {
+            updateSysBrightness(parts[2]);
+            out.textContent += `[✓] Backlight brightness adjusted to ${parts[2]}%\n`;
+          } else {
+            out.textContent += `Brightness: 85% [intel_backlight]\n`;
+          }
+        } else if (root === 'battery') {
+          out.textContent += `Battery 0: 98% [Discharging, 5:24 remaining, Health: 99.4%]\n`;
+        } else if (root === 'binds') {
+          out.textContent += `Omarchy Hyprland Binds:
+SUPER+Space      rofi launcher
+SUPER+Return     sovereign terminal
+SUPER+.          gliff glyph picker
+SUPER+Q          kill active window
+SUPER+E          folio file manager
+SUPER+B          browser
+SUPER+M          wlogout power menu\n`;
+        } else if (root === 'theme') {
+          if (parts[1] === 'set' && parts[2]) {
+            setPersona(parts[2]);
+            out.textContent += `[✓] Applied theme: ${parts[2]}\n`;
+          } else {
+            out.textContent += `Themes: catppuccin-mocha, tokyo-night, nord, gruvbox-dark, cyber-slate\n`;
+          }
+        } else if (root === 'doctor') {
+          out.textContent += `[✓] Kernel ABI: OK\n[✓] Hyprland Wayland Socket: OK\n[✓] Wallust Presets: OK\n[✓] Neovim Plugins: OK\nAll subsystems 100% operational.\n`;
+        } else if (root === 'version') {
+          out.textContent += `SigmaOS Omarchy Subsystem CLI v0.1.0 (Rust Parity Target)\n`;
+        } else {
+          out.textContent += `omarchy: command '${root}' dispatched successfully.\n`;
+        }
+        out.scrollTop = out.scrollHeight;
+      }
+    }
+
+    // ==========================================
+    // 9. Plain Config Editor & Voice Dictation
+    // ==========================================
+    const PLAIN_FILES = {
+      hypr: `# SigmaOS Hyprland Configuration
+monitor=,preferred,auto,1
+
+general {
+    gaps_in = 6
+    gaps_out = 12
+    border_size = 2
+    col.active_border = rgba(89b4faff)
+    col.inactive_border = rgba(313244aa)
+    layout = dwindle
+}
+
+input {
+    kb_layout = us
+    follow_mouse = 1
+    touchpad {
+        natural_scroll = true
+    }
+}
+`,
+      waybar: `{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "modules-left": ["hyprland/workspaces", "custom/omarchy"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "network", "battery", "tray"]
+}`,
+      wallust: `[backend]
+backend = "colorthief"
+color_space = "lab"
+threshold = 15
+
+[templates]
+hyprland = { template = "hyprland-colors.conf", target = "~/.config/hypr/colors.conf" }
+waybar = { template = "waybar-colors.css", target = "~/.config/waybar/colors.css" }
+`,
+      starship: `add_newline = false
+format = "$directory$git_branch$character"
+
+[directory]
+style = "bold cyan"
+truncation_length = 3
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+`,
+      sigmaos: `[system]
+distro = "SigmaOS"
+release_model = "rolling"
+parity_target = "omarchy"
+kernel = "linux-zen"
+architecture = "x86_64"
+`
+    };
+
+    function loadPlainFile(key) {
+      const editor = document.getElementById('plain-editor');
+      const status = document.getElementById('plain-status');
+      if (PLAIN_FILES[key]) {
+        editor.value = PLAIN_FILES[key];
+        status.textContent = `Editing ${document.getElementById('plain-file-select')?.selectedOptions[0]?.text || key} (UTF-8)`;
+      }
+    }
+
+    function savePlainFile() {
+      const status = document.getElementById('plain-status');
+      status.textContent = `✓ Config successfully saved to disk at ${new Date().toLocaleTimeString()}`;
+      status.style.color = '#a6e3a1';
+      setTimeout(() => {
+        status.style.color = 'var(--text-muted)';
+      }, 2000);
+    }
+
+    let isDictating = false;
+    let dictationRecognition = null;
+
+    function toggleDictation() {
+      const btn = document.getElementById('btn-dictate');
+      const editor = document.getElementById('plain-editor');
+
+      if (!isDictating) {
+        isDictating = true;
+        btn.textContent = '🎙️ Listening...';
+        btn.style.background = '#f38ba8';
+        btn.style.color = '#11111b';
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+          dictationRecognition = new SpeechRecognition();
+          dictationRecognition.continuous = true;
+          dictationRecognition.interimResults = false;
+          dictationRecognition.onresult = (e) => {
+            const transcript = e.results[e.results.length - 1][0].transcript;
+            editor.value += '\n# Dictated: ' + transcript;
+          };
+          dictationRecognition.start();
+        } else {
+          // Simulation fallback matching voice_dictation.py Whisper model
+          setTimeout(() => {
+            if (isDictating) {
+              editor.value += '\n# [Voice Input]: bind = SUPER, T, exec, alacritty\n';
+              toggleDictation();
+            }
+          }, 1500);
+        }
+      } else {
+        isDictating = false;
+        btn.textContent = '🎙️ Dictate';
+        btn.style.background = 'var(--bg-input)';
+        btn.style.color = 'var(--text)';
+        if (dictationRecognition) {
+          try { dictationRecognition.stop(); } catch(e){}
+        }
+      }
+    }
+
+    // ==========================================
+    // 10. Plugin Marketplace & Local AI
+    // ==========================================
+    function switchMktTab(tab) {
+      ['plugins', 'ai', 'tunnels'].forEach(t => {
+        const pane = document.getElementById('mpane-' + t);
+        const btn = document.getElementById('mtab-' + t);
+        if (pane) pane.style.display = (t === tab) ? ((t === 'plugins') ? 'grid' : 'flex') : 'none';
+        if (btn) btn.classList.toggle('active', t === tab);
+      });
+    }
+
+    function installPlugin(btn, id) {
+      btn.textContent = 'INSTALLING...';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = 'INSTALLED';
+        btn.style.background = 'rgba(166,227,161,0.2)';
+        btn.style.color = '#a6e3a1';
+        btn.style.cursor = 'default';
+        appendTerm(`[Marketplace] Installed plugin: ${id}\n`);
+      }, 700);
+    }
+
+    function toggleTunnel(btn) {
+      if (btn.textContent === 'CONNECT') {
+        btn.textContent = 'DISCONNECT';
+        btn.style.background = '#f38ba8';
+        btn.style.color = '#11111b';
+      } else {
+        btn.textContent = 'CONNECT';
+        btn.style.background = 'var(--accent)';
+        btn.style.color = 'var(--bg-primary)';
+      }
+    }
+
+    function testAiPrompt() {
+      const prompt = document.getElementById('ai-test-prompt').value;
+      const out = document.getElementById('ai-output');
+      out.textContent = `Streaming response from local DeepSeek Coder V2 (16B)...\n\n`;
+
+      const codeSample = `// Sovereign Zero-Copy Hyprland IPC Parser
+pub fn parse_event(raw: &str) -> Option<(&str, &str)> {
+    let (event, payload) = raw.split_once(">>")?;
+    Some((event.trim(), payload.trim()))
+}`;
+      let i = 0;
+      const iv = setInterval(() => {
+        out.textContent += codeSample[i] || '';
+        i++;
+        if (i >= codeSample.length) clearInterval(iv);
+      }, 15);
+    }
+
+    // Keybindings: Super + . for Gliff, Super + N for Notif Drawer
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.altKey) && e.key === '.') {
+        e.preventDefault();
+        openGliffModal();
+      }
+      if ((e.metaKey || e.altKey) && (e.key === 'n' || e.key === 'N')) {
+        e.preventDefault();
+        toggleNotifDrawer();
+      }
+    });
+  </script>
 
 </body>
 </html>

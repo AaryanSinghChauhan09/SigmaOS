@@ -192,6 +192,33 @@ def test_gliff_and_self_healing_parity():
     assert res.returncode == 0
     assert "ALL CHECKS PASSED" in res.stdout
 
+def test_lazyvim_and_voice_dictation_parity():
+    """Arrange-Act-Assert: Verify Pixel Neovim theme, LazyVim plugins, WKD signature validator, and voice dictation."""
+    # 1. Neovim colorschemes & plugins
+    assert (CONFIG_DIR / "nvim" / "colors" / "pixel.lua").is_file()
+    for plugin in ["lsp.lua", "treesitter.lua", "telescope.lua", "lualine.lua"]:
+        assert (CONFIG_DIR / "nvim" / "lua" / "plugins" / plugin).is_file()
+
+    # 2. PGP / WKD signature verification script
+    wkd_script = SCRIPTS_DIR / "verify_signatures.py"
+    assert wkd_script.is_file()
+    res_wkd = subprocess.run(["python3", str(wkd_script)], capture_output=True, text=True)
+    assert res_wkd.returncode == 0
+    assert "WKD (Web Key Directory)" in res_wkd.stdout
+
+    # 3. Voice dictation engine
+    voice_script = SCRIPTS_DIR / "voice_dictation.py"
+    assert voice_script.is_file()
+    res_voice = subprocess.run(["python3", str(voice_script)], capture_output=True, text=True)
+    assert res_voice.returncode == 0
+    assert "Whisper ASR" in res_voice.stdout
+
+    # 4. Voice dictation button in HTML
+    with open(UI_INDEX, "r", encoding="utf-8") as f:
+        html = f.read()
+    assert "btn-dictate" in html
+    assert "toggleDictation" in html
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -215,4 +242,6 @@ if __name__ == "__main__":
     print("✓ test_archiso_and_pkgs_parity passed")
     test_gliff_and_self_healing_parity()
     print("✓ test_gliff_and_self_healing_parity passed")
-    print("\nALL 11 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_lazyvim_and_voice_dictation_parity()
+    print("✓ test_lazyvim_and_voice_dictation_parity passed")
+    print("\nALL 12 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")

@@ -57,10 +57,14 @@ cp "$CONFIG_SRC/wlogout/layout" "$TARGET_DIR/wlogout/layout"
 cp "$CONFIG_SRC/wlogout/style.css" "$TARGET_DIR/wlogout/style.css"
 cp "$CONFIG_SRC/starship/starship.toml" "$TARGET_DIR/starship.toml"
 
-# 7. Neovim & Colorschemes (Aether, Lumon)
-echo "[+] Deploying Neovim configuration & dynamic colorschemes..."
+# 7. Neovim & Colorschemes (Aether, Lumon, Pixel & LazyVim modular plugins)
+echo "[+] Deploying Neovim configuration, plugins & dynamic colorschemes..."
 cp "$CONFIG_SRC/nvim/init.lua" "$TARGET_DIR/nvim/init.lua"
 cp "$CONFIG_SRC/nvim/colors/"*.lua "$TARGET_DIR/nvim/colors/"
+mkdir -p "$TARGET_DIR/nvim/lua/plugins"
+if [[ -d "$CONFIG_SRC/nvim/lua/plugins" ]]; then
+    cp "$CONFIG_SRC/nvim/lua/plugins/"*.lua "$TARGET_DIR/nvim/lua/plugins/"
+fi
 
 # 8. Shell Environments (Zsh & Fish)
 echo "[+] Deploying Zsh & Fish shells..."
