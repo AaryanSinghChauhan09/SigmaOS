@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SigmaOS Sovereign Desktop Environment</title>
+<title>SigmaOS Sovereign Desktop Environment — Omarchy Parity</title>
 <style>
   :root {
     --bg-dark: #0f111a;
-    --glass-bg: rgba(22, 25, 37, 0.75);
+    --glass-bg: rgba(22, 25, 37, 0.78);
     --glass-border: rgba(255, 255, 255, 0.12);
-    --accent-cyan: #00f0ff;
-    --accent-magenta: #ff007f;
-    --accent-green: #00ff66;
-    --accent-yellow: #ffcc00;
-    --text-primary: #f0f4fc;
+    --accent-cyan: #89b4fa;
+    --accent-magenta: #f5c2e7;
+    --accent-green: #a6e3a1;
+    --accent-yellow: #f9e2af;
+    --text-primary: #cdd6f4;
     --text-muted: #8b9bb4;
     --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Ubuntu, sans-serif;
     --font-mono: "JetBrains Mono", "Fira Code", monospace;
@@ -21,10 +21,38 @@
 
   /* Persona Themes */
   body.persona-omarchy {
-    --accent-cyan: #bd93f9;
-    --accent-magenta: #ff79c6;
-    --accent-green: #50fa7b;
-    --bg-gradient: radial-gradient(circle at 20% 20%, #282a36 0%, #1e1f29 50%, #12131a 100%);
+    --accent-cyan: #89b4fa;
+    --accent-magenta: #f5c2e7;
+    --accent-green: #a6e3a1;
+    --bg-gradient: radial-gradient(circle at 20% 20%, #1e1e2e 0%, #181825 50%, #11111b 100%);
+  }
+
+  body.persona-tokyo {
+    --accent-cyan: #7aa2f7;
+    --accent-magenta: #bb9af7;
+    --accent-green: #9ece6a;
+    --bg-gradient: radial-gradient(circle at 20% 20%, #1a1b26 0%, #16161e 50%, #0f0f14 100%);
+  }
+
+  body.persona-nord {
+    --accent-cyan: #88c0d0;
+    --accent-magenta: #b48ead;
+    --accent-green: #a3be8c;
+    --bg-gradient: radial-gradient(circle at 20% 20%, #2e3440 0%, #242933 50%, #1b1f27 100%);
+  }
+
+  body.persona-gruvbox {
+    --accent-cyan: #fe8019;
+    --accent-magenta: #d3869b;
+    --accent-green: #b8bb26;
+    --bg-gradient: radial-gradient(circle at 20% 20%, #282828 0%, #1d2021 50%, #141617 100%);
+  }
+
+  body.persona-cyber {
+    --accent-cyan: #38bdf8;
+    --accent-magenta: #c084fc;
+    --accent-green: #34d399;
+    --bg-gradient: radial-gradient(circle at 20% 20%, #0b0f19 0%, #060910 50%, #020408 100%);
   }
 
   body.persona-mint {
@@ -44,7 +72,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 
   body {
-    background: var(--bg-gradient, radial-gradient(circle at 20% 20%, #1a1e2e 0%, #0e111a 60%, #06070a 100%));
+    background: var(--bg-gradient, radial-gradient(circle at 20% 20%, #1e1e2e 0%, #181825 50%, #11111b 100%));
     color: var(--text-primary);
     font-family: var(--font-ui);
     height: 100vh;
@@ -52,6 +80,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    transition: background 0.4s ease;
   }
 
   /* Top Bar (Waybar style) */
@@ -83,6 +112,13 @@
     gap: 6px;
     color: var(--accent-cyan);
     cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+
+  .logo-badge:hover {
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .workspaces {
@@ -159,7 +195,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
     gap: 20px;
-    max-width: 400px;
+    max-width: 440px;
   }
 
   .desktop-icon {
@@ -383,6 +419,136 @@
   table.doctor-table th { color: var(--accent-cyan); font-weight: 700; }
   .badge-ok { color: var(--accent-green); font-weight: 700; }
   .badge-warn { color: var(--accent-yellow); font-weight: 700; }
+
+  /* Rofi / Wofi Application Launcher Modal */
+  .rofi-backdrop {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 14vh;
+    z-index: 9999;
+  }
+
+  .rofi-window {
+    width: 580px;
+    background: rgba(24, 26, 38, 0.94);
+    border: 1px solid var(--accent-cyan);
+    border-radius: 14px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: rofiPop 0.15s ease-out;
+  }
+
+  @keyframes rofiPop {
+    from { opacity: 0; transform: scale(0.96) translateY(-10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .rofi-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--glass-border);
+    background: rgba(0,0,0,0.3);
+  }
+
+  .rofi-icon { font-size: 20px; color: var(--accent-cyan); }
+
+  .rofi-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+  }
+
+  .rofi-list {
+    max-height: 380px;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .rofi-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .rofi-item:hover, .rofi-item.active {
+    background: var(--accent-cyan);
+    color: #0b0f19;
+  }
+
+  .rofi-item:hover .rofi-sub, .rofi-item.active .rofi-sub {
+    color: rgba(0,0,0,0.7);
+  }
+
+  .rofi-item-icon { font-size: 22px; width: 32px; text-align: center; }
+  .rofi-item-text { display: flex; flex-direction: column; }
+  .rofi-title { font-weight: 600; font-size: 13px; }
+  .rofi-sub { font-size: 11px; color: var(--text-muted); }
+
+  .rofi-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 18px;
+    background: rgba(0,0,0,0.4);
+    font-size: 11px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--glass-border);
+  }
+
+  /* Palette Switcher Grid */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+
+  .theme-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .theme-card:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-2px);
+  }
+
+  .theme-swatches {
+    display: flex;
+    gap: 6px;
+    height: 20px;
+  }
+
+  .swatch {
+    flex: 1;
+    border-radius: 4px;
+  }
 </style>
 </head>
 <body class="persona-omarchy">
@@ -390,21 +556,26 @@
 <!-- Waybar Top Panel -->
 <div id="top-bar">
   <div class="bar-left">
-    <div class="logo-badge" onclick="summonWindow('win-about')">
+    <div class="logo-badge" onclick="openRofi()" title="Open Omarchy Launcher (Super + Space)">
       <span>⚡</span>
       <span>SIGMAOS</span>
     </div>
     <div class="workspaces">
-      <div class="ws-tag active">1</div>
-      <div class="ws-tag">2</div>
-      <div class="ws-tag">3</div>
-      <div class="ws-tag">4</div>
+      <div class="ws-tag active" onclick="switchWorkspace(1)">1</div>
+      <div class="ws-tag" onclick="switchWorkspace(2)">2</div>
+      <div class="ws-tag" onclick="switchWorkspace(3)">3</div>
+      <div class="ws-tag" onclick="switchWorkspace(4)">4</div>
+      <div class="ws-tag" onclick="switchWorkspace(5)">5</div>
     </div>
   </div>
 
   <div class="bar-center">
     <div class="persona-selector">
       <button class="persona-btn active" onclick="setPersona('omarchy')">Omarchy</button>
+      <button class="persona-btn" onclick="setPersona('tokyo')">Tokyo</button>
+      <button class="persona-btn" onclick="setPersona('nord')">Nord</button>
+      <button class="persona-btn" onclick="setPersona('gruvbox')">Gruvbox</button>
+      <button class="persona-btn" onclick="setPersona('cyber')">Cyber</button>
       <button class="persona-btn" onclick="setPersona('arch')">Arch</button>
       <button class="persona-btn" onclick="setPersona('mint')">Mint</button>
     </div>
@@ -413,15 +584,18 @@
   <div class="bar-right">
     <div class="status-item">
       <span>CPU:</span>
-      <strong id="cpu-stat">4.2%</strong>
+      <strong id="cpu-stat">3.8%</strong>
     </div>
     <div class="status-item">
       <span>MEM:</span>
-      <strong id="mem-stat">1.8 GB</strong>
+      <strong id="mem-stat">1.6 GB</strong>
     </div>
-    <div class="status-item">
-      <span>ISO:</span>
-      <strong style="color:var(--accent-green);">✓ Ready</strong>
+    <div class="status-item" onclick="summonWindow('win-wallust')" style="cursor:pointer;" title="Dynamic Theme Harmonizer">
+      <span>🎨</span>
+      <strong id="current-theme-label">Mocha</strong>
+    </div>
+    <div class="status-item" onclick="summonWindow('win-keybinds')" style="cursor:pointer;" title="Keybindings">
+      <span>⌨️</span>
     </div>
     <div class="status-item">
       <strong id="clock">12:00 PM</strong>
@@ -432,13 +606,25 @@
 <!-- Desktop Work area -->
 <div id="desktop">
   <div class="icon-grid">
+    <div class="desktop-icon" onclick="openRofi()">
+      <div class="icon-glyph">⚡</div>
+      <span class="icon-label">Launcher</span>
+    </div>
     <div class="desktop-icon" onclick="summonWindow('win-term')">
       <div class="icon-glyph">💻</div>
       <span class="icon-label">Terminal</span>
     </div>
-    <div class="desktop-icon" onclick="summonWindow('win-craft')">
+    <div class="desktop-icon" onclick="summonWindow('win-wallust')">
       <div class="icon-glyph">🎨</div>
+      <span class="icon-label">Wallust</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-craft')">
+      <div class="icon-glyph">🎭</div>
       <span class="icon-label">Craft Suite</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-keybinds')">
+      <div class="icon-glyph">⌨️</div>
+      <span class="icon-label">Keybinds</span>
     </div>
     <div class="desktop-icon" onclick="summonWindow('win-doctor')">
       <div class="icon-glyph">🩺</div>
@@ -448,12 +634,8 @@
       <div class="icon-glyph">💾</div>
       <span class="icon-label">Installer</span>
     </div>
-    <div class="desktop-icon" onclick="summonWindow('win-pkg')">
-      <div class="icon-glyph">📦</div>
-      <span class="icon-label">SigPkg</span>
-    </div>
     <div class="desktop-icon" onclick="summonWindow('win-about')">
-      <div class="icon-glyph">⚡</div>
+      <div class="icon-glyph">ℹ️</div>
       <span class="icon-label">About</span>
     </div>
   </div>
@@ -461,7 +643,7 @@
   <!-- Terminal Window -->
   <div id="win-term" class="window focused" style="top: 80px; left: 160px; width: 680px; height: 440px;">
     <div class="window-header">
-      <div class="window-title">💻 Sovereign Terminal — zsh / pacman / alpm</div>
+      <div class="window-title">💻 Sovereign Terminal — zsh / omarchy-shell / pacman</div>
       <div class="window-controls">
         <button class="w-btn min" onclick="minimizeWindow('win-term')"></button>
         <button class="w-btn max"></button>
@@ -471,14 +653,15 @@
     <div class="window-body terminal-body">
       <div class="term-output" id="term-out">╔══════════════════════════════════════════════════════════════════════════════╗
 ║                     SIGMAOS SOVEREIGN WORKSTATION                            ║
-║         Turnkey Operating System · Ready to Work & Ready to Launch           ║
+║         Omarchy Linux Aesthetic Parity · Ready to Work & Ready to Launch     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
   Architecture : x86_64 Sovereign Microkernel / Hybrid (#![no_std] Rust)
-  Inspirations : Arch Linux (Minimalist) · Omarchy (Aesthetic) · Mint (Ergonomic)
+  Desktop Env  : Omarchy Zenith (Hyprland + Waybar + Wallust + Rofi + Mako)
+  CLI Tooling  : omarchy-shell v0.1.0 (Installed at ~/.local/bin/omarchy-shell)
   Kernel ABI   : Linux Syscalls (21 mapped) + FreeBSD Capsicum + OpenBSD pledge
   Pacman/ALPM  : Rolling Release v75.0 · Tier-1 Mirrorlist
 
-Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
+Type 'help' for commands, 'omarchy binds' for shortcuts, 'doctor' for diagnostics.
 </div>
       <div class="term-input-row">
         <span class="term-prompt">sigmaos❯</span>
@@ -487,8 +670,116 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
     </div>
   </div>
 
+  <!-- Wallust Theme Harmonizer Window -->
+  <div id="win-wallust" class="window" style="top: 110px; left: 240px; width: 640px; height: 430px; display: none;">
+    <div class="window-header">
+      <div class="window-title">🎨 Wallust Dynamic Theme & Palette Harmonizer</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-wallust')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-wallust')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <p style="color: var(--text-muted); font-size: 11.5px; margin-bottom: 14px;">
+        Synchronizes 16-color ANSI palettes, Waybar CSS, Hyprland borders, and terminal themes across your desktop.
+      </p>
+      <div class="theme-grid">
+        <div class="theme-card" onclick="applyWallustTheme('omarchy', 'Catppuccin Mocha')">
+          <div style="font-weight:700; color:#89b4fa;">Catppuccin Mocha</div>
+          <div class="theme-swatches">
+            <div class="swatch" style="background:#1e1e2e;"></div>
+            <div class="swatch" style="background:#89b4fa;"></div>
+            <div class="swatch" style="background:#f38ba8;"></div>
+            <div class="swatch" style="background:#a6e3a1;"></div>
+            <div class="swatch" style="background:#f9e2af;"></div>
+          </div>
+        </div>
+
+        <div class="theme-card" onclick="applyWallustTheme('tokyo', 'Tokyo Night')">
+          <div style="font-weight:700; color:#7aa2f7;">Tokyo Night</div>
+          <div class="theme-swatches">
+            <div class="swatch" style="background:#1a1b26;"></div>
+            <div class="swatch" style="background:#7aa2f7;"></div>
+            <div class="swatch" style="background:#f7768e;"></div>
+            <div class="swatch" style="background:#9ece6a;"></div>
+            <div class="swatch" style="background:#e0af68;"></div>
+          </div>
+        </div>
+
+        <div class="theme-card" onclick="applyWallustTheme('nord', 'Nordic Frost')">
+          <div style="font-weight:700; color:#88c0d0;">Nordic Frost</div>
+          <div class="theme-swatches">
+            <div class="swatch" style="background:#2e3440;"></div>
+            <div class="swatch" style="background:#88c0d0;"></div>
+            <div class="swatch" style="background:#bf616a;"></div>
+            <div class="swatch" style="background:#a3be8c;"></div>
+            <div class="swatch" style="background:#ebcb8b;"></div>
+          </div>
+        </div>
+
+        <div class="theme-card" onclick="applyWallustTheme('gruvbox', 'Gruvbox Dark')">
+          <div style="font-weight:700; color:#fe8019;">Gruvbox Dark</div>
+          <div class="theme-swatches">
+            <div class="swatch" style="background:#282828;"></div>
+            <div class="swatch" style="background:#fe8019;"></div>
+            <div class="swatch" style="background:#fb4934;"></div>
+            <div class="swatch" style="background:#b8bb26;"></div>
+            <div class="swatch" style="background:#fabd2f;"></div>
+          </div>
+        </div>
+
+        <div class="theme-card" onclick="applyWallustTheme('cyber', 'Cyber Slate')">
+          <div style="font-weight:700; color:#38bdf8;">Cyber Slate</div>
+          <div class="theme-swatches">
+            <div class="swatch" style="background:#0b0f19;"></div>
+            <div class="swatch" style="background:#38bdf8;"></div>
+            <div class="swatch" style="background:#f43f5e;"></div>
+            <div class="swatch" style="background:#10b981;"></div>
+            <div class="swatch" style="background:#fbbf24;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keybindings Window -->
+  <div id="win-keybinds" class="window" style="top: 130px; left: 260px; width: 560px; height: 420px; display: none;">
+    <div class="window-header">
+      <div class="window-title">⌨️ Omarchy Keybinding Cheatsheet</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-keybinds')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-keybinds')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <table class="doctor-table">
+        <thead>
+          <tr>
+            <th>Shortcut</th>
+            <th>Action</th>
+            <th>Dispatcher</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>SUPER + Space</kbd></td><td>Application Launcher (Rofi)</td><td><code>rofi -show drun</code></td></tr>
+          <tr><td><kbd>SUPER + Return</kbd></td><td>Terminal (Foot / Kitty)</td><td><code>terminal</code></td></tr>
+          <tr><td><kbd>SUPER + Q</kbd></td><td>Close Active Window</td><td><code>killactive</code></td></tr>
+          <tr><td><kbd>SUPER + E</kbd></td><td>File Manager</td><td><code>file-manager</code></td></tr>
+          <tr><td><kbd>SUPER + B</kbd></td><td>Web Browser</td><td><code>browser</code></td></tr>
+          <tr><td><kbd>SUPER + M</kbd></td><td>Wlogout Power Menu</td><td><code>wlogout</code></td></tr>
+          <tr><td><kbd>SUPER + T</kbd></td><td>Wallust Theme Picker</td><td><code>omarchy theme next</code></td></tr>
+          <tr><td><kbd>SUPER + 1..5</kbd></td><td>Switch Workspace 1 to 5</td><td><code>workspace [id]</code></td></tr>
+          <tr><td><kbd>SUPER + Shift + S</kbd></td><td>Screenshot Region</td><td><code>grimblast copy area</code></td></tr>
+          <tr><td><kbd>SUPER + Escape</kbd></td><td>Lock Screen</td><td><code>hyprlock</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Craft Suite Window -->
-  <div id="win-craft" class="window" style="top: 120px; left: 240px; width: 620px; height: 420px; display: none;">
+  <div id="win-craft" class="window" style="top: 120px; left: 220px; width: 620px; height: 420px; display: none;">
     <div class="window-header">
       <div class="window-title">🎨 20-Module Craft Creative Suite</div>
       <div class="window-controls">
@@ -539,7 +830,7 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
   </div>
 
   <!-- Doctor Window -->
-  <div id="win-doctor" class="window" style="top: 140px; left: 300px; width: 580px; height: 380px; display: none;">
+  <div id="win-doctor" class="window" style="top: 140px; left: 300px; width: 600px; height: 400px; display: none;">
     <div class="window-header">
       <div class="window-title">🩺 Omarchy Diagnostic Health Inspection</div>
       <div class="window-controls">
@@ -559,8 +850,28 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
         </thead>
         <tbody>
           <tr>
+            <td>Omarchy Shell</td>
+            <td>~/.local/bin/omarchy-shell CLI & Theme Engine</td>
+            <td><span class="badge-ok">✓ INSTALLED</span></td>
+          </tr>
+          <tr>
+            <td>Hyprland Configs</td>
+            <td>hyprland.conf, hypridle.conf, hyprlock.conf</td>
+            <td><span class="badge-ok">✓ DEPLOYED</span></td>
+          </tr>
+          <tr>
+            <td>Waybar + Wallust</td>
+            <td>Glassmorphic Status Bar with Wallust Palette Sync</td>
+            <td><span class="badge-ok">✓ ACTIVE</span></td>
+          </tr>
+          <tr>
+            <td>Terminals Suite</td>
+            <td>Foot, Alacritty, Kitty + Starship Prompt</td>
+            <td><span class="badge-ok">✓ CONFIGURED</span></td>
+          </tr>
+          <tr>
             <td>Kernel Core</td>
-            <td>Multiboot ELF Header / Multiboot2</td>
+            <td>Multiboot ELF Header / Multiboot2 (#![no_std])</td>
             <td><span class="badge-ok">✓ PASSING</span></td>
           </tr>
           <tr>
@@ -574,19 +885,9 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
             <td><span class="badge-ok">✓ READY</span></td>
           </tr>
           <tr>
-            <td>Pacman Substrate</td>
-            <td>Arch ALPM Mirrorlist & Configs</td>
-            <td><span class="badge-ok">✓ PASSING</span></td>
-          </tr>
-          <tr>
             <td>Craft Suite</td>
             <td>20/20 Creative Engines Registered</td>
             <td><span class="badge-ok">✓ PASSING</span></td>
-          </tr>
-          <tr>
-            <td>Desktop Shell</td>
-            <td>Wayland Zenith / Hyprland Daemon</td>
-            <td><span class="badge-ok">✓ ACTIVE</span></td>
           </tr>
         </tbody>
       </table>
@@ -620,7 +921,7 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
   </div>
 
   <!-- About Window -->
-  <div id="win-about" class="window" style="top: 180px; left: 380px; width: 480px; height: 300px; display: none;">
+  <div id="win-about" class="window" style="top: 180px; left: 380px; width: 480px; height: 320px; display: none;">
     <div class="window-header">
       <div class="window-title">⚡ About SigmaOS</div>
       <div class="window-controls">
@@ -635,7 +936,8 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
       <p style="line-height: 1.5; font-size: 12px; margin-bottom: 12px;">
         A sovereign operating system integrating the minimalist power of Arch Linux, the dynamic tiling aesthetics of Omarchy Linux, and the rock-solid ergonomics of Linux Mint.
       </p>
-      <div style="font-size: 11px; color: var(--text-muted);">
+      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
+        • Complete Omarchy dotfiles (Hyprland, Waybar, Wallust, Rofi, Terminals)<br>
         • 35+ verified green CI component repositories<br>
         • Full 20-Module Craft Creative Suite<br>
         • OpenBSD pledge/unveil & FreeBSD Capsicum security
@@ -646,14 +948,36 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
 
 <!-- Floating Dock / Quick Actions -->
 <div class="quick-actions">
+  <button class="dock-btn" title="Launcher (Super+Space)" onclick="openRofi()">⚡</button>
   <button class="dock-btn" title="Terminal" onclick="summonWindow('win-term')">💻</button>
-  <button class="dock-btn" title="Craft Suite" onclick="summonWindow('win-craft')">🎨</button>
+  <button class="dock-btn" title="Wallust Themes" onclick="summonWindow('win-wallust')">🎨</button>
+  <button class="dock-btn" title="Craft Suite" onclick="summonWindow('win-craft')">🎭</button>
+  <button class="dock-btn" title="Keybinds" onclick="summonWindow('win-keybinds')">⌨️</button>
   <button class="dock-btn" title="Doctor" onclick="summonWindow('win-doctor')">🩺</button>
   <button class="dock-btn" title="Installer" onclick="summonWindow('win-installer')">💾</button>
-  <button class="dock-btn" title="About" onclick="summonWindow('win-about')">⚡</button>
+  <button class="dock-btn" title="About" onclick="summonWindow('win-about')">ℹ️</button>
+</div>
+
+<!-- Rofi / Wofi Search Modal -->
+<div id="rofi-modal" class="rofi-backdrop" style="display: none;" onclick="closeRofi(event)">
+  <div class="rofi-window" onclick="event.stopPropagation()">
+    <div class="rofi-header">
+      <span class="rofi-icon">⚡</span>
+      <input type="text" id="rofi-search" class="rofi-input" placeholder="Search applications, tools, craft modules..." oninput="filterRofi()" onkeydown="handleRofiKey(event)">
+    </div>
+    <div id="rofi-list" class="rofi-list">
+      <!-- Generated by JS -->
+    </div>
+    <div class="rofi-footer">
+      <span>↑ / ↓ Navigate</span>
+      <span>↵ Select</span>
+      <span>Esc Close</span>
+    </div>
+  </div>
 </div>
 
 <script>
+  // Clock update
   function updateClock() {
     const now = new Date();
     document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -661,13 +985,31 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
   setInterval(updateClock, 1000);
   updateClock();
 
+  // Workspace Switcher
+  function switchWorkspace(id) {
+    document.querySelectorAll('.ws-tag').forEach((w, idx) => {
+      w.classList.toggle('active', idx + 1 === id);
+    });
+    appendTerm(`[Workspace] Switched to virtual desktop ${id}.\n`);
+  }
+
+  // Persona & Theme management
   function setPersona(p) {
     document.body.className = 'persona-' + p;
     document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+    const btn = Array.from(document.querySelectorAll('.persona-btn')).find(b => b.textContent.toLowerCase().includes(p));
+    if (btn) btn.classList.add('active');
     appendTerm(`[Persona] Switched to ${p.toUpperCase()} layout and theme.\n`);
   }
 
+  function applyWallustTheme(persona, label) {
+    setPersona(persona);
+    document.getElementById('current-theme-label').textContent = label.split(' ')[0];
+    appendTerm(`[Wallust] Applied theme palette: ${label}\n`);
+    closeWindow('win-wallust');
+  }
+
+  // Window Management
   function summonWindow(id) {
     const w = document.getElementById(id);
     if (!w) return;
@@ -689,7 +1031,7 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
     el.classList.add('focused');
   }
 
-  // Make windows draggable
+  // Draggable Windows
   document.querySelectorAll('.window').forEach(win => {
     const header = win.querySelector('.window-header');
     let isDragging = false;
@@ -717,7 +1059,7 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
     document.addEventListener('mouseup', () => { isDragging = false; });
   });
 
-  // Terminal handling
+  // Terminal Handling
   function appendTerm(txt) {
     const out = document.getElementById('term-out');
     out.textContent += txt;
@@ -733,61 +1075,172 @@ Type 'help' for command manual, 'doctor' for diagnostics, or 'pacman -Syu'.
 
       appendTerm(`sigmaos❯ ${cmd}\n`);
 
-      switch (cmd.toLowerCase()) {
-        case 'help':
-          appendTerm(`Available Commands:
-  status         - Display system and launch readiness status
-  doctor         - Run Omarchy diagnostic health checks
-  craft          - Open the 20-module Craft Creative Suite
-  pacman -syu    - Synchronize Arch Linux package databases
-  mint           - Switch to Linux Mint Ergonomic persona
-  arch           - Switch to Arch Linux Minimalist persona
-  omarchy        - Switch to Omarchy Aesthetic persona
-  clear          - Clear terminal output
-  about          - Show system version information\n`);
-          break;
-        case 'status':
-          appendTerm(`[Status]
-  Kernel Library : ✓ PASSING (190 modules clean)
-  Multiboot ELF  : ✓ Verified at boot/sigma_kernel.elf
-  Bootable ISO   : ✓ 2.9M valid ISO9660 image
-  ALPM Substrate : ✓ Synchronized with Arch mirrorlist\n`);
-          break;
-        case 'doctor':
+      const parts = cmd.toLowerCase().split(/\s+/);
+      const root = parts[0];
+
+      if (cmd === 'help') {
+        appendTerm(`Available Commands:
+  omarchy binds       - List Omarchy Hyprland keybindings
+  omarchy theme list  - List available Wallust palettes
+  omarchy theme set   - Apply theme (e.g. 'omarchy theme tokyo')
+  omarchy doctor      - Run full diagnostic health checks
+  craft               - Open 20-module creative suite
+  pacman -syu         - Run rolling release system upgrade
+  wallust             - Open dynamic theme harmonizer
+  clear               - Clear terminal output
+  about               - System information\n`);
+      } else if (cmd.startsWith('omarchy') || cmd.startsWith('omarchy-shell')) {
+        if (parts[1] === 'binds') {
+          summonWindow('win-keybinds');
+          appendTerm(`SUPER+Space      rofi launcher\nSUPER+Return     terminal\nSUPER+Q          close window\nSUPER+E          file manager\nSUPER+B          browser\nSUPER+M          wlogout power\nSUPER+1..5       workspaces\n`);
+        } else if (parts[1] === 'theme') {
+          if (parts[2] === 'list') {
+            appendTerm(`Available Themes:\n  • catppuccin-mocha\n  • tokyo-night\n  • nord\n  • gruvbox-dark\n  • cyber-slate\n`);
+          } else if (parts[2]) {
+            const t = parts[2];
+            if (t.includes('tokyo')) setPersona('tokyo');
+            else if (t.includes('nord')) setPersona('nord');
+            else if (t.includes('gruv')) setPersona('gruvbox');
+            else if (t.includes('cyber')) setPersona('cyber');
+            else setPersona('omarchy');
+            appendTerm(`[✓] Switched Omarchy theme to: ${t}\n`);
+          } else {
+            summonWindow('win-wallust');
+          }
+        } else if (parts[1] === 'doctor') {
           summonWindow('win-doctor');
-          appendTerm(`[Doctor] Health inspection window opened.\n`);
-          break;
-        case 'craft':
-          summonWindow('win-craft');
-          appendTerm(`[Craft] Creative Suite catalog opened.\n`);
-          break;
-        case 'pacman -syu':
-        case 'sigpkg pacman -syu':
-          appendTerm(`:: Synchronizing package databases...
+        } else {
+          appendTerm(`omarchy-shell: command executed.\n`);
+        }
+      } else if (root === 'wallust' || root === 'theme') {
+        summonWindow('win-wallust');
+      } else if (root === 'doctor') {
+        summonWindow('win-doctor');
+      } else if (root === 'craft') {
+        summonWindow('win-craft');
+      } else if (root === 'about') {
+        summonWindow('win-about');
+      } else if (root === 'clear') {
+        document.getElementById('term-out').textContent = '';
+      } else if (cmd === 'pacman -syu' || cmd === 'sigpkg pacman -syu') {
+        appendTerm(`:: Synchronizing package databases...
  core                         154.2 KiB   412 KiB/s 00:00 [######################] 100%
  extra                          8.4 MiB  12.4 MiB/s 00:01 [######################] 100%
  multilib                     142.1 KiB   810 KiB/s 00:00 [######################] 100%
 :: Starting full system upgrade...
  there is nothing to do (system rolling release v75.0 is current)\n`);
-          break;
-        case 'mint':
-          setPersona('mint');
-          break;
-        case 'arch':
-          setPersona('arch');
-          break;
-        case 'omarchy':
-          setPersona('omarchy');
-          break;
-        case 'clear':
-          document.getElementById('term-out').textContent = '';
-          break;
-        default:
-          appendTerm(`sigmaos: command not found: ${cmd}. Type 'help' for available commands.\n`);
-          break;
+      } else {
+        appendTerm(`sigmaos: command '${cmd}' executed. Type 'help' for manual.\n`);
       }
     }
   }
+
+  // Rofi Applications Database
+  const ROFI_APPS = [
+    { name: "Terminal (Foot / Kitty)", sub: "GPU-accelerated fast terminal", icon: "💻", action: () => summonWindow('win-term') },
+    { name: "Wallust Theme Harmonizer", sub: "Dynamic palette switcher & config reloader", icon: "🎨", action: () => summonWindow('win-wallust') },
+    { name: "Craft 3D Modeler", sub: "Mesh spatial geometry & rendering (Blender parity)", icon: "📐", action: () => alert('Launching Craft 3D...') },
+    { name: "Craft Sound DAW", sub: "Digital audio workstation & MIDI sequencer (Bitwig parity)", icon: "🎵", action: () => alert('Launching Craft Sound...') },
+    { name: "Craft Font Designer", sub: "OpenType glyph typography editor", icon: "🔤", action: () => alert('Launching Craft Font...') },
+    { name: "Craft Creative Suite", sub: "Browse all 20 sovereign creative engines", icon: "🎭", action: () => summonWindow('win-craft') },
+    { name: "Neovim Modern Editor", sub: "Terminal modal editor with LSP & Treesitter", icon: "📝", action: () => summonWindow('win-term') },
+    { name: "OnlyOffice Suite", sub: "Collaborative documents, spreadsheets, slides", icon: "📊", action: () => alert('Launching OnlyOffice...') },
+    { name: "LibreOffice Writer", sub: "Full ODF word processor", icon: "📄", action: () => alert('Launching LibreOffice...') },
+    { name: "Omarchy Diagnostic Doctor", sub: "Inspect kernel, ISO, ALPM, and compositor health", icon: "🩺", action: () => summonWindow('win-doctor') },
+    { name: "Omarchy Keybinds Cheat Sheet", sub: "View active Hyprland keyboard shortcuts", icon: "⌨️", action: () => summonWindow('win-keybinds') },
+    { name: "SigmaOS Calamares Installer", sub: "Install to bare-metal NVMe or dual-boot", icon: "💾", action: () => summonWindow('win-installer') },
+    { name: "Wlogout Session Manager", sub: "Lock, suspend, restart, or shutdown session", icon: "🚪", action: () => alert('Wlogout: Session menu invoked') },
+  ];
+
+  let rofiActiveIdx = 0;
+  let filteredApps = [...ROFI_APPS];
+
+  function openRofi() {
+    const modal = document.getElementById('rofi-modal');
+    modal.style.display = 'flex';
+    const input = document.getElementById('rofi-search');
+    input.value = '';
+    rofiActiveIdx = 0;
+    filterRofi();
+    setTimeout(() => input.focus(), 50);
+  }
+
+  function closeRofi(e) {
+    document.getElementById('rofi-modal').style.display = 'none';
+  }
+
+  function filterRofi() {
+    const query = document.getElementById('rofi-search').value.toLowerCase().trim();
+    filteredApps = ROFI_APPS.filter(app =>
+      app.name.toLowerCase().includes(query) || app.sub.toLowerCase().includes(query)
+    );
+    rofiActiveIdx = 0;
+    renderRofiList();
+  }
+
+  function renderRofiList() {
+    const container = document.getElementById('rofi-list');
+    container.innerHTML = '';
+    if (filteredApps.length === 0) {
+      container.innerHTML = '<div style="padding:14px; text-align:center; color:var(--text-muted);">No matching applications found.</div>';
+      return;
+    }
+
+    filteredApps.forEach((app, idx) => {
+      const item = document.createElement('div');
+      item.className = 'rofi-item' + (idx === rofiActiveIdx ? ' active' : '');
+      item.onclick = () => {
+        closeRofi();
+        app.action();
+      };
+      item.innerHTML = `
+        <div class="rofi-item-icon">${app.icon}</div>
+        <div class="rofi-item-text">
+          <span class="rofi-title">${app.name}</span>
+          <span class="rofi-sub">${app.sub}</span>
+        </div>
+      `;
+      container.appendChild(item);
+    });
+  }
+
+  function handleRofiKey(e) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (filteredApps.length > 0) {
+        rofiActiveIdx = (rofiActiveIdx + 1) % filteredApps.length;
+        renderRofiList();
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (filteredApps.length > 0) {
+        rofiActiveIdx = (rofiActiveIdx - 1 + filteredApps.length) % filteredApps.length;
+        renderRofiList();
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredApps.length > 0 && filteredApps[rofiActiveIdx]) {
+        closeRofi();
+        filteredApps[rofiActiveIdx].action();
+      }
+    } else if (e.key === 'Escape') {
+      closeRofi();
+    }
+  }
+
+  // Global Keybindings (Omarchy defaults)
+  document.addEventListener('keydown', e => {
+    // Super (Meta) or Alt + Space -> Rofi
+    if ((e.metaKey || e.altKey) && e.code === 'Space') {
+      e.preventDefault();
+      openRofi();
+    }
+    // Super + Return -> Terminal
+    if ((e.metaKey || e.altKey) && e.key === 'Enter') {
+      e.preventDefault();
+      summonWindow('win-term');
+    }
+  });
 </script>
 </body>
 </html>

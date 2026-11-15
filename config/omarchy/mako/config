@@ -1,0 +1,20 @@
+# SigmaOS Omarchy Mako Notification Configuration
+
+font=JetBrains Mono 11
+background-color=#11111be6
+text-color=#cdd6f4
+border-color=#cba6f7
+border-size=2
+border-radius=10
+padding=14
+margin=10
+default-timeout=5000
+group-by=summary
+
+[urgency=high]
+border-color=#f38ba8
+default-timeout=0
+
+[urgency=low]
+border-color=#6c7086
+default-timeout=3000

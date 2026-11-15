@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+"""
+test_omarchy_parity.py: AAA Automated Test Suite for Omarchy Parity in SigmaOS.
+Ensures full parity between SigmaOS and Omarchy Linux desktop configurations.
+"""
+
+import os
+import json
+import subprocess
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+CONFIG_DIR = ROOT_DIR / "config" / "omarchy"
+SCRIPTS_DIR = ROOT_DIR / "scripts"
+
+def test_hyprland_configs_exist_and_nonempty():
+    """Arrange-Act-Assert: Verify all Hyprland suite configs exist and are non-empty."""
+    expected_files = [
+        CONFIG_DIR / "hyprland" / "hyprland.conf",
+        CONFIG_DIR / "hyprland" / "hyprland-binds.conf",
+        CONFIG_DIR / "hyprland" / "hypridle.conf",
+        CONFIG_DIR / "hyprland" / "hyprlock.conf",
+    ]
+    for p in expected_files:
+        assert p.is_file(), f"Missing config: {p}"
+        assert p.stat().st_size > 50, f"Config {p} is too small / stub"
+
+def test_waybar_config_valid_json():
+    """Arrange-Act-Assert: Verify Waybar config is valid JSON/JSONC."""
+    wb_cfg = CONFIG_DIR / "waybar" / "config.jsonc"
+    assert wb_cfg.is_file(), f"Missing waybar config: {wb_cfg}"
+    with open(wb_cfg, "r", encoding="utf-8") as f:
+        content = f.read()
+    # Strip comments if any
+    lines = [line for line in content.splitlines() if not line.strip().startswith("//")]
+    parsed = json.loads("\n".join(lines))
+    assert "layer" in parsed
+    assert "modules-left" in parsed
+    assert "modules-right" in parsed
+
+def test_wallust_presets_valid():
+    """Arrange-Act-Assert: Verify Wallust theme presets exist and have 16 colors."""
+    preset_dir = CONFIG_DIR / "wallust" / "presets"
+    assert preset_dir.is_dir()
+    presets = list(preset_dir.glob("*.json"))
+    assert len(presets) >= 5, f"Expected at least 5 presets, found {len(presets)}"
+    for p in presets:
+        with open(p, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            assert "name" in data
+            assert "background" in data
+            assert "foreground" in data
+            assert len(data.get("colors", [])) == 16, f"Preset {p.name} must define 16 ANSI colors"
+
+def test_terminal_configs_exist():
+    """Arrange-Act-Assert: Verify Foot, Alacritty, and Kitty configs exist and are non-empty."""
+    term_configs = [
+        CONFIG_DIR / "foot" / "foot.ini",
+        CONFIG_DIR / "alacritty" / "alacritty.toml",
+        CONFIG_DIR / "kitty" / "kitty.conf",
+    ]
+    for p in term_configs:
+        assert p.is_file(), f"Missing terminal config: {p}"
+        assert p.stat().st_size > 100, f"Terminal config {p} is too small"
+
+def test_notification_and_shell_configs():
+    """Arrange-Act-Assert: Verify Dunst, Mako, Wlogout, Starship, and Neovim configs."""
+    configs = [
+        CONFIG_DIR / "dunst" / "dunstrc",
+        CONFIG_DIR / "mako" / "config",
+        CONFIG_DIR / "wlogout" / "layout",
+        CONFIG_DIR / "wlogout" / "style.css",
+        CONFIG_DIR / "starship" / "starship.toml",
+        CONFIG_DIR / "nvim" / "init.lua",
+    ]
+    for p in configs:
+        assert p.is_file(), f"Missing config: {p}"
+        assert p.stat().st_size > 50, f"Config {p} is too small"
+
+def test_omarchy_shell_cli_execution():
+    """Arrange-Act-Assert: Verify omarchy-shell binary executes and outputs binds."""
+    binary = ROOT_DIR / "bin" / "omarchy-shell"
+    assert binary.is_file(), f"Missing binary: {binary}"
+    res = subprocess.run([str(binary), "binds"], capture_output=True, text=True)
+    assert res.returncode == 0
+    assert "bind = SUPER+SHIFT, Return, exec, omarchy terminal" in res.stdout
+
+def test_apply_theme_orchestrator():
+    """Arrange-Act-Assert: Verify apply_theme.py executes without error."""
+    script = CONFIG_DIR / "scripts" / "apply_theme.py"
+    assert script.is_file()
+    res = subprocess.run([str(script), "list"], capture_output=True, text=True)
+    assert res.returncode == 0
+    assert "catppuccin-mocha" in res.stdout
+
+if __name__ == "__main__":
+    test_hyprland_configs_exist_and_nonempty()
+    print("✓ test_hyprland_configs_exist_and_nonempty passed")
+    test_waybar_config_valid_json()
+    print("✓ test_waybar_config_valid_json passed")
+    test_wallust_presets_valid()
+    print("✓ test_wallust_presets_valid passed")
+    test_terminal_configs_exist()
+    print("✓ test_terminal_configs_exist passed")
+    test_notification_and_shell_configs()
+    print("✓ test_notification_and_shell_configs passed")
+    test_omarchy_shell_cli_execution()
+    print("✓ test_omarchy_shell_cli_execution passed")
+    test_apply_theme_orchestrator()
+    print("✓ test_apply_theme_orchestrator passed")
+    print("\nALL 7 AAA OMARCHY PARITY TESTS PASSED SUCCESSFULLY!")

@@ -1,0 +1,14 @@
+# SigmaOS Omarchy Wallust Configuration
+# Dynamic color harmony generator for wallpaper-driven desktop themes
+
+backend = "resized"
+color_space = "lab"
+filter = "dark16"
+check_contrast = true
+
+[templates]
+waybar = { template = "waybar.css", target = "~/.config/waybar/colors-wallust.css" }
+hyprland = { template = "hyprland-colors.conf", target = "~/.config/hypr/colors.conf" }
+foot = { template = "foot.ini", target = "~/.config/foot/colors.ini" }
+mako = { template = "mako", target = "~/.config/mako/config" }
+rofi = { template = "rofi.rasi", target = "~/.config/rofi/colors.rasi" }

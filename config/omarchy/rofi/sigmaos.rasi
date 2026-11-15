@@ -1,0 +1,83 @@
+/**
+ * SigmaOS Omarchy Rofi Application Launcher Theme
+ * Clean, modern, keyboard-driven application selector
+ */
+
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    display-drun: "   Apps ";
+    display-run: "   Run ";
+    display-window: "   Window ";
+    drun-display-format: "{name}";
+    font: "JetBrains Mono 11";
+}
+
+* {
+    bg: #11111b;
+    bg-alt: #1e1e2e;
+    fg: #cdd6f4;
+    accent: #89b4fa;
+    border-col: #cba6f7;
+    background-color: transparent;
+    text-color: @fg;
+}
+
+window {
+    width: 650px;
+    height: 480px;
+    background-color: @bg;
+    border: 2px solid @border-col;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+    spacing: 15px;
+}
+
+inputbar {
+    children: [ prompt, entry ];
+    background-color: @bg-alt;
+    border-radius: 10px;
+    padding: 8px 12px;
+}
+
+prompt {
+    text-color: @accent;
+    font-weight: 700;
+}
+
+entry {
+    placeholder: "Search applications or commands...";
+    placeholder-color: #6c7086;
+    text-color: @fg;
+}
+
+listview {
+    columns: 2;
+    lines: 7;
+    spacing: 8px;
+    scrollbar: false;
+}
+
+element {
+    padding: 8px 12px;
+    border-radius: 8px;
+    children: [ element-icon, element-text ];
+    spacing: 12px;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: #11111b;
+}
+
+element-icon {
+    size: 24px;
+}
+
+element-text {
+    vertical-align: 0.5;
+}

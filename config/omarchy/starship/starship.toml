@@ -1,0 +1,44 @@
+# SigmaOS Omarchy Starship Shell Prompt
+
+format = """
+[░▒▓](#89b4fa)\
+[ ⚡ SIGMA ](bg:#89b4fa fg:#11111b bold)\
+[](bg:#313244 fg:#89b4fa)\
+$directory\
+[](fg:#313244 bg:#45475a)\
+$git_branch\
+$git_status\
+[](fg:#45475a bg:#1e1e2e)\
+$rust\
+$package\
+[](fg:#1e1e2e)\
+$character"""
+
+[directory]
+style = "fg:#cdd6f4 bg:#313244"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+style = "fg:#f5e0dc bg:#45475a"
+format = "[ $symbol$branch ]($style)"
+symbol = " "
+
+[git_status]
+style = "fg:#f38ba8 bg:#45475a"
+format = "[$all_status$ahead_behind ]($style)"
+
+[rust]
+style = "fg:#fab387 bg:#1e1e2e"
+format = "[ $symbol($version) ]($style)"
+symbol = "🦀 "
+
+[package]
+style = "fg:#a6e3a1 bg:#1e1e2e"
+format = "[ $symbol$version ]($style)"
+symbol = "󰏗 "
+
+[character]
+success_symbol = "[ ❯](bold fg:#89b4fa)"
+error_symbol = "[ ❯](bold fg:#f38ba8)"

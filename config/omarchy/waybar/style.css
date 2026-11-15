@@ -1,0 +1,97 @@
+/* SigmaOS Omarchy Waybar Theme — Catppuccin / Wallust Aesthetic */
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrains Mono", "Inter", "Font Awesome 6 Free", monospace;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(17, 17, 27, 0.75);
+    border-bottom: 2px solid rgba(137, 180, 250, 0.3);
+    color: #cdd6f4;
+}
+
+#custom-launcher {
+    background: #89b4fa;
+    color: #11111b;
+    border-radius: 12px;
+    padding: 0 10px;
+    margin: 4px 6px;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+#workspaces {
+    background: rgba(30, 30, 46, 0.8);
+    border-radius: 14px;
+    margin: 4px 4px;
+    padding: 0 4px;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #6c7086;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.active {
+    color: #11111b;
+    background: #cba6f7;
+    font-weight: 800;
+}
+
+#workspaces button:hover {
+    background: rgba(203, 166, 247, 0.2);
+    color: #cdd6f4;
+}
+
+#custom-omarchy-theme, #window, #clock, #pulseaudio, #cpu, #memory, #network, #battery, #tray, #custom-power {
+    background: rgba(30, 30, 46, 0.7);
+    border-radius: 12px;
+    padding: 2px 12px;
+    margin: 4px 4px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#window {
+    color: #89dceb;
+    font-style: italic;
+}
+
+#clock {
+    background: linear-gradient(135deg, rgba(137, 180, 250, 0.2), rgba(203, 166, 247, 0.2));
+    border-color: rgba(203, 166, 247, 0.4);
+    color: #f5e0dc;
+    font-weight: 700;
+}
+
+#custom-omarchy-theme {
+    color: #f38ba8;
+    cursor: pointer;
+}
+
+#cpu { color: #fab387; }
+#memory { color: #a6e3a1; }
+#network { color: #89b4fa; }
+#pulseaudio { color: #f9e2af; }
+#battery { color: #94e2d5; }
+
+#battery.warning { color: #f9e2af; }
+#battery.critical { color: #f38ba8; animation: blink 1s infinite; }
+
+#custom-power {
+    background: #f38ba8;
+    color: #11111b;
+    padding: 0 10px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+@keyframes blink {
+    to { background-color: rgba(243, 139, 168, 0.5); }
+}

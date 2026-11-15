@@ -1,0 +1,104 @@
+{
+    "layer": "top",
+    "position": "top",
+    "mod": "dock",
+    "exclusive": true,
+    "passthrough": false,
+    "gtk-layer-shell": true,
+    "height": 38,
+    "modules-left": [
+        "custom/launcher",
+        "hyprland/workspaces",
+        "custom/omarchy-theme",
+        "hyprland/window"
+    ],
+    "modules-center": [
+        "clock"
+    ],
+    "modules-right": [
+        "pulseaudio",
+        "cpu",
+        "memory",
+        "network",
+        "battery",
+        "tray",
+        "custom/power"
+    ],
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "on-click": "activate",
+        "format": "{name}",
+        "persistent-workspaces": {
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": []
+        }
+    },
+    "custom/launcher": {
+        "format": " ⚡ ",
+        "on-click": "rofi -show drun -theme ~/.config/rofi/sigmaos.rasi",
+        "tooltip": false
+    },
+    "custom/omarchy-theme": {
+        "format": " 🎨 {} ",
+        "exec": "omarchy-shell theme list | head -1",
+        "on-click": "omarchy-shell theme next",
+        "tooltip": true
+    },
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 45,
+        "separate-outputs": true
+    },
+    "clock": {
+        "format": "{:%a %b %d  %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+    "cpu": {
+        "interval": 2,
+        "format": "  {usage}%",
+        "max-length": 10
+    },
+    "memory": {
+        "interval": 5,
+        "format": "  {}%",
+        "max-length": 10
+    },
+    "network": {
+        "format-wifi": "  {essid}",
+        "format-ethernet": "󰈀  {ipaddr}",
+        "format-linked": "󰈀  (No IP)",
+        "format-disconnected": "󰖪  Offline",
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}"
+    },
+    "pulseaudio": {
+        "format": "{icon}  {volume}%",
+        "format-muted": "󰖁  Muted",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon}  {capacity}%",
+        "format-charging": "󰂄  {capacity}%",
+        "format-plugged": "󰂄  {capacity}%",
+        "format-icons": ["󰂃", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+    },
+    "tray": {
+        "icon-size": 16,
+        "spacing": 10
+    },
+    "custom/power": {
+        "format": " ⏻ ",
+        "on-click": "wlogout",
+        "tooltip": false
+    }
+}
