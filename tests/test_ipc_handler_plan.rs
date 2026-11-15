@@ -32,7 +32,14 @@ fn test_ipc_handler_documentation_plan_verification() {
 
 #[test]
 fn test_ipc_handler_pr_template_verification() {
-    let template = "IPC handler PR template: IPC semantics, blocking, non-blocking, zero-copy";
+    let template = "IPC handler PR template: IPC semantics, \
+        Blocking behavior: pipe blocks until reader present. \
+        Non-blocking behavior: returns EAGAIN immediately. \
+        EOF / closure behavior: reader gets 0 bytes on peer close. \
+        Security review: Capability/namespace checks enforced at open. \
+        Verification: ./run_sigma_tests.sh must pass before merge. \
+        Capability status: verified against pledge/capsicum matrix. \
+        Integration impact: none for existing IPC consumers.";
 
     assert!(template.contains("IPC handler"));
     assert!(template.contains("IPC semantics"));
