@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-craft-ani
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Timeline keyframe animation and easing curves"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-craft-ani"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-craft')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-craft-ani"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-craft-ani"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-craft-ani"
+    install -Dm755 "target/release/sigmaos-craft-ani" "${pkgdir}/usr/bin/sigmaos-craft-ani" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-craft-ani/README.md"
+}

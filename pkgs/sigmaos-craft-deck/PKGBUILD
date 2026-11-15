@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-craft-deck
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Presentation slides and layout orchestration"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-craft-deck"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-craft')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-craft-deck"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-craft-deck"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-craft-deck"
+    install -Dm755 "target/release/sigmaos-craft-deck" "${pkgdir}/usr/bin/sigmaos-craft-deck" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-craft-deck/README.md"
+}

@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-dos-free
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="FreeDOS kernel and command interpreter compatibility layer"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-dos-free"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-dos')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-dos-free"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-dos-free"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-dos-free"
+    install -Dm755 "target/release/sigmaos-dos-free" "${pkgdir}/usr/bin/sigmaos-dos-free" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-dos-free/README.md"
+}

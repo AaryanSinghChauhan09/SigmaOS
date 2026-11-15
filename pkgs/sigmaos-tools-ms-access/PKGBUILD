@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-tools-ms-access
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Jet/ACE relational database table catalog and queries"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-tools-ms-access"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-tools' 'sigmaos-datascience')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-tools-ms-access"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-tools-ms-access"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-tools-ms-access"
+    install -Dm755 "target/release/sigmaos-tools-ms-access" "${pkgdir}/usr/bin/sigmaos-tools-ms-access" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-tools-ms-access/README.md"
+}

@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-libreoffice-writer
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="ODT document layout and style hierarchy"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-writer"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-libreoffice')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-libreoffice-writer"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-libreoffice-writer"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-libreoffice-writer"
+    install -Dm755 "target/release/sigmaos-libreoffice-writer" "${pkgdir}/usr/bin/sigmaos-libreoffice-writer" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-libreoffice-writer/README.md"
+}

@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-craft-cad
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Parametric 2D/3D geometry and geometric constraints"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-craft-cad"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-craft')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-craft-cad"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-craft-cad"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-craft-cad"
+    install -Dm755 "target/release/sigmaos-craft-cad" "${pkgdir}/usr/bin/sigmaos-craft-cad" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-craft-cad/README.md"
+}
