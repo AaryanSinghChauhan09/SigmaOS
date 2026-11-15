@@ -69,7 +69,14 @@ impl Ext4AdvancementsV78Engine {
         }
     }
 
-    pub fn record_fast_commit(&mut self, inode: u32, lblk: u32, pblk: u64, count: u16, unwritten: bool) {
+    pub fn record_fast_commit(
+        &mut self,
+        inode: u32,
+        lblk: u32,
+        pblk: u64,
+        count: u16,
+        unwritten: bool,
+    ) {
         self.fast_commit_log.push(Ext4V78FastCommitEntry {
             inode_num: inode,
             logical_block: lblk,
@@ -166,7 +173,11 @@ impl XfsAdvancementsV78Engine {
     }
 
     pub fn register_reflink(&mut self, ag: u32, bno: u64, len: u32) {
-        if let Some(ext) = self.reflink_extents.iter_mut().find(|e| e.source_ag == ag && e.source_bno == bno) {
+        if let Some(ext) = self
+            .reflink_extents
+            .iter_mut()
+            .find(|e| e.source_ag == ag && e.source_bno == bno)
+        {
             ext.ref_count += 1;
         } else {
             self.reflink_extents.push(XfsV78ReflinkExtent {
@@ -367,7 +378,11 @@ impl F2FSAdvancementsV78Engine {
     }
 
     pub fn invalidate_block(&mut self, segment_id: u32) {
-        if let Some(seg) = self.segments.iter_mut().find(|s| s.segment_id == segment_id) {
+        if let Some(seg) = self
+            .segments
+            .iter_mut()
+            .find(|s| s.segment_id == segment_id)
+        {
             if seg.valid_blocks > 0 {
                 seg.valid_blocks -= 1;
                 seg.is_dirty = true;
@@ -419,7 +434,10 @@ impl ExFatFatAdvancementsV78Engine {
     pub fn walk_cluster_chain(&self, start_cluster: usize) -> Vec<usize> {
         let mut chain = Vec::new();
         let mut curr = start_cluster;
-        while curr < self.fat_table.len() && self.fat_table[curr] != 0 && self.fat_table[curr] != 0xFFFFFFFF {
+        while curr < self.fat_table.len()
+            && self.fat_table[curr] != 0
+            && self.fat_table[curr] != 0xFFFFFFFF
+        {
             chain.push(curr);
             curr = self.fat_table[curr] as usize;
         }
@@ -495,7 +513,11 @@ impl LvmCryptoMaintenanceUtilsV78Engine {
         Self
     }
 
-    pub fn calculate_thin_overcommit_pct(&self, allocated_virtual_mb: u64, physical_pool_mb: u64) -> u32 {
+    pub fn calculate_thin_overcommit_pct(
+        &self,
+        allocated_virtual_mb: u64,
+        physical_pool_mb: u64,
+    ) -> u32 {
         if physical_pool_mb == 0 {
             0
         } else {

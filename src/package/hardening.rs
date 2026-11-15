@@ -114,12 +114,13 @@ impl PackageSecurityMetadata {
         engine: &PackageSigningEngine,
         package_data: &[u8],
     ) -> bool {
-        !self.signatures.is_empty() && self.signatures.iter().all(|sig| {
-            matches!(
-                engine.verify_signature(sig, package_data),
-                PackageVerificationResult::Valid
-            )
-        })
+        !self.signatures.is_empty()
+            && self.signatures.iter().all(|sig| {
+                matches!(
+                    engine.verify_signature(sig, package_data),
+                    PackageVerificationResult::Valid
+                )
+            })
     }
 }
 

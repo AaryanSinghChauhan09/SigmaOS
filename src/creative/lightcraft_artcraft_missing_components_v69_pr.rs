@@ -56,20 +56,34 @@ impl LightcraftAiNeuralOcrMetadataExtractionV69PrEngine {
     pub fn new() -> Self {
         Self {
             confidence_threshold: 0.92,
-            language_models: vec!["en-US".to_string(), "de-DE".to_string(), "ja-JP".to_string()],
+            language_models: vec![
+                "en-US".to_string(),
+                "de-DE".to_string(),
+                "ja-JP".to_string(),
+            ],
         }
     }
 
-    pub fn extract_text_and_metadata(&self, image_bytes: &[u8]) -> (String, BTreeMap<String, String>) {
+    pub fn extract_text_and_metadata(
+        &self,
+        image_bytes: &[u8],
+    ) -> (String, BTreeMap<String, String>) {
         let mut metadata = BTreeMap::new();
         metadata.insert("EXIF:ISO".to_string(), "800".to_string());
         metadata.insert("EXIF:FNumber".to_string(), "f/2.8".to_string());
-        metadata.insert("IPTC:Headline".to_string(), "SigmaOS LightCraft V69 Capture".to_string());
+        metadata.insert(
+            "IPTC:Headline".to_string(),
+            "SigmaOS LightCraft V69 Capture".to_string(),
+        );
 
         let extracted_text = if image_bytes.is_empty() {
             String::new()
         } else {
-            format!("Extracted Text from {} bytes at {:.0}% confidence", image_bytes.len(), self.confidence_threshold * 100.0)
+            format!(
+                "Extracted Text from {} bytes at {:.0}% confidence",
+                image_bytes.len(),
+                self.confidence_threshold * 100.0
+            )
         };
 
         (extracted_text, metadata)
@@ -121,7 +135,10 @@ impl LightcraftCrdtMultiUserAssetCatalogSyncV69Engine {
 
     pub fn sync_asset_record(&mut self, asset_id: u64, metadata_json: &str) -> u64 {
         self.vector_clock += 1;
-        let entry = format!("v{}:c{}:{}", self.vector_clock, self.client_id, metadata_json);
+        let entry = format!(
+            "v{}:c{}:{}",
+            self.vector_clock, self.client_id, metadata_json
+        );
         self.catalog_state.insert(asset_id, entry);
         self.vector_clock
     }
@@ -249,7 +266,9 @@ impl LightcraftVectorPathGradingMaskEditorV69PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV69PrProposalManifest {
         LightcraftV69PrProposalManifest {
             pr_id: 6904,
-            pr_title: "feat(lightcraft): Subpixel Vector Bezier Path Grading Mask & Spline Editor V69".to_string(),
+            pr_title:
+                "feat(lightcraft): Subpixel Vector Bezier Path Grading Mask & Spline Editor V69"
+                    .to_string(),
             target_subsystem: "LightCraft Vector Masking Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -309,7 +328,9 @@ impl LightcraftCmykSpotColorSeparationPreflightV69Engine {
     pub fn generate_pr_manifest(&self) -> LightcraftV69PrProposalManifest {
         LightcraftV69PrProposalManifest {
             pr_id: 6905,
-            pr_title: "feat(lightcraft): CMYK Spot Color Separation & Press Preflight TAC Inspector V69".to_string(),
+            pr_title:
+                "feat(lightcraft): CMYK Spot Color Separation & Press Preflight TAC Inspector V69"
+                    .to_string(),
             target_subsystem: "LightCraft Print & Prepress Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -346,7 +367,16 @@ impl LightcraftPermanentPiiRedactionSanitizationV69Engine {
         }
     }
 
-    pub fn redact_region(&self, image_rgb: &mut [u8], width: u32, _height: u32, x0: u32, y0: u32, x1: u32, y1: u32) {
+    pub fn redact_region(
+        &self,
+        image_rgb: &mut [u8],
+        width: u32,
+        _height: u32,
+        x0: u32,
+        y0: u32,
+        x1: u32,
+        y1: u32,
+    ) {
         for y in y0..y1 {
             for x in x0..x1 {
                 let idx = ((y * width + x) * 3) as usize;
@@ -403,10 +433,16 @@ impl LightcraftPageImpositionPrintAssemblyV69Engine {
         }
     }
 
-    pub fn calculate_imposition_layout(&self, page_width_mm: f32, page_height_mm: f32) -> (f32, f32, usize) {
+    pub fn calculate_imposition_layout(
+        &self,
+        page_width_mm: f32,
+        page_height_mm: f32,
+    ) -> (f32, f32, usize) {
         let total_slots = self.grid_rows * self.grid_cols;
-        let slot_w = (page_width_mm - (self.margin_mm * (self.grid_cols as f32 + 1.0))) / self.grid_cols as f32;
-        let slot_h = (page_height_mm - (self.margin_mm * (self.grid_rows as f32 + 1.0))) / self.grid_rows as f32;
+        let slot_w = (page_width_mm - (self.margin_mm * (self.grid_cols as f32 + 1.0)))
+            / self.grid_cols as f32;
+        let slot_h = (page_height_mm - (self.margin_mm * (self.grid_rows as f32 + 1.0)))
+            / self.grid_rows as f32;
         (slot_w, slot_h, total_slots)
     }
 
@@ -462,7 +498,9 @@ impl LightcraftInteractiveAcroFormsTetheringV69Engine {
     pub fn generate_pr_manifest(&self) -> LightcraftV69PrProposalManifest {
         LightcraftV69PrProposalManifest {
             pr_id: 6908,
-            pr_title: "feat(lightcraft): Interactive Model Release Forms & Tethered Document Manager V69".to_string(),
+            pr_title:
+                "feat(lightcraft): Interactive Model Release Forms & Tethered Document Manager V69"
+                    .to_string(),
             target_subsystem: "LightCraft Form & Release Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -500,13 +538,18 @@ impl LightcraftPdfAArchivalXmpComplianceV69Engine {
     }
 
     pub fn validate_xmp_archival_header(&self, header_bytes: &[u8]) -> bool {
-        header_bytes.windows(5).any(|w| w == b"pdfaExtension" || w == b"pdfaProperty" || w == b"xmpmeta") || header_bytes.len() >= 10
+        header_bytes
+            .windows(5)
+            .any(|w| w == b"pdfaExtension" || w == b"pdfaProperty" || w == b"xmpmeta")
+            || header_bytes.len() >= 10
     }
 
     pub fn generate_pr_manifest(&self) -> LightcraftV69PrProposalManifest {
         LightcraftV69PrProposalManifest {
             pr_id: 6909,
-            pr_title: "feat(lightcraft): ISO 19005 PDF/A-3b Archival & Deep XMP Compliance Engine V69".to_string(),
+            pr_title:
+                "feat(lightcraft): ISO 19005 PDF/A-3b Archival & Deep XMP Compliance Engine V69"
+                    .to_string(),
             target_subsystem: "LightCraft Archival & Standards Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -562,7 +605,9 @@ impl Lightcraft3dSpatialLumaChromaMeshViewerV69Engine {
     pub fn generate_pr_manifest(&self) -> LightcraftV69PrProposalManifest {
         LightcraftV69PrProposalManifest {
             pr_id: 6910,
-            pr_title: "feat(lightcraft): 3D Spatial Luma/Chroma Surface Mesh & Point Cloud Inspector V69".to_string(),
+            pr_title:
+                "feat(lightcraft): 3D Spatial Luma/Chroma Surface Mesh & Point Cloud Inspector V69"
+                    .to_string(),
             target_subsystem: "LightCraft Spatial 3D Inspection Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -646,12 +691,15 @@ impl SovereignLightcraftArtcraftMissingComponentsV69PrGateway {
         }
 
         let mut rgb_buffer = vec![255u8; 12];
-        self.redaction_engine.redact_region(&mut rgb_buffer, 2, 2, 0, 0, 1, 1);
+        self.redaction_engine
+            .redact_region(&mut rgb_buffer, 2, 2, 0, 0, 1, 1);
         if rgb_buffer[0] != 0 || rgb_buffer[1] != 0 || rgb_buffer[2] != 0 {
             return false;
         }
 
-        let (sw, sh, slots) = self.imposition_engine.calculate_imposition_layout(210.0, 297.0);
+        let (sw, sh, slots) = self
+            .imposition_engine
+            .calculate_imposition_layout(210.0, 297.0);
         if sw <= 0.0 || sh <= 0.0 || slots != 4 {
             return false;
         }
@@ -661,12 +709,17 @@ impl SovereignLightcraftArtcraftMissingComponentsV69PrGateway {
             return false;
         }
 
-        if !self.pdfa_engine.validate_xmp_archival_header(b"xmpmeta_header_test") {
+        if !self
+            .pdfa_engine
+            .validate_xmp_archival_header(b"xmpmeta_header_test")
+        {
             return false;
         }
 
         let rgb_data = vec![200, 150, 100, 100, 100, 100];
-        let vertices = self.spatial_3d_engine.generate_spatial_color_mesh(&rgb_data);
+        let vertices = self
+            .spatial_3d_engine
+            .generate_spatial_color_mesh(&rgb_data);
         if vertices.len() != 2 {
             return false;
         }
@@ -815,7 +868,10 @@ mod tests {
     fn test_interactive_acroforms_tethering() {
         let mut engine = LightcraftInteractiveAcroFormsTetheringV69Engine::new();
         engine.set_field_value("StudioLocation", "Berlin");
-        assert_eq!(engine.get_field_value("StudioLocation"), Some(&"Berlin".to_string()));
+        assert_eq!(
+            engine.get_field_value("StudioLocation"),
+            Some(&"Berlin".to_string())
+        );
         let manifest = engine.generate_pr_manifest();
         assert_eq!(manifest.pr_id, 6908);
     }

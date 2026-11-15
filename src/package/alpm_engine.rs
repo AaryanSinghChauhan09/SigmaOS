@@ -141,9 +141,7 @@ impl SovereignAlpmEngine {
     /// Look up a package by name across all sync repositories.
     /// Mirrors libalpm's `alpm_db_get_pkg` sync search; first repo wins.
     fn find_in_sync(&self, name: &str) -> Option<&AlpmPackage> {
-        self.sync_dbs
-            .values()
-            .find_map(|db| db.get(name))
+        self.sync_dbs.values().find_map(|db| db.get(name))
     }
 
     /// Check whether `name` conflicts with any already-installed package.
@@ -213,7 +211,8 @@ impl SovereignAlpmEngine {
             if !nodeps {
                 for dep in &candidate.depends {
                     // deps may use versioned specs like "foo>=1.2"; match on name prefix
-                    let dep_name = dep.split(|c| c == '>' || c == '<' || c == '=' || c == ' ')
+                    let dep_name = dep
+                        .split(|c| c == '>' || c == '<' || c == '=' || c == ' ')
                         .next()
                         .unwrap_or(dep);
                     visit(dep_name, root, engine, order, visiting, visited, nodeps)?;
@@ -408,10 +407,15 @@ mod tests {
         };
 
         // glibc and zlib live only in the sync repo; bash depends on both
-        alpm.add_sync_package("core", mkpkg("glibc", Vec::new())).unwrap();
-        alpm.add_sync_package("core", mkpkg("zlib", Vec::new())).unwrap();
+        alpm.add_sync_package("core", mkpkg("glibc", Vec::new()))
+            .unwrap();
+        alpm.add_sync_package("core", mkpkg("zlib", Vec::new()))
+            .unwrap();
 
-        let bash = mkpkg("bash", alloc::vec!["glibc".to_string(), "zlib>=1.2".to_string()]);
+        let bash = mkpkg(
+            "bash",
+            alloc::vec!["glibc".to_string(), "zlib>=1.2".to_string()],
+        );
         let flags = AlpmTransactionFlags {
             download_only: true,
             ..AlpmTransactionFlags::default()
@@ -421,7 +425,10 @@ mod tests {
         assert_eq!(alpm.installed_count(), 0);
 
         // real install pulls the whole closure
-        let bash2 = mkpkg("bash", alloc::vec!["glibc".to_string(), "zlib>=1.2".to_string()]);
+        let bash2 = mkpkg(
+            "bash",
+            alloc::vec!["glibc".to_string(), "zlib>=1.2".to_string()],
+        );
         assert!(alpm
             .install_package(bash2, AlpmTransactionFlags::default())
             .is_ok());

@@ -318,8 +318,7 @@ impl CraftlibsEulerianVolumetricFluidCombustionSimulationEngineV71 {
         temperature_grid: &mut [f32],
         dt: f32,
     ) -> Result<(), &'static str> {
-        let grid_size =
-            self.grid_dimensions[0] * self.grid_dimensions[1] * self.grid_dimensions[2];
+        let grid_size = self.grid_dimensions[0] * self.grid_dimensions[1] * self.grid_dimensions[2];
         if density_grid.len() != grid_size || temperature_grid.len() != grid_size {
             return Err("Grid sizes must match configured dimensions");
         }
@@ -394,8 +393,7 @@ impl CraftlibsAcousticWavePropagationSpatialAudioEngineV71 {
         let dz = listener_pos[2] - source_pos[2];
         let direct_dist = (dx * dx + dy * dy + dz * dz).sqrt();
         let speed_of_sound = 343.0f32;
-        let direct_delay_samples =
-            ((direct_dist / speed_of_sound) * 48000.0) as usize;
+        let direct_delay_samples = ((direct_dist / speed_of_sound) * 48000.0) as usize;
         let buffer_len = rir_buffer_out.len();
 
         for (i, sample) in rir_buffer_out.iter_mut().enumerate() {
@@ -483,9 +481,7 @@ impl CraftlibsGpuAcceleratedImagePyramidMorphologyEngineV71 {
             ),
             target_subsystem: String::from("CraftLibs / Image Morphology"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from(
-                "100% Parity with ArtCraft GPU Morphology V71",
-            ),
+            artcraft_feature_parity: String::from("100% Parity with ArtCraft GPU Morphology V71"),
             components_added: vec![
                 String::from("LaplacianPyramidDecomposer"),
                 String::from("BilateralEdgePreservingFilter"),

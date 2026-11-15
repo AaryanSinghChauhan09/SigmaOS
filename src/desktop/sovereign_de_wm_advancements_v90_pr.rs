@@ -37,7 +37,12 @@ pub struct Rect {
 
 impl Rect {
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
-        Self { x, y, width, height }
+        Self {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 }
 
@@ -99,7 +104,12 @@ impl GnomeAdvancementsV90Engine {
         if num_windows == 1 {
             let w = container.width.saturating_sub(gap * 2);
             let h = container.height.saturating_sub(gap * 2);
-            tiles.push(Rect::new(container.x + gap as i32, container.y + gap as i32, w, h));
+            tiles.push(Rect::new(
+                container.x + gap as i32,
+                container.y + gap as i32,
+                w,
+                h,
+            ));
             return tiles;
         }
 
@@ -107,12 +117,20 @@ impl GnomeAdvancementsV90Engine {
         let full_h = container.height.saturating_sub(gap * 2);
 
         // Master window on left
-        tiles.push(Rect::new(container.x + gap as i32, container.y + gap as i32, half_w, full_h));
+        tiles.push(Rect::new(
+            container.x + gap as i32,
+            container.y + gap as i32,
+            half_w,
+            full_h,
+        ));
 
         // Stacked windows on right
         let right_x = container.x + gap as i32 + half_w as i32 + gap as i32;
         let right_count = num_windows - 1;
-        let sub_h = (container.height.saturating_sub(gap * (right_count as u32 + 1))) / right_count as u32;
+        let sub_h = (container
+            .height
+            .saturating_sub(gap * (right_count as u32 + 1)))
+            / right_count as u32;
 
         for i in 0..right_count {
             let sub_y = container.y + gap as i32 + (i as u32 * (sub_h + gap)) as i32;
@@ -213,7 +231,12 @@ impl KdePlasmaAdvancementsV90Engine {
         }
     }
 
-    pub fn calculate_kwin_tile_grid(&self, width: u32, height: u32, window_count: usize) -> Vec<Rect> {
+    pub fn calculate_kwin_tile_grid(
+        &self,
+        width: u32,
+        height: u32,
+        window_count: usize,
+    ) -> Vec<Rect> {
         if window_count == 0 {
             return vec![];
         }
@@ -236,7 +259,12 @@ impl KdePlasmaAdvancementsV90Engine {
             } else {
                 slot_h
             };
-            grid.push(Rect::new(half_w as i32, (i * slot_h) as i32, width - half_w, h));
+            grid.push(Rect::new(
+                half_w as i32,
+                (i * slot_h) as i32,
+                width - half_w,
+                h,
+            ));
         }
         grid
     }
@@ -683,12 +711,22 @@ impl I3AdvancementsV90Engine {
         if self.split_direction == "horizontal" {
             let half = parent.width / 2;
             let left = Rect::new(parent.x, parent.y, half, parent.height);
-            let right = Rect::new(parent.x + half as i32, parent.y, parent.width - half, parent.height);
+            let right = Rect::new(
+                parent.x + half as i32,
+                parent.y,
+                parent.width - half,
+                parent.height,
+            );
             (left, right)
         } else {
             let half = parent.height / 2;
             let top = Rect::new(parent.x, parent.y, parent.width, half);
-            let bottom = Rect::new(parent.x, parent.y + half as i32, parent.width, parent.height - half);
+            let bottom = Rect::new(
+                parent.x,
+                parent.y + half as i32,
+                parent.width,
+                parent.height - half,
+            );
             (top, bottom)
         }
     }
@@ -1281,7 +1319,9 @@ mod tests {
         let mut lxde = LxdeAdvancementsV90Engine::new();
         lxde.apply_gtk_theme("Adwaita-Dark");
         assert_eq!(lxde.lxappearance_gtk_theme, "Adwaita-Dark");
-        assert!(lxde.generate_openbox_pipe_menu_xml().contains("Adwaita-Dark"));
+        assert!(lxde
+            .generate_openbox_pipe_menu_xml()
+            .contains("Adwaita-Dark"));
 
         let mut mate = MateAdvancementsV90Engine::new();
         let toggled = mate.toggle_csd_decorations();
@@ -1304,14 +1344,19 @@ mod tests {
         let mut moksha = EnlightenmentMokshaAdvancementsV90Engine::new();
         moksha.set_efl_scale(1.5);
         assert_eq!(moksha.efl_scale_factor, 1.5);
-        assert_eq!(moksha.compile_evas_theme("darkness"), "EvasCompiledTheme:darkness.edj");
+        assert_eq!(
+            moksha.compile_evas_theme("darkness"),
+            "EvasCompiledTheme:darkness.edj"
+        );
     }
 
     #[test]
     fn test_lxqt_and_awesome() {
         let mut lxqt = LxqtAdvancementsV90Engine::new();
         assert!(lxqt.toggle_qterminal_dropdown());
-        assert!(lxqt.generate_qterminal_color_scheme().contains("QTerminalColorScheme"));
+        assert!(lxqt
+            .generate_qterminal_color_scheme()
+            .contains("QTerminalColorScheme"));
 
         let mut awesome = AwesomeAdvancementsV90Engine::new();
         assert_eq!(awesome.send_naughty_notification("Test", "Msg"), 1);

@@ -22,14 +22,11 @@ fn test_integration_security_and_hardening_v89_proposals() {
         proposals[0].title,
         "Linux Access Control, Sandboxing & Mandatory Policy Parity (v89)"
     );
-    assert_eq!(
-        proposals[0].target_subsystem,
-        "Security / Linux Sandboxing"
-    );
+    assert_eq!(proposals[0].target_subsystem, "Security / Linux Sandboxing");
     assert_eq!(proposals[0].status, "Ready for Merge");
-    assert!(proposals[0].components_implemented.contains(
-        &String::from("SELinux v40 AVC Decision Engine & Multilevel Security Contexts")
-    ));
+    assert!(proposals[0].components_implemented.contains(&String::from(
+        "SELinux v40 AVC Decision Engine & Multilevel Security Contexts"
+    )));
 
     // PR #9047: BSD Hardening & Isolation
     assert_eq!(proposals[1].pr_id, 9047);
@@ -39,9 +36,9 @@ fn test_integration_security_and_hardening_v89_proposals() {
     );
     assert_eq!(proposals[1].target_subsystem, "Security / BSD Hardening");
     assert_eq!(proposals[1].status, "Ready for Merge");
-    assert!(proposals[1].components_implemented.contains(
-        &String::from("OpenBSD Pledge Promises Validator")
-    ));
+    assert!(proposals[1]
+        .components_implemented
+        .contains(&String::from("OpenBSD Pledge Promises Validator")));
 
     // PR #9048: Audit & Intrusion Prevention
     assert_eq!(proposals[2].pr_id, 9048);
@@ -54,9 +51,9 @@ fn test_integration_security_and_hardening_v89_proposals() {
         "Security / Audit & Intrusion Prevention"
     );
     assert_eq!(proposals[2].status, "Ready for Merge");
-    assert!(proposals[2].components_implemented.contains(
-        &String::from("Fail2ban Log Pattern IP Extractor & Exponential Ban Calculator")
-    ));
+    assert!(proposals[2].components_implemented.contains(&String::from(
+        "Fail2ban Log Pattern IP Extractor & Exponential Ban Calculator"
+    )));
 
     // PR #9049: Antivirus & Cryptographic Enclaves
     assert_eq!(proposals[3].pr_id, 9049);
@@ -69,9 +66,9 @@ fn test_integration_security_and_hardening_v89_proposals() {
         "Security / Crypto & Antivirus"
     );
     assert_eq!(proposals[3].status, "Ready for Merge");
-    assert!(proposals[3].components_implemented.contains(
-        &String::from("ClamAV CVD Signature Scanner")
-    ));
+    assert!(proposals[3]
+        .components_implemented
+        .contains(&String::from("ClamAV CVD Signature Scanner")));
 
     // PR #9050: Identity & Enterprise Auth
     assert_eq!(proposals[4].pr_id, 9050);
@@ -84,9 +81,9 @@ fn test_integration_security_and_hardening_v89_proposals() {
         "Security / Enterprise Identity"
     );
     assert_eq!(proposals[4].status, "Ready for Merge");
-    assert!(proposals[4].components_implemented.contains(
-        &String::from("Kerberos v5 TGT Ticket Validation & Realm Matcher")
-    ));
+    assert!(proposals[4].components_implemented.contains(&String::from(
+        "Kerberos v5 TGT Ticket Validation & Realm Matcher"
+    )));
 }
 
 #[test]
@@ -95,10 +92,7 @@ fn test_integration_linux_access_control_sub_engine() {
 
     // Context format & check
     let scontext = LinuxAccessControlAndSandboxingV89Engine::format_selinux_context(
-        "system_u",
-        "system_r",
-        "httpd_t",
-        "s0",
+        "system_u", "system_r", "httpd_t", "s0",
     );
     let tcontext = LinuxAccessControlAndSandboxingV89Engine::format_selinux_context(
         "system_u",
@@ -128,14 +122,18 @@ fn test_integration_linux_access_control_sub_engine() {
     assert!(!LinuxAccessControlAndSandboxingV89Engine::evaluate_namespace_isolation(0x02, 0x01));
 
     // Cgroups v2
-    assert!(LinuxAccessControlAndSandboxingV89Engine::is_cgroup_controller_enabled(
-        "cpu memory io pids rdma cpuset",
-        "pids"
-    ));
-    assert!(!LinuxAccessControlAndSandboxingV89Engine::is_cgroup_controller_enabled(
-        "cpu memory io",
-        "hugetlb"
-    ));
+    assert!(
+        LinuxAccessControlAndSandboxingV89Engine::is_cgroup_controller_enabled(
+            "cpu memory io pids rdma cpuset",
+            "pids"
+        )
+    );
+    assert!(
+        !LinuxAccessControlAndSandboxingV89Engine::is_cgroup_controller_enabled(
+            "cpu memory io",
+            "hugetlb"
+        )
+    );
 }
 
 #[test]
@@ -152,11 +150,7 @@ fn test_integration_bsd_hardening_sub_engine() {
         "cpath"
     ));
 
-    let unveil_rules = [
-        ("/etc/ssl", "r"),
-        ("/var/mail", "rw"),
-        ("/tmp", "rwc"),
-    ];
+    let unveil_rules = [("/etc/ssl", "r"), ("/var/mail", "rw"), ("/tmp", "rwc")];
     assert!(BsdHardeningAndIsolationV89Engine::check_unveil_access(
         &unveil_rules,
         "/etc/ssl/cert.pem",
@@ -173,19 +167,33 @@ fn test_integration_bsd_hardening_sub_engine() {
     assert!(!BsdHardeningAndIsolationV89Engine::evaluate_freebsd_jail_perm(false, 0, "raw_socket"));
     assert!(!BsdHardeningAndIsolationV89Engine::evaluate_freebsd_jail_perm(true, 1, "raw_socket"));
 
-    assert!(BsdHardeningAndIsolationV89Engine::check_capsicum_rights(0xFFFF, 0x00FF));
-    assert!(!BsdHardeningAndIsolationV89Engine::check_capsicum_rights(0x00FF, 0xFFFF));
+    assert!(BsdHardeningAndIsolationV89Engine::check_capsicum_rights(
+        0xFFFF, 0x00FF
+    ));
+    assert!(!BsdHardeningAndIsolationV89Engine::check_capsicum_rights(
+        0x00FF, 0xFFFF
+    ));
 
     // FreeBSD MAC Framework Biba
-    assert!(BsdHardeningAndIsolationV89Engine::evaluate_mac_biba_rule(3, 2, "read"));
-    assert!(!BsdHardeningAndIsolationV89Engine::evaluate_mac_biba_rule(1, 2, "read"));
-    assert!(BsdHardeningAndIsolationV89Engine::evaluate_mac_biba_rule(1, 2, "write"));
-    assert!(!BsdHardeningAndIsolationV89Engine::evaluate_mac_biba_rule(3, 2, "write"));
+    assert!(BsdHardeningAndIsolationV89Engine::evaluate_mac_biba_rule(
+        3, 2, "read"
+    ));
+    assert!(!BsdHardeningAndIsolationV89Engine::evaluate_mac_biba_rule(
+        1, 2, "read"
+    ));
+    assert!(BsdHardeningAndIsolationV89Engine::evaluate_mac_biba_rule(
+        1, 2, "write"
+    ));
+    assert!(!BsdHardeningAndIsolationV89Engine::evaluate_mac_biba_rule(
+        3, 2, "write"
+    ));
 
     // Securelevel
     assert!(BsdHardeningAndIsolationV89Engine::check_securelevel_allow_mod(0, "kldload"));
     assert!(!BsdHardeningAndIsolationV89Engine::check_securelevel_allow_mod(1, "kldload"));
-    assert!(!BsdHardeningAndIsolationV89Engine::check_securelevel_allow_mod(2, "time_set_backward"));
+    assert!(
+        !BsdHardeningAndIsolationV89Engine::check_securelevel_allow_mod(2, "time_set_backward")
+    );
     assert!(!BsdHardeningAndIsolationV89Engine::check_securelevel_allow_mod(3, "ipfw_flush"));
 
     let proposal = engine.generate_pr_proposal();
@@ -215,7 +223,9 @@ fn test_integration_audit_intrusion_sub_engine() {
         None
     );
 
-    let auth_fail_log = "May 12 14:32:00 server sshd[9921]: Failed pass" /* safe string */ .to_string() + "word for root from 198.51.100.23 port 41234 ssh2";
+    let auth_fail_log = "May 12 14:32:00 server sshd[9921]: Failed pass" /* safe string */
+        .to_string()
+        + "word for root from 198.51.100.23 port 41234 ssh2";
     assert_eq!(
         AuditAndIntrusionPreventionV89Engine::extract_fail2ban_failed_ip(&auth_fail_log),
         Some(String::from("198.51.100.23"))
@@ -270,7 +280,8 @@ fn test_integration_antivirus_crypto_identity_sub_engines() {
     assert!(!av_crypto.scan_clamav_signature(binary_stream, b"WORM_CONFICKER_V3"));
 
     // GnuPG Armor
-    let gpg_pubkey = "-----BEGIN PGP PUBLIC KEY BLOCK-----\nmQENBF+...=\n-----END PGP PUBLIC KEY BLOCK-----";
+    let gpg_pubkey =
+        "-----BEGIN PGP PUBLIC KEY BLOCK-----\nmQENBF+...=\n-----END PGP PUBLIC KEY BLOCK-----";
     assert!(av_crypto.parse_gnupg_ascii_armor(gpg_pubkey));
     assert!(!av_crypto.parse_gnupg_ascii_armor("PLAIN TEXT KEY DATA"));
 
@@ -296,8 +307,14 @@ fn test_integration_antivirus_crypto_identity_sub_engines() {
     let identity = IdentityAndEnterpriseAuthV89Engine::new();
     let dn_parts = identity.parse_ldap_dn("uid=alovelace, ou=engineering, dc=sigmaos, dc=internal");
     assert_eq!(dn_parts.len(), 4);
-    assert_eq!(dn_parts[0], (String::from("uid"), String::from("alovelace")));
-    assert_eq!(dn_parts[1], (String::from("ou"), String::from("engineering")));
+    assert_eq!(
+        dn_parts[0],
+        (String::from("uid"), String::from("alovelace"))
+    );
+    assert_eq!(
+        dn_parts[1],
+        (String::from("ou"), String::from("engineering"))
+    );
     assert_eq!(dn_parts[2], (String::from("dc"), String::from("sigmaos")));
     assert_eq!(dn_parts[3], (String::from("dc"), String::from("internal")));
 

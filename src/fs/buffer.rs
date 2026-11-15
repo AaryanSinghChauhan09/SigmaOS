@@ -53,7 +53,11 @@ impl BufferCache {
     }
 
     /// Read a block buffer from cache, or allocate a new buffer if missing.
-    pub fn get_block(&mut self, dev_id: u32, block_num: u64) -> Result<&mut BufferHead, BufferError> {
+    pub fn get_block(
+        &mut self,
+        dev_id: u32,
+        block_num: u64,
+    ) -> Result<&mut BufferHead, BufferError> {
         self.access_counter += 1;
         let counter = self.access_counter;
         let key = (dev_id, block_num);

@@ -1065,7 +1065,9 @@ mod tests {
         jack.connect_ports("system:capture_1", "SigmaJack:input_1");
         assert_eq!(jack.connected_port_pairs.len(), 1);
 
-        assert!(jack.push_sysex_msg(&[0xF0, 0x7E, 0x7F, 0x09, 0x01, 0xF7]).is_ok());
+        assert!(jack
+            .push_sysex_msg(&[0xF0, 0x7E, 0x7F, 0x09, 0x01, 0xF7])
+            .is_ok());
         assert!(jack.push_sysex_msg(&[0x00, 0x01]).is_err());
 
         assert!(jack.save_nsm_session("/tmp/nsm_jack"));

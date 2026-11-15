@@ -244,7 +244,10 @@ fn test_component_rule_files_exist_and_conform() {
         let candidates = [
             PathBuf::from(base_file),
             PathBuf::from(format!("../SigmaOS.wiki/Doc-component-rules-{}", fname)),
-            PathBuf::from(format!("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-component-rules-{}", fname)),
+            PathBuf::from(format!(
+                "/home/aaryansinghchauhan/SigmaOS.wiki/Doc-component-rules-{}",
+                fname
+            )),
         ];
         let path = candidates
             .iter()

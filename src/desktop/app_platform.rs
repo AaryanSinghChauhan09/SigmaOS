@@ -22,10 +22,29 @@ use std::path::PathBuf;
 /// XDG menu category for an application.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AppCategory {
-    WebBrowser, FileManager, TerminalEmulator, TextEditor, Office, Spreadsheet,
-    WordProcessor, Presentation, PdfViewer, ImageViewer, AudioVideo, Audio,
-    Video, Game, Development, System, Settings, Utility, Accessibility,
-    Network, Security, Science, Graphics,
+    WebBrowser,
+    FileManager,
+    TerminalEmulator,
+    TextEditor,
+    Office,
+    Spreadsheet,
+    WordProcessor,
+    Presentation,
+    PdfViewer,
+    ImageViewer,
+    AudioVideo,
+    Audio,
+    Video,
+    Game,
+    Development,
+    System,
+    Settings,
+    Utility,
+    Accessibility,
+    Network,
+    Security,
+    Science,
+    Graphics,
 }
 
 impl AppCategory {
@@ -82,12 +101,18 @@ impl DesktopEntry {
     pub fn render(&self) -> String {
         let mut s = String::from("[Desktop Entry]\nType=Application\n");
         s += &format!("Name={}\n", self.name);
-        if !self.generic_name.is_empty() { s += &format!("GenericName={}\n", self.generic_name); }
-        if !self.comment.is_empty() { s += &format!("Comment={}\n", self.comment); }
+        if !self.generic_name.is_empty() {
+            s += &format!("GenericName={}\n", self.generic_name);
+        }
+        if !self.comment.is_empty() {
+            s += &format!("Comment={}\n", self.comment);
+        }
         s += &format!("Exec={}\n", self.exec);
         s += &format!("Icon={}\n", self.icon);
         s += &format!("Terminal={}\n", self.terminal);
-        if self.startup_notify { s += "StartupNotify=true\n"; }
+        if self.startup_notify {
+            s += "StartupNotify=true\n";
+        }
         if !self.categories.is_empty() {
             let cats: Vec<&str> = self.categories.iter().map(|c| c.xdg_name()).collect();
             s += &format!("Categories={};\n", cats.join(";"));
@@ -127,17 +152,33 @@ pub struct AppPermissions {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NetworkPermission { Full, LocalOnly, None }
+pub enum NetworkPermission {
+    Full,
+    LocalOnly,
+    None,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FilesystemPermission { Full, HomeOnly, DocumentsOnly, None }
+pub enum FilesystemPermission {
+    Full,
+    HomeOnly,
+    DocumentsOnly,
+    None,
+}
 
 impl AppPermissions {
     pub fn trusted() -> Self {
         Self {
-            notifications: true, clipboard_read: true, clipboard_write: true,
-            camera: false, microphone: false, location: false, bluetooth: false,
-            printing: true, background: true, autostart: true,
+            notifications: true,
+            clipboard_read: true,
+            clipboard_write: true,
+            camera: false,
+            microphone: false,
+            location: false,
+            bluetooth: false,
+            printing: true,
+            background: true,
+            autostart: true,
             network: NetworkPermission::Full,
             filesystem: FilesystemPermission::HomeOnly,
         }
@@ -145,16 +186,25 @@ impl AppPermissions {
 
     pub fn sandboxed() -> Self {
         Self {
-            notifications: true, clipboard_read: false, clipboard_write: false,
-            camera: false, microphone: false, location: false, bluetooth: false,
-            printing: false, background: false, autostart: false,
+            notifications: true,
+            clipboard_read: false,
+            clipboard_write: false,
+            camera: false,
+            microphone: false,
+            location: false,
+            bluetooth: false,
+            printing: false,
+            background: false,
+            autostart: false,
             network: NetworkPermission::None,
             filesystem: FilesystemPermission::None,
         }
     }
 
     pub fn has_dangerous_permissions(&self) -> bool {
-        self.camera || self.microphone || self.location
+        self.camera
+            || self.microphone
+            || self.location
             || self.network == NetworkPermission::Full
             || self.filesystem == FilesystemPermission::Full
     }
@@ -175,7 +225,9 @@ pub struct ResourceLimits {
 impl ResourceLimits {
     pub fn unlimited() -> Self {
         Self {
-            max_memory_mb: None, max_cpu_percent: None, max_fds: None,
+            max_memory_mb: None,
+            max_cpu_percent: None,
+            max_fds: None,
             network_access: NetworkPermission::Full,
             fs_access: FilesystemPermission::HomeOnly,
         }
@@ -183,7 +235,9 @@ impl ResourceLimits {
 
     pub fn sandboxed() -> Self {
         Self {
-            max_memory_mb: Some(512), max_cpu_percent: Some(80), max_fds: Some(256),
+            max_memory_mb: Some(512),
+            max_cpu_percent: Some(80),
+            max_fds: Some(256),
             network_access: NetworkPermission::None,
             fs_access: FilesystemPermission::None,
         }
@@ -214,7 +268,12 @@ pub struct RegisteredApp {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AppTrustLevel { System, Official, Community, Unknown }
+pub enum AppTrustLevel {
+    System,
+    Official,
+    Community,
+    Unknown,
+}
 
 // ─── File Association Manager ────────────────────────────────────────────────
 
@@ -227,29 +286,42 @@ pub struct FileAssociationManager {
 
 impl FileAssociationManager {
     pub fn new() -> Self {
-        Self { defaults: HashMap::new(), added: HashMap::new() }
+        Self {
+            defaults: HashMap::new(),
+            added: HashMap::new(),
+        }
     }
 
     /// Set the default app for a MIME type.
     pub fn set_default(&mut self, mime: &str, desktop_file: &str) {
-        self.defaults.insert(mime.to_string(), desktop_file.to_string());
-        self.added.entry(mime.to_string()).or_default().push(desktop_file.to_string());
+        self.defaults
+            .insert(mime.to_string(), desktop_file.to_string());
+        self.added
+            .entry(mime.to_string())
+            .or_default()
+            .push(desktop_file.to_string());
     }
 
     pub fn get_default(&self, mime: &str) -> Option<&str> {
         self.defaults.get(mime).map(|s| s.as_str())
     }
 
-    pub fn remove(&mut self, mime: &str) { self.defaults.remove(mime); }
+    pub fn remove(&mut self, mime: &str) {
+        self.defaults.remove(mime);
+    }
 
-    pub fn len(&self) -> usize { self.defaults.len() }
+    pub fn len(&self) -> usize {
+        self.defaults.len()
+    }
 
     /// Generate ~/.config/mimeapps.list content.
     pub fn render_mimeapps_list(&self) -> String {
         let mut s = String::from("[Default Applications]\n");
         let mut entries: Vec<_> = self.defaults.iter().collect();
         entries.sort_by_key(|(k, _)| k.as_str());
-        for (mime, file) in &entries { s += &format!("{mime}={file}\n"); }
+        for (mime, file) in &entries {
+            s += &format!("{mime}={file}\n");
+        }
         s += "\n[Added Associations]\n";
         for (mime, files) in &self.added {
             s += &format!("{mime}={}\n", files.join(";"));
@@ -260,35 +332,50 @@ impl FileAssociationManager {
     /// Load the V1 default associations.
     pub fn load_v1_defaults(&mut self) {
         let defs = [
-            ("text/html",                 "sigma-browser.desktop"),
-            ("x-scheme-handler/http",     "sigma-browser.desktop"),
-            ("x-scheme-handler/https",    "sigma-browser.desktop"),
-            ("application/pdf",           "sigma-pdfview.desktop"),
-            ("inode/directory",           "sigma-files.desktop"),
-            ("text/plain",               "sigma-text.desktop"),
-            ("image/jpeg",               "sigma-pix.desktop"),
-            ("image/png",                "sigma-pix.desktop"),
-            ("image/webp",               "sigma-pix.desktop"),
-            ("image/gif",                "sigma-pix.desktop"),
-            ("audio/mpeg",               "sigma-music.desktop"),
-            ("audio/flac",               "sigma-music.desktop"),
-            ("audio/ogg",                "sigma-music.desktop"),
-            ("video/mp4",                "sigma-player.desktop"),
-            ("video/x-matroska",         "sigma-player.desktop"),
-            ("video/webm",               "sigma-player.desktop"),
-            ("application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-             "libreoffice-writer.desktop"),
-            ("application/vnd.oasis.opendocument.text", "libreoffice-writer.desktop"),
+            ("text/html", "sigma-browser.desktop"),
+            ("x-scheme-handler/http", "sigma-browser.desktop"),
+            ("x-scheme-handler/https", "sigma-browser.desktop"),
+            ("application/pdf", "sigma-pdfview.desktop"),
+            ("inode/directory", "sigma-files.desktop"),
+            ("text/plain", "sigma-text.desktop"),
+            ("image/jpeg", "sigma-pix.desktop"),
+            ("image/png", "sigma-pix.desktop"),
+            ("image/webp", "sigma-pix.desktop"),
+            ("image/gif", "sigma-pix.desktop"),
+            ("audio/mpeg", "sigma-music.desktop"),
+            ("audio/flac", "sigma-music.desktop"),
+            ("audio/ogg", "sigma-music.desktop"),
+            ("video/mp4", "sigma-player.desktop"),
+            ("video/x-matroska", "sigma-player.desktop"),
+            ("video/webm", "sigma-player.desktop"),
+            (
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "libreoffice-writer.desktop",
+            ),
+            (
+                "application/vnd.oasis.opendocument.text",
+                "libreoffice-writer.desktop",
+            ),
             ("application/vnd.ms-excel", "libreoffice-calc.desktop"),
-            ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-             "libreoffice-calc.desktop"),
-            ("application/vnd.ms-powerpoint", "libreoffice-impress.desktop"),
-            ("application/vnd.debian.binary-package", "sigma-packages.desktop"),
-            ("text/x-python",            "sigma-text.desktop"),
-            ("text/x-rust",              "sigma-text.desktop"),
-            ("text/x-shellscript",       "sigma-text.desktop"),
+            (
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "libreoffice-calc.desktop",
+            ),
+            (
+                "application/vnd.ms-powerpoint",
+                "libreoffice-impress.desktop",
+            ),
+            (
+                "application/vnd.debian.binary-package",
+                "sigma-packages.desktop",
+            ),
+            ("text/x-python", "sigma-text.desktop"),
+            ("text/x-rust", "sigma-text.desktop"),
+            ("text/x-shellscript", "sigma-text.desktop"),
         ];
-        for (mime, file) in &defs { self.set_default(mime, file); }
+        for (mime, file) in &defs {
+            self.set_default(mime, file);
+        }
     }
 }
 
@@ -300,36 +387,52 @@ pub struct AppRegistry {
 }
 
 impl AppRegistry {
-    pub fn new() -> Self { Self { apps: HashMap::new() } }
+    pub fn new() -> Self {
+        Self {
+            apps: HashMap::new(),
+        }
+    }
 
     pub fn register(&mut self, app: RegisteredApp) {
         self.apps.insert(app.app_id.clone(), app);
     }
 
-    pub fn get(&self, id: &str) -> Option<&RegisteredApp> { self.apps.get(id) }
-    pub fn len(&self) -> usize { self.apps.len() }
-    pub fn is_empty(&self) -> bool { self.apps.is_empty() }
+    pub fn get(&self, id: &str) -> Option<&RegisteredApp> {
+        self.apps.get(id)
+    }
+    pub fn len(&self) -> usize {
+        self.apps.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.apps.is_empty()
+    }
 
     pub fn installed_apps(&self) -> Vec<&RegisteredApp> {
         self.apps.values().filter(|a| a.installed).collect()
     }
 
     pub fn by_category(&self, cat: AppCategory) -> Vec<&RegisteredApp> {
-        self.apps.values()
+        self.apps
+            .values()
             .filter(|a| a.installed && a.entry.categories.contains(&cat))
             .collect()
     }
 
     pub fn default_for_mime<'a>(
-        &'a self, mime: &str, assoc: &FileAssociationManager,
+        &'a self,
+        mime: &str,
+        assoc: &FileAssociationManager,
     ) -> Option<&'a RegisteredApp> {
         let desktop_file = assoc.get_default(mime)?;
-        self.apps.values().find(|a| a.installed && a.entry.desktop_file_name == desktop_file)
+        self.apps
+            .values()
+            .find(|a| a.installed && a.entry.desktop_file_name == desktop_file)
     }
 
     /// Render all .desktop files as a map of path → content.
     pub fn render_desktop_files(&self) -> HashMap<PathBuf, String> {
-        self.apps.values()
+        self.apps
+            .values()
             .filter(|a| a.installed)
             .map(|a| (a.entry.install_path(), a.entry.render()))
             .collect()
@@ -349,13 +452,17 @@ impl DesktopPlatform {
     pub fn new() -> Self {
         let mut mime = FileAssociationManager::new();
         mime.load_v1_defaults();
-        Self { registry: AppRegistry::new(), mime }
+        Self {
+            registry: AppRegistry::new(),
+            mime,
+        }
     }
 
     /// Register an app and auto-wire its MIME types.
     pub fn install_app(&mut self, app: RegisteredApp) {
         for m in &app.entry.mime_types.clone() {
-            self.mime.set_default(m, &app.entry.desktop_file_name.clone());
+            self.mime
+                .set_default(m, &app.entry.desktop_file_name.clone());
         }
         self.registry.register(app);
     }
@@ -431,8 +538,14 @@ mod tests {
         mgr.load_v1_defaults();
         assert!(mgr.len() >= 24);
         assert_eq!(mgr.get_default("text/html"), Some("sigma-browser.desktop"));
-        assert_eq!(mgr.get_default("application/pdf"), Some("sigma-pdfview.desktop"));
-        assert_eq!(mgr.get_default("inode/directory"), Some("sigma-files.desktop"));
+        assert_eq!(
+            mgr.get_default("application/pdf"),
+            Some("sigma-pdfview.desktop")
+        );
+        assert_eq!(
+            mgr.get_default("inode/directory"),
+            Some("sigma-files.desktop")
+        );
     }
 
     #[test]

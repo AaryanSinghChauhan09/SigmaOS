@@ -16,7 +16,11 @@ fn test_fontcraft_v80_master_suite_integration() {
     );
 
     let manifests = master_suite.collect_all_pr_manifests();
-    assert_eq!(manifests.len(), 5, "Expected 5 PR manifests in FontCraft V80 suite");
+    assert_eq!(
+        manifests.len(),
+        5,
+        "Expected 5 PR manifests in FontCraft V80 suite"
+    );
 
     let pr_titles = [
         "feat(fontcraft): OpenType GSUB/GPOS Complex Script Text Shaping & Bidi Engine V80",

@@ -83,7 +83,10 @@ impl DesigncraftAiGenerativeComponentVariantSynthesizerV68PrEngine {
         self.variants.push(ComponentVariantSpec {
             variant_id: 3,
             state_name: "Disabled".to_string(),
-            style_modifications: format!("{}: opacity: 0.4, cursor: not-allowed", base_component_name),
+            style_modifications: format!(
+                "{}: opacity: 0.4, cursor: not-allowed",
+                base_component_name
+            ),
         });
         self.variants.len()
     }
@@ -91,7 +94,8 @@ impl DesigncraftAiGenerativeComponentVariantSynthesizerV68PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV68PrProposalManifest {
         DesigncraftV68PrProposalManifest {
             pr_id: 6811,
-            pr_title: "feat(designcraft): Add AI Generative Component Variant Synthesizer Engine".to_string(),
+            pr_title: "feat(designcraft): Add AI Generative Component Variant Synthesizer Engine"
+                .to_string(),
             target_subsystem: "DesignCraft AI Component Variant Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Generative Design Studio".to_string(),
             components_added: vec![
@@ -138,7 +142,14 @@ impl DesigncraftCrdtMultiUserCursorPositionPresenceV68PrEngine {
         }
     }
 
-    pub fn update_user_cursor(&mut self, user_id: u32, name: &str, x: f32, y: f32, sel: Option<u32>) {
+    pub fn update_user_cursor(
+        &mut self,
+        user_id: u32,
+        name: &str,
+        x: f32,
+        y: f32,
+        sel: Option<u32>,
+    ) {
         self.active_users.insert(
             user_id,
             UserPresenceCursor {
@@ -158,7 +169,9 @@ impl DesigncraftCrdtMultiUserCursorPositionPresenceV68PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV68PrProposalManifest {
         DesigncraftV68PrProposalManifest {
             pr_id: 6812,
-            pr_title: "feat(designcraft): Add Real-Time CRDT Multi-User Cursor Position & Presence Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add Real-Time CRDT Multi-User Cursor Position & Presence Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft CRDT Presence Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Multiplayer Collaboration Studio".to_string(),
             components_added: vec![
@@ -202,7 +215,10 @@ impl DesigncraftSubpixelVectorPathOffsetOutlineV68PrEngine {
         }
     }
 
-    pub fn compute_expanded_bounding_box(&self, path: &[PathPoint2D]) -> Option<(PathPoint2D, PathPoint2D)> {
+    pub fn compute_expanded_bounding_box(
+        &self,
+        path: &[PathPoint2D],
+    ) -> Option<(PathPoint2D, PathPoint2D)> {
         if path.is_empty() {
             return None;
         }
@@ -212,23 +228,38 @@ impl DesigncraftSubpixelVectorPathOffsetOutlineV68PrEngine {
         let mut max_y = f32::MIN;
 
         for p in path {
-            if p.x < min_x { min_x = p.x; }
-            if p.x > max_x { max_x = p.x; }
-            if p.y < min_y { min_y = p.y; }
-            if p.y > max_y { max_y = p.y; }
+            if p.x < min_x {
+                min_x = p.x;
+            }
+            if p.x > max_x {
+                max_x = p.x;
+            }
+            if p.y < min_y {
+                min_y = p.y;
+            }
+            if p.y > max_y {
+                max_y = p.y;
+            }
         }
 
         let off = self.offset_distance_px;
         Some((
-            PathPoint2D { x: min_x - off, y: min_y - off },
-            PathPoint2D { x: max_x + off, y: max_y + off },
+            PathPoint2D {
+                x: min_x - off,
+                y: min_y - off,
+            },
+            PathPoint2D {
+                x: max_x + off,
+                y: max_y + off,
+            },
         ))
     }
 
     pub fn generate_pr_manifest(&self) -> DesigncraftV68PrProposalManifest {
         DesigncraftV68PrProposalManifest {
             pr_id: 6813,
-            pr_title: "feat(designcraft): Add Subpixel Vector Path Offset & Contour Outline Engine".to_string(),
+            pr_title: "feat(designcraft): Add Subpixel Vector Path Offset & Contour Outline Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Vector Path Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Vector Geometry Studio".to_string(),
             components_added: vec![
@@ -255,9 +286,9 @@ impl Default for DesigncraftSubpixelVectorPathOffsetOutlineV68PrEngine {
 /// Variable font axis configuration.
 #[derive(Debug, Clone)]
 pub struct VariableFontAxisConfig {
-    pub weight_wght: f32,   // 100.0 .. 900.0
-    pub width_wdth: f32,    // 50.0 .. 200.0
-    pub optical_opsz: f32,  // 6.0 .. 72.0 pt
+    pub weight_wght: f32,  // 100.0 .. 900.0
+    pub width_wdth: f32,   // 50.0 .. 200.0
+    pub optical_opsz: f32, // 6.0 .. 72.0 pt
 }
 
 /// Variable Font Glyph Axis Optimizer & Optical Sizing PR Engine.
@@ -288,7 +319,9 @@ impl DesigncraftVariableFontGlyphOpticalSizingV68PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV68PrProposalManifest {
         DesigncraftV68PrProposalManifest {
             pr_id: 6814,
-            pr_title: "feat(designcraft): Add Variable Font Glyph Axis Optimizer & Optical Sizing Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add Variable Font Glyph Axis Optimizer & Optical Sizing Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Variable Font Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Typography Engine".to_string(),
             components_added: vec![
@@ -347,7 +380,12 @@ impl DesigncraftWcagContrastColorBlindnessSimulatorV68PrEngine {
         (max_l + 0.05) / (min_l + 0.05)
     }
 
-    pub fn passes_wcag_aaa(&self, fg_rgb: (u8, u8, u8), bg_rgb: (u8, u8, u8), is_large_text: bool) -> bool {
+    pub fn passes_wcag_aaa(
+        &self,
+        fg_rgb: (u8, u8, u8),
+        bg_rgb: (u8, u8, u8),
+        is_large_text: bool,
+    ) -> bool {
         let ratio = self.calculate_contrast_ratio(fg_rgb, bg_rgb);
         if is_large_text {
             ratio >= 4.5
@@ -359,7 +397,9 @@ impl DesigncraftWcagContrastColorBlindnessSimulatorV68PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV68PrProposalManifest {
         DesigncraftV68PrProposalManifest {
             pr_id: 6815,
-            pr_title: "feat(designcraft): Add WCAG AAA Contrast Audit & Color Blindness Simulator Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add WCAG AAA Contrast Audit & Color Blindness Simulator Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Accessibility Audit Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Accessibility Studio".to_string(),
             components_added: vec![
@@ -400,7 +440,9 @@ pub struct DesigncraftMultiDeviceResponsiveFramePresetsV68PrEngine {
 
 impl DesigncraftMultiDeviceResponsiveFramePresetsV68PrEngine {
     pub fn new() -> Self {
-        let mut engine = Self { presets: Vec::new() };
+        let mut engine = Self {
+            presets: Vec::new(),
+        };
         engine.load_standard_presets();
         engine
     }
@@ -555,7 +597,9 @@ impl DesigncraftInteractivePrototypeStateTransitionPhysicsV68PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV68PrProposalManifest {
         DesigncraftV68PrProposalManifest {
             pr_id: 6818,
-            pr_title: "feat(designcraft): Add Interactive Prototype State Transition Physics Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add Interactive Prototype State Transition Physics Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Prototype Physics Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Interactive Prototyping Studio".to_string(),
             components_added: vec![
@@ -714,7 +758,8 @@ pub struct SovereignDesigncraftArtcraftMissingComponentsV68PrGateway {
     pub wcag_contrast_simulator: DesigncraftWcagContrastColorBlindnessSimulatorV68PrEngine,
     pub multi_device_frame_presets: DesigncraftMultiDeviceResponsiveFramePresetsV68PrEngine,
     pub style_dictionary_compiler: DesigncraftDesignTokensStyleDictionaryCompilerV68PrEngine,
-    pub prototype_transition_physics: DesigncraftInteractivePrototypeStateTransitionPhysicsV68PrEngine,
+    pub prototype_transition_physics:
+        DesigncraftInteractivePrototypeStateTransitionPhysicsV68PrEngine,
     pub smart_guides_grid_snap: DesigncraftVectorGridSnapSmartGuidesEngineV68PrEngine,
     pub spatial_3d_canvas_projection: DesigncraftSpatial3dCanvasPerspectiveProjectionV68PrEngine,
 }
@@ -722,16 +767,23 @@ pub struct SovereignDesigncraftArtcraftMissingComponentsV68PrGateway {
 impl SovereignDesigncraftArtcraftMissingComponentsV68PrGateway {
     pub fn new() -> Self {
         Self {
-            ai_variant_synthesizer: DesigncraftAiGenerativeComponentVariantSynthesizerV68PrEngine::new(),
+            ai_variant_synthesizer:
+                DesigncraftAiGenerativeComponentVariantSynthesizerV68PrEngine::new(),
             crdt_presence: DesigncraftCrdtMultiUserCursorPositionPresenceV68PrEngine::new(),
             path_offset_outline: DesigncraftSubpixelVectorPathOffsetOutlineV68PrEngine::new(2.0),
-            variable_font_optical_sizing: DesigncraftVariableFontGlyphOpticalSizingV68PrEngine::new(),
-            wcag_contrast_simulator: DesigncraftWcagContrastColorBlindnessSimulatorV68PrEngine::new(),
-            multi_device_frame_presets: DesigncraftMultiDeviceResponsiveFramePresetsV68PrEngine::new(),
-            style_dictionary_compiler: DesigncraftDesignTokensStyleDictionaryCompilerV68PrEngine::new(),
-            prototype_transition_physics: DesigncraftInteractivePrototypeStateTransitionPhysicsV68PrEngine::new(),
+            variable_font_optical_sizing: DesigncraftVariableFontGlyphOpticalSizingV68PrEngine::new(
+            ),
+            wcag_contrast_simulator: DesigncraftWcagContrastColorBlindnessSimulatorV68PrEngine::new(
+            ),
+            multi_device_frame_presets:
+                DesigncraftMultiDeviceResponsiveFramePresetsV68PrEngine::new(),
+            style_dictionary_compiler:
+                DesigncraftDesignTokensStyleDictionaryCompilerV68PrEngine::new(),
+            prototype_transition_physics:
+                DesigncraftInteractivePrototypeStateTransitionPhysicsV68PrEngine::new(),
             smart_guides_grid_snap: DesigncraftVectorGridSnapSmartGuidesEngineV68PrEngine::new(5.0),
-            spatial_3d_canvas_projection: DesigncraftSpatial3dCanvasPerspectiveProjectionV68PrEngine::new(),
+            spatial_3d_canvas_projection:
+                DesigncraftSpatial3dCanvasPerspectiveProjectionV68PrEngine::new(),
         }
     }
 

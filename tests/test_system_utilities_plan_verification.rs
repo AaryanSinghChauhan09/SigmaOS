@@ -19,7 +19,8 @@ use system_utilities::{
 fn test_system_utilities_documentation_plan_verification() {
     let docs_path = "/home/aaryansinghchauhan/SigmaOS.wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md";
     let wiki_path_1 = "/home/aaryansinghchauhan/SigmaOS.wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md";
-    let wiki_path_2 = "/home/aaryansinghchauhan/SigmaOS.wiki/26-System-Utilities-Development-Plan.md";
+    let wiki_path_2 =
+        "/home/aaryansinghchauhan/SigmaOS.wiki/26-System-Utilities-Development-Plan.md";
 
     assert!(
         Path::new(docs_path).exists(),
@@ -68,7 +69,9 @@ fn test_system_utilities_documentation_plan_verification() {
             pr_marker
         );
     }
-    assert!(docs_content.contains("`docs(utils): audit current tools and define compatibility policy`"));
+    assert!(
+        docs_content.contains("`docs(utils): audit current tools and define compatibility policy`")
+    );
     assert!(docs_content.contains("`feat(utils): implement minimal file and directory utilities`"));
     assert!(docs_content.contains("`release(utils): publish utility support matrix`"));
 
@@ -116,8 +119,8 @@ fn test_system_utilities_documentation_plan_verification() {
 
 #[test]
 fn test_feature_status_toml_system_utilities_registration() {
-    let toml_content = fs::read_to_string("FEATURE_STATUS.toml")
-        .expect("FEATURE_STATUS.toml must exist");
+    let toml_content =
+        fs::read_to_string("FEATURE_STATUS.toml").expect("FEATURE_STATUS.toml must exist");
 
     assert!(toml_content.contains("[userspace.system_utilities]"));
     assert!(toml_content.contains("SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md"));
@@ -249,5 +252,8 @@ fn test_system_utilities_registry_and_parser_contract_verification() {
         result: PeriodicTaskResult::ExecutionFailure,
         summary: "Execution timed out after 30s".to_string(),
     };
-    assert_eq!(exec_fail_record.result, PeriodicTaskResult::ExecutionFailure);
+    assert_eq!(
+        exec_fail_record.result,
+        PeriodicTaskResult::ExecutionFailure
+    );
 }

@@ -16,7 +16,11 @@ fn test_anicraft_v75_master_suite_integration() {
     );
 
     let manifests = master_suite.collect_all_pr_manifests();
-    assert_eq!(manifests.len(), 5, "Expected 5 PR manifests in AniCraft V75 suite");
+    assert_eq!(
+        manifests.len(),
+        5,
+        "Expected 5 PR manifests in AniCraft V75 suite"
+    );
 
     let pr_titles = [
         "feat(anicraft): Implement Subpixel Vector Contour Scanline Rasterizer & Anti-Aliased Edge Engine V75",

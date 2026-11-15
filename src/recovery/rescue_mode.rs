@@ -28,13 +28,13 @@ impl RescueReason {
     /// Human-readable description of the failure reason.
     pub fn description(&self) -> &'static str {
         match self {
-            Self::FailedUpdate       => "A system update failed or left packages in a broken state",
+            Self::FailedUpdate => "A system update failed or left packages in a broken state",
             Self::CorruptedFilesystem => "Filesystem corruption detected at boot",
-            Self::MissingKernel      => "Kernel image not found in /boot",
-            Self::BrokenGrub         => "GRUB bootloader configuration is invalid",
-            Self::ManualRequest      => "Rescue mode requested manually",
-            Self::FailedMigration    => "System migration or upgrade script failed",
-            Self::Unknown            => "Boot failure reason could not be determined",
+            Self::MissingKernel => "Kernel image not found in /boot",
+            Self::BrokenGrub => "GRUB bootloader configuration is invalid",
+            Self::ManualRequest => "Rescue mode requested manually",
+            Self::FailedMigration => "System migration or upgrade script failed",
+            Self::Unknown => "Boot failure reason could not be determined",
         }
     }
 }
@@ -92,13 +92,13 @@ impl RescueAction {
     /// Priority order for auto-repair (lower is higher priority).
     pub fn priority(&self) -> u8 {
         match self {
-            Self::RollbackUpdate        => 1,
-            Self::RestoreLastSnapshot   => 2,
-            Self::RepairFilesystem      => 3,
-            Self::ReinstallBootloader   => 4,
+            Self::RollbackUpdate => 1,
+            Self::RestoreLastSnapshot => 2,
+            Self::RepairFilesystem => 3,
+            Self::ReinstallBootloader => 4,
             Self::RestoreSpecificSnapshot(_) => 5,
-            Self::LaunchEmergencyShell  => 9,
-            Self::RebootNormal          => 10,
+            Self::LaunchEmergencyShell => 9,
+            Self::RebootNormal => 10,
         }
     }
 }
@@ -139,7 +139,9 @@ pub struct RescueMode {
 impl RescueMode {
     /// Create a new rescue mode instance with the given context.
     pub fn new(reason: RescueReason) -> Self {
-        Self { context: RescueContext::new(reason) }
+        Self {
+            context: RescueContext::new(reason),
+        }
     }
 
     /// Create with full context.
@@ -230,7 +232,10 @@ impl RescueMode {
         let actions = self.list_available_actions();
         for action in actions {
             // Skip the interactive / reboot actions in auto mode
-            if matches!(action, RescueAction::LaunchEmergencyShell | RescueAction::RebootNormal) {
+            if matches!(
+                action,
+                RescueAction::LaunchEmergencyShell | RescueAction::RebootNormal
+            ) {
                 continue;
             }
             match self.execute_action(action) {
@@ -287,8 +292,12 @@ mod tests {
         // Act
         let actions = rescue.list_available_actions();
         // Assert — rollback should come before shell
-        let rollback_pos = actions.iter().position(|a| *a == RescueAction::RollbackUpdate);
-        let shell_pos = actions.iter().position(|a| *a == RescueAction::LaunchEmergencyShell);
+        let rollback_pos = actions
+            .iter()
+            .position(|a| *a == RescueAction::RollbackUpdate);
+        let shell_pos = actions
+            .iter()
+            .position(|a| *a == RescueAction::LaunchEmergencyShell);
         assert!(rollback_pos < shell_pos);
     }
 
@@ -307,9 +316,9 @@ mod tests {
         // Arrange
         let rescue = RescueMode::new(RescueReason::ManualRequest);
         // Act
-        let result = rescue.execute_action(
-            RescueAction::RestoreSpecificSnapshot("nonexistent".to_string()),
-        );
+        let result = rescue.execute_action(RescueAction::RestoreSpecificSnapshot(
+            "nonexistent".to_string(),
+        ));
         // Assert
         assert!(matches!(result, Err(RescueError::SnapshotNotFound(_))));
     }
@@ -326,9 +335,9 @@ mod tests {
         assert!(matches!(
             outcome,
             RescueOutcome::Repaired
-            | RescueOutcome::RestoredSnapshot
-            | RescueOutcome::RebootRequired
-            | RescueOutcome::RequiresManualIntervention
+                | RescueOutcome::RestoredSnapshot
+                | RescueOutcome::RebootRequired
+                | RescueOutcome::RequiresManualIntervention
         ));
     }
 }

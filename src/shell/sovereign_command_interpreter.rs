@@ -959,14 +959,30 @@ impl ShellMaintenanceCadence {
 
     pub fn task_name(&self) -> &'static str {
         match self {
-            ShellMaintenanceCadence::EveryPr => "ci(shell): run shell-specific checks for changed code",
-            ShellMaintenanceCadence::WeeklyFuzzReview => "test(shell): review fuzz crashes and parser regressions",
-            ShellMaintenanceCadence::WeeklyDocReconciliation => "docs(shell): reconcile feature status with implementation",
-            ShellMaintenanceCadence::MonthlySecurityBoundaries => "security(shell): review command execution and expansion boundaries",
-            ShellMaintenanceCadence::MonthlyScriptCompatibility => "test(shell): run script compatibility corpus",
-            ShellMaintenanceCadence::MonthlyCleanupAudit => "maint(shell): review terminal, signal, and child-process cleanup",
-            ShellMaintenanceCadence::QuarterlyPosixAlignment => "docs(shell): review POSIX and reference-shell alignment",
-            ShellMaintenanceCadence::ReleaseCandidateCertification => "release(shell): certify shell support claims",
+            ShellMaintenanceCadence::EveryPr => {
+                "ci(shell): run shell-specific checks for changed code"
+            }
+            ShellMaintenanceCadence::WeeklyFuzzReview => {
+                "test(shell): review fuzz crashes and parser regressions"
+            }
+            ShellMaintenanceCadence::WeeklyDocReconciliation => {
+                "docs(shell): reconcile feature status with implementation"
+            }
+            ShellMaintenanceCadence::MonthlySecurityBoundaries => {
+                "security(shell): review command execution and expansion boundaries"
+            }
+            ShellMaintenanceCadence::MonthlyScriptCompatibility => {
+                "test(shell): run script compatibility corpus"
+            }
+            ShellMaintenanceCadence::MonthlyCleanupAudit => {
+                "maint(shell): review terminal, signal, and child-process cleanup"
+            }
+            ShellMaintenanceCadence::QuarterlyPosixAlignment => {
+                "docs(shell): review POSIX and reference-shell alignment"
+            }
+            ShellMaintenanceCadence::ReleaseCandidateCertification => {
+                "release(shell): certify shell support claims"
+            }
             ShellMaintenanceCadence::PostIncidentFix => "fix(shell): prevent recurrence of <bug>",
         }
     }

@@ -90,7 +90,10 @@ impl GnuBsdCoreutilsAdvancedEngineV88 {
         };
 
         if enable_hyperlinks {
-            format!("\x1b]8;;file://{}\x1b\\{}\x1b]8;;\x1b\\", entry.path, base_str)
+            format!(
+                "\x1b]8;;file://{}\x1b\\{}\x1b]8;;\x1b\\",
+                entry.path, base_str
+            )
         } else {
             base_str
         }
@@ -233,15 +236,40 @@ impl BusyBoxAppletExtensionEngineV88 {
         let mut applets = BTreeMap::new();
         let default_list = [
             ("ash", "Shell", 46000, "Almquist Shell POSIX dialect (v88)"),
-            ("ip", "Networking", 33000, "iproute2 routing & link configuration"),
-            ("nc", "Networking", 12500, "Netcat socket listener & port scan"),
-            ("wget", "Networking", 23000, "HTTP/HTTPS file retrieve engine"),
+            (
+                "ip",
+                "Networking",
+                33000,
+                "iproute2 routing & link configuration",
+            ),
+            (
+                "nc",
+                "Networking",
+                12500,
+                "Netcat socket listener & port scan",
+            ),
+            (
+                "wget",
+                "Networking",
+                23000,
+                "HTTP/HTTPS file retrieve engine",
+            ),
             ("vi", "Editors", 39000, "Modal text editor with ex commands"),
-            ("hwclock", "System", 8200, "Hardware RTC clock query and set"),
+            (
+                "hwclock",
+                "System",
+                8200,
+                "Hardware RTC clock query and set",
+            ),
             ("syslogd", "Daemons", 15500, "Syslog daemon log collector"),
             ("klogd", "Daemons", 9200, "Kernel printk log interceptor"),
             ("sed", "Text", 18000, "Stream editor for filtering text"),
-            ("awk", "Text", 28000, "Pattern scanning and processing language"),
+            (
+                "awk",
+                "Text",
+                28000,
+                "Pattern scanning and processing language",
+            ),
         ];
 
         for (name, cat, sz, desc) in default_list {
@@ -278,7 +306,10 @@ impl BusyBoxAppletExtensionEngineV88 {
         } else {
             (
                 127,
-                format!("busybox: applet '{}' not found in multicall binary", applet_name),
+                format!(
+                    "busybox: applet '{}' not found in multicall binary",
+                    applet_name
+                ),
             )
         }
     }
@@ -311,10 +342,7 @@ impl UtilLinuxAdvancedEngineV88 {
     }
 
     /// `mount` namespace propagation and container chroot/pivot_root simulator
-    pub fn simulate_mount_namespace(
-        &self,
-        specs: &[NamespacePropagationSpecV88],
-    ) -> Vec<String> {
+    pub fn simulate_mount_namespace(&self, specs: &[NamespacePropagationSpecV88]) -> Vec<String> {
         let mut log = Vec::new();
         for s in specs {
             log.push(format!(
@@ -380,7 +408,10 @@ impl FindutilsDiffutilsAdvancedEngineV88 {
         vec![
             format!("{}/src/lib.rs", root),
             format!("{}/src/userland/mod.rs", root),
-            format!("{}/src/userland/sovereign_coreutils_and_userland_advancements_v88_pr.rs", root),
+            format!(
+                "{}/src/userland/sovereign_coreutils_and_userland_advancements_v88_pr.rs",
+                root
+            ),
         ]
         .into_iter()
         .filter(|p| p.contains(name_pattern.trim_start_matches('*').trim_end_matches('*')))
@@ -396,7 +427,13 @@ impl FindutilsDiffutilsAdvancedEngineV88 {
     }
 
     /// Patience / Myers diff algorithm simulator with unified diff formatting
-    pub fn diff_unified_patience(&self, file_a: &str, file_b: &str, text_a: &str, text_b: &str) -> String {
+    pub fn diff_unified_patience(
+        &self,
+        file_a: &str,
+        file_b: &str,
+        text_a: &str,
+        text_b: &str,
+    ) -> String {
         let lines_a: Vec<&str> = text_a.lines().collect();
         let lines_b: Vec<&str> = text_b.lines().collect();
 
@@ -417,7 +454,12 @@ impl FindutilsDiffutilsAdvancedEngineV88 {
     }
 
     /// `patch` application simulator with fuzz factor and rejection file fallback
-    pub fn apply_patch_fuzz(&self, target_file: &str, patch_data: &str, fuzz: u32) -> (bool, String) {
+    pub fn apply_patch_fuzz(
+        &self,
+        target_file: &str,
+        patch_data: &str,
+        fuzz: u32,
+    ) -> (bool, String) {
         if patch_data.contains("---") && patch_data.contains("+++") {
             (
                 true,
@@ -511,13 +553,19 @@ impl ArchivalCompressionSuiteAdvancedV88 {
     }
 
     /// `tar` PAX extended header generator supporting ACLs, xattrs, and nanosecond timestamps
-    pub fn generate_pax_header(&self, xattrs: &BTreeMap<String, Vec<u8>>) -> BTreeMap<String, String> {
+    pub fn generate_pax_header(
+        &self,
+        xattrs: &BTreeMap<String, Vec<u8>>,
+    ) -> BTreeMap<String, String> {
         let mut pax = BTreeMap::new();
         pax.insert("mtime".to_string(), "1710000000.000000000".to_string());
         pax.insert("GNU.sparse.size".to_string(), "1073741824".to_string());
 
         for (k, v) in xattrs {
-            pax.insert(format!("SCHILY.xattr.{}", k), String::from_utf8_lossy(v).to_string());
+            pax.insert(
+                format!("SCHILY.xattr.{}", k),
+                String::from_utf8_lossy(v).to_string(),
+            );
         }
         pax
     }
@@ -738,8 +786,14 @@ impl AuthPrivilegeSessionAdvancedEngineV88 {
     pub fn pam_evaluate_stack(&self, service: &str, username: &str) -> Vec<String> {
         vec![
             format!("pam_env(service={}): env loaded", service),
-            format!("pam_unix(service={}): auth successful for user {}", service, username),
-            format!("pam_cgroup(service={}): pid attached to user slice", service),
+            format!(
+                "pam_unix(service={}): auth successful for user {}",
+                service, username
+            ),
+            format!(
+                "pam_cgroup(service={}): pid attached to user slice",
+                service
+            ),
         ]
     }
 }
@@ -935,7 +989,8 @@ mod tests {
     #[test]
     fn test_util_linux_advanced_v88() {
         let engine = UtilLinuxAdvancedEngineV88::new();
-        let loop_msg = engine.setup_crypto_loopdevice("/var/lib/container.img", "aes-xts-plain64", 512);
+        let loop_msg =
+            engine.setup_crypto_loopdevice("/var/lib/container.img", "aes-xts-plain64", 512);
         assert!(loop_msg.contains("AES") || loop_msg.contains("crypto loop"));
 
         let ns_msg = engine.unshare_namespaces(&["PID", "NET", "IPC", "MOUNT"]);
@@ -948,7 +1003,12 @@ mod tests {
         let found = engine.run_parallel_find("/home/user", "*.rs", 3);
         assert!(!found.is_empty());
 
-        let diff = engine.diff_unified_patience("a.txt", "b.txt", "line1\nline2\n", "line1\nline_modified\n");
+        let diff = engine.diff_unified_patience(
+            "a.txt",
+            "b.txt",
+            "line1\nline2\n",
+            "line1\nline_modified\n",
+        );
         assert!(diff.contains("--- a.txt"));
         assert!(diff.contains("-line2"));
         assert!(diff.contains("+line_modified"));

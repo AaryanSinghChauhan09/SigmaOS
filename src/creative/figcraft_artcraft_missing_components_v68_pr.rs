@@ -76,7 +76,9 @@ impl FigcraftAiGenerativeWireframeToUiComponentSynthesisEngineV68 {
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6821,
-            pr_title: String::from("Figcraft AI Generative Wireframe-to-UI Component Synthesis V68 Engine"),
+            pr_title: String::from(
+                "Figcraft AI Generative Wireframe-to-UI Component Synthesis V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/WireframeSynthesis"),
             original_suite: String::from("ArtCraft Figcraft AI V68"),
             components_added: vec![
@@ -135,7 +137,9 @@ impl FigcraftDesignSystemTokenMigrationStyleDictionaryEngineV68 {
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6822,
-            pr_title: String::from("Figcraft Design System Token Migration & Style Dictionary V68 Engine"),
+            pr_title: String::from(
+                "Figcraft Design System Token Migration & Style Dictionary V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/TokenMigration"),
             original_suite: String::from("ArtCraft Figcraft Tokens V68"),
             components_added: vec![
@@ -192,7 +196,9 @@ impl FigcraftPhysicsSpringRigidBodyAnimationPhysicsEngineV68 {
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6823,
-            pr_title: String::from("Figcraft Physics Spring & Rigid Body Interactive Animation Physics V68 Engine"),
+            pr_title: String::from(
+                "Figcraft Physics Spring & Rigid Body Interactive Animation Physics V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/SpringPhysics"),
             original_suite: String::from("ArtCraft Figcraft Physics V68"),
             components_added: vec![
@@ -204,7 +210,13 @@ impl FigcraftPhysicsSpringRigidBodyAnimationPhysicsEngineV68 {
         }
     }
 
-    pub fn step_spring_simulation(&self, current_pos: f32, target_pos: f32, velocity: f32, dt: f32) -> (f32, f32) {
+    pub fn step_spring_simulation(
+        &self,
+        current_pos: f32,
+        target_pos: f32,
+        velocity: f32,
+        dt: f32,
+    ) -> (f32, f32) {
         let displacement = current_pos - target_pos;
         let spring_force = -self.spring.stiffness * displacement;
         let damping_force = -self.spring.damping * velocity;
@@ -232,13 +244,17 @@ pub struct FigcraftMultiResolutionVectorTilePyramidRenderingEngineV68 {
 
 impl FigcraftMultiResolutionVectorTilePyramidRenderingEngineV68 {
     pub fn new() -> Self {
-        Self { cached_tiles: Vec::new() }
+        Self {
+            cached_tiles: Vec::new(),
+        }
     }
 
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6824,
-            pr_title: String::from("Figcraft Multi-Resolution Vector Tile Pyramid Rendering V68 Engine"),
+            pr_title: String::from(
+                "Figcraft Multi-Resolution Vector Tile Pyramid Rendering V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/VectorTilePyramid"),
             original_suite: String::from("ArtCraft Figcraft TilePyramid V68"),
             components_added: vec![
@@ -251,7 +267,11 @@ impl FigcraftMultiResolutionVectorTilePyramidRenderingEngineV68 {
     }
 
     pub fn request_tile(&mut self, zoom: u32, x: u32, y: u32) -> TileCoordV68 {
-        let tile = TileCoordV68 { zoom_level: zoom, tile_x: x, tile_y: y };
+        let tile = TileCoordV68 {
+            zoom_level: zoom,
+            tile_x: x,
+            tile_y: y,
+        };
         self.cached_tiles.push(tile);
         tile
     }
@@ -291,7 +311,9 @@ impl FigcraftRealtimeMultiUserConflictFreeCrdtTreeSyncEngineV68 {
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6825,
-            pr_title: String::from("Figcraft Realtime Multi-User Conflict-Free CRDT Tree Sync V68 Engine"),
+            pr_title: String::from(
+                "Figcraft Realtime Multi-User Conflict-Free CRDT Tree Sync V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/CrdtTreeSync"),
             original_suite: String::from("ArtCraft Figcraft CRDT V68"),
             components_added: vec![
@@ -338,7 +360,9 @@ impl FigcraftWcagContrastAndColorBlindnessSimulationEngineV68 {
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6826,
-            pr_title: String::from("Figcraft WCAG Contrast & Color Blindness Simulation V68 Engine"),
+            pr_title: String::from(
+                "Figcraft WCAG Contrast & Color Blindness Simulation V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/ColorBlindnessSim"),
             original_suite: String::from("ArtCraft Figcraft Accessibility V68"),
             components_added: vec![
@@ -350,7 +374,11 @@ impl FigcraftWcagContrastAndColorBlindnessSimulationEngineV68 {
         }
     }
 
-    pub fn simulate_color(&self, rgb: (u8, u8, u8), cb_type: ColorBlindnessTypeV68) -> (u8, u8, u8) {
+    pub fn simulate_color(
+        &self,
+        rgb: (u8, u8, u8),
+        cb_type: ColorBlindnessTypeV68,
+    ) -> (u8, u8, u8) {
         let (r, g, b) = rgb;
         match cb_type {
             ColorBlindnessTypeV68::Protanopia => {
@@ -394,9 +422,7 @@ impl FigcraftOpenTypeFontFeatureLayoutEngineV68 {
             pr_title: String::from("Figcraft OpenType Font Feature Layout V68 Engine"),
             target_subsystem: String::from("Creative/Figcraft/OpenTypeFeatures"),
             original_suite: String::from("ArtCraft Figcraft FontFeatures V68"),
-            components_added: vec![
-                String::from("FigcraftOpenTypeFontFeatureLayoutEngineV68"),
-            ],
+            components_added: vec![String::from("FigcraftOpenTypeFontFeatureLayoutEngineV68")],
             performance_multiplier: String::from("35.0x OpenType GSUB/GPOS shaping speed"),
             status: String::from("APPROVED_PR_STAGE_V68"),
         }
@@ -419,18 +445,22 @@ pub struct FigcraftGpuAcceleratedSubpixelAntialiasedRasterizerEngineV68 {
 
 impl FigcraftGpuAcceleratedSubpixelAntialiasedRasterizerEngineV68 {
     pub fn new() -> Self {
-        Self { subpixel_samples: 16 }
+        Self {
+            subpixel_samples: 16,
+        }
     }
 
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6828,
-            pr_title: String::from("Figcraft GPU-Accelerated Subpixel Antialiased Rasterizer V68 Engine"),
+            pr_title: String::from(
+                "Figcraft GPU-Accelerated Subpixel Antialiased Rasterizer V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/GpuSubpixelRasterizer"),
             original_suite: String::from("ArtCraft Figcraft GPU V68"),
-            components_added: vec![
-                String::from("FigcraftGpuAcceleratedSubpixelAntialiasedRasterizerEngineV68"),
-            ],
+            components_added: vec![String::from(
+                "FigcraftGpuAcceleratedSubpixelAntialiasedRasterizerEngineV68",
+            )],
             performance_multiplier: String::from("55.0x GPU subpixel anti-aliasing rasterization"),
             status: String::from("APPROVED_PR_STAGE_V68"),
         }
@@ -455,12 +485,14 @@ impl FigcraftInteractiveDesignDocsiteStorybookGeneratorEngineV68 {
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6829,
-            pr_title: String::from("Figcraft Interactive Design Docsite & Storybook Generator V68 Engine"),
+            pr_title: String::from(
+                "Figcraft Interactive Design Docsite & Storybook Generator V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/DocsiteStorybookGen"),
             original_suite: String::from("ArtCraft Figcraft Storybook V68"),
-            components_added: vec![
-                String::from("FigcraftInteractiveDesignDocsiteStorybookGeneratorEngineV68"),
-            ],
+            components_added: vec![String::from(
+                "FigcraftInteractiveDesignDocsiteStorybookGeneratorEngineV68",
+            )],
             performance_multiplier: String::from("22.6x static docsite compilation"),
             status: String::from("APPROVED_PR_STAGE_V68"),
         }
@@ -493,7 +525,9 @@ impl FigcraftMultiFormatVectorDesignCanvasTranspilerEngineV68 {
     pub fn generate_proposal(&self) -> FigcraftV68PrProposalManifest {
         FigcraftV68PrProposalManifest {
             pr_id: 6830,
-            pr_title: String::from("Figcraft Multi-Format Vector Design Canvas Transpiler V68 Engine"),
+            pr_title: String::from(
+                "Figcraft Multi-Format Vector Design Canvas Transpiler V68 Engine",
+            ),
             target_subsystem: String::from("Creative/Figcraft/CanvasTranspiler"),
             original_suite: String::from("ArtCraft Figcraft Transpiler V68"),
             components_added: vec![
@@ -605,7 +639,10 @@ impl FigcraftArtcraftMissingComponentsV68PrSuite {
 
         // Test 9: Storybook Docsite Generator
         let storybook = FigcraftInteractiveDesignDocsiteStorybookGeneratorEngineV68::new();
-        if !storybook.build_storybook_manifest("Button").contains("Button") {
+        if !storybook
+            .build_storybook_manifest("Button")
+            .contains("Button")
+        {
             return false;
         }
 

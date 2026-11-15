@@ -36,16 +36,19 @@ impl PartitionScheme {
     pub fn description(self) -> &'static str {
         match self {
             Self::SingleRootBtrfs => "BTRFS root with @ and @home subvolumes (recommended)",
-            Self::SingleRootExt4  => "Single ext4 root partition",
+            Self::SingleRootExt4 => "Single ext4 root partition",
             Self::SeparateHomeBtrfs => "Separate /home partition on BTRFS",
-            Self::EncryptedLvm    => "Encrypted LVM (LUKS2 + LVM)",
-            Self::Manual          => "Manual partitioning",
+            Self::EncryptedLvm => "Encrypted LVM (LUKS2 + LVM)",
+            Self::Manual => "Manual partitioning",
         }
     }
 
     /// Whether this scheme uses a separate home partition.
     pub fn has_separate_home(self) -> bool {
-        matches!(self, Self::SeparateHomeBtrfs | Self::EncryptedLvm | Self::Manual)
+        matches!(
+            self,
+            Self::SeparateHomeBtrfs | Self::EncryptedLvm | Self::Manual
+        )
     }
 }
 
@@ -146,7 +149,10 @@ pub struct MountPoints {
 pub enum PartitionError {
     /// The target disk is smaller than the minimum requirement.
     #[error("disk too small: need {required_gib} GiB, have {available_gib} GiB")]
-    DiskTooSmall { required_gib: u64, available_gib: u64 },
+    DiskTooSmall {
+        required_gib: u64,
+        available_gib: u64,
+    },
     /// Root partition is smaller than the minimum.
     #[error("root partition too small: minimum {MIN_ROOT_GIB} GiB")]
     RootTooSmall,
@@ -169,22 +175,22 @@ pub struct PartitionManager;
 
 impl PartitionManager {
     /// Create a new partition manager.
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 
     /// Detect available disks.  Returns simulated data in this build;
     /// production code reads `/sys/block` and `lsblk`.
     pub fn detect_disks() -> Result<Vec<DiskInfo>, PartitionError> {
         // Production: parse /sys/block and query udev.
         // This simulation returns a plausible NVMe disk.
-        Ok(vec![
-            DiskInfo {
-                device_path: PathBuf::from("/dev/nvme0n1"),
-                size_bytes: 512 * GIB,
-                model: "Samsung SSD 980 500GB".to_string(),
-                is_ssd: true,
-                existing_partitions: vec![],
-            },
-        ])
+        Ok(vec![DiskInfo {
+            device_path: PathBuf::from("/dev/nvme0n1"),
+            size_bytes: 512 * GIB,
+            model: "Samsung SSD 980 500GB".to_string(),
+            is_ssd: true,
+            existing_partitions: vec![],
+        }])
     }
 
     /// Build a partition plan for the given disk and scheme.
@@ -194,11 +200,7 @@ impl PartitionManager {
     /// - Swap: equal to available RAM, capped at 32 GiB
     /// - Home: 40 % of remaining space (if separate)
     /// - Root: remainder
-    pub fn create_plan(
-        disk: &DiskInfo,
-        scheme: PartitionScheme,
-        encrypt: bool,
-    ) -> PartitionPlan {
+    pub fn create_plan(disk: &DiskInfo, scheme: PartitionScheme, encrypt: bool) -> PartitionPlan {
         let swap = 8 * GIB; // Simplified: 8 GiB swap
         let usable = disk.size_bytes.saturating_sub(EFI_SIZE_BYTES + swap);
         let (root, home) = if scheme.has_separate_home() {
@@ -293,7 +295,7 @@ impl PartitionManager {
         Ok(MountPoints {
             root: PathBuf::from("/mnt"),
             home: PathBuf::from("/mnt/home"),
-            efi:  PathBuf::from("/mnt/boot/efi"),
+            efi: PathBuf::from("/mnt/boot/efi"),
             boot: PathBuf::from("/mnt/boot"),
             swap: if plan.swap_size_bytes > 0 {
                 Some(PathBuf::from("/dev/nvme0n1p2"))
@@ -313,7 +315,9 @@ impl PartitionPlan {
 }
 
 impl Default for PartitionManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]

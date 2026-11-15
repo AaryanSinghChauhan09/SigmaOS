@@ -29,14 +29,22 @@ fn test_integration_photocraft_v66_all_engines() {
     let engine1 = PhotocraftRaw32BitFloatHdrDemosaicV66PrEngine::new();
     let raw = vec![32768u16; 16];
     let mut float_rgb = vec![0.0f32; 16 * 3];
-    assert_eq!(engine1.demosaic_to_float_rgb(&raw, 4, 4, &mut float_rgb).unwrap(), 16);
+    assert_eq!(
+        engine1
+            .demosaic_to_float_rgb(&raw, 4, 4, &mut float_rgb)
+            .unwrap(),
+        16
+    );
 
     // 2. Generative Inpainting
     let engine2 = PhotocraftAiNeuralGenerativeInpaintingV66PrEngine::new();
     let mut rgba = vec![0u8; 16 * 4];
     let mut mask = vec![0u8; 16];
     mask[0] = 255;
-    assert_eq!(engine2.inpaint_selection(&mut rgba, &mask, 4, 4).unwrap(), 1);
+    assert_eq!(
+        engine2.inpaint_selection(&mut rgba, &mask, 4, 4).unwrap(),
+        1
+    );
 
     // 3. CMYK Separation
     let engine3 = PhotocraftCmykSpotColorSeparationV66PrEngine::new();
@@ -45,7 +53,12 @@ fn test_integration_photocraft_v66_all_engines() {
     let mut m = vec![0u8; 1];
     let mut y = vec![0u8; 1];
     let mut k = vec![0u8; 1];
-    assert_eq!(engine3.convert_rgb_to_cmyk_planes(&rgb, &mut c, &mut m, &mut y, &mut k).unwrap(), 1);
+    assert_eq!(
+        engine3
+            .convert_rgb_to_cmyk_planes(&rgb, &mut c, &mut m, &mut y, &mut k)
+            .unwrap(),
+        1
+    );
 
     // 4. Perceptual Wheel
     let engine4 = PhotocraftLchOklabColorGradingWheelV66PrEngine::new();
@@ -57,7 +70,12 @@ fn test_integration_photocraft_v66_all_engines() {
     let s1 = vec![50u8; 3];
     let s2 = vec![150u8; 3];
     let mut out_stack = vec![0u8; 3];
-    assert_eq!(engine5.stack_focus_slices(&[s1, s2], 1, 1, &mut out_stack).unwrap(), 1);
+    assert_eq!(
+        engine5
+            .stack_focus_slices(&[s1, s2], 1, 1, &mut out_stack)
+            .unwrap(),
+        1
+    );
     assert_eq!(out_stack[0], 150);
 
     // 6. Vector Clipping
@@ -69,7 +87,12 @@ fn test_integration_photocraft_v66_all_engines() {
         p1: SubpixelPoint2D { x: 3.0, y: 3.0 },
     });
     let mut mask_out = vec![0u8; 4];
-    assert_eq!(engine6.rasterize_vector_clipping_mask(&mut mask_out, 2, 2).unwrap(), 4);
+    assert_eq!(
+        engine6
+            .rasterize_vector_clipping_mask(&mut mask_out, 2, 2)
+            .unwrap(),
+        4
+    );
 
     // 7. Smart Filter
     let mut engine7 = PhotocraftNonDestructiveSmartFilterPipelineV66PrEngine::new();
@@ -85,7 +108,10 @@ fn test_integration_photocraft_v66_all_engines() {
     // 8. Portrait Matting
     let engine8 = PhotocraftAiNeuralPortraitMattingHairRefinerV66PrEngine::new();
     let mut trimap = vec![100u8; 4];
-    assert_eq!(engine8.refine_portrait_trimap(&mut trimap, 2, 2).unwrap(), 4);
+    assert_eq!(
+        engine8.refine_portrait_trimap(&mut trimap, 2, 2).unwrap(),
+        4
+    );
 
     // 9. Panorama Stitcher
     let engine9 = PhotocraftMultiBandPanoramaEquirectangularStitcherV66PrEngine::new();

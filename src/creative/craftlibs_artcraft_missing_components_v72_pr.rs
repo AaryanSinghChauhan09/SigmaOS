@@ -316,8 +316,7 @@ impl CraftlibsEulerianVolumetricNavierStokesCombustionV72Engine {
         temperature_grid: &mut [f32],
         dt: f32,
     ) -> Result<(), &'static str> {
-        let grid_size =
-            self.grid_dimensions[0] * self.grid_dimensions[1] * self.grid_dimensions[2];
+        let grid_size = self.grid_dimensions[0] * self.grid_dimensions[1] * self.grid_dimensions[2];
         if density_grid.len() != grid_size || temperature_grid.len() != grid_size {
             return Err("Grid sizes must match configured dimensions");
         }
@@ -392,8 +391,7 @@ impl CraftlibsAcousticSpatialAudioRaytracingImpulseV72Engine {
         let dz = listener_pos[2] - source_pos[2];
         let direct_dist = (dx * dx + dy * dy + dz * dz).sqrt();
         let speed_of_sound = 343.0f32;
-        let direct_delay_samples =
-            ((direct_dist / speed_of_sound) * 48000.0) as usize;
+        let direct_delay_samples = ((direct_dist / speed_of_sound) * 48000.0) as usize;
         let buffer_len = rir_buffer_out.len();
 
         for (i, sample) in rir_buffer_out.iter_mut().enumerate() {
@@ -736,14 +734,11 @@ impl SovereignCraftlibsArtcraftMissingComponentsV72PrGateway {
             mesh_cluster_direct_storage:
                 CraftlibsGpuMeshClusterInstancingDirectStorageV72Engine::new(),
             spectral_bsdf: CraftlibsSpectralAnisotropicBsdfMaterialLightingV72Engine::new(),
-            neural_sdf_collision:
-                CraftlibsNeuralImplicitSdfDistanceFieldCollisionV72Engine::new(),
+            neural_sdf_collision: CraftlibsNeuralImplicitSdfDistanceFieldCollisionV72Engine::new(),
             hw_bvh512: CraftlibsHardwareAcceleratedBvh512SimdTreeRaytracerV72Engine::new(),
-            eulerian_combustion:
-                CraftlibsEulerianVolumetricNavierStokesCombustionV72Engine::new(),
+            eulerian_combustion: CraftlibsEulerianVolumetricNavierStokesCombustionV72Engine::new(),
             acoustic_audio: CraftlibsAcousticSpatialAudioRaytracingImpulseV72Engine::new(),
-            pyramid_morphology:
-                CraftlibsGpuMorphologicalFilterPyramidDecompositionV72Engine::new(),
+            pyramid_morphology: CraftlibsGpuMorphologicalFilterPyramidDecompositionV72Engine::new(),
             vram_suballocator: CraftlibsMultiBackendVramPoolSuballocatorV72Engine::new(
                 1024 * 1024 * 1024,
             ),

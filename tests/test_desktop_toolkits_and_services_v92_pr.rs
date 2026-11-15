@@ -153,7 +153,10 @@ fn test_xdg_portals_v92_integration() {
     "#;
     let loaded = portals.parse_portals_conf(conf);
     assert_eq!(loaded, 2);
-    assert_eq!(portals.portals_config.get("default"), Some(&"gtk;hyprland".to_string()));
+    assert_eq!(
+        portals.portals_config.get("default"),
+        Some(&"gtk;hyprland".to_string())
+    );
 
     let user_dirs_text = r#"
         XDG_DESKTOP_DIR="$HOME/Desktop"
@@ -167,7 +170,10 @@ fn test_xdg_portals_v92_integration() {
     "#;
     let parsed_dirs = portals.parse_user_dirs(user_dirs_text);
     assert_eq!(parsed_dirs, 8);
-    assert_eq!(portals.user_dirs.get("XDG_PICTURES_DIR"), Some(&"$HOME/Pictures".to_string()));
+    assert_eq!(
+        portals.user_dirs.get("XDG_PICTURES_DIR"),
+        Some(&"$HOME/Pictures".to_string())
+    );
 
     let open_res = portals.open_uri_handler("mailto:developer@sigmaos.org");
     assert!(open_res.contains("mailto:developer@sigmaos.org"));
@@ -178,8 +184,12 @@ fn test_font_text_layout_v92_integration() {
     let font_engine = SovereignFontTextLayoutEngineV92::new();
     let xml = font_engine.generate_fontconfig_xml();
     assert!(xml.contains("<?xml version=\"1.0\"?>"));
-    assert!(xml.contains("<edit name=\"hintstyle\" mode=\"assign\"><const>hintslight</const></edit>"));
-    assert!(xml.contains("<edit name=\"lcdfilter\" mode=\"assign\"><const>lcddefault</const></edit>"));
+    assert!(
+        xml.contains("<edit name=\"hintstyle\" mode=\"assign\"><const>hintslight</const></edit>")
+    );
+    assert!(
+        xml.contains("<edit name=\"lcdfilter\" mode=\"assign\"><const>lcddefault</const></edit>")
+    );
 
     let shaped = font_engine.shape_harfbuzz_text("SigmaOS Desktop", "Latn");
     assert_eq!(shaped.len(), 15);
@@ -204,8 +214,12 @@ fn test_ime_framework_v92_integration() {
     let fcitx_engine = SovereignInputMethodFrameworkEngineV92::new(ImeEngineKindV92::Fcitx5);
     assert_eq!(fcitx_engine.active_kind, ImeEngineKindV92::Fcitx5);
 
-    let wayland_ime = SovereignInputMethodFrameworkEngineV92::new(ImeEngineKindV92::WaylandTextInputV3);
-    assert_eq!(wayland_ime.active_kind, ImeEngineKindV92::WaylandTextInputV3);
+    let wayland_ime =
+        SovereignInputMethodFrameworkEngineV92::new(ImeEngineKindV92::WaylandTextInputV3);
+    assert_eq!(
+        wayland_ime.active_kind,
+        ImeEngineKindV92::WaylandTextInputV3
+    );
 }
 
 #[test]

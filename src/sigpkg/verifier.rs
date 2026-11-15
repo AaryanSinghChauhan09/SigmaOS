@@ -65,12 +65,7 @@ impl CryptoVerifier {
     /// `signature` must be the 64-byte RFC 8032 signature over `data`.
     /// Returns true only when `key_name` is trusted AND the signature
     /// verifies — untrusted or malformed inputs return false.
-    pub fn verify_ed25519_signature(
-        &self,
-        key_name: &str,
-        signature: &[u8],
-        data: &[u8],
-    ) -> bool {
+    pub fn verify_ed25519_signature(&self, key_name: &str, signature: &[u8], data: &[u8]) -> bool {
         let Some((_, pubkey)) = self
             .trusted_ed25519_keys
             .iter()
@@ -448,7 +443,11 @@ mod tests {
         // untrusted key name fails
         assert!(!verifier.verify_ed25519_signature("other-key", &sig, b"package payload"));
         // wrong-length signature fails
-        assert!(!verifier.verify_ed25519_signature("sigmaos-release", &sig[..32], b"package payload"));
+        assert!(!verifier.verify_ed25519_signature(
+            "sigmaos-release",
+            &sig[..32],
+            b"package payload"
+        ));
 
         // different signer cannot forge
         let other = Ed25519Signer::from_seed(&[9u8; 32]);

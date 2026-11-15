@@ -117,8 +117,17 @@ impl JournaldGatewayRestApiEndpointV21 {
         out
     }
 
-    pub fn render_rfc5424_header(&self, priority: u8, app_name: &str, proc_id: u32, msg_id: &str) -> String {
-        format!("<{}>1 2025-02-18T12:00:00.000Z sigma-node01 {} {} {} - ", priority, app_name, proc_id, msg_id)
+    pub fn render_rfc5424_header(
+        &self,
+        priority: u8,
+        app_name: &str,
+        proc_id: u32,
+        msg_id: &str,
+    ) -> String {
+        format!(
+            "<{}>1 2025-02-18T12:00:00.000Z sigma-node01 {} {} {} - ",
+            priority, app_name, proc_id, msg_id
+        )
     }
 }
 
@@ -221,7 +230,14 @@ impl SyslogNgSinkEngineV21 {
         }
     }
 
-    pub fn expand_macros(&self, template: &str, host: &str, msg: &str, facility: &str, priority: &str) -> String {
+    pub fn expand_macros(
+        &self,
+        template: &str,
+        host: &str,
+        msg: &str,
+        facility: &str,
+        priority: &str,
+    ) -> String {
         template
             .replace("${HOST}", host)
             .replace("${MSG}", msg)
@@ -447,7 +463,10 @@ impl DmesgFormatterV21 {
                 color_code, entry.level, "\x1b[0m", time_str, delta_str, entry.message
             )
         } else {
-            format!("[{}] {}{} {}", entry.level, time_str, delta_str, entry.message)
+            format!(
+                "[{}] {}{} {}",
+                entry.level, time_str, delta_str, entry.message
+            )
         }
     }
 }
@@ -976,7 +995,10 @@ impl SovereignHardwareDiagnosticsSuiteV21 {
         );
 
         let mut ipmi_props = BTreeMap::new();
-        ipmi_props.insert("Interface Type".to_string(), "KCS (Keyboard Controller Style)".to_string());
+        ipmi_props.insert(
+            "Interface Type".to_string(),
+            "KCS (Keyboard Controller Style)".to_string(),
+        );
         ipmi_props.insert("Specification Version".to_string(), "2.0".to_string());
         ipmi_props.insert("I2C Slave Address".to_string(), "0x20".to_string());
 
@@ -1245,7 +1267,10 @@ impl SovereignLoggingDiagnosticsV21PrGatewayEngine {
         );
         audit.insert(
             "smbios_ipmi_present".to_string(),
-            self.hardware_suite.smbios_tables.iter().any(|t| t.table_type == 38),
+            self.hardware_suite
+                .smbios_tables
+                .iter()
+                .any(|t| t.table_type == 38),
         );
         audit
     }
@@ -1349,7 +1374,10 @@ mod tests {
         let vmcore_summary = suite.vmcore_parser.parse_header_summary();
         assert_eq!(vmcore_summary.architecture, "x86_64");
         assert!(vmcore_summary.panic_string.contains("Kernel panic"));
-        assert_eq!(vmcore_summary.registers.get("RBP"), Some(&0xffffc90000003f50));
+        assert_eq!(
+            vmcore_summary.registers.get("RBP"),
+            Some(&0xffffc90000003f50)
+        );
 
         assert!(suite.ebpf_filter.evaluate_event("sys_enter_openat", 1024));
         assert!(suite.ebpf_filter.evaluate_event("block_rq_issue", 2048));
@@ -1410,7 +1438,9 @@ mod tests {
         let expo = gateway.prometheus_node_exporter.render_exposition_text();
         assert!(expo.contains("node_uptime_seconds{instance=\"sigma-node01.internal\"}"));
         assert!(expo.contains("node_load1{instance=\"sigma-node01.internal\"}"));
-        assert!(expo.contains("node_disk_read_bytes_total{device=\"nvme0n1\",instance=\"sigma-node01.internal\"}"));
+        assert!(expo.contains(
+            "node_disk_read_bytes_total{device=\"nvme0n1\",instance=\"sigma-node01.internal\"}"
+        ));
 
         let diff = gateway.generate_unified_diff();
         assert!(diff.contains("Title: feat(diagnostics): V21"));

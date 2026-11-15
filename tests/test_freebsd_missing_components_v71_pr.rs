@@ -44,7 +44,11 @@ fn test_integration_freebsd_v71_all_engines() {
 
     // 4. Casper cap_netlink Route Delegate
     let mut casper = FreeBsdCapsicumCasperCapNetlinkRoutePrEngine::new();
-    let d4 = casper.configure_cap_netlink("routing_daemon", vec!["AF_INET".to_string(), "AF_INET6".to_string()], true);
+    let d4 = casper.configure_cap_netlink(
+        "routing_daemon",
+        vec!["AF_INET".to_string(), "AF_INET6".to_string()],
+        true,
+    );
     assert!(d4.contains("cap_service_open(cap_chan, \"cap_netlink\")"));
     assert!(casper.netlink_delegates.contains_key("routing_daemon"));
 
@@ -70,7 +74,8 @@ fn test_integration_freebsd_v71_all_engines() {
 
     // 8. pkgbase ZFS Boot Environment Staging
     let mut be = FreeBsdPkgBaseZfsBootEnvironmentStagingPrEngine::new();
-    let d8_stage = be.stage_upgrade_environment("zroot", "16.1-RELEASE", "zroot/ROOT/default@pre_16_1");
+    let d8_stage =
+        be.stage_upgrade_environment("zroot", "16.1-RELEASE", "zroot/ROOT/default@pre_16_1");
     assert!(d8_stage.contains("bectl create -e zroot/ROOT/default@pre_16_1 16.1-RELEASE"));
     assert!(be.staged_environments.contains_key("16.1-RELEASE"));
     let d8_rb = be.rollback_staged_environment("16.0-RELEASE");
@@ -80,11 +85,19 @@ fn test_integration_freebsd_v71_all_engines() {
     let mut kinst = FreeBsdDtraceKinstInstructionTraceMatrixPrEngine::new();
     let d9 = kinst.trace_instruction_latency("tcp_do_segment", 0x30, 200);
     assert!(d9.contains("kinst::tcp_do_segment:0x30"));
-    assert!(kinst.instruction_probes.contains_key("kinst::tcp_do_segment:0x30"));
+    assert!(kinst
+        .instruction_probes
+        .contains_key("kinst::tcp_do_segment:0x30"));
 
     // 10. FreeBSD PQC Secure Boot Loader / Kexec Verifier
     let mut boot = FreeBsdPqcSecureBootKexecVerifierPrEngine::new();
-    let d10 = boot.verify_and_authorize_kernel("/boot/kernel/kernel.v71", "d5_hex_sig_392", "sha3_root_trust");
+    let d10 = boot.verify_and_authorize_kernel(
+        "/boot/kernel/kernel.v71",
+        "d5_hex_sig_392",
+        "sha3_root_trust",
+    );
     assert!(d10.contains("loader_pqc_verify --kernel /boot/kernel/kernel.v71"));
-    assert!(boot.boot_verifications.contains_key("/boot/kernel/kernel.v71"));
+    assert!(boot
+        .boot_verifications
+        .contains_key("/boot/kernel/kernel.v71"));
 }

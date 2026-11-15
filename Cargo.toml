@@ -91,7 +91,7 @@ unexpected_cfgs = { level = "warn", check-cfg = [
 opt-level = 0
 debug = false
 incremental = false
-codegen-units = 16
+codegen-units = 1
 panic = "abort"
 
 # Tests inherit dev; keep assertions but shed full DWARF for faster linking.

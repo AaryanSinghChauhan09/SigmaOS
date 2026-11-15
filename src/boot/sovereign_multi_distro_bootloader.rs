@@ -576,7 +576,12 @@ mod tests {
         engine.import_freebsd_loader("zfs_load=YES");
         engine.import_openbsd_boot("boot /bsd.mp");
         engine.import_bls_entry("title Fedora\nlinux /vmlinuz\noptions root=/dev/sda1");
-        engine.import_syslinux_entry("Arch", "/boot/vmlinuz-linux", "/boot/initramfs-linux.img", "rw quiet");
+        engine.import_syslinux_entry(
+            "Arch",
+            "/boot/vmlinuz-linux",
+            "/boot/initramfs-linux.img",
+            "rw quiet",
+        );
         engine.import_lilo_image("Debian", "/boot/vmlinuz", "/boot/initrd.img", "/dev/sda2");
 
         assert_eq!(engine.entries.len(), 5);

@@ -69,5 +69,8 @@ fn test_functional_parity_engines_v89() {
     assert!(posix_ok);
 
     let terminals = TerminalMultiplexersAndEmulatorsV89Engine::new();
-    assert_eq!(terminals.parse_truecolor_24bit_escape("\x1b[38;2;10;20;30m"), Some((10, 20, 30)));
+    assert_eq!(
+        terminals.parse_truecolor_24bit_escape("\x1b[38;2;10;20;30m"),
+        Some((10, 20, 30))
+    );
 }

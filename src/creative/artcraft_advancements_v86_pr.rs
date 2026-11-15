@@ -221,7 +221,12 @@ impl ArtcraftGpuBezierClothCurvaturePrEngineV86 {
     }
 
     /// Evaluates point on 4x4 bicubic control point grid P(u, v).
-    pub fn evaluate_patch_point(&self, control_points: &[Vector3D; 16], u: f32, v: f32) -> Vector3D {
+    pub fn evaluate_patch_point(
+        &self,
+        control_points: &[Vector3D; 16],
+        u: f32,
+        v: f32,
+    ) -> Vector3D {
         let mut pt = Vector3D::new(0.0, 0.0, 0.0);
         for row in 0..4 {
             let b_row = Self::bernstein_cubic(row, v);
@@ -236,7 +241,12 @@ impl ArtcraftGpuBezierClothCurvaturePrEngineV86 {
     }
 
     /// Computes partial derivatives and surface normal vector at (u, v).
-    pub fn compute_surface_normal(&self, control_points: &[Vector3D; 16], u: f32, v: f32) -> Vector3D {
+    pub fn compute_surface_normal(
+        &self,
+        control_points: &[Vector3D; 16],
+        u: f32,
+        v: f32,
+    ) -> Vector3D {
         let eps = 1e-3f32;
         let u0 = (u - eps).clamp(0.0, 1.0);
         let u1 = (u + eps).clamp(0.0, 1.0);
@@ -266,7 +276,8 @@ impl ArtcraftGpuBezierClothCurvaturePrEngineV86 {
                 let normal = self.compute_surface_normal(control_points, u, v);
                 let center = self.evaluate_patch_point(control_points, u, v);
                 let displacement = center.length();
-                let curvature_approx = (1.0 - normal.dot(Vector3D::new(0.0, 1.0, 0.0)).abs()).max(0.0);
+                let curvature_approx =
+                    (1.0 - normal.dot(Vector3D::new(0.0, 1.0, 0.0)).abs()).max(0.0);
                 total_strain += curvature_approx * displacement * self.stiffness_coefficient;
             }
         }
@@ -277,15 +288,20 @@ impl ArtcraftGpuBezierClothCurvaturePrEngineV86 {
     pub fn generate_proposal(&self) -> ArtcraftV86PrProposalManifest {
         ArtcraftV86PrProposalManifest {
             pr_id: 8602,
-            pr_title: "feat(artcraft): Implement GPU Bézier Cloth Curvature & Surface Strain Engine".to_string(),
+            pr_title:
+                "feat(artcraft): Implement GPU Bézier Cloth Curvature & Surface Strain Engine"
+                    .to_string(),
             target_subsystem: "ArtCraft 3D Vector & Physics Modeling".to_string(),
             original_suite: "ArtCraft Surface Physics Engine".to_string(),
             components_added: vec![
-                "Bicubic Bézier patch analytic normal and Gaussian curvature evaluation".to_string(),
-                "Cloth strain energy minimization shader pipeline with stiffness damping".to_string(),
+                "Bicubic Bézier patch analytic normal and Gaussian curvature evaluation"
+                    .to_string(),
+                "Cloth strain energy minimization shader pipeline with stiffness damping"
+                    .to_string(),
                 "Real-time interactive draping mesh vertex reparameterization".to_string(),
             ],
-            performance_multiplier: "8x Shader evaluation speedup (<0.02ms for 16x16 patch tessellation)".to_string(),
+            performance_multiplier:
+                "8x Shader evaluation speedup (<0.02ms for 16x16 patch tessellation)".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -350,7 +366,13 @@ impl ArtcraftSpectralCmykHalftoneScreeningPrEngineV86 {
     }
 
     /// Evaluates stochastic/angled halftone dot threshold value for channel at coordinate (x, y).
-    pub fn evaluate_halftone_dot(&self, x: f32, y: f32, channel_idx: usize, ink_level: f32) -> bool {
+    pub fn evaluate_halftone_dot(
+        &self,
+        x: f32,
+        y: f32,
+        channel_idx: usize,
+        ink_level: f32,
+    ) -> bool {
         let angle_rad = self.angles_deg[channel_idx % 4] * core::f32::consts::PI / 180.0;
         let cos_a = angle_rad.cos();
         let sin_a = angle_rad.sin();
@@ -519,7 +541,9 @@ impl ArtcraftMultiLayerDagCompositorCachePrEngineV86 {
     pub fn generate_proposal(&self) -> ArtcraftV86PrProposalManifest {
         ArtcraftV86PrProposalManifest {
             pr_id: 8604,
-            pr_title: "feat(artcraft): Implement Multi-Layer DAG Compositor Cache & Invalidation Engine".to_string(),
+            pr_title:
+                "feat(artcraft): Implement Multi-Layer DAG Compositor Cache & Invalidation Engine"
+                    .to_string(),
             target_subsystem: "ArtCraft Compositor & Layer Pipeline".to_string(),
             original_suite: "ArtCraft Layer Graph Cache".to_string(),
             components_added: vec![
@@ -527,7 +551,8 @@ impl ArtcraftMultiLayerDagCompositorCachePrEngineV86 {
                 "Dirty tile rectangular union aggregation and minimal redraw bounding".to_string(),
                 "Zero-copy sub-tile cache rehydration on viewport pan/zoom".to_string(),
             ],
-            performance_multiplier: "95% Cache hit rate on complex 100+ layer composition documents".to_string(),
+            performance_multiplier:
+                "95% Cache hit rate on complex 100+ layer composition documents".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -585,13 +610,7 @@ impl ArtcraftUniversalOpenRasterExchangePrEngineV86 {
     }
 
     /// Appends layer descriptor to document stack.
-    pub fn add_layer(
-        &mut self,
-        name: &str,
-        opacity: f32,
-        blend_mode: OraBlendMode,
-        visible: bool,
-    ) {
+    pub fn add_layer(&mut self, name: &str, opacity: f32, blend_mode: OraBlendMode, visible: bool) {
         self.layers.push(OraLayerDescriptor {
             name: name.to_string(),
             opacity: opacity.clamp(0.0, 1.0),
@@ -643,15 +662,20 @@ impl ArtcraftUniversalOpenRasterExchangePrEngineV86 {
     pub fn generate_proposal(&self) -> ArtcraftV86PrProposalManifest {
         ArtcraftV86PrProposalManifest {
             pr_id: 8605,
-            pr_title: "feat(artcraft): Implement Universal OpenRaster (ORA) Archive Exchange Engine".to_string(),
+            pr_title:
+                "feat(artcraft): Implement Universal OpenRaster (ORA) Archive Exchange Engine"
+                    .to_string(),
             target_subsystem: "ArtCraft Asset Exchange & Interoperability".to_string(),
             original_suite: "ArtCraft OpenRaster Bridge".to_string(),
             components_added: vec![
                 "Standard OpenRaster 0.0.3 XML stack parser and generator".to_string(),
-                "Non-destructive multi-layer opacity, blend modes, and offsets serialization".to_string(),
+                "Non-destructive multi-layer opacity, blend modes, and offsets serialization"
+                    .to_string(),
                 "Zero-copy mimetype container validation and cross-app raster export".to_string(),
             ],
-            performance_multiplier: "Lossless multi-layer document exchange across Krita, GIMP, MyPaint & SigmaOS".to_string(),
+            performance_multiplier:
+                "Lossless multi-layer document exchange across Krita, GIMP, MyPaint & SigmaOS"
+                    .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -714,7 +738,9 @@ impl SovereignArtcraftAdvancementsV86MasterSuite {
             cp[i] = Vector3D::new(col as f32, ((row + col) as f32 * 0.2).sin(), row as f32);
         }
         let strain = self.bezier_cloth_engine.compute_cloth_strain_energy(&cp);
-        let norm = self.bezier_cloth_engine.compute_surface_normal(&cp, 0.5, 0.5);
+        let norm = self
+            .bezier_cloth_engine
+            .compute_surface_normal(&cp, 0.5, 0.5);
         let cloth_ok = strain >= 0.0 && norm.length() > 0.5;
 
         // 3. Halftone screening test
@@ -734,10 +760,9 @@ impl SovereignArtcraftAdvancementsV86MasterSuite {
         self.dag_compositor_cache_engine.register_layer_node(102);
         self.dag_compositor_cache_engine
             .invalidate_node_region(101, RectTile::new(0, 0, 128, 128));
-        self.dag_compositor_cache_engine.commit_node_cache(101, 0xAABBCCDD);
-        let valid_nodes = self
-            .dag_compositor_cache_engine
-            .count_valid_cached_nodes();
+        self.dag_compositor_cache_engine
+            .commit_node_cache(101, 0xAABBCCDD);
+        let valid_nodes = self.dag_compositor_cache_engine.count_valid_cached_nodes();
         let cache_ok = valid_nodes >= 1;
 
         // 5. OpenRaster exchange test

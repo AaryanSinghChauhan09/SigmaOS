@@ -614,7 +614,9 @@ impl AurClient {
         let q = query.to_lowercase();
         self.local_index
             .values()
-            .filter(|p| p.name.to_lowercase().contains(&q) || p.description.to_lowercase().contains(&q))
+            .filter(|p| {
+                p.name.to_lowercase().contains(&q) || p.description.to_lowercase().contains(&q)
+            })
             .cloned()
             .collect()
     }
@@ -651,7 +653,10 @@ impl AurHelper {
     }
 
     pub fn install(&mut self, pkg_name: &str) -> Result<(), AurError> {
-        let pkg = self.client.info(pkg_name).ok_or_else(|| AurError::NotFound(pkg_name.to_string()))?;
+        let pkg = self
+            .client
+            .info(pkg_name)
+            .ok_or_else(|| AurError::NotFound(pkg_name.to_string()))?;
         self.installed.insert(pkg.name, pkg.version);
         Ok(())
     }
@@ -670,7 +675,10 @@ impl AurHelper {
     }
 
     pub fn list_installed(&self) -> Vec<(&str, &str)> {
-        self.installed.iter().map(|(n, v)| (n.as_str(), v.as_str())).collect()
+        self.installed
+            .iter()
+            .map(|(n, v)| (n.as_str(), v.as_str()))
+            .collect()
     }
 }
 
@@ -683,8 +691,16 @@ mod aur_arch_tests {
     fn test_aur_client_search() {
         // Arrange
         let mut client = AurClient::default();
-        let pkg1 = AurPackage::new("visual-studio-code-bin", "1.89.0", "Visual Studio Code binary release");
-        let pkg2 = AurPackage::new("google-chrome", "125.0", "The popular web browser by Google");
+        let pkg1 = AurPackage::new(
+            "visual-studio-code-bin",
+            "1.89.0",
+            "Visual Studio Code binary release",
+        );
+        let pkg2 = AurPackage::new(
+            "google-chrome",
+            "125.0",
+            "The popular web browser by Google",
+        );
         client.register_mock_package(pkg1);
         client.register_mock_package(pkg2);
 

@@ -29,7 +29,10 @@ fn test_integration_photocraft_v68_all_engines() {
     let engine1 = PhotocraftRaw32BitFloatingPointDemosaicV68PrEngine::new();
     let bayer = vec![0.8f32; 2 * 2];
     let mut dst_rgb = vec![0.0f32; 2 * 2 * 3];
-    assert_eq!(engine1.demosaic_float(&bayer, 2, 2, &mut dst_rgb).unwrap(), 4);
+    assert_eq!(
+        engine1.demosaic_float(&bayer, 2, 2, &mut dst_rgb).unwrap(),
+        4
+    );
     assert!(dst_rgb[0] > 0.0);
 
     // 2. AI Diffusion Generative Inpainting Engine
@@ -56,7 +59,12 @@ fn test_integration_photocraft_v68_all_engines() {
     let slice1 = vec![40u8; 6];
     let slice2 = vec![180u8; 6];
     let mut out_stack = vec![0u8; 6];
-    assert_eq!(engine5.stack_focus_slices(&[slice1, slice2], 2, 1, &mut out_stack).unwrap(), 2);
+    assert_eq!(
+        engine5
+            .stack_focus_slices(&[slice1, slice2], 2, 1, &mut out_stack)
+            .unwrap(),
+        2
+    );
     assert_eq!(out_stack[0], 180);
 
     // 6. Non-Destructive Smart Filter Graph Engine
@@ -80,13 +88,21 @@ fn test_integration_photocraft_v68_all_engines() {
         anchor_end: VectorCoord2DV68 { x: 30.0, y: 30.0 },
     });
     let mut mask_out = vec![0u8; 4];
-    assert_eq!(engine7.rasterize_clipping_mask(&mut mask_out, 2, 2).unwrap(), 4);
+    assert_eq!(
+        engine7
+            .rasterize_clipping_mask(&mut mask_out, 2, 2)
+            .unwrap(),
+        4
+    );
     assert_eq!(mask_out[0], 255);
 
     // 8. Neural Semantic Hair Alpha Matting Engine
     let engine8 = PhotocraftNeuralSemanticHairAlphaMattingV68PrEngine::new();
     let mut trimap = vec![128u8; 4];
-    assert_eq!(engine8.solve_matte_transparency(&mut trimap, 2, 2).unwrap(), 4);
+    assert_eq!(
+        engine8.solve_matte_transparency(&mut trimap, 2, 2).unwrap(),
+        4
+    );
     assert_eq!(trimap[0], 230);
 
     // 9. Gigapixel Multi-Band Spherical Stitcher Engine

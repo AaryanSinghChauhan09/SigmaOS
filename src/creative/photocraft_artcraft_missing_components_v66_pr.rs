@@ -126,7 +126,9 @@ impl PhotocraftRaw32BitFloatHdrDemosaicV66PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV66PrProposalManifest {
         PhotocraftV66PrProposalManifest {
             pr_id: 6601,
-            pr_title: String::from("PR #6601: 32-Bit Float HDR RAW Demosaic & Dual-Exposure Pipeline"),
+            pr_title: String::from(
+                "PR #6601: 32-Bit Float HDR RAW Demosaic & Dual-Exposure Pipeline",
+            ),
             target_subsystem: String::from("PhotoCraft Darkroom Core"),
             original_suite: String::from("PhotoCraft Professional Studio"),
             components_added: vec![
@@ -281,7 +283,11 @@ impl PhotocraftCmykSpotColorSeparationV66PrEngine {
             let (c, m, y) = if k >= 0.999 {
                 (0.0, 0.0, 0.0)
             } else {
-                ((c_raw - k) / (1.0 - k), (m_raw - k) / (1.0 - k), (y_raw - k) / (1.0 - k))
+                (
+                    (c_raw - k) / (1.0 - k),
+                    (m_raw - k) / (1.0 - k),
+                    (y_raw - k) / (1.0 - k),
+                )
             };
 
             cyan[i] = (c.clamp(0.0, 1.0) * 255.0) as u8;
@@ -296,7 +302,9 @@ impl PhotocraftCmykSpotColorSeparationV66PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV66PrProposalManifest {
         PhotocraftV66PrProposalManifest {
             pr_id: 6603,
-            pr_title: String::from("PR #6603: CMYK Pre-press Separation & Spot Color Channel Preflight"),
+            pr_title: String::from(
+                "PR #6603: CMYK Pre-press Separation & Spot Color Channel Preflight",
+            ),
             target_subsystem: String::from("PhotoCraft Print Publishing"),
             original_suite: String::from("PhotoCraft Color Separation"),
             components_added: vec![
@@ -382,7 +390,9 @@ impl PhotocraftLchOklabColorGradingWheelV66PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV66PrProposalManifest {
         PhotocraftV66PrProposalManifest {
             pr_id: 6604,
-            pr_title: String::from("PR #6604: Oklab / LCH Perceptual 3-Way Color Wheels & 3D LUT Engine"),
+            pr_title: String::from(
+                "PR #6604: Oklab / LCH Perceptual 3-Way Color Wheels & 3D LUT Engine",
+            ),
             target_subsystem: String::from("PhotoCraft Color Grading Studio"),
             original_suite: String::from("PhotoCraft Color Master"),
             components_added: vec![
@@ -620,7 +630,9 @@ impl PhotocraftNonDestructiveSmartFilterPipelineV66PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV66PrProposalManifest {
         PhotocraftV66PrProposalManifest {
             pr_id: 6607,
-            pr_title: String::from("PR #6607: Non-Destructive Live Smart Filter DAG Execution Pipeline"),
+            pr_title: String::from(
+                "PR #6607: Non-Destructive Live Smart Filter DAG Execution Pipeline",
+            ),
             target_subsystem: String::from("PhotoCraft Smart Layers"),
             original_suite: String::from("PhotoCraft Filter Architecture"),
             components_added: vec![
@@ -839,7 +851,8 @@ impl SovereignPhotocraftArtcraftMissingComponentsV66PrGateway {
             engine_vector_clipping: PhotocraftSubpixelVectorPenPathClippingV66PrEngine::new(),
             engine_smart_filter: PhotocraftNonDestructiveSmartFilterPipelineV66PrEngine::new(),
             engine_portrait_matting: PhotocraftAiNeuralPortraitMattingHairRefinerV66PrEngine::new(),
-            engine_panorama_stitcher: PhotocraftMultiBandPanoramaEquirectangularStitcherV66PrEngine::new(),
+            engine_panorama_stitcher:
+                PhotocraftMultiBandPanoramaEquirectangularStitcherV66PrEngine::new(),
             engine_puppet_warp: PhotocraftPerspectiveMeshPuppetWarpV66PrEngine::new(),
         }
     }

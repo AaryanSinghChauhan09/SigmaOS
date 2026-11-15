@@ -19,7 +19,9 @@ fn test_integration_ext4_and_xfs_v89() {
     assert_eq!(ext4.lookup_htree_block("kernel.img"), Some(512));
 
     let mut xfs = XfsAdvancementsV89Engine::new(8, 50000);
-    let (ag, bno) = xfs.allocate_lockless_ag_extent(1024).expect("Allocation should succeed");
+    let (ag, bno) = xfs
+        .allocate_lockless_ag_extent(1024)
+        .expect("Allocation should succeed");
     assert_eq!(ag, 0);
     assert_eq!(bno, 0);
 

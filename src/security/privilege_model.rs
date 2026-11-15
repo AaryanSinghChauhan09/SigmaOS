@@ -54,12 +54,12 @@ impl Capability {
         matches!(
             self,
             Self::CapSysAdmin
-            | Self::CapNetAdmin
-            | Self::CapSysPtrace
-            | Self::CapSysModule
-            | Self::CapSysRawio
-            | Self::CapSetuid
-            | Self::CapSetgid
+                | Self::CapNetAdmin
+                | Self::CapSysPtrace
+                | Self::CapSysModule
+                | Self::CapSysRawio
+                | Self::CapSetuid
+                | Self::CapSetgid
         )
     }
 }
@@ -140,38 +140,76 @@ pub struct PrivilegeManager {
 
 impl PrivilegeManager {
     pub fn new() -> Self {
-        Self { permissions: Vec::new() }
+        Self {
+            permissions: Vec::new(),
+        }
     }
 
     /// Build the default permission set for a given trust level.
     pub fn default_permission(trust: AppTrustLevel) -> AppPermission {
         let (caps, syscalls, network, display, audio) = match trust {
             AppTrustLevel::System => (
-                vec![Capability::CapNetAdmin, Capability::CapSysAdmin,
-                     Capability::CapSetuid, Capability::CapSetgid],
+                vec![
+                    Capability::CapNetAdmin,
+                    Capability::CapSysAdmin,
+                    Capability::CapSetuid,
+                    Capability::CapSetgid,
+                ],
                 vec!["all".to_string()],
-                true, true, true,
+                true,
+                true,
+                true,
             ),
             AppTrustLevel::Trusted => (
                 vec![Capability::CapNetBindService],
-                vec!["read".to_string(), "write".to_string(), "open".to_string(),
-                     "close".to_string(), "mmap".to_string(), "brk".to_string(),
-                     "socket".to_string(), "connect".to_string(), "sendmsg".to_string(),
-                     "recvmsg".to_string(), "ioctl".to_string(), "futex".to_string()],
-                true, true, true,
+                vec![
+                    "read".to_string(),
+                    "write".to_string(),
+                    "open".to_string(),
+                    "close".to_string(),
+                    "mmap".to_string(),
+                    "brk".to_string(),
+                    "socket".to_string(),
+                    "connect".to_string(),
+                    "sendmsg".to_string(),
+                    "recvmsg".to_string(),
+                    "ioctl".to_string(),
+                    "futex".to_string(),
+                ],
+                true,
+                true,
+                true,
             ),
             AppTrustLevel::Sandboxed => (
                 vec![],
-                vec!["read".to_string(), "write".to_string(), "open".to_string(),
-                     "close".to_string(), "mmap".to_string(), "brk".to_string(),
-                     "socket".to_string(), "connect".to_string(), "futex".to_string()],
-                true, true, true,
+                vec![
+                    "read".to_string(),
+                    "write".to_string(),
+                    "open".to_string(),
+                    "close".to_string(),
+                    "mmap".to_string(),
+                    "brk".to_string(),
+                    "socket".to_string(),
+                    "connect".to_string(),
+                    "futex".to_string(),
+                ],
+                true,
+                true,
+                true,
             ),
             AppTrustLevel::Untrusted => (
                 vec![],
-                vec!["read".to_string(), "write".to_string(), "open".to_string(),
-                     "close".to_string(), "brk".to_string(), "futex".to_string()],
-                false, false, false,
+                vec![
+                    "read".to_string(),
+                    "write".to_string(),
+                    "open".to_string(),
+                    "close".to_string(),
+                    "brk".to_string(),
+                    "futex".to_string(),
+                ],
+                false,
+                false,
+                false,
             ),
         };
         AppPermission {
@@ -217,19 +255,23 @@ impl PrivilegeManager {
 
     /// Check whether an app has a specific capability.
     pub fn check_permission(&self, app_id: &str, cap: &Capability) -> bool {
-        self.permissions.iter()
+        self.permissions
+            .iter()
             .find(|p| p.app_id == app_id)
             .map_or(false, |p| p.allowed_caps.contains(cap))
     }
 
     /// Return audit entries for all registered apps.
     pub fn audit_privileges(&self) -> Vec<PrivilegeAuditEntry> {
-        self.permissions.iter().map(|p| PrivilegeAuditEntry {
-            app_id: p.app_id.clone(),
-            trust: p.trust,
-            cap_count: p.allowed_caps.len(),
-            has_dangerous_caps: p.allowed_caps.iter().any(|c| c.is_dangerous()),
-        }).collect()
+        self.permissions
+            .iter()
+            .map(|p| PrivilegeAuditEntry {
+                app_id: p.app_id.clone(),
+                trust: p.trust,
+                cap_count: p.allowed_caps.len(),
+                has_dangerous_caps: p.allowed_caps.iter().any(|c| c.is_dangerous()),
+            })
+            .collect()
     }
 
     /// Apply `PR_SET_NO_NEW_PRIVS` to the current process.
@@ -240,7 +282,9 @@ impl PrivilegeManager {
 }
 
 impl Default for PrivilegeManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -268,10 +312,13 @@ mod tests {
         let mut mgr = PrivilegeManager::new();
         let mut perm = PrivilegeManager::default_permission(AppTrustLevel::Sandboxed);
         perm.allowed_caps.push(Capability::CapSysAdmin); // dangerous!
-        // Act
+                                                         // Act
         let result = mgr.grant_permission("org.test.app", perm);
         // Assert
-        assert!(matches!(result, Err(PrivilegeError::CapabilityDenied(_, _))));
+        assert!(matches!(
+            result,
+            Err(PrivilegeError::CapabilityDenied(_, _))
+        ));
     }
 
     #[test]
@@ -290,11 +337,15 @@ mod tests {
         // Arrange
         let mut mgr = PrivilegeManager::new();
         let sys_perm = PrivilegeManager::default_permission(AppTrustLevel::System);
-        mgr.grant_permission("org.sigmaos.system", sys_perm).unwrap();
+        mgr.grant_permission("org.sigmaos.system", sys_perm)
+            .unwrap();
         // Act
         let audit = mgr.audit_privileges();
         // Assert
-        let entry = audit.iter().find(|e| e.app_id == "org.sigmaos.system").unwrap();
+        let entry = audit
+            .iter()
+            .find(|e| e.app_id == "org.sigmaos.system")
+            .unwrap();
         assert!(entry.has_dangerous_caps);
     }
 
@@ -302,7 +353,8 @@ mod tests {
     fn test_drop_privileges_fails_for_root_without_no_new_privs() {
         // Arrange
         let priv_ = ProcessPrivilege {
-            uid: 0, gid: 0,
+            uid: 0,
+            gid: 0,
             capabilities: vec![],
             no_new_privs: false,
             seccomp_enabled: false,

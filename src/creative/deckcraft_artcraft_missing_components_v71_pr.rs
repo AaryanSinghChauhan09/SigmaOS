@@ -76,9 +76,27 @@ impl DeckcraftKineticTypographyPhysicsGlitchV71Engine {
             glitch_intensity: 0.25,
             font_optical_size: 18.0,
             text_path: vec![
-                GlitchPoint2DV71 { x: 0.0, y: 0.0, r_offset: 2.2, g_offset: -0.9, b_offset: 1.4 },
-                GlitchPoint2DV71 { x: 160.0, y: 80.0, r_offset: 3.0, g_offset: -1.6, b_offset: 2.2 },
-                GlitchPoint2DV71 { x: 320.0, y: 0.0, r_offset: 1.2, g_offset: -0.6, b_offset: 0.9 },
+                GlitchPoint2DV71 {
+                    x: 0.0,
+                    y: 0.0,
+                    r_offset: 2.2,
+                    g_offset: -0.9,
+                    b_offset: 1.4,
+                },
+                GlitchPoint2DV71 {
+                    x: 160.0,
+                    y: 80.0,
+                    r_offset: 3.0,
+                    g_offset: -1.6,
+                    b_offset: 2.2,
+                },
+                GlitchPoint2DV71 {
+                    x: 320.0,
+                    y: 0.0,
+                    r_offset: 1.2,
+                    g_offset: -0.6,
+                    b_offset: 0.9,
+                },
             ],
         }
     }
@@ -222,7 +240,9 @@ impl DeckcraftRealtimeAudioVisualizerBeatSyncV71Engine {
     }
 
     pub fn is_transient_spike_detected(&self) -> bool {
-        self.fft_bands.iter().any(|&b| b >= self.transient_threshold)
+        self.fft_bands
+            .iter()
+            .any(|&b| b >= self.transient_threshold)
     }
 
     pub fn compute_pulse_scale(&self) -> f32 {
@@ -276,9 +296,24 @@ impl DeckcraftSmartDiagramSankeyFlowLayoutV71Engine {
     pub fn new() -> Self {
         Self {
             nodes: vec![
-                SankeyNodeV71 { node_id: 1, name: String::from("Enterprise Revenue"), inflow: 2500.0, outflow: 2500.0 },
-                SankeyNodeV71 { node_id: 2, name: String::from("R&D Engineering"), inflow: 1000.0, outflow: 1000.0 },
-                SankeyNodeV71 { node_id: 3, name: String::from("Cloud Infrastructure"), inflow: 1500.0, outflow: 1500.0 },
+                SankeyNodeV71 {
+                    node_id: 1,
+                    name: String::from("Enterprise Revenue"),
+                    inflow: 2500.0,
+                    outflow: 2500.0,
+                },
+                SankeyNodeV71 {
+                    node_id: 2,
+                    name: String::from("R&D Engineering"),
+                    inflow: 1000.0,
+                    outflow: 1000.0,
+                },
+                SankeyNodeV71 {
+                    node_id: 3,
+                    name: String::from("Cloud Infrastructure"),
+                    inflow: 1500.0,
+                    outflow: 1500.0,
+                },
             ],
         }
     }
@@ -375,7 +410,11 @@ impl DeckcraftLiveAudienceQnaModerationMeshV71Engine {
     }
 
     pub fn upvote_question(&mut self, question_id: u32) {
-        if let Some(q) = self.questions.iter_mut().find(|q| q.question_id == question_id) {
+        if let Some(q) = self
+            .questions
+            .iter_mut()
+            .find(|q| q.question_id == question_id)
+        {
             q.upvotes += 1;
         }
     }
@@ -490,7 +529,11 @@ impl DeckcraftAiSlideGeneratorWcagBalancerV71Engine {
     }
 
     pub fn compute_contrast_ratio(&self, lum1: f32, lum2: f32) -> WcagResultV71 {
-        let (l1, l2) = if lum1 > lum2 { (lum1, lum2) } else { (lum2, lum1) };
+        let (l1, l2) = if lum1 > lum2 {
+            (lum1, lum2)
+        } else {
+            (lum2, lum1)
+        };
         let ratio = (l1 + 0.05) / (l2 + 0.05);
         WcagResultV71 {
             contrast_ratio: ratio,
@@ -501,7 +544,9 @@ impl DeckcraftAiSlideGeneratorWcagBalancerV71Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV71PrProposalManifest {
         DeckcraftV71PrProposalManifest {
             pr_id: 7107,
-            pr_title: String::from("PR #7107: AI Slide Generator & WCAG 2.1 AAA Design Balancer V71"),
+            pr_title: String::from(
+                "PR #7107: AI Slide Generator & WCAG 2.1 AAA Design Balancer V71",
+            ),
             target_subsystem: String::from("Deckcraft Intelligence & WCAG Layout Core V71"),
             original_suite: String::from("ArtCraft Deckcraft AI Design Suite V71"),
             components_added: vec![
@@ -558,7 +603,9 @@ impl DeckcraftAiTeleprompterSpeechAnalyticsV71Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV71PrProposalManifest {
         DeckcraftV71PrProposalManifest {
             pr_id: 7108,
-            pr_title: String::from("PR #7108: AI Teleprompter & Speech Pacing Analytics Engine V71"),
+            pr_title: String::from(
+                "PR #7108: AI Teleprompter & Speech Pacing Analytics Engine V71",
+            ),
             target_subsystem: String::from("Deckcraft Presenter Copilot Subsystem V71"),
             original_suite: String::from("ArtCraft Deckcraft Speech Copilot V71"),
             components_added: vec![
@@ -665,7 +712,9 @@ impl DeckcraftMultiFormatBatchExporterPdfaRevealV71Engine {
         let mut output = Vec::new();
         let header = match format {
             ExportFormatV71::PdfA3b => "%PDF-1.7 (PDF/A-3b ISO 19005-3 V71)",
-            ExportFormatV71::RevealJsBundle => "<!DOCTYPE html><html><head><title>Reveal.js V71 Deck</title></head>",
+            ExportFormatV71::RevealJsBundle => {
+                "<!DOCTYPE html><html><head><title>Reveal.js V71 Deck</title></head>"
+            }
             ExportFormatV71::Mp4Video4K => "\x00\x00\x00\x1cftypisom",
             ExportFormatV71::SvgSlideDeck => "<?xml version=\"1.0\" encoding=\"UTF-8\"?><svg>",
         };
@@ -677,12 +726,16 @@ impl DeckcraftMultiFormatBatchExporterPdfaRevealV71Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV71PrProposalManifest {
         DeckcraftV71PrProposalManifest {
             pr_id: 7110,
-            pr_title: String::from("PR #7110: Multi-Format High-Res PDF/A & Reveal.js Batch Exporter V71"),
+            pr_title: String::from(
+                "PR #7110: Multi-Format High-Res PDF/A & Reveal.js Batch Exporter V71",
+            ),
             target_subsystem: String::from("Deckcraft Multi-Format Publishing Core V71"),
             original_suite: String::from("ArtCraft Deckcraft Multi-Format Exporter V71"),
             components_added: vec![
                 String::from("ISO 19005-3 PDF/A-3b Archival Export Engine V71"),
-                String::from("Standalone Self-Contained Reveal.js HTML5 Interactive Deck Bundler V71"),
+                String::from(
+                    "Standalone Self-Contained Reveal.js HTML5 Interactive Deck Bundler V71",
+                ),
                 String::from("Hardware NVENC/VAAPI Accelerated 4K MP4 Video Renderer V71"),
             ],
             performance_multiplier: String::from("Parallel Export Acceleration (24x faster)"),
@@ -840,9 +893,14 @@ mod tests {
     #[test]
     fn test_qna_moderation_v71() {
         let mut engine = DeckcraftLiveAudienceQnaModerationMeshV71Engine::new();
-        let q_id = engine.submit_question("Carol", "Can Deckcraft V71 run headless for batch exports?");
+        let q_id =
+            engine.submit_question("Carol", "Can Deckcraft V71 run headless for batch exports?");
         engine.upvote_question(q_id);
-        let q = engine.questions.iter().find(|q| q.question_id == q_id).unwrap();
+        let q = engine
+            .questions
+            .iter()
+            .find(|q| q.question_id == q_id)
+            .unwrap();
         assert_eq!(q.upvotes, 2);
 
         let manifest = engine.generate_pr_manifest();

@@ -51,7 +51,10 @@ impl SovereignGoogleDocsSmartChipPaginatedTableEngineV8 {
     ) -> PaginatedTableRenderResult {
         let mut filtered: Vec<SmartTableRow> = if let Some(st) = filter_status {
             rows.iter()
-                .filter(|r| r.status_badge.eq_ignore_ascii_case(st) || r.cells.values().any(|v| v.contains(st)))
+                .filter(|r| {
+                    r.status_badge.eq_ignore_ascii_case(st)
+                        || r.cells.values().any(|v| v.contains(st))
+                })
                 .cloned()
                 .collect()
         } else {
@@ -315,7 +318,11 @@ impl SovereignMicrosoftWordSmartRevisionDiffEngineV8 {
 
         let deletions = base_chunks
             .iter()
-            .filter(|bc| !author_chunks.iter().any(|ac| ac.paragraph_index == bc.paragraph_index))
+            .filter(|bc| {
+                !author_chunks
+                    .iter()
+                    .any(|ac| ac.paragraph_index == bc.paragraph_index)
+            })
             .count();
 
         SmartRevisionDiffResult {
@@ -361,9 +368,13 @@ impl SovereignMicrosoftExcelMonteCarloSimulationEngineV8 {
         // Deterministic Pseudo-Random Number Generator (LCG + Box-Muller transform)
         let mut state: u64 = 123456789;
         for _ in 0..(n / 2) {
-            state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             let u1 = ((state >> 11) as f64) / ((1u64 << 53) as f64);
-            state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             let u2 = ((state >> 11) as f64) / ((1u64 << 53) as f64);
 
             let u1_safe = u1.clamp(1e-10, 1.0 - 1e-10);
@@ -379,7 +390,8 @@ impl SovereignMicrosoftExcelMonteCarloSimulationEngineV8 {
         let sum: f64 = samples.iter().sum();
         let mean = sum / samples.len() as f64;
 
-        let var: f64 = samples.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / samples.len() as f64;
+        let var: f64 =
+            samples.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / samples.len() as f64;
 
         let p10 = samples[(samples.len() as f64 * 0.10) as usize];
         let p50 = samples[(samples.len() as f64 * 0.50) as usize];
@@ -433,8 +445,14 @@ impl SovereignMicrosoftPowerBiTimeSeriesForecastingEngineV8 {
         let n = historical_points.len() as f64;
         let sum_x: f64 = (0..historical_points.len()).map(|i| i as f64).sum();
         let sum_y: f64 = historical_points.iter().map(|p| p.observed_value).sum();
-        let sum_xy: f64 = historical_points.iter().enumerate().map(|(i, p)| i as f64 * p.observed_value).sum();
-        let sum_xx: f64 = (0..historical_points.len()).map(|i| (i as f64).powi(2)).sum();
+        let sum_xy: f64 = historical_points
+            .iter()
+            .enumerate()
+            .map(|(i, p)| i as f64 * p.observed_value)
+            .sum();
+        let sum_xx: f64 = (0..historical_points.len())
+            .map(|i| (i as f64).powi(2))
+            .sum();
 
         let denominator = n * sum_xx - sum_x.powi(2);
         let slope = if denominator.abs() > 1e-9 {
@@ -612,7 +630,10 @@ impl SovereignZohoDeskSentimentAwareTicketRouterEngineV8 {
         let positive_words = ["great", "thanks", "happy", "awesome", "fixed"];
 
         let urgent_count = urgent_words.iter().filter(|&&w| lower.contains(w)).count();
-        let positive_count = positive_words.iter().filter(|&&w| lower.contains(w)).count();
+        let positive_count = positive_words
+            .iter()
+            .filter(|&&w| lower.contains(w))
+            .count();
 
         let (sentiment, priority, queue, reply) = if urgent_count > 0 {
             (
@@ -861,7 +882,9 @@ impl SovereignSalesforceServiceCloudWorkloadBalanceRouterEngineV8 {
     ) -> WorkloadBalanceRoutingResult {
         let eligible = agents
             .iter()
-            .filter(|a| a.skills.contains(&required_skill.to_string()) && a.active_cases < a.max_capacity)
+            .filter(|a| {
+                a.skills.contains(&required_skill.to_string()) && a.active_cases < a.max_capacity
+            })
             .min_by_key(|a| a.active_cases);
 
         if let Some(ag) = eligible {
@@ -1144,7 +1167,10 @@ impl SovereignBitrix24WorkgroupResourceGanttEngineV8 {
     ) -> ResourceGanttPlanResult {
         let total_res = resources.len();
         let total_cap: f64 = resources.iter().map(|r| r.capacity_hours_per_day).sum();
-        let total_assigned: f64 = resources.iter().map(|r| r.assigned_tasks_count as f64 * 2.0).sum();
+        let total_assigned: f64 = resources
+            .iter()
+            .map(|r| r.assigned_tasks_count as f64 * 2.0)
+            .sum();
 
         let utilization = if total_cap > 0.0 {
             (total_assigned / total_cap) * 100.0
@@ -1249,7 +1275,8 @@ impl SovereignEnterpriseProductivitySuiteV8PrGatewayEngine {
             }],
             60,
         );
-        let slides_passed = slides_res.total_slides_synced == 1 && slides_res.total_rendered_frames == 300;
+        let slides_passed =
+            slides_res.total_slides_synced == 1 && slides_res.total_rendered_frames == 300;
 
         // 4. Google Looker Studio Realtime Drilldown
         let looker_eng = SovereignGoogleLookerStudioRealtimeDrilldownEngineV8::new();
@@ -1262,7 +1289,8 @@ impl SovereignEnterpriseProductivitySuiteV8PrGatewayEngine {
             100,
             &[10.0, 20.0, 30.0],
         );
-        let looker_passed = looker_res.aggregated_metric_val == 60.0 && looker_res.metric_mean == 20.0;
+        let looker_passed =
+            looker_res.aggregated_metric_val == 60.0 && looker_res.metric_mean == 20.0;
 
         // 5. Microsoft Word Smart Revision Diff
         let word_eng = SovereignMicrosoftWordSmartRevisionDiffEngineV8::new();
@@ -1296,8 +1324,14 @@ impl SovereignEnterpriseProductivitySuiteV8PrGatewayEngine {
         let pbi_eng = SovereignMicrosoftPowerBiTimeSeriesForecastingEngineV8::new();
         let pbi_res = pbi_eng.forecast_time_series(
             &[
-                TimeSeriesPoint { timestamp_ms: 1000, observed_value: 10.0 },
-                TimeSeriesPoint { timestamp_ms: 2000, observed_value: 20.0 },
+                TimeSeriesPoint {
+                    timestamp_ms: 1000,
+                    observed_value: 10.0,
+                },
+                TimeSeriesPoint {
+                    timestamp_ms: 2000,
+                    observed_value: 20.0,
+                },
             ],
             3,
         );
@@ -1305,12 +1339,15 @@ impl SovereignEnterpriseProductivitySuiteV8PrGatewayEngine {
 
         // 8. Microsoft Loop Realtime Dataverse Bridge
         let loop_eng = SovereignMicrosoftLoopRealtimeDataverseBridgeEngineV8::new();
-        let loop_res = loop_eng.sync_mutations("Account", &[DataverseFieldMutation {
-            field_key: "Name".to_string(),
-            old_value: "Old Corp".to_string(),
-            new_value: "New Corp".to_string(),
-            client_timestamp_ms: 1000,
-        }]);
+        let loop_res = loop_eng.sync_mutations(
+            "Account",
+            &[DataverseFieldMutation {
+                field_key: "Name".to_string(),
+                old_value: "Old Corp".to_string(),
+                new_value: "New Corp".to_string(),
+                client_timestamp_ms: 1000,
+            }],
+        );
         let loop_passed = loop_res.muts_applied == 1;
 
         // 9. Zoho Books Multi-Country Tax Compliance
@@ -1391,7 +1428,8 @@ impl SovereignEnterpriseProductivitySuiteV8PrGatewayEngine {
             vibration_hz: 135.0,
             pressure_psi: 45.0,
         });
-        let odoo_mrp_passed = odoo_mrp_res.anomaly_detected && odoo_mrp_res.auto_work_order_generated;
+        let odoo_mrp_passed =
+            odoo_mrp_res.anomaly_detected && odoo_mrp_res.auto_work_order_generated;
 
         // 16. Odoo Inventory Cross-Docking
         let odoo_inv_eng = SovereignOdooInventoryCrossDockingEngineV8::new();
@@ -1401,7 +1439,8 @@ impl SovereignEnterpriseProductivitySuiteV8PrGatewayEngine {
             outbound_dock: "DOCK_B".to_string(),
             pallet_count: 5,
         });
-        let odoo_inv_passed = odoo_inv_res.is_direct_transfer && odoo_inv_res.transit_time_mins == 20;
+        let odoo_inv_passed =
+            odoo_inv_res.is_direct_transfer && odoo_inv_res.transit_time_mins == 20;
 
         // 17. Odoo POS Offline Sync
         let odoo_pos_eng = SovereignOdooPosOfflineSyncEngineV8::new();
@@ -1413,7 +1452,8 @@ impl SovereignEnterpriseProductivitySuiteV8PrGatewayEngine {
                 timestamp_ms: 1000,
             }],
         );
-        let odoo_pos_passed = odoo_pos_res.conflict_free && odoo_pos_res.total_amount_synced == 45.0;
+        let odoo_pos_passed =
+            odoo_pos_res.conflict_free && odoo_pos_res.total_amount_synced == 45.0;
 
         // 18. Bitrix24 Telephony CRM AI Call Scorer
         let bitrix_tele_eng = SovereignBitrix24TelephonyCrmAiCallScorerEngineV8::new();

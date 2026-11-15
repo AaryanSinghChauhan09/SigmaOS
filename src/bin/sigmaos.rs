@@ -70,7 +70,10 @@ fn run_script(script_name: &str) {
             .current_dir(&base)
             .status();
     } else {
-        println!("\x1b[31mError: script '{}' not found at {:?}\x1b[0m", script_name, script_path);
+        println!(
+            "\x1b[31mError: script '{}' not found at {:?}\x1b[0m",
+            script_name, script_path
+        );
     }
 }
 
@@ -80,7 +83,10 @@ fn print_status() {
     println!("  Kernel Library Status: \x1b[32m✓ PASSING (0 errors across 190 modules)\x1b[0m");
     let iso = base.join("build/sigmaos-desktop-preview.iso");
     if iso.exists() {
-        println!("  Bootable ISO Preview : \x1b[32m✓ Available at {} (ISO9660)\x1b[0m", iso.display());
+        println!(
+            "  Bootable ISO Preview : \x1b[32m✓ Available at {} (ISO9660)\x1b[0m",
+            iso.display()
+        );
     } else {
         println!("  Bootable ISO Preview : \x1b[33m! Run `make iso-stub` or `./run.sh --iso` to generate\x1b[0m");
     }
@@ -211,12 +217,21 @@ fn run_doctor() {
     let base = find_base_dir();
 
     // Check Wayland
-    let wayland = env::var("WAYLAND_DISPLAY").is_ok() || env::var("XDG_SESSION_TYPE").map(|v| v == "wayland").unwrap_or(false);
+    let wayland = env::var("WAYLAND_DISPLAY").is_ok()
+        || env::var("XDG_SESSION_TYPE")
+            .map(|v| v == "wayland")
+            .unwrap_or(false);
     if wayland {
-        println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m running under Wayland", "wayland-session");
+        println!(
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m running under Wayland",
+            "wayland-session"
+        );
         pass += 1;
     } else {
-        println!("\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m headless/TTY or X11 session", "wayland-session");
+        println!(
+            "\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m headless/TTY or X11 session",
+            "wayland-session"
+        );
         println!("       \x1b[90mfix: launch in Hyprland or run ./run.sh --omarchy\x1b[0m");
         warn += 1;
     }
@@ -224,10 +239,16 @@ fn run_doctor() {
     // Check Compositor (Hyprland)
     let hypr = env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok();
     if hypr {
-        println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m Hyprland compositor active", "hyprland");
+        println!(
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m Hyprland compositor active",
+            "hyprland"
+        );
         pass += 1;
     } else {
-        println!("\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m compositor not detected in current shell", "hyprland");
+        println!(
+            "\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m compositor not detected in current shell",
+            "hyprland"
+        );
         println!("       \x1b[90mfix: start Hyprland session or use ./run.sh --omarchy\x1b[0m");
         warn += 1;
     }
@@ -235,47 +256,83 @@ fn run_doctor() {
     // Check Desktop Shell Daemon
     let shell_script = base.join("bin/sigmaos-shell");
     if shell_script.exists() {
-        println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m daemon script present and ready", "desktop-shell");
+        println!(
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m daemon script present and ready",
+            "desktop-shell"
+        );
         pass += 1;
     } else {
-        println!("\x1b[31m[FAIL]\x1b[0m \x1b[1m{:<18}\x1b[0m bin/sigmaos-shell not found", "desktop-shell");
+        println!(
+            "\x1b[31m[FAIL]\x1b[0m \x1b[1m{:<18}\x1b[0m bin/sigmaos-shell not found",
+            "desktop-shell"
+        );
         println!("       \x1b[90mfix: verify SigmaOS installation\x1b[0m");
         fail += 1;
     }
 
     // Check Audio Subsystem
-    let audio_ok = Command::new("pgrep").arg("-f").arg("pipewire|pulseaudio").output().map(|o| o.status.success()).unwrap_or(false);
+    let audio_ok = Command::new("pgrep")
+        .arg("-f")
+        .arg("pipewire|pulseaudio")
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false);
     if audio_ok {
-        println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m PipeWire/PulseAudio sound server running", "audio");
+        println!(
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m PipeWire/PulseAudio sound server running",
+            "audio"
+        );
         pass += 1;
     } else {
-        println!("\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m no active audio server detected", "audio");
+        println!(
+            "\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m no active audio server detected",
+            "audio"
+        );
         println!("       \x1b[90mfix: systemctl --user start pipewire\x1b[0m");
         warn += 1;
     }
 
     // Check Network
-    let net_ok = Path::new("/sys/class/net").read_dir().map(|mut d| d.any(|e| {
-        if let Ok(entry) = e {
-            let name = entry.file_name().to_string_lossy().to_string();
-            name != "lo"
-        } else { false }
-    })).unwrap_or(false);
+    let net_ok = Path::new("/sys/class/net")
+        .read_dir()
+        .map(|mut d| {
+            d.any(|e| {
+                if let Ok(entry) = e {
+                    let name = entry.file_name().to_string_lossy().to_string();
+                    name != "lo"
+                } else {
+                    false
+                }
+            })
+        })
+        .unwrap_or(false);
     if net_ok {
-        println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m network interface online", "network");
+        println!(
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m network interface online",
+            "network"
+        );
         pass += 1;
     } else {
-        println!("\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m no external network interface found", "network");
+        println!(
+            "\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m no external network interface found",
+            "network"
+        );
         warn += 1;
     }
 
     // Check Multiboot Kernel
     let kernel_elf = base.join("boot/sigma_kernel.elf");
     if kernel_elf.exists() {
-        println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m compiled Multiboot kernel ELF verified", "kernel-binary");
+        println!(
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m compiled Multiboot kernel ELF verified",
+            "kernel-binary"
+        );
         pass += 1;
     } else {
-        println!("\x1b[31m[FAIL]\x1b[0m \x1b[1m{:<18}\x1b[0m boot/sigma_kernel.elf missing", "kernel-binary");
+        println!(
+            "\x1b[31m[FAIL]\x1b[0m \x1b[1m{:<18}\x1b[0m boot/sigma_kernel.elf missing",
+            "kernel-binary"
+        );
         println!("       \x1b[90mfix: make kernel\x1b[0m");
         fail += 1;
     }
@@ -286,7 +343,10 @@ fn run_doctor() {
         println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m bootable ISO image built (build/sigmaos-desktop-preview.iso)", "bootable-iso");
         pass += 1;
     } else {
-        println!("\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m desktop preview ISO not yet synthesized", "bootable-iso");
+        println!(
+            "\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m desktop preview ISO not yet synthesized",
+            "bootable-iso"
+        );
         println!("       \x1b[90mfix: make iso-stub\x1b[0m");
         warn += 1;
     }
@@ -294,18 +354,30 @@ fn run_doctor() {
     // Check Package Manager
     let pkg_mgr = base.join("src/bin/sigpkg.rs");
     if pkg_mgr.exists() {
-        println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m SigPkg Arch Linux translation gate present", "pkg-manager");
+        println!(
+            "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m SigPkg Arch Linux translation gate present",
+            "pkg-manager"
+        );
         pass += 1;
     } else {
-        println!("\x1b[31m[FAIL]\x1b[0m \x1b[1m{:<18}\x1b[0m sigpkg package manager missing", "pkg-manager");
+        println!(
+            "\x1b[31m[FAIL]\x1b[0m \x1b[1m{:<18}\x1b[0m sigpkg package manager missing",
+            "pkg-manager"
+        );
         fail += 1;
     }
 
     // Check Craft Suite
-    println!("\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m 20/20 Craft Creative Suite modules registered", "craft-suite");
+    println!(
+        "\x1b[32m[ ok ]\x1b[0m \x1b[1m{:<18}\x1b[0m 20/20 Craft Creative Suite modules registered",
+        "craft-suite"
+    );
     pass += 1;
 
-    println!("\n\x1b[1mSummary:\x1b[0m {} passed, {} warnings, {} failures\n", pass, warn, fail);
+    println!(
+        "\n\x1b[1mSummary:\x1b[0m {} passed, {} warnings, {} failures\n",
+        pass, warn, fail
+    );
 }
 
 fn run_interactive_repl() {
@@ -379,10 +451,7 @@ fn run_interactive_repl() {
             "shell" => {
                 println!("\n[Pinging bin/sigmaos-shell...]");
                 let shell_bin = base.join("bin/sigmaos-shell");
-                let status = Command::new("bash")
-                    .arg(&shell_bin)
-                    .arg("ping")
-                    .status();
+                let status = Command::new("bash").arg(&shell_bin).arg("ping").status();
                 if let Err(e) = status {
                     println!("Failed to invoke shell: {}", e);
                 }
@@ -391,10 +460,7 @@ fn run_interactive_repl() {
             "iso" => {
                 println!("\n[Bootable ISO Image Details]");
                 let iso_path = base.join("build/sigmaos-desktop-preview.iso");
-                let status = Command::new("ls")
-                    .arg("-lh")
-                    .arg(&iso_path)
-                    .status();
+                let status = Command::new("ls").arg("-lh").arg(&iso_path).status();
                 if let Err(e) = status {
                     println!("No built ISO image found: {}", e);
                 }
@@ -459,8 +525,12 @@ fn main() {
                 println!("SigmaOS Sovereign Workstation CLI\n");
                 println!("Usage: ./run.sh [OPTIONS] or sigmaos [OPTIONS]\n");
                 println!("Options:");
-                println!("  --omarchy, omarchy Launch Omarchy Aesthetic Persona (Hyprland / Wallust)");
-                println!("  --arch, arch       Launch Arch Linux Minimalist Persona (Pacman / Rolling)");
+                println!(
+                    "  --omarchy, omarchy Launch Omarchy Aesthetic Persona (Hyprland / Wallust)"
+                );
+                println!(
+                    "  --arch, arch       Launch Arch Linux Minimalist Persona (Pacman / Rolling)"
+                );
                 println!("  --mint, mint       Launch Linux Mint Ergonomic Desktop Persona");
                 println!("  --doctor           Execute Omarchy system diagnostics health check");
                 println!("  --check            Execute launch readiness validation");

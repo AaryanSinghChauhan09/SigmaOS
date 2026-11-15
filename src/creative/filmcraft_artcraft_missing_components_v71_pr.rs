@@ -97,7 +97,8 @@ impl FilmcraftNeuralSuperResolutionTemporalUpscalerV71PrEngine {
 
         // Deterministic super-resolution simulation with edge reconstruction
         for i in 0..target_len {
-            let src_idx = (i / (self.scale_factor as usize * self.scale_factor as usize)) % lr_buffer.len();
+            let src_idx =
+                (i / (self.scale_factor as usize * self.scale_factor as usize)) % lr_buffer.len();
             let enhanced = lr_buffer[src_idx].wrapping_add(((i % 17) as u8) ^ 0x5A);
             out_sr_buffer.push(enhanced);
         }
@@ -171,9 +172,9 @@ impl FilmcraftHardwareAcceleratedProResRawBayerDemosaicV71PrEngine {
             let row = idx / width;
             let col = idx % width;
             let (r, g, b) = match (row % 2 == 0, col % 2 == 0) {
-                (true, true) => (sample, sample / 2, sample / 3),   // Red pixel
-                (true, false) => (sample / 2, sample, sample / 2),  // Green (R row)
-                (false, true) => (sample / 2, sample, sample / 2),  // Green (B row)
+                (true, true) => (sample, sample / 2, sample / 3), // Red pixel
+                (true, false) => (sample / 2, sample, sample / 2), // Green (R row)
+                (false, true) => (sample / 2, sample, sample / 2), // Green (B row)
                 (false, false) => (sample / 3, sample / 2, sample), // Blue pixel
             };
             rgb_linear_out.push(r);
@@ -237,7 +238,11 @@ impl FilmcraftAcousticRoomImpulseResponseConvolutionV71PrEngine {
         for i in 0..self.simulated_ir_length_samples {
             let t = i as f32 / 48000.0;
             let decay = (-3.0 * t * (1.0 - self.wall_absorption_coefficient)).exp();
-            let echo = if i % 480 == 0 { 0.8 * decay } else { 0.05 * decay * ((i as f32).sin()) };
+            let echo = if i % 480 == 0 {
+                0.8 * decay
+            } else {
+                0.05 * decay * ((i as f32).sin())
+            };
             rir.push(echo);
         }
         rir
@@ -323,7 +328,11 @@ impl FilmcraftAiNeuralObjectSegmentationInpaintingV71PrEngine {
         for i in 0..source_frame.len() {
             if mask_binary[i] > 128 {
                 // Synthesize background pixel via spatial-temporal diffusion
-                let neighbor = if i >= 4 { source_frame[i - 4] } else { source_frame[i] };
+                let neighbor = if i >= 4 {
+                    source_frame[i - 4]
+                } else {
+                    source_frame[i]
+                };
                 inpainted_out.push(neighbor.wrapping_add(1));
                 inpaint_count += 1;
             } else {
@@ -390,7 +399,11 @@ impl FilmcraftSubframeAudioMultibandTransientShaperV71PrEngine {
         let ceiling = 10.0f32.powf(self.true_peak_ceiling_db / 20.0);
 
         for (idx, &sample) in audio_in.iter().enumerate() {
-            let is_transient = if idx > 0 { (sample - audio_in[idx - 1]).abs() > 0.08 } else { false };
+            let is_transient = if idx > 0 {
+                (sample - audio_in[idx - 1]).abs() > 0.08
+            } else {
+                false
+            };
             let shaped = if is_transient {
                 sample * attack_multiplier
             } else {
@@ -453,7 +466,8 @@ impl FilmcraftCrdtPeerToPeerTimelineGossipSyncV71PrEngine {
     /// Broadcasts an edit operation to peer nodes and advances the Lamport vector clock.
     pub fn broadcast_edit_operation(&mut self, track_id: u32, edit_action: &str) -> (u64, String) {
         self.state_vector_clock += 1;
-        self.active_peer_nodes.insert(self.local_peer_id, self.state_vector_clock);
+        self.active_peer_nodes
+            .insert(self.local_peer_id, self.state_vector_clock);
         let digest = format!(
             "p2p-op-{:016x}-track{}-len{}",
             self.state_vector_clock,
@@ -531,7 +545,11 @@ impl FilmcraftColorGradingOcioV2SpectralCurveMapperV71PrEngine {
         // ACES 2.0 tone-scale compression (Reinhard-JzAzBz hybrid)
         let luma = 0.2627 * r + 0.6780 * g + 0.0593 * b;
         let compressed_luma = luma / (1.0 + luma / (self.tonemap_peak_nits / 100.0));
-        let scale = if luma > 1e-5 { compressed_luma / luma } else { 1.0 };
+        let scale = if luma > 1e-5 {
+            compressed_luma / luma
+        } else {
+            1.0
+        };
 
         [r * scale, g * scale, b * scale]
     }
@@ -592,11 +610,18 @@ impl FilmcraftOpenFxSandboxedGpuKernelHostV71PrEngine {
     }
 
     /// Dispatches a compute render task to the plugin over shared memory IPC.
-    pub fn dispatch_gpu_render(&self, plugin_id: u32, frame_index: u64) -> Result<String, &'static str> {
+    pub fn dispatch_gpu_render(
+        &self,
+        plugin_id: u32,
+        frame_index: u64,
+    ) -> Result<String, &'static str> {
         if plugin_id == 0 || plugin_id > self.registered_plugins_count as u32 {
             return Err("Invalid plugin instance handle");
         }
-        Ok(format!("OFX_DISPATCH:plugin={}:frame={}:vulkan_spirv=OK", plugin_id, frame_index))
+        Ok(format!(
+            "OFX_DISPATCH:plugin={}:frame={}:vulkan_spirv=OK",
+            plugin_id, frame_index
+        ))
     }
 
     pub fn generate_proposal(&self) -> FilmcraftV71PrProposalManifest {
@@ -721,11 +746,18 @@ impl FilmcraftLosslessMultiCodecSmartRenderExporterV71PrEngine {
     }
 
     /// Evaluates if a timeline clip segment can bypass re-encoding via bitstream copy.
-    pub fn can_smart_render(&self, source_codec: &str, has_effects: bool, has_color_grading: bool) -> bool {
+    pub fn can_smart_render(
+        &self,
+        source_codec: &str,
+        has_effects: bool,
+        has_color_grading: bool,
+    ) -> bool {
         if !self.enable_pass_through || has_effects || has_color_grading {
             return false;
         }
-        self.supported_codecs.iter().any(|c| c.contains(source_codec))
+        self.supported_codecs
+            .iter()
+            .any(|c| c.contains(source_codec))
     }
 
     /// Performs zero-transcode packet splice for eligible timeline segments.
@@ -785,7 +817,8 @@ impl SovereignFilmcraftArtcraftMissingComponentsV71PrGateway {
             FilmcraftNeuralSuperResolutionTemporalUpscalerV71PrEngine::new().generate_proposal(),
         );
         gateway.register_proposal(
-            FilmcraftHardwareAcceleratedProResRawBayerDemosaicV71PrEngine::new().generate_proposal(),
+            FilmcraftHardwareAcceleratedProResRawBayerDemosaicV71PrEngine::new()
+                .generate_proposal(),
         );
         gateway.register_proposal(
             FilmcraftAcousticRoomImpulseResponseConvolutionV71PrEngine::new().generate_proposal(),
@@ -1000,7 +1033,9 @@ mod tests {
         assert!(!engine.can_smart_render("ProRes", true, false));
 
         let mut sink = Vec::new();
-        let spliced = engine.splice_bitstream_packet(&[0x00, 0x00, 0x01, 0xBE], &mut sink).unwrap();
+        let spliced = engine
+            .splice_bitstream_packet(&[0x00, 0x00, 0x01, 0xBE], &mut sink)
+            .unwrap();
         assert_eq!(spliced, 4);
         assert_eq!(sink.len(), 4);
         assert_eq!(engine.exported_byte_savings, 4);

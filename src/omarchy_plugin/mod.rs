@@ -237,10 +237,7 @@ impl PluginRegistry {
 
     /// Get loaded plugins
     pub fn get_loaded(&self) -> Vec<&PluginInstance> {
-        self.plugins
-            .values()
-            .filter(|p| p.loaded)
-            .collect()
+        self.plugins.values().filter(|p| p.loaded).collect()
     }
 
     /// Get first-party plugins
@@ -357,14 +354,12 @@ mod tests {
 
     #[test]
     fn test_plugin_manifest() {
-        let mut manifest = PluginManifest::new(
-            String::from("omarchy.clock"),
-            String::from("Clock")
-        );
-        
+        let mut manifest =
+            PluginManifest::new(String::from("omarchy.clock"), String::from("Clock"));
+
         manifest.add_kind(PluginKind::BarWidget);
         manifest.add_entry_point(String::from("barWidget"), String::from("BarWidget.qml"));
-        
+
         assert!(manifest.is_first_party());
         assert!(manifest.validate().is_ok());
     }
@@ -372,13 +367,11 @@ mod tests {
     #[test]
     fn test_plugin_registry() {
         let mut registry = PluginRegistry::new();
-        let mut manifest = PluginManifest::new(
-            String::from("omarchy.network"),
-            String::from("Network")
-        );
+        let mut manifest =
+            PluginManifest::new(String::from("omarchy.network"), String::from("Network"));
         manifest.add_kind(PluginKind::Service);
         manifest.add_entry_point(String::from("service"), String::from("Service.qml"));
-        
+
         assert!(registry.register(manifest).is_ok());
         assert_eq!(registry.plugins.len(), 1);
     }
@@ -386,14 +379,12 @@ mod tests {
     #[test]
     fn test_plugin_loading() {
         let mut registry = PluginRegistry::new();
-        let mut manifest = PluginManifest::new(
-            String::from("test.plugin"),
-            String::from("Test Plugin")
-        );
+        let mut manifest =
+            PluginManifest::new(String::from("test.plugin"), String::from("Test Plugin"));
         manifest.add_kind(PluginKind::Service);
         manifest.add_entry_point(String::from("service"), String::from("Service.qml"));
         registry.register(manifest).unwrap();
-        
+
         assert!(registry.load(String::from("test.plugin")).is_ok());
         assert!(registry.get_plugin("test.plugin").unwrap().loaded);
     }
@@ -401,17 +392,15 @@ mod tests {
     #[test]
     fn test_plugin_enable_disable() {
         let mut registry = PluginRegistry::new();
-        let mut manifest = PluginManifest::new(
-            String::from("test.plugin"),
-            String::from("Test Plugin")
-        );
+        let mut manifest =
+            PluginManifest::new(String::from("test.plugin"), String::from("Test Plugin"));
         manifest.add_kind(PluginKind::Service);
         manifest.add_entry_point(String::from("service"), String::from("Service.qml"));
         registry.register(manifest).unwrap();
-        
+
         assert!(registry.disable(String::from("test.plugin")).is_ok());
         assert!(!registry.get_plugin("test.plugin").unwrap().manifest.enabled);
-        
+
         assert!(registry.enable(String::from("test.plugin")).is_ok());
         assert!(registry.get_plugin("test.plugin").unwrap().manifest.enabled);
     }
@@ -419,14 +408,11 @@ mod tests {
     #[test]
     fn test_get_by_kind() {
         let mut registry = PluginRegistry::new();
-        let mut manifest = PluginManifest::new(
-            String::from("omarchy.bar"),
-            String::from("Bar")
-        );
+        let mut manifest = PluginManifest::new(String::from("omarchy.bar"), String::from("Bar"));
         manifest.add_kind(PluginKind::Bar);
         manifest.add_entry_point(String::from("bar"), String::from("Bar.qml"));
         registry.register(manifest).unwrap();
-        
+
         let bars = registry.get_by_kind(&PluginKind::Bar);
         assert_eq!(bars.len(), 1);
     }
@@ -435,7 +421,7 @@ mod tests {
     fn test_ipc_handler() {
         let registry = PluginRegistry::new();
         let mut handler = PluginIPCHandler::new(registry);
-        
+
         let result = handler.handle(PluginIPCCommand::Ping);
         assert_eq!(result.unwrap(), "pong");
     }
@@ -443,23 +429,19 @@ mod tests {
     #[test]
     fn test_first_party_detection() {
         let mut registry = PluginRegistry::new();
-        
-        let mut first_party = PluginManifest::new(
-            String::from("omarchy.clock"),
-            String::from("Clock")
-        );
+
+        let mut first_party =
+            PluginManifest::new(String::from("omarchy.clock"), String::from("Clock"));
         first_party.add_kind(PluginKind::BarWidget);
         first_party.add_entry_point(String::from("barWidget"), String::from("BarWidget.qml"));
         registry.register(first_party).unwrap();
-        
-        let mut third_party = PluginManifest::new(
-            String::from("custom.weather"),
-            String::from("Weather")
-        );
+
+        let mut third_party =
+            PluginManifest::new(String::from("custom.weather"), String::from("Weather"));
         third_party.add_kind(PluginKind::Panel);
         third_party.add_entry_point(String::from("panel"), String::from("Panel.qml"));
         registry.register(third_party).unwrap();
-        
+
         assert_eq!(registry.get_first_party().len(), 1);
         assert_eq!(registry.get_third_party().len(), 1);
     }

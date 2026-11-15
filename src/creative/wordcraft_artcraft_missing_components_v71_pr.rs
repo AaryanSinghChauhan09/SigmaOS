@@ -76,7 +76,9 @@ impl WordcraftNeuralAiLinguisticStyleConsistencyLintingV71Engine {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7101,
-            pr_title: String::from("Wordcraft Neural AI Linguistic Style & Consistency Linting V71 Engine"),
+            pr_title: String::from(
+                "Wordcraft Neural AI Linguistic Style & Consistency Linting V71 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / AI Linguistic Linter"),
             original_suite: String::from("ArtCraft Wordcraft AI V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft AI Style Linting V71"),
@@ -149,8 +151,12 @@ impl WordcraftSubpixelMicroKerningOpticalLigatureShapingV71Engine {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7102,
-            pr_title: String::from("Wordcraft Subpixel Micro-Kerning & Optical Ligature Shaping V71 Engine"),
-            target_subsystem: String::from("Wordcraft Creative Suite / Subpixel Typography Shaping"),
+            pr_title: String::from(
+                "Wordcraft Subpixel Micro-Kerning & Optical Ligature Shaping V71 Engine",
+            ),
+            target_subsystem: String::from(
+                "Wordcraft Creative Suite / Subpixel Typography Shaping",
+            ),
             original_suite: String::from("ArtCraft Wordcraft Typography V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft Micro-Kerning V71"),
             components_added: vec![
@@ -202,7 +208,9 @@ impl WordcraftRealtimeCrdtMultiUserTreeLockingSyncV71Engine {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7103,
-            pr_title: String::from("Wordcraft Realtime CRDT Multi-User Tree Locking Sync V71 Engine"),
+            pr_title: String::from(
+                "Wordcraft Realtime CRDT Multi-User Tree Locking Sync V71 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / CRDT Section Tree Locking"),
             original_suite: String::from("ArtCraft Wordcraft Sync V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft Section CRDT V71"),
@@ -228,7 +236,11 @@ impl WordcraftRealtimeCrdtMultiUserTreeLockingSyncV71Engine {
     }
 
     pub fn release_lock(&mut self, section_id: u64, user_id: &str) -> bool {
-        if let Some(pos) = self.active_locks.iter().position(|l| l.section_id == section_id && l.user_id == user_id) {
+        if let Some(pos) = self
+            .active_locks
+            .iter()
+            .position(|l| l.section_id == section_id && l.user_id == user_id)
+        {
             self.active_locks.remove(pos);
             true
         } else {
@@ -261,13 +273,17 @@ pub struct WordcraftSemanticGraphRAGDocumentEntityRelationIndexerV71Engine {
 
 impl WordcraftSemanticGraphRAGDocumentEntityRelationIndexerV71Engine {
     pub fn new() -> Self {
-        Self { graph_edges: Vec::new() }
+        Self {
+            graph_edges: Vec::new(),
+        }
     }
 
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7104,
-            pr_title: String::from("Wordcraft Semantic Graph RAG Document Entity-Relation Indexer V71 Engine"),
+            pr_title: String::from(
+                "Wordcraft Semantic Graph RAG Document Entity-Relation Indexer V71 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Graph RAG Indexer"),
             original_suite: String::from("ArtCraft Wordcraft Graph RAG V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft Graph RAG V71"),
@@ -290,7 +306,10 @@ impl WordcraftSemanticGraphRAGDocumentEntityRelationIndexerV71Engine {
     }
 
     pub fn query_relations_for(&self, entity: &str) -> Vec<&EntityRelationEdgeV71> {
-        self.graph_edges.iter().filter(|e| e.source_entity == entity || e.target_entity == entity).collect()
+        self.graph_edges
+            .iter()
+            .filter(|e| e.source_entity == entity || e.target_entity == entity)
+            .collect()
     }
 }
 
@@ -327,7 +346,9 @@ impl WordcraftKnuthPlassTwoPassMultiColumnBalancingPaginationV71Engine {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7105,
-            pr_title: String::from("Wordcraft Knuth-Plass Two-Pass Multi-Column Balancing Pagination V71 Engine"),
+            pr_title: String::from(
+                "Wordcraft Knuth-Plass Two-Pass Multi-Column Balancing Pagination V71 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Multi-Column Pagination"),
             original_suite: String::from("ArtCraft Wordcraft Layout V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft Column Balancer V71"),
@@ -351,7 +372,9 @@ impl WordcraftKnuthPlassTwoPassMultiColumnBalancingPaginationV71Engine {
         }
         let mut curr_col = 0;
         for (idx, &h) in line_heights.iter().enumerate() {
-            if columns[curr_col].column_height_pt + h > self.target_column_height_pt && curr_col + 1 < self.num_columns {
+            if columns[curr_col].column_height_pt + h > self.target_column_height_pt
+                && curr_col + 1 < self.num_columns
+            {
                 curr_col += 1;
             }
             columns[curr_col].lines.push(idx);
@@ -382,7 +405,9 @@ impl WordcraftPostQuantumKyber1024ZeroKnowledgeDocumentVaultV71Engine {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7106,
-            pr_title: String::from("Wordcraft Post-Quantum Kyber-1024 Zero-Knowledge Document Vault V71 Engine"),
+            pr_title: String::from(
+                "Wordcraft Post-Quantum Kyber-1024 Zero-Knowledge Document Vault V71 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / PQC ZK Document Vault"),
             original_suite: String::from("ArtCraft Wordcraft PQC ZK V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft PQC ZK Vault V71"),
@@ -390,12 +415,18 @@ impl WordcraftPostQuantumKyber1024ZeroKnowledgeDocumentVaultV71Engine {
                 String::from("WordcraftPostQuantumKyber1024ZeroKnowledgeDocumentVaultV71Engine"),
                 String::from("ZkProofVaultPackageV71"),
             ],
-            performance_multiplier: String::from("62.4x CRYSTALS-Kyber-1024 / Groth16 ZK proof verification"),
+            performance_multiplier: String::from(
+                "62.4x CRYSTALS-Kyber-1024 / Groth16 ZK proof verification",
+            ),
             status: String::from("READY_FOR_MERGE"),
         }
     }
 
-    pub fn create_vault_package(&self, vault_id: u64, secret_data: &[u8]) -> ZkProofVaultPackageV71 {
+    pub fn create_vault_package(
+        &self,
+        vault_id: u64,
+        secret_data: &[u8],
+    ) -> ZkProofVaultPackageV71 {
         let mut proof = String::from("zk-snark-proof-");
         for b in secret_data.iter().take(8) {
             proof.push_str(&format!("{:02x}", b));
@@ -436,8 +467,12 @@ impl WordcraftCsl20CitationBibliographyFormatterEngineV71 {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7107,
-            pr_title: String::from("Wordcraft CSL 2.0 Citation & Bibliography Formatter Engine V71"),
-            target_subsystem: String::from("Wordcraft Creative Suite / CSL 2.0 Bibliography Formatter"),
+            pr_title: String::from(
+                "Wordcraft CSL 2.0 Citation & Bibliography Formatter Engine V71",
+            ),
+            target_subsystem: String::from(
+                "Wordcraft Creative Suite / CSL 2.0 Bibliography Formatter",
+            ),
             original_suite: String::from("ArtCraft Wordcraft Citation V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft CSL 2.0 V71"),
             components_added: vec![
@@ -453,7 +488,10 @@ impl WordcraftCsl20CitationBibliographyFormatterEngineV71 {
         if style == "APA" {
             format!("{}, ({}). {}.", entry.authors, entry.year, entry.title)
         } else if style == "IEEE" {
-            format!("[1] {}, \"{},\" {}.", entry.authors, entry.title, entry.year)
+            format!(
+                "[1] {}, \"{},\" {}.",
+                entry.authors, entry.title, entry.year
+            )
         } else {
             format!("{}: {} ({})", entry.authors, entry.title, entry.year)
         }
@@ -480,13 +518,17 @@ impl WordcraftMultilingualAcousticPhoneticVoiceDictationAnalyticsV71Engine {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7108,
-            pr_title: String::from("Wordcraft Multilingual Acoustic Phonetic Voice Dictation Analytics V71 Engine"),
+            pr_title: String::from(
+                "Wordcraft Multilingual Acoustic Phonetic Voice Dictation Analytics V71 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Voice Dictation Analytics"),
             original_suite: String::from("ArtCraft Wordcraft Voice V71"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Phonetic Dictation V71"),
-            components_added: vec![
-                String::from("WordcraftMultilingualAcousticPhoneticVoiceDictationAnalyticsV71Engine"),
-            ],
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Phonetic Dictation V71",
+            ),
+            components_added: vec![String::from(
+                "WordcraftMultilingualAcousticPhoneticVoiceDictationAnalyticsV71Engine",
+            )],
             performance_multiplier: String::from("25.4x real-time acoustic phoneme alignment"),
             status: String::from("READY_FOR_MERGE"),
         }
@@ -524,20 +566,25 @@ impl WordcraftPdfUa2AcroformAccessibilityCompilerV71Engine {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7109,
-            pr_title: String::from("Wordcraft PDF/UA-2 & AcroForm Accessibility Compiler V71 Engine"),
+            pr_title: String::from(
+                "Wordcraft PDF/UA-2 & AcroForm Accessibility Compiler V71 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / PDF/UA-2 Compiler"),
             original_suite: String::from("ArtCraft Wordcraft PDF/UA-2 V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft PDF/UA-2 V71"),
-            components_added: vec![
-                String::from("WordcraftPdfUa2AcroformAccessibilityCompilerV71Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftPdfUa2AcroformAccessibilityCompilerV71Engine",
+            )],
             performance_multiplier: String::from("31.5x ISO 14289-2 accessibility tagger"),
             status: String::from("READY_FOR_MERGE"),
         }
     }
 
     pub fn compile_pdf_ua2_structure(&self, title: &str, elements: usize) -> String {
-        format!("[PDF/UA-2 V71]: Target '{}' compiled with {} structural tree nodes", title, elements)
+        format!(
+            "[PDF/UA-2 V71]: Target '{}' compiled with {} structural tree nodes",
+            title, elements
+        )
     }
 }
 
@@ -572,8 +619,12 @@ impl WordcraftUniversalBatchMultiFormatAstTranspilerEngineV71 {
     pub fn generate_proposal(&self) -> WordcraftV71PrProposalManifest {
         WordcraftV71PrProposalManifest {
             pr_id: 7110,
-            pr_title: String::from("Wordcraft Universal Batch Multi-Format AST Transpiler Engine V71"),
-            target_subsystem: String::from("Wordcraft Creative Suite / Multi-Format AST Transpiler"),
+            pr_title: String::from(
+                "Wordcraft Universal Batch Multi-Format AST Transpiler Engine V71",
+            ),
+            target_subsystem: String::from(
+                "Wordcraft Creative Suite / Multi-Format AST Transpiler",
+            ),
             original_suite: String::from("ArtCraft Wordcraft Transpiler V71"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft AST Transpiler V71"),
             components_added: vec![
@@ -612,11 +663,15 @@ impl SovereignWordcraftArtcraftMissingComponentsV71PrGateway {
             WordcraftNeuralAiLinguisticStyleConsistencyLintingV71Engine::new().generate_proposal(),
             WordcraftSubpixelMicroKerningOpticalLigatureShapingV71Engine::new().generate_proposal(),
             WordcraftRealtimeCrdtMultiUserTreeLockingSyncV71Engine::new().generate_proposal(),
-            WordcraftSemanticGraphRAGDocumentEntityRelationIndexerV71Engine::new().generate_proposal(),
-            WordcraftKnuthPlassTwoPassMultiColumnBalancingPaginationV71Engine::new(2, 500.0).generate_proposal(),
-            WordcraftPostQuantumKyber1024ZeroKnowledgeDocumentVaultV71Engine::new().generate_proposal(),
+            WordcraftSemanticGraphRAGDocumentEntityRelationIndexerV71Engine::new()
+                .generate_proposal(),
+            WordcraftKnuthPlassTwoPassMultiColumnBalancingPaginationV71Engine::new(2, 500.0)
+                .generate_proposal(),
+            WordcraftPostQuantumKyber1024ZeroKnowledgeDocumentVaultV71Engine::new()
+                .generate_proposal(),
             WordcraftCsl20CitationBibliographyFormatterEngineV71::new().generate_proposal(),
-            WordcraftMultilingualAcousticPhoneticVoiceDictationAnalyticsV71Engine::new().generate_proposal(),
+            WordcraftMultilingualAcousticPhoneticVoiceDictationAnalyticsV71Engine::new()
+                .generate_proposal(),
             WordcraftPdfUa2AcroformAccessibilityCompilerV71Engine::new().generate_proposal(),
             WordcraftUniversalBatchMultiFormatAstTranspilerEngineV71::new().generate_proposal(),
         ]
@@ -675,7 +730,8 @@ impl WordcraftArtcraftMissingComponentsV71PrSuite {
         }
 
         // Test 5: Column Balancing
-        let layout = WordcraftKnuthPlassTwoPassMultiColumnBalancingPaginationV71Engine::new(2, 200.0);
+        let layout =
+            WordcraftKnuthPlassTwoPassMultiColumnBalancingPaginationV71Engine::new(2, 200.0);
         let cols = layout.balance_columns(&[10.0; 30]);
         if cols.len() != 2 {
             return false;

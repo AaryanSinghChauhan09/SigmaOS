@@ -94,12 +94,7 @@ impl FreeBsdBhyveArm64HypercallPciAcsPrEngine {
         Self { vm_instances }
     }
 
-    pub fn attach_pci_acs_multiqueue(
-        &mut self,
-        vm: &str,
-        slot: u8,
-        queues: u16,
-    ) -> String {
+    pub fn attach_pci_acs_multiqueue(&mut self, vm: &str, slot: u8, queues: u16) -> String {
         let spec = BhyveArm64PciAcsSpec {
             vm_name: vm.to_string(),
             pci_slot: slot,
@@ -156,12 +151,7 @@ impl FreeBsdOpenZfsRaidzExpansionBtreePrEngine {
         Self { expansion_jobs }
     }
 
-    pub fn initiate_raidz_expansion(
-        &mut self,
-        pool: &str,
-        vdev: &str,
-        disk: &str,
-    ) -> String {
+    pub fn initiate_raidz_expansion(&mut self, pool: &str, vdev: &str, disk: &str) -> String {
         let spec = RaidzExpansionSpec {
             pool_name: pool.to_string(),
             vdev_target: vdev.to_string(),
@@ -217,12 +207,7 @@ impl FreeBsdKqueueAsyncRingTimerCompletionPrEngine {
         Self { kqueue_rings }
     }
 
-    pub fn create_async_ring(
-        &mut self,
-        kq_id: u32,
-        depth: u32,
-        timer_ns: u64,
-    ) -> String {
+    pub fn create_async_ring(&mut self, kq_id: u32, depth: u32, timer_ns: u64) -> String {
         let spec = KqueueAsyncRingSpec {
             kq_id,
             ring_depth: depth,
@@ -454,8 +439,8 @@ impl FreeBsdRctlStorageBandwidthQosPrEngine {
             "cache_jail".to_string(),
             RctlBandwidthQosSpec {
                 jail_name: "cache_jail".to_string(),
-                read_bps_limit: 524288000,   // 500 MB/s
-                write_bps_limit: 262144000,  // 250 MB/s
+                read_bps_limit: 524288000,  // 500 MB/s
+                write_bps_limit: 262144000, // 250 MB/s
                 max_iops: 50000,
                 latency_sla_micros: 250,
             },
@@ -522,7 +507,9 @@ impl FreeBsdPkgBaseZfsBootEnvironmentStagingPrEngine {
                 auto_rollback_on_failure: true,
             },
         );
-        Self { staged_environments }
+        Self {
+            staged_environments,
+        }
     }
 
     pub fn stage_upgrade_environment(
@@ -752,7 +739,9 @@ impl FreeBsdMissingComponentsV71PrSuite {
     }
 
     pub fn evaluate_freebsd_v71_parity(&mut self) -> bool {
-        let bhyve_diff = self.bhyve_arm64_acs.attach_pci_acs_multiqueue("vm_gw", 6, 16);
+        let bhyve_diff = self
+            .bhyve_arm64_acs
+            .attach_pci_acs_multiqueue("vm_gw", 6, 16);
         let pr1 = self.submit_pr_proposal(
             "bhyve virtio-net multi-queue and PCI ACS isolation hypercall engine",
             "jules",
@@ -762,7 +751,9 @@ impl FreeBsdMissingComponentsV71PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let raidz_diff = self.raidz_expansion.initiate_raidz_expansion("zroot", "raidz1-0", "/dev/da3");
+        let raidz_diff = self
+            .raidz_expansion
+            .initiate_raidz_expansion("zroot", "raidz1-0", "/dev/da3");
         let pr2 = self.submit_pr_proposal(
             "OpenZFS 2.4+ online RAID-Z expansion with B-tree metadata allocator",
             "jules",
@@ -782,7 +773,11 @@ impl FreeBsdMissingComponentsV71PrSuite {
         );
         self.validate_and_merge_pr(pr3);
 
-        let be_diff = self.be_staging.stage_upgrade_environment("zroot", "16.0-STAGE", "zroot/ROOT/default@clean");
+        let be_diff = self.be_staging.stage_upgrade_environment(
+            "zroot",
+            "16.0-STAGE",
+            "zroot/ROOT/default@clean",
+        );
         let pr4 = self.submit_pr_proposal(
             "pkgbase atomic ZFS boot environment staging and instant rollback coordinator",
             "jules",
@@ -833,7 +828,8 @@ mod tests {
         assert!(kq.kqueue_rings.contains_key(&10));
 
         let mut casper = FreeBsdCapsicumCasperCapNetlinkRoutePrEngine::new();
-        let diff2 = casper.configure_cap_netlink("routing_jail", vec!["AF_INET6".to_string()], true);
+        let diff2 =
+            casper.configure_cap_netlink("routing_jail", vec!["AF_INET6".to_string()], true);
         assert!(diff2.contains("cap_netlink_limit"));
         assert!(casper.netlink_delegates.contains_key("routing_jail"));
 
@@ -864,7 +860,9 @@ mod tests {
         let mut kinst = FreeBsdDtraceKinstInstructionTraceMatrixPrEngine::new();
         let diff4 = kinst.trace_instruction_latency("sched_idletd", 0x1c, 100);
         assert!(diff4.contains("kinst::sched_idletd:0x1c"));
-        assert!(kinst.instruction_probes.contains_key("kinst::sched_idletd:0x1c"));
+        assert!(kinst
+            .instruction_probes
+            .contains_key("kinst::sched_idletd:0x1c"));
 
         let mut boot = FreeBsdPqcSecureBootKexecVerifierPrEngine::new();
         let diff5 = boot.verify_and_authorize_kernel("/boot/kernel/test", "sig123", "root456");

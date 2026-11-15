@@ -108,7 +108,9 @@ fn test_gateway_pr_generation_and_export() {
     assert_eq!(spec.guardrails_count, 7);
 
     let pr_md = gateway.generate_pr_proposal_markdown();
-    assert!(pr_md.contains("# feat(governance): Adopt Role-Based Operating Plan and Strategic Wedge Roadmap"));
+    assert!(pr_md.contains(
+        "# feat(governance): Adopt Role-Based Operating Plan and Strategic Wedge Roadmap"
+    ));
     assert!(pr_md.contains("Reality Check & Strategic Wedge"));
     assert!(pr_md.contains("12 Operating Maintenance Roles"));
     assert!(pr_md.contains("8-Step Team Execution Plan"));

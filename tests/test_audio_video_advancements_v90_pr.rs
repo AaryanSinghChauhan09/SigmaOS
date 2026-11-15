@@ -41,10 +41,13 @@ fn test_integration_v90_gateway_and_submissions() {
     let new_pr_id = gateway.submit_pr(
         "Vulkan Video Next-Gen Accelerated Decode V90",
         "FFmpeg",
-        "pqc_dilithium5_ext_v90"
+        "pqc_dilithium5_ext_v90",
     );
     assert_eq!(new_pr_id, 9012);
-    let custom_pr = gateway.submissions.get(&new_pr_id).expect("Custom PR must exist");
+    let custom_pr = gateway
+        .submissions
+        .get(&new_pr_id)
+        .expect("Custom PR must exist");
     assert_eq!(custom_pr.status, SovereignAvPrStatusV90::Proposed);
     assert_eq!(custom_pr.subsystem, "FFmpeg");
 }
@@ -61,7 +64,8 @@ fn test_integration_sub_engines_functionality() {
 
     // OSSv4
     let mut oss = SovereignOss4EngineV90::new("/dev/dsp1");
-    let count = oss.parse_sndstat("pcm0: <Realtek ALC892> (play/rec)\npcm1: <Intel Display Audio> (play)");
+    let count =
+        oss.parse_sndstat("pcm0: <Realtek ALC892> (play/rec)\npcm1: <Intel Display Audio> (play)");
     assert_eq!(count, 2);
     oss.configure_dsp_format("AFMT_S32_LE", 96000, 2048);
     assert_eq!(oss.sample_format, "AFMT_S32_LE");
@@ -87,7 +91,9 @@ fn test_integration_sub_engines_functionality() {
     let mut jack = SovereignJackEngineV90::new("SigmaDAW");
     jack.connect_ports("SigmaDAW:out_1", "system:playback_1");
     assert_eq!(jack.connected_port_pairs.len(), 1);
-    assert!(jack.push_sysex_msg(&[0xF0, 0x7E, 0x7F, 0x09, 0x01, 0xF7]).is_ok());
+    assert!(jack
+        .push_sysex_msg(&[0xF0, 0x7E, 0x7F, 0x09, 0x01, 0xF7])
+        .is_ok());
     assert!(jack.save_nsm_session("/var/run/nsm/session1"));
 
     // sndio
@@ -134,5 +140,7 @@ fn test_integration_sub_engines_functionality() {
     mpv.register_property_observer(1, "time-pos");
     mpv.show_osd_message("Buffering...");
     assert_eq!(mpv.osd_notification_text, "Buffering...");
-    assert!(mpv.format_jsonrpc_command("speed", "1.25").contains("speed"));
+    assert!(mpv
+        .format_jsonrpc_command("speed", "1.25")
+        .contains("speed"));
 }

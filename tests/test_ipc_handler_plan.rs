@@ -4,10 +4,13 @@ use std::fs;
 
 #[test]
 fn test_ipc_handler_documentation_plan_verification() {
-    let docs_plan = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/ipc-handler.md").expect("wiki ipc-handler.md must exist");
-    let wiki_plan = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/ipc-handler.md").expect("wiki ipc-handler.md must exist");
+    let docs_plan = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/ipc-handler.md")
+        .expect("wiki ipc-handler.md must exist");
+    let wiki_plan = fs::read_to_string("/home/aaryansinghchauhan/SigmaOS.wiki/ipc-handler.md")
+        .expect("wiki ipc-handler.md must exist");
 
-    assert!(docs_plan.contains("SigmaOS IPC Handler Master Architecture, Support Matrix, and Program Plan"));
+    assert!(docs_plan
+        .contains("SigmaOS IPC Handler Master Architecture, Support Matrix, and Program Plan"));
     assert!(docs_plan.contains("Repository Context and Scope"));
     assert!(docs_plan.contains("Scope and Boundaries"));
     assert!(docs_plan.contains("Periodic Task Cadence"));
@@ -131,7 +134,10 @@ fn test_ipc_core_object_invariants() {
         }
     }
 
-    let perm = LocalShmPermissions { uid: 1000, mode: 0o600 }; // Read/Write for owner only
+    let perm = LocalShmPermissions {
+        uid: 1000,
+        mode: 0o600,
+    }; // Read/Write for owner only
     assert!(perm.can_access(1000, 0o400)); // Owner read access
     assert!(perm.can_access(1000, 0o200)); // Owner write access
     assert!(!perm.can_access(1001, 0o400)); // Other user denied

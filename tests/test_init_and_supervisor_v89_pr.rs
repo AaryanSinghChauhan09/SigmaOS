@@ -35,7 +35,10 @@ fn test_init_and_supervisor_v89_pr_integration() {
         ..Default::default()
     };
     let cgroup_params = systemd.build_cgroup_v2_control_parameters(&limits);
-    assert_eq!(cgroup_params.get("memory.max"), Some(&"536870912".to_string()));
+    assert_eq!(
+        cgroup_params.get("memory.max"),
+        Some(&"536870912".to_string())
+    );
 
     let mut active = BTreeSet::new();
     active.insert("network.target".to_string());
@@ -43,7 +46,8 @@ fn test_init_and_supervisor_v89_pr_integration() {
         requires: vec!["network.target".to_string()],
         ..Default::default()
     };
-    let (can_start, missing) = systemd.evaluate_unit_dependencies_startable("app.service", &deps, &active);
+    let (can_start, missing) =
+        systemd.evaluate_unit_dependencies_startable("app.service", &deps, &active);
     assert!(can_start);
     assert!(missing.is_empty());
 }

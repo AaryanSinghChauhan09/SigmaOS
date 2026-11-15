@@ -247,7 +247,9 @@ impl Default for ElementaryShortcutOverlayV78Engine {
 
 impl ElementaryShortcutOverlayV78Engine {
     pub fn new() -> Self {
-        Self { overlay_visible: false }
+        Self {
+            overlay_visible: false,
+        }
     }
 
     pub fn toggle_overlay(&mut self) -> bool {
@@ -324,7 +326,8 @@ impl ElementaryOsMissingComponentsV78Suite {
                 repository: "elementary/files".to_string(),
                 title: "Files Tabbed Navigation & Spatial Miller Columns".to_string(),
                 component_name: "pantheon-files".to_string(),
-                description: "Tabbed file browsing with spatial folder restored states.".to_string(),
+                description: "Tabbed file browsing with spatial folder restored states."
+                    .to_string(),
                 features: vec!["Tab Management".to_string(), "Miller Columns".to_string()],
                 status_verified: true,
                 coverage_score: 100,
@@ -334,7 +337,8 @@ impl ElementaryOsMissingComponentsV78Suite {
                 repository: "elementary/code".to_string(),
                 title: "Code Editor Syntax Diagnostics & LSP Integration".to_string(),
                 component_name: "pantheon-code".to_string(),
-                description: "Granite syntax highlighting with instant LSP diagnostics.".to_string(),
+                description: "Granite syntax highlighting with instant LSP diagnostics."
+                    .to_string(),
                 features: vec!["LSP Bridge".to_string(), "Syntax Highlighting".to_string()],
                 status_verified: true,
                 coverage_score: 100,
@@ -344,7 +348,8 @@ impl ElementaryOsMissingComponentsV78Suite {
                 repository: "elementary/mail".to_string(),
                 title: "Mail Account Coordination & Conversation Threading".to_string(),
                 component_name: "pantheon-mail".to_string(),
-                description: "Multi-account IMAP/SMTP coordination with conversation view.".to_string(),
+                description: "Multi-account IMAP/SMTP coordination with conversation view."
+                    .to_string(),
                 features: vec!["Threading".to_string(), "IMAP Sync".to_string()],
                 status_verified: true,
                 coverage_score: 100,
@@ -374,7 +379,8 @@ impl ElementaryOsMissingComponentsV78Suite {
                 repository: "elementary/calculator".to_string(),
                 title: "Calculator Expression Evaluator & History Stack".to_string(),
                 component_name: "pantheon-calculator".to_string(),
-                description: "Full mathematical formula evaluation with interactive history.".to_string(),
+                description: "Full mathematical formula evaluation with interactive history."
+                    .to_string(),
                 features: vec!["Expression Eval".to_string(), "History Stack".to_string()],
                 status_verified: true,
                 coverage_score: 100,
@@ -394,7 +400,8 @@ impl ElementaryOsMissingComponentsV78Suite {
                 repository: "elementary/calendar".to_string(),
                 title: "Calendar Event Store & Alarm Dispatcher".to_string(),
                 component_name: "pantheon-calendar".to_string(),
-                description: "Event scheduling with background desktop alarm dispatching.".to_string(),
+                description: "Event scheduling with background desktop alarm dispatching."
+                    .to_string(),
                 features: vec!["Event Alarm".to_string(), "CalDAV Store".to_string()],
                 status_verified: true,
                 coverage_score: 100,
@@ -414,8 +421,12 @@ impl ElementaryOsMissingComponentsV78Suite {
                 repository: "elementary/onboarding".to_string(),
                 title: "Onboarding Welcome Wizard & Privacy Configurator".to_string(),
                 component_name: "pantheon-onboarding".to_string(),
-                description: "Interactive first-boot setup wizard for theme and privacy choices.".to_string(),
-                features: vec!["Privacy Options".to_string(), "First-Boot Setup".to_string()],
+                description: "Interactive first-boot setup wizard for theme and privacy choices."
+                    .to_string(),
+                features: vec![
+                    "Privacy Options".to_string(),
+                    "First-Boot Setup".to_string(),
+                ],
                 status_verified: true,
                 coverage_score: 100,
             },

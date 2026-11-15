@@ -1,10 +1,10 @@
-pub mod first_boot_wizard;
-pub mod partition_manager;
-pub mod user_profile_generator;
 pub mod arch_install_scripts;
+pub mod first_boot_wizard;
 pub mod gui_wizard;
 pub mod iso_installer;
 pub mod lightning_installer;
+pub mod partition_manager;
+pub mod user_profile_generator;
 
 pub use crate::installer::gui_wizard::{
     DetectedOperatingSystem, GuiInstallerWizard, InstallerStep, PartitionStrategy, PrivacySettings,

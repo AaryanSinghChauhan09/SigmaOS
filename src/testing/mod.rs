@@ -1,7 +1,7 @@
 //! Testing Infrastructure (Gentoo Test Frameworks + BSD Test Suites Inspiration)
 //! Comprehensive testing framework for SigmaOS
-pub mod smoke_tests;
 pub mod regression_tests;
+pub mod smoke_tests;
 use std::vec;
 
 use std::string::{String, ToString};

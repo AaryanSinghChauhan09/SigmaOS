@@ -58,10 +58,26 @@ fn test_individual_v80_engines_integration() {
     // 1. NURBS Engine
     let mut nurbs = ArtcraftVectorPathNurbsSplineEvaluationPrEngineV80::new(3);
     nurbs.setup_curve(vec![
-        NurbsControlPoint { x: 0.0, y: 0.0, weight: 1.0 },
-        NurbsControlPoint { x: 50.0, y: 100.0, weight: 1.0 },
-        NurbsControlPoint { x: 100.0, y: 100.0, weight: 1.0 },
-        NurbsControlPoint { x: 150.0, y: 0.0, weight: 1.0 },
+        NurbsControlPoint {
+            x: 0.0,
+            y: 0.0,
+            weight: 1.0,
+        },
+        NurbsControlPoint {
+            x: 50.0,
+            y: 100.0,
+            weight: 1.0,
+        },
+        NurbsControlPoint {
+            x: 100.0,
+            y: 100.0,
+            weight: 1.0,
+        },
+        NurbsControlPoint {
+            x: 150.0,
+            y: 0.0,
+            weight: 1.0,
+        },
     ]);
     let (pt_x, pt_y) = nurbs.evaluate_point(0.5);
     assert!(pt_x > 0.0 && pt_y > 0.0);
@@ -69,7 +85,9 @@ fn test_individual_v80_engines_integration() {
     // 2. Tile Render Engine
     let tile_render = ArtcraftMultiThreadedTileBasedTileBufferRenderPrEngineV80::new(512, 512, 64);
     assert_eq!(tile_render.total_tiles_count(), 64);
-    let buf = tile_render.render_tile_buffer(0).expect("Tile 0 failed to render");
+    let buf = tile_render
+        .render_tile_buffer(0)
+        .expect("Tile 0 failed to render");
     assert_eq!(buf.len(), 64 * 64 * 4);
 
     // 3. Spectral CMS Engine

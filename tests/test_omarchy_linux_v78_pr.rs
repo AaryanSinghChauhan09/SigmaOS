@@ -18,16 +18,22 @@ fn test_v78_omarchy_linux_integration_full() {
     assert!(hyprland.set_layout("dwindle").contains("dwindle"));
 
     let waybar = OmarchyWaybarStatusHudEngineV78::new();
-    assert!(waybar.reload_theme_css("/etc/waybar/style.css").contains("style.css"));
+    assert!(waybar
+        .reload_theme_css("/etc/waybar/style.css")
+        .contains("style.css"));
 
     let mut ghostty = OmarchyGhosttyPtyTerminalEngineV78::new();
-    assert!(ghostty.tune_font("JetBrains Mono", 11.5).contains("JetBrains Mono"));
+    assert!(ghostty
+        .tune_font("JetBrains Mono", 11.5)
+        .contains("JetBrains Mono"));
 
     let walker = OmarchyWalkerLauncherEngineV78::new();
     assert!(walker.search_query("terminal").contains("terminal"));
 
     let mut wallust = OmarchyWallustThemeSyncEngineV78::new();
-    assert!(wallust.sync_wallpaper_and_palette("/usr/share/bg.png", "catppuccin").contains("catppuccin"));
+    assert!(wallust
+        .sync_wallpaper_and_palette("/usr/share/bg.png", "catppuccin")
+        .contains("catppuccin"));
 
     let mut hyprlock = OmarchyHyprlockPamSecurityEngineV78::new();
     assert!(hyprlock.set_idle_timeout(300).contains("300s"));
@@ -36,11 +42,15 @@ fn test_v78_omarchy_linux_integration_full() {
     assert!(ananicy.toggle_gamemode(true).contains("true"));
 
     let herdr = OmarchyHerdrAiSchedulerEngineV78::new();
-    assert!(herdr.trigger_ai_agent_workflow("launch session").contains("launch session"));
+    assert!(herdr
+        .trigger_ai_agent_workflow("launch session")
+        .contains("launch session"));
 
     let shield = OmarchyFailClosedSudoPrivilegeShieldEngineV78::new();
     assert!(shield.verify_sudo_request("user", "systemctl status"));
 
     let chord = OmarchyWallustChordThemeNavigatorEngineV78::new();
-    assert!(chord.trigger_chord_action("SUPER+ALT+ENTER").contains("SUPER+ALT+ENTER"));
+    assert!(chord
+        .trigger_chord_action("SUPER+ALT+ENTER")
+        .contains("SUPER+ALT+ENTER"));
 }

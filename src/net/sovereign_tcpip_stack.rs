@@ -513,11 +513,25 @@ impl SovereignNetworkStack {
     pub fn new(mac: MacAddress, ip: [u8; 4], gateway: [u8; 4]) -> Self {
         let mut arp = ArpCache::new();
         arp.insert(ip, mac); // Self entry
-        // Derive EUI-64 link-local IPv6 address from MAC (RFC 4291 §2.5.6)
+                             // Derive EUI-64 link-local IPv6 address from MAC (RFC 4291 §2.5.6)
         let m = mac.0;
         let ipv6_addr = [
-            0xFE, 0x80, 0, 0, 0, 0, 0, 0,
-            m[0] ^ 0x02, m[1], m[2], 0xFF, 0xFE, m[3], m[4], m[5],
+            0xFE,
+            0x80,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            m[0] ^ 0x02,
+            m[1],
+            m[2],
+            0xFF,
+            0xFE,
+            m[3],
+            m[4],
+            m[5],
         ];
         Self {
             mac,
@@ -643,7 +657,7 @@ impl SovereignNetworkStack {
 
         // Parse fixed header fields inline (no_std compatible)
         let next_header = payload[6];
-        let hop_limit   = payload[7];
+        let hop_limit = payload[7];
 
         let mut dst_bytes = [0u8; 16];
         dst_bytes.copy_from_slice(&payload[24..40]);
@@ -672,18 +686,13 @@ impl SovereignNetworkStack {
     }
 
     /// Process an ICMPv6 message and produce an optional reply frame payload.
-    fn handle_icmpv6(
-        &mut self,
-        src: [u8; 16],
-        _dst: [u8; 16],
-        payload: &[u8],
-    ) -> Option<Vec<u8>> {
+    fn handle_icmpv6(&mut self, src: [u8; 16], _dst: [u8; 16], payload: &[u8]) -> Option<Vec<u8>> {
         if payload.len() < 4 {
             return None;
         }
 
         let msg_type = payload[0];
-        let _code    = payload[1];
+        let _code = payload[1];
         // bytes [2..4] = received checksum (we recompute on reply)
 
         match msg_type {
@@ -693,14 +702,15 @@ impl SovereignNetworkStack {
                     return None;
                 }
                 let identifier = u16::from_be_bytes([payload[4], payload[5]]);
-                let sequence   = u16::from_be_bytes([payload[6], payload[7]]);
-                let echo_data  = payload[8..].to_vec();
+                let sequence = u16::from_be_bytes([payload[6], payload[7]]);
+                let echo_data = payload[8..].to_vec();
 
                 // Build Echo Reply payload (type=129, code=0)
                 let mut reply_icmpv6: Vec<u8> = Vec::new();
-                reply_icmpv6.push(129u8);        // Echo Reply
-                reply_icmpv6.push(0u8);           // Code
-                reply_icmpv6.push(0); reply_icmpv6.push(0); // checksum placeholder
+                reply_icmpv6.push(129u8); // Echo Reply
+                reply_icmpv6.push(0u8); // Code
+                reply_icmpv6.push(0);
+                reply_icmpv6.push(0); // checksum placeholder
                 reply_icmpv6.extend_from_slice(&identifier.to_be_bytes());
                 reply_icmpv6.extend_from_slice(&sequence.to_be_bytes());
                 reply_icmpv6.extend_from_slice(&echo_data);
@@ -738,12 +748,14 @@ impl SovereignNetworkStack {
                 let flags: u32 = 0x6000_0000;
                 let mut na_body: Vec<u8> = Vec::new();
                 na_body.push(136u8);
-                na_body.push(0u8);              // code
-                na_body.push(0); na_body.push(0); // checksum placeholder
+                na_body.push(0u8); // code
+                na_body.push(0);
+                na_body.push(0); // checksum placeholder
                 na_body.extend_from_slice(&flags.to_be_bytes());
                 na_body.extend_from_slice(&target); // Target address
-                // Option: Target Link-Layer Address (type=2, len=1 unit=8B)
-                na_body.push(2); na_body.push(1);
+                                                    // Option: Target Link-Layer Address (type=2, len=1 unit=8B)
+                na_body.push(2);
+                na_body.push(1);
                 na_body.extend_from_slice(&self.mac.0);
 
                 let csum = icmpv6_pseudo_checksum(&self.ipv6_addr, &src, &na_body);
@@ -959,7 +971,10 @@ mod tests {
     fn make_icmpv6_ns(src: [u8; 16], dst: [u8; 16], target: [u8; 16]) -> Vec<u8> {
         // NS body: type=135, code=0, csum(0,0), reserved(4B), target(16B)
         let mut ns_body: Vec<u8> = Vec::new();
-        ns_body.push(135); ns_body.push(0); ns_body.push(0); ns_body.push(0);
+        ns_body.push(135);
+        ns_body.push(0);
+        ns_body.push(0);
+        ns_body.push(0);
         ns_body.extend_from_slice(&[0u8; 4]); // reserved
         ns_body.extend_from_slice(&target);
         let csum = icmpv6_pseudo_checksum(&src, &dst, &ns_body);
@@ -1045,7 +1060,10 @@ mod tests {
         assert!(reply.is_some(), "NS must produce a Neighbor Advertisement");
         let reply_bytes = reply.unwrap();
         assert!(reply_bytes.len() >= 41);
-        assert_eq!(reply_bytes[40], 136, "ICMPv6 type must be Neighbor Advertisement (136)");
+        assert_eq!(
+            reply_bytes[40], 136,
+            "ICMPv6 type must be Neighbor Advertisement (136)"
+        );
     }
 
     #[test]

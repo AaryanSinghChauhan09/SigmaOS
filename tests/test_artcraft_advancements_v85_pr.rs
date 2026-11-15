@@ -57,14 +57,22 @@ fn test_artcraft_advancements_v85_integration_suite() {
 fn test_individual_v85_engines_integration() {
     // 1. Oklab 3D LUT Color Grading
     let color_engine = ArtcraftWideGamutOklabLutColorGradingPrEngineV85::new(17, 0.2);
-    let srgb = LinearRgb { r: 0.7, g: 0.4, b: 0.2 };
+    let srgb = LinearRgb {
+        r: 0.7,
+        g: 0.4,
+        b: 0.2,
+    };
     let oklab = color_engine.srgb_to_oklab(srgb);
     let recon = color_engine.oklab_to_srgb(oklab);
     assert!((srgb.r - recon.r).abs() < 0.05);
 
     // 2. Ultra HDR Gainmap
     let hdr_engine = ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85::new(1200.0);
-    let sdr = LinearRgb { r: 0.4, g: 0.4, b: 0.4 };
+    let sdr = LinearRgb {
+        r: 0.4,
+        g: 0.4,
+        b: 0.4,
+    };
     let boosted = hdr_engine.blend_gainmap_pixel(sdr, 0.9);
     assert!(boosted.r >= sdr.r);
 

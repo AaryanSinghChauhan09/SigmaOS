@@ -608,7 +608,8 @@ impl Default for SoundcraftDolbyAtmosBedObjectSpatializerV70Engine {
 #[derive(Debug, Clone)]
 pub struct SovereignSoundcraftArtcraftMissingComponentsV70PrGateway {
     pub pitch_correction_engine: SoundcraftNeuralAiVoiceFormantPitchCorrectionV70Engine,
-    pub mastering_compressor_engine: SoundcraftSpectralLookaheadMultibandMasteringCompressorV70Engine,
+    pub mastering_compressor_engine:
+        SoundcraftSpectralLookaheadMultibandMasteringCompressorV70Engine,
     pub convolution_reverb_engine: SoundcraftPartitionedAcousticConvolutionReverbV70Engine,
     pub audio_to_midi_engine: SoundcraftPolyphonicAudioToMidiStreamTranscriberV70Engine,
     pub transient_shaper_engine: SoundcraftDualBandTransientPunchShaperV70Engine,
@@ -623,14 +624,20 @@ impl SovereignSoundcraftArtcraftMissingComponentsV70PrGateway {
     pub fn new() -> Self {
         Self {
             pitch_correction_engine: SoundcraftNeuralAiVoiceFormantPitchCorrectionV70Engine::new(),
-            mastering_compressor_engine: SoundcraftSpectralLookaheadMultibandMasteringCompressorV70Engine::new(),
-            convolution_reverb_engine: SoundcraftPartitionedAcousticConvolutionReverbV70Engine::new(),
+            mastering_compressor_engine:
+                SoundcraftSpectralLookaheadMultibandMasteringCompressorV70Engine::new(),
+            convolution_reverb_engine: SoundcraftPartitionedAcousticConvolutionReverbV70Engine::new(
+            ),
             audio_to_midi_engine: SoundcraftPolyphonicAudioToMidiStreamTranscriberV70Engine::new(),
             transient_shaper_engine: SoundcraftDualBandTransientPunchShaperV70Engine::new(),
             stem_mixer_engine: SoundcraftAutomatedMultiTrackStemMixerAutoLevelerV70Engine::new(),
             binaural_spatial_engine: SoundcraftHeadTracked6DofBinauralSpatialAudioV70Engine::new(),
-            plugin_host_engine: SoundcraftSandboxedVst3ClapPluginHostV70Engine::new("SovereignDAWPluginV70"),
-            batch_transcoder_engine: SoundcraftBatchAudioFileTranscoderConverterV70Engine::new("flac"),
+            plugin_host_engine: SoundcraftSandboxedVst3ClapPluginHostV70Engine::new(
+                "SovereignDAWPluginV70",
+            ),
+            batch_transcoder_engine: SoundcraftBatchAudioFileTranscoderConverterV70Engine::new(
+                "flac",
+            ),
             atmos_spatializer_engine: SoundcraftDolbyAtmosBedObjectSpatializerV70Engine::new(),
         }
     }

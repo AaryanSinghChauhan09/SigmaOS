@@ -176,7 +176,8 @@ impl IoPrGatewayTracker {
                     title: "PR 15: Master Subsystem Coordinator & System Integration Gate",
                     component: "master",
                     status: PrStatus::Integrated,
-                    description: "Master subsystem coordinator enforcing end-to-end lifecycle parity.",
+                    description:
+                        "Master subsystem coordinator enforcing end-to-end lifecycle parity.",
                 },
             ],
         }

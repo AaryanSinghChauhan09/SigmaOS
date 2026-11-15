@@ -10,10 +10,16 @@ fn test_v80_kernel_pr_gateway_manifest() {
     let mut gateway = SovereignKernelOpenSourceOsDistroAdvancementsV80PrGateway::new();
     let manifest = gateway.generate_advancements_v80_pr_manifest();
 
-    assert_eq!(manifest.pr_id, "PR-KERNEL-OPEN-SOURCE-OS-DISTRO-ADVANCEMENTS-V80");
+    assert_eq!(
+        manifest.pr_id,
+        "PR-KERNEL-OPEN-SOURCE-OS-DISTRO-ADVANCEMENTS-V80"
+    );
     assert!(manifest.title.contains("V80 Engine"));
     assert_eq!(manifest.subsystems_affected.len(), 8);
-    assert_eq!(manifest.pqc_signature, "DILITHIUM5_SIG_V80_KERNEL_OPEN_SOURCE_DISTRO_ADVANCEMENTS_SUCCESS");
+    assert_eq!(
+        manifest.pqc_signature,
+        "DILITHIUM5_SIG_V80_KERNEL_OPEN_SOURCE_DISTRO_ADVANCEMENTS_SUCCESS"
+    );
     assert_eq!(manifest.status, "Approved and Ready for Merge");
 }
 

@@ -212,7 +212,11 @@ impl SovereignGoogleSheetsDynamicArraySpillEngineV9 {
             formula: formula.to_string(),
             required_range_rows: rows,
             required_range_cols: cols,
-            spilled_values: if is_spill_error { Vec::new() } else { generated_grid },
+            spilled_values: if is_spill_error {
+                Vec::new()
+            } else {
+                generated_grid
+            },
             is_spill_error,
             colliding_cells: colliding,
         }
@@ -462,7 +466,11 @@ impl SovereignMicrosoftExcelDynamicPivotTableEngineV9 {
                 row_keys.push(key.clone());
             }
 
-            let metric_val = rec.numeric_values.get(target_metric).copied().unwrap_or(0.0);
+            let metric_val = rec
+                .numeric_values
+                .get(target_metric)
+                .copied()
+                .unwrap_or(0.0);
             *totals.entry(key.clone()).or_insert(0.0) += metric_val;
             *counts.entry(key).or_insert(0) += 1;
         }
@@ -577,12 +585,14 @@ impl SovereignMicrosoftLoopDistributedCanvasCrdtEngineV9 {
         for elem in incoming {
             if let Some(existing) = self.canvas_elements.get(&elem.element_id) {
                 if elem.lww_timestamp > existing.lww_timestamp {
-                    self.canvas_elements.insert(elem.element_id.clone(), elem.clone());
+                    self.canvas_elements
+                        .insert(elem.element_id.clone(), elem.clone());
                     applied += 1;
                     overrides += 1;
                 }
             } else {
-                self.canvas_elements.insert(elem.element_id.clone(), elem.clone());
+                self.canvas_elements
+                    .insert(elem.element_id.clone(), elem.clone());
                 applied += 1;
             }
         }
@@ -805,7 +815,7 @@ pub struct LeadAttributeSignals {
 #[derive(Debug, Clone, PartialEq)]
 pub struct LeadScoringOutcome {
     pub lead_id: String,
-    pub composite_score: u32, // 0 - 100
+    pub composite_score: u32,        // 0 - 100
     pub classification_tier: String, // "Hot", "Warm", "Cold"
     pub key_drivers: Vec<String>,
 }
@@ -898,7 +908,8 @@ impl SovereignSalesforceCpqDynamicAmendmentEngineV9 {
     ) -> ContractAmendmentCalculation {
         let delta_qty = amendment.updated_quantity as i32 - subscription.existing_quantity as i32;
         let discount_factor = 1.0 - (amendment.discount_pct / 100.0);
-        let incremental_mrr = (delta_qty as f64) * subscription.unit_price_per_month * discount_factor;
+        let incremental_mrr =
+            (delta_qty as f64) * subscription.unit_price_per_month * discount_factor;
         let prorated_total = incremental_mrr * amendment.remaining_months_on_term;
 
         ContractAmendmentCalculation {
@@ -951,14 +962,20 @@ impl SovereignSalesforceServiceCloudSkillsBasedRoutingEngineV9 {
         let mut lowest_utilization = 1.0;
 
         for agent in agents {
-            let available_units = agent.max_capacity_units.saturating_sub(agent.current_workload_units);
+            let available_units = agent
+                .max_capacity_units
+                .saturating_sub(agent.current_workload_units);
             if available_units < case_req.difficulty_workload_units {
                 continue;
             }
 
-            let overlap = agent.certified_skills.intersection(&case_req.required_skills).count();
+            let overlap = agent
+                .certified_skills
+                .intersection(&case_req.required_skills)
+                .count();
             if overlap == case_req.required_skills.len() {
-                let utilization = agent.current_workload_units as f64 / agent.max_capacity_units as f64;
+                let utilization =
+                    agent.current_workload_units as f64 / agent.max_capacity_units as f64;
                 if best_agent.is_none() || utilization < lowest_utilization {
                     best_agent = Some(agent);
                     best_skill_overlap = overlap;
@@ -1052,7 +1069,14 @@ impl SovereignOdooMrpMultiLevelBomExplosionEngineV9 {
             });
 
             if let Some(sub) = &comp.sub_bom {
-                self.recurse_bom(&comp.component_sku, total_qty, cum_lead, depth + 1, sub, output);
+                self.recurse_bom(
+                    &comp.component_sku,
+                    total_qty,
+                    cum_lead,
+                    depth + 1,
+                    sub,
+                    output,
+                );
             }
         }
     }
@@ -1088,7 +1112,10 @@ impl SovereignOdooInventoryTwoStepWavePickingEngineV9 {
         let mut zone_groups: HashMap<String, Vec<&WarehousePickItem>> = HashMap::new();
 
         for it in items {
-            zone_groups.entry(it.warehouse_zone.clone()).or_insert_with(Vec::new).push(it);
+            zone_groups
+                .entry(it.warehouse_zone.clone())
+                .or_insert_with(Vec::new)
+                .push(it);
         }
 
         let mut waves = Vec::new();
@@ -1373,7 +1400,10 @@ impl SovereignEnterpriseProductivitySuiteV9PrGatewayEngine {
     pub fn audit_suite_v9(&self) -> ProductivitySuiteV9AuditManifest {
         // 1. Google Workspace checks
         let docs = SovereignGoogleDocsSemanticSearchEngineV9::new();
-        let chunks = docs.chunk_document("# Introduction\nWelcome to SigmaOS Docs.\n\n# Features\nAdvanced vector search.", 5);
+        let chunks = docs.chunk_document(
+            "# Introduction\nWelcome to SigmaOS Docs.\n\n# Features\nAdvanced vector search.",
+            5,
+        );
         let search = docs.semantic_search("SigmaOS", &chunks, 2);
         let docs_ok = !search.matched_chunks.is_empty();
 
@@ -1389,14 +1419,13 @@ impl SovereignEnterpriseProductivitySuiteV9PrGatewayEngine {
         let sheets_ok = spill.is_spill_error && spill.colliding_cells.len() == 1;
 
         let slides = SovereignGoogleSlidesGenerativePresentationLayoutEngineV9::new();
-        let presentation = slides.generate_presentation_plan(&[
-            PresentationSection {
-                section_title: "Executive Summary".into(),
-                bullet_points: vec!["Revenue up 20%".into()],
-                layout_intent: "hero-stat".into(),
-            },
-        ]);
-        let slides_ok = presentation.len() == 1 && presentation[0].template_type == "HeroStatTemplate";
+        let presentation = slides.generate_presentation_plan(&[PresentationSection {
+            section_title: "Executive Summary".into(),
+            bullet_points: vec!["Revenue up 20%".into()],
+            layout_intent: "hero-stat".into(),
+        }]);
+        let slides_ok =
+            presentation.len() == 1 && presentation[0].template_type == "HeroStatTemplate";
 
         let looker = SovereignGoogleLookerStudioSemanticModelEngineV9::new();
         let query_plan = looker.compile_federated_plan(
@@ -1415,14 +1444,20 @@ impl SovereignEnterpriseProductivitySuiteV9PrGatewayEngine {
 
         // 2. Microsoft 365 checks
         let word = SovereignMicrosoftWordOperationalTransformationCoAuthoringEngineV9::new();
-        let doc_transformed = word.apply_transform(
-            "Hello World",
-            &UserEditPayload {
-                client_id: "client-1".into(),
-                revision_clock: 1,
-                ops: vec![TextOperation::Retain(6), TextOperation::Insert("SigmaOS ".into()), TextOperation::Retain(5)],
-            },
-        ).unwrap();
+        let doc_transformed = word
+            .apply_transform(
+                "Hello World",
+                &UserEditPayload {
+                    client_id: "client-1".into(),
+                    revision_clock: 1,
+                    ops: vec![
+                        TextOperation::Retain(6),
+                        TextOperation::Insert("SigmaOS ".into()),
+                        TextOperation::Retain(5),
+                    ],
+                },
+            )
+            .unwrap();
         let word_ok = doc_transformed == "Hello SigmaOS World";
 
         let excel = SovereignMicrosoftExcelDynamicPivotTableEngineV9::new();
@@ -1500,7 +1535,14 @@ impl SovereignEnterpriseProductivitySuiteV9PrGatewayEngine {
 
         let zoho_desk = SovereignZohoDeskOmnichannelSlaEscalationEngineV9::new();
         let mut policies = HashMap::new();
-        policies.insert("High".into(), SlaPolicyRule { priority: "High".into(), max_response_hours: 2, max_resolution_hours: 8 });
+        policies.insert(
+            "High".into(),
+            SlaPolicyRule {
+                priority: "High".into(),
+                max_response_hours: 2,
+                max_resolution_hours: 8,
+            },
+        );
         let sla_res = zoho_desk.evaluate_slas(
             &[OmnichannelTicket {
                 ticket_id: "TICK-1".into(),
@@ -1612,7 +1654,8 @@ impl SovereignEnterpriseProductivitySuiteV9PrGatewayEngine {
                 total_amount: 4.50,
             },
         ]);
-        let odoo_pos_ok = pos_sync.accepted_transactions_count == 1 && pos_sync.duplicate_collided_count == 1;
+        let odoo_pos_ok =
+            pos_sync.accepted_transactions_count == 1 && pos_sync.duplicate_collided_count == 1;
 
         // 6. Bitrix24 Suite checks
         let bitrix_ivr = SovereignBitrix24IvrCallRouterEngineV9::new();
@@ -1638,17 +1681,18 @@ impl SovereignEnterpriseProductivitySuiteV9PrGatewayEngine {
                 send_client_notification: true,
             }],
         );
-        let bitrix_crm_ok = deal_trans.spawned_tasks.len() == 1 && deal_trans.notifications_sent == 1;
+        let bitrix_crm_ok =
+            deal_trans.spawned_tasks.len() == 1 && deal_trans.notifications_sent == 1;
 
         let bitrix_wg = SovereignBitrix24WorkgroupResourceCapacityEngineV9::new();
-        let capacity_report = bitrix_wg.inspect_capacity(&[
-            WorkgroupMemberCapacity {
-                user_id: "user-1".into(),
-                standard_capacity_hours_per_week: 40.0,
-                allocated_project_hours: 50.0,
-            },
-        ]);
-        let bitrix_wg_ok = capacity_report.overloaded_members.contains(&"user-1".to_string());
+        let capacity_report = bitrix_wg.inspect_capacity(&[WorkgroupMemberCapacity {
+            user_id: "user-1".into(),
+            standard_capacity_hours_per_week: 40.0,
+            allocated_project_hours: 50.0,
+        }]);
+        let bitrix_wg_ok = capacity_report
+            .overloaded_members
+            .contains(&"user-1".to_string());
 
         let overall = docs_ok
             && sheets_ok

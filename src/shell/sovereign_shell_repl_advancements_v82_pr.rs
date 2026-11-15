@@ -9,9 +9,7 @@ use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
 
-use crate::shell::universal_cli_shell_system::{
-    ShellSystemFormat, UniversalCliOptionTranslator,
-};
+use crate::shell::universal_cli_shell_system::{ShellSystemFormat, UniversalCliOptionTranslator};
 
 /// Result of transpiling a shell script into POSIX /bin/sh format
 #[derive(Debug, Clone)]
@@ -45,7 +43,10 @@ impl SovereignUniversalShTranspilerV82 {
                 return ShellSystemFormat::Fish;
             } else if first_line.contains("tcsh") || first_line.contains("csh") {
                 return ShellSystemFormat::Tcsh;
-            } else if first_line.contains("ksh") || first_line.contains("mksh") || first_line.contains("oksh") {
+            } else if first_line.contains("ksh")
+                || first_line.contains("mksh")
+                || first_line.contains("oksh")
+            {
                 return ShellSystemFormat::Ksh;
             } else if first_line.contains("dash") || first_line.contains("ash") {
                 return ShellSystemFormat::Dash;
@@ -59,7 +60,10 @@ impl SovereignUniversalShTranspilerV82 {
                 return ShellSystemFormat::Elvish;
             } else if first_line.contains("xonsh") {
                 return ShellSystemFormat::Xonsh;
-            } else if first_line.contains("ysh") || first_line.contains("oil") || first_line.contains("osh") {
+            } else if first_line.contains("ysh")
+                || first_line.contains("oil")
+                || first_line.contains("osh")
+            {
                 return ShellSystemFormat::Oil;
             } else if first_line.contains("pwsh") || first_line.contains("powershell") {
                 return ShellSystemFormat::PowerShell;
@@ -77,7 +81,8 @@ impl SovereignUniversalShTranspilerV82 {
         }
 
         // Heuristic signature detection
-        if script.contains("set -gx ") || (script.contains("function ") && script.contains("; end")) {
+        if script.contains("set -gx ") || (script.contains("function ") && script.contains("; end"))
+        {
             ShellSystemFormat::Fish
         } else if script.contains("setenv ") || script.contains("if ($?VAR)") {
             ShellSystemFormat::Tcsh
@@ -97,7 +102,10 @@ impl SovereignUniversalShTranspilerV82 {
     /// Transpiles any script into universal POSIX /bin/sh execution
     pub fn transpile(&self, raw_script: &str) -> TranspilationResultV82 {
         let format = Self::detect_dialect(raw_script);
-        let mut posix_lines = vec!["#!/bin/sh".to_string(), "# Universal SigmaOS Transpiled Output".to_string()];
+        let mut posix_lines = vec![
+            "#!/bin/sh".to_string(),
+            "# Universal SigmaOS Transpiled Output".to_string(),
+        ];
         let mut exported_vars = BTreeMap::new();
         let mut converted_aliases = BTreeMap::new();
         let mut warnings = Vec::new();
@@ -175,10 +183,13 @@ impl SovereignUniversalShTranspilerV82 {
                             exported_vars.insert(var.to_string(), val.to_string());
                         }
                         posix_lines.push(trimmed.to_string());
-                    } else if trimmed.starts_with("declare -g ") || trimmed.starts_with("typeset -g ") {
+                    } else if trimmed.starts_with("declare -g ")
+                        || trimmed.starts_with("typeset -g ")
+                    {
                         let decl = &trimmed[11..];
                         posix_lines.push(decl.to_string());
-                        posix_lines.push(format!("export {}", decl.split('=').next().unwrap_or("")));
+                        posix_lines
+                            .push(format!("export {}", decl.split('=').next().unwrap_or("")));
                     } else {
                         posix_lines.push(trimmed.to_string());
                     }
@@ -190,7 +201,8 @@ impl SovereignUniversalShTranspilerV82 {
         }
 
         if exported_vars.is_empty() {
-            warnings.push("No explicit exported environment variables detected in script.".to_string());
+            warnings
+                .push("No explicit exported environment variables detected in script.".to_string());
         }
 
         TranspilationResultV82 {
@@ -298,7 +310,10 @@ impl SovereignUniversalReplEngineV82 {
                 "dash" => self.active_format = ShellSystemFormat::Dash,
                 _ => self.active_format = ShellSystemFormat::Bash,
             }
-            return format!("Switched interactive REPL format to {:?}", self.active_format);
+            return format!(
+                "Switched interactive REPL format to {:?}",
+                self.active_format
+            );
         }
 
         self.bridge.execute_cross_dialect_cmd(trimmed)
@@ -307,8 +322,19 @@ impl SovereignUniversalReplEngineV82 {
     /// Generates context-aware ghost completions
     pub fn autocomplete_suggestion(&self, prefix: &str) -> Vec<String> {
         let commands = [
-            "export", "unset", "set -gx", "setenv", "Get-ChildItem", "Select-String",
-            "pledge", "unveil", "a11y", "pkg list", "vm list", "container run", "audit status",
+            "export",
+            "unset",
+            "set -gx",
+            "setenv",
+            "Get-ChildItem",
+            "Select-String",
+            "pledge",
+            "unveil",
+            "a11y",
+            "pkg list",
+            "vm list",
+            "container run",
+            "audit status",
         ];
 
         commands
@@ -349,8 +375,14 @@ impl SovereignShellReplAdvancementsV82PrGateway {
         let formats = vec![
             (ShellSystemFormat::Bash, "#!/bin/bash\nexport PORT=8080"),
             (ShellSystemFormat::Zsh, "#!/bin/zsh\ntypeset -A conf"),
-            (ShellSystemFormat::Fish, "#!/bin/fish\nset -gx DB_HOST localhost"),
-            (ShellSystemFormat::Tcsh, "#!/bin/tcsh\nsetenv CACHE_DIR /tmp"),
+            (
+                ShellSystemFormat::Fish,
+                "#!/bin/fish\nset -gx DB_HOST localhost",
+            ),
+            (
+                ShellSystemFormat::Tcsh,
+                "#!/bin/tcsh\nsetenv CACHE_DIR /tmp",
+            ),
             (ShellSystemFormat::Ksh, "#!/bin/ksh\ntypeset -x TIMEOUT=30"),
             (ShellSystemFormat::Dash, "#!/bin/dash\nPATH=/bin:/usr/bin"),
             (ShellSystemFormat::PowerShell, "$env:MODE = 'prod'"),

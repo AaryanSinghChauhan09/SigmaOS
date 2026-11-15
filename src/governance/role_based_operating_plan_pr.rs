@@ -526,7 +526,10 @@ impl RoleBasedOperatingPlanPrGateway {
         let mut doc = String::new();
 
         doc.push_str(&format!("# {}\n\n", spec.pr_title));
-        doc.push_str(&format!("**Branch:** `{}` | **Status:** {}\n\n", spec.pr_branch, spec.status));
+        doc.push_str(&format!(
+            "**Branch:** `{}` | **Status:** {}\n\n",
+            spec.pr_branch, spec.status
+        ));
         doc.push_str("## Executive Summary\n\n");
         doc.push_str("This pull request establishes SigmaOS's Role-Based Governance, Phased Strategic Wedge Roadmap, and AI-Agent Maintenance Plan. Grounded in a pragmatic reality check, it shifts the project away from superficial feature parity claims across hundreds of distributions toward a focused, evidence-gated operating model where every capability claim requires verifiable CI artifacts (such as QEMU boot logs).\n\n");
 
@@ -535,7 +538,9 @@ impl RoleBasedOperatingPlanPrGateway {
         doc.push_str("- **The 4 Wedge Pillars:**\n");
         doc.push_str("  1. Memory-safe Rust microkernel and userland.\n");
         doc.push_str("  2. Atomic, rollbackable system updates by default (simplified Silverblue / NixOS model).\n");
-        doc.push_str("  3. Capability-based security by default (pledge/unveil, Capsicum, Landlock).\n");
+        doc.push_str(
+            "  3. Capability-based security by default (pledge/unveil, Capsicum, Landlock).\n",
+        );
         doc.push_str("  4. Agent-native maintainability with machine-readable status, strict guardrails, and test gates.\n");
         doc.push_str("- **Ground Truth Over Claims:** Eliminates duplicate docs, unifies status tracking into evidence-based records, and replaces synthetic claims with QEMU serial output validation.\n\n");
 
@@ -546,7 +551,11 @@ impl RoleBasedOperatingPlanPrGateway {
                 phase.phase,
                 phase.name,
                 phase.timeframe,
-                if phase.is_complete { "Complete" } else { "In Progress" }
+                if phase.is_complete {
+                    "Complete"
+                } else {
+                    "In Progress"
+                }
             ));
         }
         doc.push_str("\n");
@@ -564,7 +573,11 @@ impl RoleBasedOperatingPlanPrGateway {
 
         doc.push_str("## Weekly Operational Calendar\n\n");
         for day in &self.engine.calendar {
-            let role_names: Vec<String> = day.assigned_roles.iter().map(|r| format!("{:?}", r)).collect();
+            let role_names: Vec<String> = day
+                .assigned_roles
+                .iter()
+                .map(|r| format!("{:?}", r))
+                .collect();
             doc.push_str(&format!(
                 "- **{:?}**: {} (Assigned Roles: {})\n",
                 day.day,

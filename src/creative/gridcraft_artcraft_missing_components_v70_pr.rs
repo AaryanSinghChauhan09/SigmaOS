@@ -476,7 +476,11 @@ impl GridcraftHierarchicalPivotTableMdxCubeQueryV70Engine {
         Self
     }
 
-    pub fn execute_mdx_slice(&self, dimension: &str, fact_values: &[f64]) -> PivotMdxSliceResultV70 {
+    pub fn execute_mdx_slice(
+        &self,
+        dimension: &str,
+        fact_values: &[f64],
+    ) -> PivotMdxSliceResultV70 {
         let sum: f64 = fact_values.iter().sum();
         PivotMdxSliceResultV70 {
             dimension: String::from(dimension),

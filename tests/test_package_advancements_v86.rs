@@ -6,8 +6,8 @@
 mod sovereign_distro_package_advancements_v86_pr;
 
 use sovereign_distro_package_advancements_v86_pr::sovereign_distro_package_advancements_v86::*;
-use sovereign_distro_package_advancements_v86_pr::SovereignDistroPackagePrGatewayV86;
 use sovereign_distro_package_advancements_v86_pr::universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v86_pr::SovereignDistroPackagePrGatewayV86;
 
 #[test]
 fn test_package_advancements_v86_full_cycle() {
@@ -50,7 +50,10 @@ fn test_package_advancements_v86_full_cycle() {
     let solved = solver
         .solve_dependencies("ripgrep", &raw_deps)
         .expect("SAT solver failed");
-    assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v86"]);
+    assert_eq!(
+        solved,
+        vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v86"]
+    );
 
     // 5. Multi-Sandbox Security Governor V86
     let sandbox_gov = UniversalMultiSandboxGovernorV86::new();

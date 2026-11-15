@@ -169,7 +169,9 @@ impl EffectcraftVolumetricCombustionExplosionV69PrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV69PrProposalManifest {
         EffectcraftV69PrProposalManifest {
             pr_id: 6902,
-            pr_title: "feat(effectcraft): Add Volumetric Fire & Combustion Explosion Physics Engine V69".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Volumetric Fire & Combustion Explosion Physics Engine V69"
+                    .to_string(),
             target_subsystem: "EffectCraft Volumetric Dynamics Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Combustion Studio".to_string(),
             components_added: vec![
@@ -234,7 +236,9 @@ impl EffectcraftSpatialAudioAmbisonics3dMixerV69PrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV69PrProposalManifest {
         EffectcraftV69PrProposalManifest {
             pr_id: 6903,
-            pr_title: "feat(effectcraft): Add Higher-Order Ambisonics 3D Spatial Audio Surround Mixer V69".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Higher-Order Ambisonics 3D Spatial Audio Surround Mixer V69"
+                    .to_string(),
             target_subsystem: "EffectCraft Spatial Audio Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Spatial Audio Studio".to_string(),
             components_added: vec![
@@ -437,7 +441,9 @@ impl EffectcraftOpenFxPluginHostAdapterV69PrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV69PrProposalManifest {
         EffectcraftV69PrProposalManifest {
             pr_id: 6906,
-            pr_title: "feat(effectcraft): Add OpenFX (OFX 1.4.2) Standard Host Architecture Adapter V69".to_string(),
+            pr_title:
+                "feat(effectcraft): Add OpenFX (OFX 1.4.2) Standard Host Architecture Adapter V69"
+                    .to_string(),
             target_subsystem: "EffectCraft OFX Interop Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft OFX Adapter Studio".to_string(),
             components_added: vec![
@@ -479,11 +485,7 @@ impl EffectcraftCryptomatteExrDeepAovExtractorV69PrEngine {
         Self { max_ranks: 6 }
     }
 
-    pub fn extract_matte_for_hash(
-        &self,
-        samples: &[CryptoCoverageV69],
-        target_hash: u32,
-    ) -> f32 {
+    pub fn extract_matte_for_hash(&self, samples: &[CryptoCoverageV69], target_hash: u32) -> f32 {
         let mut total_coverage = 0.0f32;
         for sample in samples {
             if sample.hash_id == target_hash {
@@ -496,7 +498,9 @@ impl EffectcraftCryptomatteExrDeepAovExtractorV69PrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV69PrProposalManifest {
         EffectcraftV69PrProposalManifest {
             pr_id: 6907,
-            pr_title: "feat(effectcraft): Add Multi-Rank Cryptomatte EXR AOV Layer Extractor Engine V69".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Multi-Rank Cryptomatte EXR AOV Layer Extractor Engine V69"
+                    .to_string(),
             target_subsystem: "EffectCraft Cryptomatte Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Cryptomatte Studio".to_string(),
             components_added: vec![
@@ -547,7 +551,9 @@ impl EffectcraftCrdtMultiUserTimelineCollabSyncV69PrEngine {
     ) -> TimelineOpV69 {
         if remote_op.timestamp > local_op.timestamp {
             remote_op.clone()
-        } else if remote_op.timestamp == local_op.timestamp && remote_op.client_id > local_op.client_id {
+        } else if remote_op.timestamp == local_op.timestamp
+            && remote_op.client_id > local_op.client_id
+        {
             remote_op.clone()
         } else {
             local_op.clone()
@@ -557,7 +563,9 @@ impl EffectcraftCrdtMultiUserTimelineCollabSyncV69PrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV69PrProposalManifest {
         EffectcraftV69PrProposalManifest {
             pr_id: 6908,
-            pr_title: "feat(effectcraft): Add Real-Time CRDT Multi-User Timeline Collaboration Engine V69".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Real-Time CRDT Multi-User Timeline Collaboration Engine V69"
+                    .to_string(),
             target_subsystem: "EffectCraft Collaboration Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Timeline Sync Studio".to_string(),
             components_added: vec![
@@ -837,8 +845,18 @@ mod tests {
     fn test_subpixel_motion_tracking_stabilizer() {
         let engine = EffectcraftSubpixelMotionTrackingStabilizerV69PrEngine::new();
         let tracks = vec![
-            SubpixelTrackpointV69 { point_id: 1, x: 10.5, y: 20.5, quality: 1.0 },
-            SubpixelTrackpointV69 { point_id: 2, x: 11.5, y: 21.5, quality: 1.0 },
+            SubpixelTrackpointV69 {
+                point_id: 1,
+                x: 10.5,
+                y: 20.5,
+                quality: 1.0,
+            },
+            SubpixelTrackpointV69 {
+                point_id: 2,
+                x: 11.5,
+                y: 21.5,
+                quality: 1.0,
+            },
         ];
         let (avg_x, avg_y) = engine.compute_stabilization_offset(&tracks);
         assert!((avg_x - 11.0).abs() < 1e-5);
@@ -872,9 +890,18 @@ mod tests {
     fn test_cryptomatte_deep_extractor() {
         let engine = EffectcraftCryptomatteExrDeepAovExtractorV69PrEngine::new();
         let samples = vec![
-            CryptoCoverageV69 { hash_id: 0xABCD, coverage: 0.6 },
-            CryptoCoverageV69 { hash_id: 0xABCD, coverage: 0.3 },
-            CryptoCoverageV69 { hash_id: 0x1234, coverage: 0.8 },
+            CryptoCoverageV69 {
+                hash_id: 0xABCD,
+                coverage: 0.6,
+            },
+            CryptoCoverageV69 {
+                hash_id: 0xABCD,
+                coverage: 0.3,
+            },
+            CryptoCoverageV69 {
+                hash_id: 0x1234,
+                coverage: 0.8,
+            },
         ];
         let cov = engine.extract_matte_for_hash(&samples, 0xABCD);
         assert!((cov - 0.9).abs() < 1e-5);
@@ -883,8 +910,18 @@ mod tests {
     #[test]
     fn test_crdt_timeline_collab_sync() {
         let engine = EffectcraftCrdtMultiUserTimelineCollabSyncV69PrEngine::new();
-        let local = TimelineOpV69 { client_id: 1, timestamp: 100, clip_id: 10, new_start_time: 2.0 };
-        let remote = TimelineOpV69 { client_id: 2, timestamp: 105, clip_id: 10, new_start_time: 3.5 };
+        let local = TimelineOpV69 {
+            client_id: 1,
+            timestamp: 100,
+            clip_id: 10,
+            new_start_time: 2.0,
+        };
+        let remote = TimelineOpV69 {
+            client_id: 2,
+            timestamp: 105,
+            clip_id: 10,
+            new_start_time: 3.5,
+        };
         let resolved = engine.resolve_timeline_op(&local, &remote);
         assert_eq!(resolved.client_id, 2);
         assert_eq!(resolved.new_start_time, 3.5);
@@ -893,7 +930,11 @@ mod tests {
     #[test]
     fn test_spatial_camera_mesh_projector() {
         let engine = EffectcraftSpatial3dCameraTrackerMeshProjectorV69PrEngine::new();
-        let vertex = TrackedMeshVertexV69 { vertex_id: 1, position: (10.0, 5.0, 50.0), confidence: 0.95 };
+        let vertex = TrackedMeshVertexV69 {
+            vertex_id: 1,
+            position: (10.0, 5.0, 50.0),
+            confidence: 0.95,
+        };
         let (x2d, y2d) = engine.project_3d_to_2d(&vertex, (1920.0, 1080.0));
         assert!(x2d > 960.0);
         assert!(y2d > 540.0);

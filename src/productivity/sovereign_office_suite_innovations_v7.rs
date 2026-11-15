@@ -341,11 +341,7 @@ impl SovereignMicrosoftLoopDataverseSyncEngineV7 {
         Self
     }
 
-    pub fn sync_component(
-        &self,
-        sync_id: &str,
-        records_count: usize,
-    ) -> DataverseSyncStatusResult {
+    pub fn sync_component(&self, sync_id: &str, records_count: usize) -> DataverseSyncStatusResult {
         DataverseSyncStatusResult {
             sync_id: sync_id.to_string(),
             records_synced: records_count,
@@ -463,9 +459,9 @@ impl SovereignZohoDeskKbAiRouterEngine {
         // Zero-allocation search filtering for ASCII queries and keywords,
         // eliminating per-keyword heap String allocations (`k.to_lowercase()`).
         // Preserves exact query.contains(keyword) semantics.
-        let match_art = articles.iter().find(|a| {
-            a.keywords.iter().any(|k| contains_ignore_case(query, k))
-        });
+        let match_art = articles
+            .iter()
+            .find(|a| a.keywords.iter().any(|k| contains_ignore_case(query, k)));
 
         if let Some(art) = match_art {
             KbRoutingResult {
@@ -550,9 +546,14 @@ impl SovereignSalesforceEinsteinPredictiveEngine {
         &self,
         input: &PredictiveAnalyticsInput,
     ) -> PredictiveAnalyticsResult {
-        let churn_risk = (input.support_tickets_count as f64 * 8.0 - input.usage_growth_rate * 50.0)
+        let churn_risk = (input.support_tickets_count as f64 * 8.0
+            - input.usage_growth_rate * 50.0)
             .clamp(5.0, 95.0);
-        let upsell = if input.usage_growth_rate > 0.2 { 85 } else { 40 };
+        let upsell = if input.usage_growth_rate > 0.2 {
+            85
+        } else {
+            40
+        };
 
         PredictiveAnalyticsResult {
             account_id: input.account_id.clone(),
@@ -872,15 +873,22 @@ impl SovereignEnterpriseProductivitySuiteV7PrGatewayEngine {
             }],
             &HashMap::from([("client_name".to_string(), "Acme Corp".to_string())]),
         );
-        let docs_passed = docs_res.is_ready_for_insertion && docs_res.rendered_template.contains("Acme Corp");
+        let docs_passed =
+            docs_res.is_ready_for_insertion && docs_res.rendered_template.contains("Acme Corp");
 
         // 2. Google Sheets Lambda Formula
         let sheets_eng = SovereignGoogleSheetsLambdaFormulaEngine::new();
         let sheets_res = sheets_eng.evaluate_lambda(
             "MULTIPLY",
             &[
-                LambdaParamSpec { param_name: "x".to_string(), param_type: "NUMBER".to_string() },
-                LambdaParamSpec { param_name: "y".to_string(), param_type: "NUMBER".to_string() },
+                LambdaParamSpec {
+                    param_name: "x".to_string(),
+                    param_type: "NUMBER".to_string(),
+                },
+                LambdaParamSpec {
+                    param_name: "y".to_string(),
+                    param_type: "NUMBER".to_string(),
+                },
             ],
             &["5".to_string(), "10".to_string()],
             "x * y",
@@ -1028,12 +1036,14 @@ impl SovereignEnterpriseProductivitySuiteV7PrGatewayEngine {
 
         // 17. Odoo POS Kitchen Batch
         let odoo_pos_eng = SovereignOdooPosKitchenBatchEngine::new();
-        let odoo_pos_res = odoo_pos_eng.batch_tickets("BATCH1", &["Steak".to_string(), "Fries".to_string()]);
+        let odoo_pos_res =
+            odoo_pos_eng.batch_tickets("BATCH1", &["Steak".to_string(), "Fries".to_string()]);
         let odoo_pos_passed = odoo_pos_res.items_in_batch == 2;
 
         // 18. Bitrix24 Voice Sentiment Metrics
         let bitrix_voice_eng = SovereignBitrix24VoiceSentimentMetricsEngineV7::new();
-        let bitrix_voice_res = bitrix_voice_eng.analyze_call("CALL100", "Customer is happy with service");
+        let bitrix_voice_res =
+            bitrix_voice_eng.analyze_call("CALL100", "Customer is happy with service");
         let bitrix_voice_passed = bitrix_voice_res.sentiment_score > 0.8;
 
         // 19. Bitrix24 CRM Kanban Automation
@@ -1118,7 +1128,15 @@ mod tests {
         assert_eq!(res.rendered_template, "Hello User");
 
         let sheets = SovereignGoogleSheetsLambdaFormulaEngine::new();
-        let lam = sheets.evaluate_lambda("ADD", &[LambdaParamSpec { param_name: "a".to_string(), param_type: "INT".to_string() }], &["5".to_string()], "a + 10");
+        let lam = sheets.evaluate_lambda(
+            "ADD",
+            &[LambdaParamSpec {
+                param_name: "a".to_string(),
+                param_type: "INT".to_string(),
+            }],
+            &["5".to_string()],
+            "a + 10",
+        );
         assert_eq!(lam.execution_status, "LAMBDA_SUCCESS");
     }
 

@@ -47,7 +47,8 @@ fn test_virtio_nic_queue_lifecycle() {
 
 #[test]
 fn test_interface_and_link_state_model() {
-    let mut model = NetworkInterfaceAndLinkStateModel::new(1, "eth0", [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
+    let mut model =
+        NetworkInterfaceAndLinkStateModel::new(1, "eth0", [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
     assert_eq!(model.mac_address, [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
     assert_eq!(model.link_state, LinkState::Down);
 
@@ -115,11 +116,10 @@ fn test_tcp_transport_rfc9293() {
 #[test]
 fn test_dhcp_dns_hardened_client() {
     let mut engine = HardenedDhcpAndDnsClientEngine::new();
-    assert!(engine.add_dns_record("sigmaos.org", [192, 168, 1, 100], 300).is_ok());
-    assert_eq!(
-        engine.resolve("sigmaos.org"),
-        Some([192, 168, 1, 100])
-    );
+    assert!(engine
+        .add_dns_record("sigmaos.org", [192, 168, 1, 100], 300)
+        .is_ok());
+    assert_eq!(engine.resolve("sigmaos.org"), Some([192, 168, 1, 100]));
     assert_eq!(engine.resolve("unknown.org"), None);
 }
 
@@ -162,7 +162,8 @@ fn test_persistent_config_rollback() {
 
 #[test]
 fn test_network_control_cli_diagnostics() {
-    let model = NetworkInterfaceAndLinkStateModel::new(1, "eth0", [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
+    let model =
+        NetworkInterfaceAndLinkStateModel::new(1, "eth0", [0x52, 0x54, 0x00, 0x12, 0x34, 0x56]);
     let status_json = NetworkControlCliAndDiagnosticsEngine::generate_interface_status_json(&model);
     assert!(status_json.contains("eth0"));
 }
@@ -187,22 +188,32 @@ fn test_master_network_development_suite() {
     assert!(master.run_complete_verification_suite());
 }
 
-
 #[test]
 fn test_network_development_plan_documentation_verification() {
     use std::fs;
     use std::path::Path;
 
-    let docs_path = "/home/aaryansinghchauhan/SigmaOS.wiki/Doc-net-NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md";
-    let wiki_path = "/home/aaryansinghchauhan/SigmaOS.wiki/28-Network-Development-And-Maintenance-Plan.md";
+    let docs_path =
+        "/home/aaryansinghchauhan/SigmaOS.wiki/Doc-net-NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md";
+    let wiki_path =
+        "/home/aaryansinghchauhan/SigmaOS.wiki/28-Network-Development-And-Maintenance-Plan.md";
 
-    assert!(Path::new(docs_path).exists(), "docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md must exist");
-    assert!(Path::new(wiki_path).exists(), "wiki/28-Network-Development-And-Maintenance-Plan.md must exist");
+    assert!(
+        Path::new(docs_path).exists(),
+        "docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md must exist"
+    );
+    assert!(
+        Path::new(wiki_path).exists(),
+        "wiki/28-Network-Development-And-Maintenance-Plan.md must exist"
+    );
 
     let docs_content = fs::read_to_string(docs_path).expect("read docs content");
     let wiki_content = fs::read_to_string(wiki_path).expect("read wiki content");
 
-    assert_eq!(docs_content, wiki_content, "Wiki documentation must match docs specification");
+    assert_eq!(
+        docs_content, wiki_content,
+        "Wiki documentation must match docs specification"
+    );
 
     // Verify key sections
     assert!(docs_content.contains("# SigmaOS development and maintenance plan"));
@@ -214,9 +225,12 @@ fn test_network_development_plan_documentation_verification() {
     assert!(docs_content.contains("## Execution order and exit criteria"));
 
     // Verify all 13 PRs in table
-    assert!(docs_content.contains("`docs(net): define network architecture, status, and support boundaries`"));
-    assert!(docs_content.contains("`test(net): add deterministic packet fixtures and parser fuzz targets`"));
-    assert!(docs_content.contains("`feat(net): connect VirtIO NIC to the Ethernet receive and transmit path`"));
+    assert!(docs_content
+        .contains("`docs(net): define network architecture, status, and support boundaries`"));
+    assert!(docs_content
+        .contains("`test(net): add deterministic packet fixtures and parser fuzz targets`"));
+    assert!(docs_content
+        .contains("`feat(net): connect VirtIO NIC to the Ethernet receive and transmit path`"));
     assert!(docs_content.contains("`feat(net): add interface and link-state model`"));
     assert!(docs_content.contains("`feat(net): add IPv4 routing and ICMP host support`"));
     assert!(docs_content.contains("`feat(net): add IPv6 host networking foundation`"));
@@ -224,7 +238,11 @@ fn test_network_development_plan_documentation_verification() {
     assert!(docs_content.contains("`feat(net): harden DHCP and DNS client behavior`"));
     assert!(docs_content.contains("`feat(net): add persistent network configuration and rollback`"));
     assert!(docs_content.contains("`feat(net): add network control CLI and diagnostics`"));
-    assert!(docs_content.contains("`feat(net): add firewall policy framework with default-deny service rules`"));
-    assert!(docs_content.contains("`ci(net): add QEMU networking integration and regression workflow`"));
-    assert!(docs_content.contains("`docs(net): publish supported networking matrix and recovery guide`"));
+    assert!(docs_content
+        .contains("`feat(net): add firewall policy framework with default-deny service rules`"));
+    assert!(
+        docs_content.contains("`ci(net): add QEMU networking integration and regression workflow`")
+    );
+    assert!(docs_content
+        .contains("`docs(net): publish supported networking matrix and recovery guide`"));
 }

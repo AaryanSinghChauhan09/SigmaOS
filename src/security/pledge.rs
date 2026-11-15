@@ -161,9 +161,7 @@ impl PledgeManager {
             return true; // No unveil restrictions — allow all.
         }
 
-        if !is_canonical_absolute_path(path)
-            || !matches!(requested_perm, 'r' | 'w' | 'x')
-        {
+        if !is_canonical_absolute_path(path) || !matches!(requested_perm, 'r' | 'w' | 'x') {
             return false;
         }
 

@@ -74,7 +74,11 @@ impl SigmaLookerAnalyticsEngine {
         }
     }
 
-    pub fn group_by_dimension(&self, dimension_key: &str, metric_key: &str) -> BTreeMap<String, f64> {
+    pub fn group_by_dimension(
+        &self,
+        dimension_key: &str,
+        metric_key: &str,
+    ) -> BTreeMap<String, f64> {
         let mut result = BTreeMap::new();
         for rec in &self.data_records {
             if let (Some(dim), Some(val_str)) = (rec.get(dimension_key), rec.get(metric_key)) {
@@ -251,7 +255,11 @@ impl SigmaDocsEnterpriseCollaborationEngine {
     }
 
     pub fn reject_suggestion(&mut self, sug_id: &str) -> bool {
-        if let Some(pos) = self.suggestions.iter().position(|s| s.suggestion_id == sug_id) {
+        if let Some(pos) = self
+            .suggestions
+            .iter()
+            .position(|s| s.suggestion_id == sug_id)
+        {
             self.suggestions.remove(pos);
             true
         } else {

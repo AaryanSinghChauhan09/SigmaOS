@@ -111,7 +111,11 @@ impl FilmcraftHardwareAcceleratedH266VvcDecoderV69PrEngine {
         }
     }
 
-    pub fn decode_vvc_packet(&self, bitstream: &[u8], out_yuv: &mut Vec<u8>) -> Result<usize, &'static str> {
+    pub fn decode_vvc_packet(
+        &self,
+        bitstream: &[u8],
+        out_yuv: &mut Vec<u8>,
+    ) -> Result<usize, &'static str> {
         if bitstream.is_empty() {
             return Err("Bitstream buffer cannot be empty");
         }
@@ -124,7 +128,9 @@ impl FilmcraftHardwareAcceleratedH266VvcDecoderV69PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV69PrProposalManifest {
         FilmcraftV69PrProposalManifest {
             pr_id: 6952,
-            pr_title: "feat(filmcraft): Hardware Accelerated H.266/VVC & AV1 Neural Video Decoder V69".to_string(),
+            pr_title:
+                "feat(filmcraft): Hardware Accelerated H.266/VVC & AV1 Neural Video Decoder V69"
+                    .to_string(),
             target_subsystem: "Codec Engine & Hardware Acceleration".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -304,7 +310,11 @@ impl FilmcraftAiAutomaticSpeechDenoisingDereverbV69PrEngine {
         }
     }
 
-    pub fn process_speech_audio(&self, pcm_in: &[f32], pcm_out: &mut Vec<f32>) -> Result<usize, &'static str> {
+    pub fn process_speech_audio(
+        &self,
+        pcm_in: &[f32],
+        pcm_out: &mut Vec<f32>,
+    ) -> Result<usize, &'static str> {
         if pcm_in.is_empty() {
             return Err("Input PCM audio buffer is empty");
         }
@@ -355,7 +365,9 @@ pub struct FilmcraftCrdtMultiTrackTimelineVersionControlV69PrEngine {
 
 impl FilmcraftCrdtMultiTrackTimelineVersionControlV69PrEngine {
     pub fn new() -> Self {
-        Self { committed_versions: 1 }
+        Self {
+            committed_versions: 1,
+        }
     }
 
     pub fn commit_timeline_delta(&mut self, delta_bytes: &[u8]) -> usize {
@@ -368,7 +380,9 @@ impl FilmcraftCrdtMultiTrackTimelineVersionControlV69PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV69PrProposalManifest {
         FilmcraftV69PrProposalManifest {
             pr_id: 6956,
-            pr_title: "feat(filmcraft): CRDT Multi-Track Timeline Version Control & Branching Engine V69".to_string(),
+            pr_title:
+                "feat(filmcraft): CRDT Multi-Track Timeline Version Control & Branching Engine V69"
+                    .to_string(),
             target_subsystem: "Timeline Versioning & Collaboration".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -403,7 +417,11 @@ impl FilmcraftColorGradingLut3dTetrahedralInterpolatorV69PrEngine {
         Self { lut_size: 33 }
     }
 
-    pub fn apply_3d_lut_tetrahedral(&self, rgb_in: &[f32], rgb_out: &mut Vec<f32>) -> Result<usize, &'static str> {
+    pub fn apply_3d_lut_tetrahedral(
+        &self,
+        rgb_in: &[f32],
+        rgb_out: &mut Vec<f32>,
+    ) -> Result<usize, &'static str> {
         if rgb_in.is_empty() || rgb_in.len() % 3 != 0 {
             return Err("Input RGB length must be non-empty and multiple of 3");
         }
@@ -455,10 +473,17 @@ pub struct FilmcraftSubframeAudioPhaseAlignmentCrossfadeV69PrEngine {
 
 impl FilmcraftSubframeAudioPhaseAlignmentCrossfadeV69PrEngine {
     pub fn new() -> Self {
-        Self { phase_correlation_threshold: 0.92 }
+        Self {
+            phase_correlation_threshold: 0.92,
+        }
     }
 
-    pub fn align_and_crossfade(&self, audio_a: &[f32], audio_b: &[f32], out_crossfade: &mut Vec<f32>) -> Result<usize, &'static str> {
+    pub fn align_and_crossfade(
+        &self,
+        audio_a: &[f32],
+        audio_b: &[f32],
+        out_crossfade: &mut Vec<f32>,
+    ) -> Result<usize, &'static str> {
         if audio_a.len() != audio_b.len() || audio_a.is_empty() {
             return Err("Audio buffers must match in size and non-empty");
         }
@@ -511,21 +536,32 @@ pub struct FilmcraftVectorKineticMotionGraphicsRendererV69PrEngine {
 
 impl FilmcraftVectorKineticMotionGraphicsRendererV69PrEngine {
     pub fn new() -> Self {
-        Self { anti_aliasing_samples: 8 }
+        Self {
+            anti_aliasing_samples: 8,
+        }
     }
 
-    pub fn render_kinetic_text_element(&self, text: &str, progress: f32) -> Result<String, &'static str> {
+    pub fn render_kinetic_text_element(
+        &self,
+        text: &str,
+        progress: f32,
+    ) -> Result<String, &'static str> {
         if text.is_empty() {
             return Err("Text input cannot be empty");
         }
 
-        Ok(format!("<g transform=\"scale({})\"><text>{}</text></g>", progress, text))
+        Ok(format!(
+            "<g transform=\"scale({})\"><text>{}</text></g>",
+            progress, text
+        ))
     }
 
     pub fn generate_proposal(&self) -> FilmcraftV69PrProposalManifest {
         FilmcraftV69PrProposalManifest {
             pr_id: 6959,
-            pr_title: "feat(filmcraft): Vector Kinetic Motion Graphics & Typography Hardware Engine V69".to_string(),
+            pr_title:
+                "feat(filmcraft): Vector Kinetic Motion Graphics & Typography Hardware Engine V69"
+                    .to_string(),
             target_subsystem: "Motion Graphics & Title Cards".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -557,21 +593,32 @@ pub struct FilmcraftUniversalNleFcpxmlAafOtioBridgeV69PrEngine {
 
 impl FilmcraftUniversalNleFcpxmlAafOtioBridgeV69PrEngine {
     pub fn new() -> Self {
-        Self { supported_formats_count: 5 }
+        Self {
+            supported_formats_count: 5,
+        }
     }
 
-    pub fn convert_timeline_project(&self, source_format: &str, target_format: &str) -> Result<String, &'static str> {
+    pub fn convert_timeline_project(
+        &self,
+        source_format: &str,
+        target_format: &str,
+    ) -> Result<String, &'static str> {
         if source_format.is_empty() || target_format.is_empty() {
             return Err("Format names cannot be empty");
         }
 
-        Ok(format!("Successfully converted project from {} to {}", source_format, target_format))
+        Ok(format!(
+            "Successfully converted project from {} to {}",
+            source_format, target_format
+        ))
     }
 
     pub fn generate_proposal(&self) -> FilmcraftV69PrProposalManifest {
         FilmcraftV69PrProposalManifest {
             pr_id: 6960,
-            pr_title: "feat(filmcraft): Universal NLE FCPXML, AAF, OTIO & Premiere XML Interop Bridge V69".to_string(),
+            pr_title:
+                "feat(filmcraft): Universal NLE FCPXML, AAF, OTIO & Premiere XML Interop Bridge V69"
+                    .to_string(),
             target_subsystem: "NLE Project Export & Interoperability".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -607,16 +654,36 @@ impl SovereignFilmcraftArtcraftMissingComponentsV69PrGateway {
             proposals: BTreeMap::new(),
         };
 
-        gateway.register_proposal(FilmcraftNeuralVideoFrameInterpolationV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftHardwareAcceleratedH266VvcDecoderV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftSpatialAudioAmbisonicsBinauralV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftRealtimeDepthMapKeyingRelightingV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftAiAutomaticSpeechDenoisingDereverbV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftCrdtMultiTrackTimelineVersionControlV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftColorGradingLut3dTetrahedralInterpolatorV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftSubframeAudioPhaseAlignmentCrossfadeV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftVectorKineticMotionGraphicsRendererV69PrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftUniversalNleFcpxmlAafOtioBridgeV69PrEngine::new().generate_proposal());
+        gateway.register_proposal(
+            FilmcraftNeuralVideoFrameInterpolationV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftHardwareAcceleratedH266VvcDecoderV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftSpatialAudioAmbisonicsBinauralV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftRealtimeDepthMapKeyingRelightingV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftAiAutomaticSpeechDenoisingDereverbV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftCrdtMultiTrackTimelineVersionControlV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftColorGradingLut3dTetrahedralInterpolatorV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftSubframeAudioPhaseAlignmentCrossfadeV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftVectorKineticMotionGraphicsRendererV69PrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftUniversalNleFcpxmlAafOtioBridgeV69PrEngine::new().generate_proposal(),
+        );
 
         gateway
     }

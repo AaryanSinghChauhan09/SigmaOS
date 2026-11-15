@@ -140,7 +140,10 @@ impl SovereignNetworkConfigDaemonsV87Engine {
         Self {
             netplan_yaml_loaded: false,
             networkmanager_profiles: vec!["Wired-DHCP".to_string(), "Roaming-WLAN".to_string()],
-            systemd_networkd_links: vec!["10-eth0.network".to_string(), "20-wlan0.network".to_string()],
+            systemd_networkd_links: vec![
+                "10-eth0.network".to_string(),
+                "20-wlan0.network".to_string(),
+            ],
             netlink_routes_count: 8,
             ifconfig_legacy_compat: true,
         }
@@ -353,7 +356,10 @@ impl SovereignPacketFilteringAndFirewallV87Engine {
     pub fn new() -> Self {
         Self {
             iptables_rules: Vec::new(),
-            nftables_chains: vec!["inet filter input".to_string(), "inet filter forward".to_string()],
+            nftables_chains: vec![
+                "inet filter input".to_string(),
+                "inet filter forward".to_string(),
+            ],
             pf_anchors: Vec::new(),
             ipfw_pipes: Vec::new(),
         }
@@ -484,7 +490,10 @@ impl SovereignNetUtilitiesAndDiagnosticsV87Engine {
     }
 
     pub fn execute_curl_http3_download(&self, url: &str) -> String {
-        format!("HTTP/3 200 OK\nlocation: {}\nserver: sovereign-quic\ncontent-length: 1048576", url)
+        format!(
+            "HTTP/3 200 OK\nlocation: {}\nserver: sovereign-quic\ncontent-length: 1048576",
+            url
+        )
     }
 
     pub fn capture_tcpdump_bpf(&mut self, filter: &str) -> u32 {
@@ -566,15 +575,25 @@ impl SovereignNetworkingStackAndDaemonsV87PrGateway {
 
     pub fn generate_master_pr_summary(&self) -> String {
         let manifests = self.generate_all_pr_manifests();
-        let mut summary = String::from("# Sovereign Networking Stack & Daemons Advancements (v87 PR Suite)\n\n");
+        let mut summary =
+            String::from("# Sovereign Networking Stack & Daemons Advancements (v87 PR Suite)\n\n");
         summary.push_str("Empowering SigmaOS with carrier-grade, quantum-ready, high-throughput network stack parity.\n\n");
 
         for manifest in manifests {
             summary.push_str(&format!("### PR #{}: {}\n", manifest.pr_id, manifest.title));
             summary.push_str(&format!("- **Category:** {}\n", manifest.category));
-            summary.push_str(&format!("- **Throughput Boost:** +{}%\n", manifest.throughput_boost_pct));
-            summary.push_str(&format!("- **Latency Reduction:** -{}%\n", manifest.latency_reduction_pct));
-            summary.push_str(&format!("- **Security Standard:** {}\n", manifest.security_rating));
+            summary.push_str(&format!(
+                "- **Throughput Boost:** +{}%\n",
+                manifest.throughput_boost_pct
+            ));
+            summary.push_str(&format!(
+                "- **Latency Reduction:** -{}%\n",
+                manifest.latency_reduction_pct
+            ));
+            summary.push_str(&format!(
+                "- **Security Standard:** {}\n",
+                manifest.security_rating
+            ));
             summary.push_str("- **Inspiration Distros/Projects:**\n");
             for src in &manifest.inspiration_sources {
                 summary.push_str(&format!("  * {}\n", src));
@@ -667,7 +686,10 @@ mod tests {
     fn test_crypto_tunnels_vpn_v87() {
         let mut engine = SovereignCryptoTunnelsAndVpnV87Engine::new();
         assert!(engine.establish_wireguard_pqc_tunnel("wg0", "203.0.113.5:51820"));
-        assert_eq!(engine.active_tunnels[0].pqc_algorithm, "ML-KEM-768 / Noise_IKpsk2");
+        assert_eq!(
+            engine.active_tunnels[0].pqc_algorithm,
+            "ML-KEM-768 / Noise_IKpsk2"
+        );
         let manifest = engine.generate_pr_proposal();
         assert_eq!(manifest.pr_id, 8156);
     }

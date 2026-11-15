@@ -179,9 +179,9 @@ mod tests {
         let panel = OverlayPanel::new(
             String::from("emoji-picker"),
             String::from("Emoji Picker"),
-            OverlayType::EmojiPicker
+            OverlayType::EmojiPicker,
         );
-        
+
         assert_eq!(panel.overlay_type, OverlayType::EmojiPicker);
         assert_eq!(panel.state, OverlayState::Hidden);
     }
@@ -192,9 +192,9 @@ mod tests {
         let panel = OverlayPanel::new(
             String::from("image-picker"),
             String::from("Image Picker"),
-            OverlayType::ImagePicker
+            OverlayType::ImagePicker,
         );
-        
+
         manager.add_overlay(panel);
         assert_eq!(manager.overlays.len(), 1);
     }
@@ -205,11 +205,13 @@ mod tests {
         let panel = OverlayPanel::new(
             String::from("clipboard"),
             String::from("Clipboard Manager"),
-            OverlayType::ClipboardManager
+            OverlayType::ClipboardManager,
         );
-        
+
         manager.add_overlay(panel);
-        assert!(manager.summon(String::from("clipboard"), String::new()).is_ok());
+        assert!(manager
+            .summon(String::from("clipboard"), String::new())
+            .is_ok());
         assert!(manager.hide(String::from("clipboard")).is_ok());
     }
 
@@ -219,12 +221,14 @@ mod tests {
         let panel = OverlayPanel::new(
             String::from("reminders"),
             String::from("Reminders"),
-            OverlayType::Reminders
+            OverlayType::Reminders,
         );
-        
+
         manager.add_overlay(panel);
-        manager.summon(String::from("reminders"), String::new()).unwrap();
-        
+        manager
+            .summon(String::from("reminders"), String::new())
+            .unwrap();
+
         assert!(manager.get_active_overlay().is_some());
     }
 
@@ -233,9 +237,9 @@ mod tests {
         let mut panel = OverlayPanel::new(
             String::from("bg-switcher"),
             String::from("Background Switcher"),
-            OverlayType::BackgroundSwitcher
+            OverlayType::BackgroundSwitcher,
         );
-        
+
         panel.set_keep_loaded(true);
         assert!(panel.keep_loaded);
     }

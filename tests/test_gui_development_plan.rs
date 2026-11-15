@@ -49,23 +49,53 @@ fn test_gui_development_plan_19_prs() {
     assert_eq!(tracker.prs.len(), 19);
 
     for pr_id in 1..=19 {
-        let pr = tracker.prs.get(&pr_id).unwrap_or_else(|| panic!("PR {} missing", pr_id));
+        let pr = tracker
+            .prs
+            .get(&pr_id)
+            .unwrap_or_else(|| panic!("PR {} missing", pr_id));
         assert_eq!(pr.pr_number, pr_id);
         assert!(!pr.title.is_empty());
         assert!(!pr.scope.is_empty());
         assert!(!pr.acceptance_criteria.is_empty());
     }
 
-    assert_eq!(tracker.prs.get(&1).unwrap().stage, GuiPrStage::AuditBaseline);
-    assert_eq!(tracker.prs.get(&2).unwrap().stage, GuiPrStage::AuditBaseline);
-    assert_eq!(tracker.prs.get(&3).unwrap().stage, GuiPrStage::BootableDesktopSlice);
-    assert_eq!(tracker.prs.get(&8).unwrap().stage, GuiPrStage::BootableDesktopSlice);
+    assert_eq!(
+        tracker.prs.get(&1).unwrap().stage,
+        GuiPrStage::AuditBaseline
+    );
+    assert_eq!(
+        tracker.prs.get(&2).unwrap().stage,
+        GuiPrStage::AuditBaseline
+    );
+    assert_eq!(
+        tracker.prs.get(&3).unwrap().stage,
+        GuiPrStage::BootableDesktopSlice
+    );
+    assert_eq!(
+        tracker.prs.get(&8).unwrap().stage,
+        GuiPrStage::BootableDesktopSlice
+    );
     assert_eq!(tracker.prs.get(&9).unwrap().stage, GuiPrStage::UsableCoreUx);
-    assert_eq!(tracker.prs.get(&12).unwrap().stage, GuiPrStage::UsableCoreUx);
-    assert_eq!(tracker.prs.get(&13).unwrap().stage, GuiPrStage::SecurityAndAccessibility);
-    assert_eq!(tracker.prs.get(&16).unwrap().stage, GuiPrStage::SecurityAndAccessibility);
-    assert_eq!(tracker.prs.get(&17).unwrap().stage, GuiPrStage::HardwareAndReleaseReadiness);
-    assert_eq!(tracker.prs.get(&19).unwrap().stage, GuiPrStage::HardwareAndReleaseReadiness);
+    assert_eq!(
+        tracker.prs.get(&12).unwrap().stage,
+        GuiPrStage::UsableCoreUx
+    );
+    assert_eq!(
+        tracker.prs.get(&13).unwrap().stage,
+        GuiPrStage::SecurityAndAccessibility
+    );
+    assert_eq!(
+        tracker.prs.get(&16).unwrap().stage,
+        GuiPrStage::SecurityAndAccessibility
+    );
+    assert_eq!(
+        tracker.prs.get(&17).unwrap().stage,
+        GuiPrStage::HardwareAndReleaseReadiness
+    );
+    assert_eq!(
+        tracker.prs.get(&19).unwrap().stage,
+        GuiPrStage::HardwareAndReleaseReadiness
+    );
 }
 
 #[test]

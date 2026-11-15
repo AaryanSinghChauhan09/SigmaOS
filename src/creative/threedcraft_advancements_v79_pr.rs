@@ -78,7 +78,10 @@ impl ThreeDCraftNeuralRadianceCachePrEngineV79 {
         let py = query.position[1].cos().abs();
         let pz = (query.position[2] * 0.5).sin().abs();
 
-        let dot_v = (query.view_direction[0] * 0.5 + query.view_direction[1] * 0.5 + query.view_direction[2] * 0.707).max(0.0);
+        let dot_v = (query.view_direction[0] * 0.5
+            + query.view_direction[1] * 0.5
+            + query.view_direction[2] * 0.707)
+            .max(0.0);
         let specular_boost = (1.0 - query.roughness) * query.metallic * dot_v;
 
         [
@@ -314,11 +317,7 @@ impl ThreeDCraftCcdFabrikSkeletalIkGovernorPrEngineV79 {
     }
 
     /// Cyclic Coordinate Descent (CCD) IK iteration step
-    pub fn solve_ccd_ik_chain(
-        &self,
-        bones: &mut [SkeletalBoneNode],
-        target_pos: [f32; 3],
-    ) -> f32 {
+    pub fn solve_ccd_ik_chain(&self, bones: &mut [SkeletalBoneNode], target_pos: [f32; 3]) -> f32 {
         if bones.len() < 2 {
             return 0.0;
         }
@@ -351,11 +350,25 @@ impl ThreeDCraftCcdFabrikSkeletalIkGovernorPrEngineV79 {
                     target_pos[2] - pivot[2],
                 ];
 
-                let len_eff = (to_effector[0] * to_effector[0] + to_effector[1] * to_effector[1] + to_effector[2] * to_effector[2]).sqrt().max(1e-4);
-                let len_tgt = (to_target[0] * to_target[0] + to_target[1] * to_target[1] + to_target[2] * to_target[2]).sqrt().max(1e-4);
+                let len_eff = (to_effector[0] * to_effector[0]
+                    + to_effector[1] * to_effector[1]
+                    + to_effector[2] * to_effector[2])
+                    .sqrt()
+                    .max(1e-4);
+                let len_tgt = (to_target[0] * to_target[0]
+                    + to_target[1] * to_target[1]
+                    + to_target[2] * to_target[2])
+                    .sqrt()
+                    .max(1e-4);
 
-                let dot = (to_effector[0] * to_target[0] + to_effector[1] * to_target[1] + to_effector[2] * to_target[2]) / (len_eff * len_tgt);
-                let angle = dot.clamp(-1.0, 1.0).acos().clamp(bones[i].min_angle_rad, bones[i].max_angle_rad);
+                let dot = (to_effector[0] * to_target[0]
+                    + to_effector[1] * to_target[1]
+                    + to_effector[2] * to_target[2])
+                    / (len_eff * len_tgt);
+                let angle = dot
+                    .clamp(-1.0, 1.0)
+                    .acos()
+                    .clamp(bones[i].min_angle_rad, bones[i].max_angle_rad);
 
                 // Update position of child bones along chain
                 bones[i + 1].position = [
@@ -427,8 +440,15 @@ impl ThreeDCraftWaylandXrHandEyeTrackingCompositorPrEngineV79 {
     }
 
     /// Calculate foveated shading quality multiplier (1.0 = full resolution at gaze center, 0.25 = outer periphery)
-    pub fn compute_foveated_quality_multiplier(&self, gaze: EyeGazeFocusTarget, pixel_dir: [f32; 3]) -> f32 {
-        let dot = (gaze.direction[0] * pixel_dir[0] + gaze.direction[1] * pixel_dir[1] + gaze.direction[2] * pixel_dir[2]).clamp(-1.0, 1.0);
+    pub fn compute_foveated_quality_multiplier(
+        &self,
+        gaze: EyeGazeFocusTarget,
+        pixel_dir: [f32; 3],
+    ) -> f32 {
+        let dot = (gaze.direction[0] * pixel_dir[0]
+            + gaze.direction[1] * pixel_dir[1]
+            + gaze.direction[2] * pixel_dir[2])
+            .clamp(-1.0, 1.0);
         let angle_deg = dot.acos() * (180.0 / PI);
 
         if angle_deg <= self.foveated_inner_radius_deg {
@@ -436,7 +456,8 @@ impl ThreeDCraftWaylandXrHandEyeTrackingCompositorPrEngineV79 {
         } else if angle_deg >= self.foveated_outer_radius_deg {
             0.25
         } else {
-            let t = (angle_deg - self.foveated_inner_radius_deg) / (self.foveated_outer_radius_deg - self.foveated_inner_radius_deg);
+            let t = (angle_deg - self.foveated_inner_radius_deg)
+                / (self.foveated_outer_radius_deg - self.foveated_inner_radius_deg);
             1.0 - t * 0.75
         }
     }
@@ -513,13 +534,17 @@ impl SovereignThreeDCraftAdvancementsV79MasterSuite {
         if manifests.is_empty() {
             0.0
         } else {
-            let ready = manifests.iter().filter(|m| m.status == "Ready for Merge").count();
+            let ready = manifests
+                .iter()
+                .filter(|m| m.status == "Ready for Merge")
+                .count();
             (ready as f64 / manifests.len() as f64) * 100.0
         }
     }
 
     pub fn export_pr_manifest_markdown(&self) -> String {
-        let mut md = String::from("# 3DCraft Spatial Computing & Advanced 3D Rendering V79 PR Manifest\n\n");
+        let mut md =
+            String::from("# 3DCraft Spatial Computing & Advanced 3D Rendering V79 PR Manifest\n\n");
         for manifest in self.collect_all_pr_manifests() {
             let digest = fnv1a_threedcraft_v79_pr_digest(manifest.pr_id, &manifest.pr_title);
             md.push_str(&format!(
@@ -622,8 +647,18 @@ mod tests {
     fn test_ccd_ik_governor_engine() {
         let engine = ThreeDCraftCcdFabrikSkeletalIkGovernorPrEngineV79::new();
         let mut bones = vec![
-            SkeletalBoneNode { position: [0.0, 0.0, 0.0], length: 1.0, min_angle_rad: -PI, max_angle_rad: PI },
-            SkeletalBoneNode { position: [0.0, 1.0, 0.0], length: 1.0, min_angle_rad: -PI, max_angle_rad: PI },
+            SkeletalBoneNode {
+                position: [0.0, 0.0, 0.0],
+                length: 1.0,
+                min_angle_rad: -PI,
+                max_angle_rad: PI,
+            },
+            SkeletalBoneNode {
+                position: [0.0, 1.0, 0.0],
+                length: 1.0,
+                min_angle_rad: -PI,
+                max_angle_rad: PI,
+            },
         ];
 
         let err = engine.solve_ccd_ik_chain(&mut bones, [0.0, 2.0, 0.0]);

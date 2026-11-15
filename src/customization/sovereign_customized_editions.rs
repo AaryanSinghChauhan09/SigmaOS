@@ -22,9 +22,9 @@
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::format;
 
 /// Primary categorization of customized SigmaOS Editions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -109,7 +109,10 @@ impl SovereignEditionManager {
                 max_memory_mb: 8192,
             },
             bundled_components: alloc::vec![
-                "betteroffice-docs", "betteroffice-sheets", "betteroffice-slides", "betteroffice-diagrams"
+                "betteroffice-docs",
+                "betteroffice-sheets",
+                "betteroffice-slides",
+                "betteroffice-diagrams"
             ],
             supported_formats: alloc::vec!["odt", "ods", "odp", "docx", "xlsx", "pptx", "svg"],
         });
@@ -159,7 +162,8 @@ impl SovereignEditionManager {
             id: "sigmaos-genoffice",
             name: "SigmaOS GenOffice Edition",
             category: SovereignEditionCategory::GenOffice,
-            description: "Generative AI multi-target pipeline: Docs, Sheet, Slides, PDF, Markdown, HTML",
+            description:
+                "Generative AI multi-target pipeline: Docs, Sheet, Slides, PDF, Markdown, HTML",
             default_shell: "/bin/genoffice-cli",
             runtime_policy: EditionRuntimePolicy {
                 personality: KernelPersonality::MicrokernelNative,
@@ -169,7 +173,12 @@ impl SovereignEditionManager {
                 max_memory_mb: 12288,
             },
             bundled_components: alloc::vec![
-                "genoffice-docs", "genoffice-sheet", "genoffice-slides", "genoffice-pdf", "genoffice-md", "genoffice-html"
+                "genoffice-docs",
+                "genoffice-sheet",
+                "genoffice-slides",
+                "genoffice-pdf",
+                "genoffice-md",
+                "genoffice-html"
             ],
             supported_formats: alloc::vec!["md", "html", "pdf", "csv", "json"],
         });
@@ -228,9 +237,7 @@ impl SovereignEditionManager {
                 enable_realtime_priority: false,
                 max_memory_mb: 8192,
             },
-            bundled_components: alloc::vec![
-                "writer", "calc", "impress", "draw", "math", "base"
-            ],
+            bundled_components: alloc::vec!["writer", "calc", "impress", "draw", "math", "base"],
             supported_formats: alloc::vec!["odt", "ods", "odp", "odg", "odf", "odb"],
         });
 
@@ -239,7 +246,8 @@ impl SovereignEditionManager {
             id: "sigmaos-onlyoffice",
             name: "SigmaOS OnlyOffice Collaborative Edition",
             category: SovereignEditionCategory::OnlyOffice,
-            description: "Real-time collaborative editing server and native OOXML document viewer/editor",
+            description:
+                "Real-time collaborative editing server and native OOXML document viewer/editor",
             default_shell: "/bin/onlyoffice-server",
             runtime_policy: EditionRuntimePolicy {
                 personality: KernelPersonality::MicrokernelNative,
@@ -249,7 +257,9 @@ impl SovereignEditionManager {
                 max_memory_mb: 8192,
             },
             bundled_components: alloc::vec![
-                "onlyoffice-documentserver", "onlyoffice-coauthoring", "onlyoffice-ooxml-core"
+                "onlyoffice-documentserver",
+                "onlyoffice-coauthoring",
+                "onlyoffice-ooxml-core"
             ],
             supported_formats: alloc::vec!["docx", "xlsx", "pptx"],
         });
@@ -385,7 +395,10 @@ mod tests {
         assert_eq!(craft[0].bundled_components.len(), 20);
 
         assert_eq!(dos.len(), 1);
-        assert_eq!(dos[0].runtime_policy.personality, KernelPersonality::DosRealModeEmul);
+        assert_eq!(
+            dos[0].runtime_policy.personality,
+            KernelPersonality::DosRealModeEmul
+        );
     }
 
     #[test]

@@ -71,40 +71,72 @@ fn alpm_pkgver_cmp(a: &str, b: &str) -> core::cmp::Ordering {
 
     loop {
         // Skip separators (`.`, `_`, `-`)
-        while ai < ab.len() && (ab[ai] == b'.' || ab[ai] == b'_' || ab[ai] == b'-') { ai += 1; }
-        while bi < bb.len() && (bb[bi] == b'.' || bb[bi] == b'_' || bb[bi] == b'-') { bi += 1; }
+        while ai < ab.len() && (ab[ai] == b'.' || ab[ai] == b'_' || ab[ai] == b'-') {
+            ai += 1;
+        }
+        while bi < bb.len() && (bb[bi] == b'.' || bb[bi] == b'_' || bb[bi] == b'-') {
+            bi += 1;
+        }
 
-        if ai >= ab.len() && bi >= bb.len() { return Ordering::Equal; }
-        if ai >= ab.len() { return Ordering::Less; }
-        if bi >= bb.len() { return Ordering::Greater; }
+        if ai >= ab.len() && bi >= bb.len() {
+            return Ordering::Equal;
+        }
+        if ai >= ab.len() {
+            return Ordering::Less;
+        }
+        if bi >= bb.len() {
+            return Ordering::Greater;
+        }
 
         // Determine segment type
         let a_is_digit = ab[ai].is_ascii_digit();
         let b_is_digit = bb[bi].is_ascii_digit();
 
-        if a_is_digit && !b_is_digit { return Ordering::Greater; } // numeric > alpha
-        if !a_is_digit && b_is_digit { return Ordering::Less; }
+        if a_is_digit && !b_is_digit {
+            return Ordering::Greater;
+        } // numeric > alpha
+        if !a_is_digit && b_is_digit {
+            return Ordering::Less;
+        }
 
         if a_is_digit {
             // Collect numeric segments
             let a_start = ai;
-            while ai < ab.len() && ab[ai].is_ascii_digit() { ai += 1; }
+            while ai < ab.len() && ab[ai].is_ascii_digit() {
+                ai += 1;
+            }
             let b_start = bi;
-            while bi < bb.len() && bb[bi].is_ascii_digit() { bi += 1; }
-            let a_num: u64 = core::str::from_utf8(&ab[a_start..ai]).unwrap_or("0").parse().unwrap_or(0);
-            let b_num: u64 = core::str::from_utf8(&bb[b_start..bi]).unwrap_or("0").parse().unwrap_or(0);
+            while bi < bb.len() && bb[bi].is_ascii_digit() {
+                bi += 1;
+            }
+            let a_num: u64 = core::str::from_utf8(&ab[a_start..ai])
+                .unwrap_or("0")
+                .parse()
+                .unwrap_or(0);
+            let b_num: u64 = core::str::from_utf8(&bb[b_start..bi])
+                .unwrap_or("0")
+                .parse()
+                .unwrap_or(0);
             let cmp = a_num.cmp(&b_num);
-            if cmp != Ordering::Equal { return cmp; }
+            if cmp != Ordering::Equal {
+                return cmp;
+            }
         } else {
             // Collect alpha segments
             let a_start = ai;
-            while ai < ab.len() && ab[ai].is_ascii_alphabetic() { ai += 1; }
+            while ai < ab.len() && ab[ai].is_ascii_alphabetic() {
+                ai += 1;
+            }
             let b_start = bi;
-            while bi < bb.len() && bb[bi].is_ascii_alphabetic() { bi += 1; }
+            while bi < bb.len() && bb[bi].is_ascii_alphabetic() {
+                bi += 1;
+            }
             let a_seg = &ab[a_start..ai];
             let b_seg = &bb[b_start..bi];
             let cmp = a_seg.cmp(b_seg);
-            if cmp != Ordering::Equal { return cmp; }
+            if cmp != Ordering::Equal {
+                return cmp;
+            }
         }
     }
 }
@@ -671,31 +703,45 @@ sha256sums=('abcdef1234567890')
     fn test_alpm_vercmp_epoch_wins() {
         // Arrange: epoch 1 vs epoch 0 — epoch must dominate pkgver
         // Act + Assert
-        assert!(alpm_vercmp("1:1.0-1", "2.0-1") == core::cmp::Ordering::Greater,
-            "epoch 1 must beat epoch-less 2.0");
-        assert!(alpm_vercmp("0:5.0-1", "1:1.0-1") == core::cmp::Ordering::Less,
-            "epoch 0 must lose to epoch 1");
-        assert!(alpm_vercmp("2:1.0-1", "2:1.0-1") == core::cmp::Ordering::Equal,
-            "identical epoch+pkgver+pkgrel must be Equal");
+        assert!(
+            alpm_vercmp("1:1.0-1", "2.0-1") == core::cmp::Ordering::Greater,
+            "epoch 1 must beat epoch-less 2.0"
+        );
+        assert!(
+            alpm_vercmp("0:5.0-1", "1:1.0-1") == core::cmp::Ordering::Less,
+            "epoch 0 must lose to epoch 1"
+        );
+        assert!(
+            alpm_vercmp("2:1.0-1", "2:1.0-1") == core::cmp::Ordering::Equal,
+            "identical epoch+pkgver+pkgrel must be Equal"
+        );
     }
 
     #[test]
     fn test_alpm_vercmp_pkgrel_tiebreaker() {
         // Arrange: same epoch+pkgver, different pkgrel
         // Act + Assert
-        assert!(alpm_vercmp("1.0.0-2", "1.0.0-1") == core::cmp::Ordering::Greater,
-            "pkgrel 2 must beat pkgrel 1");
-        assert!(alpm_vercmp("1.0.0-1", "1.0.0-2") == core::cmp::Ordering::Less,
-            "pkgrel 1 must lose to pkgrel 2");
+        assert!(
+            alpm_vercmp("1.0.0-2", "1.0.0-1") == core::cmp::Ordering::Greater,
+            "pkgrel 2 must beat pkgrel 1"
+        );
+        assert!(
+            alpm_vercmp("1.0.0-1", "1.0.0-2") == core::cmp::Ordering::Less,
+            "pkgrel 1 must lose to pkgrel 2"
+        );
     }
 
     #[test]
     fn test_alpm_vercmp_numeric_segment() {
         // Arrange: numeric segments compared as integers, not strings
-        assert!(alpm_vercmp("2.9.0-1", "2.10.0-1") == core::cmp::Ordering::Less,
-            "2.9 < 2.10 numerically (string ordering would be wrong)");
-        assert!(alpm_vercmp("1.100-1", "1.99-1") == core::cmp::Ordering::Greater,
-            "1.100 > 1.99 numerically");
+        assert!(
+            alpm_vercmp("2.9.0-1", "2.10.0-1") == core::cmp::Ordering::Less,
+            "2.9 < 2.10 numerically (string ordering would be wrong)"
+        );
+        assert!(
+            alpm_vercmp("1.100-1", "1.99-1") == core::cmp::Ordering::Greater,
+            "1.100 > 1.99 numerically"
+        );
     }
 
     #[test]
@@ -705,7 +751,7 @@ sha256sums=('abcdef1234567890')
         mgr.register("openssl", "3.0.0");
         // Act
         let upgrades = mgr.simulate_upgrade(&[("openssl", "1:3.0.0")]); // epoch bumped
-        // Assert: epoch 1 > epoch 0, so must upgrade
+                                                                        // Assert: epoch 1 > epoch 0, so must upgrade
         assert_eq!(upgrades.len(), 1, "epoch bump must trigger upgrade");
         assert_eq!(upgrades[0].2, "1:3.0.0");
     }
@@ -717,7 +763,7 @@ sha256sums=('abcdef1234567890')
         mgr.register("zlib", "1.3.1-2");
         // Act
         let upgrades = mgr.simulate_upgrade(&[("zlib", "1.3.1-1")]); // older pkgrel
-        // Assert: no downgrade
+                                                                     // Assert: no downgrade
         assert!(upgrades.is_empty(), "must not downgrade pkgrel");
     }
 
@@ -735,8 +781,12 @@ sha256sums=('abcdef1234567890')
         assert!(!tx.is_committed);
 
         // Stage valid files
-        assert!(tx.stage_file("/usr/bin/rg", vec![0x7F, b'E', b'L', b'F']).is_ok());
-        assert!(tx.stage_file("/usr/share/man/man1/rg.1", vec![b'.', b'T', b'H']).is_ok());
+        assert!(tx
+            .stage_file("/usr/bin/rg", vec![0x7F, b'E', b'L', b'F'])
+            .is_ok());
+        assert!(tx
+            .stage_file("/usr/share/man/man1/rg.1", vec![b'.', b'T', b'H'])
+            .is_ok());
 
         // Commit succeeds
         let count = tx.commit().expect("commit should succeed");
@@ -753,7 +803,9 @@ sha256sums=('abcdef1234567890')
 
         // Corrupted file failure mode
         let mut corrupted_tx = PackageTransaction::new("bad-pkg", "1.0-1");
-        assert!(corrupted_tx.stage_file("/usr/bin/corrupted", vec![]).is_ok());
+        assert!(corrupted_tx
+            .stage_file("/usr/bin/corrupted", vec![])
+            .is_ok());
         assert!(corrupted_tx.commit().is_err());
         assert!(!corrupted_tx.is_committed);
     }

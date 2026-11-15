@@ -35,7 +35,9 @@ pub mod sovereign_distro_package_advancements_v82;
 
 #[cfg(feature = "standalone_test")]
 #[allow(unused_imports)]
-pub use sovereign_distro_package_advancements_v82::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+pub use sovereign_distro_package_advancements_v82::universal::{
+    PackageError, PackageFormat, PackageState, UnifiedPackage,
+};
 
 /// Pull Request Proposal Manifest V82
 #[derive(Debug, Clone, PartialEq, Eq)]

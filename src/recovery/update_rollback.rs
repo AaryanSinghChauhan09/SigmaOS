@@ -22,10 +22,10 @@ impl RollbackReason {
     /// Short label for logging.
     pub fn label(&self) -> &'static str {
         match self {
-            Self::UpdateFailed          => "update-failed",
-            Self::SystemUnstable        => "system-unstable",
-            Self::UserRequested         => "user-requested",
-            Self::PostUpdateTestFailed  => "post-update-test-failed",
+            Self::UpdateFailed => "update-failed",
+            Self::SystemUnstable => "system-unstable",
+            Self::UserRequested => "user-requested",
+            Self::PostUpdateTestFailed => "post-update-test-failed",
         }
     }
 }
@@ -199,18 +199,24 @@ impl UpdateRollbackManager {
 
     /// `true` if the last transaction can still be rolled back.
     pub fn pending_rollback(&self) -> bool {
-        self.transactions.last().map_or(false, |tx| tx.can_rollback())
+        self.transactions
+            .last()
+            .map_or(false, |tx| tx.can_rollback())
     }
 
     // --- private helpers ---
 
     fn find(&self, id: &str) -> Result<&UpdateTransaction, RollbackError> {
-        self.transactions.iter().find(|t| t.id == id)
+        self.transactions
+            .iter()
+            .find(|t| t.id == id)
             .ok_or_else(|| RollbackError::TransactionNotFound(id.to_string()))
     }
 
     fn find_mut(&mut self, id: &str) -> Result<&mut UpdateTransaction, RollbackError> {
-        self.transactions.iter_mut().find(|t| t.id == id)
+        self.transactions
+            .iter_mut()
+            .find(|t| t.id == id)
             .ok_or_else(|| RollbackError::TransactionNotFound(id.to_string()))
     }
 
@@ -221,7 +227,9 @@ impl UpdateRollbackManager {
 }
 
 impl Default for UpdateRollbackManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -233,7 +241,9 @@ mod tests {
         // Arrange
         let mut mgr = UpdateRollbackManager::new();
         // Act
-        let tx = mgr.begin_transaction(&["sigma-browser", "sigma-update"]).unwrap();
+        let tx = mgr
+            .begin_transaction(&["sigma-browser", "sigma-update"])
+            .unwrap();
         // Assert
         assert!(!tx.pre_snapshot_id.is_empty());
         assert_eq!(tx.status, UpdateStatus::InProgress);
@@ -259,7 +269,8 @@ mod tests {
         let mut mgr = UpdateRollbackManager::new();
         let tx = mgr.begin_transaction(&["broken-pkg"]).unwrap();
         // Act
-        mgr.abort_transaction(&tx.id, RollbackReason::UpdateFailed).unwrap();
+        mgr.abort_transaction(&tx.id, RollbackReason::UpdateFailed)
+            .unwrap();
         // Assert
         let aborted = mgr.list_transactions().last().unwrap();
         assert_eq!(aborted.status, UpdateStatus::RolledBack);

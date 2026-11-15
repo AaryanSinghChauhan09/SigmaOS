@@ -84,7 +84,14 @@ impl Ext4AdvancementsV89Engine {
         }
     }
 
-    pub fn record_fast_commit(&mut self, inode: u32, lblk: u32, pblk: u64, count: u16, unwritten: bool) {
+    pub fn record_fast_commit(
+        &mut self,
+        inode: u32,
+        lblk: u32,
+        pblk: u64,
+        count: u16,
+        unwritten: bool,
+    ) {
         self.fast_commit_log.push(Ext4V89FastCommitEntry {
             inode_num: inode,
             logical_block: lblk,
@@ -232,7 +239,11 @@ impl XfsAdvancementsV89Engine {
     }
 
     pub fn register_reflink(&mut self, ag: u32, bno: u64, len: u32) {
-        if let Some(ext) = self.reflink_extents.iter_mut().find(|e| e.source_ag == ag && e.source_bno == bno) {
+        if let Some(ext) = self
+            .reflink_extents
+            .iter_mut()
+            .find(|e| e.source_ag == ag && e.source_bno == bno)
+        {
             ext.ref_count += 1;
         } else {
             self.reflink_extents.push(XfsV89ReflinkExtent {
@@ -255,7 +266,10 @@ impl XfsAdvancementsV89Engine {
     }
 
     pub fn run_online_scrub(&mut self) -> bool {
-        self.scrub_health_ok = self.allocation_groups.iter().all(|ag| ag.free_blocks <= ag.total_blocks);
+        self.scrub_health_ok = self
+            .allocation_groups
+            .iter()
+            .all(|ag| ag.free_blocks <= ag.total_blocks);
         self.scrub_health_ok
     }
 }
@@ -354,7 +368,10 @@ impl BtrfsAdvancementsV89Engine {
         while idx < payload.len() {
             let current = payload[idx];
             let mut run_len = 1;
-            while idx + run_len < payload.len() && payload[idx + run_len] == current && run_len < 255 {
+            while idx + run_len < payload.len()
+                && payload[idx + run_len] == current
+                && run_len < 255
+            {
                 run_len += 1;
             }
             if run_len >= 4 {
@@ -585,7 +602,11 @@ impl F2FSAdvancementsV89Engine {
     }
 
     pub fn invalidate_block(&mut self, segment_id: u32) {
-        if let Some(seg) = self.segments.iter_mut().find(|s| s.segment_id == segment_id) {
+        if let Some(seg) = self
+            .segments
+            .iter_mut()
+            .find(|s| s.segment_id == segment_id)
+        {
             if seg.valid_blocks > 0 {
                 seg.valid_blocks -= 1;
                 seg.is_dirty = true;
@@ -649,7 +670,10 @@ impl FatExFatAdvancementsV89Engine {
     pub fn walk_cluster_chain(&self, start_cluster: usize) -> Vec<usize> {
         let mut chain = Vec::new();
         let mut curr = start_cluster;
-        while curr < self.fat_table.len() && self.fat_table[curr] != 0 && self.fat_table[curr] != 0xFFFF_FFFF {
+        while curr < self.fat_table.len()
+            && self.fat_table[curr] != 0
+            && self.fat_table[curr] != 0xFFFF_FFFF
+        {
             chain.push(curr);
             curr = self.fat_table[curr] as usize;
         }
@@ -738,7 +762,8 @@ impl NtfsNfsCifsPseudoFsV89Engine {
 
     pub fn match_devfs_rule(&self, dev_name: &str, expected_group: &str) -> bool {
         self.devfs_rules.iter().any(|r| {
-            (r.pattern == "nvme*" && dev_name.starts_with("nvme")) || r.group_owner == expected_group
+            (r.pattern == "nvme*" && dev_name.starts_with("nvme"))
+                || r.group_owner == expected_group
         })
     }
 
@@ -763,7 +788,11 @@ impl LvmCryptoMaintenanceUtilsV89Engine {
         Self
     }
 
-    pub fn calculate_thin_overcommit_pct(&self, allocated_virtual_mb: u64, physical_pool_mb: u64) -> u32 {
+    pub fn calculate_thin_overcommit_pct(
+        &self,
+        allocated_virtual_mb: u64,
+        physical_pool_mb: u64,
+    ) -> u32 {
         if physical_pool_mb == 0 {
             0
         } else {
@@ -790,7 +819,10 @@ impl LvmCryptoMaintenanceUtilsV89Engine {
     }
 
     pub fn derive_argon2id_key(&self, password: &[u8]) -> [u8; 32] {
-        let salt: [u8; 16] = [0x5A, 0xA5, 0x12, 0x34, 0xFE, 0xDC, 0xBA, 0x98, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88];
+        let salt: [u8; 16] = [
+            0x5A, 0xA5, 0x12, 0x34, 0xFE, 0xDC, 0xBA, 0x98, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66,
+            0x77, 0x88,
+        ];
         let mut key = [0u8; 32];
         for (i, &b) in password.iter().chain(salt.iter()).enumerate() {
             key[i % 32] = key[i % 32].wrapping_add(b).wrapping_mul(31);
@@ -809,7 +841,11 @@ impl LvmCryptoMaintenanceUtilsV89Engine {
         key
     }
 
-    pub fn verify_dm_verity_roothash(&self, computed_root: &[u8; 32], expected_root: &[u8; 32]) -> bool {
+    pub fn verify_dm_verity_roothash(
+        &self,
+        computed_root: &[u8; 32],
+        expected_root: &[u8; 32],
+    ) -> bool {
         computed_root == expected_root
     }
 }
@@ -837,12 +873,20 @@ impl StorageMaintenanceAndToolsV89Engine {
         Some((mount_point.to_string(), location.to_string()))
     }
 
-    pub fn audit_smart_health(&self, raw_read_error_rate: u64, reallocated_sectors: u64, temperature_c: u32) -> bool {
+    pub fn audit_smart_health(
+        &self,
+        raw_read_error_rate: u64,
+        reallocated_sectors: u64,
+        temperature_c: u32,
+    ) -> bool {
         raw_read_error_rate < 100 && reallocated_sectors == 0 && temperature_c < 70
     }
 
     pub fn generate_udisks_block_device_event(&self, dev_path: &str, is_removable: bool) -> String {
-        format!("UDISKS2_EVENT:path={};removable={};status=ADDED", dev_path, is_removable)
+        format!(
+            "UDISKS2_EVENT:path={};removable={};status=ADDED",
+            dev_path, is_removable
+        )
     }
 }
 

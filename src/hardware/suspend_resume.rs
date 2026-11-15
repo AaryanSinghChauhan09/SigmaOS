@@ -17,10 +17,10 @@ impl SuspendState {
     /// Kernel string written to `/sys/power/state`.
     pub fn kernel_name(self) -> &'static str {
         match self {
-            Self::S3Sleep           => "mem",
-            Self::S4Hibernate       => "disk",
+            Self::S3Sleep => "mem",
+            Self::S4Hibernate => "disk",
             Self::S0ixModernStandby => "s2idle",
-            Self::Freeze            => "freeze",
+            Self::Freeze => "freeze",
         }
     }
 }
@@ -49,9 +49,9 @@ impl PowerProfile {
     pub fn dbus_name(self) -> &'static str {
         match self {
             Self::Performance => "performance",
-            Self::Balanced    => "balanced",
-            Self::PowerSaver  => "power-saver",
-            Self::Custom      => "balanced",
+            Self::Balanced => "balanced",
+            Self::PowerSaver => "power-saver",
+            Self::Custom => "balanced",
         }
     }
 }
@@ -97,7 +97,9 @@ pub struct SuspendManager {
 
 impl SuspendManager {
     pub fn new() -> Self {
-        Self { current_profile: PowerProfile::Balanced }
+        Self {
+            current_profile: PowerProfile::Balanced,
+        }
     }
 
     /// Return the list of suspend states supported by the current hardware.
@@ -155,7 +157,9 @@ impl SuspendManager {
 }
 
 impl Default for SuspendManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]

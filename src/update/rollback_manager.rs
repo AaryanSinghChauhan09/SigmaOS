@@ -21,10 +21,10 @@ impl UpdateChannel {
     /// APT suite/component string.
     pub fn apt_suite(self) -> &'static str {
         match self {
-            Self::Stable   => "sigma-stable",
-            Self::Testing  => "sigma-testing",
+            Self::Stable => "sigma-stable",
+            Self::Testing => "sigma-testing",
             Self::Security => "sigma-security",
-            Self::Lts      => "sigma-lts",
+            Self::Lts => "sigma-lts",
         }
     }
 }
@@ -87,7 +87,10 @@ pub struct UpdateManager {
 
 impl UpdateManager {
     pub fn new() -> Self {
-        Self { last_snapshot_id: None, tx_counter: 0 }
+        Self {
+            last_snapshot_id: None,
+            tx_counter: 0,
+        }
     }
 
     /// Check the configured channel for available updates.
@@ -135,7 +138,8 @@ impl UpdateManager {
     pub fn apply_plan(&mut self, plan: &UpdatePlan) -> Result<UpdateResult, UpdateError> {
         if plan.updates.is_empty() {
             return Ok(UpdateResult {
-                applied: 0, failed: 0,
+                applied: 0,
+                failed: 0,
                 snapshot_id: String::new(),
                 can_rollback: false,
             });
@@ -169,7 +173,9 @@ impl UpdateManager {
 
     /// Roll back to the pre-update snapshot.
     pub fn rollback(&mut self, reason: &str) -> Result<(), UpdateError> {
-        let snap = self.last_snapshot_id.take()
+        let snap = self
+            .last_snapshot_id
+            .take()
             .ok_or(UpdateError::NoRollbackAvailable)?;
         // Production: btrfs subvolume set-default <snap>; systemctl reboot
         let _ = (snap, reason);
@@ -195,7 +201,9 @@ impl UpdateManager {
 }
 
 impl Default for UpdateManager {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]

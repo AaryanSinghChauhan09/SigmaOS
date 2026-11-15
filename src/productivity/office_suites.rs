@@ -28,12 +28,12 @@ pub enum OfficeSuite {
 impl OfficeSuite {
     pub fn name(self) -> &'static str {
         match self {
-            Self::LibreOffice  => "LibreOffice",
-            Self::OpenOffice   => "Apache OpenOffice",
-            Self::OnlyOffice   => "OnlyOffice",
+            Self::LibreOffice => "LibreOffice",
+            Self::OpenOffice => "Apache OpenOffice",
+            Self::OnlyOffice => "OnlyOffice",
             Self::BetterOffice => "BetterOffice",
-            Self::CraftOffice  => "CraftOffice",
-            Self::GenOffice    => "GenOffice",
+            Self::CraftOffice => "CraftOffice",
+            Self::GenOffice => "GenOffice",
         }
     }
 
@@ -44,41 +44,67 @@ impl OfficeSuite {
 
     /// Whether this suite works offline (no network required).
     pub fn is_offline(self) -> bool {
-        matches!(self, Self::LibreOffice | Self::OpenOffice | Self::BetterOffice | Self::CraftOffice | Self::GenOffice)
+        matches!(
+            self,
+            Self::LibreOffice
+                | Self::OpenOffice
+                | Self::BetterOffice
+                | Self::CraftOffice
+                | Self::GenOffice
+        )
     }
 
     /// Whether it uses a Chromium-based rendering engine.
     pub fn is_chromium_based(self) -> bool {
-        matches!(self, Self::OnlyOffice | Self::GenOffice | Self::CraftOffice | Self::BetterOffice)
+        matches!(
+            self,
+            Self::OnlyOffice | Self::GenOffice | Self::CraftOffice | Self::BetterOffice
+        )
     }
 
     /// Modules (applications) included in this suite.
     pub fn modules(self) -> Vec<OfficeModule> {
         match self {
             Self::LibreOffice => vec![
-                OfficeModule::Writer, OfficeModule::Calc, OfficeModule::Impress,
-                OfficeModule::Draw,  OfficeModule::Math,  OfficeModule::Base,
+                OfficeModule::Writer,
+                OfficeModule::Calc,
+                OfficeModule::Impress,
+                OfficeModule::Draw,
+                OfficeModule::Math,
+                OfficeModule::Base,
             ],
             Self::OpenOffice => vec![
-                OfficeModule::Writer, OfficeModule::Calc, OfficeModule::Impress,
-                OfficeModule::Draw,  OfficeModule::Math,  OfficeModule::Base,
+                OfficeModule::Writer,
+                OfficeModule::Calc,
+                OfficeModule::Impress,
+                OfficeModule::Draw,
+                OfficeModule::Math,
+                OfficeModule::Base,
             ],
             Self::OnlyOffice => vec![
-                OfficeModule::Documents, OfficeModule::Spreadsheets,
-                OfficeModule::Slides, OfficeModule::Pdf,
+                OfficeModule::Documents,
+                OfficeModule::Spreadsheets,
+                OfficeModule::Slides,
+                OfficeModule::Pdf,
             ],
             Self::BetterOffice => vec![
-                OfficeModule::Documents, OfficeModule::Spreadsheets,
+                OfficeModule::Documents,
+                OfficeModule::Spreadsheets,
                 OfficeModule::Diagrams,
             ],
             Self::CraftOffice => vec![
-                OfficeModule::Documents, OfficeModule::Spreadsheets,
-                OfficeModule::Slides, OfficeModule::Diagrams,
+                OfficeModule::Documents,
+                OfficeModule::Spreadsheets,
+                OfficeModule::Slides,
+                OfficeModule::Diagrams,
             ],
             Self::GenOffice => vec![
-                OfficeModule::Documents, OfficeModule::Spreadsheets,
-                OfficeModule::Slides, OfficeModule::Pdf,
-                OfficeModule::Markdown, OfficeModule::Html,
+                OfficeModule::Documents,
+                OfficeModule::Spreadsheets,
+                OfficeModule::Slides,
+                OfficeModule::Pdf,
+                OfficeModule::Markdown,
+                OfficeModule::Html,
             ],
         }
     }
@@ -133,19 +159,19 @@ pub enum OfficeModule {
 impl OfficeModule {
     pub fn name(self) -> &'static str {
         match self {
-            Self::Writer       => "Writer",
-            Self::Calc         => "Calc",
-            Self::Impress      => "Impress",
-            Self::Draw         => "Draw",
-            Self::Math         => "Math",
-            Self::Base         => "Base",
-            Self::Documents    => "Documents",
-            Self::Spreadsheets  => "Spreadsheets",
-            Self::Slides       => "Slides",
-            Self::Pdf          => "PDF",
-            Self::Diagrams     => "Diagrams",
-            Self::Markdown     => "Markdown",
-            Self::Html         => "HTML",
+            Self::Writer => "Writer",
+            Self::Calc => "Calc",
+            Self::Impress => "Impress",
+            Self::Draw => "Draw",
+            Self::Math => "Math",
+            Self::Base => "Base",
+            Self::Documents => "Documents",
+            Self::Spreadsheets => "Spreadsheets",
+            Self::Slides => "Slides",
+            Self::Pdf => "PDF",
+            Self::Diagrams => "Diagrams",
+            Self::Markdown => "Markdown",
+            Self::Html => "HTML",
         }
     }
 }
@@ -153,19 +179,40 @@ impl OfficeModule {
 /// MIME type mapping for office file associations.
 pub fn office_mime_types() -> Vec<(&'static str, OfficeModule)> {
     vec![
-        ("application/vnd.oasis.opendocument.text",        OfficeModule::Writer),
-        ("application/vnd.oasis.opendocument.spreadsheet",  OfficeModule::Calc),
-        ("application/vnd.oasis.opendocument.presentation", OfficeModule::Impress),
-        ("application/vnd.oasis.opendocument.graphics",     OfficeModule::Draw),
-        ("application/msword",                               OfficeModule::Writer),
-        ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", OfficeModule::Writer),
-        ("application/vnd.ms-excel",                         OfficeModule::Calc),
-        ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",        OfficeModule::Calc),
-        ("application/vnd.ms-powerpoint",                   OfficeModule::Impress),
-        ("application/vnd.openxmlformats-officedocument.presentationml.presentation", OfficeModule::Impress),
-        ("application/pdf",                                  OfficeModule::Pdf),
-        ("text/markdown",                                    OfficeModule::Markdown),
-        ("text/html",                                       OfficeModule::Html),
+        (
+            "application/vnd.oasis.opendocument.text",
+            OfficeModule::Writer,
+        ),
+        (
+            "application/vnd.oasis.opendocument.spreadsheet",
+            OfficeModule::Calc,
+        ),
+        (
+            "application/vnd.oasis.opendocument.presentation",
+            OfficeModule::Impress,
+        ),
+        (
+            "application/vnd.oasis.opendocument.graphics",
+            OfficeModule::Draw,
+        ),
+        ("application/msword", OfficeModule::Writer),
+        (
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            OfficeModule::Writer,
+        ),
+        ("application/vnd.ms-excel", OfficeModule::Calc),
+        (
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            OfficeModule::Calc,
+        ),
+        ("application/vnd.ms-powerpoint", OfficeModule::Impress),
+        (
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            OfficeModule::Impress,
+        ),
+        ("application/pdf", OfficeModule::Pdf),
+        ("text/markdown", OfficeModule::Markdown),
+        ("text/html", OfficeModule::Html),
     ]
 }
 
@@ -216,9 +263,15 @@ impl SigmaOfficeConfig {
     /// List of suites that will be installed with this config.
     pub fn installed_suites(&self) -> Vec<OfficeSuite> {
         let mut suites = Vec::new();
-        if self.install_libreoffice  { suites.push(OfficeSuite::LibreOffice); }
-        if self.install_onlyoffice   { suites.push(OfficeSuite::OnlyOffice); }
-        if self.install_genoffice    { suites.push(OfficeSuite::GenOffice); }
+        if self.install_libreoffice {
+            suites.push(OfficeSuite::LibreOffice);
+        }
+        if self.install_onlyoffice {
+            suites.push(OfficeSuite::OnlyOffice);
+        }
+        if self.install_genoffice {
+            suites.push(OfficeSuite::GenOffice);
+        }
         suites
     }
 }

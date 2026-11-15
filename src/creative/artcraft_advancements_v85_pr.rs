@@ -63,7 +63,11 @@ pub struct ColorGradingLut3D {
 impl ColorGradingLut3D {
     pub fn identity(size: usize) -> Self {
         let mut table = Vec::with_capacity(size * size * size);
-        let step = if size > 1 { 1.0 / (size - 1) as f64 } else { 0.0 };
+        let step = if size > 1 {
+            1.0 / (size - 1) as f64
+        } else {
+            0.0
+        };
         for r_idx in 0..size {
             for g_idx in 0..size {
                 for b_idx in 0..size {
@@ -127,9 +131,18 @@ impl ColorGradingLut3D {
             let c010 = self.table[idx(r0, g1, b0)];
             let c001 = self.table[idx(r0, g0, b1)];
             LinearRgb {
-                r: (1.0 - dr) * c000.r + dr * c100.r + dg * (c010.r - c000.r) + db * (c001.r - c000.r),
-                g: (1.0 - dg) * c000.g + dg * c010.g + dr * (c100.g - c000.g) + db * (c001.g - c000.g),
-                b: (1.0 - db) * c000.b + db * c001.b + dr * (c100.b - c000.b) + dg * (c010.b - c000.b),
+                r: (1.0 - dr) * c000.r
+                    + dr * c100.r
+                    + dg * (c010.r - c000.r)
+                    + db * (c001.r - c000.r),
+                g: (1.0 - dg) * c000.g
+                    + dg * c010.g
+                    + dr * (c100.g - c000.g)
+                    + db * (c001.g - c000.g),
+                b: (1.0 - db) * c000.b
+                    + db * c001.b
+                    + dr * (c100.b - c000.b)
+                    + dg * (c010.b - c000.b),
             }
         }
     }
@@ -157,9 +170,21 @@ impl ArtcraftWideGamutOklabLutColorGradingPrEngineV85 {
         let s = 0.0883024619 * rgb.r + 0.2817188376 * rgb.g + 0.6299787005 * rgb.b;
 
         // Cube root of LMS components with sign preservation
-        let l_ = if l >= 0.0 { l.powf(1.0 / 3.0) } else { -(-l).powf(1.0 / 3.0) };
-        let m_ = if m >= 0.0 { m.powf(1.0 / 3.0) } else { -(-m).powf(1.0 / 3.0) };
-        let s_ = if s >= 0.0 { s.powf(1.0 / 3.0) } else { -(-s).powf(1.0 / 3.0) };
+        let l_ = if l >= 0.0 {
+            l.powf(1.0 / 3.0)
+        } else {
+            -(-l).powf(1.0 / 3.0)
+        };
+        let m_ = if m >= 0.0 {
+            m.powf(1.0 / 3.0)
+        } else {
+            -(-m).powf(1.0 / 3.0)
+        };
+        let s_ = if s >= 0.0 {
+            s.powf(1.0 / 3.0)
+        } else {
+            -(-s).powf(1.0 / 3.0)
+        };
 
         OklabColor {
             l: 0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_,
@@ -199,7 +224,8 @@ impl ArtcraftWideGamutOklabLutColorGradingPrEngineV85 {
     pub fn generate_proposal(&self) -> ArtcraftV85PrProposalManifest {
         ArtcraftV85PrProposalManifest {
             pr_id: 8501,
-            pr_title: "ArtCraft Wide Gamut Oklab & 3D LUT Tetrahedral Color Grading Engine".to_string(),
+            pr_title: "ArtCraft Wide Gamut Oklab & 3D LUT Tetrahedral Color Grading Engine"
+                .to_string(),
             target_subsystem: "sigmaos::creative::color_management".to_string(),
             original_suite: "ArtCraft Creative Cloud / Affinity Photo CMS".to_string(),
             components_added: vec![
@@ -208,7 +234,8 @@ impl ArtcraftWideGamutOklabLutColorGradingPrEngineV85 {
                 "TetrahedralInterpolationSimplex".to_string(),
                 "OklabLinearRgbBidirectionalMapper".to_string(),
             ],
-            performance_multiplier: "4.8x SIMD-friendly color transformation throughput".to_string(),
+            performance_multiplier: "4.8x SIMD-friendly color transformation throughput"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -277,7 +304,8 @@ impl ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85 {
     pub fn generate_proposal(&self) -> ArtcraftV85PrProposalManifest {
         ArtcraftV85PrProposalManifest {
             pr_id: 8502,
-            pr_title: "ArtCraft Ultra HDR & HDR10 Gainmap Tone-Expansion Compositor Engine".to_string(),
+            pr_title: "ArtCraft Ultra HDR & HDR10 Gainmap Tone-Expansion Compositor Engine"
+                .to_string(),
             target_subsystem: "sigmaos::creative::hdr_gainmap".to_string(),
             original_suite: "ArtCraft PhotoCraft / Adobe ACR Gainmap Engine".to_string(),
             components_added: vec![
@@ -358,7 +386,10 @@ impl ArtcraftComputeShaderBrushStampSimulationPrEngineV85 {
                         1.0 - norm_dist
                     };
 
-                    let alpha = (dab.opacity * dab.pressure * edge_factor * (1.0 - self.pigment_dispersion_rate * 0.2))
+                    let alpha = (dab.opacity
+                        * dab.pressure
+                        * edge_factor
+                        * (1.0 - self.pigment_dispersion_rate * 0.2))
                         .clamp(0.0, 1.0);
                     let alpha_u8 = (alpha * 255.0) as u8;
 
@@ -366,9 +397,9 @@ impl ArtcraftComputeShaderBrushStampSimulationPrEngineV85 {
                     if pixel_idx + 3 < tile_buffer.len() {
                         let current_a = tile_buffer[pixel_idx + 3];
                         tile_buffer[pixel_idx + 3] = current_a.saturating_add(alpha_u8);
-                        tile_buffer[pixel_idx] = 255;     // Red tint
+                        tile_buffer[pixel_idx] = 255; // Red tint
                         tile_buffer[pixel_idx + 1] = 128; // Green tint
-                        tile_buffer[pixel_idx + 2] = 64;  // Blue tint
+                        tile_buffer[pixel_idx + 2] = 64; // Blue tint
                         pixels_modified += 1;
                     }
                 }
@@ -380,7 +411,9 @@ impl ArtcraftComputeShaderBrushStampSimulationPrEngineV85 {
     pub fn generate_proposal(&self) -> ArtcraftV85PrProposalManifest {
         ArtcraftV85PrProposalManifest {
             pr_id: 8503,
-            pr_title: "ArtCraft GPU Compute Shader Dynamic Brush Dab Stamping & Wet-Edge Simulation".to_string(),
+            pr_title:
+                "ArtCraft GPU Compute Shader Dynamic Brush Dab Stamping & Wet-Edge Simulation"
+                    .to_string(),
             target_subsystem: "sigmaos::creative::brush_engine".to_string(),
             original_suite: "ArtCraft PhotoCraft / Affinity Pixel Brush Engine".to_string(),
             components_added: vec![
@@ -466,10 +499,14 @@ impl ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85 {
                     let delta = match &node.kind {
                         LiveFilterKind::GaussianBlur { radius } => (*radius * 100.0) as u64,
                         LiveFilterKind::Curves { contrast } => (*contrast * 100.0) as u64,
-                        LiveFilterKind::ChromaticAberration { shift_px } => (*shift_px * 50.0) as u64,
+                        LiveFilterKind::ChromaticAberration { shift_px } => {
+                            (*shift_px * 50.0) as u64
+                        }
                         LiveFilterKind::Vignette { amount } => (*amount * 75.0) as u64,
                     };
-                    seed_hash = seed_hash.wrapping_mul(31).wrapping_add(delta ^ (node.id as u64));
+                    seed_hash = seed_hash
+                        .wrapping_mul(31)
+                        .wrapping_add(delta ^ (node.id as u64));
                     node.cached_checksum = seed_hash;
                     node.dirty = false;
                     recomputed_count += 1;
@@ -493,7 +530,8 @@ impl ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85 {
                 "LiveFilterKind".to_string(),
                 "IncrementalDagCacheInvalidator".to_string(),
             ],
-            performance_multiplier: "8.4x caching speedup via targeted dirty invalidation".to_string(),
+            performance_multiplier: "8.4x caching speedup via targeted dirty invalidation"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -506,9 +544,18 @@ impl ArtcraftNonDestructiveLiveFilterAdjustmentGraphPrEngineV85 {
 /// Vector element record for compact stream serialization.
 #[derive(Debug, Clone, PartialEq)]
 pub enum VectorRecordV85 {
-    PathBezier { points_count: u32, closed: bool },
-    TextSpan { glyphs_count: u32, font_size_pt: f32 },
-    GradientFill { stops_count: u32, is_radial: bool },
+    PathBezier {
+        points_count: u32,
+        closed: bool,
+    },
+    TextSpan {
+        glyphs_count: u32,
+        font_size_pt: f32,
+    },
+    GradientFill {
+        stops_count: u32,
+        is_radial: bool,
+    },
 }
 
 /// Compact lossless binary vector asset stream serializer.
@@ -538,17 +585,26 @@ impl ArtcraftLosslessVectorAssetExchangeFormatPrEngineV85 {
 
         for rec in &self.records {
             match rec {
-                VectorRecordV85::PathBezier { points_count, closed } => {
+                VectorRecordV85::PathBezier {
+                    points_count,
+                    closed,
+                } => {
                     stream.push(0x01);
                     stream.extend_from_slice(&points_count.to_le_bytes());
                     stream.push(if *closed { 1 } else { 0 });
                 }
-                VectorRecordV85::TextSpan { glyphs_count, font_size_pt } => {
+                VectorRecordV85::TextSpan {
+                    glyphs_count,
+                    font_size_pt,
+                } => {
                     stream.push(0x02);
                     stream.extend_from_slice(&glyphs_count.to_le_bytes());
                     stream.extend_from_slice(&font_size_pt.to_le_bytes());
                 }
-                VectorRecordV85::GradientFill { stops_count, is_radial } => {
+                VectorRecordV85::GradientFill {
+                    stops_count,
+                    is_radial,
+                } => {
                     stream.push(0x03);
                     stream.extend_from_slice(&stops_count.to_le_bytes());
                     stream.push(if *is_radial { 1 } else { 0 });
@@ -589,7 +645,8 @@ impl ArtcraftLosslessVectorAssetExchangeFormatPrEngineV85 {
                 "BinaryVectorStreamSerializer".to_string(),
                 "CompactVectorIpcChannel".to_string(),
             ],
-            performance_multiplier: "5.5x faster vector parsing with 60% smaller footprint".to_string(),
+            performance_multiplier: "5.5x faster vector parsing with 60% smaller footprint"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -623,7 +680,11 @@ impl SovereignArtcraftAdvancementsV85MasterSuite {
     /// Evaluates full parity across all 5 V85 ArtCraft advancement components.
     pub fn evaluate_artcraft_advancements_v85_parity(&mut self) -> bool {
         // 1. Color Grading Verification
-        let srgb = LinearRgb { r: 0.6, g: 0.3, b: 0.1 };
+        let srgb = LinearRgb {
+            r: 0.6,
+            g: 0.3,
+            b: 0.1,
+        };
         let oklab = self.color_engine.srgb_to_oklab(srgb);
         let recon = self.color_engine.oklab_to_srgb(oklab);
         let color_ok = (srgb.r - recon.r).abs() < 0.05
@@ -644,26 +705,35 @@ impl SovereignArtcraftAdvancementsV85MasterSuite {
             opacity: 0.8,
         };
         let mut tile_buf = vec![0u8; 32 * 32 * 4];
-        let pixels_stamped = self.brush_engine.stamp_dab_to_tile(dab, (0, 0), 32, &mut tile_buf);
+        let pixels_stamped = self
+            .brush_engine
+            .stamp_dab_to_tile(dab, (0, 0), 32, &mut tile_buf);
         let brush_ok = pixels_stamped > 0;
 
         // 4. Filter Graph Verification
-        self.filter_graph_engine.add_filter(1, LiveFilterKind::GaussianBlur { radius: 2.5 });
-        self.filter_graph_engine.add_filter(2, LiveFilterKind::Curves { contrast: 1.2 });
+        self.filter_graph_engine
+            .add_filter(1, LiveFilterKind::GaussianBlur { radius: 2.5 });
+        self.filter_graph_engine
+            .add_filter(2, LiveFilterKind::Curves { contrast: 1.2 });
         let (_hash, recomputed) = self.filter_graph_engine.evaluate_graph_pipeline(12345);
         let filter_ok = recomputed == 2;
 
         // 5. Vector Exchange Verification
-        self.vector_exchange_engine.append_record(VectorRecordV85::PathBezier {
-            points_count: 12,
-            closed: true,
-        });
-        self.vector_exchange_engine.append_record(VectorRecordV85::TextSpan {
-            glyphs_count: 24,
-            font_size_pt: 14.0,
-        });
+        self.vector_exchange_engine
+            .append_record(VectorRecordV85::PathBezier {
+                points_count: 12,
+                closed: true,
+            });
+        self.vector_exchange_engine
+            .append_record(VectorRecordV85::TextSpan {
+                glyphs_count: 24,
+                font_size_pt: 14.0,
+            });
         let stream = self.vector_exchange_engine.serialize_to_binary_stream();
-        let vector_ok = self.vector_exchange_engine.validate_and_count_stream(&stream).is_ok();
+        let vector_ok = self
+            .vector_exchange_engine
+            .validate_and_count_stream(&stream)
+            .is_ok();
 
         color_ok && hdr_ok && brush_ok && filter_ok && vector_ok
     }
@@ -693,9 +763,15 @@ impl SovereignArtcraftAdvancementsV85MasterSuite {
         let mut md = String::from("# ArtCraft Creative Suite Advancements V85 PR Manifest\n\n");
         for p in self.collect_all_proposals() {
             md.push_str(&format!("## PR #{}: {}\n", p.pr_id, p.pr_title));
-            md.push_str(&format!("- **Target Subsystem:** `{}`\n", p.target_subsystem));
+            md.push_str(&format!(
+                "- **Target Subsystem:** `{}`\n",
+                p.target_subsystem
+            ));
             md.push_str(&format!("- **Inspiration Suite:** {}\n", p.original_suite));
-            md.push_str(&format!("- **Performance Impact:** {}\n", p.performance_multiplier));
+            md.push_str(&format!(
+                "- **Performance Impact:** {}\n",
+                p.performance_multiplier
+            ));
             md.push_str(&format!("- **PR Status:** {}\n", p.status));
             md.push_str("- **Components Added:**\n");
             for c in &p.components_added {
@@ -727,7 +803,8 @@ impl ArtcraftAdvancementsV85ParitySuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.master_suite.evaluate_artcraft_advancements_v85_parity()
+        self.master_suite
+            .evaluate_artcraft_advancements_v85_parity()
     }
 }
 
@@ -738,7 +815,11 @@ mod tests {
     #[test]
     fn test_oklab_color_grading_engine() {
         let engine = ArtcraftWideGamutOklabLutColorGradingPrEngineV85::new(9, 0.0);
-        let srgb = LinearRgb { r: 0.8, g: 0.5, b: 0.2 };
+        let srgb = LinearRgb {
+            r: 0.8,
+            g: 0.5,
+            b: 0.2,
+        };
         let oklab = engine.srgb_to_oklab(srgb);
         let back = engine.oklab_to_srgb(oklab);
         assert!((srgb.r - back.r).abs() < 0.05);
@@ -753,7 +834,11 @@ mod tests {
     #[test]
     fn test_hdr_gainmap_engine() {
         let engine = ArtcraftHighDynamicRangeHdr10GainmapCompositorPrEngineV85::new(1000.0);
-        let sdr = LinearRgb { r: 0.5, g: 0.5, b: 0.5 };
+        let sdr = LinearRgb {
+            r: 0.5,
+            g: 0.5,
+            b: 0.5,
+        };
         let boosted = engine.blend_gainmap_pixel(sdr, 1.0);
         assert!(boosted.r >= sdr.r);
 

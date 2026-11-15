@@ -446,9 +446,15 @@ impl NetctlProfile {
     /// Generate netctl profile file content
     pub fn to_profile_content(&self) -> String {
         let mut lines = Vec::new();
-        lines.push(format!("Description='SigmaOS netctl profile: {}'", self.name));
+        lines.push(format!(
+            "Description='SigmaOS netctl profile: {}'",
+            self.name
+        ));
         lines.push(format!("Interface={}", self.interface));
-        lines.push(format!("Connection={}", format!("{:?}", self.connection).to_lowercase()));
+        lines.push(format!(
+            "Connection={}",
+            format!("{:?}", self.connection).to_lowercase()
+        ));
         lines.push(format!("IP={}", format!("{:?}", self.ip).to_lowercase()));
         if let Some(ref addr) = self.address {
             lines.push(format!("Address=('{}')", addr));
@@ -457,7 +463,14 @@ impl NetctlProfile {
             lines.push(format!("Gateway='{}'", gw));
         }
         if !self.dns.is_empty() {
-            lines.push(format!("DNS=({})", self.dns.iter().map(|d| format!("'{}'", d)).collect::<Vec<_>>().join(" ")));
+            lines.push(format!(
+                "DNS=({})",
+                self.dns
+                    .iter()
+                    .map(|d| format!("'{}'", d))
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            ));
         }
         if let Some(ref essid) = self.essid {
             lines.push(format!("ESSID='{}'", essid));
@@ -481,10 +494,15 @@ pub struct NetctlManager {
 
 impl NetctlManager {
     pub fn new() -> Self {
-        Self { profiles: Vec::new(), active: None }
+        Self {
+            profiles: Vec::new(),
+            active: None,
+        }
     }
 
-    pub fn add(&mut self, profile: NetctlProfile) { self.profiles.push(profile); }
+    pub fn add(&mut self, profile: NetctlProfile) {
+        self.profiles.push(profile);
+    }
 
     pub fn start(&mut self, name: &str) -> Result<(), NetworkConfigError> {
         if self.profiles.iter().any(|p| p.name == name) {
@@ -495,14 +513,18 @@ impl NetctlManager {
         }
     }
 
-    pub fn stop(&mut self) { self.active = None; }
+    pub fn stop(&mut self) {
+        self.active = None;
+    }
 
     pub fn restart(&mut self) -> Result<(), NetworkConfigError> {
         if let Some(name) = self.active.clone() {
             self.stop();
             self.start(&name)
         } else {
-            Err(NetworkConfigError::InvalidConfig("No active profile".to_string()))
+            Err(NetworkConfigError::InvalidConfig(
+                "No active profile".to_string(),
+            ))
         }
     }
 
@@ -512,7 +534,7 @@ impl NetctlManager {
 
     pub fn enable(&self, name: &str) -> Result<(), NetworkConfigError> {
         if self.profiles.iter().any(|p| p.name == name) {
-            Ok(())  // Would create systemd service symlink in real impl
+            Ok(()) // Would create systemd service symlink in real impl
         } else {
             Err(NetworkConfigError::ProfileNotFound(name.to_string()))
         }
@@ -532,7 +554,10 @@ mod arch_net_tests {
         let profile = WirelessProfile::new_wpa2(ssid, pass);
         // Assert
         assert_eq!(profile.ssid, ssid);
-        assert_eq!(profile.security, WirelessSecurity::Wpa2Psk(pass.to_string()));
+        assert_eq!(
+            profile.security,
+            WirelessSecurity::Wpa2Psk(pass.to_string())
+        );
         assert!(profile.auto_connect);
     }
 

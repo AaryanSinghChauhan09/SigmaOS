@@ -42,7 +42,8 @@ fn test_fontcraft_v83_complex_shaping_and_bidi() {
     assert_eq!(shaped[0], ('a' as u32, 500));
     assert_eq!(shaped[1], (0xFB03, 750)); // 'ffi' ligature
 
-    let spans = engine.reorder_bidi_spans_v83("Latin \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
+    let spans =
+        engine.reorder_bidi_spans_v83("Latin \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
     assert_eq!(spans.len(), 2);
     assert!(!spans[0].1);
     assert!(spans[1].1);
@@ -54,14 +55,18 @@ fn test_fontcraft_v83_complex_shaping_and_bidi() {
 #[test]
 fn test_fontcraft_v83_color_emoji_and_woff2() {
     let emoji_engine = FontcraftColorEmojiColrV1BitmapCompositorPrEngineV83::new();
-    let blend = emoji_engine.composite_colrv1_paint_layer_v83((100, 100, 100), (200, 200, 200), 0.5);
+    let blend =
+        emoji_engine.composite_colrv1_paint_layer_v83((100, 100, 100), (200, 200, 200), 0.5);
     assert_eq!(blend, (150, 150, 150));
 
     let zwj_key = emoji_engine.resolve_zwj_sequence_key_v83(&[0x1F468, 0x200D, 0x1F469]);
     assert_ne!(zwj_key, 0);
 
     let woff2_engine = FontcraftWoff2BrotliTranscoderSubsettingPrEngineV83::new();
-    assert_eq!(woff2_engine.validate_brotli_stream_header_v83(128).unwrap(), 512);
+    assert_eq!(
+        woff2_engine.validate_brotli_stream_header_v83(128).unwrap(),
+        512
+    );
 
     let subset = woff2_engine.subset_glyph_directory_v83(500, &[1, 2, 3, 999]);
     assert_eq!(subset, vec![1, 2, 3]);

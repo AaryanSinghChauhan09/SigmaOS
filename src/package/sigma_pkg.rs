@@ -48,46 +48,46 @@ pub struct Transaction {
 /// Supported Linux & BSD Universal Foreign Package Formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UniversalPackageFormat {
-    DebianDeb,       // .deb (APT/dpkg)
-    ArchPacman,      // .pkg.tar.zst (pacman)
-    FedoraRpm,       // .rpm (dnf/rpm)
-    AlpineApk,       // .apk (apk)
-    GentooEbuild,    // .ebuild (portage)
-    VoidXbps,        // .xbps (xbps)
-    FreeBsdPkg,      // .txz / .pkg (pkg)
-    OpenBsdPkg,      // .tgz / .pkg (OpenBSD pkg_add)
-    NetBsdPkgsrc,    // .tgz / .tgz (NetBSD pkgsrc)
-    SlackwarePkg,    // .txz / .tgz (Slackware installpkg)
-    NixDerivation,   // .nix / .drv (NixOS store derivation)
-    GuixPackage,     // .scm (GNU Guix package scheme)
-    HaikuHpkg,       // .hpkg (Haiku package format)
-    SolusEopkg,      // .eopkg / .pisi (Solus eopkg)
-    OpenWrtIpk,      // .ipk / .opkg (OpenWrt opkg)
-    TinyCoreTcz,     // .tcz / .sfs (TinyCore Linux)
-    ChimeraCports,   // .cports (Chimera Linux)
-    MacOsBottle,     // .bottle (Homebrew macOS/Linux)
-    IosIpa,          // .ipa (iOS app bundle)
-    AndroidAab,      // .aab / .apk (Android App Bundle / APK)
-    HarmonyHap,      // .hap (OpenHarmony HAP package)
-    FlatpakBundle,   // .flatpak
-    SnapPackage,     // .snap
-    AppImageBinary,  // .AppImage
-    SwupdClear,      // .swupd
-    StarlingFormat,  // .starling
-    MageiaUrpmi,     // .urpmi (urpmi)
-    PardusPisi,      // .pisi (PiSi)
-    PuppyPet,        // .pet (Puppy Linux)
-    SlaxLzm,         // .lzm (Slax)
-    CruxPkg,         // .crux.tar.gz (CRUX pkgadd)
-    DragonFlyDports, // .dports (DragonFly BSD DPorts)
-    BedrockStratum,  // .stratum (Bedrock Linux)
-    SpackHpc,        // .spack (Spack HPC)
-    ConanCpp,        // .conan (Conan C++)
-    OpenSuseZypper,  // .rpm / .drpm (openSUSE Zypper)
+    DebianDeb,         // .deb (APT/dpkg)
+    ArchPacman,        // .pkg.tar.zst (pacman)
+    FedoraRpm,         // .rpm (dnf/rpm)
+    AlpineApk,         // .apk (apk)
+    GentooEbuild,      // .ebuild (portage)
+    VoidXbps,          // .xbps (xbps)
+    FreeBsdPkg,        // .txz / .pkg (pkg)
+    OpenBsdPkg,        // .tgz / .pkg (OpenBSD pkg_add)
+    NetBsdPkgsrc,      // .tgz / .tgz (NetBSD pkgsrc)
+    SlackwarePkg,      // .txz / .tgz (Slackware installpkg)
+    NixDerivation,     // .nix / .drv (NixOS store derivation)
+    GuixPackage,       // .scm (GNU Guix package scheme)
+    HaikuHpkg,         // .hpkg (Haiku package format)
+    SolusEopkg,        // .eopkg / .pisi (Solus eopkg)
+    OpenWrtIpk,        // .ipk / .opkg (OpenWrt opkg)
+    TinyCoreTcz,       // .tcz / .sfs (TinyCore Linux)
+    ChimeraCports,     // .cports (Chimera Linux)
+    MacOsBottle,       // .bottle (Homebrew macOS/Linux)
+    IosIpa,            // .ipa (iOS app bundle)
+    AndroidAab,        // .aab / .apk (Android App Bundle / APK)
+    HarmonyHap,        // .hap (OpenHarmony HAP package)
+    FlatpakBundle,     // .flatpak
+    SnapPackage,       // .snap
+    AppImageBinary,    // .AppImage
+    SwupdClear,        // .swupd
+    StarlingFormat,    // .starling
+    MageiaUrpmi,       // .urpmi (urpmi)
+    PardusPisi,        // .pisi (PiSi)
+    PuppyPet,          // .pet (Puppy Linux)
+    SlaxLzm,           // .lzm (Slax)
+    CruxPkg,           // .crux.tar.gz (CRUX pkgadd)
+    DragonFlyDports,   // .dports (DragonFly BSD DPorts)
+    BedrockStratum,    // .stratum (Bedrock Linux)
+    SpackHpc,          // .spack (Spack HPC)
+    ConanCpp,          // .conan (Conan C++)
+    OpenSuseZypper,    // .rpm / .drpm (openSUSE Zypper)
     SolarisIllumosIps, // .p5p / IPS pkg (Solaris/Illumos IPS)
-    AndroidApex,     // .apex (Android Pony EXpress)
-    GuixNar,         // .nar / .narinfo (GNU Guix NAR)
-    GoboLinuxRecipe, // .recipe (GoboLinux Recipes)
+    AndroidApex,       // .apex (Android Pony EXpress)
+    GuixNar,           // .nar / .narinfo (GNU Guix NAR)
+    GoboLinuxRecipe,   // .recipe (GoboLinux Recipes)
 }
 
 /// Importer/Converter engine mapping foreign Linux/BSD packages into SigmaPkg native representation
@@ -325,7 +325,11 @@ impl UniversalPackageImporter {
             UniversalPackageFormat::ConanCpp => ("MIT", vec!["conan-center".to_string()]),
             UniversalPackageFormat::OpenSuseZypper => (
                 "GPL-2.0-or-later",
-                vec!["glibc".to_string(), "libzypp".to_string(), "libssl3".to_string()],
+                vec![
+                    "glibc".to_string(),
+                    "libzypp".to_string(),
+                    "libssl3".to_string(),
+                ],
             ),
             UniversalPackageFormat::SolarisIllumosIps => (
                 "CDDL-1.0",
@@ -2139,7 +2143,8 @@ impl SigmaPkg {
             } else if args.contains(&"search") || args.contains(&"se") {
                 action = "search";
                 action_explicitly_set = true;
-            } else if args.contains(&"upgrade") || args.contains(&"update") || args.contains(&"up") {
+            } else if args.contains(&"upgrade") || args.contains(&"update") || args.contains(&"up")
+            {
                 action = "upgrade";
                 action_explicitly_set = true;
             } else if args.contains(&"info") {
@@ -2411,7 +2416,10 @@ impl UniversalPackageTriggerEngine {
             self.execution_log.push(res.clone());
             results.push(res);
         }
-        if files.iter().any(|f| f.contains("/icons/") || f.ends_with(".png") || f.ends_with(".svg")) {
+        if files
+            .iter()
+            .any(|f| f.contains("/icons/") || f.ends_with(".png") || f.ends_with(".svg"))
+        {
             let res = TriggerExecutionResult {
                 trigger_type: UniversalPackageTriggerType::IconThemeCache,
                 target_dir: "/usr/share/icons/hicolor".to_string(),
@@ -2420,7 +2428,10 @@ impl UniversalPackageTriggerEngine {
             self.execution_log.push(res.clone());
             results.push(res);
         }
-        if files.iter().any(|f| f.contains("/fonts/") || f.ends_with(".ttf") || f.ends_with(".otf")) {
+        if files
+            .iter()
+            .any(|f| f.contains("/fonts/") || f.ends_with(".ttf") || f.ends_with(".otf"))
+        {
             let res = TriggerExecutionResult {
                 trigger_type: UniversalPackageTriggerType::FontconfigCache,
                 target_dir: "/usr/share/fonts".to_string(),
@@ -2429,7 +2440,10 @@ impl UniversalPackageTriggerEngine {
             self.execution_log.push(res.clone());
             results.push(res);
         }
-        if files.iter().any(|f| f.contains("/man/") || f.ends_with(".1.gz")) {
+        if files
+            .iter()
+            .any(|f| f.contains("/man/") || f.ends_with(".1.gz"))
+        {
             let res = TriggerExecutionResult {
                 trigger_type: UniversalPackageTriggerType::MandbUpdate,
                 target_dir: "/usr/share/man".to_string(),

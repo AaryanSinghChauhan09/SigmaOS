@@ -198,7 +198,9 @@ impl ArtcraftCrossAppAssetPipelinePrEngine {
     pub fn generate_proposal(&self) -> ArtcraftAdvancementPrProposalManifest {
         ArtcraftAdvancementPrProposalManifest {
             pr_id: 7902,
-            pr_title: "feat(artcraft): Implement Zero-Copy SHM Cross-App Asset Exchange Pipeline Engine".to_string(),
+            pr_title:
+                "feat(artcraft): Implement Zero-Copy SHM Cross-App Asset Exchange Pipeline Engine"
+                    .to_string(),
             target_subsystem: "ArtCraft IPC Interoperability".to_string(),
             original_suite: "ArtCraft Cross-App Asset Exchange".to_string(),
             components_added: vec![
@@ -249,7 +251,11 @@ impl ArtcraftRealtimeCollaborationEnginePrEngine {
 
     /// Dispatches and merges an incoming CRDT operation cleanly.
     pub fn apply_crdt_op(&mut self, op: CrdtCanvasOp) -> bool {
-        let last_seq = self.client_sequences.get(&op.client_id).copied().unwrap_or(0);
+        let last_seq = self
+            .client_sequences
+            .get(&op.client_id)
+            .copied()
+            .unwrap_or(0);
         if op.sequence_num > last_seq {
             self.client_sequences.insert(op.client_id, op.sequence_num);
             self.applied_ops.push(op);
@@ -267,7 +273,9 @@ impl ArtcraftRealtimeCollaborationEnginePrEngine {
     pub fn generate_proposal(&self) -> ArtcraftAdvancementPrProposalManifest {
         ArtcraftAdvancementPrProposalManifest {
             pr_id: 7903,
-            pr_title: "feat(artcraft): Implement Real-Time CRDT Multi-User Canvas Collaboration Engine".to_string(),
+            pr_title:
+                "feat(artcraft): Implement Real-Time CRDT Multi-User Canvas Collaboration Engine"
+                    .to_string(),
             target_subsystem: "ArtCraft Collaborative Canvas".to_string(),
             original_suite: "ArtCraft Collaborative Workspace".to_string(),
             components_added: vec![
@@ -414,15 +422,18 @@ impl ArtcraftWasiOpenfxPluginHostSandboxingPrEngine {
     pub fn generate_proposal(&self) -> ArtcraftAdvancementPrProposalManifest {
         ArtcraftAdvancementPrProposalManifest {
             pr_id: 7905,
-            pr_title: "feat(artcraft): Implement WASI / OpenFX Sandboxed Plugin Host Architecture".to_string(),
+            pr_title: "feat(artcraft): Implement WASI / OpenFX Sandboxed Plugin Host Architecture"
+                .to_string(),
             target_subsystem: "ArtCraft Plugin Core".to_string(),
             original_suite: "ArtCraft OpenFX WASI Host".to_string(),
             components_added: vec![
-                "WASI WebAssembly sandboxed runtime host for third-party C/C++/Rust plugins".to_string(),
+                "WASI WebAssembly sandboxed runtime host for third-party C/C++/Rust plugins"
+                    .to_string(),
                 "OpenFX v1.4 node API bridge and image buffer binding layer".to_string(),
                 "Fault-isolated memory sandbox with per-plugin resource quotas".to_string(),
             ],
-            performance_multiplier: "Near-native WebAssembly Execution Speed (1.05x native)".to_string(),
+            performance_multiplier: "Near-native WebAssembly Execution Speed (1.05x native)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -460,10 +471,14 @@ impl SovereignArtcraftAdvancementsMasterSuite {
     }
 
     pub fn evaluate_artcraft_advancements_parity(&mut self) -> bool {
-        let wal_digest = self.persistence_engine.append_wal_record(1, 101, b"session_data");
+        let wal_digest = self
+            .persistence_engine
+            .append_wal_record(1, 101, b"session_data");
         let wal_ok = wal_digest != 0 && self.persistence_engine.rehydrate_session(101).is_some();
 
-        let handle_id = self.asset_pipeline_engine.allocate_shm_asset(CrossAppAssetType::RasterImage, 1024);
+        let handle_id = self
+            .asset_pipeline_engine
+            .allocate_shm_asset(CrossAppAssetType::RasterImage, 1024);
         let shm_ok = handle_id > 0 && self.asset_pipeline_engine.acquire_handle(handle_id);
 
         let crdt_ok = self.collaboration_engine.apply_crdt_op(CrdtCanvasOp {
@@ -481,12 +496,14 @@ impl SovereignArtcraftAdvancementsMasterSuite {
         );
         let cms_ok = color[0] <= 1.0;
 
-        let plugin_loaded = self.wasi_plugin_engine.load_plugin(WasiOpenfxPluginManifest {
-            plugin_id: 1,
-            name: "InvertFilter".to_string(),
-            wasm_module_bytes: vec![0x00, 0x61, 0x73, 0x6d],
-            sandbox_memory_limit_mb: 64,
-        });
+        let plugin_loaded = self
+            .wasi_plugin_engine
+            .load_plugin(WasiOpenfxPluginManifest {
+                plugin_id: 1,
+                name: "InvertFilter".to_string(),
+                wasm_module_bytes: vec![0x00, 0x61, 0x73, 0x6d],
+                sandbox_memory_limit_mb: 64,
+            });
         let wasi_ok = plugin_loaded
             && self
                 .wasi_plugin_engine

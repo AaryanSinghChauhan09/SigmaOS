@@ -164,7 +164,6 @@ pub use storage::*;
 pub mod system;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub use system::sovereign_init_and_supervisor_advancements_v63_pr::*;
-pub use system::sovereign_init_and_supervisor_advancements_v89_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v67::*;
 pub use system::sovereign_init_and_supervisor_advancements_v68_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v69_pr::*;
@@ -176,6 +175,7 @@ pub use system::sovereign_init_and_supervisor_advancements_v78_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v79_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v82_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v88_pr::*;
+pub use system::sovereign_init_and_supervisor_advancements_v89_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v89_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v90_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v92_pr::*;
@@ -204,9 +204,9 @@ pub mod omarchy_bar;
 pub mod omarchy_overlay;
 pub mod omarchy_plugin;
 pub mod orchestration;
+pub mod package;
 pub mod quickshell;
 pub mod wallpaper_palette;
-pub mod package;
 pub use package::{
     ForeignRepoIndexParser, PkgConfig, SandboxActionType, SandboxedScriptletResult, SigmaPkg,
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
@@ -696,14 +696,12 @@ pub use shell::{
     ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
     SovereignShellsTerminalsSupervisorsParityPrGateway,
     SovereignShellsTerminalsSupervisorsParityV78Gateway,
-    SovereignShellsTerminalsSupervisorsV78PrSuite,
     SovereignShellsTerminalsSupervisorsParityV83Gateway,
-    SovereignShellsTerminalsSupervisorsV83PrSuite,
     SovereignShellsTerminalsSupervisorsParityV89Gateway,
-    SovereignShellsTerminalsSupervisorsV89PrSuite,
     SovereignShellsTerminalsSupervisorsParityV90Gateway,
-    SovereignShellsTerminalsSupervisorsV90PrSuite, TerminalMultiplexersAndEmulatorsPrEngine,
-    ZshPromptFormatter,
+    SovereignShellsTerminalsSupervisorsV78PrSuite, SovereignShellsTerminalsSupervisorsV83PrSuite,
+    SovereignShellsTerminalsSupervisorsV89PrSuite, SovereignShellsTerminalsSupervisorsV90PrSuite,
+    TerminalMultiplexersAndEmulatorsPrEngine, ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
@@ -729,6 +727,9 @@ pub use userland::sovereign_coreutils_and_userland_advancements_v78_pr::*;
 pub use userland::sovereign_coreutils_and_userland_advancements_v86_pr::*;
 pub use userland::sovereign_coreutils_and_userland_advancements_v88_pr::*;
 pub use userland::system_utilities::*;
+pub use virtualization::sovereign_virtualization_and_containers_v88_pr::*;
+pub use virtualization::sovereign_virtualization_and_containers_v89_pr::*;
+pub use virtualization::sovereign_virtualization_and_containers_v91_pr::*;
 pub use virtualization::{
     Container, FirecrackerCloudHypervisorV61Engine, FirecrackerCloudHypervisorV63Engine,
     FirecrackerCloudHypervisorV67Engine, FirecrackerCloudHypervisorV68Engine,
@@ -739,12 +740,11 @@ pub use virtualization::{
     KubernetesK3sRancherV63Engine, KubernetesK3sRancherV67Engine, KubernetesK3sRancherV68Engine,
     KubernetesK3sRancherV80Engine, KubernetesPod, KvmQemuV61Engine, KvmQemuV63Engine,
     KvmQemuV67Engine, KvmQemuV68Engine, KvmQemuV80Engine, LibvirtDomainV61Engine,
-    LibvirtDomainV63Engine, LibvirtDomainV67Engine, LibvirtDomainV68Engine,
-    LibvirtDomainV80Engine, LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine, LxcLxdNspawnV67Engine,
-    LxcLxdNspawnV68Engine, LxcLxdNspawnV80Engine, OciDockerPodmanRuncV61Engine,
-    OciDockerPodmanRuncV63Engine, OciDockerPodmanRuncV67Engine, OciDockerPodmanRuncV68Engine,
-    OciDockerPodmanRuncV80Engine, ResourcePool,
-    SovereignVirtualizationAndContainersParityV61Gateway,
+    LibvirtDomainV63Engine, LibvirtDomainV67Engine, LibvirtDomainV68Engine, LibvirtDomainV80Engine,
+    LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine, LxcLxdNspawnV67Engine, LxcLxdNspawnV68Engine,
+    LxcLxdNspawnV80Engine, OciDockerPodmanRuncV61Engine, OciDockerPodmanRuncV63Engine,
+    OciDockerPodmanRuncV67Engine, OciDockerPodmanRuncV68Engine, OciDockerPodmanRuncV80Engine,
+    ResourcePool, SovereignVirtualizationAndContainersParityV61Gateway,
     SovereignVirtualizationAndContainersParityV63Gateway,
     SovereignVirtualizationAndContainersParityV67Gateway,
     SovereignVirtualizationAndContainersParityV68Gateway,
@@ -758,9 +758,6 @@ pub use virtualization::{
     VirtualizationTech, VmState, XenHypervisorV61Engine, XenHypervisorV63Engine,
     XenHypervisorV67Engine, XenHypervisorV68Engine, XenHypervisorV80Engine,
 };
-pub use virtualization::sovereign_virtualization_and_containers_v88_pr::*;
-pub use virtualization::sovereign_virtualization_and_containers_v89_pr::*;
-pub use virtualization::sovereign_virtualization_and_containers_v91_pr::*;
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
 
@@ -805,10 +802,10 @@ pub mod logging;
 pub mod media;
 pub use media::sovereign_audio_video_advancements_v76_pr::*;
 pub use media::sovereign_audio_video_advancements_v80_pr::*;
-pub use media::sovereign_audio_video_advancements_v90_pr::*;
 pub use media::sovereign_audio_video_advancements_v84_pr::*;
 pub use media::sovereign_audio_video_advancements_v86_pr::*;
 pub use media::sovereign_audio_video_advancements_v88_pr::*;
+pub use media::sovereign_audio_video_advancements_v90_pr::*;
 pub use media::sovereign_audio_video_advancements_v92_pr::*;
 pub use media::sovereign_web_browser_advancements_v82_pr::*;
 pub use media::sovereign_web_browser_advancements_v86_pr::*;
@@ -879,7 +876,13 @@ pub use crate::desktop::sovereign_de_wm_advancements_v92_pr::*;
 pub use crate::distro::arch_linux_missing_components_v71_pr::*;
 pub use crate::distro::arch_linux_missing_components_v73_pr::*;
 pub use crate::distro::arch_linux_missing_components_v74_pr::*;
+pub use crate::distro::arch_linux_missing_components_v82_pr::*;
+pub use crate::distro::arch_linux_missing_components_v84_pr::*;
+pub use crate::distro::arch_linux_missing_components_v84_pr::*;
+pub use crate::distro::arch_linux_missing_components_v85_pr::*;
+pub use crate::distro::arch_linux_missing_components_v85_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
+pub use crate::distro::continuous_open_source_os_improvement_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v68_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v69_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v71_pr::*;
@@ -889,21 +892,13 @@ pub use crate::distro::omarchy_linux_missing_components_v69_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v70_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v73_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v74_pr::*;
-pub use crate::distro::arch_linux_missing_components_v82_pr::*;
-pub use crate::distro::arch_linux_missing_components_v84_pr::*;
-pub use crate::distro::open_source_os_and_arch_missing_components_v84_pr::*;
-pub use crate::distro::arch_linux_missing_components_v85_pr::*;
-pub use crate::distro::open_source_os_and_arch_missing_components_v85_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v78_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v82_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v83_pr::*;
-pub use crate::distro::open_source_os_missing_components_v82_pr::*;
-pub use crate::distro::open_source_os_missing_components_v83_pr::*;
-pub use crate::distro::open_source_os_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_and_arch_missing_components_v82_pr::*;
-pub use crate::distro::arch_linux_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_and_arch_missing_components_v84_pr::*;
-pub use crate::distro::arch_linux_missing_components_v85_pr::*;
+pub use crate::distro::open_source_os_and_arch_missing_components_v84_pr::*;
+pub use crate::distro::open_source_os_and_arch_missing_components_v85_pr::*;
 pub use crate::distro::open_source_os_and_arch_missing_components_v85_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v68_pr::*;
@@ -924,13 +919,15 @@ pub use crate::distro::open_source_os_missing_components_v73_pr::*;
 pub use crate::distro::open_source_os_missing_components_v73_pr::*;
 pub use crate::distro::open_source_os_missing_components_v76_pr::*;
 pub use crate::distro::open_source_os_missing_components_v77_pr::*;
+pub use crate::distro::open_source_os_missing_components_v82_pr::*;
+pub use crate::distro::open_source_os_missing_components_v83_pr::*;
+pub use crate::distro::open_source_os_missing_components_v84_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v69_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v70_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v71_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
 pub use crate::distro::repeatable_agent_operating_loop_pr::*;
-pub use crate::distro::continuous_open_source_os_improvement_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
 pub use crate::distro::sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
@@ -945,20 +942,20 @@ pub use crate::graphics::sovereign_graphics_display_v86_pr::*;
 pub use crate::graphics::sovereign_graphics_display_v88_pr::*;
 
 pub use crate::distro::cachy_linux_missing_components_v83_pr::*;
-pub use crate::distro::open_source_os_and_cachy_linux_v83_pr::*;
 pub use crate::distro::cachy_linux_missing_components_v84_pr::*;
-pub use crate::distro::open_source_os_and_cachy_linux_v84_pr::*;
 pub use crate::distro::cachy_linux_missing_components_v85_pr::*;
-pub use crate::distro::open_source_os_and_cachy_linux_v85_pr::*;
 pub use crate::distro::cachy_linux_missing_components_v86_pr::*;
-pub use crate::distro::open_source_os_and_cachy_linux_v86_pr::*;
-pub use crate::distro::open_source_os_unimplemented_ideas_v83_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v84_pr::*;
-pub use crate::distro::open_source_os_debian_unimplemented_ideas_v84_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v85_pr::*;
-pub use crate::distro::open_source_os_debian_unimplemented_ideas_v85_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v86_pr::*;
+pub use crate::distro::open_source_os_and_cachy_linux_v83_pr::*;
+pub use crate::distro::open_source_os_and_cachy_linux_v84_pr::*;
+pub use crate::distro::open_source_os_and_cachy_linux_v85_pr::*;
+pub use crate::distro::open_source_os_and_cachy_linux_v86_pr::*;
+pub use crate::distro::open_source_os_debian_unimplemented_ideas_v84_pr::*;
+pub use crate::distro::open_source_os_debian_unimplemented_ideas_v85_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v86_pr::*;
+pub use crate::distro::open_source_os_unimplemented_ideas_v83_pr::*;
 
 pub mod screen;
 pub mod software_manager;

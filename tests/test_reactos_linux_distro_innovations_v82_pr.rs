@@ -34,11 +34,10 @@ fn test_reactos_linux_distro_innovations_v82_pr_integration() {
     assert_eq!(lpc_req.data_length, 12);
 
     // Verify KMDF Driver Dispatcher Engine
-    let drv_reg = gateway.kmdf_engine.register_driver(
-        "\\Driver\\Audio",
-        "\\Device\\Audio0",
-        0x0000001D,
-    );
+    let drv_reg =
+        gateway
+            .kmdf_engine
+            .register_driver("\\Driver\\Audio", "\\Device\\Audio0", 0x0000001D);
     assert!(drv_reg.is_ok());
 
     let irp_disp = gateway
@@ -52,7 +51,10 @@ fn test_reactos_linux_distro_innovations_v82_pr_integration() {
         .pe_tls_engine
         .bind_iat_function("User32.dll!MessageBoxW", 0x77801000);
     assert_eq!(
-        gateway.pe_tls_engine.iat_bindings.get("User32.dll!MessageBoxW"),
+        gateway
+            .pe_tls_engine
+            .iat_bindings
+            .get("User32.dll!MessageBoxW"),
         Some(&0x77801000)
     );
 

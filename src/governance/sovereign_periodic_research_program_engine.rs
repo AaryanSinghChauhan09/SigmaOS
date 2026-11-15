@@ -405,7 +405,13 @@ impl SovereignPeriodicResearchEngine {
         self.adrs.iter().find(|a| a.id == id)
     }
 
-    pub fn generate_weekly_task_toml(&self, id: &str, title: &str, theme: &str, upstream: &[&str]) -> String {
+    pub fn generate_weekly_task_toml(
+        &self,
+        id: &str,
+        title: &str,
+        theme: &str,
+        upstream: &[&str],
+    ) -> String {
         let mut toml = String::new();
         toml.push_str(&format!("id = \"{}\"\n", id));
         toml.push_str(&format!("title = \"{}\"\n", title));
@@ -421,7 +427,10 @@ impl SovereignPeriodicResearchEngine {
         toml.push_str("]\n");
         toml.push_str("deliverables = [\n");
         let first_upstream = upstream.first().copied().unwrap_or("linux");
-        toml.push_str(&format!("  \"research/upstream/{}/topic.md\",\n", first_upstream));
+        toml.push_str(&format!(
+            "  \"research/upstream/{}/topic.md\",\n",
+            first_upstream
+        ));
         toml.push_str("  \"research/decisions/ADR-xxx.md\",\n");
         toml.push_str("  \"implementation PR\",\n");
         toml.push_str("  \"test report\"\n");
@@ -436,7 +445,13 @@ impl SovereignPeriodicResearchEngine {
         toml
     }
 
-    pub fn generate_monthly_task_toml(&self, id: &str, title: &str, priority: &str, owner: &str) -> String {
+    pub fn generate_monthly_task_toml(
+        &self,
+        id: &str,
+        title: &str,
+        priority: &str,
+        owner: &str,
+    ) -> String {
         let mut toml = String::new();
         toml.push_str(&format!("id = \"{}\"\n", id));
         toml.push_str(&format!("title = \"{}\"\n", title));
@@ -568,15 +583,26 @@ mod tests {
     #[test]
     fn test_generators() {
         let engine = SovereignPeriodicResearchEngine::new();
-        let weekly_toml = engine.generate_weekly_task_toml("STUDY-2026-W42", "Study Linux VFS", "filesystem", &["linux", "xv6"]);
+        let weekly_toml = engine.generate_weekly_task_toml(
+            "STUDY-2026-W42",
+            "Study Linux VFS",
+            "filesystem",
+            &["linux", "xv6"],
+        );
         assert!(weekly_toml.contains("STUDY-2026-W42"));
         assert!(weekly_toml.contains("filesystem"));
 
-        let monthly_toml = engine.generate_monthly_task_toml("CAP-2026-M10", "Deliver QEMU boot", "P0", "boot-agent");
+        let monthly_toml = engine.generate_monthly_task_toml(
+            "CAP-2026-M10",
+            "Deliver QEMU boot",
+            "P0",
+            "boot-agent",
+        );
         assert!(monthly_toml.contains("CAP-2026-M10"));
         assert!(monthly_toml.contains("P0"));
 
-        let adr_tmpl = engine.generate_adr_template("ADR-007", "Minimal scheduler model", "xv6 and Linux");
+        let adr_tmpl =
+            engine.generate_adr_template("ADR-007", "Minimal scheduler model", "xv6 and Linux");
         assert!(adr_tmpl.contains("ADR-007"));
         assert!(adr_tmpl.contains("Minimal scheduler model"));
 

@@ -33,22 +33,25 @@ impl ValidationTest {
     /// Human-readable name.
     pub fn name(self) -> &'static str {
         match self {
-            Self::GpuRender         => "GPU rendering",
-            Self::WifiAssociation   => "WiFi association",
+            Self::GpuRender => "GPU rendering",
+            Self::WifiAssociation => "WiFi association",
             Self::BluetoothDiscovery => "Bluetooth discovery",
-            Self::AudioPlayback     => "Audio playback",
-            Self::AudioRecord       => "Audio recording",
-            Self::SuspendResume     => "Suspend/resume cycle",
-            Self::DisplayHotplug    => "Display hotplug",
-            Self::UsbStorage        => "USB storage mount",
-            Self::PrinterDiscovery  => "Printer discovery",
-            Self::SensorRead        => "Sensor read",
+            Self::AudioPlayback => "Audio playback",
+            Self::AudioRecord => "Audio recording",
+            Self::SuspendResume => "Suspend/resume cycle",
+            Self::DisplayHotplug => "Display hotplug",
+            Self::UsbStorage => "USB storage mount",
+            Self::PrinterDiscovery => "Printer discovery",
+            Self::SensorRead => "Sensor read",
         }
     }
 
     /// Whether this test is considered critical (blocking install).
     pub fn is_critical(self) -> bool {
-        matches!(self, Self::GpuRender | Self::AudioPlayback | Self::WifiAssociation)
+        matches!(
+            self,
+            Self::GpuRender | Self::AudioPlayback | Self::WifiAssociation
+        )
     }
 }
 
@@ -69,11 +72,23 @@ pub struct ValidationResult {
 
 impl ValidationResult {
     fn pass(test: ValidationTest, latency_ms: Option<u64>, hw_id: impl Into<String>) -> Self {
-        Self { test, passed: true, latency_ms, error: None, hardware_id: hw_id.into() }
+        Self {
+            test,
+            passed: true,
+            latency_ms,
+            error: None,
+            hardware_id: hw_id.into(),
+        }
     }
 
     fn fail(test: ValidationTest, error: impl Into<String>, hw_id: impl Into<String>) -> Self {
-        Self { test, passed: false, latency_ms: None, error: Some(error.into()), hardware_id: hw_id.into() }
+        Self {
+            test,
+            passed: false,
+            latency_ms: None,
+            error: Some(error.into()),
+            hardware_id: hw_id.into(),
+        }
     }
 }
 
@@ -108,7 +123,9 @@ pub struct HardwareValidator;
 
 impl HardwareValidator {
     /// Create a new validator.
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 
     /// Run a single validation test.
     ///
@@ -117,26 +134,48 @@ impl HardwareValidator {
     pub fn run_test(&self, test: ValidationTest) -> Result<ValidationResult, ValidationError> {
         // Simulate test execution with plausible results.
         match test {
-            ValidationTest::GpuRender =>
-                Ok(ValidationResult::pass(test, Some(8), "Intel Arc A770 (8086:56A0)")),
-            ValidationTest::WifiAssociation =>
-                Ok(ValidationResult::pass(test, Some(450), "Intel AX211 (8086:2725)")),
-            ValidationTest::BluetoothDiscovery =>
-                Ok(ValidationResult::pass(test, Some(1200), "Intel Bluetooth 5.3")),
-            ValidationTest::AudioPlayback =>
-                Ok(ValidationResult::pass(test, Some(12), "Intel HDA (8086:7AD0)")),
-            ValidationTest::AudioRecord =>
-                Ok(ValidationResult::pass(test, Some(15), "Intel HDA (8086:7AD0)")),
-            ValidationTest::SuspendResume =>
-                Ok(ValidationResult::pass(test, Some(3800), "S3 sleep")),
-            ValidationTest::DisplayHotplug =>
-                Ok(ValidationResult::pass(test, Some(250), "HDMI/DP")),
-            ValidationTest::UsbStorage =>
-                Ok(ValidationResult::pass(test, Some(80), "USB 3.2 Gen 2")),
-            ValidationTest::PrinterDiscovery =>
-                Ok(ValidationResult::fail(test, "No IPP printers found on network", "CUPS")),
-            ValidationTest::SensorRead =>
-                Ok(ValidationResult::pass(test, Some(5), "hwmon0 (coretemp)")),
+            ValidationTest::GpuRender => Ok(ValidationResult::pass(
+                test,
+                Some(8),
+                "Intel Arc A770 (8086:56A0)",
+            )),
+            ValidationTest::WifiAssociation => Ok(ValidationResult::pass(
+                test,
+                Some(450),
+                "Intel AX211 (8086:2725)",
+            )),
+            ValidationTest::BluetoothDiscovery => Ok(ValidationResult::pass(
+                test,
+                Some(1200),
+                "Intel Bluetooth 5.3",
+            )),
+            ValidationTest::AudioPlayback => Ok(ValidationResult::pass(
+                test,
+                Some(12),
+                "Intel HDA (8086:7AD0)",
+            )),
+            ValidationTest::AudioRecord => Ok(ValidationResult::pass(
+                test,
+                Some(15),
+                "Intel HDA (8086:7AD0)",
+            )),
+            ValidationTest::SuspendResume => {
+                Ok(ValidationResult::pass(test, Some(3800), "S3 sleep"))
+            }
+            ValidationTest::DisplayHotplug => {
+                Ok(ValidationResult::pass(test, Some(250), "HDMI/DP"))
+            }
+            ValidationTest::UsbStorage => {
+                Ok(ValidationResult::pass(test, Some(80), "USB 3.2 Gen 2"))
+            }
+            ValidationTest::PrinterDiscovery => Ok(ValidationResult::fail(
+                test,
+                "No IPP printers found on network",
+                "CUPS",
+            )),
+            ValidationTest::SensorRead => {
+                Ok(ValidationResult::pass(test, Some(5), "hwmon0 (coretemp)"))
+            }
         }
     }
 
@@ -171,11 +210,12 @@ impl HardwareValidator {
 
     /// Generate a hardware report from a set of results.
     pub fn generate_report(results: &[ValidationResult]) -> HardwareReport {
-        let passed  = results.iter().filter(|r| r.passed).count();
-        let failed  = results.iter().filter(|r| !r.passed).count();
-        let warnings = results.iter().filter(|r| {
-            r.passed && r.latency_ms.map_or(false, |ms| ms > 5000)
-        }).count();
+        let passed = results.iter().filter(|r| r.passed).count();
+        let failed = results.iter().filter(|r| !r.passed).count();
+        let warnings = results
+            .iter()
+            .filter(|r| r.passed && r.latency_ms.map_or(false, |ms| ms > 5000))
+            .count();
 
         let recommendation = if failed == 0 {
             "Hardware is fully compatible. Ready for installation.".to_string()
@@ -188,19 +228,28 @@ impl HardwareValidator {
             )
         };
 
-        HardwareReport { passed, failed, warnings, details: results.to_vec(), recommendation }
+        HardwareReport {
+            passed,
+            failed,
+            warnings,
+            details: results.to_vec(),
+            recommendation,
+        }
     }
 
     /// Return `true` if all critical (Tier 1) tests passed.
     pub fn is_ready_for_install(results: &[ValidationResult]) -> bool {
-        results.iter()
+        results
+            .iter()
             .filter(|r| r.test.is_critical())
             .all(|r| r.passed)
     }
 }
 
 impl Default for HardwareValidator {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]

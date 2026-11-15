@@ -222,31 +222,63 @@ fn alpm_vercmp(a: &str, b: &str) -> core::cmp::Ordering {
     let ab = av.as_bytes();
     let bb = bv.as_bytes();
     loop {
-        while ai < ab.len() && (ab[ai] == b'.' || ab[ai] == b'_' || ab[ai] == b'-') { ai += 1; }
-        while bi < bb.len() && (bb[bi] == b'.' || bb[bi] == b'_' || bb[bi] == b'-') { bi += 1; }
-        if ai >= ab.len() && bi >= bb.len() { break; }
-        if ai >= ab.len() { return Ordering::Less; }
-        if bi >= bb.len() { return Ordering::Greater; }
+        while ai < ab.len() && (ab[ai] == b'.' || ab[ai] == b'_' || ab[ai] == b'-') {
+            ai += 1;
+        }
+        while bi < bb.len() && (bb[bi] == b'.' || bb[bi] == b'_' || bb[bi] == b'-') {
+            bi += 1;
+        }
+        if ai >= ab.len() && bi >= bb.len() {
+            break;
+        }
+        if ai >= ab.len() {
+            return Ordering::Less;
+        }
+        if bi >= bb.len() {
+            return Ordering::Greater;
+        }
         let a_is_digit = ab[ai].is_ascii_digit();
         let b_is_digit = bb[bi].is_ascii_digit();
-        if a_is_digit && !b_is_digit { return Ordering::Greater; }
-        if !a_is_digit && b_is_digit { return Ordering::Less; }
+        if a_is_digit && !b_is_digit {
+            return Ordering::Greater;
+        }
+        if !a_is_digit && b_is_digit {
+            return Ordering::Less;
+        }
         if a_is_digit {
             let a_start = ai;
-            while ai < ab.len() && ab[ai].is_ascii_digit() { ai += 1; }
+            while ai < ab.len() && ab[ai].is_ascii_digit() {
+                ai += 1;
+            }
             let b_start = bi;
-            while bi < bb.len() && bb[bi].is_ascii_digit() { bi += 1; }
-            let a_num: u64 = core::str::from_utf8(&ab[a_start..ai]).unwrap_or("0").parse().unwrap_or(0);
-            let b_num: u64 = core::str::from_utf8(&bb[b_start..bi]).unwrap_or("0").parse().unwrap_or(0);
+            while bi < bb.len() && bb[bi].is_ascii_digit() {
+                bi += 1;
+            }
+            let a_num: u64 = core::str::from_utf8(&ab[a_start..ai])
+                .unwrap_or("0")
+                .parse()
+                .unwrap_or(0);
+            let b_num: u64 = core::str::from_utf8(&bb[b_start..bi])
+                .unwrap_or("0")
+                .parse()
+                .unwrap_or(0);
             let cmp = a_num.cmp(&b_num);
-            if cmp != Ordering::Equal { return cmp; }
+            if cmp != Ordering::Equal {
+                return cmp;
+            }
         } else {
             let a_start = ai;
-            while ai < ab.len() && ab[ai].is_ascii_alphabetic() { ai += 1; }
+            while ai < ab.len() && ab[ai].is_ascii_alphabetic() {
+                ai += 1;
+            }
             let b_start = bi;
-            while bi < bb.len() && bb[bi].is_ascii_alphabetic() { bi += 1; }
+            while bi < bb.len() && bb[bi].is_ascii_alphabetic() {
+                bi += 1;
+            }
             let cmp = ab[a_start..ai].cmp(&bb[b_start..bi]);
-            if cmp != Ordering::Equal { return cmp; }
+            if cmp != Ordering::Equal {
+                return cmp;
+            }
         }
     }
     ar.cmp(&br)

@@ -179,7 +179,9 @@ impl WordcraftRealtimeMultiUserConflictFreeCrdtTreeV69Engine {
     pub fn generate_proposal(&self) -> WordcraftV69PrProposalManifest {
         WordcraftV69PrProposalManifest {
             pr_id: 6903,
-            pr_title: String::from("Wordcraft Realtime Multi-User Conflict-Free CRDT Tree V69 Engine"),
+            pr_title: String::from(
+                "Wordcraft Realtime Multi-User Conflict-Free CRDT Tree V69 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / CRDT Document Tree"),
             original_suite: String::from("ArtCraft Wordcraft CRDT V69"),
             components_added: vec![
@@ -356,7 +358,12 @@ impl WordcraftZeroKnowledgeEncryptedDocumentVaultV69Engine {
         }
     }
 
-    pub fn encrypt_chunk(&self, chunk_id: u32, secret_data: &[u8], key: u64) -> EncryptedVaultChunkV69 {
+    pub fn encrypt_chunk(
+        &self,
+        chunk_id: u32,
+        secret_data: &[u8],
+        key: u64,
+    ) -> EncryptedVaultChunkV69 {
         let mut hex = String::new();
         for (i, b) in secret_data.iter().enumerate() {
             let enc = b ^ ((key >> (i % 8)) & 0xFF) as u8;
@@ -397,7 +404,9 @@ pub struct WordcraftAutomatedBibliographyStyleCompilerV69Engine {
 
 impl WordcraftAutomatedBibliographyStyleCompilerV69Engine {
     pub fn new() -> Self {
-        Self { records: Vec::new() }
+        Self {
+            records: Vec::new(),
+        }
     }
 
     pub fn generate_proposal(&self) -> WordcraftV69PrProposalManifest {
@@ -432,13 +441,22 @@ impl WordcraftAutomatedBibliographyStyleCompilerV69Engine {
             let author = r.authors.first().map(|s| s.as_str()).unwrap_or("Unknown");
             match format {
                 BibliographyFormatV69::APA => {
-                    out.push_str(&format!("{}, ({}) . {}. {}.\n", author, r.year, r.title, r.publisher));
+                    out.push_str(&format!(
+                        "{}, ({}) . {}. {}.\n",
+                        author, r.year, r.title, r.publisher
+                    ));
                 }
                 BibliographyFormatV69::MLA => {
-                    out.push_str(&format!("{}. \"{}\". {}, {}.\n", author, r.title, r.publisher, r.year));
+                    out.push_str(&format!(
+                        "{}. \"{}\". {}, {}.\n",
+                        author, r.title, r.publisher, r.year
+                    ));
                 }
                 BibliographyFormatV69::IEEE => {
-                    out.push_str(&format!("[{}] {}, \"{},\" {}.\n", r.key, author, r.title, r.year));
+                    out.push_str(&format!(
+                        "[{}] {}, \"{},\" {}.\n",
+                        r.key, author, r.title, r.year
+                    ));
                 }
                 BibliographyFormatV69::Chicago => {
                     out.push_str(&format!("{}, {}. {}.\n", author, r.title, r.year));
@@ -463,19 +481,29 @@ impl WordcraftSpeechToTextMultilingualVoiceDictationV69Engine {
     pub fn generate_proposal(&self) -> WordcraftV69PrProposalManifest {
         WordcraftV69PrProposalManifest {
             pr_id: 6908,
-            pr_title: String::from("Wordcraft Speech-to-Text Multilingual Voice Dictation V69 Engine"),
-            target_subsystem: String::from("Wordcraft Creative Suite / Multilingual Voice Dictation"),
+            pr_title: String::from(
+                "Wordcraft Speech-to-Text Multilingual Voice Dictation V69 Engine",
+            ),
+            target_subsystem: String::from(
+                "Wordcraft Creative Suite / Multilingual Voice Dictation",
+            ),
             original_suite: String::from("ArtCraft Wordcraft Voice V69"),
-            components_added: vec![
-                String::from("WordcraftSpeechToTextMultilingualVoiceDictationV69Engine"),
-            ],
-            performance_multiplier: String::from("18.7x Whisper-class low-latency acoustic inference"),
+            components_added: vec![String::from(
+                "WordcraftSpeechToTextMultilingualVoiceDictationV69Engine",
+            )],
+            performance_multiplier: String::from(
+                "18.7x Whisper-class low-latency acoustic inference",
+            ),
             status: String::from("MERGED_PR_STAGE_V69"),
         }
     }
 
     pub fn dictating_stream(&self, language: &str, samples: &[i16]) -> String {
-        format!("[V69 Voice Dictation ({})]: Processed {} audio samples", language, samples.len())
+        format!(
+            "[V69 Voice Dictation ({})]: Processed {} audio samples",
+            language,
+            samples.len()
+        )
     }
 }
 
@@ -493,19 +521,24 @@ impl WordcraftInteractivePdfAcroformDocumentCompilerV69Engine {
     pub fn generate_proposal(&self) -> WordcraftV69PrProposalManifest {
         WordcraftV69PrProposalManifest {
             pr_id: 6909,
-            pr_title: String::from("Wordcraft Interactive PDF AcroForm Document Compiler V69 Engine"),
+            pr_title: String::from(
+                "Wordcraft Interactive PDF AcroForm Document Compiler V69 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / PDF Form Compiler"),
             original_suite: String::from("ArtCraft Wordcraft PDF Forms V69"),
-            components_added: vec![
-                String::from("WordcraftInteractivePdfAcroformDocumentCompilerV69Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftInteractivePdfAcroformDocumentCompilerV69Engine",
+            )],
             performance_multiplier: String::from("25.3x interactive field PDF widget compilation"),
             status: String::from("MERGED_PR_STAGE_V69"),
         }
     }
 
     pub fn compile_acroform(&self, form_name: &str, field_count: usize) -> String {
-        format!("[V69 AcroForm PDF]: '{}' compiled with {} interactive fields", form_name, field_count)
+        format!(
+            "[V69 AcroForm PDF]: '{}' compiled with {} interactive fields",
+            form_name, field_count
+        )
     }
 }
 
@@ -545,7 +578,11 @@ impl WordcraftMultiFormatBatchDocumentTranspilerV69Engine {
         }
     }
 
-    pub fn transpile_batch(&self, title: &str, targets: &[DocumentFormatV69]) -> Vec<(DocumentFormatV69, String)> {
+    pub fn transpile_batch(
+        &self,
+        title: &str,
+        targets: &[DocumentFormatV69],
+    ) -> Vec<(DocumentFormatV69, String)> {
         targets
             .iter()
             .map(|t| (*t, format!("{}.{:?}", title, t)))
@@ -635,7 +672,13 @@ impl WordcraftArtcraftMissingComponentsV69PrSuite {
 
         // Test 7: Bibliography
         let mut bib = WordcraftAutomatedBibliographyStyleCompilerV69Engine::new();
-        bib.add_record("turing36", "On Computable Numbers", "Turing, A. M.", 1936, "Proc. London Math. Soc.");
+        bib.add_record(
+            "turing36",
+            "On Computable Numbers",
+            "Turing, A. M.",
+            1936,
+            "Proc. London Math. Soc.",
+        );
         let formatted = bib.render_bibliography(BibliographyFormatV69::APA);
         if !formatted.contains("Turing, A. M.") {
             return false;
@@ -658,7 +701,10 @@ impl WordcraftArtcraftMissingComponentsV69PrSuite {
 
         // Test 10: Batch Transpiler
         let transpiler = WordcraftMultiFormatBatchDocumentTranspilerV69Engine::new();
-        let batch = transpiler.transpile_batch("Manual", &[DocumentFormatV69::Docx, DocumentFormatV69::PdfA]);
+        let batch = transpiler.transpile_batch(
+            "Manual",
+            &[DocumentFormatV69::Docx, DocumentFormatV69::PdfA],
+        );
         if batch.len() != 2 {
             return false;
         }

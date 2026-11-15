@@ -25,7 +25,10 @@ mod tests {
         .wanted_by("multi-user.target".to_string());
 
         assert_eq!(config.name, "test");
-        assert_eq!(config.service_type, crate::etc::service_manager::ServiceType::Notify);
+        assert_eq!(
+            config.service_type,
+            crate::etc::service_manager::ServiceType::Notify
+        );
     }
 
     // Test mirror selector
@@ -68,7 +71,10 @@ mod tests {
         );
 
         assert_eq!(hook.name, "test-hook");
-        assert_eq!(hook.hook_type, crate::etc::package_hooks::HookType::PostInstall);
+        assert_eq!(
+            hook.hook_type,
+            crate::etc::package_hooks::HookType::PostInstall
+        );
     }
 
     // Test hardware detection
@@ -107,7 +113,9 @@ mod tests {
             .add_binary("fsck".to_string())
             .root_device("/dev/sda1".to_string());
 
-        assert!(config.hooks.contains(&crate::etc::boot_manager::InitcpioHook::Base));
+        assert!(config
+            .hooks
+            .contains(&crate::etc::boot_manager::InitcpioHook::Base));
         assert!(config.modules.contains(&"ext4".to_string()));
         assert!(config.binaries.contains(&"fsck".to_string()));
         assert_eq!(config.root_device, Some("/dev/sda1".to_string()));
@@ -133,8 +141,14 @@ mod tests {
 
         assert_eq!(entry.device, "/dev/sda1");
         assert_eq!(entry.mount_point, PathBuf::from("/"));
-        assert_eq!(entry.filesystem, crate::etc::filesystem::FilesystemType::Ext4);
-        assert_eq!(entry.uuid, Some("12345678-1234-1234-1234-123456789012".to_string()));
+        assert_eq!(
+            entry.filesystem,
+            crate::etc::filesystem::FilesystemType::Ext4
+        );
+        assert_eq!(
+            entry.uuid,
+            Some("12345678-1234-1234-1234-123456789012".to_string())
+        );
     }
 
     // Test kernel module manager
@@ -163,7 +177,8 @@ mod tests {
 
     #[test]
     fn test_module_blacklist() {
-        let mut blacklist = crate::etc::kernel_modules::ModuleBlacklist::new("/tmp/test_blacklist.conf");
+        let mut blacklist =
+            crate::etc::kernel_modules::ModuleBlacklist::new("/tmp/test_blacklist.conf");
         blacklist.add("bad_module".to_string());
 
         assert!(blacklist.is_blacklisted("bad_module"));
@@ -174,12 +189,19 @@ mod tests {
     #[test]
     fn test_pkg_source() {
         let url_source = crate::etc::pkgbuild::PkgSource::url("https://example.com/package.tar.gz");
-        assert_eq!(url_source.get_source_string(), "https://example.com/package.tar.gz");
+        assert_eq!(
+            url_source.get_source_string(),
+            "https://example.com/package.tar.gz"
+        );
         assert!(!url_source.is_local());
         assert!(!url_source.is_vcs());
 
-        let git_source = crate::etc::pkgbuild::PkgSource::git("https://github.com/user/repo.git", Some("main"));
-        assert_eq!(git_source.get_source_string(), "https://github.com/user/repo.git#branch=main");
+        let git_source =
+            crate::etc::pkgbuild::PkgSource::git("https://github.com/user/repo.git", Some("main"));
+        assert_eq!(
+            git_source.get_source_string(),
+            "https://github.com/user/repo.git#branch=main"
+        );
         assert!(git_source.is_vcs());
 
         let local_source = crate::etc::pkgbuild::PkgSource::local("/path/to/local");
@@ -247,14 +269,23 @@ package() {
     // Test network manager
     #[test]
     fn test_connection_type() {
-        assert_eq!(crate::etc::network_manager::ConnectionType::Ethernet.as_str(), "ethernet");
-        assert_eq!(crate::etc::network_manager::ConnectionType::from_str("wifi"), Some(crate::etc::network_manager::ConnectionType::Wifi));
+        assert_eq!(
+            crate::etc::network_manager::ConnectionType::Ethernet.as_str(),
+            "ethernet"
+        );
+        assert_eq!(
+            crate::etc::network_manager::ConnectionType::from_str("wifi"),
+            Some(crate::etc::network_manager::ConnectionType::Wifi)
+        );
     }
 
     #[test]
     fn test_ip_method() {
         assert_eq!(crate::etc::network_manager::IpMethod::Dhcp.as_str(), "dhcp");
-        assert_eq!(crate::etc::network_manager::IpMethod::from_str("static"), Some(crate::etc::network_manager::IpMethod::Static));
+        assert_eq!(
+            crate::etc::network_manager::IpMethod::from_str("static"),
+            Some(crate::etc::network_manager::IpMethod::Static)
+        );
     }
 
     #[test]
@@ -273,7 +304,10 @@ package() {
         .autoconnect(true);
 
         assert_eq!(profile.name, "home-wifi");
-        assert_eq!(profile.connection_type, crate::etc::network_manager::ConnectionType::Wifi);
+        assert_eq!(
+            profile.connection_type,
+            crate::etc::network_manager::ConnectionType::Wifi
+        );
         assert_eq!(profile.ssid, Some("HomeNetwork".to_string()));
         assert_eq!(profile.password, Some("password123".to_string()));
         assert_eq!(profile.priority, 10);
@@ -306,35 +340,73 @@ package() {
     // Test system installer
     #[test]
     fn test_install_target() {
-        assert_eq!(crate::etc::system_installer::InstallTarget::Disk.as_str(), "disk");
-        assert_eq!(crate::etc::system_installer::InstallTarget::from_str("usb"), Some(crate::etc::system_installer::InstallTarget::Usb));
+        assert_eq!(
+            crate::etc::system_installer::InstallTarget::Disk.as_str(),
+            "disk"
+        );
+        assert_eq!(
+            crate::etc::system_installer::InstallTarget::from_str("usb"),
+            Some(crate::etc::system_installer::InstallTarget::Usb)
+        );
     }
 
     #[test]
     fn test_partition_scheme() {
-        assert_eq!(crate::etc::system_installer::PartitionScheme::Gpt.as_str(), "gpt");
-        assert_eq!(crate::etc::system_installer::PartitionScheme::from_str("mbr"), Some(crate::etc::system_installer::PartitionScheme::Mbr));
+        assert_eq!(
+            crate::etc::system_installer::PartitionScheme::Gpt.as_str(),
+            "gpt"
+        );
+        assert_eq!(
+            crate::etc::system_installer::PartitionScheme::from_str("mbr"),
+            Some(crate::etc::system_installer::PartitionScheme::Mbr)
+        );
     }
 
     #[test]
     fn test_install_filesystem() {
-        assert_eq!(crate::etc::system_installer::InstallFilesystem::Ext4.as_str(), "ext4");
-        assert_eq!(crate::etc::system_installer::InstallFilesystem::from_str("btrfs"), Some(crate::etc::system_installer::InstallFilesystem::Btrfs));
-        assert_eq!(crate::etc::system_installer::InstallFilesystem::Ext4.get_mkfs_command(), "mkfs.ext4");
+        assert_eq!(
+            crate::etc::system_installer::InstallFilesystem::Ext4.as_str(),
+            "ext4"
+        );
+        assert_eq!(
+            crate::etc::system_installer::InstallFilesystem::from_str("btrfs"),
+            Some(crate::etc::system_installer::InstallFilesystem::Btrfs)
+        );
+        assert_eq!(
+            crate::etc::system_installer::InstallFilesystem::Ext4.get_mkfs_command(),
+            "mkfs.ext4"
+        );
     }
 
     #[test]
     fn test_boot_loader() {
-        assert_eq!(crate::etc::system_installer::BootLoader::SystemdBoot.as_str(), "systemd-boot");
-        assert_eq!(crate::etc::system_installer::BootLoader::from_str("grub"), Some(crate::etc::system_installer::BootLoader::Grub));
-        assert!(crate::etc::system_installer::BootLoader::SystemdBoot.get_install_command().is_some());
+        assert_eq!(
+            crate::etc::system_installer::BootLoader::SystemdBoot.as_str(),
+            "systemd-boot"
+        );
+        assert_eq!(
+            crate::etc::system_installer::BootLoader::from_str("grub"),
+            Some(crate::etc::system_installer::BootLoader::Grub)
+        );
+        assert!(crate::etc::system_installer::BootLoader::SystemdBoot
+            .get_install_command()
+            .is_some());
     }
 
     #[test]
     fn test_install_step() {
-        assert_eq!(crate::etc::system_installer::InstallStep::PartitionDisk.as_str(), "partition-disk");
-        assert_eq!(crate::etc::system_installer::InstallStep::PartitionDisk.get_order(), 2);
-        assert!(crate::etc::system_installer::InstallStep::DetectHardware.get_order() < crate::etc::system_installer::InstallStep::Finalize.get_order());
+        assert_eq!(
+            crate::etc::system_installer::InstallStep::PartitionDisk.as_str(),
+            "partition-disk"
+        );
+        assert_eq!(
+            crate::etc::system_installer::InstallStep::PartitionDisk.get_order(),
+            2
+        );
+        assert!(
+            crate::etc::system_installer::InstallStep::DetectHardware.get_order()
+                < crate::etc::system_installer::InstallStep::Finalize.get_order()
+        );
     }
 
     #[test]
@@ -376,9 +448,15 @@ package() {
             .enable_firewall(true)
             .enable_sshd(true);
 
-        assert_eq!(config.target, crate::etc::system_installer::InstallTarget::Disk);
+        assert_eq!(
+            config.target,
+            crate::etc::system_installer::InstallTarget::Disk
+        );
         assert_eq!(config.target_device, Some("/dev/sda".to_string()));
-        assert_eq!(config.bootloader, crate::etc::system_installer::BootLoader::SystemdBoot);
+        assert_eq!(
+            config.bootloader,
+            crate::etc::system_installer::BootLoader::SystemdBoot
+        );
         assert_eq!(config.kernel, "linux");
         assert_eq!(config.hostname, "myhost");
         assert_eq!(config.desktop_environment, Some("gnome".to_string()));
@@ -391,9 +469,18 @@ package() {
     // Test boot loader
     #[test]
     fn test_boot_loader_type() {
-        assert_eq!(crate::etc::boot_loader::BootLoaderType::SystemdBoot.as_str(), "systemd-boot");
-        assert_eq!(crate::etc::boot_loader::BootLoaderType::from_str("grub"), Some(crate::etc::boot_loader::BootLoaderType::Grub));
-        assert_eq!(crate::etc::boot_loader::BootLoaderType::SystemdBoot.get_config_dir(), PathBuf::from("/boot/EFI/Linux"));
+        assert_eq!(
+            crate::etc::boot_loader::BootLoaderType::SystemdBoot.as_str(),
+            "systemd-boot"
+        );
+        assert_eq!(
+            crate::etc::boot_loader::BootLoaderType::from_str("grub"),
+            Some(crate::etc::boot_loader::BootLoaderType::Grub)
+        );
+        assert_eq!(
+            crate::etc::boot_loader::BootLoaderType::SystemdBoot.get_config_dir(),
+            PathBuf::from("/boot/EFI/Linux")
+        );
     }
 
     #[test]
@@ -428,17 +515,22 @@ package() {
 
     #[test]
     fn test_boot_loader_config_builder() {
-        let config = crate::etc::boot_loader::BootLoaderConfig::new(crate::etc::boot_loader::BootLoaderType::SystemdBoot)
-            .default_entry("sigmaos")
-            .timeout(10)
-            .theme("sigmaos-theme")
-            .resolution("1920x1080")
-            .kernel_param("quiet")
-            .kernel_param("loglevel=3")
-            .secure_boot(true)
-            .quiet_boot(true);
+        let config = crate::etc::boot_loader::BootLoaderConfig::new(
+            crate::etc::boot_loader::BootLoaderType::SystemdBoot,
+        )
+        .default_entry("sigmaos")
+        .timeout(10)
+        .theme("sigmaos-theme")
+        .resolution("1920x1080")
+        .kernel_param("quiet")
+        .kernel_param("loglevel=3")
+        .secure_boot(true)
+        .quiet_boot(true);
 
-        assert_eq!(config.boot_loader_type, crate::etc::boot_loader::BootLoaderType::SystemdBoot);
+        assert_eq!(
+            config.boot_loader_type,
+            crate::etc::boot_loader::BootLoaderType::SystemdBoot
+        );
         assert_eq!(config.default_entry, Some("sigmaos".to_string()));
         assert_eq!(config.timeout, 10);
         assert_eq!(config.theme, Some("sigmaos-theme".to_string()));
@@ -516,8 +608,12 @@ package() {
         manager.add_group(group).unwrap();
 
         assert!(manager.add_user_to_group("testuser", "testgroup").is_ok());
-        assert!(manager.get_user_groups("testuser").contains(&"testgroup".to_string()));
-        assert!(manager.get_group_members("testgroup").contains(&"testuser".to_string()));
+        assert!(manager
+            .get_user_groups("testuser")
+            .contains(&"testgroup".to_string()));
+        assert!(manager
+            .get_group_members("testgroup")
+            .contains(&"testuser".to_string()));
     }
 
     #[test]
@@ -573,8 +669,7 @@ package() {
 
         manager.add_user(user).unwrap();
 
-        let group = crate::etc::user_manager::GroupInfo::new("wheel", 10)
-            .add_member("testuser");
+        let group = crate::etc::user_manager::GroupInfo::new("wheel", 10).add_member("testuser");
         manager.add_group(group).unwrap();
 
         let export = manager.export_users();
@@ -591,7 +686,9 @@ package() {
         let mut manager = crate::etc::user_manager::UserManager::new();
 
         let user1 = crate::etc::user_manager::UserInfo::new("user1", 1000, 1000).system_user(false);
-        let user2 = crate::etc::user_manager::UserInfo::new("user2", 1001, 1001).system_user(false).locked(true);
+        let user2 = crate::etc::user_manager::UserInfo::new("user2", 1001, 1001)
+            .system_user(false)
+            .locked(true);
         let user3 = crate::etc::user_manager::UserInfo::new("system", 0, 0).system_user(true);
 
         manager.add_user(user1).unwrap();

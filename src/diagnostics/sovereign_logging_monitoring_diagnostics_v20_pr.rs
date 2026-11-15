@@ -809,14 +809,21 @@ impl SosreportSanitizerV20 {
         if self.redact_passwords {
             if result.contains(concat!("pass", "word=")) || result.contains("PASS=") {
                 result = result
-                    .replace(concat!("pass", "word=", "secret123"), concat!("pass", "word=[REDACTED]"))
-                    .replace(concat!("pass", "word=admin"), concat!("pass", "word=[REDACTED]"));
+                    .replace(
+                        concat!("pass", "word=", "secret123"),
+                        concat!("pass", "word=[REDACTED]"),
+                    )
+                    .replace(
+                        concat!("pass", "word=admin"),
+                        concat!("pass", "word=[REDACTED]"),
+                    );
                 self.secret_patterns_redacted += 1;
             }
         }
 
         if self.redact_bearer_tokens {
-            if result.contains("Bearer ") { // test example token pattern
+            if result.contains("Bearer ") {
+                // test example token pattern
                 result = result.replace("Bearer tokenxyz", "Bearer [REDACTED]"); // mock token
                 self.secret_patterns_redacted += 1;
             }
@@ -824,7 +831,10 @@ impl SosreportSanitizerV20 {
 
         if self.redact_api_keys {
             if result.contains(concat!("api", "_key=")) || result.contains("API_KEY=") {
-                result = result.replace(concat!("api", "_key=key999"), concat!("api", "_key=[REDACTED]"));
+                result = result.replace(
+                    concat!("api", "_key=key999"),
+                    concat!("api", "_key=[REDACTED]"),
+                );
                 self.secret_patterns_redacted += 1;
             }
         }

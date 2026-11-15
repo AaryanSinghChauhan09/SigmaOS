@@ -50,33 +50,59 @@ fn test_integration_sub_engines_v87() {
 
     // 2. Network Configuration & Daemons
     let netplan_cfg = "network:\n  version: 2\n  renderer: NetworkManager\n  ethernets:\n    enp3s0:\n      dhcp4: true\n";
-    assert!(gateway.config_daemons_engine.parse_netplan_config(netplan_cfg));
-    let iface_info = gateway.config_daemons_engine.route_iproute2_cmd("ip addr show");
+    assert!(gateway
+        .config_daemons_engine
+        .parse_netplan_config(netplan_cfg));
+    let iface_info = gateway
+        .config_daemons_engine
+        .route_iproute2_cmd("ip addr show");
     assert!(iface_info.contains("eth0"));
 
     // 3. DHCP & DNS Services
-    let lease = gateway.dhcp_dns_engine.assign_dhcp_lease("00:1A:2B:3C:4D:5E", "10.0.0.15");
+    let lease = gateway
+        .dhcp_dns_engine
+        .assign_dhcp_lease("00:1A:2B:3C:4D:5E", "10.0.0.15");
     assert_eq!(lease.ip_address, "10.0.0.15");
     let resolved_ip = gateway.dhcp_dns_engine.resolve_doh_query("example.com");
     assert_eq!(resolved_ip, "93.184.216.34");
 
     // 4. Wireless & Bluetooth
-    assert!(gateway.wireless_bluetooth_engine.connect_wpa3_sae("SecureOffice-WPA3", "AA:BB:CC:DD:EE:01"));
-    assert!(gateway.wireless_bluetooth_engine.initialize_bluez_lc3_audio());
-    assert!(gateway.wireless_bluetooth_engine.bluetooth_active_codecs.contains(&"LC3".to_string()));
+    assert!(gateway
+        .wireless_bluetooth_engine
+        .connect_wpa3_sae("SecureOffice-WPA3", "AA:BB:CC:DD:EE:01"));
+    assert!(gateway
+        .wireless_bluetooth_engine
+        .initialize_bluez_lc3_audio());
+    assert!(gateway
+        .wireless_bluetooth_engine
+        .bluetooth_active_codecs
+        .contains(&"LC3".to_string()));
 
     // 5. Packet Filtering & Firewall
-    gateway.firewall_engine.add_nftables_rule("inet", "filter", "tcp dport 443", "accept");
-    gateway.firewall_engine.load_openbsd_pf_anchor("vpn_filter_anchor");
+    gateway
+        .firewall_engine
+        .add_nftables_rule("inet", "filter", "tcp dport 443", "accept");
+    gateway
+        .firewall_engine
+        .load_openbsd_pf_anchor("vpn_filter_anchor");
     assert_eq!(gateway.firewall_engine.pf_anchors[0], "vpn_filter_anchor");
 
     // 6. Crypto Tunnels & VPN
-    assert!(gateway.crypto_vpn_engine.establish_wireguard_pqc_tunnel("wg1", "198.51.100.1:51820"));
-    assert_eq!(gateway.crypto_vpn_engine.active_tunnels[0].tunnel_type, "WireGuard-PQC");
+    assert!(gateway
+        .crypto_vpn_engine
+        .establish_wireguard_pqc_tunnel("wg1", "198.51.100.1:51820"));
+    assert_eq!(
+        gateway.crypto_vpn_engine.active_tunnels[0].tunnel_type,
+        "WireGuard-PQC"
+    );
 
     // 7. Network Utilities & Diagnostics
-    let http_response = gateway.utilities_engine.execute_curl_http3_download("https://sigmaos.org");
+    let http_response = gateway
+        .utilities_engine
+        .execute_curl_http3_download("https://sigmaos.org");
     assert!(http_response.contains("HTTP/3 200 OK"));
-    let captured = gateway.utilities_engine.capture_tcpdump_bpf("tcp and port 443");
+    let captured = gateway
+        .utilities_engine
+        .capture_tcpdump_bpf("tcp and port 443");
     assert_eq!(captured, 500);
 }

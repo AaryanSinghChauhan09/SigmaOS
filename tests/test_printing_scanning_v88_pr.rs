@@ -33,14 +33,18 @@ fn test_integration_cups_subsystem_v88() {
     );
     cups_gw.register_printer_app("laserjet-m600", "ipp://192.168.1.50:631/ipp/print");
     let txt_records = cups_gw.generate_dns_sd_txt_records("laserjet-m600");
-    assert!(txt_records.iter().any(|(k, v)| k == "note" && v.contains("V88")));
+    assert!(txt_records
+        .iter()
+        .any(|(k, v)| k == "note" && v.contains("V88")));
 
     let ppd_opts = vec![("PageSize", "A4"), ("Duplex", "DuplexNoTumble")];
     let attrs = cups_gw.convert_ppd_to_ipp_attributes(&ppd_opts);
     assert_eq!(attrs.get("ipp-ppd-pagesize").unwrap(), "A4");
     assert_eq!(attrs.get("printer-is-accepting-jobs").unwrap(), "true");
 
-    let route = cups_gw.route_ipp_operation("Print-Job", "ipp://192.168.1.50:631/ipp/print").unwrap();
+    let route = cups_gw
+        .route_ipp_operation("Print-Job", "ipp://192.168.1.50:631/ipp/print")
+        .unwrap();
     assert!(route.contains("Print-Job"));
     assert!(route.contains("PrinterApplication"));
 
@@ -51,7 +55,9 @@ fn test_integration_cups_subsystem_v88() {
         "pdftopclm",
         25,
     );
-    let plan = filter_graph.resolve_pipeline("application/pdf", "application/vnd.hp-PCLm").unwrap();
+    let plan = filter_graph
+        .resolve_pipeline("application/pdf", "application/vnd.hp-PCLm")
+        .unwrap();
     assert_eq!(plan, vec!["pdftopclm"]);
 }
 

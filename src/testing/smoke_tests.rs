@@ -654,7 +654,9 @@ mod tests {
 
         // Assert
         assert!(!gate.passed, "A P0 failure must block the release");
-        assert!(gate.blocking_failures.contains(&SmokeTestId::BootsToDesktop));
+        assert!(gate
+            .blocking_failures
+            .contains(&SmokeTestId::BootsToDesktop));
     }
 
     // --- gate_release fails when > 5 P1s fail --------------------------------

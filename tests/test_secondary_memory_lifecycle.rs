@@ -10,7 +10,8 @@ fn test_storage_rules_file_exists_and_valid() {
         Path::new("STORAGE_RULES.toml").exists(),
         "STORAGE_RULES.toml must exist in repo root"
     );
-    let content = fs::read_to_string("STORAGE_RULES.toml").expect("Failed to read STORAGE_RULES.toml");
+    let content =
+        fs::read_to_string("STORAGE_RULES.toml").expect("Failed to read STORAGE_RULES.toml");
 
     assert!(content.contains("[rule.storage_completeness]"));
     assert!(content.contains("[rule.no_leak]"));
@@ -23,20 +24,28 @@ fn test_storage_rules_file_exists_and_valid() {
 
 #[test]
 fn test_secondary_memory_documentation_exists_and_valid() {
-    let policy_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-storage-SECONDARY_MEMORY_POLICY.md");
-    let adr_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-storage-SECONDARY_MEMORY_ADR.md");
+    let policy_path =
+        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-storage-SECONDARY_MEMORY_POLICY.md");
+    let adr_path =
+        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-storage-SECONDARY_MEMORY_ADR.md");
     let block_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-storage-BLOCK_POLICY.md");
-    let cache_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-filesystem-CACHE_POLICY.md");
-    let mount_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-filesystem-MOUNT_POLICY.md");
+    let cache_path =
+        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-filesystem-CACHE_POLICY.md");
+    let mount_path =
+        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-filesystem-MOUNT_POLICY.md");
 
-    assert!(policy_path.exists(), "SECONDARY_MEMORY_POLICY.md must exist");
+    assert!(
+        policy_path.exists(),
+        "SECONDARY_MEMORY_POLICY.md must exist"
+    );
     assert!(adr_path.exists(), "SECONDARY_MEMORY_ADR.md must exist");
     assert!(block_path.exists(), "BLOCK_POLICY.md must exist");
     assert!(cache_path.exists(), "CACHE_POLICY.md must exist");
     assert!(mount_path.exists(), "MOUNT_POLICY.md must exist");
 
     let policy_content = fs::read_to_string(policy_path).unwrap();
-    assert!(policy_content.contains("probe -> identify -> block layer -> cache -> filesystem -> mount ->"));
+    assert!(policy_content
+        .contains("probe -> identify -> block layer -> cache -> filesystem -> mount ->"));
     assert!(policy_content.contains("read/write -> flush -> unmount -> detach -> error/recovery"));
     assert!(policy_content.contains("Block Layer Class"));
     assert!(policy_content.contains("Device Class"));
@@ -81,7 +90,8 @@ fn test_secondary_memory_documentation_exists_and_valid() {
 
 #[test]
 fn test_pull_request_template_storage_sections() {
-    let pr_template_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-PULL_REQUEST_TEMPLATE.md");
+    let pr_template_path =
+        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-PULL_REQUEST_TEMPLATE.md");
     let template = if pr_template_path.exists() {
         fs::read_to_string(pr_template_path).unwrap_or_default()
     } else {

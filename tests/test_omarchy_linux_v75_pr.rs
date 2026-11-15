@@ -45,7 +45,9 @@ fn test_omarchy_linux_v75_subsystem_engines() {
     assert!(hypr.generate_hyprland_conf().contains("layout = master"));
 
     let waybar = OmarchyWaybarStatusHudEngineV75::new();
-    assert!(waybar.render_config_json().contains("\"position\": \"top\""));
+    assert!(waybar
+        .render_config_json()
+        .contains("\"position\": \"top\""));
 
     let ghostty = OmarchyGhosttyPtyTerminalEngineV75::new();
     assert!(ghostty.render_ghostty_config().contains("JetBrainsMono"));
@@ -58,7 +60,9 @@ fn test_omarchy_linux_v75_subsystem_engines() {
     assert!(wallust.generate_wallust_colors_json().contains("#1e1e2e"));
 
     let hyprlock = OmarchyHyprlockPamSecurityEngineV75::new();
-    assert!(hyprlock.generate_hyprlock_conf().contains("pam_module = hyprlock"));
+    assert!(hyprlock
+        .generate_hyprlock_conf()
+        .contains("pam_module = hyprlock"));
 
     let ananicy = OmarchyAnanicyGameModeEngineV75::new();
     assert_eq!(ananicy.get_nice_value("hyprland"), -15);

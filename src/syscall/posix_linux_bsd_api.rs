@@ -70,12 +70,15 @@ impl PosixLinuxBsdApiDispatcher {
         if let Some(promises) = self.active_pledges.get(&pid) {
             let tokens: Vec<&str> = promises.split_whitespace().collect();
             match sys_nr {
-                syscall_abi_numbers::LINUX_SYS_IO_URING_SETUP | syscall_abi_numbers::LINUX_SYS_MSEAL => {
+                syscall_abi_numbers::LINUX_SYS_IO_URING_SETUP
+                | syscall_abi_numbers::LINUX_SYS_MSEAL => {
                     if !tokens.contains(&"stdio") {
                         return Err(posix_errno::EPERM);
                     }
                 }
-                syscall_abi_numbers::LINUX_SYS_PIDFD_OPEN | syscall_abi_numbers::FREEBSD_SYS_PDFORK | syscall_abi_numbers::FREEBSD_SYS_PDGETPID => {
+                syscall_abi_numbers::LINUX_SYS_PIDFD_OPEN
+                | syscall_abi_numbers::FREEBSD_SYS_PDFORK
+                | syscall_abi_numbers::FREEBSD_SYS_PDGETPID => {
                     if !tokens.contains(&"proc") {
                         return Err(posix_errno::EPERM);
                     }
@@ -102,7 +105,12 @@ impl PosixLinuxBsdApiDispatcher {
     }
 
     /// Enforces path access permissions against active unveil restrictions.
-    pub fn check_unveil_access(&self, pid: u32, target_path: &str, requested_perm: &str) -> Result<(), i64> {
+    pub fn check_unveil_access(
+        &self,
+        pid: u32,
+        target_path: &str,
+        requested_perm: &str,
+    ) -> Result<(), i64> {
         if let Some(unveils) = self.active_unveils.get(&pid) {
             if unveils.is_empty() {
                 return Ok(());
@@ -294,20 +302,23 @@ mod tests {
         assert_eq!(api.sys_pledge(pid, "stdio rpath"), 0);
 
         // Assert 1: Syscalls requiring "stdio" pass
-        let mseal_ret = api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_MSEAL, pid, 0x2000, 4096);
+        let mseal_ret =
+            api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_MSEAL, pid, 0x2000, 4096);
         assert_eq!(mseal_ret, 0);
 
         // Assert 2: Syscalls requiring "proc" (pdfork, pidfd_open) are strictly blocked with EPERM
         let fork_ret = api.dispatch_syscall(syscall_abi_numbers::FREEBSD_SYS_PDFORK, pid, 0, 0);
         assert_eq!(fork_ret, posix_errno::EPERM);
 
-        let pidfd_ret = api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_PIDFD_OPEN, pid, 1002, 0);
+        let pidfd_ret =
+            api.dispatch_syscall(syscall_abi_numbers::LINUX_SYS_PIDFD_OPEN, pid, 1002, 0);
         assert_eq!(pidfd_ret, posix_errno::EPERM);
 
         // Act 2: Elevate pledge to include "proc" for another PID
         let pid_proc = 56;
         assert_eq!(api.sys_pledge(pid_proc, "stdio proc"), 0);
-        let allowed_fork = api.dispatch_syscall(syscall_abi_numbers::FREEBSD_SYS_PDFORK, pid_proc, 0, 0);
+        let allowed_fork =
+            api.dispatch_syscall(syscall_abi_numbers::FREEBSD_SYS_PDFORK, pid_proc, 0, 0);
         assert!(allowed_fork > 0);
     }
 
@@ -322,7 +333,9 @@ mod tests {
         assert_eq!(api.sys_unveil(pid, "/tmp/app", "rw"), 0);
 
         // Assert 1: Authorized read under /etc/config succeeds
-        assert!(api.check_unveil_access(pid, "/etc/config/sigma.toml", "r").is_ok());
+        assert!(api
+            .check_unveil_access(pid, "/etc/config/sigma.toml", "r")
+            .is_ok());
 
         // Assert 2: Unauthorized write under /etc/config fails with EACCES
         assert_eq!(
@@ -337,6 +350,8 @@ mod tests {
         );
 
         // Assert 4: Read and write under /tmp/app succeeds
-        assert!(api.check_unveil_access(pid, "/tmp/app/cache.dat", "rw").is_ok());
+        assert!(api
+            .check_unveil_access(pid, "/tmp/app/cache.dat", "rw")
+            .is_ok());
     }
 }

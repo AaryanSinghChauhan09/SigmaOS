@@ -608,26 +608,77 @@ impl SovereignGraphicsDisplayV76MasterSuiteEngine {
 
     pub fn run_system_audit(&mut self) -> BTreeMap<String, bool> {
         let mut results = BTreeMap::new();
-        results.insert("x11_multipointer_atoms".to_string(), self.x11.intern_atom("TEST") > 0);
-        results.insert("wayland_color_v4".to_string(), self.wayland.color_management_v4_supported);
+        results.insert(
+            "x11_multipointer_atoms".to_string(),
+            self.x11.intern_atom("TEST") > 0,
+        );
+        results.insert(
+            "wayland_color_v4".to_string(),
+            self.wayland.color_management_v4_supported,
+        );
         results.insert("mesa_aco_wave64".to_string(), self.mesa.aco_wave64_enabled);
         results.insert("drm_vrr_ctm".to_string(), self.drm_kms.vrr_enabled);
-        results.insert("libdrm_dumb_buffers".to_string(), self.libdrm.dumb_buffer_count == 0);
-        results.insert("vulkan_mesh_shading".to_string(), self.vulkan.mesh_shading_supported);
-        results.insert("opengl_46_compute".to_string(), self.opengl.dispatch_compute(4, 4));
-        results.insert("weston_repaint_sched".to_string(), self.weston.schedule_repaint());
-        results.insert("sway_swaymsg_ipc".to_string(), self.sway.swaymsg_ipc_connected);
-        results.insert("wlroots_damage_ring".to_string(), self.wlroots.flush_damage_ring() == 4);
-        results.insert("mutter_fractional_scale".to_string(), self.mutter.fractional_scale_factor > 1.0);
-        results.insert("kwin_gaussian_blur".to_string(), self.kwin.gaussian_blur_passes == 4);
-        results.insert("compiz_3d_cube_spring".to_string(), self.compiz.step_wobbly_physics(0.1) > 0.0);
-        results.insert("picom_kawase_blur".to_string(), self.picom.dual_kawase_blur_radius == 12);
-        results.insert("xwayland_glamor_clip".to_string(), self.xwayland.glamor_2d_accel_active);
-        results.insert("evdev_multitouch_slots".to_string(), self.evdev.touch_down(0));
-        results.insert("libinput_gesture_palm".to_string(), self.libinput.palm_rejection_active);
-        results.insert("framebuffer_psf_glyphs".to_string(), self.framebuffer.render_psf_glyph(65));
+        results.insert(
+            "libdrm_dumb_buffers".to_string(),
+            self.libdrm.dumb_buffer_count == 0,
+        );
+        results.insert(
+            "vulkan_mesh_shading".to_string(),
+            self.vulkan.mesh_shading_supported,
+        );
+        results.insert(
+            "opengl_46_compute".to_string(),
+            self.opengl.dispatch_compute(4, 4),
+        );
+        results.insert(
+            "weston_repaint_sched".to_string(),
+            self.weston.schedule_repaint(),
+        );
+        results.insert(
+            "sway_swaymsg_ipc".to_string(),
+            self.sway.swaymsg_ipc_connected,
+        );
+        results.insert(
+            "wlroots_damage_ring".to_string(),
+            self.wlroots.flush_damage_ring() == 4,
+        );
+        results.insert(
+            "mutter_fractional_scale".to_string(),
+            self.mutter.fractional_scale_factor > 1.0,
+        );
+        results.insert(
+            "kwin_gaussian_blur".to_string(),
+            self.kwin.gaussian_blur_passes == 4,
+        );
+        results.insert(
+            "compiz_3d_cube_spring".to_string(),
+            self.compiz.step_wobbly_physics(0.1) > 0.0,
+        );
+        results.insert(
+            "picom_kawase_blur".to_string(),
+            self.picom.dual_kawase_blur_radius == 12,
+        );
+        results.insert(
+            "xwayland_glamor_clip".to_string(),
+            self.xwayland.glamor_2d_accel_active,
+        );
+        results.insert(
+            "evdev_multitouch_slots".to_string(),
+            self.evdev.touch_down(0),
+        );
+        results.insert(
+            "libinput_gesture_palm".to_string(),
+            self.libinput.palm_rejection_active,
+        );
+        results.insert(
+            "framebuffer_psf_glyphs".to_string(),
+            self.framebuffer.render_psf_glyph(65),
+        );
         results.insert("vt_wscons_active_matrix".to_string(), self.vt.switch_vt(2));
-        results.insert("cosmic_smithay_applets".to_string(), self.cosmic.smithay_backend_ready);
+        results.insert(
+            "cosmic_smithay_applets".to_string(),
+            self.cosmic.smithay_backend_ready,
+        );
         results
     }
 }
@@ -650,26 +701,106 @@ impl SovereignGraphicsDisplayV76PrGatewayEngine {
 
     fn bootstrap_v76_prs(&mut self) {
         let prs = vec![
-            (1, "X11 DRI3/XRandR 1.5 Protocol Enhancements", GraphicsDisplayV76PrCategory::X11ServerExtensionsAndMultipointer),
-            (2, "Wayland Color Management v4 and Tearing Protocol", GraphicsDisplayV76PrCategory::WaylandCoreSubsurfacesAndColorManagement),
-            (3, "Mesa Gallium3D ACO Wave64 Optimization Pass", GraphicsDisplayV76PrCategory::MesaEglGallium3dAcoAndZinkTranslation),
-            (4, "DRM/KMS Atomic Modesetting and VRR Sync Matrix", GraphicsDisplayV76PrCategory::DrmKmsAtomicModesettingVrrAndCtm),
-            (5, "libdrm Dumb Buffer and Ioctl Probe Gate", GraphicsDisplayV76PrCategory::LibdrmUserlandIoctlAndDumbBuffers),
-            (6, "Vulkan 1.4 Task/Mesh Shading and Ray Tracing Suite", GraphicsDisplayV76PrCategory::Vulkan13And14MeshShadingAndRayTracing),
-            (7, "OpenGL 4.6 Compute Shader and GLSL Pipeline", GraphicsDisplayV76PrCategory::OpenGl46GlslAndComputeShaderContext),
-            (8, "Weston Shell Repaint Scheduler and Blitting Engine", GraphicsDisplayV76PrCategory::WestonReferenceShellAndRepaintScheduler),
-            (9, "Sway Dynamic Container Tiling and IPC Gateway", GraphicsDisplayV76PrCategory::SwayDynamicTilingAndIpcEngine),
-            (10, "wlroots Damage Ring and Seat Multi-Device Router", GraphicsDisplayV76PrCategory::WlrootsModularBackendAndSeatDispatcher),
-            (11, "Mutter Clutter Scene Graph and Fractional Scale", GraphicsDisplayV76PrCategory::MutterClutterSceneGraphAndFractionalScaling),
-            (12, "KWin Plasma Blur Effects and Window Decoration", GraphicsDisplayV76PrCategory::KWinPlasmaCompositorBlurAndDecorations),
-            (13, "Compiz 3D Cube Projection and Spring Physics", GraphicsDisplayV76PrCategory::Compiz3dCubeAndWobblyWindowPhysics),
-            (14, "Picom Vsync Backend and Dual-Kawase Multi-Blur", GraphicsDisplayV76PrCategory::PicomX11VsyncAndDualKawaseBlur),
-            (15, "Xwayland Glamor 2D-over-3D and Clipboard Sync", GraphicsDisplayV76PrCategory::XwaylandGlamor2dAndClipboardBridge),
-            (16, "evdev Multitouch Slot Tracker and Rumble Output", GraphicsDisplayV76PrCategory::EvdevMultitouchSlotTrackerAndRumble),
-            (17, "libinput Gesture Recognition and Accel Curves", GraphicsDisplayV76PrCategory::LibinputGesturePalmRejectionAndAccel),
-            (18, "Console Framebuffer fbdev Pixel and Glyph Engine", GraphicsDisplayV76PrCategory::ConsoleFramebufferFbdevAndPsfGlyph),
-            (19, "Virtual Terminal VT_ACTIVATE Matrix and ANSI Parser", GraphicsDisplayV76PrCategory::VirtualTerminalWsconsMatrixAndIoctls),
-            (20, "COSMIC Smithay Rust Wayland Applet Router", GraphicsDisplayV76PrCategory::CosmicSmithayFrameworkAndAppletRouter),
+            (
+                1,
+                "X11 DRI3/XRandR 1.5 Protocol Enhancements",
+                GraphicsDisplayV76PrCategory::X11ServerExtensionsAndMultipointer,
+            ),
+            (
+                2,
+                "Wayland Color Management v4 and Tearing Protocol",
+                GraphicsDisplayV76PrCategory::WaylandCoreSubsurfacesAndColorManagement,
+            ),
+            (
+                3,
+                "Mesa Gallium3D ACO Wave64 Optimization Pass",
+                GraphicsDisplayV76PrCategory::MesaEglGallium3dAcoAndZinkTranslation,
+            ),
+            (
+                4,
+                "DRM/KMS Atomic Modesetting and VRR Sync Matrix",
+                GraphicsDisplayV76PrCategory::DrmKmsAtomicModesettingVrrAndCtm,
+            ),
+            (
+                5,
+                "libdrm Dumb Buffer and Ioctl Probe Gate",
+                GraphicsDisplayV76PrCategory::LibdrmUserlandIoctlAndDumbBuffers,
+            ),
+            (
+                6,
+                "Vulkan 1.4 Task/Mesh Shading and Ray Tracing Suite",
+                GraphicsDisplayV76PrCategory::Vulkan13And14MeshShadingAndRayTracing,
+            ),
+            (
+                7,
+                "OpenGL 4.6 Compute Shader and GLSL Pipeline",
+                GraphicsDisplayV76PrCategory::OpenGl46GlslAndComputeShaderContext,
+            ),
+            (
+                8,
+                "Weston Shell Repaint Scheduler and Blitting Engine",
+                GraphicsDisplayV76PrCategory::WestonReferenceShellAndRepaintScheduler,
+            ),
+            (
+                9,
+                "Sway Dynamic Container Tiling and IPC Gateway",
+                GraphicsDisplayV76PrCategory::SwayDynamicTilingAndIpcEngine,
+            ),
+            (
+                10,
+                "wlroots Damage Ring and Seat Multi-Device Router",
+                GraphicsDisplayV76PrCategory::WlrootsModularBackendAndSeatDispatcher,
+            ),
+            (
+                11,
+                "Mutter Clutter Scene Graph and Fractional Scale",
+                GraphicsDisplayV76PrCategory::MutterClutterSceneGraphAndFractionalScaling,
+            ),
+            (
+                12,
+                "KWin Plasma Blur Effects and Window Decoration",
+                GraphicsDisplayV76PrCategory::KWinPlasmaCompositorBlurAndDecorations,
+            ),
+            (
+                13,
+                "Compiz 3D Cube Projection and Spring Physics",
+                GraphicsDisplayV76PrCategory::Compiz3dCubeAndWobblyWindowPhysics,
+            ),
+            (
+                14,
+                "Picom Vsync Backend and Dual-Kawase Multi-Blur",
+                GraphicsDisplayV76PrCategory::PicomX11VsyncAndDualKawaseBlur,
+            ),
+            (
+                15,
+                "Xwayland Glamor 2D-over-3D and Clipboard Sync",
+                GraphicsDisplayV76PrCategory::XwaylandGlamor2dAndClipboardBridge,
+            ),
+            (
+                16,
+                "evdev Multitouch Slot Tracker and Rumble Output",
+                GraphicsDisplayV76PrCategory::EvdevMultitouchSlotTrackerAndRumble,
+            ),
+            (
+                17,
+                "libinput Gesture Recognition and Accel Curves",
+                GraphicsDisplayV76PrCategory::LibinputGesturePalmRejectionAndAccel,
+            ),
+            (
+                18,
+                "Console Framebuffer fbdev Pixel and Glyph Engine",
+                GraphicsDisplayV76PrCategory::ConsoleFramebufferFbdevAndPsfGlyph,
+            ),
+            (
+                19,
+                "Virtual Terminal VT_ACTIVATE Matrix and ANSI Parser",
+                GraphicsDisplayV76PrCategory::VirtualTerminalWsconsMatrixAndIoctls,
+            ),
+            (
+                20,
+                "COSMIC Smithay Rust Wayland Applet Router",
+                GraphicsDisplayV76PrCategory::CosmicSmithayFrameworkAndAppletRouter,
+            ),
         ];
 
         for (id, title, cat) in prs {

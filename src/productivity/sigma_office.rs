@@ -1046,13 +1046,19 @@ impl SigmaOffice {
     }
 
     /// Execute V8 Enterprise Productivity Suite audit gateway
-    pub fn audit_v8_productivity_suite(&self) -> crate::productivity::sovereign_office_suite_innovations_v8::ProductivitySuiteV8AuditManifest {
+    pub fn audit_v8_productivity_suite(
+        &self,
+    ) -> crate::productivity::sovereign_office_suite_innovations_v8::ProductivitySuiteV8AuditManifest
+    {
         let gateway = crate::productivity::sovereign_office_suite_innovations_v8::SovereignEnterpriseProductivitySuiteV8PrGatewayEngine::new();
         gateway.audit_suite_v8()
     }
 
     /// Execute V9 Enterprise Productivity Suite audit gateway
-    pub fn audit_v9_productivity_suite(&self) -> crate::productivity::sovereign_office_suite_innovations_v9::ProductivitySuiteV9AuditManifest {
+    pub fn audit_v9_productivity_suite(
+        &self,
+    ) -> crate::productivity::sovereign_office_suite_innovations_v9::ProductivitySuiteV9AuditManifest
+    {
         let gateway = crate::productivity::sovereign_office_suite_innovations_v9::SovereignEnterpriseProductivitySuiteV9PrGatewayEngine::new();
         gateway.audit_suite_v9()
     }

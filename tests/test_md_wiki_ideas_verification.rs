@@ -522,13 +522,17 @@ fn test_hybrid_scheduler_innovations_wiki_parity() {
 
 #[test]
 fn test_unimplemented_ideas_v83_pr_full_parity() {
-    let suite = open_source_os_unimplemented_ideas_v83_pr::SovereignUnimplementedIdeasSuiteV83::new();
+    let suite =
+        open_source_os_unimplemented_ideas_v83_pr::SovereignUnimplementedIdeasSuiteV83::new();
     let manifests = suite.collect_all_manifests();
     assert_eq!(manifests.len(), 9);
 
     let summary = suite.generate_suite_summary();
     assert_eq!(summary.get("suite_version").unwrap(), "v83.0");
     assert_eq!(summary.get("total_proposals").unwrap(), "9");
-    assert_eq!(summary.get("pqc_signature_algorithm").unwrap(), "Dilithium-5");
+    assert_eq!(
+        summary.get("pqc_signature_algorithm").unwrap(),
+        "Dilithium-5"
+    );
     assert_eq!(summary.get("interoperability_score").unwrap(), "100.0%");
 }

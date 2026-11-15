@@ -437,7 +437,9 @@ impl core::fmt::Display for DkmsError {
             Self::NotFound(name) => write!(f, "DKMS module not registered: {}", name),
             Self::BuildFailed(msg) => write!(f, "DKMS module compilation failure: {}", msg),
             Self::InstallFailed(msg) => write!(f, "DKMS module install failure: {}", msg),
-            Self::AlreadyInstalled(name) => write!(f, "DKMS module already installed for kernel: {}", name),
+            Self::AlreadyInstalled(name) => {
+                write!(f, "DKMS module already installed for kernel: {}", name)
+            }
             Self::Blacklisted(name) => write!(f, "Module is blacklisted in modprobe.d: {}", name),
         }
     }
@@ -478,7 +480,10 @@ impl DkmsManager {
     }
 
     pub fn build_for_kernel(&mut self, name: &str, kernel_ver: &str) -> Result<(), DkmsError> {
-        let mod_entry = self.modules.get_mut(name).ok_or_else(|| DkmsError::NotFound(name.to_string()))?;
+        let mod_entry = self
+            .modules
+            .get_mut(name)
+            .ok_or_else(|| DkmsError::NotFound(name.to_string()))?;
         if !mod_entry.built_kernels.contains(&kernel_ver.to_string()) {
             mod_entry.built_kernels.push(kernel_ver.to_string());
         }
@@ -487,12 +492,24 @@ impl DkmsManager {
     }
 
     pub fn install_for_kernel(&mut self, name: &str, kernel_ver: &str) -> Result<(), DkmsError> {
-        let mod_entry = self.modules.get_mut(name).ok_or_else(|| DkmsError::NotFound(name.to_string()))?;
+        let mod_entry = self
+            .modules
+            .get_mut(name)
+            .ok_or_else(|| DkmsError::NotFound(name.to_string()))?;
         if !mod_entry.built_kernels.contains(&kernel_ver.to_string()) {
-            return Err(DkmsError::InstallFailed(format!("Module {} not built for {}", name, kernel_ver)));
+            return Err(DkmsError::InstallFailed(format!(
+                "Module {} not built for {}",
+                name, kernel_ver
+            )));
         }
-        if mod_entry.installed_kernels.contains(&kernel_ver.to_string()) {
-            return Err(DkmsError::AlreadyInstalled(format!("{}/{}", name, kernel_ver)));
+        if mod_entry
+            .installed_kernels
+            .contains(&kernel_ver.to_string())
+        {
+            return Err(DkmsError::AlreadyInstalled(format!(
+                "{}/{}",
+                name, kernel_ver
+            )));
         }
         mod_entry.installed_kernels.push(kernel_ver.to_string());
         mod_entry.state = DkmsState::Installed;
@@ -501,14 +518,16 @@ impl DkmsManager {
 
     pub fn autoinstall(&mut self, kernel_ver: &str) -> Vec<Result<(), DkmsError>> {
         let mut results = Vec::new();
-        let module_names: Vec<String> = self.modules
+        let module_names: Vec<String> = self
+            .modules
             .values()
             .filter(|m| m.auto_rebuild)
             .map(|m| m.name.clone())
             .collect();
 
         for name in module_names {
-            let res = self.build_for_kernel(&name, kernel_ver)
+            let res = self
+                .build_for_kernel(&name, kernel_ver)
                 .and_then(|_| self.install_for_kernel(&name, kernel_ver));
             results.push(res);
         }
@@ -555,7 +574,7 @@ impl DkmsManager {
 pub struct ModprobeConf {
     pub blacklists: Vec<String>,
     pub options: BTreeMap<String, BTreeMap<String, String>>, // module -> (param -> value)
-    pub aliases: BTreeMap<String, String>, // alias -> module
+    pub aliases: BTreeMap<String, String>,                   // alias -> module
 }
 
 impl ModprobeConf {
@@ -672,7 +691,9 @@ mod arch_dkms_tests {
         }
         let status = dkms.status();
         assert_eq!(status.len(), 2);
-        assert!(status.iter().all(|s| s.state == DkmsState::Installed && s.kernel_version == new_kernel));
+        assert!(status
+            .iter()
+            .all(|s| s.state == DkmsState::Installed && s.kernel_version == new_kernel));
     }
 
     // --- AAA Pattern: modprobe.d Blacklisting and Options ---

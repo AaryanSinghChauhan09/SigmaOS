@@ -155,9 +155,24 @@ impl EffectcraftNeuralDepthSegmentationMatteV71Engine {
             model_resolution: (3840, 2160),
             temporal_smoothing: 0.90,
             active_layers: vec![
-                DepthMapLayerV71 { layer_id: 1, depth_min: 0.0, depth_max: 2.5, confidence: 0.99 },
-                DepthMapLayerV71 { layer_id: 2, depth_min: 2.5, depth_max: 12.0, confidence: 0.96 },
-                DepthMapLayerV71 { layer_id: 3, depth_min: 12.0, depth_max: 200.0, confidence: 0.93 },
+                DepthMapLayerV71 {
+                    layer_id: 1,
+                    depth_min: 0.0,
+                    depth_max: 2.5,
+                    confidence: 0.99,
+                },
+                DepthMapLayerV71 {
+                    layer_id: 2,
+                    depth_min: 2.5,
+                    depth_max: 12.0,
+                    confidence: 0.96,
+                },
+                DepthMapLayerV71 {
+                    layer_id: 3,
+                    depth_min: 12.0,
+                    depth_max: 200.0,
+                    confidence: 0.93,
+                },
             ],
         }
     }
@@ -166,7 +181,8 @@ impl EffectcraftNeuralDepthSegmentationMatteV71Engine {
         let norm_z = raw_z.max(0.0);
         for layer in &self.active_layers {
             if norm_z >= layer.depth_min && norm_z < layer.depth_max {
-                let alpha = ((norm_z - layer.depth_min) / (layer.depth_max - layer.depth_min)).clamp(0.0, 1.0);
+                let alpha = ((norm_z - layer.depth_min) / (layer.depth_max - layer.depth_min))
+                    .clamp(0.0, 1.0);
                 return (layer.layer_id, alpha * layer.confidence);
             }
         }
@@ -243,7 +259,12 @@ impl EffectcraftGpuVectorFieldParticlePhysicsV71Engine {
         }
     }
 
-    pub fn update_particle(&self, p: &mut GpuParticleV71, vector_field_force: (f32, f32, f32), dt: f32) -> bool {
+    pub fn update_particle(
+        &self,
+        p: &mut GpuParticleV71,
+        vector_field_force: (f32, f32, f32),
+        dt: f32,
+    ) -> bool {
         if p.life <= 0.0 {
             return false;
         }
@@ -467,7 +488,10 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: AI Neural Optical Flow Motion Vector V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/MotionFlow"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("Sub-frame Motion Interpolation"), String::from("Neural Confidence Weighting")],
+                components_added: vec![
+                    String::from("Sub-frame Motion Interpolation"),
+                    String::from("Neural Confidence Weighting"),
+                ],
                 performance_multiplier: String::from("19.5x"),
                 status: String::from("Approved"),
             },
@@ -476,7 +500,10 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: Anamorphic Iris Bokeh Lens Flare V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/Optics"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("Anamorphic Ellipse Squeeze"), String::from("Chromatic Fringe Aberration")],
+                components_added: vec![
+                    String::from("Anamorphic Ellipse Squeeze"),
+                    String::from("Chromatic Fringe Aberration"),
+                ],
                 performance_multiplier: String::from("16.8x"),
                 status: String::from("Approved"),
             },
@@ -485,7 +512,10 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: Monocular Video Neural Depth Segmentation V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/DepthMatte"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("3840x2160 Monocular Depth Estimation"), String::from("Temporal Matte Smoothing")],
+                components_added: vec![
+                    String::from("3840x2160 Monocular Depth Estimation"),
+                    String::from("Temporal Matte Smoothing"),
+                ],
                 performance_multiplier: String::from("14.2x"),
                 status: String::from("Approved"),
             },
@@ -494,7 +524,10 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: Volumetric Navier-Stokes Combustion Fluid V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/Volumetric"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("Sparse Grid VDB Navier-Stokes"), String::from("Combustion Buoyancy Physics")],
+                components_added: vec![
+                    String::from("Sparse Grid VDB Navier-Stokes"),
+                    String::from("Combustion Buoyancy Physics"),
+                ],
                 performance_multiplier: String::from("24.5x"),
                 status: String::from("Approved"),
             },
@@ -503,7 +536,10 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: GPU Vector Field Million Particle Physics V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/ParticlePhysics"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("2M Particle GPU Solver"), String::from("3D Force Attractor Vector Fields")],
+                components_added: vec![
+                    String::from("2M Particle GPU Solver"),
+                    String::from("3D Force Attractor Vector Fields"),
+                ],
                 performance_multiplier: String::from("35.0x"),
                 status: String::from("Approved"),
             },
@@ -512,16 +548,24 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: Deep EXR Cryptomatte AOV Extractor V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/DeepCompositing"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("Hash Coverage Accumulator"), String::from("Multi-Channel EXR Deep Buffer Parsing")],
+                components_added: vec![
+                    String::from("Hash Coverage Accumulator"),
+                    String::from("Multi-Channel EXR Deep Buffer Parsing"),
+                ],
                 performance_multiplier: String::from("15.5x"),
                 status: String::from("Approved"),
             },
             EffectcraftV71PrProposalManifest {
                 pr_id: 7107,
-                pr_title: String::from("PR: ACES 1.3 / OCIO v2 Wide-Gamut Color Pipeline V71 Engine"),
+                pr_title: String::from(
+                    "PR: ACES 1.3 / OCIO v2 Wide-Gamut Color Pipeline V71 Engine",
+                ),
                 target_subsystem: String::from("Creative/VFX/ColorPipeline"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("REDWideGamut to ACEScg Transformation"), String::from("OCIO v2 Display Tonemapping")],
+                components_added: vec![
+                    String::from("REDWideGamut to ACEScg Transformation"),
+                    String::from("OCIO v2 Display Tonemapping"),
+                ],
                 performance_multiplier: String::from("18.0x"),
                 status: String::from("Approved"),
             },
@@ -530,7 +574,10 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: Spatial 3D Camera SfM Track Mesh Projector V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/Matchmoving"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("Structure-from-Motion Point Cloud Solver"), String::from("3D Mesh Surface Screen Projector")],
+                components_added: vec![
+                    String::from("Structure-from-Motion Point Cloud Solver"),
+                    String::from("3D Mesh Surface Screen Projector"),
+                ],
                 performance_multiplier: String::from("13.1x"),
                 status: String::from("Approved"),
             },
@@ -539,7 +586,10 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: Temporal Inpaint Clean Plate Rig Removal V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/Inpainting"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("Temporal Inpaint Synthesis Window"), String::from("Wire & Rig Optical Mask Inpainter")],
+                components_added: vec![
+                    String::from("Temporal Inpaint Synthesis Window"),
+                    String::from("Wire & Rig Optical Mask Inpainter"),
+                ],
                 performance_multiplier: String::from("14.8x"),
                 status: String::from("Approved"),
             },
@@ -548,7 +598,10 @@ impl SovereignEffectcraftArtcraftMissingComponentsV71PrGateway {
                 pr_title: String::from("PR: OpenFX OFX 1.4 Sandboxed Plugin Host V71 Engine"),
                 target_subsystem: String::from("Creative/VFX/PluginHost"),
                 original_suite: String::from("ArtCraft EffectCraft"),
-                components_added: vec![String::from("OFX Sandboxed Plugin Runtime"), String::from("Parameter Serialization Protocol")],
+                components_added: vec![
+                    String::from("OFX Sandboxed Plugin Runtime"),
+                    String::from("Parameter Serialization Protocol"),
+                ],
                 performance_multiplier: String::from("22.4x"),
                 status: String::from("Approved"),
             },
@@ -584,7 +637,11 @@ mod tests {
     #[test]
     fn test_optical_flow_motion_vector_v71() {
         let engine = EffectcraftNeuralOpticalFlowMotionVectorV71Engine::new();
-        let mv = MotionVectorV71 { dx: 20.0, dy: 10.0, confidence: 1.0 };
+        let mv = MotionVectorV71 {
+            dx: 20.0,
+            dy: 10.0,
+            confidence: 1.0,
+        };
         let interp = engine.interpolate_motion_vector(&mv, 0.5);
         assert_eq!(interp.dx, 10.0);
         assert_eq!(interp.dy, 5.0);
@@ -644,9 +701,18 @@ mod tests {
     fn test_cryptomatte_aov_exr_extractor_v71() {
         let engine = EffectcraftCryptomatteAovExrExtractorV71Engine::new();
         let samples = vec![
-            CryptoSampleV71 { hash: 0xABCD, coverage: 0.5 },
-            CryptoSampleV71 { hash: 0xABCD, coverage: 0.3 },
-            CryptoSampleV71 { hash: 0x9999, coverage: 0.2 },
+            CryptoSampleV71 {
+                hash: 0xABCD,
+                coverage: 0.5,
+            },
+            CryptoSampleV71 {
+                hash: 0xABCD,
+                coverage: 0.3,
+            },
+            CryptoSampleV71 {
+                hash: 0x9999,
+                coverage: 0.2,
+            },
         ];
         let cov = engine.extract_coverage_for_hash(&samples, 0xABCD);
         assert!((cov - 0.8).abs() < 1e-5);

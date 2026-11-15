@@ -864,7 +864,14 @@ impl JournalManager {
         }
     }
 
-    pub fn log(&mut self, unit: &str, priority: JournalPriority, pid: u32, message: &str, timestamp_us: u64) {
+    pub fn log(
+        &mut self,
+        unit: &str,
+        priority: JournalPriority,
+        pid: u32,
+        message: &str,
+        timestamp_us: u64,
+    ) {
         if self.entries.len() >= self.max_entries {
             self.entries.remove(0);
         }
@@ -882,7 +889,10 @@ impl JournalManager {
     }
 
     pub fn query_by_priority<'a>(&'a self, max_priority: JournalPriority) -> Vec<&'a JournalEntry> {
-        self.entries.iter().filter(|e| e.priority <= max_priority).collect()
+        self.entries
+            .iter()
+            .filter(|e| e.priority <= max_priority)
+            .collect()
     }
 
     pub fn tail(&self, n: usize) -> &[JournalEntry] {
@@ -919,7 +929,12 @@ pub struct SocketUnit {
 }
 
 impl SocketUnit {
-    pub fn new(name: &str, listen_address: &str, service_name: &str, protocol: SocketProtocol) -> Self {
+    pub fn new(
+        name: &str,
+        listen_address: &str,
+        service_name: &str,
+        protocol: SocketProtocol,
+    ) -> Self {
         Self {
             name: name.to_string(),
             listen_address: listen_address.to_string(),
@@ -998,9 +1013,7 @@ impl TimerUnit {
             TimerSchedule::OnUnitActiveSec(sec) => {
                 current_time_us >= self.last_triggered_us + sec * 1_000_000
             }
-            TimerSchedule::Daily => {
-                current_time_us >= self.last_triggered_us + 86_400 * 1_000_000
-            }
+            TimerSchedule::Daily => current_time_us >= self.last_triggered_us + 86_400 * 1_000_000,
             TimerSchedule::Weekly => {
                 current_time_us >= self.last_triggered_us + 7 * 86_400 * 1_000_000
             }
@@ -1023,9 +1036,27 @@ mod arch_systemd_tests {
         let mut journal = JournalManager::new(100);
 
         // Act
-        journal.log("systemd-networkd", JournalPriority::Info, 101, "Link eth0 entered state configured", 1_000_000);
-        journal.log("sshd", JournalPriority::Error, 202, "Failed password for invalid user root", 1_500_000);
-        journal.log("systemd-networkd", JournalPriority::Debug, 101, "Carrier lost on wlan0", 2_000_000);
+        journal.log(
+            "systemd-networkd",
+            JournalPriority::Info,
+            101,
+            "Link eth0 entered state configured",
+            1_000_000,
+        );
+        journal.log(
+            "sshd",
+            JournalPriority::Error,
+            202,
+            "Failed password for invalid user root",
+            1_500_000,
+        );
+        journal.log(
+            "systemd-networkd",
+            JournalPriority::Debug,
+            101,
+            "Carrier lost on wlan0",
+            2_000_000,
+        );
 
         // Assert: query by unit
         let net_logs = journal.query_by_unit("systemd-networkd");
@@ -1042,7 +1073,12 @@ mod arch_systemd_tests {
     #[test]
     fn test_socket_activation_lifecycle() {
         // Arrange
-        let mut socket = SocketUnit::new("sshd.socket", "0.0.0.0:22", "sshd.service", SocketProtocol::Stream);
+        let mut socket = SocketUnit::new(
+            "sshd.socket",
+            "0.0.0.0:22",
+            "sshd.service",
+            SocketProtocol::Stream,
+        );
         socket.listen();
 
         // Act: incoming connection received
@@ -1062,7 +1098,11 @@ mod arch_systemd_tests {
     #[test]
     fn test_timer_unit_trigger_evaluation() {
         // Arrange
-        let mut timer = TimerUnit::new("fstrim.timer", "fstrim.service", TimerSchedule::OnUnitActiveSec(3600));
+        let mut timer = TimerUnit::new(
+            "fstrim.timer",
+            "fstrim.service",
+            TimerSchedule::OnUnitActiveSec(3600),
+        );
 
         // Act & Assert before interval (1800s)
         assert!(!timer.should_trigger(1800 * 1_000_000));

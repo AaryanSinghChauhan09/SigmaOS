@@ -105,10 +105,14 @@ impl GridcraftNeuralTimeSeriesForecastingArimaEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6901,
-            pr_title: String::from("PR-6901: GridCraft Neural Time-Series Forecasting & ARIMA Engine V69"),
+            pr_title: String::from(
+                "PR-6901: GridCraft Neural Time-Series Forecasting & ARIMA Engine V69",
+            ),
             target_subsystem: String::from("GridCraft / Analytics Subsystem"),
             original_suite: String::from("ArtCraft / GridCraft"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Time Series Predictor V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Time Series Predictor V69",
+            ),
             components_added: vec![
                 String::from("HoltWintersTripleSmoothing"),
                 String::from("ArimaAutoRegressor"),
@@ -182,7 +186,9 @@ impl GridcraftDynamicArrayLambdaRecursionEngineV69 {
             pr_title: String::from("PR-6902: GridCraft Dynamic Array LAMBDA Recursion Engine V69"),
             target_subsystem: String::from("GridCraft / Formula Engine"),
             original_suite: String::from("ArtCraft / GridCraft"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Dynamic Array LAMBDA V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Dynamic Array LAMBDA V69",
+            ),
             components_added: vec![
                 String::from("LambdaFunctionEvaluator"),
                 String::from("MapReduceScanDynamicSpillArray"),
@@ -250,7 +256,9 @@ impl GridcraftOlapCubeMDXQueryEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6903,
-            pr_title: String::from("PR-6903: GridCraft Multi-Dimensional OLAP Cube MDX Query Engine V69"),
+            pr_title: String::from(
+                "PR-6903: GridCraft Multi-Dimensional OLAP Cube MDX Query Engine V69",
+            ),
             target_subsystem: String::from("GridCraft / Analytics Subsystem"),
             original_suite: String::from("ArtCraft / GridCraft"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft MDX OLAP Engine V69"),
@@ -306,7 +314,11 @@ impl GridcraftFuzzyLookupSemanticSimilarityEngineV69 {
 
         for i in 1..=m {
             for j in 1..=n {
-                let cost = if a_chars[i - 1] == b_chars[j - 1] { 0 } else { 1 };
+                let cost = if a_chars[i - 1] == b_chars[j - 1] {
+                    0
+                } else {
+                    1
+                };
                 dp[i][j] = usize::min(
                     dp[i - 1][j] + 1,
                     usize::min(dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost),
@@ -352,7 +364,9 @@ impl GridcraftFuzzyLookupSemanticSimilarityEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6904,
-            pr_title: String::from("PR-6904: GridCraft Fuzzy Lookup & Semantic Similarity Engine V69"),
+            pr_title: String::from(
+                "PR-6904: GridCraft Fuzzy Lookup & Semantic Similarity Engine V69",
+            ),
             target_subsystem: String::from("GridCraft / Data Join Subsystem"),
             original_suite: String::from("ArtCraft / GridCraft"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft Fuzzy Lookup V69"),
@@ -407,7 +421,8 @@ impl GridcraftGpuAcceleratedMonteCarloOptionPricingEngineV69 {
 
         // Normal CDF approximation placeholder
         let norm_cdf = |x: f64| -> f64 { 1.0 / (1.0 + (-x * 1.702).exp()) };
-        let norm_pdf = |x: f64| -> f64 { (-0.5 * x * x).exp() / (2.0f64 * 3.141592653589793f64).sqrt() };
+        let norm_pdf =
+            |x: f64| -> f64 { (-0.5 * x * x).exp() / (2.0f64 * 3.141592653589793f64).sqrt() };
 
         let price = spot * norm_cdf(d1) - strike * (-rate * expiry).exp() * norm_cdf(d2);
         let delta = norm_cdf(d1);
@@ -428,10 +443,14 @@ impl GridcraftGpuAcceleratedMonteCarloOptionPricingEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6905,
-            pr_title: String::from("PR-6905: GridCraft GPU Monte Carlo Option Pricing & Greeks Engine V69"),
+            pr_title: String::from(
+                "PR-6905: GridCraft GPU Monte Carlo Option Pricing & Greeks Engine V69",
+            ),
             target_subsystem: String::from("GridCraft / Financial Subsystem"),
             original_suite: String::from("ArtCraft / GridCraft"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Financial Monte Carlo V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Financial Monte Carlo V69",
+            ),
             components_added: vec![
                 String::from("BlackScholesGreeksCalculator"),
                 String::from("GpuAcceleratedMonteCarloPathSim"),
@@ -498,10 +517,14 @@ impl GridcraftSpatialGeospatialChoroplethMapEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6906,
-            pr_title: String::from("PR-6906: GridCraft Spatial Geospatial Choropleth Map Engine V69"),
+            pr_title: String::from(
+                "PR-6906: GridCraft Spatial Geospatial Choropleth Map Engine V69",
+            ),
             target_subsystem: String::from("GridCraft / Visualization Subsystem"),
             original_suite: String::from("ArtCraft / GridCraft"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Geospatial Mapper V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Geospatial Mapper V69",
+            ),
             components_added: vec![
                 String::from("GeoJsonPolygonMapRenderer"),
                 String::from("QuantileColorBucketizer"),
@@ -563,10 +586,14 @@ impl GridcraftDifferentialPrivacyAnonymizationEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6907,
-            pr_title: String::from("PR-6907: GridCraft Differential Privacy & K-Anonymity Engine V69"),
+            pr_title: String::from(
+                "PR-6907: GridCraft Differential Privacy & K-Anonymity Engine V69",
+            ),
             target_subsystem: String::from("GridCraft / Security & Privacy"),
             original_suite: String::from("ArtCraft / GridCraft"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Privacy Anonymizer V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Privacy Anonymizer V69",
+            ),
             components_added: vec![
                 String::from("LaplaceGaussianNoiseInjector"),
                 String::from("KAnonymityGroupEvaluator"),
@@ -629,10 +656,14 @@ impl GridcraftRealtimeWebsocketDataFeedConnectorEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6908,
-            pr_title: String::from("PR-6908: GridCraft Sub-millisecond RTD WebSocket Tick Data Feed V69"),
+            pr_title: String::from(
+                "PR-6908: GridCraft Sub-millisecond RTD WebSocket Tick Data Feed V69",
+            ),
             target_subsystem: String::from("GridCraft / Live Stream Subsystem"),
             original_suite: String::from("ArtCraft / GridCraft"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Real-time RTD Stream V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Real-time RTD Stream V69",
+            ),
             components_added: vec![
                 String::from("SubMillisecondRtdServer"),
                 String::from("WebSocketTickDataConnector"),
@@ -713,7 +744,9 @@ impl GridcraftAutomatedDataProfilingSchemaInferenceEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6909,
-            pr_title: String::from("PR-6909: GridCraft Automated Data Profiling & Schema Inference V69"),
+            pr_title: String::from(
+                "PR-6909: GridCraft Automated Data Profiling & Schema Inference V69",
+            ),
             target_subsystem: String::from("GridCraft / Data Quality Subsystem"),
             original_suite: String::from("ArtCraft / GridCraft"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft Data Profiler V69"),
@@ -763,10 +796,14 @@ impl GridcraftMultiFormatXlsxXlsbCsvParquetConverterEngineV69 {
     pub fn generate_proposal(&self) -> GridcraftV69PrProposalManifest {
         GridcraftV69PrProposalManifest {
             pr_id: 6910,
-            pr_title: String::from("PR-6910: GridCraft Multi-Format XLSX/XLSB/CSV/Parquet Transpiler V69"),
+            pr_title: String::from(
+                "PR-6910: GridCraft Multi-Format XLSX/XLSB/CSV/Parquet Transpiler V69",
+            ),
             target_subsystem: String::from("GridCraft / File I/O Engine"),
             original_suite: String::from("ArtCraft / GridCraft"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Format Transpiler V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Format Transpiler V69",
+            ),
             components_added: vec![
                 String::from("XlsbBinaryBiffParser"),
                 String::from("ParquetArrowColumnarTranspiler"),

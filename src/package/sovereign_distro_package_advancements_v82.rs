@@ -108,80 +108,179 @@ impl UniversalPackageFormatInspectorV82 {
     }
 
     /// Detects package format based on header magic bytes or file extension V82
-    pub fn detect_format_by_magic_bytes(&self, raw_payload: &[u8], filename: &str) -> (PackageFormat, PackageSignatureKindV82, &'static str) {
+    pub fn detect_format_by_magic_bytes(
+        &self,
+        raw_payload: &[u8],
+        filename: &str,
+    ) -> (PackageFormat, PackageSignatureKindV82, &'static str) {
         if raw_payload.len() >= 8 && &raw_payload[0..7] == b"!<arch>" {
-            return (PackageFormat::Deb, PackageSignatureKindV82::GpgOpenPgp, "ar/tar");
+            return (
+                PackageFormat::Deb,
+                PackageSignatureKindV82::GpgOpenPgp,
+                "ar/tar",
+            );
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0xed, 0xab, 0xee, 0xdb] {
-            return (PackageFormat::Rpm, PackageSignatureKindV82::GpgOpenPgp, "rpm-lead");
+            return (
+                PackageFormat::Rpm,
+                PackageSignatureKindV82::GpgOpenPgp,
+                "rpm-lead",
+            );
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x28, 0xb5, 0x2f, 0xfd] {
-            return (PackageFormat::Pacman, PackageSignatureKindV82::GpgOpenPgp, "zstd");
+            return (
+                PackageFormat::Pacman,
+                PackageSignatureKindV82::GpgOpenPgp,
+                "zstd",
+            );
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x50, 0x4b, 0x03, 0x04] {
             if filename.ends_with(".apk") {
-                return (PackageFormat::Apk, PackageSignatureKindV82::ApkV2V3Signature, "zip");
+                return (
+                    PackageFormat::Apk,
+                    PackageSignatureKindV82::ApkV2V3Signature,
+                    "zip",
+                );
             }
             if filename.ends_with(".air") {
-                return (PackageFormat::Air, PackageSignatureKindV82::PqcKyberDilithium5, "zip");
+                return (
+                    PackageFormat::Air,
+                    PackageSignatureKindV82::PqcKyberDilithium5,
+                    "zip",
+                );
             }
             if filename.ends_with(".ipa") {
-                return (PackageFormat::Ipa, PackageSignatureKindV82::X509Certificate, "zip");
+                return (
+                    PackageFormat::Ipa,
+                    PackageSignatureKindV82::X509Certificate,
+                    "zip",
+                );
             }
             if filename.ends_with(".aab") {
-                return (PackageFormat::Aab, PackageSignatureKindV82::ApkV2V3Signature, "zip");
+                return (
+                    PackageFormat::Aab,
+                    PackageSignatureKindV82::ApkV2V3Signature,
+                    "zip",
+                );
             }
             if filename.ends_with(".hap") {
-                return (PackageFormat::Hap, PackageSignatureKindV82::PqcKyberDilithium5, "zip");
+                return (
+                    PackageFormat::Hap,
+                    PackageSignatureKindV82::PqcKyberDilithium5,
+                    "zip",
+                );
             }
             if filename.ends_with(".whl") || filename.ends_with(".jar") {
-                return (PackageFormat::TarGz, PackageSignatureKindV82::Minisign, "zip");
+                return (
+                    PackageFormat::TarGz,
+                    PackageSignatureKindV82::Minisign,
+                    "zip",
+                );
             }
         }
         if filename.ends_with(".ebuild") || filename.contains("portage") {
-            return (PackageFormat::Portage, PackageSignatureKindV82::OpenBsdSignify, "ebuild");
+            return (
+                PackageFormat::Portage,
+                PackageSignatureKindV82::OpenBsdSignify,
+                "ebuild",
+            );
         }
         if filename.ends_with(".xbps") {
-            return (PackageFormat::Xbps, PackageSignatureKindV82::OpenBsdSignify, "xbps");
+            return (
+                PackageFormat::Xbps,
+                PackageSignatureKindV82::OpenBsdSignify,
+                "xbps",
+            );
         }
         if filename.ends_with(".nix") || filename.ends_with(".nixpkg") {
-            return (PackageFormat::Nix, PackageSignatureKindV82::CosignSigstore, "nix");
+            return (
+                PackageFormat::Nix,
+                PackageSignatureKindV82::CosignSigstore,
+                "nix",
+            );
         }
         if filename.ends_with(".guix") || filename.ends_with(".scm") {
-            return (PackageFormat::Guix, PackageSignatureKindV82::OpenBsdSignify, "guix");
+            return (
+                PackageFormat::Guix,
+                PackageSignatureKindV82::OpenBsdSignify,
+                "guix",
+            );
         }
         if filename.ends_with(".pkg") || filename.ends_with(".txz") {
-            return (PackageFormat::Pkg, PackageSignatureKindV82::OpenBsdSignify, "pkg");
+            return (
+                PackageFormat::Pkg,
+                PackageSignatureKindV82::OpenBsdSignify,
+                "pkg",
+            );
         }
         if filename.ends_with(".hpkg") {
-            return (PackageFormat::Hpkg, PackageSignatureKindV82::Minisign, "hpkg");
+            return (
+                PackageFormat::Hpkg,
+                PackageSignatureKindV82::Minisign,
+                "hpkg",
+            );
         }
         if filename.ends_with(".flatpak") {
-            return (PackageFormat::Flatpak, PackageSignatureKindV82::CosignSigstore, "ostree");
+            return (
+                PackageFormat::Flatpak,
+                PackageSignatureKindV82::CosignSigstore,
+                "ostree",
+            );
         }
         if filename.ends_with(".snap") {
-            return (PackageFormat::Snap, PackageSignatureKindV82::X509Certificate, "squashfs");
+            return (
+                PackageFormat::Snap,
+                PackageSignatureKindV82::X509Certificate,
+                "squashfs",
+            );
         }
         if filename.ends_with(".AppImage") || filename.ends_with(".appimage") {
-            return (PackageFormat::AppImage, PackageSignatureKindV82::CosignSigstore, "elf-squashfs");
+            return (
+                PackageFormat::AppImage,
+                PackageSignatureKindV82::CosignSigstore,
+                "elf-squashfs",
+            );
         }
         if filename.ends_with(".bottle") {
-            return (PackageFormat::Bottle, PackageSignatureKindV82::PqcKyberDilithium5, "tar.gz");
+            return (
+                PackageFormat::Bottle,
+                PackageSignatureKindV82::PqcKyberDilithium5,
+                "tar.gz",
+            );
         }
         if filename.ends_with(".lzm") {
-            return (PackageFormat::Lzm, PackageSignatureKindV82::Minisign, "squashfs");
+            return (
+                PackageFormat::Lzm,
+                PackageSignatureKindV82::Minisign,
+                "squashfs",
+            );
         }
         if filename.ends_with(".pup") || filename.ends_with(".pet") {
             return (PackageFormat::Pup, PackageSignatureKindV82::Minisign, "pet");
         }
 
-        (PackageFormat::TarGz, PackageSignatureKindV82::Unsigned, "gzip")
+        (
+            PackageFormat::TarGz,
+            PackageSignatureKindV82::Unsigned,
+            "gzip",
+        )
     }
 
     /// Inspects and parses package header and metadata V82
-    pub fn inspect_package(&mut self, filename: &str, raw_payload: &[u8]) -> &InspectedPackageManifestV82 {
+    pub fn inspect_package(
+        &mut self,
+        filename: &str,
+        raw_payload: &[u8],
+    ) -> &InspectedPackageManifestV82 {
         let (fmt, sig_kind, comp_type) = self.detect_format_by_magic_bytes(raw_payload, filename);
-        let base_name = filename.split('-').next().unwrap_or(filename).split('.').next().unwrap_or(filename).to_string();
+        let base_name = filename
+            .split('-')
+            .next()
+            .unwrap_or(filename)
+            .split('.')
+            .next()
+            .unwrap_or(filename)
+            .to_string();
 
         let manifest = InspectedPackageManifestV82 {
             name: base_name,
@@ -194,12 +293,14 @@ impl UniversalPackageFormatInspectorV82 {
             conflicts: vec![],
             target_microarch: "x86-64-v4".to_string(),
             build_cflags: Some("-O3 -march=x86-64-v4 -flto".to_string()),
-            payload_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+            payload_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                .to_string(),
             provenance: Some(PackageProvenanceAttestationV82 {
                 builder_id: "sigmaos-builder-v82".to_string(),
                 build_timestamp: 1735000000,
                 source_commit_sha: "a1b2c3d4e5f678901234567890abcdef12345678".to_string(),
-                reproducible_build_hash: "b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b".to_string(),
+                reproducible_build_hash:
+                    "b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b82b".to_string(),
                 slsa_level: 4,
             }),
         };
@@ -221,14 +322,22 @@ pub trait SovereignInstallationStrategyV82 {
 pub struct AtomicCopyInstallationStrategyV82;
 impl SovereignInstallationStrategyV82 for AtomicCopyInstallationStrategyV82 {
     fn execute_install(&self, package_name: &str, payload: &[u8]) -> Result<String, PackageError> {
-        Ok(format!("Atomic install completed for {} ({} bytes)", package_name, payload.len()))
+        Ok(format!(
+            "Atomic install completed for {} ({} bytes)",
+            package_name,
+            payload.len()
+        ))
     }
 }
 
 pub struct DeltaPatchInstallationStrategyV82;
 impl SovereignInstallationStrategyV82 for DeltaPatchInstallationStrategyV82 {
     fn execute_install(&self, package_name: &str, payload: &[u8]) -> Result<String, PackageError> {
-        Ok(format!("Delta patch applied for {} ({} bytes)", package_name, payload.len()))
+        Ok(format!(
+            "Delta patch applied for {} ({} bytes)",
+            package_name,
+            payload.len()
+        ))
     }
 }
 
@@ -271,9 +380,14 @@ impl SovereignPackageFacadeV82 {
         }
     }
 
-    pub fn quick_install(&mut self, filename: &str, payload: &[u8]) -> Result<String, PackageError> {
+    pub fn quick_install(
+        &mut self,
+        filename: &str,
+        payload: &[u8],
+    ) -> Result<String, PackageError> {
         let manifest = self.inspector.inspect_package(filename, payload);
-        self.default_strategy.execute_install(&manifest.name, payload)
+        self.default_strategy
+            .execute_install(&manifest.name, payload)
     }
 }
 
@@ -304,8 +418,16 @@ impl UdfScriptletEngineV82 {
         }
     }
 
-    pub fn run_scriptlet(&self, hook: UdfLifecycleHookV82, script_body: &str) -> Result<String, PackageError> {
-        Ok(format!("Successfully executed scriptlet {:?} in sandbox (len: {})", hook, script_body.len()))
+    pub fn run_scriptlet(
+        &self,
+        hook: UdfLifecycleHookV82,
+        script_body: &str,
+    ) -> Result<String, PackageError> {
+        Ok(format!(
+            "Successfully executed scriptlet {:?} in sandbox (len: {})",
+            hook,
+            script_body.len()
+        ))
     }
 }
 
@@ -330,7 +452,11 @@ impl SatDpllDependencySolverV82 {
         Self { canonical_mappings }
     }
 
-    pub fn solve_dependencies(&self, _package_name: &str, raw_dependencies: &[String]) -> Result<Vec<String>, PackageError> {
+    pub fn solve_dependencies(
+        &self,
+        _package_name: &str,
+        raw_dependencies: &[String],
+    ) -> Result<Vec<String>, PackageError> {
         let mut solved = Vec::new();
         for dep in raw_dependencies {
             if let Some(mapped) = self.canonical_mappings.get(dep) {
@@ -373,9 +499,21 @@ impl UniversalMultiSandboxGovernorV82 {
         SandboxRulesetV82 {
             landlock_abi_version: 6,
             pledge_promises: "stdio rpath wpath cpath inet id".to_string(),
-            unveil_paths: vec![("/tmp".to_string(), "rwc".to_string()), ("/usr/lib".to_string(), "r".to_string())],
-            capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string(), "CAP_SEEK".to_string()],
-            seccomp_syscall_filter: vec!["read".to_string(), "write".to_string(), "exit_group".to_string(), "futex".to_string()],
+            unveil_paths: vec![
+                ("/tmp".to_string(), "rwc".to_string()),
+                ("/usr/lib".to_string(), "r".to_string()),
+            ],
+            capsicum_rights: vec![
+                "CAP_READ".to_string(),
+                "CAP_WRITE".to_string(),
+                "CAP_SEEK".to_string(),
+            ],
+            seccomp_syscall_filter: vec![
+                "read".to_string(),
+                "write".to_string(),
+                "exit_group".to_string(),
+                "futex".to_string(),
+            ],
         }
     }
 }
@@ -403,7 +541,11 @@ impl UniversalCasDeltaStoreGovernorV82 {
         }
     }
 
-    pub fn apply_delta_patch(&mut self, _base_hash: &str, delta_hash: &str) -> Result<CasDeltaChunkV82, PackageError> {
+    pub fn apply_delta_patch(
+        &mut self,
+        _base_hash: &str,
+        delta_hash: &str,
+    ) -> Result<CasDeltaChunkV82, PackageError> {
         Ok(CasDeltaChunkV82 {
             chunk_hash: delta_hash.to_string(),
             offset: 0,
@@ -441,15 +583,21 @@ impl UniversalBootEnvSnapshotGovernorV82 {
 
     pub fn create_snapshot(&mut self, kind: BootEnvKindV82, label: &str) -> u64 {
         let id = (self.active_snapshots.len() + 1) as u64;
-        self.active_snapshots.insert(id, format!("{:?}:{}", kind, label));
+        self.active_snapshots
+            .insert(id, format!("{:?}:{}", kind, label));
         id
     }
 
     pub fn rollback(&mut self, snapshot_id: u64) -> Result<String, PackageError> {
         if let Some(snap_name) = self.active_snapshots.get(&snapshot_id) {
-            Ok(format!("Rolled back system to boot environment snapshot: {}", snap_name))
+            Ok(format!(
+                "Rolled back system to boot environment snapshot: {}",
+                snap_name
+            ))
         } else {
-            Err(PackageError::InstallationFailed("Snapshot not found".to_string()))
+            Err(PackageError::InstallationFailed(
+                "Snapshot not found".to_string(),
+            ))
         }
     }
 }
@@ -495,13 +643,22 @@ impl UniversalPmCliRouterV82 {
         let mut dry_run = false;
 
         for token in &tokens[1..] {
-            if *token == "--dry-run" || *token == "--simulate" || *token == "-s" || *token == "--print" {
+            if *token == "--dry-run"
+                || *token == "--simulate"
+                || *token == "-s"
+                || *token == "--print"
+            {
                 dry_run = true;
                 continue;
             }
             if *token == "install" || *token == "-S" || *token == "add" || *token == "in" {
                 action = UniversalPmActionV82::Install;
-            } else if *token == "remove" || *token == "-R" || *token == "del" || *token == "purge" || *token == "erase" {
+            } else if *token == "remove"
+                || *token == "-R"
+                || *token == "del"
+                || *token == "purge"
+                || *token == "erase"
+            {
                 action = UniversalPmActionV82::Remove;
             } else if *token == "update" || *token == "upgrade" || *token == "-Syu" {
                 action = UniversalPmActionV82::Update;
@@ -552,11 +709,24 @@ impl SovereignDistroPackageAdvancementsSuiteV82 {
         }
     }
 
-    pub fn process_and_install(&mut self, filename: &str, raw_payload: &[u8]) -> Result<UnifiedPackage, PackageError> {
-        let manifest = self.inspector.inspect_package(filename, raw_payload).clone();
-        let solved_deps = self.solver.solve_dependencies(&manifest.name, &manifest.dependencies)?;
-        let _rules = self.sandbox_governor.generate_sandbox_rules(manifest.detected_format);
-        let _script_res = self.scriptlet_engine.run_scriptlet(UdfLifecycleHookV82::PostInstall, "echo post_install")?;
+    pub fn process_and_install(
+        &mut self,
+        filename: &str,
+        raw_payload: &[u8],
+    ) -> Result<UnifiedPackage, PackageError> {
+        let manifest = self
+            .inspector
+            .inspect_package(filename, raw_payload)
+            .clone();
+        let solved_deps = self
+            .solver
+            .solve_dependencies(&manifest.name, &manifest.dependencies)?;
+        let _rules = self
+            .sandbox_governor
+            .generate_sandbox_rules(manifest.detected_format);
+        let _script_res = self
+            .scriptlet_engine
+            .run_scriptlet(UdfLifecycleHookV82::PostInstall, "echo post_install")?;
 
         let pkg_id = format!("sigpkg-v82-{}", manifest.name);
         self.installed_packages.push(pkg_id.clone());
@@ -579,7 +749,8 @@ mod tests {
         let mut inspector = UniversalPackageFormatInspectorV82::new();
         assert_eq!(inspector.total_formats_supported, 250);
 
-        let manifest = inspector.inspect_package("ripgrep-14.0.0-amd64.deb", b"!<arch>\ndebian-binary\n");
+        let manifest =
+            inspector.inspect_package("ripgrep-14.0.0-amd64.deb", b"!<arch>\ndebian-binary\n");
         assert_eq!(manifest.name, "ripgrep");
         assert_eq!(manifest.detected_format, PackageFormat::Deb);
         assert_eq!(manifest.signature_kind, PackageSignatureKindV82::GpgOpenPgp);
@@ -589,7 +760,9 @@ mod tests {
     #[test]
     fn test_oop_patterns_v82() {
         let mut facade = SovereignPackageFacadeV82::new();
-        let res = facade.quick_install("curl.apk", &[0x50, 0x4b, 0x03, 0x04]).unwrap();
+        let res = facade
+            .quick_install("curl.apk", &[0x50, 0x4b, 0x03, 0x04])
+            .unwrap();
         assert!(res.contains("curl"));
     }
 
@@ -598,7 +771,10 @@ mod tests {
         let solver = SatDpllDependencySolverV82::new();
         let raw_deps = vec!["libssl3".to_string(), "glibc".to_string()];
         let solved = solver.solve_dependencies("ripgrep", &raw_deps).unwrap();
-        assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v82"]);
+        assert_eq!(
+            solved,
+            vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v82"]
+        );
 
         let sandbox = UniversalMultiSandboxGovernorV82::new();
         let rules = sandbox.generate_sandbox_rules(PackageFormat::Deb);

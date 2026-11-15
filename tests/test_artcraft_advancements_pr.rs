@@ -21,10 +21,7 @@ fn test_artcraft_advancements_integration() {
     );
 
     for prop in &proposals {
-        assert!(
-            !prop.pr_title.is_empty(),
-            "PR title should not be empty"
-        );
+        assert!(!prop.pr_title.is_empty(), "PR title should not be empty");
         assert_eq!(
             prop.status, "Ready for Merge",
             "PR proposal status should be 'Ready for Merge'"

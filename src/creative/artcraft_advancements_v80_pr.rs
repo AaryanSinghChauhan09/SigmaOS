@@ -93,7 +93,9 @@ impl ArtcraftVectorPathNurbsSplineEvaluationPrEngineV80 {
     /// Evaluates B-spline basis function N_{i,p}(u) using Cox-de Boor recursion.
     fn evaluate_basis(&self, i: usize, p: usize, u: f64) -> f64 {
         if p == 0 {
-            if u >= self.knot_vector[i] && (u < self.knot_vector[i + 1] || (u == 1.0 && self.knot_vector[i + 1] == 1.0)) {
+            if u >= self.knot_vector[i]
+                && (u < self.knot_vector[i + 1] || (u == 1.0 && self.knot_vector[i + 1] == 1.0))
+            {
                 1.0
             } else {
                 0.0
@@ -108,7 +110,8 @@ impl ArtcraftVectorPathNurbsSplineEvaluationPrEngineV80 {
 
             let right_denom = self.knot_vector[i + p + 1] - self.knot_vector[i + 1];
             let right = if right_denom > 1e-9 {
-                ((self.knot_vector[i + p + 1] - u) / right_denom) * self.evaluate_basis(i + 1, p - 1, u)
+                ((self.knot_vector[i + p + 1] - u) / right_denom)
+                    * self.evaluate_basis(i + 1, p - 1, u)
             } else {
                 0.0
             };
@@ -149,7 +152,8 @@ impl ArtcraftVectorPathNurbsSplineEvaluationPrEngineV80 {
     pub fn generate_proposal(&self) -> ArtcraftV80PrProposalManifest {
         ArtcraftV80PrProposalManifest {
             pr_id: 8001,
-            pr_title: "feat(artcraft): Implement NURBS B-Spline Vector Path Evaluation Engine".to_string(),
+            pr_title: "feat(artcraft): Implement NURBS B-Spline Vector Path Evaluation Engine"
+                .to_string(),
             target_subsystem: "ArtCraft Vector Geometry Core".to_string(),
             original_suite: "ArtCraft Vector Engine".to_string(),
             components_added: vec![
@@ -157,7 +161,8 @@ impl ArtcraftVectorPathNurbsSplineEvaluationPrEngineV80 {
                 "Homogeneous 2D rational control point weighting engine".to_string(),
                 "Uniform clamped knot vector normalization & curve sampler".to_string(),
             ],
-            performance_multiplier: "Sub-pixel smooth NURBS rendering (<2.0µs per sample)".to_string(),
+            performance_multiplier: "Sub-pixel smooth NURBS rendering (<2.0µs per sample)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -248,7 +253,9 @@ impl ArtcraftMultiThreadedTileBasedTileBufferRenderPrEngineV80 {
     pub fn generate_proposal(&self) -> ArtcraftV80PrProposalManifest {
         ArtcraftV80PrProposalManifest {
             pr_id: 8002,
-            pr_title: "feat(artcraft): Implement Multi-Threaded Tile-Based Tile-Buffer Render Engine".to_string(),
+            pr_title:
+                "feat(artcraft): Implement Multi-Threaded Tile-Based Tile-Buffer Render Engine"
+                    .to_string(),
             target_subsystem: "ArtCraft Compositing & Rasterization Core".to_string(),
             original_suite: "ArtCraft Tile Compositor".to_string(),
             components_added: vec![
@@ -256,7 +263,8 @@ impl ArtcraftMultiThreadedTileBasedTileBufferRenderPrEngineV80 {
                 "Lock-free tile buffer parallel render allocation scheme".to_string(),
                 "SIMD-friendly RGBA tile pixel buffer compositor".to_string(),
             ],
-            performance_multiplier: "8x Multi-core rasterization speedup (<10ms for 4K frame)".to_string(),
+            performance_multiplier: "8x Multi-core rasterization speedup (<10ms for 4K frame)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -319,7 +327,8 @@ impl ArtcraftSpectralColorGradingIccProfilePrEngineV80 {
     pub fn spectral_to_rgb(&self, spectral: SpectralDistribution) -> [f32; 3] {
         let b = (spectral.bands[0] + spectral.bands[1] + spectral.bands[2]) / 3.0;
         let g = (spectral.bands[3] + spectral.bands[4] + spectral.bands[5]) / 3.0;
-        let r = (spectral.bands[6] + spectral.bands[7] + spectral.bands[8] + spectral.bands[9]) / 4.0;
+        let r =
+            (spectral.bands[6] + spectral.bands[7] + spectral.bands[8] + spectral.bands[9]) / 4.0;
 
         [r.clamp(0.0, 1.0), g.clamp(0.0, 1.0), b.clamp(0.0, 1.0)]
     }
@@ -450,7 +459,8 @@ impl ArtcraftProceduralTextureGraphGeneratorPrEngineV80 {
     pub fn generate_proposal(&self) -> ArtcraftV80PrProposalManifest {
         ArtcraftV80PrProposalManifest {
             pr_id: 8004,
-            pr_title: "feat(artcraft): Implement Procedural Texture Graph Node Generator Engine".to_string(),
+            pr_title: "feat(artcraft): Implement Procedural Texture Graph Node Generator Engine"
+                .to_string(),
             target_subsystem: "ArtCraft Procedural Texture Engine".to_string(),
             original_suite: "ArtCraft Procedural Generator".to_string(),
             components_added: vec![
@@ -458,7 +468,8 @@ impl ArtcraftProceduralTextureGraphGeneratorPrEngineV80 {
                 "Deterministic seedable 2D hash gradient evaluator".to_string(),
                 "Node-based procedural material synthesis texture sampler".to_string(),
             ],
-            performance_multiplier: "Infinite-resolution procedural texture generation (<1.0µs/sample)".to_string(),
+            performance_multiplier:
+                "Infinite-resolution procedural texture generation (<1.0µs/sample)".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -554,9 +565,13 @@ impl SovereignArtcraftAdvancementsV80MasterSuite {
     pub fn new() -> Self {
         Self {
             nurbs_engine: ArtcraftVectorPathNurbsSplineEvaluationPrEngineV80::new(3),
-            tile_render_engine: ArtcraftMultiThreadedTileBasedTileBufferRenderPrEngineV80::new(1920, 1080, 64),
+            tile_render_engine: ArtcraftMultiThreadedTileBasedTileBufferRenderPrEngineV80::new(
+                1920, 1080, 64,
+            ),
             spectral_cms_engine: ArtcraftSpectralColorGradingIccProfilePrEngineV80::new("sRGB-v4"),
-            procedural_texture_engine: ArtcraftProceduralTextureGraphGeneratorPrEngineV80::new(42, 4, 0.5),
+            procedural_texture_engine: ArtcraftProceduralTextureGraphGeneratorPrEngineV80::new(
+                42, 4, 0.5,
+            ),
             subpixel_filter_engine: ArtcraftGpuAcceleratedSubpixelVectorFilterPrEngineV80::new(),
         }
     }
@@ -565,10 +580,26 @@ impl SovereignArtcraftAdvancementsV80MasterSuite {
     pub fn evaluate_artcraft_advancements_v80_parity(&mut self) -> bool {
         // 1. NURBS Spline test
         self.nurbs_engine.setup_curve(vec![
-            NurbsControlPoint { x: 0.0, y: 0.0, weight: 1.0 },
-            NurbsControlPoint { x: 10.0, y: 20.0, weight: 1.0 },
-            NurbsControlPoint { x: 30.0, y: 20.0, weight: 1.0 },
-            NurbsControlPoint { x: 40.0, y: 0.0, weight: 1.0 },
+            NurbsControlPoint {
+                x: 0.0,
+                y: 0.0,
+                weight: 1.0,
+            },
+            NurbsControlPoint {
+                x: 10.0,
+                y: 20.0,
+                weight: 1.0,
+            },
+            NurbsControlPoint {
+                x: 30.0,
+                y: 20.0,
+                weight: 1.0,
+            },
+            NurbsControlPoint {
+                x: 40.0,
+                y: 0.0,
+                weight: 1.0,
+            },
         ]);
         let (pt_x, pt_y) = self.nurbs_engine.evaluate_point(0.5);
         let nurbs_ok = pt_x > 0.0 && pt_y > 0.0;
@@ -583,12 +614,16 @@ impl SovereignArtcraftAdvancementsV80MasterSuite {
         let cms_ok = rgb[0] > 0.0;
 
         // 4. Procedural Texture test
-        let noise_val = self.procedural_texture_engine.sample_noise(12.5, 34.8, NoiseType::Perlin);
+        let noise_val = self
+            .procedural_texture_engine
+            .sample_noise(12.5, 34.8, NoiseType::Perlin);
         let proc_ok = noise_val >= 0.0 && noise_val <= 1.0;
 
         // 5. Subpixel Filter test
         let row_in = vec![255u8; 32];
-        let row_out = self.subpixel_filter_engine.apply_subpixel_filter_row(&row_in);
+        let row_out = self
+            .subpixel_filter_engine
+            .apply_subpixel_filter_row(&row_in);
         let filter_ok = row_out.len() == 32;
 
         nurbs_ok && tile_ok && cms_ok && proc_ok && filter_ok
@@ -708,10 +743,26 @@ mod tests {
     fn test_nurbs_engine() {
         let mut engine = ArtcraftVectorPathNurbsSplineEvaluationPrEngineV80::new(3);
         engine.setup_curve(vec![
-            NurbsControlPoint { x: 0.0, y: 0.0, weight: 1.0 },
-            NurbsControlPoint { x: 10.0, y: 20.0, weight: 1.0 },
-            NurbsControlPoint { x: 20.0, y: 20.0, weight: 1.0 },
-            NurbsControlPoint { x: 30.0, y: 0.0, weight: 1.0 },
+            NurbsControlPoint {
+                x: 0.0,
+                y: 0.0,
+                weight: 1.0,
+            },
+            NurbsControlPoint {
+                x: 10.0,
+                y: 20.0,
+                weight: 1.0,
+            },
+            NurbsControlPoint {
+                x: 20.0,
+                y: 20.0,
+                weight: 1.0,
+            },
+            NurbsControlPoint {
+                x: 30.0,
+                y: 0.0,
+                weight: 1.0,
+            },
         ]);
 
         let (x, y) = engine.evaluate_point(0.5);

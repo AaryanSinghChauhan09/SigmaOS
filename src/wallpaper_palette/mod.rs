@@ -30,7 +30,7 @@ impl Color {
     pub fn saturation(&self) -> u8 {
         let max = self.r.max(self.g).max(self.b) as f32;
         let min = self.r.min(self.g).min(self.b) as f32;
-        
+
         if max == 0.0 {
             0
         } else {
@@ -113,7 +113,8 @@ impl ColorPalette {
 
     /// Get colors by category
     pub fn get_colors_by_category(&self, category: ColorCategory) -> Vec<Color> {
-        self.colors.iter()
+        self.colors
+            .iter()
             .zip(self.categories.iter())
             .filter(|(_, cat)| **cat == category)
             .map(|(color, _)| *color)
@@ -138,7 +139,8 @@ impl ColorPalette {
     /// Generate accent color using golden ratio
     pub fn generate_accent(&self) -> Color {
         // Simple accent generation: pick most saturated color
-        self.colors.iter()
+        self.colors
+            .iter()
             .max_by(|a, b| a.saturation().cmp(&b.saturation()))
             .copied()
             .unwrap_or(Color::new(255, 100, 100))
@@ -233,18 +235,22 @@ impl PaletteExtractor {
     }
 
     /// Extract palette from image
-    pub fn extract_palette(&mut self, image_path: &str, options: &ExtractionOptions) -> ExtractionResult {
+    pub fn extract_palette(
+        &mut self,
+        image_path: &str,
+        options: &ExtractionOptions,
+    ) -> ExtractionResult {
         // In a real implementation, this would:
         // 1. Load the image
         // 2. Run K-means clustering
         // 3. Extract dominant colors
         // 4. Map to categories
-        
+
         let mut palette = ColorPalette::new(image_path.to_string());
-        
+
         // Mock extraction - add some sample colors
         let sample_colors = vec![
-            Color::new(45, 45, 45),   // Dark
+            Color::new(45, 45, 45),    // Dark
             Color::new(128, 128, 128), // Middle
             Color::new(220, 220, 220), // Light
             Color::new(255, 100, 100), // Accent (red)
@@ -259,7 +265,7 @@ impl PaletteExtractor {
         }
 
         palette.set_dominant(palette.colors[0]);
-        
+
         self.palettes.push(palette.clone());
         ExtractionResult::success(palette)
     }
@@ -278,7 +284,10 @@ impl PaletteExtractor {
 
     /// Get palette by source image
     pub fn get_palette(&self, source: &str) -> Option<ColorPalette> {
-        self.palettes.iter().find(|p| p.source_image == source).cloned()
+        self.palettes
+            .iter()
+            .find(|p| p.source_image == source)
+            .cloned()
     }
 
     /// Generate theme colors from palette
@@ -423,7 +432,7 @@ mod tests {
         palette.add_color(Color::new(50, 50, 50));
         palette.add_color(Color::new(200, 200, 200));
         palette.add_color(Color::new(128, 128, 128));
-        
+
         let dark = palette.dark_colors();
         let light = palette.light_colors();
         assert_eq!(dark.len(), 1);

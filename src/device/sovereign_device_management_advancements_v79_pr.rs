@@ -234,8 +234,14 @@ impl SovereignUdevEudevMdevDevdHotplugV79Engine {
 
         let mut hwdb_entries = Vec::new();
         let mut hw_props = BTreeMap::new();
-        hw_props.insert("ID_VENDOR_FROM_DATABASE".to_string(), "SigmaCorp".to_string());
-        hw_props.insert("ID_MODEL_FROM_DATABASE".to_string(), "Sovereign Acceleration Controller V79".to_string());
+        hw_props.insert(
+            "ID_VENDOR_FROM_DATABASE".to_string(),
+            "SigmaCorp".to_string(),
+        );
+        hw_props.insert(
+            "ID_MODEL_FROM_DATABASE".to_string(),
+            "Sovereign Acceleration Controller V79".to_string(),
+        );
         hwdb_entries.push(UdevHwdbEntryV79 {
             modalias_pattern: "pci:v00008086d*".to_string(),
             property_keys: hw_props,
@@ -605,7 +611,12 @@ impl SovereignLogindElogindSessionV79Engine {
     }
 
     /// Take unprivileged DRI or evdev File Descriptor for Wayland compositor passing.
-    pub fn take_device_fd(&self, session_id: &str, device_path: &str, _uid: u32) -> Result<u32, String> {
+    pub fn take_device_fd(
+        &self,
+        session_id: &str,
+        device_path: &str,
+        _uid: u32,
+    ) -> Result<u32, String> {
         if let Some(session) = self.sessions.get(session_id) {
             if session.is_active {
                 if device_path.starts_with("/dev/dri/") || device_path.starts_with("/dev/input/") {
@@ -619,7 +630,13 @@ impl SovereignLogindElogindSessionV79Engine {
     }
 
     /// Create an inhibitor lock.
-    pub fn create_inhibitor_lock(&mut self, lock_type: &str, who: &str, why: &str, mode: InhibitorModeV79) -> u64 {
+    pub fn create_inhibitor_lock(
+        &mut self,
+        lock_type: &str,
+        who: &str,
+        why: &str,
+        mode: InhibitorModeV79,
+    ) -> u64 {
         let lock_id = self.next_lock_id;
         self.next_lock_id += 1;
         self.inhibitor_locks.push(LogindInhibitorLockV79 {
@@ -730,13 +747,24 @@ impl SovereignPolkitAuthorizationV79Engine {
     }
 
     /// Cache authorization result with expiration TTL timestamp.
-    pub fn cache_authorization(&mut self, action_id: &str, uid: u32, current_time: u64, ttl_seconds: u64) {
+    pub fn cache_authorization(
+        &mut self,
+        action_id: &str,
+        uid: u32,
+        current_time: u64,
+        ttl_seconds: u64,
+    ) {
         let expiry = current_time + ttl_seconds;
         self.auth_cache.insert((action_id.to_string(), uid), expiry);
     }
 
     /// Verify if cached authorization is valid and not expired.
-    pub fn is_cached_authorization_valid(&self, action_id: &str, uid: u32, current_time: u64) -> bool {
+    pub fn is_cached_authorization_valid(
+        &self,
+        action_id: &str,
+        uid: u32,
+        current_time: u64,
+    ) -> bool {
         if let Some(&expiry) = self.auth_cache.get(&(action_id.to_string(), uid)) {
             return current_time < expiry;
         }
@@ -821,7 +849,8 @@ impl SovereignDbusSystemBusBrokerV79Engine {
 
     /// Subscribe to a D-Bus signal interface.
     pub fn subscribe_signal(&mut self, interface: &str, subscriber_unique_id: &str) {
-        self.subscriptions.push((interface.to_string(), subscriber_unique_id.to_string()));
+        self.subscriptions
+            .push((interface.to_string(), subscriber_unique_id.to_string()));
     }
 
     /// Route signal and return matching subscriber unique IDs.
@@ -986,7 +1015,9 @@ impl SovereignDeviceManagementAdvancementsV79PrGateway {
         }
 
         // 2. Verify acpid
-        let acpi_event = self.acpid_engine.parse_acpi_event_line("button/power PWRF 00000080 00000000");
+        let acpi_event = self
+            .acpid_engine
+            .parse_acpi_event_line("button/power PWRF 00000080 00000000");
         if acpi_event.is_none() {
             return false;
         }
@@ -998,7 +1029,9 @@ impl SovereignDeviceManagementAdvancementsV79PrGateway {
         }
 
         // 4. Verify logind
-        let fd = self.logind_engine.take_device_fd("session-1", "/dev/dri/card0", 1000);
+        let fd = self
+            .logind_engine
+            .take_device_fd("session-1", "/dev/dri/card0", 1000);
         if fd.is_err() {
             return false;
         }
@@ -1009,13 +1042,19 @@ impl SovereignDeviceManagementAdvancementsV79PrGateway {
             uid: 1000,
             session_id: "session-1".to_string(),
         };
-        let res = self.polkit_engine.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subj, true);
+        let res = self.polkit_engine.check_authorization(
+            "org.freedesktop.udisks2.filesystem-mount",
+            &subj,
+            true,
+        );
         if res != PolkitAuthResultV79::Yes {
             return false;
         }
 
         // 6. Verify dbus broker
-        let req_res = self.dbus_broker.request_name("org.custom.Service", ":1.9", true);
+        let req_res = self
+            .dbus_broker
+            .request_name("org.custom.Service", ":1.9", true);
         if !req_res {
             return false;
         }
@@ -1049,10 +1088,12 @@ mod tests {
         assert!(!links.is_empty());
         assert_eq!(mode, Some(0o660));
 
-        let netname = engine.generate_predictable_net_ifname(PredictableNetIfTypeV79::Ethernet, 3, 0, 0);
+        let netname =
+            engine.generate_predictable_net_ifname(PredictableNetIfTypeV79::Ethernet, 3, 0, 0);
         assert_eq!(netname, "enp3s0");
 
-        let onboard_name = engine.generate_predictable_net_ifname(PredictableNetIfTypeV79::PciOnboard, 0, 0, 0);
+        let onboard_name =
+            engine.generate_predictable_net_ifname(PredictableNetIfTypeV79::PciOnboard, 0, 0, 0);
         assert_eq!(onboard_name, "eno1");
     }
 
@@ -1108,11 +1149,16 @@ mod tests {
             session_id: "session-1".to_string(),
         };
 
-        let res = engine.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subj, true);
+        let res =
+            engine.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subj, true);
         assert_eq!(res, PolkitAuthResultV79::Yes);
 
         engine.cache_authorization("org.freedesktop.udisks2.filesystem-mount", 1000, 300, 10000);
-        assert!(engine.is_cached_authorization_valid("org.freedesktop.udisks2.filesystem-mount", 1000, 10100));
+        assert!(engine.is_cached_authorization_valid(
+            "org.freedesktop.udisks2.filesystem-mount",
+            1000,
+            10100
+        ));
     }
 
     #[test]

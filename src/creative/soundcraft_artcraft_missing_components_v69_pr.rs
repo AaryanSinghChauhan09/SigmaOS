@@ -121,7 +121,8 @@ impl SoundcraftSpectralTransientDenoiseDeclipEngineV69 {
         let declip_threshold = 10.0f32.powf(self.declip_threshold_dbfs / 20.0);
         for sample in buffer.iter_mut() {
             if sample.abs() >= declip_threshold {
-                *sample = sample.signum() * (declip_threshold - (sample.abs() - declip_threshold) * 0.1);
+                *sample =
+                    sample.signum() * (declip_threshold - (sample.abs() - declip_threshold) * 0.1);
             }
             if sample.abs() < 0.005 {
                 *sample *= 0.1; // Denoise gate
@@ -132,7 +133,9 @@ impl SoundcraftSpectralTransientDenoiseDeclipEngineV69 {
     pub fn generate_pr_manifest(&self) -> SoundcraftV69PrProposalManifest {
         SoundcraftV69PrProposalManifest {
             pr_id: 69302,
-            pr_title: String::from("Spectral Transient De-Noising & De-Clipping Audio Restoration PR"),
+            pr_title: String::from(
+                "Spectral Transient De-Noising & De-Clipping Audio Restoration PR",
+            ),
             target_subsystem: String::from("Creative::Soundcraft::Restoration"),
             original_suite: String::from("ArtCraft SoundCraft V69 Restoration Suite"),
             components_added: vec![
@@ -175,11 +178,14 @@ impl SoundcraftMultiBusSidechainDuckingCompressorEngineV69 {
 
     /// Ducks main buffer based on sidechain trigger signal level.
     pub fn apply_sidechain_ducking(&self, main_buffer: &mut [f32], sidechain_trigger: &[f32]) {
-        let trigger_rms = (sidechain_trigger.iter().map(|&s| s * s).sum::<f32>() / sidechain_trigger.len().max(1) as f32).sqrt();
+        let trigger_rms = (sidechain_trigger.iter().map(|&s| s * s).sum::<f32>()
+            / sidechain_trigger.len().max(1) as f32)
+            .sqrt();
         let trigger_db = 20.0 * (trigger_rms + 1e-6).log10();
 
         if trigger_db > self.threshold_db {
-            let attenuation_db = ((trigger_db - self.threshold_db) * (1.0 - 1.0 / self.ratio)).min(self.ducking_depth_db);
+            let attenuation_db = ((trigger_db - self.threshold_db) * (1.0 - 1.0 / self.ratio))
+                .min(self.ducking_depth_db);
             let gain = 10.0f32.powf(-attenuation_db / 20.0);
             for s in main_buffer.iter_mut() {
                 *s *= gain;
@@ -230,7 +236,12 @@ impl SoundcraftAmbisonicBinaural3dHrtfPannerEngineV69 {
     }
 
     /// Encodes mono input into 16-channel HOA B-format stream for 3D spatialization.
-    pub fn encode_hoa_3d(&self, mono_sample: f32, azimuth_rad: f32, elevation_rad: f32) -> Vec<f32> {
+    pub fn encode_hoa_3d(
+        &self,
+        mono_sample: f32,
+        azimuth_rad: f32,
+        elevation_rad: f32,
+    ) -> Vec<f32> {
         let channel_count = ((self.order as usize) + 1).pow(2); // 16 channels for 3rd order
         let mut hoa_bformat = vec![0.0f32; channel_count];
 
@@ -361,7 +372,10 @@ impl SoundcraftMultiUserCrdtStemSyncEngineV69 {
     }
 
     pub fn update_stem_version(&mut self, stem_name: &str) -> u64 {
-        let counter = self.stem_vector_clock.entry(String::from(stem_name)).or_insert(0);
+        let counter = self
+            .stem_vector_clock
+            .entry(String::from(stem_name))
+            .or_insert(0);
         *counter += 1;
         *counter
     }
@@ -618,7 +632,9 @@ impl SovereignSoundcraftArtcraftMissingComponentsV69PrGateway {
             sidechain_engine: SoundcraftMultiBusSidechainDuckingCompressorEngineV69::new(),
             ambisonic_engine: SoundcraftAmbisonicBinaural3dHrtfPannerEngineV69::new(),
             mpe_engine: SoundcraftMidi20PolyphonicExpressionMpeEngineV69::new(),
-            crdt_sync_engine: SoundcraftMultiUserCrdtStemSyncEngineV69::new("SovereignDAWSessionV69"),
+            crdt_sync_engine: SoundcraftMultiUserCrdtStemSyncEngineV69::new(
+                "SovereignDAWSessionV69",
+            ),
             ai_stem_engine: SoundcraftNeuralAiStemSeparationEngineV69::new(),
             loudness_limiter_engine: SoundcraftEbuR128TruePeakLoudnessLimiterEngineV69::new(),
             tape_saturation_engine: SoundcraftAnalogTapeConsoleSaturationEngineV69::new(),

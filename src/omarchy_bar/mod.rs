@@ -141,9 +141,7 @@ impl BarWidgetManager {
             BarWidgetPosition::Right => &self.right_widgets,
         };
 
-        ids.iter()
-            .filter_map(|id| self.widgets.get(id))
-            .collect()
+        ids.iter().filter_map(|id| self.widgets.get(id)).collect()
     }
 
     /// Enable widget
@@ -195,9 +193,9 @@ mod tests {
         let widget = BarWidget::new(
             String::from("clock"),
             String::from("Clock"),
-            BarWidgetType::Clock
+            BarWidgetType::Clock,
         );
-        
+
         assert_eq!(widget.widget_type, BarWidgetType::Clock);
         assert!(widget.enabled);
     }
@@ -208,9 +206,9 @@ mod tests {
         let widget = BarWidget::new(
             String::from("network"),
             String::from("Network"),
-            BarWidgetType::Network
+            BarWidgetType::Network,
         );
-        
+
         manager.add_widget(widget);
         assert_eq!(manager.widgets.len(), 1);
     }
@@ -221,10 +219,10 @@ mod tests {
         let mut widget = BarWidget::new(
             String::from("clock"),
             String::from("Clock"),
-            BarWidgetType::Clock
+            BarWidgetType::Clock,
         );
         widget.set_position(BarWidgetPosition::Left);
-        
+
         manager.add_widget(widget);
         assert_eq!(manager.left_widgets.len(), 1);
     }
@@ -235,9 +233,9 @@ mod tests {
         let widget = BarWidget::new(
             String::from("audio"),
             String::from("Audio"),
-            BarWidgetType::Audio
+            BarWidgetType::Audio,
         );
-        
+
         manager.add_widget(widget);
         assert!(manager.enable_widget(String::from("audio")).is_ok());
         assert!(manager.disable_widget(String::from("audio")).is_ok());
@@ -249,9 +247,9 @@ mod tests {
         let widget = BarWidget::new(
             String::from("power"),
             String::from("Power"),
-            BarWidgetType::Power
+            BarWidgetType::Power,
         );
-        
+
         manager.add_widget(widget);
         let visible = manager.get_visible();
         assert_eq!(visible.len(), 1);

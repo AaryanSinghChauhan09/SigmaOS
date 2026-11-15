@@ -102,7 +102,10 @@ fn test_init_and_supervisor_v90_pr_integration() {
         jail_name: Some("secjail".to_string()),
         ..Default::default()
     };
-    assert_eq!(bsd.build_jail_chroot_command(&hooks), "jail -n secjail exec /usr/bin/test");
+    assert_eq!(
+        bsd.build_jail_chroot_command(&hooks),
+        "jail -n secjail exec /usr/bin/test"
+    );
 
     let scripts = vec![
         ("netif", vec!["net"], vec![]),

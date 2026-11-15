@@ -53,13 +53,17 @@ fn test_v79_udev_mdev_devd_rules() {
     let ifname = engine.generate_predictable_net_ifname(PredictableNetIfTypeV79::Wireless, 2, 0, 0);
     assert_eq!(ifname, "wlp2s0");
 
-    let usb_ifname = engine.generate_predictable_net_ifname(PredictableNetIfTypeV79::UsbPort, 0, 1, 0);
+    let usb_ifname =
+        engine.generate_predictable_net_ifname(PredictableNetIfTypeV79::UsbPort, 0, 1, 0);
     assert_eq!(usb_ifname, "enp0s0u1");
 
     let hwdb = engine.lookup_hwdb("pci:v00008086d000015f3");
     assert!(hwdb.is_some());
     let props = hwdb.unwrap();
-    assert_eq!(props.get("ID_VENDOR_FROM_DATABASE").map(|s| s.as_str()), Some("SigmaCorp"));
+    assert_eq!(
+        props.get("ID_VENDOR_FROM_DATABASE").map(|s| s.as_str()),
+        Some("SigmaCorp")
+    );
 }
 
 #[test]
@@ -101,7 +105,12 @@ fn test_v79_logind_session_lifecycle() {
     let fd = logind.take_device_fd("session-1", "/dev/dri/card0", 1000);
     assert_eq!(fd, Ok(42));
 
-    let lock_id = logind.create_inhibitor_lock("shutdown", "updater", "System upgrade", InhibitorModeV79::Delay);
+    let lock_id = logind.create_inhibitor_lock(
+        "shutdown",
+        "updater",
+        "System upgrade",
+        InhibitorModeV79::Delay,
+    );
     assert_eq!(lock_id, 1);
     assert_eq!(logind.inhibitor_locks.len(), 1);
 
@@ -109,7 +118,10 @@ fn test_v79_logind_session_lifecycle() {
     assert_eq!(logind.inhibitor_locks.len(), 0);
 
     assert!(logind.switch_vt(2));
-    assert_eq!(logind.sessions.get("session-1").map(|s| s.is_active), Some(false));
+    assert_eq!(
+        logind.sessions.get("session-1").map(|s| s.is_active),
+        Some(false)
+    );
 }
 
 #[test]
@@ -121,12 +133,21 @@ fn test_v79_polkit_action_cache() {
         session_id: "session-1".to_string(),
     };
 
-    let result = polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, true);
+    let result =
+        polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, true);
     assert_eq!(result, PolkitAuthResultV79::Yes);
 
     polkit.cache_authorization("org.freedesktop.udisks2.filesystem-mount", 1000, 5000, 300);
-    assert!(polkit.is_cached_authorization_valid("org.freedesktop.udisks2.filesystem-mount", 1000, 5200));
-    assert!(!polkit.is_cached_authorization_valid("org.freedesktop.udisks2.filesystem-mount", 1000, 5301));
+    assert!(polkit.is_cached_authorization_valid(
+        "org.freedesktop.udisks2.filesystem-mount",
+        1000,
+        5200
+    ));
+    assert!(!polkit.is_cached_authorization_valid(
+        "org.freedesktop.udisks2.filesystem-mount",
+        1000,
+        5301
+    ));
 }
 
 #[test]

@@ -63,7 +63,9 @@ impl FirstBootStep {
     }
 
     /// Total number of steps (for progress display).
-    pub const fn total() -> usize { 9 }
+    pub const fn total() -> usize {
+        9
+    }
 
     /// Step index, 1-based.
     pub fn index(self) -> usize {
@@ -175,12 +177,12 @@ impl UserProfile {
     pub fn new(username: &str) -> Self {
         let home = PathBuf::from(format!("/home/{username}"));
         let xdg = XdgDirectories {
-            desktop:   home.join("Desktop"),
+            desktop: home.join("Desktop"),
             documents: home.join("Documents"),
             downloads: home.join("Downloads"),
-            music:     home.join("Music"),
-            pictures:  home.join("Pictures"),
-            videos:    home.join("Videos"),
+            music: home.join("Music"),
+            pictures: home.join("Pictures"),
+            videos: home.join("Videos"),
             templates: home.join("Templates"),
         };
         Self {
@@ -345,7 +347,9 @@ impl FirstBootWizard {
     /// Write `/etc/vconsole.conf` with the keyboard layout.
     pub fn apply_keyboard(&self) -> Result<(), FirstBootError> {
         if self.config.keyboard_layout.is_empty() {
-            return Err(FirstBootError::StepIncomplete("keyboard_layout".to_string()));
+            return Err(FirstBootError::StepIncomplete(
+                "keyboard_layout".to_string(),
+            ));
         }
         // Writing /etc/vconsole.conf would happen here.
         Ok(())
@@ -414,7 +418,9 @@ impl FirstBootWizard {
             }
             FirstBootStep::KeyboardLayout => {
                 if self.config.keyboard_layout.is_empty() {
-                    return Err(FirstBootError::StepIncomplete("keyboard_layout".to_string()));
+                    return Err(FirstBootError::StepIncomplete(
+                        "keyboard_layout".to_string(),
+                    ));
                 }
             }
             _ => {}
@@ -492,7 +498,7 @@ mod tests {
         let mut wizard = make_wizard();
         let update = full_update();
         let _ = wizard.advance(&update); // set username
-        // Act
+                                         // Act
         let profile = wizard.generate_user_profile().unwrap();
         // Assert
         assert_eq!(profile.home_dir, PathBuf::from("/home/alice"));

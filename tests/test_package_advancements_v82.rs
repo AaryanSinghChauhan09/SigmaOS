@@ -46,7 +46,10 @@ fn test_package_advancements_v82_full_cycle() {
     let solved = solver
         .solve_dependencies("ripgrep", &raw_deps)
         .expect("SAT solver failed");
-    assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v82"]);
+    assert_eq!(
+        solved,
+        vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v82"]
+    );
 
     // 4. Multi-Sandbox Security Governor V82
     let sandbox_gov = UniversalMultiSandboxGovernorV82::new();

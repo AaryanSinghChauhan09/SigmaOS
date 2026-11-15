@@ -105,7 +105,9 @@ impl GraphicsDisplayV86PrCategory {
             Self::WestonReferenceShellAndRepaintScheduler => "weston-shell-repaint-scheduler-v86",
             Self::SwayDynamicTilingAndIpcEngine => "sway-dynamic-tiling-ipc-v86",
             Self::WlrootsModularBackendAndSeatDispatcher => "wlroots-backend-seat-dispatcher-v86",
-            Self::MutterClutterSceneGraphAndFractionalScaling => "mutter-scene-fractional-scaling-v86",
+            Self::MutterClutterSceneGraphAndFractionalScaling => {
+                "mutter-scene-fractional-scaling-v86"
+            }
             Self::KWinPlasmaCompositorBlurAndDecorations => "kwin-plasma-blur-decorations-v86",
             Self::Compiz3dCubeAndWobblyWindowPhysics => "compiz-3d-cube-physics-v86",
             Self::PicomX11VsyncAndDualKawaseBlur => "picom-vsync-kawase-blur-v86",
@@ -209,7 +211,9 @@ impl SovereignWaylandV86Engine {
             subsurfaces: BTreeMap::new(),
             tearing_enabled: true,
             color_management_v4_active: true,
-            hdr10_icc_profile_blob: vec![0x00, 0x00, 0x02, 0x00, 0x6d, 0x66, 0x74, 0x72, 0x56, 0x38, 0x36],
+            hdr10_icc_profile_blob: vec![
+                0x00, 0x00, 0x02, 0x00, 0x6d, 0x66, 0x74, 0x72, 0x56, 0x38, 0x36,
+            ],
         }
     }
 
@@ -255,7 +259,9 @@ impl SovereignMesaV86Engine {
     pub fn compile_nir_shader(&mut self, _nir_bc: &str) -> Vec<u8> {
         self.nir_opt_passes_run += 20;
         self.aco_wave64_compiled += 1;
-        vec![0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00, 0x56, 0x38, 0x36]
+        vec![
+            0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00, 0x56, 0x38, 0x36,
+        ]
     }
 
     pub fn zink_draw_arrays(&mut self, count: u32) {
@@ -749,15 +755,24 @@ impl SovereignGraphicsDisplayV86MasterSuiteEngine {
 
         // 2. Wayland
         let surf = self.wayland.create_surface();
-        audit.insert("Wayland Core Wire Surface Creation Functional V86", surf > 0);
+        audit.insert(
+            "Wayland Core Wire Surface Creation Functional V86",
+            surf > 0,
+        );
 
         // 3. Mesa
         let bc = self.mesa.compile_nir_shader("test_shader");
-        audit.insert("Mesa Gallium3D ACO Shader Compilation Functional V86", !bc.is_empty());
+        audit.insert(
+            "Mesa Gallium3D ACO Shader Compilation Functional V86",
+            !bc.is_empty(),
+        );
 
         // 4. DRM/KMS
         let prime = self.drm_kms.alloc_gem_export_prime(2560, 1440);
-        audit.insert("DRM/KMS GEM PRIME Handle Export Functional V86", prime.is_ok());
+        audit.insert(
+            "DRM/KMS GEM PRIME Handle Export Functional V86",
+            prime.is_ok(),
+        );
 
         // 5. libdrm
         let dumb = self.libdrm.create_dumb_buffer(1920, 1080, 32);
@@ -765,7 +780,10 @@ impl SovereignGraphicsDisplayV86MasterSuiteEngine {
 
         // 6. Vulkan
         let mesh = self.vulkan.dispatch_mesh_tasks(4, 4);
-        audit.insert("Vulkan 1.3/1.4 Mesh Task Dispatch Functional V86", mesh == 16);
+        audit.insert(
+            "Vulkan 1.3/1.4 Mesh Task Dispatch Functional V86",
+            mesh == 16,
+        );
 
         // 7. OpenGL
         let comp = self.opengl.dispatch_compute(8, 8, 1);
@@ -773,7 +791,10 @@ impl SovereignGraphicsDisplayV86MasterSuiteEngine {
 
         // 8. Weston
         self.weston.schedule_repaint();
-        audit.insert("Weston Repaint Scheduler Functional V86", self.weston.repaint_pending);
+        audit.insert(
+            "Weston Repaint Scheduler Functional V86",
+            self.weston.repaint_pending,
+        );
 
         // 9. Sway
         let split = self.sway.split_container(1, true);
@@ -781,7 +802,10 @@ impl SovereignGraphicsDisplayV86MasterSuiteEngine {
 
         // 10. wlroots
         self.wlroots.add_damage(0, 0, 100, 100);
-        audit.insert("wlroots Damage Ring Functional V86", !self.wlroots.damage_rects.is_empty());
+        audit.insert(
+            "wlroots Damage Ring Functional V86",
+            !self.wlroots.damage_rects.is_empty(),
+        );
 
         // 11. Mutter
         let px = self.mutter.scale_geometry(100.0);
@@ -789,11 +813,17 @@ impl SovereignGraphicsDisplayV86MasterSuiteEngine {
 
         // 12. KWin
         let (kw_w, kw_h) = self.kwin.compute_decorated_extents(800, 600);
-        audit.insert("KWin Decorated Window Geometry Functional V86", kw_w == 832 && kw_h == 660);
+        audit.insert(
+            "KWin Decorated Window Geometry Functional V86",
+            kw_w == 832 && kw_h == 660,
+        );
 
         // 13. Compiz
         self.compiz.rotate_cube(0.5);
-        audit.insert("Compiz 3D Cube Rotation Functional V86", self.compiz.cube_angle_rad > 0.0);
+        audit.insert(
+            "Compiz 3D Cube Rotation Functional V86",
+            self.compiz.cube_angle_rad > 0.0,
+        );
 
         // 14. Picom
         let corner = self.picom.is_inside_rounded_corner(50, 50, 100, 100);
@@ -801,11 +831,17 @@ impl SovereignGraphicsDisplayV86MasterSuiteEngine {
 
         // 15. Xwayland
         self.xwayland.set_clipboard("Wayland Paste V86");
-        audit.insert("Xwayland Clipboard Selection Bridge Functional V86", self.xwayland.clipboard_text == "Wayland Paste V86");
+        audit.insert(
+            "Xwayland Clipboard Selection Bridge Functional V86",
+            self.xwayland.clipboard_text == "Wayland Paste V86",
+        );
 
         // 16. evdev
         self.evdev.update_slot_position(0, 100, 200);
-        audit.insert("evdev Multitouch Slot Tracker Functional V86", self.evdev.slots[0] == (100, 200));
+        audit.insert(
+            "evdev Multitouch Slot Tracker Functional V86",
+            self.evdev.slots[0] == (100, 200),
+        );
 
         // 17. libinput
         let palm = self.libinput.is_palm_touch(10, 1000);
@@ -813,7 +849,10 @@ impl SovereignGraphicsDisplayV86MasterSuiteEngine {
 
         // 18. Framebuffer
         self.fbdev.draw_pixel(10, 10, 0xFF00FF00);
-        audit.insert("Console Framebuffer ARGB Pixel Drawing Functional V86", self.fbdev.buffer[10 * 2560 + 10] == 0xFF00FF00);
+        audit.insert(
+            "Console Framebuffer ARGB Pixel Drawing Functional V86",
+            self.fbdev.buffer[10 * 2560 + 10] == 0xFF00FF00,
+        );
 
         // 19. Virtual Terminal
         let vt_ok = self.vt.switch_vt(3);
@@ -845,26 +884,106 @@ impl SovereignGraphicsDisplayV86PrGatewayEngine {
 
     fn bootstrap_v86_prs(&mut self) {
         let prs = vec![
-            (1, "X11 DRI3/XRandR 1.5 Protocol Enhancements V86", GraphicsDisplayV86PrCategory::X11ServerExtensionsAndMultipointer),
-            (2, "Wayland Color Management v4 and Tearing Protocol V86", GraphicsDisplayV86PrCategory::WaylandCoreSubsurfacesAndColorManagement),
-            (3, "Mesa Gallium3D ACO Wave64 Optimization Pass V86", GraphicsDisplayV86PrCategory::MesaEglGallium3dAcoAndZinkTranslation),
-            (4, "DRM/KMS Atomic Modesetting and VRR Sync Matrix V86", GraphicsDisplayV86PrCategory::DrmKmsAtomicModesettingVrrAndCtm),
-            (5, "libdrm Dumb Buffer and Ioctl Probe Gate V86", GraphicsDisplayV86PrCategory::LibdrmUserlandIoctlAndDumbBuffers),
-            (6, "Vulkan 1.4 Task/Mesh Shading and Ray Tracing Suite V86", GraphicsDisplayV86PrCategory::Vulkan13And14MeshShadingAndRayTracing),
-            (7, "OpenGL 4.6 Compute Shader and GLSL Pipeline V86", GraphicsDisplayV86PrCategory::OpenGl46GlslAndComputeShaderContext),
-            (8, "Weston Shell Repaint Scheduler and Blitting Engine V86", GraphicsDisplayV86PrCategory::WestonReferenceShellAndRepaintScheduler),
-            (9, "Sway Dynamic Container Tiling and IPC Gateway V86", GraphicsDisplayV86PrCategory::SwayDynamicTilingAndIpcEngine),
-            (10, "wlroots Damage Ring and Seat Multi-Device Router V86", GraphicsDisplayV86PrCategory::WlrootsModularBackendAndSeatDispatcher),
-            (11, "Mutter Clutter Scene Graph and Fractional Scale V86", GraphicsDisplayV86PrCategory::MutterClutterSceneGraphAndFractionalScaling),
-            (12, "KWin Plasma Blur Effects and Window Decoration V86", GraphicsDisplayV86PrCategory::KWinPlasmaCompositorBlurAndDecorations),
-            (13, "Compiz 3D Cube Projection and Spring Physics V86", GraphicsDisplayV86PrCategory::Compiz3dCubeAndWobblyWindowPhysics),
-            (14, "Picom Vsync Backend and Dual-Kawase Multi-Blur V86", GraphicsDisplayV86PrCategory::PicomX11VsyncAndDualKawaseBlur),
-            (15, "Xwayland Glamor 2D-over-3D and Clipboard Sync V86", GraphicsDisplayV86PrCategory::XwaylandGlamor2dAndClipboardBridge),
-            (16, "evdev Multitouch Slot Tracker and Rumble Output V86", GraphicsDisplayV86PrCategory::EvdevMultitouchSlotTrackerAndRumble),
-            (17, "libinput Gesture Recognition and Accel Curves V86", GraphicsDisplayV86PrCategory::LibinputGesturePalmRejectionAndAccel),
-            (18, "Console Framebuffer fbdev Pixel and Glyph Engine V86", GraphicsDisplayV86PrCategory::ConsoleFramebufferFbdevAndPsfGlyph),
-            (19, "Virtual Terminal VT_ACTIVATE Matrix and ANSI Parser V86", GraphicsDisplayV86PrCategory::VirtualTerminalWsconsMatrixAndIoctls),
-            (20, "COSMIC Smithay Rust Wayland Applet Router V86", GraphicsDisplayV86PrCategory::CosmicSmithayFrameworkAndAppletRouter),
+            (
+                1,
+                "X11 DRI3/XRandR 1.5 Protocol Enhancements V86",
+                GraphicsDisplayV86PrCategory::X11ServerExtensionsAndMultipointer,
+            ),
+            (
+                2,
+                "Wayland Color Management v4 and Tearing Protocol V86",
+                GraphicsDisplayV86PrCategory::WaylandCoreSubsurfacesAndColorManagement,
+            ),
+            (
+                3,
+                "Mesa Gallium3D ACO Wave64 Optimization Pass V86",
+                GraphicsDisplayV86PrCategory::MesaEglGallium3dAcoAndZinkTranslation,
+            ),
+            (
+                4,
+                "DRM/KMS Atomic Modesetting and VRR Sync Matrix V86",
+                GraphicsDisplayV86PrCategory::DrmKmsAtomicModesettingVrrAndCtm,
+            ),
+            (
+                5,
+                "libdrm Dumb Buffer and Ioctl Probe Gate V86",
+                GraphicsDisplayV86PrCategory::LibdrmUserlandIoctlAndDumbBuffers,
+            ),
+            (
+                6,
+                "Vulkan 1.4 Task/Mesh Shading and Ray Tracing Suite V86",
+                GraphicsDisplayV86PrCategory::Vulkan13And14MeshShadingAndRayTracing,
+            ),
+            (
+                7,
+                "OpenGL 4.6 Compute Shader and GLSL Pipeline V86",
+                GraphicsDisplayV86PrCategory::OpenGl46GlslAndComputeShaderContext,
+            ),
+            (
+                8,
+                "Weston Shell Repaint Scheduler and Blitting Engine V86",
+                GraphicsDisplayV86PrCategory::WestonReferenceShellAndRepaintScheduler,
+            ),
+            (
+                9,
+                "Sway Dynamic Container Tiling and IPC Gateway V86",
+                GraphicsDisplayV86PrCategory::SwayDynamicTilingAndIpcEngine,
+            ),
+            (
+                10,
+                "wlroots Damage Ring and Seat Multi-Device Router V86",
+                GraphicsDisplayV86PrCategory::WlrootsModularBackendAndSeatDispatcher,
+            ),
+            (
+                11,
+                "Mutter Clutter Scene Graph and Fractional Scale V86",
+                GraphicsDisplayV86PrCategory::MutterClutterSceneGraphAndFractionalScaling,
+            ),
+            (
+                12,
+                "KWin Plasma Blur Effects and Window Decoration V86",
+                GraphicsDisplayV86PrCategory::KWinPlasmaCompositorBlurAndDecorations,
+            ),
+            (
+                13,
+                "Compiz 3D Cube Projection and Spring Physics V86",
+                GraphicsDisplayV86PrCategory::Compiz3dCubeAndWobblyWindowPhysics,
+            ),
+            (
+                14,
+                "Picom Vsync Backend and Dual-Kawase Multi-Blur V86",
+                GraphicsDisplayV86PrCategory::PicomX11VsyncAndDualKawaseBlur,
+            ),
+            (
+                15,
+                "Xwayland Glamor 2D-over-3D and Clipboard Sync V86",
+                GraphicsDisplayV86PrCategory::XwaylandGlamor2dAndClipboardBridge,
+            ),
+            (
+                16,
+                "evdev Multitouch Slot Tracker and Rumble Output V86",
+                GraphicsDisplayV86PrCategory::EvdevMultitouchSlotTrackerAndRumble,
+            ),
+            (
+                17,
+                "libinput Gesture Recognition and Accel Curves V86",
+                GraphicsDisplayV86PrCategory::LibinputGesturePalmRejectionAndAccel,
+            ),
+            (
+                18,
+                "Console Framebuffer fbdev Pixel and Glyph Engine V86",
+                GraphicsDisplayV86PrCategory::ConsoleFramebufferFbdevAndPsfGlyph,
+            ),
+            (
+                19,
+                "Virtual Terminal VT_ACTIVATE Matrix and ANSI Parser V86",
+                GraphicsDisplayV86PrCategory::VirtualTerminalWsconsMatrixAndIoctls,
+            ),
+            (
+                20,
+                "COSMIC Smithay Rust Wayland Applet Router V86",
+                GraphicsDisplayV86PrCategory::CosmicSmithayFrameworkAndAppletRouter,
+            ),
         ];
 
         for (id, title, cat) in prs {

@@ -36,7 +36,9 @@ fn test_alsa_advancements_integration_v94() {
 #[test]
 fn test_oss4_advancements_integration_v94() {
     let mut oss = SovereignOss4EngineV94::new("/dev/dsp1");
-    let count = oss.parse_sndstat("Installed devices:\npcm0: <Realtek ALC892>\npcm1: <USB Audio DAC>\ndsp1: <OSS Direct>");
+    let count = oss.parse_sndstat(
+        "Installed devices:\npcm0: <Realtek ALC892>\npcm1: <USB Audio DAC>\ndsp1: <OSS Direct>",
+    );
     assert_eq!(count, 3);
 
     oss.configure_dsp_format("AFMT_S32_LE", 192000, 8192);
@@ -89,7 +91,9 @@ fn test_pipewire_advancements_integration_v94() {
     assert_eq!(pw.quantum_frames, 128);
 
     pw.add_wireplumber_rule("50-alsa-config.lua");
-    assert!(pw.wireplumber_rules.contains(&"50-alsa-config.lua".to_string()));
+    assert!(pw
+        .wireplumber_rules
+        .contains(&"50-alsa-config.lua".to_string()));
 
     assert!(pw.set_eq_band_gain(5, 6.0).is_ok());
     assert_eq!(pw.filter_chain_eq_bands_db[5], 6.0);
@@ -113,7 +117,9 @@ fn test_jack_advancements_integration_v94() {
     jack.connect_ports("system:playback_1", "SigmaJack:in_1");
     assert_eq!(jack.connected_port_pairs.len(), 1);
 
-    let sysex_valid = vec![0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7];
+    let sysex_valid = vec![
+        0xF0, 0x41, 0x10, 0x42, 0x12, 0x40, 0x00, 0x7F, 0x00, 0x41, 0xF7,
+    ];
     assert!(jack.push_sysex_msg(&sysex_valid).is_ok());
     assert_eq!(jack.sysex_queue.len(), 1);
 
@@ -271,7 +277,7 @@ fn test_master_suite_and_pr_gateway_integration_v94() {
     let custom_pr = gateway.submit_pr(
         "Low-Latency Opus RTP Packetizer with PTP Timestamping",
         "PulseAudio",
-        "pqc_dilithium5_custom_sig"
+        "pqc_dilithium5_custom_sig",
     );
     assert_eq!(custom_pr, 12);
     assert_eq!(gateway.submissions.len(), 12);

@@ -606,7 +606,8 @@ mod tests {
     fn test_dual_quaternion_skinning_v75() {
         let engine = AnicraftMultiBoneDqsSkinningPrEngineV75::new();
         let dq1 = DualQuaternionV75::IDENTITY;
-        let dq2 = DualQuaternionV75::from_rotation_translation(0.5, (0.0, 0.0, 1.0), (1.0, 0.0, 0.0));
+        let dq2 =
+            DualQuaternionV75::from_rotation_translation(0.5, (0.0, 0.0, 1.0), (1.0, 0.0, 0.0));
         let blended = engine.blend_dual_quaternions(&[dq1, dq2], &[0.5, 0.5]);
         assert!(blended.real[0] > 0.0);
     }

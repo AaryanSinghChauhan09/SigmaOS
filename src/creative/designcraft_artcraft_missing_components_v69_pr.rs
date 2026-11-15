@@ -82,7 +82,11 @@ impl DesigncraftAiDesignTokenLinterAndSemanticMapperV69PrEngine {
     }
 
     pub fn lint_tokens(&self) -> (usize, usize) {
-        let passed = self.registered_tokens.iter().filter(|t| t.is_accessible).count();
+        let passed = self
+            .registered_tokens
+            .iter()
+            .filter(|t| t.is_accessible)
+            .count();
         let total = self.registered_tokens.len();
         (passed, total)
     }
@@ -90,7 +94,9 @@ impl DesigncraftAiDesignTokenLinterAndSemanticMapperV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6911,
-            pr_title: "feat(designcraft): Add AI Design Token Linter & Semantic Palette Mapper Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add AI Design Token Linter & Semantic Palette Mapper Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Design Token System Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Design Token Studio".to_string(),
             components_added: vec![
@@ -98,7 +104,8 @@ impl DesigncraftAiDesignTokenLinterAndSemanticMapperV69PrEngine {
                 "ColorContrastLinterEngine".to_string(),
                 "DarkLightModePairingSynthesizer".to_string(),
             ],
-            performance_multiplier: "14.2x Faster Token Coverage & Accessibility Linting".to_string(),
+            performance_multiplier: "14.2x Faster Token Coverage & Accessibility Linting"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -169,7 +176,9 @@ impl DesigncraftCrdtMultiUserBranchAndMergeSyncV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6912,
-            pr_title: "feat(designcraft): Add Real-Time CRDT Multi-User Branch & Merge Vector Sync Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add Real-Time CRDT Multi-User Branch & Merge Vector Sync Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft CRDT Collaboration Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Collaborative Canvas Studio".to_string(),
             components_added: vec![
@@ -233,17 +242,23 @@ impl DesigncraftVariableFontGlyphAxisSynthesizerV69PrEngine {
     pub fn interpolate_glyph_metrics(&self, factor: f32) -> FontVariationCoordsV69 {
         let f = factor.clamp(0.0, 1.0);
         FontVariationCoordsV69 {
-            weight_wght: self.default_coords.weight_wght + (self.active_coords.weight_wght - self.default_coords.weight_wght) * f,
-            width_wdth: self.default_coords.width_wdth + (self.active_coords.width_wdth - self.default_coords.width_wdth) * f,
-            slant_slnt: self.default_coords.slant_slnt + (self.active_coords.slant_slnt - self.default_coords.slant_slnt) * f,
-            optical_size_opsz: self.default_coords.optical_size_opsz + (self.active_coords.optical_size_opsz - self.default_coords.optical_size_opsz) * f,
+            weight_wght: self.default_coords.weight_wght
+                + (self.active_coords.weight_wght - self.default_coords.weight_wght) * f,
+            width_wdth: self.default_coords.width_wdth
+                + (self.active_coords.width_wdth - self.default_coords.width_wdth) * f,
+            slant_slnt: self.default_coords.slant_slnt
+                + (self.active_coords.slant_slnt - self.default_coords.slant_slnt) * f,
+            optical_size_opsz: self.default_coords.optical_size_opsz
+                + (self.active_coords.optical_size_opsz - self.default_coords.optical_size_opsz)
+                    * f,
         }
     }
 
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6913,
-            pr_title: "feat(designcraft): Add OpenType Variable Font Glyph Axis Synthesizer Engine".to_string(),
+            pr_title: "feat(designcraft): Add OpenType Variable Font Glyph Axis Synthesizer Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Typography & Text Layout Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Font Engineering Studio".to_string(),
             components_added: vec![
@@ -312,7 +327,9 @@ impl DesigncraftSubpixelSdfVectorPenToolBooleanV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6914,
-            pr_title: "feat(designcraft): Add Subpixel SDF Vector Pen Tool & Boolean Geometry Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add Subpixel SDF Vector Pen Tool & Boolean Geometry Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Vector Geometry Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Vector Drawing Studio".to_string(),
             components_added: vec![
@@ -383,7 +400,8 @@ impl DesigncraftReactiveComponentVariantStateMachineV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6915,
-            pr_title: "feat(designcraft): Add Reactive Component Variant State Machine Engine".to_string(),
+            pr_title: "feat(designcraft): Add Reactive Component Variant State Machine Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Interactive Prototyping Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Interactive Components Studio".to_string(),
             components_added: vec![
@@ -451,7 +469,9 @@ impl DesigncraftWcagAccessibleFocusOrderAndAriaTaggingV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6916,
-            pr_title: "feat(designcraft): Add WCAG Accessible Focus Order & ARIA Semantic Tagging Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add WCAG Accessible Focus Order & ARIA Semantic Tagging Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Accessibility & WCAG Compliance Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Accessibility Studio".to_string(),
             components_added: vec![
@@ -532,7 +552,8 @@ impl DesigncraftMultiPlatformDesignTokenTranspilerV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6917,
-            pr_title: "feat(designcraft): Add Multi-Platform Design Token Transpiler Engine".to_string(),
+            pr_title: "feat(designcraft): Add Multi-Platform Design Token Transpiler Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Code Generation Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Code Transpiler Studio".to_string(),
             components_added: vec![
@@ -591,7 +612,8 @@ impl DesigncraftMicroInteractionSpringPhysicsTimelineV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6918,
-            pr_title: "feat(designcraft): Add Micro-Interaction Spring Physics Timeline Engine".to_string(),
+            pr_title: "feat(designcraft): Add Micro-Interaction Spring Physics Timeline Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Animation & Motion Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Motion Physics Studio".to_string(),
             components_added: vec![
@@ -599,7 +621,8 @@ impl DesigncraftMicroInteractionSpringPhysicsTimelineV69PrEngine {
                 "TimelineKeyframeInterpolator".to_string(),
                 "VelocityContinuationController".to_string(),
             ],
-            performance_multiplier: "25.0x 120fps Real-Time Micro-Interaction Motion Solver".to_string(),
+            performance_multiplier: "25.0x 120fps Real-Time Micro-Interaction Motion Solver"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -639,7 +662,11 @@ impl DesigncraftSmartLayoutDynamicGridAutoReflowV69PrEngine {
     }
 
     pub fn add_item(&mut self, item_id: u32, width: f32, height: f32) {
-        self.items.push(GridItemSpecV69 { item_id, width, height });
+        self.items.push(GridItemSpecV69 {
+            item_id,
+            width,
+            height,
+        });
     }
 
     pub fn compute_reflow_rows(&self, container_width: f32) -> usize {
@@ -669,7 +696,8 @@ impl DesigncraftSmartLayoutDynamicGridAutoReflowV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6919,
-            pr_title: "feat(designcraft): Add Smart Layout Dynamic Grid & Auto-Reflow Engine".to_string(),
+            pr_title: "feat(designcraft): Add Smart Layout Dynamic Grid & Auto-Reflow Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Auto-Layout Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Responsive Layout Studio".to_string(),
             components_added: vec![
@@ -728,7 +756,8 @@ impl DesigncraftSpatial3dCanvasHapticFeedbackProjectionV69PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV69PrProposalManifest {
         DesigncraftV69PrProposalManifest {
             pr_id: 6920,
-            pr_title: "feat(designcraft): Add Spatial 3D Canvas Haptic Feedback Projection Engine".to_string(),
+            pr_title: "feat(designcraft): Add Spatial 3D Canvas Haptic Feedback Projection Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Spatial & Immersive Canvas Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Spatial Canvas Studio".to_string(),
             components_added: vec![
@@ -774,12 +803,14 @@ impl SovereignDesigncraftArtcraftMissingComponentsV69PrGateway {
             crdt_branch_merge: DesigncraftCrdtMultiUserBranchAndMergeSyncV69PrEngine::new(),
             variable_font_axis: DesigncraftVariableFontGlyphAxisSynthesizerV69PrEngine::new(),
             sdf_pen_tool: DesigncraftSubpixelSdfVectorPenToolBooleanV69PrEngine::new(0.5),
-            reactive_state_machine: DesigncraftReactiveComponentVariantStateMachineV69PrEngine::new(),
+            reactive_state_machine: DesigncraftReactiveComponentVariantStateMachineV69PrEngine::new(
+            ),
             wcag_focus_aria: DesigncraftWcagAccessibleFocusOrderAndAriaTaggingV69PrEngine::new(),
             token_transpiler: DesigncraftMultiPlatformDesignTokenTranspilerV69PrEngine::new(),
             spring_physics: DesigncraftMicroInteractionSpringPhysicsTimelineV69PrEngine::new(),
             smart_layout_grid: DesigncraftSmartLayoutDynamicGridAutoReflowV69PrEngine::new(8.0),
-            spatial_haptic_projection: DesigncraftSpatial3dCanvasHapticFeedbackProjectionV69PrEngine::new(),
+            spatial_haptic_projection:
+                DesigncraftSpatial3dCanvasHapticFeedbackProjectionV69PrEngine::new(),
         }
     }
 

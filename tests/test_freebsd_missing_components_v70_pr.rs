@@ -79,7 +79,11 @@ fn test_integration_freebsd_v70_all_engines() {
 
     // 10. FreeBSD Update Dilithium-5
     let mut updater = FreeBsdFreebsdUpdateDilithium5PqcPackageSignerEngine::new();
-    let d10 = updater.sign_and_verify_package_manifest("16.0-RELEASE", "sha256_hash", "pqc_dilithium5_pubkey");
+    let d10 = updater.sign_and_verify_package_manifest(
+        "16.0-RELEASE",
+        "sha256_hash",
+        "pqc_dilithium5_pubkey",
+    );
     assert!(d10.contains("--verify-dilithium5"));
     assert!(updater.signature_registry.contains_key("16.0-RELEASE"));
 }

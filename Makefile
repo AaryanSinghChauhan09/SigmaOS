@@ -25,7 +25,7 @@ fmt-fix:
 
 fmt:
 	@echo "==> Verifying code formatting..."
-	$(CARGO) fmt --check || true
+	$(CARGO) fmt --check
 
 # Backwards-compatible alias (kept for scripts / CI references)
 format: fmt
@@ -132,7 +132,7 @@ run-stub: iso-stub
 
 # 10. Launch readiness check (INSTRUMENTATION + FAIL-FAST)
 launch-check:
-	@bash scripts/check_launch_ready.sh || true
+	@bash scripts/check_launch_ready.sh
 
 # 11. Interactive OS launch & workstation dashboard (READY TO WORK & LAUNCH)
 launch: bin/sigmaos

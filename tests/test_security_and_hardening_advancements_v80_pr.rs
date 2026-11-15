@@ -22,14 +22,11 @@ fn test_integration_security_and_hardening_v80_proposals() {
         proposals[0].title,
         "Linux Access Control, Sandboxing & Mandatory Policy Parity (v80)"
     );
-    assert_eq!(
-        proposals[0].target_subsystem,
-        "Security / Linux Sandboxing"
-    );
+    assert_eq!(proposals[0].target_subsystem, "Security / Linux Sandboxing");
     assert_eq!(proposals[0].status, "Ready for Merge");
-    assert!(proposals[0].components_implemented.contains(
-        &String::from("SELinux v39 AVC Decision Engine & Multilevel Security Contexts")
-    ));
+    assert!(proposals[0].components_implemented.contains(&String::from(
+        "SELinux v39 AVC Decision Engine & Multilevel Security Contexts"
+    )));
 
     // PR #9042: BSD Hardening & Isolation
     assert_eq!(proposals[1].pr_id, 9042);
@@ -82,37 +79,42 @@ fn test_integration_linux_access_control_sub_engine() {
     let engine = LinuxAccessControlAndSandboxingV80Engine::new();
 
     // Landlock access check
-    assert!(LinuxAccessControlAndSandboxingV80Engine::check_landlock_access(
-        0b1111, 0b0011
-    ));
-    assert!(!LinuxAccessControlAndSandboxingV80Engine::check_landlock_access(
-        0b0001, 0b0011
-    ));
+    assert!(LinuxAccessControlAndSandboxingV80Engine::check_landlock_access(0b1111, 0b0011));
+    assert!(!LinuxAccessControlAndSandboxingV80Engine::check_landlock_access(0b0001, 0b0011));
 
     // SELinux context formatting & AVC evaluation
     let scontext = LinuxAccessControlAndSandboxingV80Engine::format_selinux_context(
-        "system_u", "system_r", "httpd_t", "s0"
+        "system_u", "system_r", "httpd_t", "s0",
     );
     assert_eq!(scontext, "system_u:system_r:httpd_t:s0");
 
     let tcontext = "system_u:object_r:httpd_sys_content_t:s0";
     assert!(engine.evaluate_selinux_avc(&scontext, tcontext, "file", "read"));
     assert!(engine.evaluate_selinux_avc(&scontext, tcontext, "file", "open"));
-    assert!(!engine.evaluate_selinux_avc(&scontext, "system_u:object_r:shadow_t:s0", "file", "read"));
+    assert!(!engine.evaluate_selinux_avc(
+        &scontext,
+        "system_u:object_r:shadow_t:s0",
+        "file",
+        "read"
+    ));
 
     // Landlock network port access
-    assert!(LinuxAccessControlAndSandboxingV80Engine::check_landlock_net_port_access(
-        &[80, 443],
-        80,
-        true,
-        0x01
-    ));
-    assert!(!LinuxAccessControlAndSandboxingV80Engine::check_landlock_net_port_access(
-        &[80, 443],
-        22,
-        true,
-        0x01
-    ));
+    assert!(
+        LinuxAccessControlAndSandboxingV80Engine::check_landlock_net_port_access(
+            &[80, 443],
+            80,
+            true,
+            0x01
+        )
+    );
+    assert!(
+        !LinuxAccessControlAndSandboxingV80Engine::check_landlock_net_port_access(
+            &[80, 443],
+            22,
+            true,
+            0x01
+        )
+    );
 
     // AppArmor path profile
     assert!(engine.matches_apparmor_path_profile("/etc/ssl/cert.pem", "/etc/ssl/*"));
@@ -121,10 +123,12 @@ fn test_integration_linux_access_control_sub_engine() {
 
     // Seccomp BPF & cgroups
     assert!(LinuxAccessControlAndSandboxingV80Engine::validate_seccomp_bpf_arch(0xC000003E));
-    assert!(LinuxAccessControlAndSandboxingV80Engine::is_cgroup_controller_enabled(
-        "cpu memory io pids cpuset",
-        "pids"
-    ));
+    assert!(
+        LinuxAccessControlAndSandboxingV80Engine::is_cgroup_controller_enabled(
+            "cpu memory io pids cpuset",
+            "pids"
+        )
+    );
     assert_eq!(engine.evaluate_seccomp_bpf(0, &[0, 1, 2]), 3);
     assert_eq!(engine.evaluate_seccomp_bpf(59, &[0, 1, 2]), 0);
 
@@ -147,20 +151,42 @@ fn test_integration_bsd_hardening_sub_engine() {
     ));
 
     let unveil_table = [("/usr", "rx"), ("/var/log", "rw"), ("/tmp", "rwc")];
-    assert!(BsdHardeningAndIsolationV80Engine::check_unveil_access(&unveil_table, "/usr/bin/tar", 'x'));
-    assert!(BsdHardeningAndIsolationV80Engine::check_unveil_access(&unveil_table, "/var/log/messages", 'w'));
-    assert!(!BsdHardeningAndIsolationV80Engine::check_unveil_access(&unveil_table, "/usr/bin/tar", 'w'));
+    assert!(BsdHardeningAndIsolationV80Engine::check_unveil_access(
+        &unveil_table,
+        "/usr/bin/tar",
+        'x'
+    ));
+    assert!(BsdHardeningAndIsolationV80Engine::check_unveil_access(
+        &unveil_table,
+        "/var/log/messages",
+        'w'
+    ));
+    assert!(!BsdHardeningAndIsolationV80Engine::check_unveil_access(
+        &unveil_table,
+        "/usr/bin/tar",
+        'w'
+    ));
 
     // FreeBSD Jails & Capsicum
     assert!(BsdHardeningAndIsolationV80Engine::evaluate_freebsd_jail_perm(true, 0, "raw_socket"));
     assert!(!BsdHardeningAndIsolationV80Engine::evaluate_freebsd_jail_perm(false, 0, "raw_socket"));
-    assert!(BsdHardeningAndIsolationV80Engine::check_capsicum_rights(0x7F, 0x07));
+    assert!(BsdHardeningAndIsolationV80Engine::check_capsicum_rights(
+        0x7F, 0x07
+    ));
 
     // MAC Biba integrity & BSD securelevel
-    assert!(BsdHardeningAndIsolationV80Engine::evaluate_mac_biba_rule(3, 2, "read")); // read down allowed
-    assert!(!BsdHardeningAndIsolationV80Engine::evaluate_mac_biba_rule(1, 2, "read")); // read up denied
-    assert!(BsdHardeningAndIsolationV80Engine::evaluate_mac_biba_rule(1, 3, "write")); // write up allowed
-    assert!(!BsdHardeningAndIsolationV80Engine::evaluate_mac_biba_rule(3, 1, "write")); // write down denied
+    assert!(BsdHardeningAndIsolationV80Engine::evaluate_mac_biba_rule(
+        3, 2, "read"
+    )); // read down allowed
+    assert!(!BsdHardeningAndIsolationV80Engine::evaluate_mac_biba_rule(
+        1, 2, "read"
+    )); // read up denied
+    assert!(BsdHardeningAndIsolationV80Engine::evaluate_mac_biba_rule(
+        1, 3, "write"
+    )); // write up allowed
+    assert!(!BsdHardeningAndIsolationV80Engine::evaluate_mac_biba_rule(
+        3, 1, "write"
+    )); // write down denied
 
     assert!(!BsdHardeningAndIsolationV80Engine::check_securelevel_allow_mod(1, "kldload"));
     assert!(!BsdHardeningAndIsolationV80Engine::check_securelevel_allow_mod(2, "disk_raw_write"));
@@ -170,7 +196,8 @@ fn test_integration_bsd_hardening_sub_engine() {
 #[test]
 fn test_integration_audit_intrusion_sub_engine() {
     // auditd formatting
-    let ev = AuditAndIntrusionPreventionV80Engine::format_audit_event("SYSCALL", 5432, "sshd", 0, true);
+    let ev =
+        AuditAndIntrusionPreventionV80Engine::format_audit_event("SYSCALL", 5432, "sshd", 0, true);
     assert!(ev.contains("type=SYSCALL"));
     assert!(ev.contains("comm=\"sshd\""));
 
@@ -210,7 +237,8 @@ fn test_integration_antivirus_crypto_identity_sub_engines() {
     assert!(!crypto_engine.scan_clamav_signature(b"CLEAN_PAYLOAD_HERE", b"MALWARE_STRING"));
 
     // GnuPG armor
-    let pgp_armor = "-----BEGIN PGP SIGNATURE-----\niQEzBAEBCAAdFiEE...\n-----END PGP SIGNATURE-----";
+    let pgp_armor =
+        "-----BEGIN PGP SIGNATURE-----\niQEzBAEBCAAdFiEE...\n-----END PGP SIGNATURE-----";
     assert!(crypto_engine.parse_gnupg_ascii_armor(pgp_armor));
 
     // TPM 2.0 PCR extend & quote

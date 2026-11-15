@@ -139,7 +139,9 @@ pub fn order_mounts(mounts: &[MountEntry]) -> Vec<MountEntry> {
                 1 + (m.mountpoint.matches('/').count().min(2) as u8)
             }
         };
-        rank(a).cmp(&rank(b)).then_with(|| a.mountpoint.cmp(&b.mountpoint))
+        rank(a)
+            .cmp(&rank(b))
+            .then_with(|| a.mountpoint.cmp(&b.mountpoint))
     });
     ordered
 }
@@ -300,14 +302,19 @@ mod tests {
         };
 
         // missing root
-        let no_root = MountEntry { mountpoint: "/boot".to_string(), pass: 2, ..base.clone() };
-        assert_eq!(
-            validate_mounts(&[no_root]),
-            Err(FstabError::MissingRoot)
-        );
+        let no_root = MountEntry {
+            mountpoint: "/boot".to_string(),
+            pass: 2,
+            ..base.clone()
+        };
+        assert_eq!(validate_mounts(&[no_root]), Err(FstabError::MissingRoot));
 
         // duplicate mountpoint
-        let dup = MountEntry { mountpoint: "/".to_string(), pass: 2, ..base.clone() };
+        let dup = MountEntry {
+            mountpoint: "/".to_string(),
+            pass: 2,
+            ..base.clone()
+        };
         assert!(matches!(
             validate_mounts(&[base.clone(), dup]),
             Err(FstabError::DuplicateMountpoint(_))
@@ -320,11 +327,20 @@ mod tests {
             pass: 1,
             ..base.clone()
         };
-        assert_eq!(validate_mounts(&[base.clone(), bad_swap]), Err(FstabError::SwapWithPass));
+        assert_eq!(
+            validate_mounts(&[base.clone(), bad_swap]),
+            Err(FstabError::SwapWithPass)
+        );
 
         // invalid pass value
-        let bad_pass = MountEntry { pass: 9, ..base.clone() };
-        assert_eq!(validate_mounts(&[bad_pass]), Err(FstabError::InvalidPass(9)));
+        let bad_pass = MountEntry {
+            pass: 9,
+            ..base.clone()
+        };
+        assert_eq!(
+            validate_mounts(&[bad_pass]),
+            Err(FstabError::InvalidPass(9))
+        );
     }
 
     #[test]

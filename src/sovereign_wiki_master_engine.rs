@@ -173,10 +173,12 @@ impl Sovereign100IdeasSuite {
         });
         self.ideas.push(ImprovementIdeaRecord {
             id: 26,
-            name: "SigmaOS Signal Development and Maintenance Plan & 19-PR Gateway Suite".to_string(),
+            name: "SigmaOS Signal Development and Maintenance Plan & 19-PR Gateway Suite"
+                .to_string(),
             category: IdeaCategory::PerformanceAndKernel,
             legacy_counterparts: "POSIX.1-2024, Linux Signals, FreeBSD Signals".to_string(),
-            implementation_module: "src/signal/sovereign_signal_development_and_pr_suite.rs".to_string(),
+            implementation_module: "src/signal/sovereign_signal_development_and_pr_suite.rs"
+                .to_string(),
             is_fulfilled: true,
         });
         self.ideas.push(ImprovementIdeaRecord {

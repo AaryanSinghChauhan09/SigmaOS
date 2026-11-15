@@ -40,15 +40,9 @@ fn test_debian_apt_pqc_dilithium_engine_v74() {
 #[test]
 fn test_debian_debconf_database_state_engine_v74() {
     let mut engine = DebianDebconfDatabaseStateV74PrEngine::new();
-    assert_eq!(
-        engine.get_answer("tzdata/zones"),
-        Some(&"UTC".to_string())
-    );
+    assert_eq!(engine.get_answer("tzdata/zones"), Some(&"UTC".to_string()));
     engine.set_answer("tzdata/zones", "EST");
-    assert_eq!(
-        engine.get_answer("tzdata/zones"),
-        Some(&"EST".to_string())
-    );
+    assert_eq!(engine.get_answer("tzdata/zones"), Some(&"EST".to_string()));
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7412);
 }

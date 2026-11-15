@@ -26,7 +26,9 @@ fn test_integration_ext4_and_xfs_v90() {
     assert_eq!(ext4.tune2fs_calculate_reserved(20000, 5), 1000);
 
     let mut xfs = XfsAdvancementsV90Engine::new(8, 50000);
-    let (ag, bno) = xfs.allocate_lockless_extent(2048).expect("Allocation should succeed");
+    let (ag, bno) = xfs
+        .allocate_lockless_extent(2048)
+        .expect("Allocation should succeed");
     assert_eq!(ag, 0);
     assert_eq!(bno, 0);
 

@@ -251,7 +251,9 @@ impl FilmcraftVolumetricAtmosphericLightingV68PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV68PrProposalManifest {
         FilmcraftV68PrProposalManifest {
             pr_id: 363,
-            pr_title: "feat(filmcraft): Volumetric Atmospheric Lighting & God-Ray Light Shaft Compositor".to_string(),
+            pr_title:
+                "feat(filmcraft): Volumetric Atmospheric Lighting & God-Ray Light Shaft Compositor"
+                    .to_string(),
             target_subsystem: "Atmospheric Lighting & VFX Compositing".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -328,7 +330,9 @@ impl FilmcraftOcioAcesGradingCurvesV68PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV68PrProposalManifest {
         FilmcraftV68PrProposalManifest {
             pr_id: 364,
-            pr_title: "feat(filmcraft): OpenColorIO v2 & ACES v2.0 Color Grading Curves & Log Tone Mapper".to_string(),
+            pr_title:
+                "feat(filmcraft): OpenColorIO v2 & ACES v2.0 Color Grading Curves & Log Tone Mapper"
+                    .to_string(),
             target_subsystem: "HDR Color Science & Grading".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -515,7 +519,8 @@ impl FilmcraftRealtimeGpuParticleFluidPhysicsV68PrEngine {
         for particle in particles.iter_mut() {
             if particle.life_sec > 0.0 {
                 particle.position_xyz.0 += particle.velocity_xyz.0 * delta_time_sec;
-                particle.position_xyz.1 += (particle.velocity_xyz.1 + self.gravity.1) * delta_time_sec;
+                particle.position_xyz.1 +=
+                    (particle.velocity_xyz.1 + self.gravity.1) * delta_time_sec;
                 particle.position_xyz.2 += particle.velocity_xyz.2 * delta_time_sec;
                 particle.life_sec -= delta_time_sec;
             }
@@ -525,7 +530,9 @@ impl FilmcraftRealtimeGpuParticleFluidPhysicsV68PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV68PrProposalManifest {
         FilmcraftV68PrProposalManifest {
             pr_id: 367,
-            pr_title: "feat(filmcraft): Real-Time GPU Particle & Fluid Physics VFX Compositor Engine".to_string(),
+            pr_title:
+                "feat(filmcraft): Real-Time GPU Particle & Fluid Physics VFX Compositor Engine"
+                    .to_string(),
             target_subsystem: "VFX & Particle Physics".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -581,11 +588,11 @@ impl FilmcraftSpatialAmbisonics714ImmersiveMixerV68PrEngine {
         out_714_channels[0] = mono_sample * front_l;
         out_714_channels[1] = mono_sample * front_r;
         out_714_channels[2] = mono_sample * 0.707; // Center
-        out_714_channels[3] = mono_sample * 0.5;   // LFE
+        out_714_channels[3] = mono_sample * 0.5; // LFE
         out_714_channels[4] = mono_sample * (1.0 - front_l); // Side L
         out_714_channels[5] = mono_sample * (1.0 - front_r); // Side R
-        out_714_channels[6] = mono_sample * 0.3;   // Rear L
-        out_714_channels[7] = mono_sample * 0.3;   // Rear R
+        out_714_channels[6] = mono_sample * 0.3; // Rear L
+        out_714_channels[7] = mono_sample * 0.3; // Rear R
         out_714_channels[8] = mono_sample * height_top; // Top Front L
         out_714_channels[9] = mono_sample * height_top; // Top Front R
         out_714_channels[10] = mono_sample * height_top * 0.5; // Top Rear L

@@ -37,8 +37,14 @@ fn test_v21_journald_gateway_and_fss() {
     .with_filter("_SYSTEMD_UNIT", "sigma-diagnostics.service");
 
     gateway.set_cursor("s=1a2b3c4d5e6f");
-    assert_eq!(gateway.cursor_pagination, Some("s=1a2b3c4d5e6f".to_string()));
-    assert_eq!(gateway.field_filters.get("_SYSTEMD_UNIT"), Some(&"sigma-diagnostics.service".to_string()));
+    assert_eq!(
+        gateway.cursor_pagination,
+        Some("s=1a2b3c4d5e6f".to_string())
+    );
+    assert_eq!(
+        gateway.field_filters.get("_SYSTEMD_UNIT"),
+        Some(&"sigma-diagnostics.service".to_string())
+    );
 
     let chunk = gateway.render_sse_chunk(
         "s=1a2b3c4d5e6f",
@@ -69,7 +75,10 @@ fn test_v21_rsyslog_relp_and_queues() {
 
     let frame = RsyslogRelpFrameV21::new(201, "syslog", "Kernel packet dropped on interface eth0");
     let wire = frame.format_relp_wire_protocol();
-    assert_eq!(wire, "201 syslog 39 Kernel packet dropped on interface eth0\n");
+    assert_eq!(
+        wire,
+        "201 syslog 39 Kernel packet dropped on interface eth0\n"
+    );
 
     engine.push_frame(frame);
     assert_eq!(engine.active_frames.len(), 1);
@@ -101,17 +110,32 @@ fn test_v21_bsd_syslogd_routing() {
     let router = BsdSyslogdRouterV21::new();
 
     // Check auth routing
-    assert_eq!(router.route_message("auth", "info"), Some("/var/log/secure".to_string()));
-    assert_eq!(router.route_message("authpriv", "info"), Some("/var/log/secure".to_string()));
+    assert_eq!(
+        router.route_message("auth", "info"),
+        Some("/var/log/secure".to_string())
+    );
+    assert_eq!(
+        router.route_message("authpriv", "info"),
+        Some("/var/log/secure".to_string())
+    );
 
     // Check daemon routing
-    assert_eq!(router.route_message("daemon", "warning"), Some("/var/log/daemon.log".to_string()));
+    assert_eq!(
+        router.route_message("daemon", "warning"),
+        Some("/var/log/daemon.log".to_string())
+    );
 
     // Check mail routing
-    assert_eq!(router.route_message("mail", "crit"), Some("/var/log/maillog".to_string()));
+    assert_eq!(
+        router.route_message("mail", "crit"),
+        Some("/var/log/maillog".to_string())
+    );
 
     // Check wildcard routing to messages
-    assert_eq!(router.route_message("local0", "notice"), Some("/var/log/messages".to_string()));
+    assert_eq!(
+        router.route_message("local0", "notice"),
+        Some("/var/log/messages".to_string())
+    );
 }
 
 #[test]
@@ -123,7 +147,10 @@ fn test_v21_logrotate_manager() {
     assert_eq!(syslog_entry.log_path, "/var/log/syslog");
     assert_eq!(syslog_entry.rotation_interval, "daily");
     assert!(syslog_entry.compress);
-    assert_eq!(syslog_entry.post_rotate_cmd, Some("/usr/lib/rsyslog/rsyslog-rotate".to_string()));
+    assert_eq!(
+        syslog_entry.post_rotate_cmd,
+        Some("/usr/lib/rsyslog/rsyslog-rotate".to_string())
+    );
 
     let nginx_entry = &manager.entries[1];
     assert_eq!(nginx_entry.max_size_mb, 500);
@@ -219,7 +246,9 @@ fn test_v21_hardware_diagnostics_and_smbios() {
     assert!(hw.smbios_tables.iter().any(|t| t.table_type == 38)); // IPMI
 
     // Sosreport safe sanitizer
-    let raw = "user config: pass".to_string() + "word=secret123 with api" + "_key=key999 and Bearer tokenxyz";
+    let raw = "user config: pass".to_string()
+        + "word=secret123 with api"
+        + "_key=key999 and Bearer tokenxyz";
     let sanitized = hw.sosreport.sanitize_content(&raw);
     assert!(sanitized.contains("password=[REDACTED]"));
     assert!(sanitized.contains("api_key=[REDACTED]"));
@@ -235,10 +264,16 @@ fn test_v21_prometheus_node_exporter_and_audit() {
     let gateway = SovereignLoggingDiagnosticsV21PrGatewayEngine::new();
 
     let text = gateway.prometheus_node_exporter.render_exposition_text();
-    assert!(text.contains("node_cpu_seconds_total{instance=\"sigma-node01.internal\",cpu=\"0\",mode=\"idle\"}"));
-    assert!(text.contains("node_memory_MemTotal_bytes{instance=\"sigma-node01.internal\"} 33738977280"));
+    assert!(text.contains(
+        "node_cpu_seconds_total{instance=\"sigma-node01.internal\",cpu=\"0\",mode=\"idle\"}"
+    ));
+    assert!(
+        text.contains("node_memory_MemTotal_bytes{instance=\"sigma-node01.internal\"} 33738977280")
+    );
     assert!(text.contains("node_load1{instance=\"sigma-node01.internal\"} 0.25"));
-    assert!(text.contains("node_disk_read_bytes_total{device=\"nvme0n1\",instance=\"sigma-node01.internal\"}"));
+    assert!(text.contains(
+        "node_disk_read_bytes_total{device=\"nvme0n1\",instance=\"sigma-node01.internal\"}"
+    ));
 
     let diff = gateway.generate_unified_diff();
     assert!(diff.contains("Title: feat(diagnostics): V21"));

@@ -14,9 +14,9 @@
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 /// Document format classification across all office engines
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -185,10 +185,14 @@ impl GenOfficeEngine {
         let prefix = match self.target {
             GenOfficeTarget::Docs => "# Document: Synthesized Knowledge\n\n",
             GenOfficeTarget::Sheet => "ColA,ColB,ColC,Total\n10,20,30,60\n",
-            GenOfficeTarget::Slides => "--- Slide 1: Introduction ---\n--- Slide 2: Architecture ---\n",
+            GenOfficeTarget::Slides => {
+                "--- Slide 1: Introduction ---\n--- Slide 2: Architecture ---\n"
+            }
             GenOfficeTarget::Pdf => "%PDF-1.7\n1 0 obj\n<< /Title (Generated PDF) >>\nendobj\n",
             GenOfficeTarget::Markdown => "# Markdown Spec\n\n- Feature A\n- Feature B\n",
-            GenOfficeTarget::Html => "<!DOCTYPE html><html><body><h1>GenOffice HTML</h1></body></html>",
+            GenOfficeTarget::Html => {
+                "<!DOCTYPE html><html><body><h1>GenOffice HTML</h1></body></html>"
+            }
         };
         self.generated_content = format!("{}{}", prefix, self.prompt_pipeline.join("\n"));
         &self.generated_content
@@ -243,7 +247,8 @@ impl OnlyOfficeServer {
     }
 
     pub fn collaborator_count(&self, token: &str) -> usize {
-        self.sessions.iter()
+        self.sessions
+            .iter()
             .find(|s| s.session_token == token)
             .map(|s| s.active_collaborators.len())
             .unwrap_or(0)
@@ -275,18 +280,45 @@ pub struct LibreOfficeUniversalBridge {
 impl LibreOfficeUniversalBridge {
     pub fn new() -> Self {
         let active_components = alloc::vec![
-            LibreComponent { module: LibreModule::Writer, default_extension: "odt", native_mime: "application/vnd.oasis.opendocument.text" },
-            LibreComponent { module: LibreModule::Calc, default_extension: "ods", native_mime: "application/vnd.oasis.opendocument.spreadsheet" },
-            LibreComponent { module: LibreModule::Impress, default_extension: "odp", native_mime: "application/vnd.oasis.opendocument.presentation" },
-            LibreComponent { module: LibreModule::Draw, default_extension: "odg", native_mime: "application/vnd.oasis.opendocument.graphics" },
-            LibreComponent { module: LibreModule::Math, default_extension: "odf", native_mime: "application/vnd.oasis.opendocument.formula" },
-            LibreComponent { module: LibreModule::Base, default_extension: "odb", native_mime: "application/vnd.oasis.opendocument.database" },
+            LibreComponent {
+                module: LibreModule::Writer,
+                default_extension: "odt",
+                native_mime: "application/vnd.oasis.opendocument.text"
+            },
+            LibreComponent {
+                module: LibreModule::Calc,
+                default_extension: "ods",
+                native_mime: "application/vnd.oasis.opendocument.spreadsheet"
+            },
+            LibreComponent {
+                module: LibreModule::Impress,
+                default_extension: "odp",
+                native_mime: "application/vnd.oasis.opendocument.presentation"
+            },
+            LibreComponent {
+                module: LibreModule::Draw,
+                default_extension: "odg",
+                native_mime: "application/vnd.oasis.opendocument.graphics"
+            },
+            LibreComponent {
+                module: LibreModule::Math,
+                default_extension: "odf",
+                native_mime: "application/vnd.oasis.opendocument.formula"
+            },
+            LibreComponent {
+                module: LibreModule::Base,
+                default_extension: "odb",
+                native_mime: "application/vnd.oasis.opendocument.database"
+            },
         ];
         Self { active_components }
     }
 
     pub fn get_extension(&self, module: LibreModule) -> Option<&'static str> {
-        self.active_components.iter().find(|c| c.module == module).map(|c| c.default_extension)
+        self.active_components
+            .iter()
+            .find(|c| c.module == module)
+            .map(|c| c.default_extension)
     }
 
     pub fn supported_modules_count(&self) -> usize {

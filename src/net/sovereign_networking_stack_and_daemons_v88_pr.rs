@@ -159,12 +159,17 @@ impl SovereignNetworkConfigDaemonsV88Engine {
 
     pub fn parse_netplan_config(&mut self, yaml_content: &str) -> bool {
         self.parsed_netplan_yaml = yaml_content.to_string();
-        if yaml_content.contains("network:") && (yaml_content.contains("ethernets:") || yaml_content.contains("wifis:")) {
+        if yaml_content.contains("network:")
+            && (yaml_content.contains("ethernets:") || yaml_content.contains("wifis:"))
+        {
             let iface = NetworkInterfaceConfigV88 {
                 name: "eth0".to_string(),
                 mac_address: "52:54:00:ab:cd:ef".to_string(),
                 ipv4_addresses: vec!["192.168.1.150/24".to_string()],
-                ipv6_addresses: vec!["fe80::5054:ff:feab:cdef/64".to_string(), "2001:db8::150/64".to_string()],
+                ipv6_addresses: vec![
+                    "fe80::5054:ff:feab:cdef/64".to_string(),
+                    "2001:db8::150/64".to_string(),
+                ],
                 dhcp_enabled: true,
                 priority_metric: 100,
                 backend_daemon: self.active_backend.clone(),
@@ -255,7 +260,11 @@ impl SovereignDhcpDnsServicesV88Engine {
             ip_address: preferred_ip.to_string(),
             subnet_mask: "255.255.255.0".to_string(),
             router: "192.168.1.1".to_string(),
-            dns_servers: vec!["1.1.1.1".to_string(), "9.9.9.9".to_string(), "8.8.8.8".to_string()],
+            dns_servers: vec![
+                "1.1.1.1".to_string(),
+                "9.9.9.9".to_string(),
+                "8.8.8.8".to_string(),
+            ],
             lease_time_secs: 86400,
             domain_name: "sovereign.local".to_string(),
         };
@@ -339,7 +348,13 @@ impl SovereignWirelessAndBluetoothV88Engine {
     }
 
     pub fn initialize_bluez_lc3_audio(&mut self) -> bool {
-        self.bluetooth_active_codecs = vec!["LC3".to_string(), "LDAC".to_string(), "aptX-HD".to_string(), "AAC".to_string(), "SBC".to_string()];
+        self.bluetooth_active_codecs = vec![
+            "LC3".to_string(),
+            "LDAC".to_string(),
+            "aptX-HD".to_string(),
+            "AAC".to_string(),
+            "SBC".to_string(),
+        ];
         self.bluetooth_devices_connected = 2;
         self.auracast_broadcast_active = true;
         true
@@ -618,7 +633,9 @@ impl SovereignNetworkingStackAndDaemonsV88PrGateway {
     }
 
     pub fn generate_master_pr_summary(&self) -> String {
-        let mut summary = String::from("# Sovereign Linux & BSD Networking Stack & Control Daemons Parity Suite (v88)\n\n");
+        let mut summary = String::from(
+            "# Sovereign Linux & BSD Networking Stack & Control Daemons Parity Suite (v88)\n\n",
+        );
         summary.push_str("This pull request suite implements comprehensive zero-dependency `#![no_std]` / `alloc` native parity engines inspired by Linux and BSD distributions across 7 critical domains:\n\n");
 
         for pr in self.generate_all_pr_manifests() {
@@ -727,7 +744,10 @@ network:
     fn test_crypto_tunnels_vpn_v88() {
         let mut engine = SovereignCryptoTunnelsAndVpnV88Engine::new();
         assert!(engine.establish_wireguard_pqc_tunnel("wg0", "203.0.113.5:51820"));
-        assert_eq!(engine.active_tunnels[0].pqc_algorithm, "ML-KEM-768 / Noise_IKpsk2");
+        assert_eq!(
+            engine.active_tunnels[0].pqc_algorithm,
+            "ML-KEM-768 / Noise_IKpsk2"
+        );
         let manifest = engine.generate_pr_proposal();
         assert_eq!(manifest.pr_id, 8166);
     }

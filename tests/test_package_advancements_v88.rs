@@ -6,8 +6,8 @@
 mod sovereign_distro_package_advancements_v88_pr;
 
 use sovereign_distro_package_advancements_v88_pr::sovereign_distro_package_advancements_v88::*;
-use sovereign_distro_package_advancements_v88_pr::SovereignDistroPackagePrGatewayV88;
 use sovereign_distro_package_advancements_v88_pr::universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v88_pr::SovereignDistroPackagePrGatewayV88;
 
 #[test]
 fn test_package_advancements_v88_full_cycle() {
@@ -59,7 +59,10 @@ fn test_package_advancements_v88_full_cycle() {
     let solved = solver
         .solve_dependencies("ripgrep", &raw_deps)
         .expect("SAT solver failed");
-    assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v88"]);
+    assert_eq!(
+        solved,
+        vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v88"]
+    );
 
     // 5. Multi-Sandbox Security Governor V88
     let sandbox_gov = UniversalMultiSandboxGovernorV88::new();

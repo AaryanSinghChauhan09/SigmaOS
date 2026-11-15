@@ -37,7 +37,12 @@ fn test_integration_photocraft_v67_all_engines() {
     let src_img = vec![200u8; 4 * 4 * 3];
     let mut low = vec![0u8; 4 * 4 * 3];
     let mut high = vec![0u8; 4 * 4 * 3];
-    assert_eq!(engine2.separate_frequencies(&src_img, &mut low, &mut high, 4, 4).unwrap(), 16);
+    assert_eq!(
+        engine2
+            .separate_frequencies(&src_img, &mut low, &mut high, 4, 4)
+            .unwrap(),
+        16
+    );
     assert_eq!(low[0], 200);
     assert_eq!(high[0], 128);
 
@@ -50,21 +55,34 @@ fn test_integration_photocraft_v67_all_engines() {
     let engine4 = PhotocraftDepthMapRelightingVolumetricNormalV67PrEngine::new();
     let mut rgb_relight = vec![40u8; 3];
     let depth_map = vec![128u8; 1];
-    assert_eq!(engine4.relight_with_depth_map(&mut rgb_relight, &depth_map, 1, 1).unwrap(), 1);
+    assert_eq!(
+        engine4
+            .relight_with_depth_map(&mut rgb_relight, &depth_map, 1, 1)
+            .unwrap(),
+        1
+    );
 
     // 5. Multi-Exposure HDR Fusion
     let engine5 = PhotocraftMultiExposureHdrToneMappingFusionV67PrEngine::new();
     let b1 = vec![60u8; 6];
     let b2 = vec![140u8; 6];
     let mut out_fused = vec![0u8; 6];
-    assert_eq!(engine5.fuse_exposures(&[b1, b2], 2, 1, &mut out_fused).unwrap(), 2);
+    assert_eq!(
+        engine5
+            .fuse_exposures(&[b1, b2], 2, 1, &mut out_fused)
+            .unwrap(),
+        2
+    );
     assert_eq!(out_fused[0], 100);
 
     // 6. Non-Destructive Smart Filter DAG Pipeline
     let mut engine6 = PhotocraftNonDestructiveSmartFilterDagPipelineV67PrEngine::new();
     engine6.add_node(DagNodeEntryV67 {
         node_id: 1,
-        filter: SmartFilterDagNodeV67::UnsharpMask { radius: 1.0, amount: 1.5 },
+        filter: SmartFilterDagNodeV67::UnsharpMask {
+            radius: 1.0,
+            amount: 1.5,
+        },
         enabled: true,
     });
     let mut dag_buf = vec![50u8; 3];

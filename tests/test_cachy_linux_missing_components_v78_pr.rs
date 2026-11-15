@@ -21,8 +21,14 @@ fn test_cachy_v78_master_suite() {
     }
 
     let summary = suite.generate_suite_summary();
-    assert_eq!(summary.get("suite").map(|s| s.as_str()), Some("CachyLinuxMissingComponentsV78PrSuite"));
-    assert_eq!(summary.get("release_parity").map(|s| s.as_str()), Some("v78.0"));
+    assert_eq!(
+        summary.get("suite").map(|s| s.as_str()),
+        Some("CachyLinuxMissingComponentsV78PrSuite")
+    );
+    assert_eq!(
+        summary.get("release_parity").map(|s| s.as_str()),
+        Some("v78.0")
+    );
 }
 
 #[test]

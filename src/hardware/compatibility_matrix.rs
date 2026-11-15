@@ -21,10 +21,10 @@ impl SupportTier {
     /// Short label for display.
     pub fn label(self) -> &'static str {
         match self {
-            Self::Tier1FullySupported  => "Tier 1",
+            Self::Tier1FullySupported => "Tier 1",
             Self::Tier2CommunityTested => "Tier 2",
-            Self::Tier3BestEffort      => "Tier 3",
-            Self::Unsupported          => "Unsupported",
+            Self::Tier3BestEffort => "Tier 3",
+            Self::Unsupported => "Unsupported",
         }
     }
 }
@@ -65,13 +65,20 @@ pub struct HardwareEntry {
 
 impl HardwareEntry {
     fn new(
-        vendor_id: u16, device_id: u16, name: &str,
-        class: HardwareClass, tier: SupportTier, driver: &str, notes: &str,
+        vendor_id: u16,
+        device_id: u16,
+        name: &str,
+        class: HardwareClass,
+        tier: SupportTier,
+        driver: &str,
+        notes: &str,
     ) -> Self {
         Self {
-            vendor_id, device_id,
+            vendor_id,
+            device_id,
             name: name.to_string(),
-            class, tier,
+            class,
+            tier,
             driver: driver.to_string(),
             notes: notes.to_string(),
         }
@@ -86,25 +93,35 @@ pub struct CompatibilityMatrix {
 impl CompatibilityMatrix {
     /// Build the matrix with all built-in entries.
     pub fn new() -> Self {
-        let mut m = Self { entries: Vec::new() };
+        let mut m = Self {
+            entries: Vec::new(),
+        };
         m.populate();
         m
     }
 
     /// Look up a device by vendor and device ID.
     pub fn lookup(&self, vendor_id: u16, device_id: u16) -> Option<&HardwareEntry> {
-        self.entries.iter().find(|e| e.vendor_id == vendor_id && e.device_id == device_id)
+        self.entries
+            .iter()
+            .find(|e| e.vendor_id == vendor_id && e.device_id == device_id)
     }
 
     /// Look up devices by name (case-insensitive substring match).
     pub fn lookup_by_name(&self, name: &str) -> Vec<&HardwareEntry> {
         let lower = name.to_lowercase();
-        self.entries.iter().filter(|e| e.name.to_lowercase().contains(&lower)).collect()
+        self.entries
+            .iter()
+            .filter(|e| e.name.to_lowercase().contains(&lower))
+            .collect()
     }
 
     /// Return all Tier 1 devices.
     pub fn get_tier1_devices(&self) -> Vec<&HardwareEntry> {
-        self.entries.iter().filter(|e| e.tier == SupportTier::Tier1FullySupported).collect()
+        self.entries
+            .iter()
+            .filter(|e| e.tier == SupportTier::Tier1FullySupported)
+            .collect()
     }
 
     /// Return all devices of a given hardware class.
@@ -113,85 +130,289 @@ impl CompatibilityMatrix {
     }
 
     /// Total number of entries in the matrix.
-    pub fn len(&self) -> usize { self.entries.len() }
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
 
     /// `true` if the matrix is empty.
-    pub fn is_empty(&self) -> bool { self.entries.is_empty() }
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
 
     // --- private: populate the database ---
 
-    fn add(&mut self, e: HardwareEntry) { self.entries.push(e); }
+    fn add(&mut self, e: HardwareEntry) {
+        self.entries.push(e);
+    }
 
     fn populate(&mut self) {
         use HardwareClass::*;
         use SupportTier::*;
 
         // --- GPUs ---
-        self.add(HardwareEntry::new(0x8086, 0x56A0, "Intel Arc A770",
-            Gpu, Tier1FullySupported, "i915", "Vulkan 1.3, VA-API"));
-        self.add(HardwareEntry::new(0x8086, 0x56A1, "Intel Arc A750",
-            Gpu, Tier1FullySupported, "i915", "Vulkan 1.3, VA-API"));
-        self.add(HardwareEntry::new(0x8086, 0x9A49, "Intel Iris Xe (laptop)",
-            Gpu, Tier1FullySupported, "i915", "Vulkan 1.2, VA-API"));
-        self.add(HardwareEntry::new(0x8086, 0x4680, "Intel UHD 770",
-            Gpu, Tier1FullySupported, "i915", "Vulkan 1.2, VA-API"));
-        self.add(HardwareEntry::new(0x8086, 0x3EA0, "Intel UHD 620",
-            Gpu, Tier1FullySupported, "i915", "Partial Vulkan, VA-API"));
-        self.add(HardwareEntry::new(0x1002, 0x744C, "AMD Radeon RX 7900 XTX",
-            Gpu, Tier1FullySupported, "amdgpu", "Vulkan 1.3, VA-API, ROCm"));
-        self.add(HardwareEntry::new(0x1002, 0x7480, "AMD Radeon RX 7700 XT",
-            Gpu, Tier1FullySupported, "amdgpu", "Vulkan 1.3, VA-API"));
-        self.add(HardwareEntry::new(0x1002, 0x73DF, "AMD Radeon RX 6700 XT",
-            Gpu, Tier1FullySupported, "amdgpu", "Vulkan 1.3, VA-API"));
-        self.add(HardwareEntry::new(0x1002, 0x1900, "AMD Radeon 780M (iGPU)",
-            Gpu, Tier1FullySupported, "amdgpu", "Vulkan 1.3, VA-API"));
-        self.add(HardwareEntry::new(0x1002, 0x67DF, "AMD Radeon RX 580",
-            Gpu, Tier2CommunityTested, "amdgpu", "Vulkan 1.2, VA-API"));
-        self.add(HardwareEntry::new(0x10DE, 0x2684, "NVIDIA GeForce RTX 4090",
-            Gpu, Tier2CommunityTested, "nvidia", "Requires sigma-nonfree; proprietary driver"));
-        self.add(HardwareEntry::new(0x10DE, 0x2484, "NVIDIA GeForce RTX 3070",
-            Gpu, Tier2CommunityTested, "nvidia", "Requires sigma-nonfree; proprietary driver"));
-        self.add(HardwareEntry::new(0x10DE, 0x2182, "NVIDIA GeForce GTX 1660 Ti",
-            Gpu, Tier2CommunityTested, "nvidia", "Requires sigma-nonfree; no VDPAU"));
-        self.add(HardwareEntry::new(0x1AF4, 0x1050, "VirtIO GPU",
-            Gpu, Tier1FullySupported, "virtio-gpu", "QEMU/KVM only; no Vulkan"));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x56A0,
+            "Intel Arc A770",
+            Gpu,
+            Tier1FullySupported,
+            "i915",
+            "Vulkan 1.3, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x56A1,
+            "Intel Arc A750",
+            Gpu,
+            Tier1FullySupported,
+            "i915",
+            "Vulkan 1.3, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x9A49,
+            "Intel Iris Xe (laptop)",
+            Gpu,
+            Tier1FullySupported,
+            "i915",
+            "Vulkan 1.2, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x4680,
+            "Intel UHD 770",
+            Gpu,
+            Tier1FullySupported,
+            "i915",
+            "Vulkan 1.2, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x3EA0,
+            "Intel UHD 620",
+            Gpu,
+            Tier1FullySupported,
+            "i915",
+            "Partial Vulkan, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x1002,
+            0x744C,
+            "AMD Radeon RX 7900 XTX",
+            Gpu,
+            Tier1FullySupported,
+            "amdgpu",
+            "Vulkan 1.3, VA-API, ROCm",
+        ));
+        self.add(HardwareEntry::new(
+            0x1002,
+            0x7480,
+            "AMD Radeon RX 7700 XT",
+            Gpu,
+            Tier1FullySupported,
+            "amdgpu",
+            "Vulkan 1.3, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x1002,
+            0x73DF,
+            "AMD Radeon RX 6700 XT",
+            Gpu,
+            Tier1FullySupported,
+            "amdgpu",
+            "Vulkan 1.3, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x1002,
+            0x1900,
+            "AMD Radeon 780M (iGPU)",
+            Gpu,
+            Tier1FullySupported,
+            "amdgpu",
+            "Vulkan 1.3, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x1002,
+            0x67DF,
+            "AMD Radeon RX 580",
+            Gpu,
+            Tier2CommunityTested,
+            "amdgpu",
+            "Vulkan 1.2, VA-API",
+        ));
+        self.add(HardwareEntry::new(
+            0x10DE,
+            0x2684,
+            "NVIDIA GeForce RTX 4090",
+            Gpu,
+            Tier2CommunityTested,
+            "nvidia",
+            "Requires sigma-nonfree; proprietary driver",
+        ));
+        self.add(HardwareEntry::new(
+            0x10DE,
+            0x2484,
+            "NVIDIA GeForce RTX 3070",
+            Gpu,
+            Tier2CommunityTested,
+            "nvidia",
+            "Requires sigma-nonfree; proprietary driver",
+        ));
+        self.add(HardwareEntry::new(
+            0x10DE,
+            0x2182,
+            "NVIDIA GeForce GTX 1660 Ti",
+            Gpu,
+            Tier2CommunityTested,
+            "nvidia",
+            "Requires sigma-nonfree; no VDPAU",
+        ));
+        self.add(HardwareEntry::new(
+            0x1AF4,
+            0x1050,
+            "VirtIO GPU",
+            Gpu,
+            Tier1FullySupported,
+            "virtio-gpu",
+            "QEMU/KVM only; no Vulkan",
+        ));
 
         // --- WiFi ---
-        self.add(HardwareEntry::new(0x8086, 0x2725, "Intel Wi-Fi 6E AX211",
-            Wifi, Tier1FullySupported, "iwlwifi", "WiFi 6E, Bluetooth 5.3"));
-        self.add(HardwareEntry::new(0x8086, 0x2723, "Intel Wi-Fi 6 AX200",
-            Wifi, Tier1FullySupported, "iwlwifi", "WiFi 6, Bluetooth 5.2"));
-        self.add(HardwareEntry::new(0x8086, 0x9DF0, "Intel Wi-Fi 5 9560",
-            Wifi, Tier1FullySupported, "iwlwifi", "WiFi 5"));
-        self.add(HardwareEntry::new(0x14C3, 0x7922, "MediaTek MT7922",
-            Wifi, Tier1FullySupported, "mt7921e", "WiFi 6E"));
-        self.add(HardwareEntry::new(0x14C3, 0x7961, "MediaTek MT7921",
-            Wifi, Tier1FullySupported, "mt7921e", "WiFi 6"));
-        self.add(HardwareEntry::new(0x10EC, 0x8852, "Realtek RTW8852AE",
-            Wifi, Tier2CommunityTested, "rtw89", "Firmware from linux-firmware required"));
-        self.add(HardwareEntry::new(0x10EC, 0xC821, "Realtek RTL8821CE",
-            Wifi, Tier2CommunityTested, "rtl8821ce", "DKMS out-of-tree module"));
-        self.add(HardwareEntry::new(0x14E4, 0x43A0, "Broadcom BCM4360",
-            Wifi, Tier3BestEffort, "wl", "Proprietary wl driver; sigma-nonfree"));
-        self.add(HardwareEntry::new(0x14E4, 0x4727, "Broadcom BCM4313",
-            Wifi, Unsupported, "brcmsmac", "Pre-2012 chip; driver EOL"));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x2725,
+            "Intel Wi-Fi 6E AX211",
+            Wifi,
+            Tier1FullySupported,
+            "iwlwifi",
+            "WiFi 6E, Bluetooth 5.3",
+        ));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x2723,
+            "Intel Wi-Fi 6 AX200",
+            Wifi,
+            Tier1FullySupported,
+            "iwlwifi",
+            "WiFi 6, Bluetooth 5.2",
+        ));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x9DF0,
+            "Intel Wi-Fi 5 9560",
+            Wifi,
+            Tier1FullySupported,
+            "iwlwifi",
+            "WiFi 5",
+        ));
+        self.add(HardwareEntry::new(
+            0x14C3,
+            0x7922,
+            "MediaTek MT7922",
+            Wifi,
+            Tier1FullySupported,
+            "mt7921e",
+            "WiFi 6E",
+        ));
+        self.add(HardwareEntry::new(
+            0x14C3,
+            0x7961,
+            "MediaTek MT7921",
+            Wifi,
+            Tier1FullySupported,
+            "mt7921e",
+            "WiFi 6",
+        ));
+        self.add(HardwareEntry::new(
+            0x10EC,
+            0x8852,
+            "Realtek RTW8852AE",
+            Wifi,
+            Tier2CommunityTested,
+            "rtw89",
+            "Firmware from linux-firmware required",
+        ));
+        self.add(HardwareEntry::new(
+            0x10EC,
+            0xC821,
+            "Realtek RTL8821CE",
+            Wifi,
+            Tier2CommunityTested,
+            "rtl8821ce",
+            "DKMS out-of-tree module",
+        ));
+        self.add(HardwareEntry::new(
+            0x14E4,
+            0x43A0,
+            "Broadcom BCM4360",
+            Wifi,
+            Tier3BestEffort,
+            "wl",
+            "Proprietary wl driver; sigma-nonfree",
+        ));
+        self.add(HardwareEntry::new(
+            0x14E4,
+            0x4727,
+            "Broadcom BCM4313",
+            Wifi,
+            Unsupported,
+            "brcmsmac",
+            "Pre-2012 chip; driver EOL",
+        ));
 
         // --- Audio ---
-        self.add(HardwareEntry::new(0x8086, 0x7AD0, "Intel HDA (Alder/Raptor Lake)",
-            Audio, Tier1FullySupported, "snd_hda_intel", "SOF firmware required"));
-        self.add(HardwareEntry::new(0x8086, 0x02C8, "Intel HDA (Comet Lake)",
-            Audio, Tier1FullySupported, "snd_hda_intel", ""));
-        self.add(HardwareEntry::new(0x1002, 0x1637, "AMD HDA (Renoir/Rembrandt)",
-            Audio, Tier1FullySupported, "snd_hda_intel", ""));
-        self.add(HardwareEntry::new(0x0000, 0x0001, "USB Audio Class 2.0",
-            Audio, Tier1FullySupported, "snd_usb_audio", "Any UAC2-compliant device"));
-        self.add(HardwareEntry::new(0x0000, 0x0002, "USB Audio Class 1.0",
-            Audio, Tier1FullySupported, "snd_usb_audio", "Any UAC1-compliant device"));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x7AD0,
+            "Intel HDA (Alder/Raptor Lake)",
+            Audio,
+            Tier1FullySupported,
+            "snd_hda_intel",
+            "SOF firmware required",
+        ));
+        self.add(HardwareEntry::new(
+            0x8086,
+            0x02C8,
+            "Intel HDA (Comet Lake)",
+            Audio,
+            Tier1FullySupported,
+            "snd_hda_intel",
+            "",
+        ));
+        self.add(HardwareEntry::new(
+            0x1002,
+            0x1637,
+            "AMD HDA (Renoir/Rembrandt)",
+            Audio,
+            Tier1FullySupported,
+            "snd_hda_intel",
+            "",
+        ));
+        self.add(HardwareEntry::new(
+            0x0000,
+            0x0001,
+            "USB Audio Class 2.0",
+            Audio,
+            Tier1FullySupported,
+            "snd_usb_audio",
+            "Any UAC2-compliant device",
+        ));
+        self.add(HardwareEntry::new(
+            0x0000,
+            0x0002,
+            "USB Audio Class 1.0",
+            Audio,
+            Tier1FullySupported,
+            "snd_usb_audio",
+            "Any UAC1-compliant device",
+        ));
     }
 }
 
 impl Default for CompatibilityMatrix {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -230,7 +451,9 @@ mod tests {
         let matrix = CompatibilityMatrix::new();
         let tier1 = matrix.get_tier1_devices();
         assert!(!tier1.is_empty());
-        assert!(tier1.iter().all(|e| e.tier == SupportTier::Tier1FullySupported));
+        assert!(tier1
+            .iter()
+            .all(|e| e.tier == SupportTier::Tier1FullySupported));
     }
 
     #[test]

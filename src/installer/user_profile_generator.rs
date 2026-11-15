@@ -69,12 +69,12 @@ pub struct FileAssociation {
 /// XDG user directory paths.
 #[derive(Debug, Clone)]
 pub struct XdgDirectories {
-    pub desktop:   PathBuf,
+    pub desktop: PathBuf,
     pub documents: PathBuf,
     pub downloads: PathBuf,
-    pub music:     PathBuf,
-    pub pictures:  PathBuf,
-    pub videos:    PathBuf,
+    pub music: PathBuf,
+    pub pictures: PathBuf,
+    pub videos: PathBuf,
     pub templates: PathBuf,
 }
 
@@ -85,8 +85,12 @@ pub const V1_DEFAULT_BUNDLE: &[DefaultApp] = &[
         package_name: "sigma-browser",
         desktop_entry: "sigma-browser.desktop",
         category: AppCategory::Browser,
-        mime_types: &["text/html", "x-scheme-handler/http", "x-scheme-handler/https",
-                      "application/xhtml+xml"],
+        mime_types: &[
+            "text/html",
+            "x-scheme-handler/http",
+            "x-scheme-handler/https",
+            "application/xhtml+xml",
+        ],
         is_essential: true,
         alternatives: &["firefox", "chromium"],
     },
@@ -113,8 +117,15 @@ pub const V1_DEFAULT_BUNDLE: &[DefaultApp] = &[
         package_name: "sigma-text",
         desktop_entry: "sigma-text.desktop",
         category: AppCategory::TextEditor,
-        mime_types: &["text/plain", "text/x-c", "text/x-python", "text/x-rust",
-                      "text/x-shellscript", "application/json", "text/x-toml"],
+        mime_types: &[
+            "text/plain",
+            "text/x-c",
+            "text/x-python",
+            "text/x-rust",
+            "text/x-shellscript",
+            "application/json",
+            "text/x-toml",
+        ],
         is_essential: true,
         alternatives: &["gedit", "kate", "mousepad"],
     },
@@ -123,14 +134,16 @@ pub const V1_DEFAULT_BUNDLE: &[DefaultApp] = &[
         package_name: "libreoffice-sigma",
         desktop_entry: "libreoffice-writer.desktop",
         category: AppCategory::Office,
-        mime_types: &["application/vnd.oasis.opendocument.text",
-                      "application/msword",
-                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                      "application/vnd.oasis.opendocument.spreadsheet",
-                      "application/vnd.ms-excel",
-                      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                      "application/vnd.oasis.opendocument.presentation",
-                      "application/vnd.ms-powerpoint"],
+        mime_types: &[
+            "application/vnd.oasis.opendocument.text",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.oasis.opendocument.spreadsheet",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.oasis.opendocument.presentation",
+            "application/vnd.ms-powerpoint",
+        ],
         is_essential: false,
         alternatives: &["onlyoffice-desktopeditors"],
     },
@@ -148,8 +161,16 @@ pub const V1_DEFAULT_BUNDLE: &[DefaultApp] = &[
         package_name: "sigma-pix",
         desktop_entry: "sigma-pix.desktop",
         category: AppCategory::ImageViewer,
-        mime_types: &["image/jpeg", "image/png", "image/gif", "image/webp",
-                      "image/svg+xml", "image/bmp", "image/tiff", "image/avif"],
+        mime_types: &[
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "image/webp",
+            "image/svg+xml",
+            "image/bmp",
+            "image/tiff",
+            "image/avif",
+        ],
         is_essential: false,
         alternatives: &["eog", "shotwell"],
     },
@@ -158,8 +179,15 @@ pub const V1_DEFAULT_BUNDLE: &[DefaultApp] = &[
         package_name: "sigma-music",
         desktop_entry: "sigma-music.desktop",
         category: AppCategory::MusicPlayer,
-        mime_types: &["audio/mpeg", "audio/ogg", "audio/flac", "audio/wav",
-                      "audio/aac", "audio/x-m4a", "audio/opus"],
+        mime_types: &[
+            "audio/mpeg",
+            "audio/ogg",
+            "audio/flac",
+            "audio/wav",
+            "audio/aac",
+            "audio/x-m4a",
+            "audio/opus",
+        ],
         is_essential: false,
         alternatives: &["rhythmbox", "amarok"],
     },
@@ -168,8 +196,15 @@ pub const V1_DEFAULT_BUNDLE: &[DefaultApp] = &[
         package_name: "sigma-player",
         desktop_entry: "sigma-player.desktop",
         category: AppCategory::VideoPlayer,
-        mime_types: &["video/mp4", "video/x-matroska", "video/webm", "video/mpeg",
-                      "video/quicktime", "video/x-msvideo", "video/x-flv"],
+        mime_types: &[
+            "video/mp4",
+            "video/x-matroska",
+            "video/webm",
+            "video/mpeg",
+            "video/quicktime",
+            "video/x-msvideo",
+            "video/x-flv",
+        ],
         is_essential: false,
         alternatives: &["vlc", "mpv", "celluloid"],
     },
@@ -312,35 +347,76 @@ pub const V1_DEFAULT_BUNDLE: &[DefaultApp] = &[
 
 /// Default MIME type → application associations.
 pub const DEFAULT_MIME_ASSOCIATIONS: &[FileAssociation] = &[
-    FileAssociation { mime_type: "text/html",
-        handler_desktop_entry: "sigma-browser.desktop", is_default: true },
-    FileAssociation { mime_type: "x-scheme-handler/http",
-        handler_desktop_entry: "sigma-browser.desktop", is_default: true },
-    FileAssociation { mime_type: "x-scheme-handler/https",
-        handler_desktop_entry: "sigma-browser.desktop", is_default: true },
-    FileAssociation { mime_type: "application/pdf",
-        handler_desktop_entry: "sigma-pdfview.desktop", is_default: true },
-    FileAssociation { mime_type: "inode/directory",
-        handler_desktop_entry: "sigma-files.desktop", is_default: true },
-    FileAssociation { mime_type: "text/plain",
-        handler_desktop_entry: "sigma-text.desktop", is_default: true },
-    FileAssociation { mime_type: "image/jpeg",
-        handler_desktop_entry: "sigma-pix.desktop", is_default: true },
-    FileAssociation { mime_type: "image/png",
-        handler_desktop_entry: "sigma-pix.desktop", is_default: true },
-    FileAssociation { mime_type: "audio/mpeg",
-        handler_desktop_entry: "sigma-music.desktop", is_default: true },
-    FileAssociation { mime_type: "audio/flac",
-        handler_desktop_entry: "sigma-music.desktop", is_default: true },
-    FileAssociation { mime_type: "video/mp4",
-        handler_desktop_entry: "sigma-player.desktop", is_default: true },
-    FileAssociation { mime_type: "video/x-matroska",
-        handler_desktop_entry: "sigma-player.desktop", is_default: true },
+    FileAssociation {
+        mime_type: "text/html",
+        handler_desktop_entry: "sigma-browser.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "x-scheme-handler/http",
+        handler_desktop_entry: "sigma-browser.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "x-scheme-handler/https",
+        handler_desktop_entry: "sigma-browser.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "application/pdf",
+        handler_desktop_entry: "sigma-pdfview.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "inode/directory",
+        handler_desktop_entry: "sigma-files.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "text/plain",
+        handler_desktop_entry: "sigma-text.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "image/jpeg",
+        handler_desktop_entry: "sigma-pix.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "image/png",
+        handler_desktop_entry: "sigma-pix.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "audio/mpeg",
+        handler_desktop_entry: "sigma-music.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "audio/flac",
+        handler_desktop_entry: "sigma-music.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "video/mp4",
+        handler_desktop_entry: "sigma-player.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "video/x-matroska",
+        handler_desktop_entry: "sigma-player.desktop",
+        is_default: true,
+    },
     FileAssociation {
         mime_type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        handler_desktop_entry: "libreoffice-writer.desktop", is_default: true },
-    FileAssociation { mime_type: "application/vnd.debian.binary-package",
-        handler_desktop_entry: "sigma-packages.desktop", is_default: true },
+        handler_desktop_entry: "libreoffice-writer.desktop",
+        is_default: true,
+    },
+    FileAssociation {
+        mime_type: "application/vnd.debian.binary-package",
+        handler_desktop_entry: "sigma-packages.desktop",
+        is_default: true,
+    },
 ];
 
 /// Errors from the user profile generator.
@@ -385,19 +461,22 @@ impl UserProfileGenerator {
         if home.as_os_str().is_empty() {
             return Err(ProfileError::InvalidHomePath(home_dir.to_string()));
         }
-        Ok(Self { username: username.to_string(), home_dir: home })
+        Ok(Self {
+            username: username.to_string(),
+            home_dir: home,
+        })
     }
 
     /// Return the standard XDG directory paths for this user.
     pub fn create_xdg_dirs(&self) -> Result<XdgDirectories, ProfileError> {
         let h = &self.home_dir;
         Ok(XdgDirectories {
-            desktop:   h.join("Desktop"),
+            desktop: h.join("Desktop"),
             documents: h.join("Documents"),
             downloads: h.join("Downloads"),
-            music:     h.join("Music"),
-            pictures:  h.join("Pictures"),
-            videos:    h.join("Videos"),
+            music: h.join("Music"),
+            pictures: h.join("Pictures"),
+            videos: h.join("Videos"),
             templates: h.join("Templates"),
         })
     }
@@ -510,11 +589,17 @@ autoload -U compinit && compinit
     pub fn generate_mimeapps_list(&self) -> String {
         let mut out = String::from("[Default Applications]\n");
         for assoc in DEFAULT_MIME_ASSOCIATIONS.iter().filter(|a| a.is_default) {
-            out.push_str(&format!("{}={}\n", assoc.mime_type, assoc.handler_desktop_entry));
+            out.push_str(&format!(
+                "{}={}\n",
+                assoc.mime_type, assoc.handler_desktop_entry
+            ));
         }
         out.push_str("\n[Added Associations]\n");
         for assoc in DEFAULT_MIME_ASSOCIATIONS {
-            out.push_str(&format!("{}={}\n", assoc.mime_type, assoc.handler_desktop_entry));
+            out.push_str(&format!(
+                "{}={}\n",
+                assoc.mime_type, assoc.handler_desktop_entry
+            ));
         }
         out
     }
@@ -526,14 +611,18 @@ mod tests {
 
     #[test]
     fn test_v1_bundle_has_24_apps() {
-        assert_eq!(V1_DEFAULT_BUNDLE.len(), 24,
-            "V1 bundle should contain exactly 24 apps");
+        assert_eq!(
+            V1_DEFAULT_BUNDLE.len(),
+            24,
+            "V1 bundle should contain exactly 24 apps"
+        );
     }
 
     #[test]
     fn test_essential_apps_present() {
         // Arrange
-        let essential: Vec<_> = V1_DEFAULT_BUNDLE.iter()
+        let essential: Vec<_> = V1_DEFAULT_BUNDLE
+            .iter()
             .filter(|a| a.is_essential)
             .map(|a| a.package_name)
             .collect();
@@ -554,7 +643,10 @@ mod tests {
         let handler = assocs.iter().find(|a| a.mime_type == "text/html");
         // Assert
         assert!(handler.is_some());
-        assert_eq!(handler.unwrap().handler_desktop_entry, "sigma-browser.desktop");
+        assert_eq!(
+            handler.unwrap().handler_desktop_entry,
+            "sigma-browser.desktop"
+        );
     }
 
     #[test]
@@ -600,10 +692,16 @@ mod tests {
     #[test]
     fn test_all_24_apps_have_desktop_entry() {
         for app in V1_DEFAULT_BUNDLE {
-            assert!(!app.desktop_entry.is_empty(),
-                "App {} has empty desktop_entry", app.name);
-            assert!(app.desktop_entry.ends_with(".desktop"),
-                "App {} desktop_entry must end with .desktop", app.name);
+            assert!(
+                !app.desktop_entry.is_empty(),
+                "App {} has empty desktop_entry",
+                app.name
+            );
+            assert!(
+                app.desktop_entry.ends_with(".desktop"),
+                "App {} desktop_entry must end with .desktop",
+                app.name
+            );
         }
     }
 }

@@ -249,9 +249,7 @@ pub fn parse_mkinitcpio_conf(input: &str) -> Result<MkinitcpioConf, MkinitcpioEr
                             .unwrap_or(19);
                         InitcpioCompression::ZstdLevel(lvl)
                     }
-                    other => {
-                        return Err(MkinitcpioError::UnknownCompression(other.to_string()))
-                    }
+                    other => return Err(MkinitcpioError::UnknownCompression(other.to_string())),
                 });
             }
             "FALLBACK" => {
@@ -316,14 +314,21 @@ impl SovereignMkinitcpioEngine {
 
     /// Create a preset from a parsed mkinitcpio.conf. Compression falls back
     /// to zstd:19 like Arch's default when unspecified.
-    pub fn preset_from_conf(&self, name: &str, kernel_version: &str, conf: &MkinitcpioConf) -> Result<MkinitcpioPreset, MkinitcpioError> {
+    pub fn preset_from_conf(
+        &self,
+        name: &str,
+        kernel_version: &str,
+        conf: &MkinitcpioConf,
+    ) -> Result<MkinitcpioPreset, MkinitcpioError> {
         validate_hooks(&conf.hooks)?;
         Ok(MkinitcpioPreset {
             name: name.to_string(),
             kernel_version: kernel_version.to_string(),
             hooks: conf.hooks.clone(),
             modules: conf.modules.clone(),
-            compression: conf.compression.unwrap_or(InitcpioCompression::ZstdLevel(19)),
+            compression: conf
+                .compression
+                .unwrap_or(InitcpioCompression::ZstdLevel(19)),
             output_image_path: format!("/boot/initramfs-{name}.img"),
             build_uki: conf.fallback.is_some(),
         })
@@ -373,8 +378,7 @@ impl SovereignMkinitcpioEngine {
         }
         // warn about modules not present on the system
         for m in &out {
-            if !self.available_modules.is_empty()
-                && !self.available_modules.iter().any(|a| a == m)
+            if !self.available_modules.is_empty() && !self.available_modules.iter().any(|a| a == m)
             {
                 warnings.push(format!("module '{m}' not found in available module set"));
             }
@@ -401,7 +405,10 @@ impl SovereignMkinitcpioEngine {
         Ok(out)
     }
 
-    fn build_preset_inner(&self, preset: &MkinitcpioPreset) -> Result<InitramfsArtifact, &'static str> {
+    fn build_preset_inner(
+        &self,
+        preset: &MkinitcpioPreset,
+    ) -> Result<InitramfsArtifact, &'static str> {
         if let Err(e) = validate_hooks(&preset.hooks) {
             return Err(e.as_str());
         }
@@ -471,7 +478,10 @@ COMPRESSION="zstd:22"
         let conf = parse_mkinitcpio_conf(conf_text).unwrap();
         assert_eq!(conf.hooks.len(), 6);
         assert_eq!(conf.hooks[0], InitcpioHook::Base);
-        assert_eq!(conf.modules, vec!["virtio_nvme".to_string(), "nvme".to_string()]);
+        assert_eq!(
+            conf.modules,
+            vec!["virtio_nvme".to_string(), "nvme".to_string()]
+        );
         assert_eq!(conf.binaries, vec!["fsck".to_string(), "btrfs".to_string()]);
         assert_eq!(conf.compression, Some(InitcpioCompression::ZstdLevel(22)));
         validate_hooks(&conf.hooks).unwrap();
@@ -484,12 +494,11 @@ COMPRESSION="zstd:22"
         assert_eq!(validate_hooks(&bad), Err(MkinitcpioError::BaseHookNotFirst));
 
         // udev after block is invalid
-        let bad2 = vec![
-            InitcpioHook::Base,
-            InitcpioHook::Block,
-            InitcpioHook::Udev,
-        ];
-        assert_eq!(validate_hooks(&bad2), Err(MkinitcpioError::UdevOrderingViolation));
+        let bad2 = vec![InitcpioHook::Base, InitcpioHook::Block, InitcpioHook::Udev];
+        assert_eq!(
+            validate_hooks(&bad2),
+            Err(MkinitcpioError::UdevOrderingViolation)
+        );
 
         // encrypt after filesystems is invalid
         let bad3 = vec![
@@ -497,7 +506,10 @@ COMPRESSION="zstd:22"
             InitcpioHook::Filesystems,
             InitcpioHook::Encrypt,
         ];
-        assert_eq!(validate_hooks(&bad3), Err(MkinitcpioError::EncryptAfterFilesystems));
+        assert_eq!(
+            validate_hooks(&bad3),
+            Err(MkinitcpioError::EncryptAfterFilesystems)
+        );
 
         // empty hooks rejected
         assert_eq!(validate_hooks(&[]), Err(MkinitcpioError::MissingHooks));
@@ -517,7 +529,11 @@ COMPRESSION="zstd:22"
         engine.add_preset(preset);
 
         let artifact = engine.build_preset("default").unwrap();
-        let pos_mbcache = artifact.modules.iter().position(|m| m == "mbcache").unwrap();
+        let pos_mbcache = artifact
+            .modules
+            .iter()
+            .position(|m| m == "mbcache")
+            .unwrap();
         let pos_jbd2 = artifact.modules.iter().position(|m| m == "jbd2").unwrap();
         let pos_ext4 = artifact.modules.iter().position(|m| m == "ext4").unwrap();
         assert!(pos_mbcache < pos_jbd2 && pos_jbd2 < pos_ext4);
@@ -530,7 +546,9 @@ COMPRESSION="zstd:22"
             "HOOKS=(base udev block filesystems fsck)\nCOMPRESSION=\"gzip\"\n",
         )
         .unwrap();
-        let preset = engine.preset_from_conf("sigma", "6.12.0-sigma", &conf).unwrap();
+        let preset = engine
+            .preset_from_conf("sigma", "6.12.0-sigma", &conf)
+            .unwrap();
         assert_eq!(preset.compression, InitcpioCompression::Gzip);
 
         let mut engine2 = SovereignMkinitcpioEngine::new();

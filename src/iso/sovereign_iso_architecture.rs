@@ -587,7 +587,9 @@ impl SigmaIsoProfile {
     pub fn desktop_standard(arch: ArchTarget) -> Self {
         Self {
             name: "SigmaOS Desktop".to_string(),
-            version: option_env!("CARGO_PKG_VERSION").unwrap_or("1.0.0").to_string(),
+            version: option_env!("CARGO_PKG_VERSION")
+                .unwrap_or("1.0.0")
+                .to_string(),
             arch,
             boot: BootLayer::new(arch),
             live_fs: LiveFilesystemLayer::default(),

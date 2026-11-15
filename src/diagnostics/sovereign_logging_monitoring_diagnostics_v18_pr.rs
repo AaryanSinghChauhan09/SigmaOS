@@ -133,7 +133,13 @@ impl RsyslogRelpFrameV18 {
     }
 
     pub fn encode_relp_wire(&self) -> String {
-        format!("{} {} {} {}\n", self.tx_id, self.command, self.payload.len(), self.payload)
+        format!(
+            "{} {} {} {}\n",
+            self.tx_id,
+            self.command,
+            self.payload.len(),
+            self.payload
+        )
     }
 }
 
@@ -182,7 +188,13 @@ impl SyslogNgSinkEngineV18 {
         count
     }
 
-    pub fn substitute_macros(&self, template: &str, host: &str, prog: &str, isodate: &str) -> String {
+    pub fn substitute_macros(
+        &self,
+        template: &str,
+        host: &str,
+        prog: &str,
+        isodate: &str,
+    ) -> String {
         template
             .replace("$ISODATE", isodate)
             .replace("$HOST", host)
@@ -230,7 +242,10 @@ impl BsdSyslogdRoutingV18 {
     pub fn match_route(&self, facility: &str, priority: &str) -> Vec<String> {
         self.rules
             .iter()
-            .filter(|r| (r.facility == "*" || r.facility == facility) && (r.priority == "*" || r.priority == priority))
+            .filter(|r| {
+                (r.facility == "*" || r.facility == facility)
+                    && (r.priority == "*" || r.priority == priority)
+            })
             .map(|r| r.destination.clone())
             .collect()
     }
@@ -271,11 +286,14 @@ impl DmesgEntryV18 {
     pub fn format_ansi(&self) -> String {
         let color_code = match self.level.as_str() {
             "EMERG" | "ALERT" | "CRIT" | "ERR" => "\x1b[31m", // Red
-            "WARN" => "\x1b[33m",                              // Yellow
-            "NOTICE" | "INFO" => "\x1b[32m",                   // Green
-            _ => "\x1b[37m",                                   // White
+            "WARN" => "\x1b[33m",                             // Yellow
+            "NOTICE" | "INFO" => "\x1b[32m",                  // Green
+            _ => "\x1b[37m",                                  // White
         };
-        format!("{}[{}] [{}] {}\x1b[0m", color_code, self.iso8601, self.level, self.message)
+        format!(
+            "{}[{}] [{}] {}\x1b[0m",
+            color_code, self.iso8601, self.level, self.message
+        )
     }
 }
 
@@ -340,7 +358,8 @@ impl SovereignDmesgKdumpSuiteV18 {
             ],
             vmcore_header: Some(KdumpVmcoreSummaryV18 {
                 elf_class: "ELF64".to_string(),
-                panic_message: "Kernel panic - not syncing: Fatal exception in interrupt".to_string(),
+                panic_message: "Kernel panic - not syncing: Fatal exception in interrupt"
+                    .to_string(),
                 crashing_cpu: 2,
                 registers: regs,
                 stack_backtrace: vec![
@@ -514,7 +533,7 @@ pub struct LsofHandleV18 {
     pub pid: u32,
     pub process_name: String,
     pub fd: String,
-    pub fd_type: String, // REG, DIR, CHR, BLK, FIFO, SOCK
+    pub fd_type: String,   // REG, DIR, CHR, BLK, FIFO, SOCK
     pub lock_type: String, // Read, Write, None
     pub path: String,
 }
@@ -565,7 +584,15 @@ impl SosreportSanitizerV18 {
 
     pub fn sanitize_content(&mut self, text: &str) -> String {
         let mut out = text.to_string();
-        let sensitive_keys = ["password", "passwd", "secret", "token", "api_key", "private_key", "Bearer"];
+        let sensitive_keys = [
+            "password",
+            "passwd",
+            "secret",
+            "token",
+            "api_key",
+            "private_key",
+            "Bearer",
+        ];
         for key in sensitive_keys {
             if out.contains(key) {
                 out = out
@@ -598,7 +625,10 @@ impl SovereignHardwareDiagnosticsSuiteV18 {
 
         let mut props_cpu = HashMap::new();
         props_cpu.insert("Socket Designation".to_string(), "CPU0".to_string());
-        props_cpu.insert("Manufacturer".to_string(), "Sigma RISC-V Enterprise".to_string());
+        props_cpu.insert(
+            "Manufacturer".to_string(),
+            "Sigma RISC-V Enterprise".to_string(),
+        );
         props_cpu.insert("Max Speed".to_string(), "4200 MHz".to_string());
 
         Self {
@@ -656,7 +686,13 @@ impl SovereignHardwareDiagnosticsSuiteV18 {
     /// Reads system DMI information from `/sys/class/dmi/id` if present
     pub fn read_sys_dmi_id(&self) -> Option<HashMap<String, String>> {
         let mut map = HashMap::new();
-        let fields = ["product_name", "sys_vendor", "bios_version", "bios_date", "product_serial"];
+        let fields = [
+            "product_name",
+            "sys_vendor",
+            "bios_version",
+            "bios_date",
+            "product_serial",
+        ];
         for f in fields {
             let path = format!("/sys/class/dmi/id/{}", f);
             if let Ok(val) = fs::read_to_string(&path) {
@@ -740,7 +776,9 @@ pub struct SovereignLoggingDiagnosticsV18PrGatewayEngine {
 impl SovereignLoggingDiagnosticsV18PrGatewayEngine {
     pub fn new() -> Self {
         Self {
-            pr_title: "feat(diagnostics): V18 Linux & BSD Logging, Monitoring, and Diagnostics Suite PR".to_string(),
+            pr_title:
+                "feat(diagnostics): V18 Linux & BSD Logging, Monitoring, and Diagnostics Suite PR"
+                    .to_string(),
             pr_branch: "feature/sovereign-logging-monitoring-diagnostics-v18-pr".to_string(),
             journal_gateway: JournaldGatewayRestApiEndpointV18::new(
                 "/entries",
@@ -777,14 +815,26 @@ impl SovereignLoggingDiagnosticsV18PrGatewayEngine {
 
     pub fn audit_system_diagnostics(&self) -> BTreeMap<String, bool> {
         let mut audit = BTreeMap::new();
-        audit.insert("journald_rest_sse_ok".to_string(), self.journal_gateway.stream_active);
+        audit.insert(
+            "journald_rest_sse_ok".to_string(),
+            self.journal_gateway.stream_active,
+        );
         audit.insert(
             "journald_fss_sealing_ok".to_string(),
             self.journal_gateway.fss_sealing.verify_integrity(1),
         );
-        audit.insert("dmesg_kdump_vmcore_parsed_ok".to_string(), self.dmesg_kdump_suite.vmcore_header.is_some());
-        audit.insert("htop_bore_psi_metrics_ok".to_string(), !self.metrics_suite.cpu_cores.is_empty());
-        audit.insert("iostat_extended_latency_ok".to_string(), !self.metrics_suite.iostat_devices.is_empty());
+        audit.insert(
+            "dmesg_kdump_vmcore_parsed_ok".to_string(),
+            self.dmesg_kdump_suite.vmcore_header.is_some(),
+        );
+        audit.insert(
+            "htop_bore_psi_metrics_ok".to_string(),
+            !self.metrics_suite.cpu_cores.is_empty(),
+        );
+        audit.insert(
+            "iostat_extended_latency_ok".to_string(),
+            !self.metrics_suite.iostat_devices.is_empty(),
+        );
         audit.insert("sosreport_secret_sanitizer_ok".to_string(), true);
         audit
     }
@@ -814,17 +864,31 @@ mod tests {
 
     #[test]
     fn test_journald_syslog_suite_v18() {
-        let endpoint = JournaldGatewayRestApiEndpointV18::new("/entries", JournalGatewayFormatV18::ServerSentEvents, 100)
-            .with_filter("_SYSTEMD_UNIT", "sshd.service");
+        let endpoint = JournaldGatewayRestApiEndpointV18::new(
+            "/entries",
+            JournalGatewayFormatV18::ServerSentEvents,
+            100,
+        )
+        .with_filter("_SYSTEMD_UNIT", "sshd.service");
         assert_eq!(endpoint.endpoint_path, "/entries");
         assert!(endpoint.fss_sealing.verify_integrity(1));
 
-        let chunk = endpoint.render_sse_chunk("s=123456", &[("_SYSTEMD_UNIT", "sshd.service"), ("MESSAGE", "Accepted publickey")]);
+        let chunk = endpoint.render_sse_chunk(
+            "s=123456",
+            &[
+                ("_SYSTEMD_UNIT", "sshd.service"),
+                ("MESSAGE", "Accepted publickey"),
+            ],
+        );
         assert!(chunk.contains("event: journal_entry_v18"));
         assert!(chunk.contains("id: s=123456"));
         assert!(chunk.contains("data: MESSAGE: Accepted publickey"));
 
-        let relp = RsyslogRelpFrameV18::new(1, "syslog", "<34>1 2025-02-23T10:00:00Z myhost app 1234 - - test");
+        let relp = RsyslogRelpFrameV18::new(
+            1,
+            "syslog",
+            "<34>1 2025-02-23T10:00:00Z myhost app 1234 - - test",
+        );
         let wire = relp.encode_relp_wire();
         assert!(wire.starts_with("1 syslog "));
 
@@ -833,7 +897,12 @@ mod tests {
         assert!(sink.ingest("msg2"));
         assert_eq!(sink.flush(), 2);
 
-        let subbed = sink.substitute_macros("[$ISODATE] $HOST $PROGRAM: test", "web01", "nginx", "2025-02-23T10:00:00Z");
+        let subbed = sink.substitute_macros(
+            "[$ISODATE] $HOST $PROGRAM: test",
+            "web01",
+            "nginx",
+            "2025-02-23T10:00:00Z",
+        );
         assert_eq!(subbed, "[2025-02-23T10:00:00Z] web01 nginx: test");
     }
 
@@ -880,7 +949,9 @@ mod tests {
         assert_eq!(suite.pcie_devices[0].rebar_capable, true);
         assert_eq!(suite.usb_devices[0].speed_mbps, 10000);
 
-        let redacted = suite.sosreport.sanitize_content("connect with password=secret123 and Bearer tokenxyz and api_key=key999");
+        let redacted = suite.sosreport.sanitize_content(
+            "connect with password=secret123 and Bearer tokenxyz and api_key=key999",
+        );
         assert!(redacted.contains("password=[REDACTED]"));
         assert!(!redacted.contains("secret123"));
         assert!(redacted.contains("Bearer [REDACTED]"));

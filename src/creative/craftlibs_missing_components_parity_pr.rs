@@ -1556,7 +1556,11 @@ impl CraftlibsMultiMaterialPhysicsClothSoftBodyPrEngine {
         }
     }
 
-    pub fn simulate_xpbd_step(&mut self, positions: &mut [[f32; 3]], dt: f32) -> Result<usize, String> {
+    pub fn simulate_xpbd_step(
+        &mut self,
+        positions: &mut [[f32; 3]],
+        dt: f32,
+    ) -> Result<usize, String> {
         if positions.is_empty() {
             return Err("Positions buffer cannot be empty".to_string());
         }
@@ -1626,13 +1630,17 @@ impl CraftlibsOpenColorIoGradingLutPipelinePrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 619,
-            pr_title: "feat(craftlibs): OpenColorIO v2 HDR Color Grading & Tetrahedral 3D LUT Pipeline".to_string(),
+            pr_title:
+                "feat(craftlibs): OpenColorIO v2 HDR Color Grading & Tetrahedral 3D LUT Pipeline"
+                    .to_string(),
             target_subsystem: "CraftLibs OCIO v2 Color Grading Subsystem".to_string(),
             original_suite: "ArtCraft CraftLibs Professional Color Grading Engine".to_string(),
-            artcraft_feature_parity: "OCIO v2 Tetrahedral 3D LUT HDR Color Grading Parity".to_string(),
+            artcraft_feature_parity: "OCIO v2 Tetrahedral 3D LUT HDR Color Grading Parity"
+                .to_string(),
             components_added: vec![
                 "OpenColorIO v2 dynamic GPU shader codegen pipeline".to_string(),
-                "Tetrahedral 33x33x33 3D LUT interpolation engine with ACES 1.3 display transform".to_string(),
+                "Tetrahedral 33x33x33 3D LUT interpolation engine with ACES 1.3 display transform"
+                    .to_string(),
                 "Primary and secondary color wheel lift/gamma/gain math transformer".to_string(),
             ],
             performance_multiplier: "120 FPS 4K HDR Real-Time Color Grading".to_string(),
@@ -1803,22 +1811,22 @@ impl CraftlibsSparseVolumeVdbGridRenderingPrEngine {
         }
     }
 
-    pub fn raymarch_sparse_grid_volume(
-        &self,
-        ray_origin: [f32; 3],
-        ray_dir: [f32; 3],
-    ) -> f32 {
-        let dot = ray_origin[0] * ray_dir[0] + ray_origin[1] * ray_dir[1] + ray_origin[2] * ray_dir[2];
+    pub fn raymarch_sparse_grid_volume(&self, ray_origin: [f32; 3], ray_dir: [f32; 3]) -> f32 {
+        let dot =
+            ray_origin[0] * ray_dir[0] + ray_origin[1] * ray_dir[1] + ray_origin[2] * ray_dir[2];
         (dot.abs() * self.volume_density_scale).clamp(0.0, 1.0)
     }
 
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 622,
-            pr_title: "feat(craftlibs): NanoVDB Sparse Volumetric Cloud, Smoke & Fire Raymarching Engine".to_string(),
+            pr_title:
+                "feat(craftlibs): NanoVDB Sparse Volumetric Cloud, Smoke & Fire Raymarching Engine"
+                    .to_string(),
             target_subsystem: "CraftLibs Volumetric Raymarching Subsystem".to_string(),
             original_suite: "ArtCraft CraftLibs Volumetric Simulation Engine".to_string(),
-            artcraft_feature_parity: "NanoVDB Volumetric Cloud, Smoke & Fire Raymarching Parity".to_string(),
+            artcraft_feature_parity: "NanoVDB Volumetric Cloud, Smoke & Fire Raymarching Parity"
+                .to_string(),
             components_added: vec![
                 "NanoVDB GPU-flattened un-paged sparse voxel grid memory accessor".to_string(),
                 "Woodcock tracking delta-tracking stochastic volume raymarcher".to_string(),

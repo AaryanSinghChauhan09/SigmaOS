@@ -22,7 +22,9 @@ fn test_v71_filmcraft_individual_engines() {
     let mut demosaic_engine = FilmcraftHardwareAcceleratedProResRawBayerDemosaicV71PrEngine::new();
     let raw = [500u16, 1000, 1500, 2000];
     let mut rgb = Vec::new();
-    let channels = demosaic_engine.demosaic_bayer(&raw, 2, 2, &mut rgb).unwrap();
+    let channels = demosaic_engine
+        .demosaic_bayer(&raw, 2, 2, &mut rgb)
+        .unwrap();
     assert_eq!(channels, 12);
     assert_eq!(demosaic_engine.processed_raw_chunks, 1);
 
@@ -39,7 +41,9 @@ fn test_v71_filmcraft_individual_engines() {
     let frame = [100u8, 120, 140, 160];
     let mask = [0u8, 255, 0, 255];
     let mut clean_plate = Vec::new();
-    let inpainted_count = inpaint_engine.segment_and_inpaint(&frame, &mask, &mut clean_plate).unwrap();
+    let inpainted_count = inpaint_engine
+        .segment_and_inpaint(&frame, &mask, &mut clean_plate)
+        .unwrap();
     assert_eq!(inpainted_count, 2);
     assert_eq!(clean_plate.len(), 4);
     assert_eq!(inpaint_engine.segmented_objects_count, 1);
@@ -87,7 +91,9 @@ fn test_v71_filmcraft_individual_engines() {
     assert!(!exporter_engine.can_smart_render("Apple ProRes", true, false));
     assert!(!exporter_engine.can_smart_render("Apple ProRes", false, true));
     let mut sink = Vec::new();
-    let spliced = exporter_engine.splice_bitstream_packet(&[0x11, 0x22, 0x33, 0x44, 0x55], &mut sink).unwrap();
+    let spliced = exporter_engine
+        .splice_bitstream_packet(&[0x11, 0x22, 0x33, 0x44, 0x55], &mut sink)
+        .unwrap();
     assert_eq!(spliced, 5);
     assert_eq!(sink.len(), 5);
     assert_eq!(exporter_engine.exported_byte_savings, 5);

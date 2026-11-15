@@ -25,30 +25,32 @@ impl RepairTool {
     /// Human-readable name.
     pub fn name(self) -> &'static str {
         match self {
-            Self::Fsck                  => "Filesystem check (fsck)",
-            Self::GrubReinstall         => "Reinstall GRUB bootloader",
+            Self::Fsck => "Filesystem check (fsck)",
+            Self::GrubReinstall => "Reinstall GRUB bootloader",
             Self::PackageIntegrityCheck => "Package database integrity check",
-            Self::KernelReinstall       => "Reinstall kernel",
-            Self::ConfigReset           => "Reset system configuration",
-            Self::NetworkReset          => "Reset network configuration",
+            Self::KernelReinstall => "Reinstall kernel",
+            Self::ConfigReset => "Reset system configuration",
+            Self::NetworkReset => "Reset network configuration",
         }
     }
 
     /// Brief description of what the tool does.
     pub fn description(self) -> &'static str {
         match self {
-            Self::Fsck =>
-                "Checks and repairs filesystem errors on root and boot partitions",
-            Self::GrubReinstall =>
-                "Reinstalls GRUB to the EFI partition and regenerates grub.cfg",
-            Self::PackageIntegrityCheck =>
-                "Verifies dpkg package integrity and reinstalls any corrupt packages",
-            Self::KernelReinstall =>
-                "Removes and reinstalls the currently booted kernel and initramfs",
-            Self::ConfigReset =>
-                "Resets /etc configuration to package defaults using dpkg-reconfigure",
-            Self::NetworkReset =>
-                "Clears NetworkManager state and resets to DHCP on all interfaces",
+            Self::Fsck => "Checks and repairs filesystem errors on root and boot partitions",
+            Self::GrubReinstall => "Reinstalls GRUB to the EFI partition and regenerates grub.cfg",
+            Self::PackageIntegrityCheck => {
+                "Verifies dpkg package integrity and reinstalls any corrupt packages"
+            }
+            Self::KernelReinstall => {
+                "Removes and reinstalls the currently booted kernel and initramfs"
+            }
+            Self::ConfigReset => {
+                "Resets /etc configuration to package defaults using dpkg-reconfigure"
+            }
+            Self::NetworkReset => {
+                "Clears NetworkManager state and resets to DHCP on all interfaces"
+            }
         }
     }
 }
@@ -106,12 +108,22 @@ pub struct RepairResult {
 impl RepairResult {
     /// Create a successful result.
     pub fn success(tool: RepairTool, output: impl Into<String>, fixed: Vec<String>) -> Self {
-        Self { tool, success: true, output: output.into(), fixed_issues: fixed }
+        Self {
+            tool,
+            success: true,
+            output: output.into(),
+            fixed_issues: fixed,
+        }
     }
 
     /// Create a failed result.
     pub fn failure(tool: RepairTool, output: impl Into<String>) -> Self {
-        Self { tool, success: false, output: output.into(), fixed_issues: vec![] }
+        Self {
+            tool,
+            success: false,
+            output: output.into(),
+            fixed_issues: vec![],
+        }
     }
 }
 
@@ -158,16 +170,14 @@ impl EmergencyShell {
     /// Run a specific repair tool.
     pub fn run_repair_tool(&self, tool: RepairTool) -> Result<RepairResult, ShellError> {
         if !self.config.tools.contains(&tool) {
-            return Err(ShellError::ToolNotAvailable { tool: format!("{tool:?}") });
+            return Err(ShellError::ToolNotAvailable {
+                tool: format!("{tool:?}"),
+            });
         }
 
         // Simulate tool execution.
         match tool {
-            RepairTool::Fsck => Ok(RepairResult::success(
-                tool,
-                "fsck: no errors found",
-                vec![],
-            )),
+            RepairTool::Fsck => Ok(RepairResult::success(tool, "fsck: no errors found", vec![])),
             RepairTool::GrubReinstall => Ok(RepairResult::success(
                 tool,
                 "grub-install: finished. update-grub: done",
@@ -198,10 +208,14 @@ impl EmergencyShell {
 
     /// Run all configured repair tools and return their results.
     pub fn run_all_repairs(&self) -> Vec<RepairResult> {
-        self.config.tools.clone().into_iter()
-            .map(|t| self.run_repair_tool(t).unwrap_or_else(|e| {
-                RepairResult::failure(t, format!("error: {e}"))
-            }))
+        self.config
+            .tools
+            .clone()
+            .into_iter()
+            .map(|t| {
+                self.run_repair_tool(t)
+                    .unwrap_or_else(|e| RepairResult::failure(t, format!("error: {e}")))
+            })
             .collect()
     }
 
@@ -217,7 +231,12 @@ impl EmergencyShell {
         let mut out = String::from("=== SigmaOS Emergency Repair Report ===\n\n");
         let passed = results.iter().filter(|r| r.success).count();
         let failed = results.len() - passed;
-        out.push_str(&format!("Tools run: {}  |  Passed: {}  |  Failed: {}\n\n", results.len(), passed, failed));
+        out.push_str(&format!(
+            "Tools run: {}  |  Passed: {}  |  Failed: {}\n\n",
+            results.len(),
+            passed,
+            failed
+        ));
 
         for r in results {
             let status = if r.success { "✓ PASS" } else { "✗ FAIL" };

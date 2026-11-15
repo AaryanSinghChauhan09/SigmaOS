@@ -54,7 +54,7 @@ pub struct PhotocraftV67PrProposalManifest {
 /// Configuration for AI Neural Super-Resolution Upscaling.
 #[derive(Debug, Clone)]
 pub struct SuperResolutionUpscalerConfigV67 {
-    pub scale_factor: u8, // e.g. 2, 4, 8
+    pub scale_factor: u8,           // e.g. 2, 4, 8
     pub model_architecture: String, // e.g. "ResidualDenseNetwork-V67", "SwinIR-Photo"
     pub noise_suppression_level: f32,
     pub detail_enhancement_level: f32,
@@ -94,10 +94,14 @@ impl PhotocraftAiNeuralSuperResolutionUpscalerV67PrEngine {
         let expected_dst_len = dst_width * dst_height * 3;
 
         if src_rgb.len() != src_width * src_height * 3 {
-            return Err(String::from("Source buffer does not match source dimensions"));
+            return Err(String::from(
+                "Source buffer does not match source dimensions",
+            ));
         }
         if dst_rgb.len() < expected_dst_len {
-            return Err(String::from("Destination buffer too small for upscaled image"));
+            return Err(String::from(
+                "Destination buffer too small for upscaled image",
+            ));
         }
 
         // Bicubic / neural nearest-neighborhood synthesis simulation
@@ -120,7 +124,9 @@ impl PhotocraftAiNeuralSuperResolutionUpscalerV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6701,
-            pr_title: String::from("PR #6701: AI Neural Residual Dense Network 4x/8x Super-Resolution Upscaler"),
+            pr_title: String::from(
+                "PR #6701: AI Neural Residual Dense Network 4x/8x Super-Resolution Upscaler",
+            ),
             target_subsystem: String::from("PhotoCraft Neural Darkroom"),
             original_suite: String::from("PhotoCraft High-Resolution Synthesis"),
             components_added: vec![
@@ -177,7 +183,9 @@ impl PhotocraftSubpixelWaveletTextureFrequencySeparationV67PrEngine {
             || low_freq_out.len() != total_bytes
             || high_freq_out.len() != total_bytes
         {
-            return Err(String::from("Buffers size mismatch for frequency separation"));
+            return Err(String::from(
+                "Buffers size mismatch for frequency separation",
+            ));
         }
 
         // Low-frequency approximation via 3x3 box blur, high frequency via difference + 128 offset
@@ -231,7 +239,9 @@ impl PhotocraftSubpixelWaveletTextureFrequencySeparationV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6702,
-            pr_title: String::from("PR #6702: Subpixel Wavelet Dual-Frequency Texture Separation Engine"),
+            pr_title: String::from(
+                "PR #6702: Subpixel Wavelet Dual-Frequency Texture Separation Engine",
+            ),
             target_subsystem: String::from("PhotoCraft Retouch Engine"),
             original_suite: String::from("PhotoCraft Portrait Retouch"),
             components_added: vec![
@@ -310,7 +320,9 @@ impl PhotocraftAcesCcColorGradingOcioLutV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6703,
-            pr_title: String::from("PR #6703: ACEScc Log Wide-Gamut Color Grading and OCIO 3D LUT Transform"),
+            pr_title: String::from(
+                "PR #6703: ACEScc Log Wide-Gamut Color Grading and OCIO 3D LUT Transform",
+            ),
             target_subsystem: String::from("PhotoCraft Color Grading Studio"),
             original_suite: String::from("PhotoCraft Color Master"),
             components_added: vec![
@@ -371,7 +383,9 @@ impl PhotocraftDepthMapRelightingVolumetricNormalV67PrEngine {
     ) -> Result<usize, String> {
         let total_pixels = width * height;
         if rgb_buffer.len() != total_pixels * 3 || depth_map.len() != total_pixels {
-            return Err(String::from("Buffer size mismatch with depth map dimensions"));
+            return Err(String::from(
+                "Buffer size mismatch with depth map dimensions",
+            ));
         }
 
         for i in 0..total_pixels {
@@ -399,7 +413,9 @@ impl PhotocraftDepthMapRelightingVolumetricNormalV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6704,
-            pr_title: String::from("PR #6704: AI Depth-Map Relighting and Volumetric Surface Normal Shading"),
+            pr_title: String::from(
+                "PR #6704: AI Depth-Map Relighting and Volumetric Surface Normal Shading",
+            ),
             target_subsystem: String::from("PhotoCraft Spatial Lighting Studio"),
             original_suite: String::from("PhotoCraft 3D Studio"),
             components_added: vec![
@@ -436,9 +452,18 @@ impl PhotocraftMultiExposureHdrToneMappingFusionV67PrEngine {
     pub fn new() -> Self {
         Self {
             brackets: vec![
-                ExposureBracketV67 { exposure_bias_ev: -2.0, weight_coefficient: 0.33 },
-                ExposureBracketV67 { exposure_bias_ev: 0.0, weight_coefficient: 0.34 },
-                ExposureBracketV67 { exposure_bias_ev: 2.0, weight_coefficient: 0.33 },
+                ExposureBracketV67 {
+                    exposure_bias_ev: -2.0,
+                    weight_coefficient: 0.33,
+                },
+                ExposureBracketV67 {
+                    exposure_bias_ev: 0.0,
+                    weight_coefficient: 0.34,
+                },
+                ExposureBracketV67 {
+                    exposure_bias_ev: 2.0,
+                    weight_coefficient: 0.33,
+                },
             ],
             saturation_boost: 1.15,
             contrast_exponent: 1.2,
@@ -462,7 +487,9 @@ impl PhotocraftMultiExposureHdrToneMappingFusionV67PrEngine {
         }
         for b in bracket_buffers {
             if b.len() != total_bytes {
-                return Err(String::from("Bracket buffer size does not match expected image dimensions"));
+                return Err(String::from(
+                    "Bracket buffer size does not match expected image dimensions",
+                ));
             }
         }
 
@@ -494,7 +521,9 @@ impl PhotocraftMultiExposureHdrToneMappingFusionV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6705,
-            pr_title: String::from("PR #6705: Mertens Multi-Exposure HDR Fusion and Local Tone Mapping"),
+            pr_title: String::from(
+                "PR #6705: Mertens Multi-Exposure HDR Fusion and Local Tone Mapping",
+            ),
             target_subsystem: String::from("PhotoCraft HDR Studio"),
             original_suite: String::from("PhotoCraft Dynamic Range"),
             components_added: vec![
@@ -590,7 +619,9 @@ impl PhotocraftNonDestructiveSmartFilterDagPipelineV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6706,
-            pr_title: String::from("PR #6706: Non-Destructive Directed Acyclic Graph (DAG) Smart Filter Pipeline"),
+            pr_title: String::from(
+                "PR #6706: Non-Destructive Directed Acyclic Graph (DAG) Smart Filter Pipeline",
+            ),
             target_subsystem: String::from("PhotoCraft Filter Engine"),
             original_suite: String::from("PhotoCraft Smart Object Pipeline"),
             components_added: vec![
@@ -666,7 +697,9 @@ impl PhotocraftSubpixelVectorPenClippingMaskV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6707,
-            pr_title: String::from("PR #6707: Subpixel Vector Pen Bezier Clipping Path Mask Rasterizer"),
+            pr_title: String::from(
+                "PR #6707: Subpixel Vector Pen Bezier Clipping Path Mask Rasterizer",
+            ),
             target_subsystem: String::from("PhotoCraft Masking Engine"),
             original_suite: String::from("PhotoCraft Precision Pen Tool"),
             components_added: vec![
@@ -735,7 +768,9 @@ impl PhotocraftNeuralSemanticInstanceAlphaMattingV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6708,
-            pr_title: String::from("PR #6708: Neural Semantic Instance Alpha Matting and Hair Strand Isolation"),
+            pr_title: String::from(
+                "PR #6708: Neural Semantic Instance Alpha Matting and Hair Strand Isolation",
+            ),
             target_subsystem: String::from("PhotoCraft AI Selection"),
             original_suite: String::from("PhotoCraft Subject Selection"),
             components_added: vec![
@@ -781,7 +816,9 @@ impl PhotocraftGigapixelPanoramaSphericalStitcherV67PrEngine {
     /// Stitch multiple image frames into a unified panoramic projection.
     pub fn stitch_frames(&self, frame_count: usize) -> Result<usize, String> {
         if frame_count < 2 {
-            return Err(String::from("At least 2 frames required for panorama stitching"));
+            return Err(String::from(
+                "At least 2 frames required for panorama stitching",
+            ));
         }
         Ok(frame_count)
     }
@@ -842,7 +879,9 @@ impl PhotocraftSpatialMeshPuppetWarpDeformationV67PrEngine {
             return Err(String::from("Vertex count must be greater than zero"));
         }
         if self.pins.is_empty() {
-            return Err(String::from("At least one control pin required for deformation"));
+            return Err(String::from(
+                "At least one control pin required for deformation",
+            ));
         }
         Ok(vertex_count)
     }
@@ -850,7 +889,9 @@ impl PhotocraftSpatialMeshPuppetWarpDeformationV67PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV67PrProposalManifest {
         PhotocraftV67PrProposalManifest {
             pr_id: 6710,
-            pr_title: String::from("PR #6710: ARAP Spatial Triangulated Mesh Puppet Warp Deformation"),
+            pr_title: String::from(
+                "PR #6710: ARAP Spatial Triangulated Mesh Puppet Warp Deformation",
+            ),
             target_subsystem: String::from("PhotoCraft Spatial Transformation"),
             original_suite: String::from("PhotoCraft Deform Studio"),
             components_added: vec![
@@ -887,14 +928,17 @@ impl SovereignPhotocraftArtcraftMissingComponentsV67PrGateway {
     pub fn new() -> Self {
         Self {
             engine_super_resolution: PhotocraftAiNeuralSuperResolutionUpscalerV67PrEngine::new(),
-            engine_wavelet_separation: PhotocraftSubpixelWaveletTextureFrequencySeparationV67PrEngine::new(),
+            engine_wavelet_separation:
+                PhotocraftSubpixelWaveletTextureFrequencySeparationV67PrEngine::new(),
             engine_acescc_grading: PhotocraftAcesCcColorGradingOcioLutV67PrEngine::new(),
             engine_depth_relighting: PhotocraftDepthMapRelightingVolumetricNormalV67PrEngine::new(),
             engine_hdr_fusion: PhotocraftMultiExposureHdrToneMappingFusionV67PrEngine::new(),
-            engine_smart_filter_dag: PhotocraftNonDestructiveSmartFilterDagPipelineV67PrEngine::new(),
+            engine_smart_filter_dag: PhotocraftNonDestructiveSmartFilterDagPipelineV67PrEngine::new(
+            ),
             engine_vector_mask: PhotocraftSubpixelVectorPenClippingMaskV67PrEngine::new(),
             engine_alpha_matting: PhotocraftNeuralSemanticInstanceAlphaMattingV67PrEngine::new(),
-            engine_panorama_stitcher: PhotocraftGigapixelPanoramaSphericalStitcherV67PrEngine::new(),
+            engine_panorama_stitcher: PhotocraftGigapixelPanoramaSphericalStitcherV67PrEngine::new(
+            ),
             engine_puppet_warp: PhotocraftSpatialMeshPuppetWarpDeformationV67PrEngine::new(),
         }
     }
@@ -957,7 +1001,9 @@ mod tests {
         let src = vec![120u8; 3 * 3 * 3];
         let mut low = vec![0u8; 3 * 3 * 3];
         let mut high = vec![0u8; 3 * 3 * 3];
-        let pixels = engine.separate_frequencies(&src, &mut low, &mut high, 3, 3).unwrap();
+        let pixels = engine
+            .separate_frequencies(&src, &mut low, &mut high, 3, 3)
+            .unwrap();
         assert_eq!(pixels, 9);
         assert_eq!(low[0], 120);
         assert_eq!(high[0], 128); // difference is 0, offset is 128
@@ -977,7 +1023,9 @@ mod tests {
         let engine = PhotocraftDepthMapRelightingVolumetricNormalV67PrEngine::new();
         let mut rgb = vec![50u8; 3];
         let depth = vec![200u8; 1];
-        let count = engine.relight_with_depth_map(&mut rgb, &depth, 1, 1).unwrap();
+        let count = engine
+            .relight_with_depth_map(&mut rgb, &depth, 1, 1)
+            .unwrap();
         assert_eq!(count, 1);
         assert!(rgb[0] > 50);
     }
@@ -998,7 +1046,10 @@ mod tests {
         let mut engine = PhotocraftNonDestructiveSmartFilterDagPipelineV67PrEngine::new();
         engine.add_node(DagNodeEntryV67 {
             node_id: 1,
-            filter: SmartFilterDagNodeV67::UnsharpMask { radius: 1.0, amount: 2.0 },
+            filter: SmartFilterDagNodeV67::UnsharpMask {
+                radius: 1.0,
+                amount: 2.0,
+            },
             enabled: true,
         });
         let mut rgb = vec![100u8; 3];

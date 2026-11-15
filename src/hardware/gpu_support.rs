@@ -58,18 +58,16 @@ impl GpuManager {
     /// Detect all GPUs in the system (reads /sys/bus/pci/devices).
     pub fn detect() -> Result<Vec<GpuInfo>, GpuError> {
         // Production: parse /sys/bus/pci/devices for class 0x0300/0x0302
-        Ok(vec![
-            GpuInfo {
-                vendor: GpuVendor::Intel,
-                name: "Intel Arc A770".to_string(),
-                vram_mb: 16384,
-                driver: "i915".to_string(),
-                supports_vulkan: true,
-                supports_opencl: true,
-                supports_vaapi: true,
-                supports_vdpau: false,
-            },
-        ])
+        Ok(vec![GpuInfo {
+            vendor: GpuVendor::Intel,
+            name: "Intel Arc A770".to_string(),
+            vram_mb: 16384,
+            driver: "i915".to_string(),
+            supports_vulkan: true,
+            supports_opencl: true,
+            supports_vaapi: true,
+            supports_vdpau: false,
+        }])
     }
 
     /// Return the primary GPU (discrete preferred over integrated).
@@ -183,6 +181,9 @@ mod tests {
             supports_vaapi: false,
             supports_vdpau: false,
         };
-        assert!(matches!(GpuManager::configure_vulkan(&gpu), Err(GpuError::VulkanNotSupported)));
+        assert!(matches!(
+            GpuManager::configure_vulkan(&gpu),
+            Err(GpuError::VulkanNotSupported)
+        ));
     }
 }

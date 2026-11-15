@@ -99,7 +99,9 @@ impl PhotocraftRaw32BitFloatingPointDemosaicV68PrEngine {
     ) -> Result<usize, String> {
         let total_pixels = width * height;
         if bayer_plane.len() != total_pixels {
-            return Err(String::from("Bayer buffer size mismatch with image dimensions"));
+            return Err(String::from(
+                "Bayer buffer size mismatch with image dimensions",
+            ));
         }
         if dst_rgb.len() != total_pixels * 3 {
             return Err(String::from("Destination RGB float buffer size mismatch"));
@@ -107,7 +109,11 @@ impl PhotocraftRaw32BitFloatingPointDemosaicV68PrEngine {
 
         let bl = self.params.black_level_offset;
         let wl = self.params.white_level_clip;
-        let scale = if (wl - bl).abs() > 1e-6 { 1.0 / (wl - bl) } else { 1.0 };
+        let scale = if (wl - bl).abs() > 1e-6 {
+            1.0 / (wl - bl)
+        } else {
+            1.0
+        };
 
         // Bilinear CFA interpolation with black level subtraction
         for y in 0..height {
@@ -117,7 +123,7 @@ impl PhotocraftRaw32BitFloatingPointDemosaicV68PrEngine {
                 let out_idx = idx * 3;
 
                 // Simulated adaptive green interpolation and red/blue gradient distribution
-                dst_rgb[out_idx] = raw_val;     // Red channel estimate
+                dst_rgb[out_idx] = raw_val; // Red channel estimate
                 dst_rgb[out_idx + 1] = raw_val; // Green channel estimate
                 dst_rgb[out_idx + 2] = raw_val; // Blue channel estimate
             }
@@ -129,12 +135,16 @@ impl PhotocraftRaw32BitFloatingPointDemosaicV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6801,
-            pr_title: String::from("PR #6801: 32-Bit Floating Point RAW Sensor Bayer Demosaic Engine"),
+            pr_title: String::from(
+                "PR #6801: 32-Bit Floating Point RAW Sensor Bayer Demosaic Engine",
+            ),
             target_subsystem: String::from("PhotoCraft RAW Darkroom"),
             original_suite: String::from("PhotoCraft Sensor Core"),
             components_added: vec![
                 String::from("Adaptive directional gradient edge-directed Bayer CFA interpolation"),
-                String::from("IEEE-754 32-bit floating point high dynamic range linear space pipeline"),
+                String::from(
+                    "IEEE-754 32-bit floating point high dynamic range linear space pipeline",
+                ),
                 String::from("Integrated optical chromatic aberration & highlight reconstruction"),
             ],
             performance_multiplier: String::from("7.8x AVX-512 / NEON Vectorized Demosaic"),
@@ -186,7 +196,9 @@ impl PhotocraftAiDiffusionGenerativeInpaintingV68PrEngine {
     ) -> Result<usize, String> {
         let total_pixels = width * height;
         if rgb_buffer.len() != total_pixels * 3 || mask_plane.len() != total_pixels {
-            return Err(String::from("Buffer size mismatch between RGB and inpainting mask"));
+            return Err(String::from(
+                "Buffer size mismatch between RGB and inpainting mask",
+            ));
         }
 
         let mut replaced_count = 0usize;
@@ -210,7 +222,9 @@ impl PhotocraftAiDiffusionGenerativeInpaintingV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6802,
-            pr_title: String::from("PR #6802: Latent Diffusion AI Generative Context-Aware Inpainting Engine"),
+            pr_title: String::from(
+                "PR #6802: Latent Diffusion AI Generative Context-Aware Inpainting Engine",
+            ),
             target_subsystem: String::from("PhotoCraft AI Generative Studio"),
             original_suite: String::from("PhotoCraft Retouch Engine"),
             components_added: vec![
@@ -241,7 +255,7 @@ pub enum RenderingIntentV68 {
 #[derive(Debug, Clone)]
 pub struct SpectralSeparationConfigV68 {
     pub icc_profile_name: String,
-    pub total_ink_limit: f32, // e.g. 300% (3.0)
+    pub total_ink_limit: f32,      // e.g. 300% (3.0)
     pub black_generation_gcr: f32, // Gray Component Replacement factor
     pub rendering_intent: RenderingIntentV68,
 }
@@ -272,10 +286,14 @@ impl PhotocraftCmykSpectralColorSeparationV68PrEngine {
         pixel_count: usize,
     ) -> Result<usize, String> {
         if src_rgb.len() != pixel_count * 3 {
-            return Err(String::from("Source RGB buffer size does not match pixel count"));
+            return Err(String::from(
+                "Source RGB buffer size does not match pixel count",
+            ));
         }
         if dst_cmyk.len() != pixel_count * 4 {
-            return Err(String::from("Destination CMYK buffer size must be 4 bytes per pixel"));
+            return Err(String::from(
+                "Destination CMYK buffer size must be 4 bytes per pixel",
+            ));
         }
 
         for i in 0..pixel_count {
@@ -306,13 +324,21 @@ impl PhotocraftCmykSpectralColorSeparationV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6803,
-            pr_title: String::from("PR #6803: CMYK Spectral Color Separation and Pre-press Proofing Engine"),
+            pr_title: String::from(
+                "PR #6803: CMYK Spectral Color Separation and Pre-press Proofing Engine",
+            ),
             target_subsystem: String::from("PhotoCraft Prepress Studio"),
             original_suite: String::from("PhotoCraft Color Management"),
             components_added: vec![
-                String::from("ICC Profile v4 spectral transform and multi-channel spot color engine"),
-                String::from("Adaptive Gray Component Replacement (GCR) & Under Color Removal (UCR)"),
-                String::from("Total Area Coverage (TAC) ink limit clamping & soft-proofing gamut monitor"),
+                String::from(
+                    "ICC Profile v4 spectral transform and multi-channel spot color engine",
+                ),
+                String::from(
+                    "Adaptive Gray Component Replacement (GCR) & Under Color Removal (UCR)",
+                ),
+                String::from(
+                    "Total Area Coverage (TAC) ink limit clamping & soft-proofing gamut monitor",
+                ),
             ],
             performance_multiplier: String::from("9.4x SIMD ICC LUT Color Space Transformation"),
             status: String::from("READY_FOR_MERGE"),
@@ -327,8 +353,8 @@ impl PhotocraftCmykSpectralColorSeparationV68PrEngine {
 /// Oklab color grading wheel coordinates (angle in radians, chroma radius).
 #[derive(Debug, Clone)]
 pub struct OklabColorWheelControlV68 {
-    pub lift_offset: (f32, f32, f32),   // Shadows: (L, a, b)
-    pub gamma_power: (f32, f32, f32),   // Midtones: (L, a, b)
+    pub lift_offset: (f32, f32, f32),     // Shadows: (L, a, b)
+    pub gamma_power: (f32, f32, f32),     // Midtones: (L, a, b)
     pub gain_multiplier: (f32, f32, f32), // Highlights: (L, a, b)
     pub global_saturation: f32,
 }
@@ -352,7 +378,11 @@ impl PhotocraftOklabColorGradingWheelMatrixV68PrEngine {
     }
 
     /// Grades an RGB buffer through perceptually uniform Oklab color coordinates.
-    pub fn grade_rgb_oklab(&self, rgb_buffer: &mut [u8], pixel_count: usize) -> Result<usize, String> {
+    pub fn grade_rgb_oklab(
+        &self,
+        rgb_buffer: &mut [u8],
+        pixel_count: usize,
+    ) -> Result<usize, String> {
         if rgb_buffer.len() != pixel_count * 3 {
             return Err(String::from("RGB buffer size mismatch with pixel count"));
         }
@@ -383,13 +413,17 @@ impl PhotocraftOklabColorGradingWheelMatrixV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6804,
-            pr_title: String::from("PR #6804: Perceptually Uniform Oklab/Oklch Color Grading Wheel Matrix"),
+            pr_title: String::from(
+                "PR #6804: Perceptually Uniform Oklab/Oklch Color Grading Wheel Matrix",
+            ),
             target_subsystem: String::from("PhotoCraft Color Grading Studio"),
             original_suite: String::from("PhotoCraft Darkroom Master"),
             components_added: vec![
                 String::from("Perceptually uniform Oklab/Oklch hue-linear color space pipeline"),
                 String::from("Tri-wheel Lift/Gamma/Gain color tone curve interactive controllers"),
-                String::from("Vividness gamut mapping and constant-perceived-lightness chroma scaling"),
+                String::from(
+                    "Vividness gamut mapping and constant-perceived-lightness chroma scaling",
+                ),
             ],
             performance_multiplier: String::from("8.6x Vectorized Perceptual Math Pipeline"),
             status: String::from("READY_FOR_MERGE"),
@@ -443,7 +477,10 @@ impl PhotocraftSubpixelPyramidFocusStackingV68PrEngine {
         }
         for (idx, slice) in slice_buffers.iter().enumerate() {
             if slice.len() != total_bytes {
-                return Err(format!("Slice buffer at index {} has incorrect dimensions", idx));
+                return Err(format!(
+                    "Slice buffer at index {} has incorrect dimensions",
+                    idx
+                ));
             }
         }
 
@@ -475,11 +512,15 @@ impl PhotocraftSubpixelPyramidFocusStackingV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6805,
-            pr_title: String::from("PR #6805: Subpixel Laplacian Pyramid Macro Focus Stacking Engine"),
+            pr_title: String::from(
+                "PR #6805: Subpixel Laplacian Pyramid Macro Focus Stacking Engine",
+            ),
             target_subsystem: String::from("PhotoCraft Macro Studio"),
             original_suite: String::from("PhotoCraft Precision Focus"),
             components_added: vec![
-                String::from("Subpixel homography matrix image registration and feature auto-aligner"),
+                String::from(
+                    "Subpixel homography matrix image registration and feature auto-aligner",
+                ),
                 String::from("Multi-scale Laplacian pyramid sharpness band energy selector"),
                 String::from("Depth-from-focus 3D point cloud and depth map synthesizer"),
             ],
@@ -577,7 +618,9 @@ impl PhotocraftNonDestructiveSmartFilterGraphV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6806,
-            pr_title: String::from("PR #6806: Non-Destructive Directed Acyclic Graph (DAG) Smart Filter Engine"),
+            pr_title: String::from(
+                "PR #6806: Non-Destructive Directed Acyclic Graph (DAG) Smart Filter Engine",
+            ),
             target_subsystem: String::from("PhotoCraft Smart Object Pipeline"),
             original_suite: String::from("PhotoCraft Filter Graph"),
             components_added: vec![
@@ -653,7 +696,9 @@ impl PhotocraftSubpixelVectorPenClippingPathV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6807,
-            pr_title: String::from("PR #6807: Subpixel Vector Pen Cubic Bezier Clipping Mask Engine"),
+            pr_title: String::from(
+                "PR #6807: Subpixel Vector Pen Cubic Bezier Clipping Mask Engine",
+            ),
             target_subsystem: String::from("PhotoCraft Precision Pen"),
             original_suite: String::from("PhotoCraft Vector Masking"),
             components_added: vec![
@@ -705,7 +750,9 @@ impl PhotocraftNeuralSemanticHairAlphaMattingV68PrEngine {
     ) -> Result<usize, String> {
         let total_pixels = width * height;
         if trimap_buffer.len() != total_pixels {
-            return Err(String::from("Trimap buffer size mismatch with image dimensions"));
+            return Err(String::from(
+                "Trimap buffer size mismatch with image dimensions",
+            ));
         }
 
         let thresh = self.config.trimap_uncertainty_threshold;
@@ -725,7 +772,9 @@ impl PhotocraftNeuralSemanticHairAlphaMattingV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6808,
-            pr_title: String::from("PR #6808: Deep Neural Semantic Hair and Edge Alpha Matting Engine"),
+            pr_title: String::from(
+                "PR #6808: Deep Neural Semantic Hair and Edge Alpha Matting Engine",
+            ),
             target_subsystem: String::from("PhotoCraft AI Selection"),
             original_suite: String::from("PhotoCraft Smart Selection"),
             components_added: vec![
@@ -771,7 +820,9 @@ impl PhotocraftGigapixelMultiBandSphericalStitcherV68PrEngine {
     /// Stitches an array of overlapping frame captures into a unified projection.
     pub fn stitch_overlapping_frames(&self, frame_count: usize) -> Result<usize, String> {
         if frame_count < 2 {
-            return Err(String::from("At least 2 frames are required for panoramic stitching"));
+            return Err(String::from(
+                "At least 2 frames are required for panoramic stitching",
+            ));
         }
         Ok(frame_count)
     }
@@ -783,9 +834,13 @@ impl PhotocraftGigapixelMultiBandSphericalStitcherV68PrEngine {
             target_subsystem: String::from("PhotoCraft Panorama Studio"),
             original_suite: String::from("PhotoCraft Wide-Angle Stitching"),
             components_added: vec![
-                String::from("Levenberg-Marquardt bundle adjustment camera pose & homography solver"),
+                String::from(
+                    "Levenberg-Marquardt bundle adjustment camera pose & homography solver",
+                ),
                 String::from("Spherical, cylindrical, and stereographic 360-degree projections"),
-                String::from("Multi-band frequency seamless seam line blender with exposure compensation"),
+                String::from(
+                    "Multi-band frequency seamless seam line blender with exposure compensation",
+                ),
             ],
             performance_multiplier: String::from("6.8x Multi-Core GPU Stitching Acceleration"),
             status: String::from("READY_FOR_MERGE"),
@@ -833,7 +888,9 @@ impl PhotocraftSpatialArapMeshPuppetWarpV68PrEngine {
             return Err(String::from("Vertex count must be greater than zero"));
         }
         if self.pins.is_empty() {
-            return Err(String::from("At least one puppet constraint pin is required"));
+            return Err(String::from(
+                "At least one puppet constraint pin is required",
+            ));
         }
         Ok(vertex_count)
     }
@@ -841,13 +898,17 @@ impl PhotocraftSpatialArapMeshPuppetWarpV68PrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV68PrProposalManifest {
         PhotocraftV68PrProposalManifest {
             pr_id: 6810,
-            pr_title: String::from("PR #6810: As-Rigid-As-Possible (ARAP) Triangular Mesh Puppet Warp Deformation"),
+            pr_title: String::from(
+                "PR #6810: As-Rigid-As-Possible (ARAP) Triangular Mesh Puppet Warp Deformation",
+            ),
             target_subsystem: String::from("PhotoCraft Spatial Transformation"),
             original_suite: String::from("PhotoCraft Deform Studio"),
             components_added: vec![
                 String::from("As-Rigid-As-Possible (ARAP) energy minimization non-linear solver"),
                 String::from("Delaunay adaptive triangulated surface remesher and depth layering"),
-                String::from("Multi-pin hierarchical skeletal kinematics and joint pin rotation lock"),
+                String::from(
+                    "Multi-pin hierarchical skeletal kinematics and joint pin rotation lock",
+                ),
             ],
             performance_multiplier: String::from("5.8x Sparse Cholesky Decomposer"),
             status: String::from("READY_FOR_MERGE"),
@@ -878,14 +939,16 @@ impl SovereignPhotocraftArtcraftMissingComponentsV68PrGateway {
     pub fn new() -> Self {
         Self {
             engine_raw_demosaic: PhotocraftRaw32BitFloatingPointDemosaicV68PrEngine::new(),
-            engine_generative_inpainting: PhotocraftAiDiffusionGenerativeInpaintingV68PrEngine::new(),
+            engine_generative_inpainting: PhotocraftAiDiffusionGenerativeInpaintingV68PrEngine::new(
+            ),
             engine_cmyk_separation: PhotocraftCmykSpectralColorSeparationV68PrEngine::new(),
             engine_oklab_grading: PhotocraftOklabColorGradingWheelMatrixV68PrEngine::new(),
             engine_focus_stacking: PhotocraftSubpixelPyramidFocusStackingV68PrEngine::new(),
             engine_smart_filter_graph: PhotocraftNonDestructiveSmartFilterGraphV68PrEngine::new(),
             engine_vector_path: PhotocraftSubpixelVectorPenClippingPathV68PrEngine::new(),
             engine_hair_matting: PhotocraftNeuralSemanticHairAlphaMattingV68PrEngine::new(),
-            engine_spherical_stitcher: PhotocraftGigapixelMultiBandSphericalStitcherV68PrEngine::new(),
+            engine_spherical_stitcher:
+                PhotocraftGigapixelMultiBandSphericalStitcherV68PrEngine::new(),
             engine_puppet_warp: PhotocraftSpatialArapMeshPuppetWarpV68PrEngine::new(),
         }
     }
@@ -977,7 +1040,9 @@ mod tests {
         let s1 = vec![50u8; 6];
         let s2 = vec![150u8; 6];
         let mut out = vec![0u8; 6];
-        let count = engine.stack_focus_slices(&[s1, s2], 2, 1, &mut out).unwrap();
+        let count = engine
+            .stack_focus_slices(&[s1, s2], 2, 1, &mut out)
+            .unwrap();
         assert_eq!(count, 2);
         assert_eq!(out[0], 150);
     }

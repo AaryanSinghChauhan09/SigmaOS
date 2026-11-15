@@ -66,7 +66,8 @@ impl SoundcraftNeuralSpectralDenoiseDeclipRestorationV71Engine {
         let declip_threshold = 10.0f32.powf(self.declip_threshold_dbfs / 20.0);
         for sample in buffer.iter_mut() {
             if sample.abs() >= declip_threshold {
-                *sample = sample.signum() * (declip_threshold - (sample.abs() - declip_threshold) * 0.1);
+                *sample =
+                    sample.signum() * (declip_threshold - (sample.abs() - declip_threshold) * 0.1);
             }
             if sample.abs() < 0.004 {
                 *sample *= 0.1; // Denoise gate
@@ -623,14 +624,20 @@ impl SovereignSoundcraftArtcraftMissingComponentsV71PrGateway {
     pub fn new() -> Self {
         Self {
             restoration_engine: SoundcraftNeuralSpectralDenoiseDeclipRestorationV71Engine::new(),
-            mastering_compressor_engine: SoundcraftPhaseLinearMultibandMasteringCompressorV71Engine::new(),
-            convolution_reverb_engine: SoundcraftPartitioned3dAcousticConvolutionReverbV71Engine::new(),
+            mastering_compressor_engine:
+                SoundcraftPhaseLinearMultibandMasteringCompressorV71Engine::new(),
+            convolution_reverb_engine:
+                SoundcraftPartitioned3dAcousticConvolutionReverbV71Engine::new(),
             audio_to_midi_engine: SoundcraftPolyphonicAudioToMidiStreamTranscriberV71Engine::new(),
             transient_shaper_engine: SoundcraftDualBandTransientPunchShaperV71Engine::new(),
             stem_mixer_engine: SoundcraftAutomatedMultiTrackStemMixerAutoLevelerV71Engine::new(),
             binaural_spatial_engine: SoundcraftHeadTracked6DofBinauralSpatialAudioV71Engine::new(),
-            plugin_host_engine: SoundcraftSandboxedVst3ClapPluginHostV71Engine::new("SovereignDAWPluginV71"),
-            batch_transcoder_engine: SoundcraftParallelStemBatchAudioTranscoderV71Engine::new("flac"),
+            plugin_host_engine: SoundcraftSandboxedVst3ClapPluginHostV71Engine::new(
+                "SovereignDAWPluginV71",
+            ),
+            batch_transcoder_engine: SoundcraftParallelStemBatchAudioTranscoderV71Engine::new(
+                "flac",
+            ),
             atmos_spatializer_engine: SoundcraftDolbyAtmos714Bed3dObjectSpatializerV71Engine::new(),
         }
     }

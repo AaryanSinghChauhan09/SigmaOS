@@ -927,9 +927,18 @@ impl SovereignVirtualizationAndContainersParityV91Gateway {
         for p in &proposals {
             out.push_str(&format!("### PR #{}: {}\n", p.pr_id, p.title));
             out.push_str(&format!("- **Category:** {}\n", p.category));
-            out.push_str(&format!("- **Inspiration Sources:** {}\n", p.inspiration_sources.join(", ")));
-            out.push_str(&format!("- **Components:** {}\n", p.components_implemented.join(", ")));
-            out.push_str(&format!("- **SLSA Attestation:** {}\n", p.slsa_level_4_attestation));
+            out.push_str(&format!(
+                "- **Inspiration Sources:** {}\n",
+                p.inspiration_sources.join(", ")
+            ));
+            out.push_str(&format!(
+                "- **Components:** {}\n",
+                p.components_implemented.join(", ")
+            ));
+            out.push_str(&format!(
+                "- **SLSA Attestation:** {}\n",
+                p.slsa_level_4_attestation
+            ));
             out.push_str(&format!("- **Summary:** {}\n\n", p.pr_markdown_summary));
         }
 

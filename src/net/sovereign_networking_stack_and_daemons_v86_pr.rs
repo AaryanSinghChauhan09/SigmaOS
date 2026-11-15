@@ -494,7 +494,8 @@ impl SovereignNetUtilitiesAndDiagnosticsV86Engine {
     pub fn execute_curl_http3_download(&mut self, url: &str) -> String {
         self.active_http3_streams += 1;
         if url.starts_with("https://") {
-            "HTTP/3 200 OK\ncontent-type: application/octet-stream\nalt-svc: h3=\":443\"".to_string()
+            "HTTP/3 200 OK\ncontent-type: application/octet-stream\nalt-svc: h3=\":443\""
+                .to_string()
         } else {
             "HTTP/1.1 200 OK".to_string()
         }
@@ -572,7 +573,9 @@ impl SovereignNetworkingStackAndDaemonsV86PrGateway {
     }
 
     pub fn generate_master_pr_summary(&self) -> String {
-        let mut summary = String::from("# Sovereign Linux & BSD Networking Stack & Control Daemons Parity Suite (v86)\n\n");
+        let mut summary = String::from(
+            "# Sovereign Linux & BSD Networking Stack & Control Daemons Parity Suite (v86)\n\n",
+        );
         summary.push_str("This pull request suite implements comprehensive zero-dependency `#![no_std]` / `alloc` native parity engines inspired by Linux and BSD distributions across 7 critical domains:\n\n");
 
         for pr in self.generate_all_pr_manifests() {
@@ -674,7 +677,10 @@ mod tests {
     fn test_crypto_tunnels_vpn_v86() {
         let mut engine = SovereignCryptoTunnelsAndVpnV86Engine::new();
         assert!(engine.establish_wireguard_pqc_tunnel("wg0", "203.0.113.5:51820"));
-        assert_eq!(engine.active_tunnels[0].pqc_algorithm, "ML-KEM-768 / Noise_IKpsk2");
+        assert_eq!(
+            engine.active_tunnels[0].pqc_algorithm,
+            "ML-KEM-768 / Noise_IKpsk2"
+        );
         let manifest = engine.generate_pr_proposal();
         assert_eq!(manifest.pr_id, 8146);
     }

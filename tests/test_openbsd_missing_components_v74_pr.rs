@@ -38,7 +38,9 @@ fn test_integration_openbsd_v74_engines() {
     assert!(v_ok.is_valid);
 
     let mut unveil = OpenBsdUnveilTreeInheritanceMountIsolationV74PrEngine::new();
-    assert!(unveil.apply_unveil_tree(100, "/usr/bin", "rx", true).is_ok());
+    assert!(unveil
+        .apply_unveil_tree(100, "/usr/bin", "rx", true)
+        .is_ok());
     assert!(unveil.check_access(100, "/usr/bin/cat", 'r'));
 
     let mut pledge = OpenBsdPledgeSyscallCategoryGuardV74PrEngine::new();

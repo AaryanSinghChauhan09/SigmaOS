@@ -14,9 +14,9 @@ mod arch_linux_missing_components_v84_pr;
 #[path = "../src/distro/open_source_os_and_arch_missing_components_v84_pr.rs"]
 mod open_source_os_and_arch_missing_components_v84_pr;
 
+use arch_linux_missing_components_v84_pr::SovereignArchLinuxMissingComponentsV84PrSuite;
 use open_source_os_and_arch_missing_components_v84_pr::UniversalOpenSourceOsAndArchV84PrGatewayManager;
 use open_source_os_unimplemented_ideas_v84_pr::SovereignUnimplementedIdeasSuiteV84;
-use arch_linux_missing_components_v84_pr::SovereignArchLinuxMissingComponentsV84PrSuite;
 
 #[test]
 fn test_v84_open_source_os_and_arch_missing_components_pr_suite() {

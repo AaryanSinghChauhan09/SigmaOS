@@ -7,9 +7,7 @@ use std::path::Path;
 #[path = "../src/governance/shell_lifecycle_program.rs"]
 mod shell_lifecycle_program;
 
-use shell_lifecycle_program::{
-    ShellAcceptanceGate, ShellIssueArea, ShellLifecycleProgramEngine,
-};
+use shell_lifecycle_program::{ShellAcceptanceGate, ShellIssueArea, ShellLifecycleProgramEngine};
 
 #[test]
 fn test_shell_rules_file_exists_and_valid() {
@@ -38,19 +36,30 @@ fn test_pull_request_template_exists() {
     assert!(path.exists(), ".github/PULL_REQUEST_TEMPLATE.md must exist");
     let content = fs::read_to_string(path).expect("Failed to read PR template");
     assert!(content.contains("## Shell component") || content.contains("## Component impact"));
-    assert!(content.contains("## Shell safety review") || content.contains("## Safety and rollback"));
+    assert!(
+        content.contains("## Shell safety review") || content.contains("## Safety and rollback")
+    );
 }
 
 #[test]
 fn test_shell_documentation_suite_exists() {
-    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-SHELL_MAINTENANCE.md").exists());
-    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-SHELL_CONFORMANCE.md").exists());
+    assert!(
+        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-SHELL_MAINTENANCE.md").exists()
+    );
+    assert!(
+        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-SHELL_CONFORMANCE.md").exists()
+    );
     assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-GRAMMAR.md").exists());
     assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-BUILTINS.md").exists());
     assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-EXIT_CODES.md").exists());
-    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-INTERACTIVE_SHELL.md").exists());
+    assert!(
+        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-INTERACTIVE_SHELL.md").exists()
+    );
     assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-shell-DIAGNOSTICS.md").exists());
-    assert!(Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-studies-2026-W41-shell-word-splitting.md").exists());
+    assert!(Path::new(
+        "/home/aaryansinghchauhan/SigmaOS.wiki/Doc-studies-2026-W41-shell-word-splitting.md"
+    )
+    .exists());
 }
 
 #[test]

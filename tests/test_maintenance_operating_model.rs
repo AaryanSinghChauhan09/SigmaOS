@@ -107,19 +107,25 @@ fn test_task_artifacts_and_status_variants() {
         title: "Boot Smoke".into(),
         path: "build/boot.log".into(),
     };
-    assert!(report.summary().contains("Report 'Boot Smoke' at build/boot.log"));
+    assert!(report
+        .summary()
+        .contains("Report 'Boot Smoke' at build/boot.log"));
 
     let test_res = TaskArtifact::TestResult {
         suite_name: "scheduler_tests".into(),
         passed: true,
     };
-    assert!(test_res.summary().contains("Test Suite 'scheduler_tests': PASS"));
+    assert!(test_res
+        .summary()
+        .contains("Test Suite 'scheduler_tests': PASS"));
 
     let adr = TaskArtifact::DocumentedDecision {
         adr_number: 7,
         title: "Boot validation before drivers".into(),
     };
-    assert!(adr.summary().contains("ADR-0007: Boot validation before drivers"));
+    assert!(adr
+        .summary()
+        .contains("ADR-0007: Boot validation before drivers"));
 
     let statuses = [
         (TaskResultStatus::CodeExists, false),
@@ -193,11 +199,21 @@ fn test_release_tier_readiness_gates() {
     let mut engine = MaintenanceOperatingModelEngine::new();
 
     // Verify required_evidence descriptions
-    assert!(ReleaseTier::Experimental.required_evidence().contains("Build and unit tests pass"));
-    assert!(ReleaseTier::DeveloperPreview.required_evidence().contains("shell/diagnostic"));
-    assert!(ReleaseTier::TestDistribution.required_evidence().contains("VM installation"));
-    assert!(ReleaseTier::ReleaseCandidate.required_evidence().contains("Full regression"));
-    assert!(ReleaseTier::Stable.required_evidence().contains("Hardware matrix"));
+    assert!(ReleaseTier::Experimental
+        .required_evidence()
+        .contains("Build and unit tests pass"));
+    assert!(ReleaseTier::DeveloperPreview
+        .required_evidence()
+        .contains("shell/diagnostic"));
+    assert!(ReleaseTier::TestDistribution
+        .required_evidence()
+        .contains("VM installation"));
+    assert!(ReleaseTier::ReleaseCandidate
+        .required_evidence()
+        .contains("Full regression"));
+    assert!(ReleaseTier::Stable
+        .required_evidence()
+        .contains("Hardware matrix"));
 
     // Experimental is ready by default
     assert!(engine.evaluate_release_readiness(ReleaseTier::Experimental));

@@ -79,8 +79,13 @@ impl VoicecraftContinuousFlowMatchingMelSynthesizerPrEngineV82 {
     }
 
     /// Perform optimal transport Euler vector field ODE integration to generate mel-spectrogram
-    pub fn generate_flow_mel_v82(&self, text_tokens: &[u32], target_duration_ms: u32) -> Vec<Vec<f32>> {
-        let frames = ((target_duration_ms as f32 * self.sample_rate as f32 / 1000.0) / 256.0) as usize;
+    pub fn generate_flow_mel_v82(
+        &self,
+        text_tokens: &[u32],
+        target_duration_ms: u32,
+    ) -> Vec<Vec<f32>> {
+        let frames =
+            ((target_duration_ms as f32 * self.sample_rate as f32 / 1000.0) / 256.0) as usize;
         let num_frames = if frames == 0 { 16 } else { frames };
 
         let mut mel = vec![vec![0.0f32; num_frames]; self.mel_channels];
@@ -92,7 +97,8 @@ impl VoicecraftContinuousFlowMatchingMelSynthesizerPrEngineV82 {
             for ch in 0..self.mel_channels {
                 for f in 0..num_frames {
                     // Vector field dynamic ODE integration for continuous flow matching
-                    let velocity = (2.0 * PI * (f as f32 * 0.05 + ch as f32 * 0.02 + t)).sin() + token_bias;
+                    let velocity =
+                        (2.0 * PI * (f as f32 * 0.05 + ch as f32 * 0.02 + t)).sin() + token_bias;
                     mel[ch][f] += velocity * dt;
                 }
             }
@@ -172,7 +178,8 @@ impl VoicecraftAutoregressiveRvqCodecLanguageModelPrEngineV82 {
                 } else {
                     prompt_last
                 };
-                let predicted_token = ((prev as usize + layer * 31 + i * 7) % self.codebook_vocab_size) as u16;
+                let predicted_token =
+                    ((prev as usize + layer * 31 + i * 7) % self.codebook_vocab_size) as u16;
                 generated[layer].push(predicted_token);
             }
         }
@@ -258,7 +265,10 @@ impl VoicecraftHarmonicPlusNoiseDdspVocoderPrEngineV82 {
                 }
 
                 // Filtered noise synthesis across frequency bands
-                let noise_sample = ((sample_idx as f32 * 0.12345).sin()) * 0.1 * gain * (self.noise_bands as f32 / 16.0);
+                let noise_sample = ((sample_idx as f32 * 0.12345).sin())
+                    * 0.1
+                    * gain
+                    * (self.noise_bands as f32 / 16.0);
 
                 pcm[sample_idx] = (harmonic_sample * 0.8 + noise_sample * 0.2).clamp(-1.0, 1.0);
             }
@@ -419,11 +429,17 @@ impl VoicecraftWaylandVoiceAssistantAccessibilityPipelinePrEngineV82 {
         );
         self.registered_actions.insert(
             String::from("mute microphone"),
-            (String::from("pipewire"), String::from("pactl set-source-mute @DEFAULT_SOURCE@ toggle")),
+            (
+                String::from("pipewire"),
+                String::from("pactl set-source-mute @DEFAULT_SOURCE@ toggle"),
+            ),
         );
         self.registered_actions.insert(
             String::from("switch workspace"),
-            (String::from("hyprland"), String::from("hyprctl dispatch workspace e+1")),
+            (
+                String::from("hyprland"),
+                String::from("hyprctl dispatch workspace e+1"),
+            ),
         );
         self.registered_actions.insert(
             String::from("take screenshot"),
@@ -436,7 +452,11 @@ impl VoicecraftWaylandVoiceAssistantAccessibilityPipelinePrEngineV82 {
     }
 
     /// Process input microphone PCM frame, detect speech activity and wake-word, then resolve intent
-    pub fn process_voice_pipeline_v82(&self, pcm_frame: &[f32], transcribed_text: &str) -> Option<VoiceAssistantIntentV82> {
+    pub fn process_voice_pipeline_v82(
+        &self,
+        pcm_frame: &[f32],
+        transcribed_text: &str,
+    ) -> Option<VoiceAssistantIntentV82> {
         if pcm_frame.is_empty() {
             return None;
         }
@@ -514,8 +534,10 @@ impl SovereignVoicecraftAdvancementsV82MasterSuite {
             flow_matching_engine: VoicecraftContinuousFlowMatchingMelSynthesizerPrEngineV82::new(),
             codec_lm_engine: VoicecraftAutoregressiveRvqCodecLanguageModelPrEngineV82::new(),
             ddsp_vocoder_engine: VoicecraftHarmonicPlusNoiseDdspVocoderPrEngineV82::new(),
-            spatial_beamforming_engine: VoicecraftSpatialArrayDelayAndSumBeamformerPrEngineV82::new(),
-            voice_assistant_engine: VoicecraftWaylandVoiceAssistantAccessibilityPipelinePrEngineV82::new(),
+            spatial_beamforming_engine: VoicecraftSpatialArrayDelayAndSumBeamformerPrEngineV82::new(
+            ),
+            voice_assistant_engine:
+                VoicecraftWaylandVoiceAssistantAccessibilityPipelinePrEngineV82::new(),
         }
     }
 
@@ -544,7 +566,10 @@ impl SovereignVoicecraftAdvancementsV82MasterSuite {
         if manifests.is_empty() {
             return 0.0;
         }
-        let ready = manifests.iter().filter(|m| m.status == "Ready for Merge").count();
+        let ready = manifests
+            .iter()
+            .filter(|m| m.status == "Ready for Merge")
+            .count();
         (ready as f64 / manifests.len() as f64) * 100.0
     }
 
@@ -552,7 +577,7 @@ impl SovereignVoicecraftAdvancementsV82MasterSuite {
     pub fn export_pr_manifest_markdown(&self) -> String {
         let manifests = self.generate_all_manifests();
         let mut markdown = String::from(
-            "# VoiceCraft V82 Zero-Shot Speech Synthesis & Audio DSP Advancements PR Suite\n\n"
+            "# VoiceCraft V82 Zero-Shot Speech Synthesis & Audio DSP Advancements PR Suite\n\n",
         );
         markdown.push_str("| PR ID | Proposal Title | Target Subsystem | Components Added | Performance Multiplier | Status |\n");
         markdown.push_str("|-------|----------------|------------------|------------------|-----------------------|--------|\n");
@@ -562,7 +587,13 @@ impl SovereignVoicecraftAdvancementsV82MasterSuite {
             let digest = fnv1a_voicecraft_v82_pr_digest(m.pr_id, &m.pr_title);
             markdown.push_str(&format!(
                 "| PR #{} | {} | `{}` | {} | {} | `{}` (Digest: `{:016x}`) |\n",
-                m.pr_id, m.pr_title, m.target_subsystem, comps, m.performance_multiplier, m.status, digest
+                m.pr_id,
+                m.pr_title,
+                m.target_subsystem,
+                comps,
+                m.performance_multiplier,
+                m.status,
+                digest
             ));
         }
 

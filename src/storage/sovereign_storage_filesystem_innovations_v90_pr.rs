@@ -170,7 +170,12 @@ impl Ext4AdvancementsV90Engine {
     }
 
     /// Store inline data with automatic xattr / extent fallback spilling
-    pub fn store_inline_data(&mut self, inode_id: u32, data: &[u8], max_inline: usize) -> (bool, bool) {
+    pub fn store_inline_data(
+        &mut self,
+        inode_id: u32,
+        data: &[u8],
+        max_inline: usize,
+    ) -> (bool, bool) {
         if data.len() <= max_inline {
             self.inline_inodes.push(Ext4V90InlineDataInode {
                 inode_id,
@@ -481,7 +486,13 @@ impl BtrfsAdvancementsV90Engine {
     }
 
     /// Allocate multi-device RAID chunk
-    pub fn allocate_raid_chunk(&mut self, chunk_id: u64, profile: &str, devs: Vec<u32>, size: u64) -> bool {
+    pub fn allocate_raid_chunk(
+        &mut self,
+        chunk_id: u64,
+        profile: &str,
+        devs: Vec<u32>,
+        size: u64,
+    ) -> bool {
         let min_devs = match profile {
             "DUP" => 1,
             "RAID0" => 2,
@@ -684,7 +695,12 @@ impl OpenZfsAdvancementsV90Engine {
     }
 
     /// Serialize incremental ZFS send/recv byte stream with integrity checksum
-    pub fn generate_send_stream(&self, dataset: &str, from_snap: Option<&str>, to_snap: &str) -> Vec<u8> {
+    pub fn generate_send_stream(
+        &self,
+        dataset: &str,
+        from_snap: Option<&str>,
+        to_snap: &str,
+    ) -> Vec<u8> {
         let mut stream = Vec::new();
         stream.extend_from_slice(b"ZFS_STREAM_V90_HEADER:");
         stream.extend_from_slice(dataset.as_bytes());
@@ -1001,7 +1017,12 @@ impl NtfsNfsCifsPseudoFsV90Engine {
     }
 
     /// Encode SMB 3.1.1 POSIX metadata extension buffer
-    pub fn encode_smb311_posix_metadata(&self, mode: u32, owner_uid: u32, owner_gid: u32) -> Vec<u8> {
+    pub fn encode_smb311_posix_metadata(
+        &self,
+        mode: u32,
+        owner_uid: u32,
+        owner_gid: u32,
+    ) -> Vec<u8> {
         let mut buf = Vec::new();
         buf.extend_from_slice(b"SMB311_POSIX_V90_META:");
         buf.extend_from_slice(&mode.to_le_bytes());
@@ -1070,9 +1091,17 @@ impl LvmCryptoMaintenanceUtilsV90Engine {
     }
 
     /// Derive LUKS2 / GELI master key via Argon2id PBKDF simulation
-    pub fn derive_argon2id_keyslot(&self, passphrase: &[u8], key_derivation_seed: &[u8]) -> [u8; 32] {
+    pub fn derive_argon2id_keyslot(
+        &self,
+        passphrase: &[u8],
+        key_derivation_seed: &[u8],
+    ) -> [u8; 32] {
         let mut key = [0u8; 32];
-        for (idx, &b) in passphrase.iter().chain(key_derivation_seed.iter()).enumerate() {
+        for (idx, &b) in passphrase
+            .iter()
+            .chain(key_derivation_seed.iter())
+            .enumerate()
+        {
             key[idx % 32] = key[idx % 32].wrapping_add(b).wrapping_mul(37);
         }
         // Argon2id memory-hard mixing rounds
@@ -1090,7 +1119,11 @@ impl LvmCryptoMaintenanceUtilsV90Engine {
     }
 
     /// Verify dm-verity Merkle tree root hash match
-    pub fn verify_dm_verity_roothash(&self, computed_root: &[u8; 32], expected_root: &[u8; 32]) -> bool {
+    pub fn verify_dm_verity_roothash(
+        &self,
+        computed_root: &[u8; 32],
+        expected_root: &[u8; 32],
+    ) -> bool {
         computed_root == expected_root
     }
 }
@@ -1131,7 +1164,12 @@ impl StorageMaintenanceAndToolsV90Engine {
     }
 
     /// Generate udisks D-Bus block device notification payload
-    pub fn generate_udisks_block_event(&self, dev_path: &str, is_removable: bool, is_added: bool) -> String {
+    pub fn generate_udisks_block_event(
+        &self,
+        dev_path: &str,
+        is_removable: bool,
+        is_added: bool,
+    ) -> String {
         format!(
             "UDISKS2_EVENT:path={};removable={};status={}",
             dev_path,
@@ -1516,7 +1554,10 @@ mod tests {
         assert!(tools.check_gpt_4k_alignment(2048, 512));
         assert!(tools.audit_smart_health(10, 0, 42));
         let autofs = tools.parse_autofs_map_entry("/mnt/net /server/share");
-        assert_eq!(autofs, Some(("/mnt/net".to_string(), "/server/share".to_string())));
+        assert_eq!(
+            autofs,
+            Some(("/mnt/net".to_string(), "/server/share".to_string()))
+        );
         let evt = tools.generate_udisks_block_event("/dev/sdc", true, true);
         assert!(evt.contains("ADDED"));
     }

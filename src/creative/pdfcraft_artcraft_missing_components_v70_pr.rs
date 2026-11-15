@@ -225,10 +225,14 @@ impl PdfcraftVectorPathSplineSubdivisionEngineV70 {
     pub fn generate_proposal(&self) -> PdfcraftV70PrProposalManifest {
         PdfcraftV70PrProposalManifest {
             pr_id: 7024,
-            pr_title: String::from("PR-7024: Pdfcraft Non-Destructive Vector Path & Bezier Spline Editor Engine V70"),
+            pr_title: String::from(
+                "PR-7024: Pdfcraft Non-Destructive Vector Path & Bezier Spline Editor Engine V70",
+            ),
             target_subsystem: String::from("Pdfcraft / Vector Path Subsystem"),
             original_suite: String::from("ArtCraft / PdfCraft Studio"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Bezier Spline Graphics V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Bezier Spline Graphics V70",
+            ),
             components_added: vec![
                 String::from("CubicBezierSplinePointManipulatorV70"),
                 String::from("VectorFillStrokeShaderStyleRendererV70"),
@@ -426,7 +430,10 @@ impl PdfcraftAcroFormsXfaDynamicCalculationEngineV70 {
     pub fn export_xfdf(&self) -> String {
         let mut xfdf = String::from("<?xml version=\"1.0\"?><xfdf><fields>");
         for (k, v) in &self.field_values {
-            xfdf.push_str(&format!("<field name=\"{}\"><value>{}</value></field>", k, v));
+            xfdf.push_str(&format!(
+                "<field name=\"{}\"><value>{}</value></field>",
+                k, v
+            ));
         }
         xfdf.push_str("</fields></xfdf>");
         xfdf
@@ -435,10 +442,14 @@ impl PdfcraftAcroFormsXfaDynamicCalculationEngineV70 {
     pub fn generate_proposal(&self) -> PdfcraftV70PrProposalManifest {
         PdfcraftV70PrProposalManifest {
             pr_id: 7028,
-            pr_title: String::from("PR-7028: Pdfcraft Interactive AcroForms & Dynamic XFA Form Validation Engine V70"),
+            pr_title: String::from(
+                "PR-7028: Pdfcraft Interactive AcroForms & Dynamic XFA Form Validation Engine V70",
+            ),
             target_subsystem: String::from("Pdfcraft / Interactive Forms Subsystem"),
             original_suite: String::from("ArtCraft / PdfCraft Studio"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft AcroForms XFA Controller V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft AcroForms XFA Controller V70",
+            ),
             components_added: vec![
                 String::from("AcroFormXfaDynamicFieldRendererV70"),
                 String::from("JavaScriptFormValidationScriptControllerV70"),
@@ -536,7 +547,9 @@ impl PdfcraftSpatial3dMeshU3dPrcViewerEngineV70 {
     pub fn generate_proposal(&self) -> PdfcraftV70PrProposalManifest {
         PdfcraftV70PrProposalManifest {
             pr_id: 7030,
-            pr_title: String::from("PR-7030: Pdfcraft Embedded 3D Mesh (U3D/PRC) & Spatial Annotations Engine V70"),
+            pr_title: String::from(
+                "PR-7030: Pdfcraft Embedded 3D Mesh (U3D/PRC) & Spatial Annotations Engine V70",
+            ),
             target_subsystem: String::from("Pdfcraft / 3D Graphics Subsystem"),
             original_suite: String::from("ArtCraft / PdfCraft Studio"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft 3D PDF Renderer V70"),
@@ -545,7 +558,9 @@ impl PdfcraftSpatial3dMeshU3dPrcViewerEngineV70 {
                 String::from("Interactive3dMeshLightingViewportV70"),
                 String::from("Spatial3dAnnotationAnchorNodeV70"),
             ],
-            performance_multiplier: String::from("60 FPS Hardware-Accelerated 3D PDF Rendering V70"),
+            performance_multiplier: String::from(
+                "60 FPS Hardware-Accelerated 3D PDF Rendering V70",
+            ),
             status: String::from("Ready for Merge"),
         }
     }

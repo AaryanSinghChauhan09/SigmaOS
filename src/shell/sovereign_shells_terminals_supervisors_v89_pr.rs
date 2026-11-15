@@ -74,7 +74,12 @@ impl SystemdAdvancementsV89Engine {
     }
 
     /// Verifies socket-activation file descriptor allocation (LISTEN_FDS and LISTEN_PID compliance).
-    pub fn verify_socket_activation(&self, listen_fds: u32, current_pid: u32, listen_pid: u32) -> bool {
+    pub fn verify_socket_activation(
+        &self,
+        listen_fds: u32,
+        current_pid: u32,
+        listen_pid: u32,
+    ) -> bool {
         listen_fds > 0 && current_pid == listen_pid
     }
 
@@ -172,7 +177,10 @@ impl OpenRcAdvancementsV89Engine {
     ) -> Result<String, String> {
         for need in need_deps {
             if !running_services.contains(need) {
-                return Err(format!("Service '{}' unsatisfied 'need' dependency: '{}'", service, need));
+                return Err(format!(
+                    "Service '{}' unsatisfied 'need' dependency: '{}'",
+                    service, need
+                ));
             }
         }
         Ok(format!("Service '{}' all dependencies satisfied", service))
@@ -218,7 +226,8 @@ impl OpenRcAdvancementsV89Engine {
     pub fn generate_proposal(&self) -> ShellsTerminalsSupervisorsV89PrProposalManifest {
         ShellsTerminalsSupervisorsV89PrProposalManifest {
             pr_number: 4228,
-            pr_title: "OpenRC Advancements: Asynchronous Wave-Based Init & Runlevel Transpiler".to_string(),
+            pr_title: "OpenRC Advancements: Asynchronous Wave-Based Init & Runlevel Transpiler"
+                .to_string(),
             target_subsystem: "Core Userland & Init Supervisors".to_string(),
             distro_inspirations: vec![
                 "Gentoo Linux (OpenRC native declarative dependency resolving)".to_string(),
@@ -234,7 +243,8 @@ impl OpenRcAdvancementsV89Engine {
             key_features_added: vec![
                 "Formal runlevel state machine transition validator".to_string(),
                 "Declarative 'need'/'use'/'before'/'after' rule evaluator".to_string(),
-                "Parallel dependency wave calculator optimizing multi-core service boots".to_string(),
+                "Parallel dependency wave calculator optimizing multi-core service boots"
+                    .to_string(),
                 "Zero-dependency stack unwinding upon service crash".to_string(),
             ],
             performance_multiplier: "140x Faster Dependency Resolution vs SysVinit".to_string(),
@@ -266,11 +276,19 @@ impl RunitS6AdvancementsV89Engine {
 
     /// Solves s6-rc compiled database state transition pipeline.
     pub fn solve_s6_rc_compiled_db_transition(&self, target_bundle: &str) -> String {
-        format!("s6-rc: compiled-db compile-step verified for bundle '{}'", target_bundle)
+        format!(
+            "s6-rc: compiled-db compile-step verified for bundle '{}'",
+            target_bundle
+        )
     }
 
     /// Simulates s6 exponential backoff throttle calculation for crashing services.
-    pub fn calculate_exponential_backoff_restart(&self, restart_count: u32, base_ms: u64, max_ms: u64) -> u64 {
+    pub fn calculate_exponential_backoff_restart(
+        &self,
+        restart_count: u32,
+        base_ms: u64,
+        max_ms: u64,
+    ) -> u64 {
         let shift = restart_count.min(10);
         let backoff = base_ms.saturating_mul(1u64 << shift);
         backoff.min(max_ms)
@@ -285,11 +303,14 @@ impl RunitS6AdvancementsV89Engine {
     pub fn generate_proposal(&self) -> ShellsTerminalsSupervisorsV89PrProposalManifest {
         ShellsTerminalsSupervisorsV89PrProposalManifest {
             pr_number: 4229,
-            pr_title: "Runit & S6 Advancements: Zero-Overhead Supervision Trees & FIFO Notification".to_string(),
+            pr_title:
+                "Runit & S6 Advancements: Zero-Overhead Supervision Trees & FIFO Notification"
+                    .to_string(),
             target_subsystem: "Core Userland & Process Supervisors".to_string(),
             distro_inspirations: vec![
                 "Void Linux (Runit runsvdir / runsv ultra-lightweight supervision)".to_string(),
-                "Alpine Linux (S6 portable supervision & s6-rc compiled service dependency DB)".to_string(),
+                "Alpine Linux (S6 portable supervision & s6-rc compiled service dependency DB)"
+                    .to_string(),
                 "Artix Linux (Multi-init flexibility with s6-linux-init)".to_string(),
             ],
             tools_covered: vec![
@@ -302,10 +323,13 @@ impl RunitS6AdvancementsV89Engine {
             key_features_added: vec![
                 "Runit /var/service scan engine with automatic supervise/run detection".to_string(),
                 "s6-rc compiled service dependency state machine compiler and runner".to_string(),
-                "Jittered exponential backoff throttle engine preventing crash-loop CPU spikes".to_string(),
-                "FIFO supervise/ok lock integrity verifier ensuring single-owner supervision".to_string(),
+                "Jittered exponential backoff throttle engine preventing crash-loop CPU spikes"
+                    .to_string(),
+                "FIFO supervise/ok lock integrity verifier ensuring single-owner supervision"
+                    .to_string(),
             ],
-            performance_multiplier: "500x Lower Memory Footprint (<120KB per service supervisor)".to_string(),
+            performance_multiplier: "500x Lower Memory Footprint (<120KB per service supervisor)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -485,7 +509,10 @@ impl CronAnacronTimersAtAdvancementsV89Engine {
                 }
             }
             if let Some(dash_idx) = spec.find('-') {
-                if let (Ok(start), Ok(end)) = (spec[..dash_idx].parse::<u8>(), spec[dash_idx + 1..].parse::<u8>()) {
+                if let (Ok(start), Ok(end)) = (
+                    spec[..dash_idx].parse::<u8>(),
+                    spec[dash_idx + 1..].parse::<u8>(),
+                ) {
                     if val >= start && val <= end {
                         return true;
                     }
@@ -533,7 +560,12 @@ impl CronAnacronTimersAtAdvancementsV89Engine {
     }
 
     /// Simulates systemd timer calendar event resolver (`OnCalendar` and `OnUnitActiveSec`).
-    pub fn solve_systemd_timer_calendar(&self, calendar_spec: &str, last_trigger: u64, active_sec: u64) -> u64 {
+    pub fn solve_systemd_timer_calendar(
+        &self,
+        calendar_spec: &str,
+        last_trigger: u64,
+        active_sec: u64,
+    ) -> u64 {
         match calendar_spec {
             "hourly" => last_trigger + 3600,
             "daily" => last_trigger + 86400,
@@ -593,18 +625,27 @@ impl PosixAndAdvancedShellsV89Engine {
     }
 
     /// Parses Bash associative array syntax (`declare -A map=([foo]="bar" [baz]="qux")`).
-    pub fn parse_bash_associative_array(&self, declare_line: &str) -> Option<(String, Vec<(String, String)>)> {
+    pub fn parse_bash_associative_array(
+        &self,
+        declare_line: &str,
+    ) -> Option<(String, Vec<(String, String)>)> {
         if declare_line.starts_with("declare -A ") {
             let rest = &declare_line["declare -A ".len()..];
             if let Some(eq_idx) = rest.find('=') {
                 let name = rest[..eq_idx].trim().to_string();
-                let inner = rest[eq_idx + 1..].trim().trim_matches('(').trim_matches(')');
+                let inner = rest[eq_idx + 1..]
+                    .trim()
+                    .trim_matches('(')
+                    .trim_matches(')');
                 let mut pairs = Vec::new();
                 for entry in inner.split_whitespace() {
                     if let (Some(l_bracket), Some(r_bracket)) = (entry.find('['), entry.find(']')) {
                         if let Some(eq) = entry.find('=') {
                             let k = entry[l_bracket + 1..r_bracket].to_string();
-                            let v = entry[eq + 1..].trim_matches('"').trim_matches('\'').to_string();
+                            let v = entry[eq + 1..]
+                                .trim_matches('"')
+                                .trim_matches('\'')
+                                .to_string();
                             pairs.push((k, v));
                         }
                     }
@@ -640,13 +681,22 @@ impl PosixAndAdvancedShellsV89Engine {
     /// Checks Dash strict POSIX compliance and warns on non-standard bashisms (`[[ ... ]]`, `==`, `&>`).
     pub fn check_dash_posix_compliance(&self, script_line: &str) -> (bool, Option<&'static str>) {
         if script_line.contains("[[ ") || script_line.contains(" ]]") {
-            return (false, Some("Bashism detected: [[ ... ]] is not valid POSIX sh syntax"));
+            return (
+                false,
+                Some("Bashism detected: [[ ... ]] is not valid POSIX sh syntax"),
+            );
         }
         if script_line.contains("==") {
-            return (false, Some("Bashism detected: == operator in test expressions (use single =)"));
+            return (
+                false,
+                Some("Bashism detected: == operator in test expressions (use single =)"),
+            );
         }
         if script_line.contains("&>") {
-            return (false, Some("Bashism detected: &> redirection (use >file 2>&1)"));
+            return (
+                false,
+                Some("Bashism detected: &> redirection (use >file 2>&1)"),
+            );
         }
         (true, None)
     }
@@ -746,7 +796,11 @@ impl TerminalMultiplexersAndEmulatorsV89Engine {
             let end_idx = rest.find('m').unwrap_or(rest.len());
             let parts: Vec<&str> = rest[..end_idx].split(';').collect();
             if parts.len() >= 3 {
-                if let (Ok(r), Ok(g), Ok(b)) = (parts[0].parse::<u8>(), parts[1].parse::<u8>(), parts[2].parse::<u8>()) {
+                if let (Ok(r), Ok(g), Ok(b)) = (
+                    parts[0].parse::<u8>(),
+                    parts[1].parse::<u8>(),
+                    parts[2].parse::<u8>(),
+                ) {
                     return Some((r, g, b));
                 }
             }
@@ -920,7 +974,9 @@ impl SovereignShellsTerminalsSupervisorsParityV89Gateway {
         let total_tools: usize = proposals.iter().map(|p| p.tools_covered.len()).sum();
         let total_features: usize = proposals.iter().map(|p| p.key_features_added.len()).sum();
 
-        let mut summary = String::from("=== SIGMAOS SHELLS, TERMINALS & SUPERVISORS V89 PR PROPOSAL SUMMARY ===\n");
+        let mut summary = String::from(
+            "=== SIGMAOS SHELLS, TERMINALS & SUPERVISORS V89 PR PROPOSAL SUMMARY ===\n",
+        );
         summary.push_str(&format!("Total PR Proposals: {}\n", proposals.len()));
         summary.push_str(&format!("Total Tools Covered: {}\n", total_tools));
         summary.push_str(&format!("Total Features Added: {}\n", total_features));
@@ -935,9 +991,18 @@ impl SovereignShellsTerminalsSupervisorsParityV89Gateway {
 
         md.push_str("## Detailed Subsystems & Covered Tools\n\n");
         for manifest in self.suite.collect_all_proposals() {
-            md.push_str(&format!("### PR #{}: {}\n\n", manifest.pr_number, manifest.pr_title));
-            md.push_str(&format!("- **Target Subsystem**: {}\n", manifest.target_subsystem));
-            md.push_str(&format!("- **Performance Multiplier**: {}\n", manifest.performance_multiplier));
+            md.push_str(&format!(
+                "### PR #{}: {}\n\n",
+                manifest.pr_number, manifest.pr_title
+            ));
+            md.push_str(&format!(
+                "- **Target Subsystem**: {}\n",
+                manifest.target_subsystem
+            ));
+            md.push_str(&format!(
+                "- **Performance Multiplier**: {}\n",
+                manifest.performance_multiplier
+            ));
             md.push_str(&format!("- **Status**: {}\n\n", manifest.status));
 
             md.push_str("#### Distro Inspirations\n");
@@ -979,7 +1044,10 @@ mod tests {
         let payload = "READY=1\nSTATUS=Daemon started\nWATCHDOG=1\n";
         let notify = engine.parse_sd_notify_payload(payload);
         assert_eq!(notify.get("READY").map(|s| s.as_str()), Some("1"));
-        assert_eq!(notify.get("STATUS").map(|s| s.as_str()), Some("Daemon started"));
+        assert_eq!(
+            notify.get("STATUS").map(|s| s.as_str()),
+            Some("Daemon started")
+        );
         assert_eq!(notify.get("WATCHDOG").map(|s| s.as_str()), Some("1"));
 
         assert!(engine.verify_socket_activation(3, 42, 42));
@@ -991,7 +1059,14 @@ mod tests {
             ("basic.target", &[][..]),
         ];
         let ordered = engine.resolve_unit_order(&units);
-        assert_eq!(ordered, vec!["basic.target".to_string(), "network.target".to_string(), "sshd.service".to_string()]);
+        assert_eq!(
+            ordered,
+            vec![
+                "basic.target".to_string(),
+                "network.target".to_string(),
+                "sshd.service".to_string()
+            ]
+        );
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_number, 4227);
@@ -1005,7 +1080,11 @@ mod tests {
         assert!(engine.validate_runlevel_transition("default", "shutdown"));
         assert!(!engine.validate_runlevel_transition("sysinit", "shutdown"));
 
-        let res = engine.evaluate_dependencies("nginx", &["network", "syslog"], &["network", "syslog", "localmount"]);
+        let res = engine.evaluate_dependencies(
+            "nginx",
+            &["network", "syslog"],
+            &["network", "syslog", "localmount"],
+        );
         assert!(res.is_ok());
 
         let res_err = engine.evaluate_dependencies("nginx", &["network", "syslog"], &["network"]);
@@ -1057,13 +1136,18 @@ mod tests {
             ("sshd", &["NETWORKING"], &["LOGIN"]),
             ("NETWORKING", &[], &["NETWORKING"]),
         ]);
-        assert_eq!(bsd_order, vec!["NETWORKING".to_string(), "sshd".to_string()]);
+        assert_eq!(
+            bsd_order,
+            vec!["NETWORKING".to_string(), "sshd".to_string()]
+        );
 
-        let (enabled, flags) = engine.inspect_bsd_rcctl("sshd", &[("sshd_enable", "YES"), ("sshd_flags", "-u0")]);
+        let (enabled, flags) =
+            engine.inspect_bsd_rcctl("sshd", &[("sshd_enable", "YES"), ("sshd_flags", "-u0")]);
         assert!(enabled);
         assert_eq!(flags, "-u0");
 
-        let (should_run, delay) = engine.evaluate_launchd_plist_conditions(false, Some("/tmp/flag"), true, 10);
+        let (should_run, delay) =
+            engine.evaluate_launchd_plist_conditions(false, Some("/tmp/flag"), true, 10);
         assert!(should_run);
         assert_eq!(delay, 10);
 
@@ -1095,7 +1179,8 @@ mod tests {
     fn test_posix_and_advanced_shells_v89() {
         let engine = PosixAndAdvancedShellsV89Engine::new();
 
-        let assoc = engine.parse_bash_associative_array("declare -A arr=([foo]=\"bar\" [baz]=\"qux\")");
+        let assoc =
+            engine.parse_bash_associative_array("declare -A arr=([foo]=\"bar\" [baz]=\"qux\")");
         assert!(assoc.is_some());
         let (name, pairs) = assoc.unwrap();
         assert_eq!(name, "arr");
@@ -1106,7 +1191,8 @@ mod tests {
         let fish_var = engine.validate_fish_universal_variable("set -U editor vim");
         assert_eq!(fish_var, Some(("editor".to_string(), "vim".to_string())));
 
-        let (compliant, err) = engine.check_dash_posix_compliance("if [[ $x == 1 ]]; then echo hi; fi");
+        let (compliant, err) =
+            engine.check_dash_posix_compliance("if [[ $x == 1 ]]; then echo hi; fi");
         assert!(!compliant);
         assert!(err.is_some());
 
@@ -1127,7 +1213,8 @@ mod tests {
         let rgb = engine.parse_truecolor_24bit_escape("\x1b[38;2;128;64;255m");
         assert_eq!(rgb, Some((128, 64, 255)));
 
-        let markers = engine.parse_kitty_shell_integration_markers("\x1b]133;A\x1b\\\x1b]133;B\x1b\\");
+        let markers =
+            engine.parse_kitty_shell_integration_markers("\x1b]133;A\x1b\\\x1b]133;B\x1b\\");
         assert_eq!(markers, vec!["prompt_start", "command_start"]);
 
         let layout = engine.compute_tmux_grid_layout("even-horizontal", 2, 160, 40);
@@ -1149,7 +1236,9 @@ mod tests {
         assert!(summary.contains("Total PR Proposals: 7"));
 
         let markdown = gateway.generate_pr_proposal_markdown();
-        assert!(markdown.contains("# Pull Request Proposal: Universal Linux & BSD Shells, Terminals"));
+        assert!(
+            markdown.contains("# Pull Request Proposal: Universal Linux & BSD Shells, Terminals")
+        );
         assert!(markdown.contains("PR #4227"));
         assert!(markdown.contains("PR #4233"));
     }

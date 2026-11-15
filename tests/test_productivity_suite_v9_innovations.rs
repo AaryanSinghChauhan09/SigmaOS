@@ -92,18 +92,20 @@ fn test_google_workspace_innovations_v9() {
 fn test_microsoft_365_innovations_v9() {
     // 1. Microsoft Word Operational Transformation (OT)
     let word = SovereignMicrosoftWordOperationalTransformationCoAuthoringEngineV9::new();
-    let transformed = word.apply_transform(
-        "SigmaOS Suite",
-        &UserEditPayload {
-            client_id: "user-alpha".into(),
-            revision_clock: 10,
-            ops: vec![
-                TextOperation::Retain(8),
-                TextOperation::Insert("Office ".into()),
-                TextOperation::Retain(5),
-            ],
-        },
-    ).unwrap();
+    let transformed = word
+        .apply_transform(
+            "SigmaOS Suite",
+            &UserEditPayload {
+                client_id: "user-alpha".into(),
+                revision_clock: 10,
+                ops: vec![
+                    TextOperation::Retain(8),
+                    TextOperation::Insert("Office ".into()),
+                    TextOperation::Retain(5),
+                ],
+            },
+        )
+        .unwrap();
     assert_eq!(transformed, "SigmaOS Office Suite");
 
     // 2. Microsoft Excel Dynamic Pivot Table
@@ -120,13 +122,22 @@ fn test_microsoft_365_innovations_v9() {
 
     let pivot = excel.compute_pivot(
         &[
-            PivotRowRecord { dimensions: rec1_dims, numeric_values: rec1_nums },
-            PivotRowRecord { dimensions: rec2_dims, numeric_values: rec2_nums },
+            PivotRowRecord {
+                dimensions: rec1_dims,
+                numeric_values: rec1_nums,
+            },
+            PivotRowRecord {
+                dimensions: rec2_dims,
+                numeric_values: rec2_nums,
+            },
         ],
         "Dept",
         "Budget",
     );
-    assert_eq!(pivot.aggregated_metric_totals.get("Engineering"), Some(&120000.0));
+    assert_eq!(
+        pivot.aggregated_metric_totals.get("Engineering"),
+        Some(&120000.0)
+    );
     assert_eq!(pivot.record_counts.get("Engineering"), Some(&2));
 
     // 3. Microsoft PowerBI Composite Data Model
@@ -155,27 +166,23 @@ fn test_microsoft_365_innovations_v9() {
 
     // 4. Microsoft Loop Distributed Canvas CRDT
     let mut loop_engine = SovereignMicrosoftLoopDistributedCanvasCrdtEngineV9::new();
-    let r1 = loop_engine.merge_incoming_elements(&[
-        CanvasComponentElement {
-            element_id: "card-task-1".into(),
-            element_type: "task".into(),
-            json_payload: "{\"done\":false}".into(),
-            lww_timestamp: 10,
-            author_node: "node-1".into(),
-        },
-    ]);
+    let r1 = loop_engine.merge_incoming_elements(&[CanvasComponentElement {
+        element_id: "card-task-1".into(),
+        element_type: "task".into(),
+        json_payload: "{\"done\":false}".into(),
+        lww_timestamp: 10,
+        author_node: "node-1".into(),
+    }]);
     assert_eq!(r1.total_elements_active, 1);
     assert_eq!(r1.applied_mutations_count, 1);
 
-    let r2 = loop_engine.merge_incoming_elements(&[
-        CanvasComponentElement {
-            element_id: "card-task-1".into(),
-            element_type: "task".into(),
-            json_payload: "{\"done\":true}".into(),
-            lww_timestamp: 20,
-            author_node: "node-2".into(),
-        },
-    ]);
+    let r2 = loop_engine.merge_incoming_elements(&[CanvasComponentElement {
+        element_id: "card-task-1".into(),
+        element_type: "task".into(),
+        json_payload: "{\"done\":true}".into(),
+        lww_timestamp: 20,
+        author_node: "node-2".into(),
+    }]);
     assert_eq!(r2.total_elements_active, 1);
     assert_eq!(r2.conflict_overrides_count, 1);
 }
@@ -215,11 +222,14 @@ fn test_zoho_salesforce_odoo_bitrix24_innovations_v9() {
 
     let zoho_desk = SovereignZohoDeskOmnichannelSlaEscalationEngineV9::new();
     let mut sla_policies = HashMap::new();
-    sla_policies.insert("Critical".into(), SlaPolicyRule {
-        priority: "Critical".into(),
-        max_response_hours: 1,
-        max_resolution_hours: 4,
-    });
+    sla_policies.insert(
+        "Critical".into(),
+        SlaPolicyRule {
+            priority: "Critical".into(),
+            max_response_hours: 1,
+            max_resolution_hours: 4,
+        },
+    );
     let sla_eval = zoho_desk.evaluate_slas(
         &[
             OmnichannelTicket {

@@ -56,7 +56,8 @@ impl DesktopAppCategory {
             || trimmed.eq_ignore_ascii_case("video")
         {
             Some(DesktopAppCategory::AudioVideo)
-        } else if trimmed.eq_ignore_ascii_case("development") || trimmed.eq_ignore_ascii_case("dev") {
+        } else if trimmed.eq_ignore_ascii_case("development") || trimmed.eq_ignore_ascii_case("dev")
+        {
             Some(DesktopAppCategory::Development)
         } else if trimmed.eq_ignore_ascii_case("education") {
             Some(DesktopAppCategory::Education)

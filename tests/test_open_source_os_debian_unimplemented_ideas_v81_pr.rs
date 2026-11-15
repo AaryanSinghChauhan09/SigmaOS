@@ -18,8 +18,14 @@ fn test_unified_open_source_os_debian_v81_suite() {
     assert_eq!(proposals.len(), 19);
 
     // Verify 9 OS proposals and 10 Debian proposals
-    let os_proposals: Vec<_> = proposals.iter().filter(|p| p.pr_id.starts_with("PR-OS-V81-")).collect();
-    let debian_proposals: Vec<_> = proposals.iter().filter(|p| p.pr_id.starts_with("PR-DEBIAN-V81-")).collect();
+    let os_proposals: Vec<_> = proposals
+        .iter()
+        .filter(|p| p.pr_id.starts_with("PR-OS-V81-"))
+        .collect();
+    let debian_proposals: Vec<_> = proposals
+        .iter()
+        .filter(|p| p.pr_id.starts_with("PR-DEBIAN-V81-"))
+        .collect();
 
     assert_eq!(os_proposals.len(), 9);
     assert_eq!(debian_proposals.len(), 10);
@@ -46,7 +52,10 @@ fn test_open_source_os_v81_unimplemented_ideas_suite() {
 
     let summary = suite.generate_suite_summary();
     assert_eq!(summary.get("total_proposals").unwrap(), "9");
-    assert_eq!(summary.get("pqc_signature_algorithm").unwrap(), "Dilithium-5");
+    assert_eq!(
+        summary.get("pqc_signature_algorithm").unwrap(),
+        "Dilithium-5"
+    );
     assert_eq!(summary.get("interoperability_score").unwrap(), "100.0%");
 }
 
@@ -69,7 +78,8 @@ fn test_debian_dpkg_triggers_deferred_engine_v81() {
 #[test]
 fn test_debian_apt_pqc_dilithium_engine_v81() {
     let engine = DebianSecureAptPqcDilithiumInReleaseEngineV81Pr::new();
-    let valid = engine.verify_inrelease_signature("stable", b"Package: test", "DILITHIUM5-SIG-VALID");
+    let valid =
+        engine.verify_inrelease_signature("stable", b"Package: test", "DILITHIUM5-SIG-VALID");
     assert!(valid);
 
     let spec = engine.generate_pr_spec();

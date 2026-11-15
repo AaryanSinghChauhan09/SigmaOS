@@ -38,25 +38,29 @@ fn test_v70_designcraft_individual_engines() {
     assert!(scaled_kerning < -1.5);
 
     // 4. Subpixel SDF Boolean Clipping Mask
-    let mut sdf_union = DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Union);
+    let mut sdf_union =
+        DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Union);
     sdf_union.add_path_a_point(0.0, 0.0);
     sdf_union.add_path_b_point(10.0, 10.0);
     let dist_at_origin = sdf_union.evaluate_combined_sdf(0.0, 0.0);
     assert_eq!(dist_at_origin, 0.0);
 
-    let mut sdf_intersect = DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Intersect);
+    let mut sdf_intersect =
+        DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Intersect);
     sdf_intersect.add_path_a_point(0.0, 0.0);
     sdf_intersect.add_path_b_point(10.0, 0.0);
     let dist_intersect = sdf_intersect.evaluate_combined_sdf(2.0, 0.0);
     assert_eq!(dist_intersect, 8.0);
 
-    let mut sdf_subtract = DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Subtract);
+    let mut sdf_subtract =
+        DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Subtract);
     sdf_subtract.add_path_a_point(0.0, 0.0);
     sdf_subtract.add_path_b_point(10.0, 0.0);
     let dist_subtract = sdf_subtract.evaluate_combined_sdf(2.0, 0.0);
     assert_eq!(dist_subtract, 2.0);
 
-    let mut sdf_exclude = DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Exclude);
+    let mut sdf_exclude =
+        DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Exclude);
     sdf_exclude.add_path_a_point(0.0, 0.0);
     sdf_exclude.add_path_b_point(10.0, 0.0);
     let dist_exclude = sdf_exclude.evaluate_combined_sdf(2.0, 0.0);

@@ -45,7 +45,7 @@ pub enum ToolchainOptModeV78 {
 /// Hardening profile inspired by Linux & BSD security posture (V78).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainHardeningModeV78 {
-    FedoraFortifyLevel3,   // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection)
+    FedoraFortifyLevel3, // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection)
     StandardFortifyLevel2, // Standard Ubuntu/Debian hardening (-D_FORTIFY_SOURCE=2 -fstack-protector-strong)
     None,
 }
@@ -138,10 +138,19 @@ impl GccClangLlvmToolchainV78Engine {
 
     pub fn generate_sanitizer_pass_config(&self, sanitizer: &str) -> Vec<String> {
         match sanitizer {
-            "address" => vec!["-fsanitize=address".to_string(), "-fno-omit-frame-pointer".to_string()],
+            "address" => vec![
+                "-fsanitize=address".to_string(),
+                "-fno-omit-frame-pointer".to_string(),
+            ],
             "thread" => vec!["-fsanitize=thread".to_string()],
-            "undefined" => vec!["-fsanitize=undefined".to_string(), "-fno-sanitize-recover=all".to_string()],
-            "memory" => vec!["-fsanitize=memory".to_string(), "-fsanitize-memory-track-origins=2".to_string()],
+            "undefined" => vec![
+                "-fsanitize=undefined".to_string(),
+                "-fno-sanitize-recover=all".to_string(),
+            ],
+            "memory" => vec![
+                "-fsanitize=memory".to_string(),
+                "-fsanitize-memory-track-origins=2".to_string(),
+            ],
             _ => vec!["-fsanitize=address".to_string()],
         }
     }
@@ -398,7 +407,9 @@ impl BuildSystemsAndPkgConfigV78Engine {
         for line in la_content.lines() {
             let trimmed = line.trim();
             if trimmed.starts_with("dependency_libs=") {
-                let val = trimmed.trim_start_matches("dependency_libs=").trim_matches('\'');
+                let val = trimmed
+                    .trim_start_matches("dependency_libs=")
+                    .trim_matches('\'');
                 for item in val.split_whitespace() {
                     libs.push(item.to_string());
                 }
@@ -425,16 +436,15 @@ impl BuildSystemsAndPkgConfigV78Engine {
         }
     }
 
-    pub fn query_pkg_config(
-        &self,
-        package: &str,
-        sysroot_triple: &str,
-    ) -> PkgConfigQueryResultV78 {
+    pub fn query_pkg_config(&self, package: &str, sysroot_triple: &str) -> PkgConfigQueryResultV78 {
         PkgConfigQueryResultV78 {
             package_name: package.to_string(),
             version: "2.4.0".to_string(),
             cflags: vec![format!("-I/usr/include/{sysroot_triple}/{package}")],
-            libs: vec![format!("-L/usr/lib/{sysroot_triple}"), format!("-l{package}")],
+            libs: vec![
+                format!("-L/usr/lib/{sysroot_triple}"),
+                format!("-l{package}"),
+            ],
             sysroot: format!("/usr/{sysroot_triple}"),
         }
     }
@@ -538,7 +548,14 @@ impl DebuggersTracersProfilersV78Engine {
         format!("{bytes_lost} bytes in {blocks_lost} blocks are definitely lost in loss record")
     }
 
-    pub fn parse_perf_topdown_metrics(&self, slots: u64, retiring: u64, bad_spec: u64, fe_bound: u64, be_bound: u64) -> (f32, f32, f32, f32) {
+    pub fn parse_perf_topdown_metrics(
+        &self,
+        slots: u64,
+        retiring: u64,
+        bad_spec: u64,
+        fe_bound: u64,
+        be_bound: u64,
+    ) -> (f32, f32, f32, f32) {
         if slots == 0 {
             return (0.0, 0.0, 0.0, 0.0);
         }
@@ -559,7 +576,13 @@ impl DebuggersTracersProfilersV78Engine {
         result
     }
 
-    pub fn format_dtrace_usdt_probe(&self, provider: &str, module: &str, func: &str, name: &str) -> String {
+    pub fn format_dtrace_usdt_probe(
+        &self,
+        provider: &str,
+        module: &str,
+        func: &str,
+        name: &str,
+    ) -> String {
         format!("{provider}:{module}:{func}:{name}")
     }
 
@@ -647,7 +670,11 @@ impl VcsAndLanguageRuntimesV78Engine {
         }
     }
 
-    pub fn git_packfile_binary_search_object(&self, object_id: &[u8], num_objects: u32) -> Option<u32> {
+    pub fn git_packfile_binary_search_object(
+        &self,
+        object_id: &[u8],
+        num_objects: u32,
+    ) -> Option<u32> {
         if object_id.is_empty() || num_objects == 0 {
             None
         } else {
@@ -704,7 +731,11 @@ impl VcsAndLanguageRuntimesV78Engine {
         format!("go build -pgo={profile_path} -ldflags=\"-s -w\"")
     }
 
-    pub fn go_cgo_zero_copy_bridge_dispatch(&self, ptr: usize, len: usize) -> Result<usize, &'static str> {
+    pub fn go_cgo_zero_copy_bridge_dispatch(
+        &self,
+        ptr: usize,
+        len: usize,
+    ) -> Result<usize, &'static str> {
         if ptr == 0 {
             Err("Null Pointer")
         } else {
@@ -728,7 +759,10 @@ impl VcsAndLanguageRuntimesV78Engine {
         ]
     }
 
-    pub fn openjdk_graalvm_native_image_optimize(&self, java_bytecode_bytes: usize) -> GraalVmNativeImageResultV78 {
+    pub fn openjdk_graalvm_native_image_optimize(
+        &self,
+        java_bytecode_bytes: usize,
+    ) -> GraalVmNativeImageResultV78 {
         GraalVmNativeImageResultV78 {
             native_elf_size_bytes: java_bytecode_bytes / 2 + 1000,
             estimated_startup_ms: 8,
@@ -903,7 +937,9 @@ mod tests {
         let polly = engine.generate_llvm_polly_flags();
         assert!(polly.contains(&"-polly".to_string()));
 
-        let ctf_count = engine.parse_ctf_compact_c_type_info(&[0xf2, 0xd9, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+        let ctf_count = engine.parse_ctf_compact_c_type_info(&[
+            0xf2, 0xd9, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        ]);
         assert_eq!(ctf_count, 1);
 
         let result = engine.estimate_compiler_optimization(
@@ -984,7 +1020,9 @@ mod tests {
         assert_eq!(sc_name, "openat");
         assert_eq!(args, vec![0x3, 0x7fff, 0x0]);
 
-        let (func, ret) = engine.parse_ltrace_plt_call("malloc(1024) -> 0x55555").unwrap();
+        let (func, ret) = engine
+            .parse_ltrace_plt_call("malloc(1024) -> 0x55555")
+            .unwrap();
         assert_eq!(func, "malloc(1024)");
         assert_eq!(ret, "0x55555");
 
@@ -1085,6 +1123,7 @@ mod tests {
         assert!(summary.contains("Total PR Proposals: 4"));
 
         let md = gateway.generate_pr_proposal_markdown();
-        assert!(md.contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V78)"));
+        assert!(md
+            .contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V78)"));
     }
 }

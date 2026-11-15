@@ -7,8 +7,7 @@ mod artcraft_advancements_v86_pr;
 
 use artcraft_advancements_v86_pr::{
     ArtcraftAdvancementsV86ParitySuite, ArtcraftGpuBezierClothCurvaturePrEngineV86,
-    ArtcraftMultiLayerDagCompositorCachePrEngineV86,
-    ArtcraftNeuralDiffusionInpaintingPrEngineV86,
+    ArtcraftMultiLayerDagCompositorCachePrEngineV86, ArtcraftNeuralDiffusionInpaintingPrEngineV86,
     ArtcraftSpectralCmykHalftoneScreeningPrEngineV86,
     ArtcraftUniversalOpenRasterExchangePrEngineV86, OraBlendMode, RectTile,
     SovereignArtcraftAdvancementsV86MasterSuite, Vector3D,

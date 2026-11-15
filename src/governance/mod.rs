@@ -12,20 +12,20 @@ pub mod periodic_study_improve_prove_engine;
 pub mod rfc;
 pub mod risk_mitigation;
 pub mod role_based_operating_plan_pr;
+pub mod shell_lifecycle_program;
 pub mod sovereign_periodic_research_program_engine;
 pub mod sovereign_task_guidelines_wiki_sync_engine;
 pub mod strategic_vision;
 pub mod study_to_implementation_pipeline_pr;
-pub mod shell_lifecycle_program;
 pub mod supreme_court;
 
 pub use kernel_lifecycle_program::*;
-pub use shell_lifecycle_program::*;
 pub use maintenance_operating_model::*;
 pub use periodic_pr_component_rules_engine::*;
 pub use periodic_study_improve_prove_engine::*;
 pub use risk_mitigation::*;
 pub use role_based_operating_plan_pr::*;
+pub use shell_lifecycle_program::*;
 pub use study_to_implementation_pipeline_pr::*;
 
 use crate::klib::HashMap;

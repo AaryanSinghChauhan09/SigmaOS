@@ -132,7 +132,8 @@ impl DesigncraftAiLayoutSemanticWireframeSynthesizerV70PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV70PrProposalManifest {
         DesigncraftV70PrProposalManifest {
             pr_id: 7011,
-            pr_title: "feat(designcraft): Add AI Layout Semantic Wireframe Synthesizer Engine".to_string(),
+            pr_title: "feat(designcraft): Add AI Layout Semantic Wireframe Synthesizer Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Layout & Wireframing Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Wireframe Studio".to_string(),
             components_added: vec![
@@ -222,7 +223,8 @@ impl DesigncraftCrdtMultiplayerMeshCursorSyncV70PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV70PrProposalManifest {
         DesigncraftV70PrProposalManifest {
             pr_id: 7012,
-            pr_title: "feat(designcraft): Add Real-Time CRDT Multiplayer Mesh Cursor Sync Engine".to_string(),
+            pr_title: "feat(designcraft): Add Real-Time CRDT Multiplayer Mesh Cursor Sync Engine"
+                .to_string(),
             target_subsystem: "DesignCraft CRDT Collaboration Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Multiplayer Collaboration Studio".to_string(),
             components_added: vec![
@@ -230,7 +232,8 @@ impl DesigncraftCrdtMultiplayerMeshCursorSyncV70PrEngine {
                 "LamportClockOrderingEngine".to_string(),
                 "MultiUserViewportPresenceRouter".to_string(),
             ],
-            performance_multiplier: "24.0x lower latency peer-to-peer cursor replication".to_string(),
+            performance_multiplier: "24.0x lower latency peer-to-peer cursor replication"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -305,7 +308,8 @@ impl DesigncraftVariableFontOpticalKerningMatrixV70PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV70PrProposalManifest {
         DesigncraftV70PrProposalManifest {
             pr_id: 7013,
-            pr_title: "feat(designcraft): Add Variable Font Optical Kerning Matrix Engine".to_string(),
+            pr_title: "feat(designcraft): Add Variable Font Optical Kerning Matrix Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Typography & Font Rendering Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Font Engine".to_string(),
             components_added: vec![
@@ -427,7 +431,8 @@ impl DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV70PrProposalManifest {
         DesigncraftV70PrProposalManifest {
             pr_id: 7014,
-            pr_title: "feat(designcraft): Add Subpixel SDF Boolean Clipping Mask Engine".to_string(),
+            pr_title: "feat(designcraft): Add Subpixel SDF Boolean Clipping Mask Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Vector Masking Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Vector Drawing Studio".to_string(),
             components_added: vec![
@@ -510,7 +515,9 @@ impl DesigncraftReactiveComponentVariantStateMachineV70PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV70PrProposalManifest {
         DesigncraftV70PrProposalManifest {
             pr_id: 7015,
-            pr_title: "feat(designcraft): Add Dynamic Reactive Component Variant State Machine Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add Dynamic Reactive Component Variant State Machine Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Interaction Modeling Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Interactive Components Studio".to_string(),
             components_added: vec![
@@ -656,9 +663,7 @@ pub struct DesigncraftCrossPlatformDesignTokenCompilerV70PrEngine {
 
 impl DesigncraftCrossPlatformDesignTokenCompilerV70PrEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            tokens: Vec::new(),
-        };
+        let mut engine = Self { tokens: Vec::new() };
         engine.add_token("color-primary", "#4F46E5");
         engine.add_token("color-surface", "#F3F4F6");
         engine.add_token("spacing-unit", "8px");
@@ -684,7 +689,10 @@ impl DesigncraftCrossPlatformDesignTokenCompilerV70PrEngine {
                 let mut out = String::from("import SwiftUI\n\npublic struct DesignTokens {\n");
                 for (k, v) in &self.tokens {
                     let sanitized = k.replace('-', "_");
-                    out.push_str(&format!("    public static let {} = \"{}\"\n", sanitized, v));
+                    out.push_str(&format!(
+                        "    public static let {} = \"{}\"\n",
+                        sanitized, v
+                    ));
                 }
                 out.push_str("}\n");
                 out
@@ -770,7 +778,12 @@ impl DesigncraftMicroInteractionSpringDynamicsTimelineV70PrEngine {
         let decay = libm_exp(-zeta * omega_0 * t);
 
         // Approximate oscillatory term: 1.0 - decay * cos(omega_d * t)
-        let omega_d = omega_0 * libm_sqrt(if 1.0 - zeta * zeta > 0.01 { 1.0 - zeta * zeta } else { 0.01 });
+        let omega_d = omega_0
+            * libm_sqrt(if 1.0 - zeta * zeta > 0.01 {
+                1.0 - zeta * zeta
+            } else {
+                0.01
+            });
         let cos_val = libm_cos(omega_d * t);
 
         1.0 - decay * cos_val
@@ -845,7 +858,11 @@ impl DesigncraftSmartLayoutAutoReflowFlexGridV70PrEngine {
         let mut current_row_width = 0.0;
 
         for item in &self.items {
-            let item_w = if item.width < item.min_width { item.min_width } else { item.width };
+            let item_w = if item.width < item.min_width {
+                item.min_width
+            } else {
+                item.width
+            };
             let required_w = if current_row_width == 0.0 {
                 item_w
             } else {
@@ -917,7 +934,9 @@ impl DesigncraftSpatial3dCanvasHapticDepthProjectorV70PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV70PrProposalManifest {
         DesigncraftV70PrProposalManifest {
             pr_id: 7020,
-            pr_title: "feat(designcraft): Add Spatial 3D Canvas Projection & Haptic Depth Feedback Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add Spatial 3D Canvas Projection & Haptic Depth Feedback Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Spatial & Immersive Canvas Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Spatial Canvas Studio".to_string(),
             components_added: vec![
@@ -925,7 +944,8 @@ impl DesigncraftSpatial3dCanvasHapticDepthProjectorV70PrEngine {
                 "NonlinearResistanceCurveCalculator".to_string(),
                 "SpatialPerspectiveMatrixTransformer".to_string(),
             ],
-            performance_multiplier: "29.7x faster spatial perspective & tactile projection".to_string(),
+            performance_multiplier: "29.7x faster spatial perspective & tactile projection"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -959,16 +979,20 @@ pub struct SovereignDesigncraftArtcraftMissingComponentsV70PrGateway {
 impl SovereignDesigncraftArtcraftMissingComponentsV70PrGateway {
     pub fn new() -> Self {
         Self {
-            wireframe_synthesizer: DesigncraftAiLayoutSemanticWireframeSynthesizerV70PrEngine::new(),
+            wireframe_synthesizer: DesigncraftAiLayoutSemanticWireframeSynthesizerV70PrEngine::new(
+            ),
             crdt_cursor_sync: DesigncraftCrdtMultiplayerMeshCursorSyncV70PrEngine::new(),
             optical_kerning: DesigncraftVariableFontOpticalKerningMatrixV70PrEngine::new(),
-            sdf_clipping_mask: DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Intersect),
+            sdf_clipping_mask: DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(
+                BooleanOpV70::Intersect,
+            ),
             state_machine: DesigncraftReactiveComponentVariantStateMachineV70PrEngine::new(),
             wcag_auditor: DesigncraftWcagAccessibleScreenReaderAriaAuditV70PrEngine::new(),
             token_compiler: DesigncraftCrossPlatformDesignTokenCompilerV70PrEngine::new(),
             spring_dynamics: DesigncraftMicroInteractionSpringDynamicsTimelineV70PrEngine::new(),
             auto_reflow_grid: DesigncraftSmartLayoutAutoReflowFlexGridV70PrEngine::new(12.0),
-            spatial_haptic_projector: DesigncraftSpatial3dCanvasHapticDepthProjectorV70PrEngine::new(),
+            spatial_haptic_projector:
+                DesigncraftSpatial3dCanvasHapticDepthProjectorV70PrEngine::new(),
         }
     }
 
@@ -1103,7 +1127,8 @@ mod tests {
 
     #[test]
     fn test_sdf_boolean_clipping_mask() {
-        let mut engine = DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Union);
+        let mut engine =
+            DesigncraftSubpixelSdfBooleanClippingMaskV70PrEngine::new(BooleanOpV70::Union);
         engine.add_path_a_point(10.0, 10.0);
         engine.add_path_b_point(20.0, 20.0);
         let dist = engine.evaluate_combined_sdf(10.0, 10.0);
@@ -1114,8 +1139,14 @@ mod tests {
     fn test_reactive_state_machine() {
         let mut engine = DesigncraftReactiveComponentVariantStateMachineV70PrEngine::new();
         assert_eq!(engine.current_state, ComponentStateV70::Idle);
-        assert_eq!(engine.trigger_event("mouse_enter"), ComponentStateV70::Hover);
-        assert_eq!(engine.trigger_event("mouse_down"), ComponentStateV70::Pressed);
+        assert_eq!(
+            engine.trigger_event("mouse_enter"),
+            ComponentStateV70::Hover
+        );
+        assert_eq!(
+            engine.trigger_event("mouse_down"),
+            ComponentStateV70::Pressed
+        );
         assert_eq!(engine.trigger_event("mouse_up"), ComponentStateV70::Focused);
         assert_eq!(engine.trigger_event("blur"), ComponentStateV70::Idle);
         assert_eq!(engine.transitions_executed, 4);

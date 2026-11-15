@@ -692,9 +692,7 @@ impl HardenedDhcpAndDnsClientEngine {
         if domain.is_empty() {
             return Err("Empty domain");
         }
-        if self.dns_cache.len() >= self.max_cache_entries
-            && !self.dns_cache.contains_key(domain)
-        {
+        if self.dns_cache.len() >= self.max_cache_entries && !self.dns_cache.contains_key(domain) {
             return Err("DNS cache capacity exceeded");
         }
         self.dns_cache.insert(domain.to_string(), (ip, ttl));
@@ -912,7 +910,9 @@ impl SovereignNetworkDevelopmentAndPrMasterSuite {
         });
 
         self.dhcp_dns.acquire_lease([192, 168, 1, 100], 3600);
-        let _ = self.dhcp_dns.add_dns_record("sigmaos.org", [192, 168, 1, 1], 300);
+        let _ = self
+            .dhcp_dns
+            .add_dns_record("sigmaos.org", [192, 168, 1, 1], 300);
 
         self.firewall.add_rule(FirewallRule {
             rule_id: 1,

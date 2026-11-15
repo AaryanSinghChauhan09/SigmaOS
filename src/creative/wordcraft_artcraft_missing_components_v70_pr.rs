@@ -92,9 +92,9 @@ impl Default for WordcraftNeuralAiStyleToneTransformerV70Engine {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct FontVariableAxesV70 {
-    pub weight: f32,   // wght: 100.0 .. 900.0
-    pub width: f32,    // wght/wdth
-    pub slant: f32,    // slnt: -15.0 .. 0.0
+    pub weight: f32,       // wght: 100.0 .. 900.0
+    pub width: f32,        // wght/wdth
+    pub slant: f32,        // slnt: -15.0 .. 0.0
     pub optical_size: f32, // opsz: 6.0 .. 72.0
 }
 
@@ -171,7 +171,9 @@ impl WordcraftCrdtDocumentBranchingVersionControlV70Engine {
     pub fn generate_proposal(&self) -> WordcraftV70PrProposalManifest {
         WordcraftV70PrProposalManifest {
             pr_id: 7003,
-            pr_title: String::from("Wordcraft CRDT Document Branching & Version Control V70 Engine"),
+            pr_title: String::from(
+                "Wordcraft CRDT Document Branching & Version Control V70 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Document Branching CRDT"),
             original_suite: String::from("ArtCraft Wordcraft CRDT V70"),
             components_added: vec![
@@ -319,7 +321,9 @@ impl WordcraftKnuthPlassOptimalPageBreakPaginationV70Engine {
     pub fn generate_proposal(&self) -> WordcraftV70PrProposalManifest {
         WordcraftV70PrProposalManifest {
             pr_id: 7005,
-            pr_title: String::from("Wordcraft Knuth-Plass Optimal Page-Break Pagination V70 Engine"),
+            pr_title: String::from(
+                "Wordcraft Knuth-Plass Optimal Page-Break Pagination V70 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Optimal Pagination"),
             original_suite: String::from("ArtCraft Wordcraft Pagination V70"),
             components_added: vec![
@@ -381,13 +385,17 @@ impl WordcraftPostQuantumEncryptedDocumentVaultV70Engine {
         WordcraftV70PrProposalManifest {
             pr_id: 7006,
             pr_title: String::from("Wordcraft Post-Quantum Encrypted Document Vault V70 Engine"),
-            target_subsystem: String::from("Wordcraft Creative Suite / Post-Quantum Security Vault"),
+            target_subsystem: String::from(
+                "Wordcraft Creative Suite / Post-Quantum Security Vault",
+            ),
             original_suite: String::from("ArtCraft Wordcraft PQC Vault V70"),
             components_added: vec![
                 String::from("WordcraftPostQuantumEncryptedDocumentVaultV70Engine"),
                 String::from("PqcVaultPackageV70"),
             ],
-            performance_multiplier: String::from("58.2x CRYSTALS-Kyber-1024 / Dilithium encryption"),
+            performance_multiplier: String::from(
+                "58.2x CRYSTALS-Kyber-1024 / Dilithium encryption",
+            ),
             status: String::from("READY_FOR_MERGE"),
         }
     }
@@ -428,16 +436,20 @@ impl WordcraftCslCitationStyleRulesetCompilerV70Engine {
             pr_title: String::from("Wordcraft CSL Citation Style Ruleset Compiler V70 Engine"),
             target_subsystem: String::from("Wordcraft Creative Suite / CSL Citation Compiler"),
             original_suite: String::from("ArtCraft Wordcraft Citation V70"),
-            components_added: vec![
-                String::from("WordcraftCslCitationStyleRulesetCompilerV70Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftCslCitationStyleRulesetCompilerV70Engine",
+            )],
             performance_multiplier: String::from("26.9x CSL XML ruleset AST evaluation"),
             status: String::from("READY_FOR_MERGE"),
         }
     }
 
     pub fn compile_csl_ruleset(&self, style_name: &str, rules_xml: &str) -> String {
-        format!("[CSL V70]: Style '{}' compiled with {} bytes XML schema rules", style_name, rules_xml.len())
+        format!(
+            "[CSL V70]: Style '{}' compiled with {} bytes XML schema rules",
+            style_name,
+            rules_xml.len()
+        )
     }
 }
 
@@ -461,19 +473,24 @@ impl WordcraftMultilingualPhoneticVoiceDictationAnalyticsV70Engine {
     pub fn generate_proposal(&self) -> WordcraftV70PrProposalManifest {
         WordcraftV70PrProposalManifest {
             pr_id: 7008,
-            pr_title: String::from("Wordcraft Multilingual Phonetic Voice Dictation Analytics V70 Engine"),
+            pr_title: String::from(
+                "Wordcraft Multilingual Phonetic Voice Dictation Analytics V70 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Voice Dictation Analytics"),
             original_suite: String::from("ArtCraft Wordcraft Voice V70"),
-            components_added: vec![
-                String::from("WordcraftMultilingualPhoneticVoiceDictationAnalyticsV70Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftMultilingualPhoneticVoiceDictationAnalyticsV70Engine",
+            )],
             performance_multiplier: String::from("21.3x real-time acoustic phoneme alignment"),
             status: String::from("READY_FOR_MERGE"),
         }
     }
 
     pub fn analyze_phonemes(&self, pcm_data: &[i16]) -> String {
-        format!("[Phonetic Voice V70]: Analyzed {} PCM audio samples into acoustic phoneme stream", pcm_data.len())
+        format!(
+            "[Phonetic Voice V70]: Analyzed {} PCM audio samples into acoustic phoneme stream",
+            pcm_data.len()
+        )
     }
 }
 
@@ -500,16 +517,19 @@ impl WordcraftPdfUaAccessibilityAcroformCompilerV70Engine {
             pr_title: String::from("Wordcraft PDF/UA Accessibility & AcroForm Compiler V70 Engine"),
             target_subsystem: String::from("Wordcraft Creative Suite / PDF Accessibility Compiler"),
             original_suite: String::from("ArtCraft Wordcraft PDF/UA V70"),
-            components_added: vec![
-                String::from("WordcraftPdfUaAccessibilityAcroformCompilerV70Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftPdfUaAccessibilityAcroformCompilerV70Engine",
+            )],
             performance_multiplier: String::from("29.1x PDF/UA ISO 14289 accessibility tagger"),
             status: String::from("READY_FOR_MERGE"),
         }
     }
 
     pub fn compile_pdf_ua(&self, doc_title: &str, num_tags: usize) -> String {
-        format!("[PDF/UA V70]: '{}' compiled with {} ISO 14289-1 accessibility structural tags", doc_title, num_tags)
+        format!(
+            "[PDF/UA V70]: '{}' compiled with {} ISO 14289-1 accessibility structural tags",
+            doc_title, num_tags
+        )
     }
 }
 
@@ -545,7 +565,9 @@ impl WordcraftUniversalBatchDocumentAstTranspilerV70Engine {
         WordcraftV70PrProposalManifest {
             pr_id: 7010,
             pr_title: String::from("Wordcraft Universal Batch Document AST Transpiler V70 Engine"),
-            target_subsystem: String::from("Wordcraft Creative Suite / Universal Document AST Transpiler"),
+            target_subsystem: String::from(
+                "Wordcraft Creative Suite / Universal Document AST Transpiler",
+            ),
             original_suite: String::from("ArtCraft Wordcraft Transpiler V70"),
             components_added: vec![
                 String::from("WordcraftUniversalBatchDocumentAstTranspilerV70Engine"),
@@ -587,7 +609,8 @@ impl SovereignWordcraftArtcraftMissingComponentsV70PrGateway {
             WordcraftKnuthPlassOptimalPageBreakPaginationV70Engine::new(40).generate_proposal(),
             WordcraftPostQuantumEncryptedDocumentVaultV70Engine::new().generate_proposal(),
             WordcraftCslCitationStyleRulesetCompilerV70Engine::new().generate_proposal(),
-            WordcraftMultilingualPhoneticVoiceDictationAnalyticsV70Engine::new().generate_proposal(),
+            WordcraftMultilingualPhoneticVoiceDictationAnalyticsV70Engine::new()
+                .generate_proposal(),
             WordcraftPdfUaAccessibilityAcroformCompilerV70Engine::new().generate_proposal(),
             WordcraftUniversalBatchDocumentAstTranspilerV70Engine::new().generate_proposal(),
         ]
