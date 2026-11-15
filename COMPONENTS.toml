@@ -26726,3 +26726,69 @@ language = "shell"
 inspirations = ["https://github.com/omacom/omarchy"]
 visibility = "public"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-wallust-themes"
+description = "Wallust wallpaper-driven color theming engine with palette generation and template application"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallust-themes"
+engine = "theming"
+category = "Desktop Environment"
+language = "rust"
+inspirations = ["https://github.com/dylanaraps/wallust"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-quickshell"
+description = "Quickshell aesthetic bar for Omarchy persona with system monitoring, application launcher, and workspace management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quickshell"
+engine = "desktop_shell"
+category = "Desktop Environment"
+language = "qml"
+inspirations = ["https://github.com/omacom/omarchy", "https://github.com/lassekongo/quickshell"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-waybar-themes"
+description = "Waybar status bar themes for Omarchy persona with system monitoring, workspace management, and aesthetic design"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-waybar-themes"
+engine = "config"
+category = "Desktop Environment"
+language = "css"
+inspirations = ["https://github.com/Alexays/Waybar"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dpkg-compat"
+description = "Debian package management compatibility layer with dpkg, apt, and repository management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dpkg-compat"
+engine = "package_manager"
+category = "Package Management"
+language = "rust"
+inspirations = ["https://github.com/Debian/dpkg", "https://github.com/Debian/apt"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-portage"
+description = "Gentoo Portage package management compatibility layer with ebuild support, USE flags, and source-based compilation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-portage"
+engine = "package_manager"
+category = "Package Management"
+language = "rust"
+inspirations = ["https://github.com/gentoo/gentoo", "https://github.com/pdscurses/sys-apps_portage"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-capsicum-impl"
+description = "FreeBSD Capsicum capability-based sandboxing implementation with process isolation and resource restriction"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-capsicum-impl"
+engine = "security_sandbox"
+category = "Security"
+language = "rust"
+inspirations = ["https://github.com/freebsd/freebsd", "https://www.freebsd.org/cgi/man.cgi?query=capsicum&sektion=2"]
+visibility = "public"
+depends_on = []
