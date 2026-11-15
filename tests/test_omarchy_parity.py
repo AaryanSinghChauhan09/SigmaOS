@@ -774,6 +774,33 @@ def test_arch_linux_ecosystem_gap_closure_aaa():
         assert "pkgver=" in pkg_content
         assert "package()" in pkg_content
 
+def test_open_source_os_ecosystem_gap_closure_aaa():
+    """
+    AAA Pattern: Verify all 12 Open Source Operating System repositories exist locally,
+    contain real domain implementations, AAA tests, Cargo packages, and PKGBUILDs.
+    """
+    # Arrange
+    os_repos = [
+        "SigmaOS-os-sel4", "SigmaOS-os-genode", "SigmaOS-os-helenos",
+        "SigmaOS-os-haiku", "SigmaOS-os-serenity", "SigmaOS-os-illumos",
+        "SigmaOS-os-smartos", "SigmaOS-os-plan9", "SigmaOS-os-inferno",
+        "SigmaOS-os-templeos", "SigmaOS-os-freertos", "SigmaOS-os-zephyr"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in os_repos:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing OS repo: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -835,4 +862,6 @@ if __name__ == "__main__":
     print("✓ test_platform_wave5_frameworks_parity_aaa passed")
     test_arch_linux_ecosystem_gap_closure_aaa()
     print("✓ test_arch_linux_ecosystem_gap_closure_aaa passed")
-    print("\nALL 30 AAA OMARCHY & ARCH LINUX PARITY TESTS PASSED SUCCESSFULLY!")
+    test_open_source_os_ecosystem_gap_closure_aaa()
+    print("✓ test_open_source_os_ecosystem_gap_closure_aaa passed")
+    print("\nALL 31 AAA OMARCHY & OPEN SOURCE OS PARITY TESTS PASSED SUCCESSFULLY!")

@@ -1,0 +1,23 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-os-serenity
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Unix-like 90s aesthetic modern OS — SigmaOS Operating System Integration"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-os-serenity"
+license=('GPL-3.0-or-later')
+groups=('sigmaos-os')
+makedepends=('rust' 'cargo')
+source=("${pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cd "${pkgname}-${pkgver}"
+  cargo build --release
+}
+
+package() {
+  cd "${pkgname}-${pkgver}"
+  install -Dm755 "target/release/sigmaos-os-serenity" \
+    "${pkgdir}/usr/bin/sigmaos-os-serenity"
+}
