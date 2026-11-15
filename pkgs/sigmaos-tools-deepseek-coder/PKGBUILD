@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-tools-deepseek-coder
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS DeepSeek Coder AI completion"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-tools-deepseek-coder"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-tools')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-tools-deepseek-coder"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-tools-deepseek-coder"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-tools-deepseek-coder"
+    install -Dm755 "target/release/sigmaos-tools-deepseek-coder" "${pkgdir}/usr/bin/sigmaos-tools-deepseek-coder" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-tools-deepseek-coder/README.md"
+}

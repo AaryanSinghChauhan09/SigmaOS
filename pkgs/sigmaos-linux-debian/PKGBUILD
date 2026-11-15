@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-linux-debian
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS Debian dpkg layer"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-linux-debian"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-linux')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-linux-debian"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-linux-debian"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-linux-debian"
+    install -Dm755 "target/release/sigmaos-linux-debian" "${pkgdir}/usr/bin/sigmaos-linux-debian" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-linux-debian/README.md"
+}

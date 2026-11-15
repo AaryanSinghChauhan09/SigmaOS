@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-tools-tensorflow
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS TensorFlow ML pipeline bridge"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-tools-tensorflow"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-tools' 'sigmaos-datascience')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-tools-tensorflow"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-tools-tensorflow"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-tools-tensorflow"
+    install -Dm755 "target/release/sigmaos-tools-tensorflow" "${pkgdir}/usr/bin/sigmaos-tools-tensorflow" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-tools-tensorflow/README.md"
+}

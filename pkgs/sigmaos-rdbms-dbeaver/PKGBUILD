@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-rdbms-dbeaver
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS DBeaver connection manager"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms-dbeaver"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-rdbms')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-rdbms-dbeaver"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-rdbms-dbeaver"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-rdbms-dbeaver"
+    install -Dm755 "target/release/sigmaos-rdbms-dbeaver" "${pkgdir}/usr/bin/sigmaos-rdbms-dbeaver" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-rdbms-dbeaver/README.md"
+}

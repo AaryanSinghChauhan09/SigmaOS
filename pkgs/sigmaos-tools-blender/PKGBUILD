@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-tools-blender
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS Blender 3D pipeline bridge"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-tools-blender"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-tools')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-tools-blender"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-tools-blender"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-tools-blender"
+    install -Dm755 "target/release/sigmaos-tools-blender" "${pkgdir}/usr/bin/sigmaos-tools-blender" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-tools-blender/README.md"
+}

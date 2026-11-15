@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-betteroffice-docs
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS BetterOffice Docs web editor"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-betteroffice-docs"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-betteroffice')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-betteroffice-docs"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-betteroffice-docs"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-betteroffice-docs"
+    install -Dm755 "target/release/sigmaos-betteroffice-docs" "${pkgdir}/usr/bin/sigmaos-betteroffice-docs" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-betteroffice-docs/README.md"
+}

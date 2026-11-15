@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-linux-fedora
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS Fedora DNF module layer"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-linux-fedora"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-linux')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-linux-fedora"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-linux-fedora"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-linux-fedora"
+    install -Dm755 "target/release/sigmaos-linux-fedora" "${pkgdir}/usr/bin/sigmaos-linux-fedora" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-linux-fedora/README.md"
+}

@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-bsd-open
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS OpenBSD pledge/pf layer"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-open"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-bsd')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-bsd-open"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-bsd-open"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-bsd-open"
+    install -Dm755 "target/release/sigmaos-bsd-open" "${pkgdir}/usr/bin/sigmaos-bsd-open" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-bsd-open/README.md"
+}

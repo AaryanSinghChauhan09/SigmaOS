@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-tools-tableau
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS Tableau BI workbook bridge"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-tools-tableau"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-tools' 'sigmaos-datascience')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-tools-tableau"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-tools-tableau"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-tools-tableau"
+    install -Dm755 "target/release/sigmaos-tools-tableau" "${pkgdir}/usr/bin/sigmaos-tools-tableau" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-tools-tableau/README.md"
+}

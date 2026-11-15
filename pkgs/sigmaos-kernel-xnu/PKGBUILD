@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-kernel-xnu
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS XNU Mach port layer"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-xnu"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-kernel')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-kernel-xnu"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-kernel-xnu"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-kernel-xnu"
+    install -Dm755 "target/release/sigmaos-kernel-xnu" "${pkgdir}/usr/bin/sigmaos-kernel-xnu" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-kernel-xnu/README.md"
+}

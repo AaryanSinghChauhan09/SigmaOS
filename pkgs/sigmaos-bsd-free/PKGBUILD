@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-bsd-free
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS FreeBSD jail management"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-free"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-bsd')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-bsd-free"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-bsd-free"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-bsd-free"
+    install -Dm755 "target/release/sigmaos-bsd-free" "${pkgdir}/usr/bin/sigmaos-bsd-free" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-bsd-free/README.md"
+}

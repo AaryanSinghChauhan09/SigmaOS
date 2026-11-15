@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-rdbms-postgresql
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS PostgreSQL query builder"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms-postgresql"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-rdbms')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-rdbms-postgresql"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-rdbms-postgresql"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-rdbms-postgresql"
+    install -Dm755 "target/release/sigmaos-rdbms-postgresql" "${pkgdir}/usr/bin/sigmaos-rdbms-postgresql" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-rdbms-postgresql/README.md"
+}

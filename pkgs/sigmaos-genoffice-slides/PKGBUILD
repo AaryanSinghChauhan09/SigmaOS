@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-genoffice-slides
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS GenOffice Slides AI presenter"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-genoffice-slides"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-genoffice')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-genoffice-slides"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-genoffice-slides"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-genoffice-slides"
+    install -Dm755 "target/release/sigmaos-genoffice-slides" "${pkgdir}/usr/bin/sigmaos-genoffice-slides" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-genoffice-slides/README.md"
+}

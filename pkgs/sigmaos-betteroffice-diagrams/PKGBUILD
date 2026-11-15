@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-betteroffice-diagrams
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS BetterOffice Diagrams web editor"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-betteroffice-diagrams"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-betteroffice')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-betteroffice-diagrams"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-betteroffice-diagrams"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-betteroffice-diagrams"
+    install -Dm755 "target/release/sigmaos-betteroffice-diagrams" "${pkgdir}/usr/bin/sigmaos-betteroffice-diagrams" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-betteroffice-diagrams/README.md"
+}

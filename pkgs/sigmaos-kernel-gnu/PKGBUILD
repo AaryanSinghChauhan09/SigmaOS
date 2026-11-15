@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-kernel-gnu
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS GNU Hurd translator layer"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-gnu"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-kernel')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-kernel-gnu"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-kernel-gnu"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-kernel-gnu"
+    install -Dm755 "target/release/sigmaos-kernel-gnu" "${pkgdir}/usr/bin/sigmaos-kernel-gnu" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-kernel-gnu/README.md"
+}

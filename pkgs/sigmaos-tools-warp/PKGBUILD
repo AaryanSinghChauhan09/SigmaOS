@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-tools-warp
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="SigmaOS Warp terminal AI bridge"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-tools-warp"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-tools')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-tools-warp"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-tools-warp"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-tools-warp"
+    install -Dm755 "target/release/sigmaos-tools-warp" "${pkgdir}/usr/bin/sigmaos-tools-warp" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-tools-warp/README.md"
+}
