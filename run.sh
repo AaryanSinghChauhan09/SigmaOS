@@ -53,6 +53,9 @@ case "$ACTION" in
     --status|status|-s)
         exec "$SCRIPT_DIR/bin/sigmaos" --status
         ;;
+    --gui|gui|--desktop|desktop)
+        exec bash "$SCRIPT_DIR/scripts/launch_gui.sh"
+        ;;
     --iso|iso)
         if [ ! -f "$SCRIPT_DIR/build/sigmaos-desktop-preview.iso" ]; then
             echo "==> Synthesizing bootable ISO..."

@@ -465,6 +465,38 @@ fn run_interactive_repl() {
                 run_script("launch_omarchy_persona.sh");
                 println!();
             }
+            "gui" | "desktop" => {
+                println!("\nLaunching SigmaOS Graphical Desktop Launcher...");
+                run_script("launch_gui.sh");
+                println!();
+            }
+            "boot" | "run" | "qemu" => {
+                println!("\n[Booting SigmaOS in QEMU...]");
+                let iso_path = base.join("build/sigmaos-desktop-preview.iso");
+                let qemu_check = Command::new("which").arg("qemu-system-x86_64").output();
+                if let Ok(output) = qemu_check {
+                    if output.status.success() {
+                        let _ = Command::new("qemu-system-x86_64")
+                            .arg("-m")
+                            .arg("2048")
+                            .arg("-cdrom")
+                            .arg(&iso_path)
+                            .arg("-serial")
+                            .arg("stdio")
+                            .arg("-no-reboot")
+                            .status();
+                    } else {
+                        println!("\x1b[33m[!] QEMU (qemu-system-x86_64) not found in PATH.\x1b[0m");
+                        println!("    To run the bootable ISO in a virtual machine, install QEMU:");
+                        println!("    \x1b[1;32msudo apt install -y qemu-system-x86 nasm xorriso\x1b[0m\n");
+                        println!("    You can also run the native personas right now:");
+                        println!("    - omarchy : Omarchy Aesthetic Persona (Hyprland / Wayland)");
+                        println!("    - mint    : Linux Mint Persona (Cinnamon / XApps)");
+                        println!("    - arch    : Arch Linux Persona (Pacman / Rolling)");
+                    }
+                }
+                println!();
+            }
             "shell" => {
                 println!("\n[Pinging bin/sigmaos-shell...]");
                 let shell_bin = base.join("bin/sigmaos-shell");
@@ -554,6 +586,36 @@ fn main() {
             }
             "--omarchy" | "omarchy" => {
                 run_script("launch_omarchy_persona.sh");
+            }
+            "--gui" | "gui" | "--desktop" | "desktop" => {
+                run_script("launch_gui.sh");
+            }
+            "--qemu" | "qemu" | "--boot" | "boot" | "--run" | "run" => {
+                let base = find_base_dir();
+                let iso_path = base.join("build/sigmaos-desktop-preview.iso");
+                let qemu_check = Command::new("which").arg("qemu-system-x86_64").output();
+                if let Ok(output) = qemu_check {
+                    if output.status.success() {
+                        let _ = Command::new("qemu-system-x86_64")
+                            .arg("-m")
+                            .arg("2048")
+                            .arg("-cdrom")
+                            .arg(&iso_path)
+                            .arg("-serial")
+                            .arg("stdio")
+                            .arg("-no-reboot")
+                            .status();
+                    } else {
+                        println!("\x1b[33m[!] QEMU (qemu-system-x86_64) not found in PATH.\x1b[0m");
+                        println!("    To run the bootable ISO in a virtual machine, install QEMU:");
+                        println!("    \x1b[1;32msudo apt install -y qemu-system-x86 nasm xorriso\x1b[0m\n");
+                        println!("    You can also run native personas right now:");
+                        println!("    - ./run.sh --omarchy : Omarchy Aesthetic Persona (Hyprland / Wayland)");
+                        println!("    - ./run.sh --mint    : Linux Mint Persona (Cinnamon / XApps)");
+                        println!("    - ./run.sh --arch    : Arch Linux Persona (Pacman / Rolling)");
+                        println!("    - ./run.sh --gui     : Graphical Desktop Launcher");
+                    }
+                }
             }
             "--check" | "check" => {
                 run_script("check_launch_ready.sh");
