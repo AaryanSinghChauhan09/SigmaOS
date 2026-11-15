@@ -54,10 +54,14 @@ fn find_base_dir() -> PathBuf {
     if is_sigmaos_dir(&cur) {
         return cur;
     }
-    let default_home = PathBuf::from("/home/aaryansinghchauhan/SigmaOS");
-    if is_sigmaos_dir(&default_home) {
-        return default_home;
+    // Fallback: try common home directory locations
+    if let Ok(home) = env::var("HOME") {
+        let home_sigmaos = PathBuf::from(home).join("SigmaOS");
+        if is_sigmaos_dir(&home_sigmaos) {
+            return home_sigmaos;
+        }
     }
+    // Last resort: current directory (may not be valid but avoids panic)
     cur
 }
 

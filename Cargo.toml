@@ -1,12 +1,15 @@
 [package]
 name = "sigmaos"
-version = "0.1.0"
+version = "1.0.0-alpha.1"
 edition = "2021"
 authors = ["SigmaOS Team"]
 description = "SigmaOS - Sovereign, AI-Native Operating System"
 license = "MIT OR GPL-2.0"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 default-run = "sigmaos"
+readme = "README.md"
+keywords = ["os", "kernel", "sovereign", "operating-system"]
+categories = ["os", "no-std"]
 
 [dependencies]
 ed25519-dalek = "3.0.0"
