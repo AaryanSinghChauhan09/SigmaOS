@@ -136,3 +136,35 @@ jobs:
         with:
           name: sigmaos-iso
           path: build/sigmaos.iso
+
+  test-incremental:
+    name: Incremental Tests (Memory-Safe)
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Cache Cargo Build
+        uses: actions/cache@v3
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run kernel tests
+        run: cargo test --lib kernel -- --test-threads=4
+
+      - name: Run filesystem tests
+        run: cargo test --lib filesystem -- --test-threads=4
+
+      - name: Run network tests
+        run: cargo test --lib network -- --test-threads=4
+
+      - name: Run security tests
+        run: cargo test --lib security -- --test-threads=4

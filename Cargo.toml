@@ -105,6 +105,7 @@ opt-level = 0
 debug = "line-tables-only"
 codegen-units = 1
 incremental = false
+panic = "abort"
 
 [profile.release]
 opt-level = 3
