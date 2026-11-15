@@ -22,17 +22,32 @@ fn test_storage_rules_file_exists_and_valid() {
     assert!(content.contains("[rule.runtime_evidence]"));
 }
 
+fn find_wiki_file(name: &str) -> std::path::PathBuf {
+    let candidates = [
+        format!("/home/aaryansinghchauhan/SigmaOS.wiki/{}", name),
+        format!("../SigmaOS.wiki/{}", name),
+        format!("/tmp/SigmaOS.wiki/{}", name),
+    ];
+    for c in &candidates {
+        let p = std::path::PathBuf::from(c);
+        if p.exists() {
+            return p;
+        }
+    }
+    // Attempt shallow clone for isolated CI environments
+    let _ = std::process::Command::new("git")
+        .args(&["clone", "--depth=1", "https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git", "/tmp/SigmaOS.wiki"])
+        .status();
+    std::path::PathBuf::from(format!("/tmp/SigmaOS.wiki/{}", name))
+}
+
 #[test]
 fn test_secondary_memory_documentation_exists_and_valid() {
-    let policy_path =
-        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-storage-SECONDARY_MEMORY_POLICY.md");
-    let adr_path =
-        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-storage-SECONDARY_MEMORY_ADR.md");
-    let block_path = Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-storage-BLOCK_POLICY.md");
-    let cache_path =
-        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-filesystem-CACHE_POLICY.md");
-    let mount_path =
-        Path::new("/home/aaryansinghchauhan/SigmaOS.wiki/Doc-filesystem-MOUNT_POLICY.md");
+    let policy_path = find_wiki_file("Doc-storage-SECONDARY_MEMORY_POLICY.md");
+    let adr_path = find_wiki_file("Doc-storage-SECONDARY_MEMORY_ADR.md");
+    let block_path = find_wiki_file("Doc-storage-BLOCK_POLICY.md");
+    let cache_path = find_wiki_file("Doc-filesystem-CACHE_POLICY.md");
+    let mount_path = find_wiki_file("Doc-filesystem-MOUNT_POLICY.md");
 
     assert!(
         policy_path.exists(),

@@ -287,6 +287,8 @@ jobs:
             chmod +x virtualization/ocirunner/run_in_microvm.sh
             timeout 60 ./virtualization/ocirunner/run_in_microvm.sh \
               "${{ matrix.image }}" 2>&1 || true
+          elif [ "${{ matrix.image }}" = "hello-world" ]; then
+            docker run --rm hello-world
           else
             docker run --rm "${{ matrix.image }}" echo "OCI compat: OK"
           fi
