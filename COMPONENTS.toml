@@ -26892,3 +26892,14 @@ inspirations = ["Linux kernel", "TCP/IP", "IPv4", "IPv6", "TCP", "UDP", "ICMP", 
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-pacman"
+description = "Package manager implementation for SigmaOS inspired by Arch Linux pacman"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman"
+engine = "rust"
+category = "Package Management"
+language = "rust"
+inspirations = ["Arch Linux", "pacman", "AUR", "package management", "dependency resolution"]
+visibility = "public"
+depends_on = []
+
