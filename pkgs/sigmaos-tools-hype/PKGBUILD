@@ -1,0 +1,20 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@users.noreply.github.com>
+pkgname=sigmaos-tools-hype
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Terminal-driven markdown presentation and slide deck engine (omacom/hype parity)"
+arch=('x86_64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-tools-hype"
+license=('MIT')
+depends=('gcc-libs' 'glibc')
+makedepends=('rust' 'cargo')
+
+build() {
+    cd "$pkgname-$pkgver"
+    cargo build --release --locked
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    install -Dm755 "target/release/hype" "$pkgdir/usr/bin/hype"
+}

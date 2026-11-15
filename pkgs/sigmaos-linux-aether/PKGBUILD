@@ -1,0 +1,20 @@
+# Maintainer: Aaryan Singh Chauhan <aaryansinghchauhan@users.noreply.github.com>
+pkgname=sigmaos-linux-aether
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Native dynamic desktop theming and color harmonization engine (omacom/aether parity)"
+arch=('x86_64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-linux-aether"
+license=('MIT')
+depends=('gcc-libs' 'glibc')
+makedepends=('rust' 'cargo')
+
+build() {
+    cd "$pkgname-$pkgver"
+    cargo build --release --locked
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    install -Dm755 "target/release/aether" "$pkgdir/usr/bin/aether"
+}

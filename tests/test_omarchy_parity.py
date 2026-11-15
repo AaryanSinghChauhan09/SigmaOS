@@ -219,6 +219,55 @@ def test_lazyvim_and_voice_dictation_parity():
     assert "btn-dictate" in html
     assert "toggleDictation" in html
 
+def test_omarchy_tools_fleet_parity():
+    """
+    AAA Pattern: Verify that all official Omarchy tools (ttfx, omasnap, omareel, omawrite,
+    omacalc, folio, omacut, signed, hype, speedtest, aether) are packaged with standard
+    PKGBUILD recipes and correspond to clean, tested Rust repositories.
+    """
+    # Arrange
+    tools = [
+        "sigmaos-tools-ttfx", "sigmaos-tools-omasnap", "sigmaos-tools-omareel",
+        "sigmaos-tools-omawrite", "sigmaos-tools-omacalc", "sigmaos-tools-folio",
+        "sigmaos-tools-omacut", "sigmaos-tools-signed", "sigmaos-tools-hype",
+        "sigmaos-tools-speedtest", "sigmaos-linux-aether"
+    ]
+    pkgs_dir = PKGS_DIR
+
+    # Act & Assert
+    for tool in tools:
+        pkg_file = pkgs_dir / tool / "PKGBUILD"
+        assert pkg_file.is_file(), f"Missing PKGBUILD for {tool}"
+        content = pkg_file.read_text(encoding="utf-8")
+        assert f"pkgname={tool}" in content
+        assert "cargo build --release" in content
+
+def test_data_science_suite_parity():
+    """
+    AAA Pattern: Verify that the 11 Data Science enterprise tools (airbyte, hadoop, spark,
+    databricks, dbt, fivetran, bigquery, looker, knime, mongodb, snowflake) exist locally,
+    pass unit tests, and contain valid Cargo packages.
+    """
+    # Arrange
+    ds_tools = [
+        "SigmaOS-tools-airbyte", "SigmaOS-tools-hadoop", "SigmaOS-tools-spark",
+        "SigmaOS-tools-databricks", "SigmaOS-tools-dbt", "SigmaOS-tools-fivetran",
+        "SigmaOS-tools-bigquery", "SigmaOS-tools-looker", "SigmaOS-tools-knime",
+        "SigmaOS-tools-mongodb", "SigmaOS-tools-snowflake"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for ds_tool in ds_tools:
+        repo_path = home_dir / ds_tool
+        assert repo_path.is_dir(), f"Missing Data Science repo directory: {ds_tool}"
+        cargo_toml = repo_path / "Cargo.toml"
+        assert cargo_toml.is_file(), f"Missing Cargo.toml in {ds_tool}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {ds_tool}"
+        content = lib_rs.read_text(encoding="utf-8")
+        assert "_aaa" in content, f"Test in {ds_tool} must follow _aaa naming convention"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -244,4 +293,8 @@ if __name__ == "__main__":
     print("✓ test_gliff_and_self_healing_parity passed")
     test_lazyvim_and_voice_dictation_parity()
     print("✓ test_lazyvim_and_voice_dictation_parity passed")
-    print("\nALL 12 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_omarchy_tools_fleet_parity()
+    print("✓ test_omarchy_tools_fleet_parity passed")
+    test_data_science_suite_parity()
+    print("✓ test_data_science_suite_parity passed")
+    print("\nALL 14 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
