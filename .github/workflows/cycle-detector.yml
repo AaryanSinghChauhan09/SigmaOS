@@ -129,21 +129,24 @@ jobs:
           CYCLE_STATUS=${PIPESTATUS[0]}
           
           # Save report for later steps
-          echo "report_path=/tmp/cycle_report.txt" >> $GITHUB_OUTPUT
-          echo "has_cycles=$([[ $CYCLE_STATUS -eq 1 ]] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+          echo "report_path=/tmp/cycle_report.txt" >> "$GITHUB_OUTPUT"
+          if [ "$CYCLE_STATUS" -eq 0 ]; then
+            echo "has_cycles=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_cycles=true" >> "$GITHUB_OUTPUT"
+          fi
           
-          exit $CYCLE_STATUS
+          exit "$CYCLE_STATUS"
         continue-on-error: true
 
       - name: Parse cycle detection results
         id: results
         run: |
+          CYCLE_COUNT=0
           if [ -f /tmp/cycle_report.txt ]; then
-            CYCLE_COUNT=$(grep -c "Cycle" /tmp/cycle_report.txt || echo "0")
-            echo "cycle_count=$CYCLE_COUNT" >> $GITHUB_OUTPUT
-          else
-            echo "cycle_count=0" >> $GITHUB_OUTPUT
+            CYCLE_COUNT=$(grep -c "^Cycle " /tmp/cycle_report.txt 2>/dev/null) || CYCLE_COUNT=0
           fi
+          echo "cycle_count=${CYCLE_COUNT}" >> "$GITHUB_OUTPUT"
 
       - name: Create issue on cycle detection failure
         if: failure() && steps.cycle_check.outcome == 'failure'
