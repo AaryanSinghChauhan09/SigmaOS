@@ -26881,3 +26881,14 @@ inspirations = ["Linux kernel", "VFS", "ext4", "Btrfs", "XFS", "FAT32", "sysfs",
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-netstack"
+description = "Networking stack implementation for SigmaOS inspired by Linux kernel networking"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-netstack"
+engine = "rust"
+category = "Networking"
+language = "rust"
+inspirations = ["Linux kernel", "TCP/IP", "IPv4", "IPv6", "TCP", "UDP", "ICMP", "ARP", "netfilter", "network namespaces"]
+visibility = "public"
+depends_on = []
+
