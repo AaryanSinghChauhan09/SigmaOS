@@ -1,0 +1,5 @@
+sigmaos (1.0.0-1) unstable; urgency=medium
+
+  * Initial release for Debian distribution compatibility.
+
+ -- SigmaOS Architecture Team <team@sigmaos.org>  Sun, 15 Nov 2026 23:09:00 +0530

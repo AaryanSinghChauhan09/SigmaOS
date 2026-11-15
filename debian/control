@@ -1,0 +1,14 @@
+Source: sigmaos
+Section: admin
+Priority: optional
+Maintainer: SigmaOS Architecture Team <team@sigmaos.org>
+Build-Depends: debhelper-compat (= 13), cargo, rustc, libssl-dev, libwayland-dev
+Standards-Version: 4.6.2
+Homepage: https://github.com/AaryanSinghChauhan09/SigmaOS
+
+Package: sigmaos-core
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, systemd, udev, btrfs-progs
+Description: SigmaOS Sovereign Operating System Core Suite
+ Modular Linux distribution framework with Wayland compositor,
+ dynamic theme orchestration, and universal packaging support.

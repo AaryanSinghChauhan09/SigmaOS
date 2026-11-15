@@ -1,0 +1,20 @@
+# Maintainer: SigmaOS Project <team@sigmaos.org>
+pkgname=sigmaos-core
+pkgver=1.0.0
+pkgrel=0
+pkgdesc="SigmaOS core operating system components for Alpine Linux musl"
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+arch="x86_64 aarch64"
+license="GPL-3.0-or-later"
+depends="musl btrfs-progs"
+makedepends="cargo rust wayland-dev openssl-dev"
+subpackages="$pkgname-doc"
+source="$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz"
+
+build() {
+	cargo build --release
+}
+
+package() {
+	install -Dm755 "target/release/omarchy-shell" "$pkgdir/usr/bin/omarchy-shell"
+}

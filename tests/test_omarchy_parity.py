@@ -801,6 +801,43 @@ def test_open_source_os_ecosystem_gap_closure_aaa():
         pkg_name = repo.lower()
         assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
 
+def test_multi_distro_open_source_os_unification_parity_aaa():
+    """
+    AAA Pattern: Verify multi-distribution open source OS unification:
+    1. Cross-distro compiler tool in tools/sigma_distro_unifier.rs
+    2. Debian DPKG packaging: debian/control, debian/rules, debian/changelog
+    3. Gentoo Portage ebuild & make.conf
+    4. Fedora RPM spec & dnf.conf
+    5. Alpine Linux APKBUILD
+    6. NixOS default.nix & flake.nix
+    """
+    # Arrange
+    tool_file = ROOT_DIR / "tools" / "sigma_distro_unifier.rs"
+    distro_assets = [
+        ROOT_DIR / "debian" / "control",
+        ROOT_DIR / "debian" / "rules",
+        ROOT_DIR / "debian" / "changelog",
+        ROOT_DIR / "portage" / "make.conf",
+        ROOT_DIR / "portage" / "sys-apps" / "sigmaos-core" / "sigmaos-core-1.0.0.ebuild",
+        ROOT_DIR / "specs" / "sigmaos.spec",
+        ROOT_DIR / "config" / "fedora" / "dnf.conf",
+        ROOT_DIR / "aports" / "main" / "sigmaos-core" / "APKBUILD",
+        ROOT_DIR / "nix" / "default.nix",
+        ROOT_DIR / "nix" / "flake.nix",
+    ]
+
+    # Act & Assert
+    assert tool_file.is_file(), f"Missing tool: {tool_file}"
+    tool_content = tool_file.read_text(encoding="utf-8")
+    assert "DistroFamily" in tool_content
+    assert "DistroDependencyMapper" in tool_content
+    assert "GentooUseFlagResolver" in tool_content
+    _verify_aaa_testing(tool_content, "sigma_distro_unifier.rs")
+
+    for asset in distro_assets:
+        assert asset.is_file(), f"Missing distro packaging asset: {asset}"
+        assert asset.stat().st_size > 20, f"Asset {asset} is empty or stub"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -864,4 +901,6 @@ if __name__ == "__main__":
     print("✓ test_arch_linux_ecosystem_gap_closure_aaa passed")
     test_open_source_os_ecosystem_gap_closure_aaa()
     print("✓ test_open_source_os_ecosystem_gap_closure_aaa passed")
-    print("\nALL 31 AAA OMARCHY & OPEN SOURCE OS PARITY TESTS PASSED SUCCESSFULLY!")
+    test_multi_distro_open_source_os_unification_parity_aaa()
+    print("✓ test_multi_distro_open_source_os_unification_parity_aaa passed")
+    print("\nALL 32 AAA MULTI-DISTRO & OPEN SOURCE OS PARITY TESTS PASSED SUCCESSFULLY!")
