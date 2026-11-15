@@ -3,7 +3,7 @@
 """
 test_omarchy_parity.py: AAA Automated Test Suite for Omarchy & Omacom Parity in SigmaOS.
 Ensures full parity between SigmaOS and Omarchy Linux desktop configurations, ISO pipelines,
-PKGBUILD packaging, and dynamic graphical UI suites.
+PKGBUILD packaging, Gliff symbol picker, Self-Healing engine, and dynamic graphical UI suites.
 """
 
 import os
@@ -127,6 +127,7 @@ def test_desktop_gui_parity():
         'id="win-marketplace"',
         'id="win-datascience"',
         'id="notif-drawer"',
+        'id="gliff-modal"',
         'id="desktop-context-menu"'
     ]
     for win in expected_windows:
@@ -169,6 +170,28 @@ def test_archiso_and_pkgs_parity():
             assert "pkgver=" in c
             assert "package()" in c
 
+def test_gliff_and_self_healing_parity():
+    """Arrange-Act-Assert: Verify Gliff symbol modal, Wallust theme registry, and WeCanFixEverything self-healing engine."""
+    # 1. Gliff modal in HTML
+    with open(UI_INDEX, "r", encoding="utf-8") as f:
+        html = f.read()
+    assert "openGliffModal" in html
+    assert "gliff-modal" in html
+
+    # 2. Theme Registry JSON
+    registry_file = CONFIG_DIR / "wallust" / "registry.json"
+    assert registry_file.is_file()
+    with open(registry_file) as f:
+        reg = json.load(f)
+        assert len(reg.get("themes", [])) >= 8
+
+    # 3. WeCanFixEverything script
+    fix_script = SCRIPTS_DIR / "wecanfixeverything.py"
+    assert fix_script.is_file()
+    res = subprocess.run(["python3", str(fix_script)], capture_output=True, text=True)
+    assert res.returncode == 0
+    assert "ALL CHECKS PASSED" in res.stdout
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -190,4 +213,6 @@ if __name__ == "__main__":
     print("✓ test_plugins_and_omacom_parity passed")
     test_archiso_and_pkgs_parity()
     print("✓ test_archiso_and_pkgs_parity passed")
-    print("\nALL 10 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_gliff_and_self_healing_parity()
+    print("✓ test_gliff_and_self_healing_parity passed")
+    print("\nALL 11 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")

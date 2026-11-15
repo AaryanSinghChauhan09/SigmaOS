@@ -1648,6 +1648,8 @@ ORDER BY memory_gb DESC;</textarea>
 
   // Rofi Applications Database
   const ROFI_APPS = [
+    { name: "Gliff Glyph & Emoji Picker", sub: "Unicode math, typography, and symbol selector (Super + .)", icon: "✨", action: () => openGliffModal() },
+    { name: "We Can Fix Everything (Auto-Heal)", sub: "Automated diagnosis and self-repair for packages and configs", icon: "🩺", action: () => summonWindow('win-doctor') },
     { name: "Plain Config Editor", sub: "Fast sovereign text editor for system configs", icon: "📝", action: () => summonWindow('win-plain') },
     { name: "Plugin Marketplace & Local AI", sub: "Desktop plugins, SSH port forwards, and local AI catalog", icon: "🧩", action: () => summonWindow('win-marketplace') },
     { name: "Folio File Manager", sub: "Keyboard-first sovereign directory explorer", icon: "📂", action: () => summonWindow('win-folio') },
@@ -1812,6 +1814,28 @@ ORDER BY memory_gb DESC;</textarea>
   });
 </script>
 
+
+
+  <!-- Gliff Unicode & Emoji Picker Modal (inspired by omacom/gliff) -->
+  <div id="gliff-modal" class="rofi-backdrop" style="display: none;" onclick="closeGliffOnBackdrop(event)">
+    <div class="rofi-window" style="width: 480px; max-height: 420px; padding: 14px; gap: 10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-weight:700; font-size:13px; color:var(--accent);">✨ Gliff — Glyph & Emoji Picker (`omacom/gliff` parity)</span>
+        <span style="font-size:10px; color:var(--text-muted);">Super + .</span>
+      </div>
+      <input type="text" id="gliff-search" class="rofi-input" placeholder="Search symbol, emoji, math..." oninput="filterGliff(this.value)">
+      <div style="display:flex; gap:6px; font-size:11px;">
+        <button class="tool-tab active" onclick="switchGliffCat('symbols')" id="gcat-symbols">Symbols</button>
+        <button class="tool-tab" onclick="switchGliffCat('emojis')" id="gcat-emojis">Emojis</button>
+        <button class="tool-tab" onclick="switchGliffCat('math')" id="gcat-math">Math</button>
+        <button class="tool-tab" onclick="switchGliffCat('typography')" id="gcat-typography">Typography</button>
+      </div>
+      <div id="gliff-grid" style="display:grid; grid-template-columns:repeat(8, 1fr); gap:8px; max-height:220px; overflow-y:auto; padding:4px;">
+        <!-- dynamic glyphs -->
+      </div>
+      <div id="gliff-toast" style="font-size:11px; color:var(--text-muted); text-align:center; height:16px;">Click any glyph to copy to clipboard.</div>
+    </div>
+  </div>
 
   <!-- Slide-out Notification Center Drawer (inspired by omacom/omarchy-notification-center-plugin) -->
   <div id="notif-drawer">

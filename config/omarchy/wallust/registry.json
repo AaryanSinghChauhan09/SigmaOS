@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "registry": "SigmaOS Omarchy Theme Registry",
+  "themes": [
+    {
+      "id": "catppuccin-mocha",
+      "name": "Catppuccin Mocha",
+      "author": "Catppuccin Org",
+      "style": "pastel-dark",
+      "background": "#1e1e2e",
+      "foreground": "#cdd6f4",
+      "accent": "#89b4fa",
+      "accent_alt": "#cba6f7",
+      "colors": ["#1e1e2e", "#f38ba8", "#a6e3a1", "#f9e2af", "#89b4fa", "#f5c2e7", "#94e2d5", "#cdd6f4"]
+    },
+    {
+      "id": "tokyo-night",
+      "name": "Tokyo Night",
+      "author": "folke",
+      "style": "neon-dark",
+      "background": "#1a1b26",
+      "foreground": "#c0caf5",
+      "accent": "#7aa2f7",
+      "accent_alt": "#bb9af7",
+      "colors": ["#1a1b26", "#f7768e", "#9ece6a", "#e0af68", "#7aa2f7", "#bb9af7", "#7dcfff", "#c0caf5"]
+    },
+    {
+      "id": "nord",
+      "name": "Nordic Frost",
+      "author": "Arctic Ice Studio",
+      "style": "arctic-cool",
+      "background": "#2e3440",
+      "foreground": "#eceff4",
+      "accent": "#88c0d0",
+      "accent_alt": "#81a1c1",
+      "colors": ["#2e3440", "#bf616a", "#a3be8c", "#ebcb8b", "#81a1c1", "#b48ead", "#88c0d0", "#eceff4"]
+    },
+    {
+      "id": "gruvbox-dark",
+      "name": "Gruvbox Retro Dark",
+      "author": "morhetz",
+      "style": "warm-retro",
+      "background": "#282828",
+      "foreground": "#ebdbb2",
+      "accent": "#fe8019",
+      "accent_alt": "#fabd2f",
+      "colors": ["#282828", "#cc241d", "#98971a", "#d79921", "#458588", "#b16286", "#689d6a", "#ebdbb2"]
+    },
+    {
+      "id": "cyber-slate",
+      "name": "Cyber Slate",
+      "author": "Omacom",
+      "style": "sleek-industrial",
+      "background": "#0d1117",
+      "foreground": "#c9d1d9",
+      "accent": "#58a6ff",
+      "accent_alt": "#bc8cff",
+      "colors": ["#0d1117", "#ff7b72", "#7ee787", "#f2cc60", "#58a6ff", "#bc8cff", "#79c0ff", "#c9d1d9"]
+    },
+    {
+      "id": "synthwave84",
+      "name": "Synthwave '84",
+      "author": "RobbOwen",
+      "style": "outrun-neon",
+      "background": "#262335",
+      "foreground": "#f92aad",
+      "accent": "#ff7edb",
+      "accent_alt": "#fe4450",
+      "colors": ["#262335", "#fe4450", "#72f1b8", "#fede5d", "#03edf9", "#ff7edb", "#36f9f6", "#ffffff"]
+    },
+    {
+      "id": "dracula",
+      "name": "Dracula Official",
+      "author": "Zeno Rocha",
+      "style": "gothic-vibrant",
+      "background": "#282a36",
+      "foreground": "#f8f8f2",
+      "accent": "#bd93f9",
+      "accent_alt": "#ff79c6",
+      "colors": ["#282a36", "#ff5555", "#50fa7b", "#f1fa8c", "#bd93f9", "#ff79c6", "#8be9fd", "#f8f8f2"]
+    },
+    {
+      "id": "rose-pine",
+      "name": "Rosé Pine",
+      "author": "mvllow",
+      "style": "soho-vibes",
+      "background": "#191724",
+      "foreground": "#e0def4",
+      "accent": "#eb6f92",
+      "accent_alt": "#c4a7e7",
+      "colors": ["#191724", "#eb6f92", "#31748f", "#f6c177", "#9ccfd8", "#c4a7e7", "#ebbcba", "#e0def4"]
+    }
+  ]
+}
