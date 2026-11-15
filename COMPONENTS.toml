@@ -26870,3 +26870,14 @@ inspirations = ["Linux kernel", "CFS", "EEVDF", "SCHED_FIFO", "SCHED_RR", "SCHED
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-vfs"
+description = "Virtual Filesystem implementation for SigmaOS inspired by Linux kernel VFS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vfs"
+engine = "rust"
+category = "Filesystem"
+language = "rust"
+inspirations = ["Linux kernel", "VFS", "ext4", "Btrfs", "XFS", "FAT32", "sysfs", "procfs", "tmpfs"]
+visibility = "public"
+depends_on = []
+
