@@ -634,6 +634,18 @@
       <div class="icon-glyph">💾</div>
       <span class="icon-label">Installer</span>
     </div>
+    <div class="desktop-icon" onclick="summonWindow('win-betteroffice')">
+      <div class="icon-glyph">📑</div>
+      <span class="icon-label">BetterOffice</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-dos')">
+      <div class="icon-glyph">💾</div>
+      <span class="icon-label">DOS Prompt</span>
+    </div>
+    <div class="desktop-icon" onclick="summonWindow('win-datascience')">
+      <div class="icon-glyph">📊</div>
+      <span class="icon-label">Data Science</span>
+    </div>
     <div class="desktop-icon" onclick="summonWindow('win-about')">
       <div class="icon-glyph">ℹ️</div>
       <span class="icon-label">About</span>
@@ -920,6 +932,102 @@ Type 'help' for commands, 'omarchy binds' for shortcuts, 'doctor' for diagnostic
     </div>
   </div>
 
+
+  <!-- BetterOffice Suite Window -->
+  <div id="win-betteroffice" class="window" style="top: 90px; left: 180px; width: 720px; height: 480px; display: none;">
+    <div class="window-header">
+      <div class="window-title">📑 BetterOffice Sovereign Productivity Suite</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-betteroffice')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-betteroffice')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; gap:8px; border-bottom:1px solid var(--glass-border); padding-bottom:8px;">
+        <button class="persona-btn active" onclick="showOfficeTab('doc')">📄 Documents</button>
+        <button class="persona-btn" onclick="showOfficeTab('sheet')">📊 Spreadsheets</button>
+        <button class="persona-btn" onclick="showOfficeTab('slide')">📽️ Slides</button>
+        <button class="persona-btn" onclick="showOfficeTab('diag')">📐 Diagrams</button>
+      </div>
+      <div id="office-doc-pane" style="flex:1; display:flex; flex-direction:column; gap:8px;">
+        <div style="font-size:11px; color:var(--text-muted);">Sovereign Markdown / ODF Typographic Document Processor</div>
+        <textarea style="flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:#fff; padding:10px; font-family:var(--font-mono); font-size:12px; resize:none;"># Sovereign Manifesto
+
+SigmaOS unites the speed of Arch, the beauty of Omarchy, and the safety of Rust.</textarea>
+      </div>
+      <div id="office-sheet-pane" style="flex:1; display:none; flex-direction:column; gap:8px;">
+        <div style="font-size:11px; color:var(--text-muted);">High Throughput A1 Reactive Formula Grid (SUM, AVG, MIN, MAX)</div>
+        <table style="width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:11px;">
+          <tr style="background:rgba(255,255,255,0.08);"><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+          <tr><td style="font-weight:700;">1</td><td>Revenue</td><td>125000</td><td>Q1 Budget</td><td>=B1*1.15</td></tr>
+          <tr><td style="font-weight:700;">2</td><td>Expenses</td><td>48000</td><td>Operations</td><td>=B2*0.95</td></tr>
+          <tr><td style="font-weight:700;">3</td><td>Net Income</td><td>=A1-A2</td><td>Total: 77000</td><td>✓ Balanced</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOS Environment Window -->
+  <div id="win-dos" class="window" style="top: 130px; left: 240px; width: 640px; height: 400px; display: none;">
+    <div class="window-header">
+      <div class="window-title">💾 FreeDOS / MS-DOS 16-Bit Real-Mode Subsystem</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-dos')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-dos')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="background:#000; font-family:var(--font-mono); color:#55ff55; padding:14px; display:flex; flex-direction:column;">
+      <div id="dos-out" style="flex:1; white-space:pre-wrap; overflow-y:auto; line-height:1.4;">SigmaOS FreeDOS Compatibility Subsystem v7.1
+(C) Copyright Microsoft Corp / FreeDOS Project 1981-2006.
+Kernel ABI: 8086/80286 Real-Mode Int 21h Vector Emulation Active.
+Drive C: Mounted on Sovereign ZFS / EXT4 Dataset.
+
+Type 'DIR' for file catalog, 'VER' for version, or 'BASIC' for GW-BASIC interpreter.
+</div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <span>C:\&gt;</span>
+        <input type="text" id="dos-in" style="flex:1; background:transparent; border:none; outline:none; color:#55ff55; font-family:var(--font-mono); font-size:13px;" onkeydown="handleDosKey(event)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Science & RDBMS Workbench Window -->
+  <div id="win-datascience" class="window" style="top: 150px; left: 280px; width: 680px; height: 440px; display: none;">
+    <div class="window-header">
+      <div class="window-title">📊 Data Science, Analytics & SQL Workbench</div>
+      <div class="window-controls">
+        <button class="w-btn min" onclick="minimizeWindow('win-datascience')"></button>
+        <button class="w-btn max"></button>
+        <button class="w-btn close" onclick="closeWindow('win-datascience')"></button>
+      </div>
+    </div>
+    <div class="window-body" style="display:flex; flex-direction:column; gap:12px;">
+      <div style="font-size:11px; color:var(--text-muted);">
+        Interactive SQL query execution across DuckDB, PostgreSQL, Apache Spark, and Snowflake bridges.
+      </div>
+      <textarea id="sql-editor" style="height:90px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--accent-cyan); padding:8px; font-family:var(--font-mono); font-size:12px; resize:none;">SELECT cluster_id, node_type, memory_gb, status
+FROM apache_spark.executors
+WHERE active_tasks &gt; 0
+ORDER BY memory_gb DESC;</textarea>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button style="padding:6px 14px; border-radius:6px; background:var(--accent-cyan); color:#000; font-weight:700; border:none; cursor:pointer;" onclick="executeSql()">▶ Execute Query</button>
+        <span style="font-size:11px; color:var(--accent-green);" id="sql-stat">Connected: DuckDB In-Memory (Zero Copy)</span>
+      </div>
+      <div id="sql-results" style="flex:1; overflow-y:auto; background:rgba(0,0,0,0.2); border-radius:8px; padding:8px;">
+        <table class="doctor-table">
+          <thead><tr><th>cluster_id</th><th>node_type</th><th>memory_gb</th><th>status</th></tr></thead>
+          <tbody>
+            <tr><td>spark-worker-01</td><td>r5b.2xlarge</td><td>64 GB</td><td><span class="badge-ok">ONLINE</span></td></tr>
+            <tr><td>spark-worker-02</td><td>r5b.2xlarge</td><td>64 GB</td><td><span class="badge-ok">ONLINE</span></td></tr>
+            <tr><td>duckdb-inproc</td><td>columnar-vfs</td><td>16 GB</td><td><span class="badge-ok">READY</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- About Window -->
   <div id="win-about" class="window" style="top: 180px; left: 380px; width: 480px; height: 320px; display: none;">
     <div class="window-header">
@@ -1059,6 +1167,44 @@ Type 'help' for commands, 'omarchy binds' for shortcuts, 'doctor' for diagnostic
     document.addEventListener('mouseup', () => { isDragging = false; });
   });
 
+  
+  function showOfficeTab(tab) {
+    document.getElementById('office-doc-pane').style.display = tab === 'doc' ? 'flex' : 'none';
+    document.getElementById('office-sheet-pane').style.display = tab === 'sheet' ? 'flex' : 'none';
+  }
+
+  function handleDosKey(e) {
+    if (e.key === 'Enter') {
+      const input = document.getElementById('dos-in');
+      const cmd = input.value.trim().toUpperCase();
+      input.value = '';
+      const out = document.getElementById('dos-out');
+      out.textContent += 'C:\\>' + cmd + '\n';
+      if (cmd === 'DIR') {
+        out.textContent += ' Volume in drive C is SIGMA_ROOT\n Directory of C:\\\n\nCOMMAND  COM    54645 05-31-94\nAUTOEXEC BAT      180 11-15-26\nBASIC    EXE   122880 07-24-87\n       3 file(s)     177705 bytes\n       2,147,483,648 bytes free\n';
+      } else if (cmd === 'VER') {
+        out.textContent += 'MS-DOS Version 6.22 (SigmaOS Real-Mode Subsystem)\n';
+      } else if (cmd === 'CLS') {
+        out.textContent = '';
+      } else if (cmd === 'BASIC') {
+        out.textContent += 'GW-BASIC 3.23 (C) Copyright Microsoft 1983, 1988\n60300 Bytes free\nOk\n';
+      } else if (cmd === 'HELP') {
+        out.textContent += 'Supported Commands: DIR, VER, CLS, BASIC, HELP\n';
+      } else {
+        out.textContent += 'Bad command or file name: ' + cmd + '\n';
+      }
+      out.scrollTop = out.scrollHeight;
+    }
+  }
+
+  function executeSql() {
+    const stat = document.getElementById('sql-stat');
+    stat.textContent = 'Executing query on DuckDB columnar engine...';
+    setTimeout(() => {
+      stat.textContent = 'Query completed in 1.4ms (3 rows returned)';
+    }, 200);
+  }
+
   // Terminal Handling
   function appendTerm(txt) {
     const out = document.getElementById('term-out');
@@ -1137,19 +1283,71 @@ Type 'help' for commands, 'omarchy binds' for shortcuts, 'doctor' for diagnostic
 
   // Rofi Applications Database
   const ROFI_APPS = [
+    // Core Desktop & Terminals
     { name: "Terminal (Foot / Kitty)", sub: "GPU-accelerated fast terminal", icon: "💻", action: () => summonWindow('win-term') },
     { name: "Wallust Theme Harmonizer", sub: "Dynamic palette switcher & config reloader", icon: "🎨", action: () => summonWindow('win-wallust') },
+    { name: "Neovim Modern Editor", sub: "Terminal modal editor with LSP & Treesitter", icon: "📝", action: () => summonWindow('win-term') },
+    { name: "Omarchy Keybinds Cheat Sheet", sub: "View active Hyprland keyboard shortcuts", icon: "⌨️", action: () => summonWindow('win-keybinds') },
+    { name: "Omarchy Diagnostic Doctor", sub: "Inspect kernel, ISO, ALPM, and compositor health", icon: "🩺", action: () => summonWindow('win-doctor') },
+    { name: "SigmaOS Calamares Installer", sub: "Install to bare-metal NVMe or dual-boot", icon: "💾", action: () => summonWindow('win-installer') },
+    { name: "Wlogout Session Manager", sub: "Lock, suspend, restart, or shutdown session", icon: "🚪", action: () => alert('Wlogout: Session menu invoked') },
+
+    // BetterOffice Suite
+    { name: "BetterOffice Documents", sub: "Structured typographic document processor & markdown export", icon: "📄", action: () => { summonWindow('win-betteroffice'); showOfficeTab('doc'); } },
+    { name: "BetterOffice Spreadsheets", sub: "A1 formula grid with high throughput reactive calculation", icon: "📊", action: () => { summonWindow('win-betteroffice'); showOfficeTab('sheet'); } },
+    { name: "BetterOffice Slides", sub: "Vector presentation slides with dynamic slide show engine", icon: "📽️", action: () => { summonWindow('win-betteroffice'); showOfficeTab('slide'); } },
+    { name: "BetterOffice Diagrams", sub: "Node-and-link architecture flowcharts & graph modeling", icon: "📐", action: () => { summonWindow('win-betteroffice'); showOfficeTab('diag'); } },
+
+    // Craft Creative Suite (20 Engines)
     { name: "Craft 3D Modeler", sub: "Mesh spatial geometry & rendering (Blender parity)", icon: "📐", action: () => alert('Launching Craft 3D...') },
     { name: "Craft Sound DAW", sub: "Digital audio workstation & MIDI sequencer (Bitwig parity)", icon: "🎵", action: () => alert('Launching Craft Sound...') },
     { name: "Craft Font Designer", sub: "OpenType glyph typography editor", icon: "🔤", action: () => alert('Launching Craft Font...') },
-    { name: "Craft Creative Suite", sub: "Browse all 20 sovereign creative engines", icon: "🎭", action: () => summonWindow('win-craft') },
-    { name: "Neovim Modern Editor", sub: "Terminal modal editor with LSP & Treesitter", icon: "📝", action: () => summonWindow('win-term') },
-    { name: "OnlyOffice Suite", sub: "Collaborative documents, spreadsheets, slides", icon: "📊", action: () => alert('Launching OnlyOffice...') },
-    { name: "LibreOffice Writer", sub: "Full ODF word processor", icon: "📄", action: () => alert('Launching LibreOffice...') },
-    { name: "Omarchy Diagnostic Doctor", sub: "Inspect kernel, ISO, ALPM, and compositor health", icon: "🩺", action: () => summonWindow('win-doctor') },
-    { name: "Omarchy Keybinds Cheat Sheet", sub: "View active Hyprland keyboard shortcuts", icon: "⌨️", action: () => summonWindow('win-keybinds') },
-    { name: "SigmaOS Calamares Installer", sub: "Install to bare-metal NVMe or dual-boot", icon: "💾", action: () => summonWindow('win-installer') },
-    { name: "Wlogout Session Manager", sub: "Lock, suspend, restart, or shutdown session", icon: "🚪", action: () => alert('Wlogout: Session menu invoked') },
+    { name: "Craft CAD Engine", sub: "Parametric solid modeling & CAM/CAE exporter", icon: "⚙️", action: () => alert('Launching Craft CAD...') },
+    { name: "Craft Ani 2D Timeline", sub: "Traditional and vector 2D keyframe animator", icon: "🎞️", action: () => alert('Launching Craft Ani...') },
+    { name: "Craft Art Canvas", sub: "Non-destructive digital painting and concept art studio", icon: "🖌️", action: () => alert('Launching Craft Art...') },
+    { name: "Craft Film Editor", sub: "Multitrack non-linear video compositor & color grading", icon: "🎬", action: () => alert('Launching Craft Film...') },
+    { name: "Craft Creative Suite (All 20)", sub: "Browse all 20 sovereign creative engines", icon: "🎭", action: () => summonWindow('win-craft') },
+
+    // DOS Subsystem
+    { name: "FreeDOS Real-Mode Prompt", sub: "8086/80286 real-mode binary execution environment", icon: "💾", action: () => summonWindow('win-dos') },
+    { name: "MS-DOS Environment", sub: "MS-DOS 6.22 command processor and interrupt vector table", icon: "📟", action: () => summonWindow('win-dos') },
+    { name: "GW-BASIC Interpreter", sub: "Classic token-threaded BASIC language environment", icon: "📜", action: () => { summonWindow('win-dos'); document.getElementById('dos-in').value = 'BASIC'; } },
+    { name: "ReactOS Subsystem", sub: "NT-compatible Win32 API execution bridge", icon: "🪟", action: () => alert('ReactOS: Win32 Subsystem initialized.') },
+
+    // LibreOffice Suite
+    { name: "LibreOffice Writer", sub: "Full ODF word processor with typography & styles", icon: "📑", action: () => alert('Launching LibreOffice Writer...') },
+    { name: "LibreOffice Calc", sub: "Spreadsheet calculation engine & A1 coordinate solver", icon: "📈", action: () => alert('Launching LibreOffice Calc...') },
+    { name: "LibreOffice Impress", sub: "Slide decks, master slides, and transition effects", icon: "📽️", action: () => alert('Launching LibreOffice Impress...') },
+    { name: "LibreOffice Draw", sub: "Vector drawing and technical schematic designer", icon: "📐", action: () => alert('Launching LibreOffice Draw...') },
+    { name: "LibreOffice Base", sub: "Desktop database frontend & form builder", icon: "🗄️", action: () => alert('Launching LibreOffice Base...') },
+    { name: "LibreOffice Math", sub: "Mathematical formula formatter and symbol parser", icon: "∑", action: () => alert('Launching LibreOffice Math...') },
+
+    // OnlyOffice Suite
+    { name: "OnlyOffice Document", sub: "Office Open XML document editor (DOCX)", icon: "📄", action: () => alert('Launching OnlyOffice Document...') },
+    { name: "OnlyOffice Spreadsheet", sub: "XLSX formula solver with multi-sheet workbook", icon: "📊", action: () => alert('Launching OnlyOffice Spreadsheet...') },
+    { name: "OnlyOffice Presentation", sub: "PPTX presentation designer with animation engine", icon: "📽️", action: () => alert('Launching OnlyOffice Presentation...') },
+    { name: "OnlyOffice PDF", sub: "Interactive PDF forms and annotations viewer", icon: "📕", action: () => alert('Launching OnlyOffice PDF...') },
+    { name: "OnlyOffice Forms", sub: "Structured fillable form template editor (OFORM)", icon: "📋", action: () => alert('Launching OnlyOffice Forms...') },
+
+    // RDBMS & Data Science
+    { name: "SQL & Analytics Workbench", sub: "Execute queries across DuckDB, Postgres, Apache Spark", icon: "📊", action: () => summonWindow('win-datascience') },
+    { name: "DuckDB Columnar Engine", sub: "In-process vectorised analytical query builder", icon: "🦆", action: () => summonWindow('win-datascience') },
+    { name: "PostgreSQL Connector", sub: "Role permissions, table DDL, and connection pooling", icon: "🐘", action: () => summonWindow('win-datascience') },
+    { name: "Apache Ecosystem Bridge", sub: "Hadoop HDFS, Spark RDD/DataFrame, Kafka topics", icon: "⚡", action: () => summonWindow('win-datascience') },
+    { name: "DBeaver / DBearer Database GUI", sub: "Multi-database management client", icon: "🦫", action: () => summonWindow('win-datascience') },
+    { name: "Metabase BI Dashboard", sub: "Self-service business intelligence charts & analytics", icon: "📈", action: () => summonWindow('win-datascience') },
+    { name: "Apache Superset", sub: "Enterprise exploratory data visualization dashboard", icon: "📉", action: () => summonWindow('win-datascience') },
+
+    // Developer & AI Agent Tools
+    { name: "Blender 3D Suite", sub: "Professional 3D animation, geometry, and cycles render", icon: "🎨", action: () => alert('Launching Blender...') },
+    { name: "Chromium Sovereign Browser", sub: "Fast, sandboxed, hardware-accelerated web engine", icon: "🌐", action: () => alert('Launching Chromium...') },
+    { name: "Hermes Agent CLI", sub: "Autonomous multi-agent orchestration runtime", icon: "🤖", action: () => { summonWindow('win-term'); appendTerm('[Hermes] Autonomous agent daemon listening on localhost:8080\\n'); } },
+    { name: "DeepSeek Coder CLI", sub: "Local code intelligence and semantic completion", icon: "🧠", action: () => { summonWindow('win-term'); appendTerm('[DeepSeek] Coder model loaded into memory.\\n'); } },
+    { name: "Docker Container Runtime", sub: "OCI container orchestration daemon", icon: "🐳", action: () => { summonWindow('win-term'); appendTerm('docker info: Server Version 26.0 (Sovereign containerd)\\n'); } },
+    { name: "LangChain Orchestrator", sub: "DAG prompt pipelines & retrieval augmented generation", icon: "⛓️", action: () => alert('LangChain pipeline active.') },
+    { name: "Notepad++ Editor", sub: "Lightweight tabbed text editor with syntax highlighting", icon: "📝", action: () => summonWindow('win-term') },
+    { name: "VLC Media Player", sub: "Universal audio and video decoder", icon: "📼", action: () => alert('Launching VLC...') },
+    { name: "Warp Fast Terminal", sub: "Modern collaborative terminal with block execution", icon: "⚡", action: () => summonWindow('win-term') },
   ];
 
   let rofiActiveIdx = 0;
