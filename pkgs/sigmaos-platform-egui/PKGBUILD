@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-platform-egui
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Immediate mode pure-Rust GUI layout and painter memory"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-egui"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-platform')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-platform-egui"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-platform-egui"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-platform-egui"
+    install -Dm755 "target/release/sigmaos-platform-egui" "${pkgdir}/usr/bin/sigmaos-platform-egui" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-platform-egui/README.md"
+}

@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-platform-sdl2
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Hardware accelerated window surface and event loop pump"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-sdl2"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-platform')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-platform-sdl2"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-platform-sdl2"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-platform-sdl2"
+    install -Dm755 "target/release/sigmaos-platform-sdl2" "${pkgdir}/usr/bin/sigmaos-platform-sdl2" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-platform-sdl2/README.md"
+}

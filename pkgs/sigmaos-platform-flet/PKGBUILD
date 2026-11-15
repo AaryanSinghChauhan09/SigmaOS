@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-platform-flet
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Client-server state synchronization and page control tree"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-flet"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-platform')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-platform-flet"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-platform-flet"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-platform-flet"
+    install -Dm755 "target/release/sigmaos-platform-flet" "${pkgdir}/usr/bin/sigmaos-platform-flet" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-platform-flet/README.md"
+}

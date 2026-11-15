@@ -580,6 +580,34 @@ def test_platform_frameworks_parity_aaa():
         pkg_name = repo.lower()
         assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
 
+def test_platform_wave2_frameworks_parity_aaa():
+    """
+    AAA Pattern: Verify all 15 Platform GUI Wave 2 framework repositories exist locally,
+    contain real domain implementations, AAA tests, Cargo packages, and PKGBUILDs.
+    """
+    # Arrange
+    platforms_w2 = [
+        "SigmaOS-platform-electron", "SigmaOS-platform-flutter", "SigmaOS-platform-gtk",
+        "SigmaOS-platform-qt", "SigmaOS-platform-iced", "SigmaOS-platform-egui",
+        "SigmaOS-platform-dioxus", "SigmaOS-platform-webview", "SigmaOS-platform-sdl2",
+        "SigmaOS-platform-kivy", "SigmaOS-platform-flet", "SigmaOS-platform-pywebview",
+        "SigmaOS-platform-nodegui", "SigmaOS-platform-electrobun", "SigmaOS-platform-react-native"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in platforms_w2:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Platform Wave 2 repo: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -631,4 +659,6 @@ if __name__ == "__main__":
     print("✓ test_extended_tools_and_office_parity_aaa passed")
     test_platform_frameworks_parity_aaa()
     print("✓ test_platform_frameworks_parity_aaa passed")
-    print("\nALL 25 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_platform_wave2_frameworks_parity_aaa()
+    print("✓ test_platform_wave2_frameworks_parity_aaa passed")
+    print("\nALL 26 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")

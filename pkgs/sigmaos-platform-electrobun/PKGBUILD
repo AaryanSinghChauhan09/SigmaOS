@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-platform-electrobun
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Ultra-fast Bun runtime native RPC bridge"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-electrobun"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-platform')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-platform-electrobun"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-platform-electrobun"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-platform-electrobun"
+    install -Dm755 "target/release/sigmaos-platform-electrobun" "${pkgdir}/usr/bin/sigmaos-platform-electrobun" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-platform-electrobun/README.md"
+}

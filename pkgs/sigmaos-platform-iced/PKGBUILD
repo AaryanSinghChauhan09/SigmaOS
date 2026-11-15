@@ -1,0 +1,28 @@
+# Maintainer: AaryanSinghChauhan09 <AaryanSinghChauhan09@users.noreply.github.com>
+pkgname=sigmaos-platform-iced
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Elm-architecture reactive GUI state and message reducer"
+arch=('x86_64' 'aarch64' 'riscv64')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS-platform-iced"
+license=('GPL3')
+makedepends=('rust' 'cargo')
+groups=('sigmaos-platform')
+source=("git+${url}.git#branch=main")
+sha256sums=('SKIP')
+
+build() {
+    cd "SigmaOS-platform-iced"
+    cargo build --release --all
+}
+
+check() {
+    cd "SigmaOS-platform-iced"
+    cargo test --all
+}
+
+package() {
+    cd "SigmaOS-platform-iced"
+    install -Dm755 "target/release/sigmaos-platform-iced" "${pkgdir}/usr/bin/sigmaos-platform-iced" 2>/dev/null || true
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/sigmaos-platform-iced/README.md"
+}
