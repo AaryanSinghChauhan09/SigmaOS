@@ -26704,3 +26704,25 @@ language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-aur-helper"
+description = "AUR helper for Arch Linux package management with yay/parcli equivalent functionality"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-aur-helper"
+engine = "aur_client"
+category = "Package Management"
+language = "rust"
+inspirations = ["https://github.com/Jguer/yay", "https://github.com/Morganamilo/paru"]
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hyprland-config"
+description = "Hyprland Wayland compositor configuration for Omarchy persona with keybindings, window rules, and theme integration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hyprland-config"
+engine = "config"
+category = "Desktop Environment"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy"]
+visibility = "public"
+depends_on = []
