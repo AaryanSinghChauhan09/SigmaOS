@@ -635,6 +635,33 @@ def test_platform_wave3_frameworks_parity_aaa():
         pkg_name = repo.lower()
         assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
 
+def test_platform_wave4_frameworks_parity_aaa():
+    """
+    AAA Pattern: Verify all 12 Platform GUI Wave 4 framework repositories exist locally,
+    contain real domain implementations, AAA tests, Cargo packages, and PKGBUILDs.
+    """
+    # Arrange
+    platforms_w4 = [
+        "SigmaOS-platform-tkinter", "SigmaOS-platform-wxwidgets", "SigmaOS-platform-wxpython",
+        "SigmaOS-platform-javafx", "SigmaOS-platform-openjfx", "SigmaOS-platform-swing",
+        "SigmaOS-platform-lorca", "SigmaOS-platform-eel", "SigmaOS-platform-chromely",
+        "SigmaOS-platform-deskgap", "SigmaOS-platform-webview-deno", "SigmaOS-platform-quasar"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in platforms_w4:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Platform Wave 4 repo: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -690,4 +717,6 @@ if __name__ == "__main__":
     print("✓ test_platform_wave2_frameworks_parity_aaa passed")
     test_platform_wave3_frameworks_parity_aaa()
     print("✓ test_platform_wave3_frameworks_parity_aaa passed")
-    print("\nALL 27 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_platform_wave4_frameworks_parity_aaa()
+    print("✓ test_platform_wave4_frameworks_parity_aaa passed")
+    print("\nALL 28 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
