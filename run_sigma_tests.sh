@@ -18,10 +18,18 @@ else
     git clone --depth 1 https://github.com/AaryanSinghChauhan09/SigmaOS.wiki.git /tmp/SigmaOS.wiki 2>/dev/null || true
     if [ -d "/tmp/SigmaOS.wiki" ]; then
         WIKI_LOCAL="/tmp/SigmaOS.wiki"
-        # Try symlinking for Rust tests that hard-code the local path (best-effort)
+        # Try symlinking for Rust tests that hard-code the local path
         ln -sfn /tmp/SigmaOS.wiki ../SigmaOS.wiki 2>/dev/null || true
-        mkdir -p /home/aaryansinghchauhan 2>/dev/null && \
-            ln -sfn /tmp/SigmaOS.wiki /home/aaryansinghchauhan/SigmaOS.wiki 2>/dev/null || true
+        if [ ! -d "/home/aaryansinghchauhan/SigmaOS.wiki" ]; then
+            if command -v sudo >/dev/null 2>&1; then
+                sudo mkdir -p /home/aaryansinghchauhan 2>/dev/null || true
+                sudo ln -sfn /tmp/SigmaOS.wiki /home/aaryansinghchauhan/SigmaOS.wiki 2>/dev/null || true
+                sudo chmod -R 777 /home/aaryansinghchauhan 2>/dev/null || true
+            else
+                mkdir -p /home/aaryansinghchauhan 2>/dev/null && \
+                    ln -sfn /tmp/SigmaOS.wiki /home/aaryansinghchauhan/SigmaOS.wiki 2>/dev/null || true
+            fi
+        fi
     fi
 fi
 echo "Wiki local path: ${WIKI_LOCAL:-none}"
