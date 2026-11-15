@@ -16,7 +16,7 @@ echo "  Deploying Omarchy Linux Desktop Configurations to ~/.config"
 echo "============================================================"
 
 # Ensure directories exist
-mkdir -p "$TARGET_DIR"/{hypr,waybar,wallust,rofi,mako,dunst,foot,alacritty,kitty,wlogout,nvim}
+mkdir -p "$TARGET_DIR"/{hypr,waybar,wallust,rofi,mako,dunst,foot,alacritty,kitty,wlogout,nvim/colors,fish,omarchy/plugins}
 
 # 1. Hyprland suite
 echo "[+] Deploying Hyprland, Hypridle, Hyprlock..."
@@ -57,9 +57,21 @@ cp "$CONFIG_SRC/wlogout/layout" "$TARGET_DIR/wlogout/layout"
 cp "$CONFIG_SRC/wlogout/style.css" "$TARGET_DIR/wlogout/style.css"
 cp "$CONFIG_SRC/starship/starship.toml" "$TARGET_DIR/starship.toml"
 
-# 7. Neovim
-echo "[+] Deploying Neovim configuration..."
+# 7. Neovim & Colorschemes (Aether, Lumon)
+echo "[+] Deploying Neovim configuration & dynamic colorschemes..."
 cp "$CONFIG_SRC/nvim/init.lua" "$TARGET_DIR/nvim/init.lua"
+cp "$CONFIG_SRC/nvim/colors/"*.lua "$TARGET_DIR/nvim/colors/"
+
+# 8. Shell Environments (Zsh & Fish)
+echo "[+] Deploying Zsh & Fish shells..."
+cp "$CONFIG_SRC/fish/config.fish" "$TARGET_DIR/fish/config.fish"
+if [[ -f "$CONFIG_SRC/zsh/.zshrc" ]]; then
+    cp "$CONFIG_SRC/zsh/.zshrc" "$HOME/.zshrc"
+fi
+
+# 9. Omarchy Plugins (Theme Sync, Local AI, Port Forward)
+echo "[+] Deploying Omarchy Plugins..."
+cp "$CONFIG_SRC/plugins/"* "$TARGET_DIR/omarchy/plugins/"
 
 echo "============================================================"
 echo "  [✓] All Omarchy configurations successfully deployed!"
