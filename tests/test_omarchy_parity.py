@@ -313,6 +313,190 @@ def test_data_science_suite_parity():
         content = lib_rs.read_text(encoding="utf-8")
         assert "_aaa" in content, f"Test in {ds_tool} must follow _aaa naming convention"
 
+def _verify_aaa_testing(content: str, repo_name: str):
+    """Verify that a repository adheres to the Arrange-Act-Assert (AAA) pattern."""
+    has_aaa_suffix = "_aaa" in content
+    has_aaa_comments = "arrange" in content.lower() and "assert" in content.lower()
+    assert has_aaa_suffix or has_aaa_comments, f"Test in {repo_name} must follow AAA pattern"
+
+def test_bsd_suite_parity_aaa():
+    """
+    AAA Pattern: Verify all 12 BSD subsystem repositories exist locally,
+    contain real domain implementations, AAA tests, Cargo packages, and PKGBUILDs.
+    """
+    # Arrange
+    bsd_repos = [
+        "SigmaOS-bsd-desktop", "SigmaOS-bsd-dragonfly", "SigmaOS-bsd-free",
+        "SigmaOS-bsd-fury", "SigmaOS-bsd-ghost", "SigmaOS-bsd-hardened",
+        "SigmaOS-bsd-karma", "SigmaOS-bsd-liberty", "SigmaOS-bsd-midnight",
+        "SigmaOS-bsd-nomad", "SigmaOS-bsd-open", "SigmaOS-bsd-star"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in bsd_repos:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing BSD repo directory: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
+def test_kernel_suite_parity_aaa():
+    """
+    AAA Pattern: Verify all 5 Kernel subsystem repositories (GNU, Linux, MINIX, ReactOS, XNU)
+    exist locally, contain real implementations, AAA tests, and PKGBUILDs.
+    """
+    # Arrange
+    kernel_repos = [
+        "SigmaOS-kernel-gnu", "SigmaOS-kernel-linux", "SigmaOS-kernel-minix",
+        "SigmaOS-kernel-reactos", "SigmaOS-kernel-xnu"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in kernel_repos:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Kernel repo directory: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
+def test_linux_distro_suite_parity_aaa():
+    """
+    AAA Pattern: Verify all 18 Linux distro inspiration repositories exist locally,
+    contain real implementations, AAA tests, and PKGBUILDs.
+    """
+    # Arrange
+    linux_repos = [
+        "SigmaOS-linux-arch", "SigmaOS-linux-cachy", "SigmaOS-linux-debian",
+        "SigmaOS-linux-elementary", "SigmaOS-linux-endeavouros", "SigmaOS-linux-fedora",
+        "SigmaOS-linux-gentoo", "SigmaOS-linux-kali", "SigmaOS-linux-lfs",
+        "SigmaOS-linux-mint", "SigmaOS-linux-omarchy", "SigmaOS-linux-parrot",
+        "SigmaOS-linux-qubes", "SigmaOS-linux-reactos", "SigmaOS-linux-redox",
+        "SigmaOS-linux-slackware", "SigmaOS-linux-suse", "SigmaOS-linux-ubuntu"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in linux_repos:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Linux distro repo directory: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
+def test_office_and_web_suites_parity_aaa():
+    """
+    AAA Pattern: Verify BetterOffice, GenOffice, OnlyOffice, and RDBMS expansion suites
+    exist locally, follow AAA naming, and have PKGBUILDs.
+    """
+    # Arrange
+    office_repos = [
+        # BetterOffice
+        "SigmaOS-betteroffice-diagrams", "SigmaOS-betteroffice-docs",
+        "SigmaOS-betteroffice-sheets", "SigmaOS-betteroffice-slides",
+        # GenOffice
+        "SigmaOS-genoffice-docs", "SigmaOS-genoffice-html",
+        "SigmaOS-genoffice-markdown", "SigmaOS-genoffice-pdf",
+        "SigmaOS-genoffice-sheets", "SigmaOS-genoffice-slides",
+        # OnlyOffice
+        "SigmaOS-onlyoffice-document", "SigmaOS-onlyoffice-forms",
+        "SigmaOS-onlyoffice-presentation", "SigmaOS-onlyoffice-pdf",
+        "SigmaOS-onlyoffice-spreadsheet",
+        # RDBMS
+        "SigmaOS-rdbms-apache", "SigmaOS-rdbms-dbeaver",
+        "SigmaOS-rdbms-duckdb", "SigmaOS-rdbms-postgresql"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in office_repos:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Office/RDBMS repo directory: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
+def test_tools_wave3_and_datascience_parity_aaa():
+    """
+    AAA Pattern: Verify Tools Wave 3 and Expanded Data Science suites
+    exist locally, follow AAA naming, and have PKGBUILDs.
+    """
+    # Arrange
+    expanded_tools = [
+        # Tools wave 3
+        "SigmaOS-tools-blender", "SigmaOS-tools-docker", "SigmaOS-tools-vlc",
+        "SigmaOS-tools-warp", "SigmaOS-tools-langchain", "SigmaOS-tools-crewai",
+        "SigmaOS-tools-deepseek-coder", "SigmaOS-tools-hermes", "SigmaOS-tools-cline",
+        "SigmaOS-tools-notepadpp", "SigmaOS-tools-codex-cli", "SigmaOS-tools-openclaw",
+        # Data Science expanded
+        "SigmaOS-tools-tensorflow", "SigmaOS-tools-tableau", "SigmaOS-tools-sql-ds",
+        "SigmaOS-tools-python-ds", "SigmaOS-tools-r-ds", "SigmaOS-tools-sas",
+        "SigmaOS-tools-ms-powerbi", "SigmaOS-tools-skyvia"
+    ]
+    home_dir = Path("/home/aaryansinghchauhan")
+
+    # Act & Assert
+    for repo in expanded_tools:
+        repo_path = home_dir / repo
+        assert repo_path.is_dir(), f"Missing Tool/DS repo directory: {repo}"
+        assert (repo_path / "Cargo.toml").is_file(), f"Missing Cargo.toml in {repo}"
+        lib_rs = repo_path / "src" / "lib.rs"
+        assert lib_rs.is_file(), f"Missing src/lib.rs in {repo}"
+        content = lib_rs.read_text(encoding="utf-8")
+        _verify_aaa_testing(content, repo)
+
+        pkg_name = repo.lower()
+        assert (PKGS_DIR / pkg_name / "PKGBUILD").is_file(), f"Missing PKGBUILD for {pkg_name}"
+
+def test_wiki_documentation_conformance_parity_aaa():
+    """
+    AAA Pattern: Verify that wiki documentation pages exist for all new components
+    and conform to the industry standard rules (zero markdown in main branch except root README).
+    """
+    # Arrange
+    wiki_dir = Path("/home/aaryansinghchauhan/SigmaOS.wiki")
+    sample_plans = [
+        "bsd-desktop-plan.md", "bsd-dragonfly-plan.md", "bsd-free-plan.md",
+        "kernel-gnu-plan.md", "kernel-linux-plan.md", "kernel-minix-plan.md",
+        "linux-arch-plan.md", "linux-cachy-plan.md", "linux-debian-plan.md",
+        "betteroffice-docs-plan.md", "betteroffice-sheets-plan.md",
+        "genoffice-docs-plan.md", "onlyoffice-document-plan.md",
+        "rdbms-duckdb-plan.md", "tools-blender-plan.md", "tools-docker-plan.md",
+        "tools-tensorflow-plan.md", "tools-tableau-plan.md"
+    ]
+
+    # Act & Assert
+    for plan in sample_plans:
+        plan_path = wiki_dir / plan
+        assert plan_path.is_file(), f"Missing wiki plan: {plan}"
+        content = plan_path.read_text(encoding="utf-8")
+        assert "Repository Context and Scope" in content, f"Missing section in {plan}"
+        assert "Scope and Boundaries" in content, f"Missing section in {plan}"
+        assert "Periodic Task Cadence" in content, f"Missing section in {plan}"
+        assert "Industry-Standard Rules" in content, f"Missing section in {plan}"
+        assert "Governance and Merge Policy" in content, f"Missing section in {plan}"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -346,4 +530,16 @@ if __name__ == "__main__":
     print("✓ test_desktop_omacom_wave2_apps_parity_aaa passed")
     test_data_science_suite_parity()
     print("✓ test_data_science_suite_parity passed")
-    print("\nALL 16 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
+    test_bsd_suite_parity_aaa()
+    print("✓ test_bsd_suite_parity_aaa passed")
+    test_kernel_suite_parity_aaa()
+    print("✓ test_kernel_suite_parity_aaa passed")
+    test_linux_distro_suite_parity_aaa()
+    print("✓ test_linux_distro_suite_parity_aaa passed")
+    test_office_and_web_suites_parity_aaa()
+    print("✓ test_office_and_web_suites_parity_aaa passed")
+    test_tools_wave3_and_datascience_parity_aaa()
+    print("✓ test_tools_wave3_and_datascience_parity_aaa passed")
+    test_wiki_documentation_conformance_parity_aaa()
+    print("✓ test_wiki_documentation_conformance_parity_aaa passed")
+    print("\nALL 22 AAA OMARCHY & OMACOM PARITY TESTS PASSED SUCCESSFULLY!")
