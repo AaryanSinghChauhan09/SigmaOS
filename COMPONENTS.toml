@@ -26858,3 +26858,15 @@ language = "rust"
 inspirations = ["https://github.com/torvalds/linux", "https://www.kernel.org/doc/html/latest/admin-guide/mm/index.html"]
 visibility = "public"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-scheduler"
+description = "CPU scheduling implementation for SigmaOS inspired by Linux kernel CFS and EEVDF"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scheduler"
+engine = "rust"
+category = "Scheduler"
+language = "rust"
+inspirations = ["Linux kernel", "CFS", "EEVDF", "SCHED_FIFO", "SCHED_RR", "SCHED_DEADLINE"]
+visibility = "public"
+depends_on = []
+
