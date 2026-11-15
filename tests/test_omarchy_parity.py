@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT_DIR / "config" / "omarchy"
 SCRIPTS_DIR = ROOT_DIR / "scripts"
+UI_INDEX = ROOT_DIR / "ui" / "desktop" / "index.html"
 
 def test_hyprland_configs_exist_and_nonempty():
     """Arrange-Act-Assert: Verify all Hyprland suite configs exist and are non-empty."""
@@ -94,6 +95,38 @@ def test_apply_theme_orchestrator():
     assert res.returncode == 0
     assert "catppuccin-mocha" in res.stdout
 
+def test_desktop_gui_parity():
+    """Arrange-Act-Assert: Verify all 20 Craft modules, GW-BASIC, Tools suite, Folio, Omarchy shell, and context menu in index.html."""
+    assert UI_INDEX.is_file(), "Missing ui/desktop/index.html"
+    with open(UI_INDEX, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    # All 20 Craft modules
+    craft_modules = [
+        "3DCraft", "AniCraft", "ArtCraft", "CADCraft", "CraftLibs",
+        "DeckCraft", "DesignCraft", "EffectCraft", "FigCraft", "FilmCraft",
+        "FontCraft", "GridCraft", "LightCraft", "PDFCraft", "PhotoCraft",
+        "PrintCraft", "SoundCraft", "VectorCraft", "VoiceCraft", "WordCraft"
+    ]
+    for mod in craft_modules:
+        assert mod in html, f"Missing Craft module: {mod}"
+
+    # Essential Sovereign Windows
+    expected_windows = [
+        'id="win-term"',
+        'id="win-wallust"',
+        'id="win-betteroffice"',
+        'id="win-dos"',
+        'id="win-basic"',
+        'id="win-tools"',
+        'id="win-folio"',
+        'id="win-omarchy-term"',
+        'id="win-datascience"',
+        'id="desktop-context-menu"'
+    ]
+    for win in expected_windows:
+        assert win in html, f"Missing desktop window or component: {win}"
+
 if __name__ == "__main__":
     test_hyprland_configs_exist_and_nonempty()
     print("✓ test_hyprland_configs_exist_and_nonempty passed")
@@ -109,4 +142,6 @@ if __name__ == "__main__":
     print("✓ test_omarchy_shell_cli_execution passed")
     test_apply_theme_orchestrator()
     print("✓ test_apply_theme_orchestrator passed")
-    print("\nALL 7 AAA OMARCHY PARITY TESTS PASSED SUCCESSFULLY!")
+    test_desktop_gui_parity()
+    print("✓ test_desktop_gui_parity passed")
+    print("\nALL 8 AAA OMARCHY PARITY TESTS PASSED SUCCESSFULLY!")
