@@ -29565,3 +29565,113 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Parrot", "security", "privacy"]
+
+[[component]]
+name = "SigmaOS-slackware"
+description = "Slackware distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slackware"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Slackware", "distribution", "original Linux"]
+
+[[component]]
+name = "SigmaOS-suse"
+description = "SUSE distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-suse"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["SUSE", "distribution", "enterprise"]
+
+[[component]]
+name = "SigmaOS-opensuse"
+description = "openSUSE distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-opensuse"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["openSUSE", "distribution", "community"]
+
+[[component]]
+name = "SigmaOS-elementaryos"
+description = "elementaryOS distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-elementaryos"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["elementaryOS", "distribution", "desktop"]
+
+[[component]]
+name = "SigmaOS-mint"
+description = "Mint distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Mint", "distribution", "user-friendly"]
+
+[[component]]
+name = "SigmaOS-linux-from-scratch"
+description = "Linux From Scratch distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-linux-from-scratch"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Linux From Scratch", "distribution", "education"]
+
+[[component]]
+name = "SigmaOS-astrodon"
+description = "Astrodon platform compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-astrodon"
+engine = "Rust"
+category = "Platform"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Astrodon", "platform", "GUI"]
+
+[[component]]
+name = "SigmaOS-avalonia"
+description = "Avalonia platform compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-avalonia"
+engine = "Rust"
+category = "Platform"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Avalonia", "platform", "cross-platform"]
+
+[[component]]
+name = "SigmaOS-kodiular"
+description = "Kodiular platform compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kodiular"
+engine = "Rust"
+category = "Platform"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Kodiular", "platform", "GUI"]
+
+[[component]]
+name = "SigmaOS-kivy"
+description = "Kivy platform compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kivy"
+engine = "Rust"
+category = "Platform"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Kivy", "platform", "mobile"]
