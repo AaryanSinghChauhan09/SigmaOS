@@ -29807,3 +29807,245 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["VB.NET", "runtime", ".NET"]
+[[component]]
+name = "SigmaOS-ebpf"
+description = "eBPF subsystem: verified program loading, maps, and attachment points"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ebpf"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kpatch"
+description = "Kernel live patching: atomic replace of kernel functions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kpatch"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ld-so"
+description = "Dynamic linker/loader: symbol resolution and relocation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ld-so"
+engine = "runtime"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-elf-loader"
+description = "ELF binary loader: segment mapping and entry setup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-elf-loader"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-syscall-dispatcher"
+description = "System call dispatcher: table-driven syscall routing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-syscall-dispatcher"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vdso"
+description = "vDSO: kernel-exported userspace fast-path pages"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vdso"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-futex"
+description = "Futex: fast userspace mutex wait/wake primitives"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-futex"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-workqueues"
+description = "Kernel workqueues: deferred work scheduling"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-workqueues"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-slab-allocator"
+description = "Slab allocator: per-cache object allocators"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slab-allocator"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-buddy-allocator"
+description = "Buddy allocator: power-of-two page block allocator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-buddy-allocator"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-iommu"
+description = "IOMMU: device DMA isolation domains"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-iommu"
+engine = "hardware_driver"
+category = "Device Drivers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-drm-kms"
+description = "DRM/KMS: kernel mode setting and atomic commits"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-drm-kms"
+engine = "hardware_driver"
+category = "Device Drivers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-v4l2"
+description = "V4L2 video subsystem: capture and output devices"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-v4l2"
+engine = "hardware_driver"
+category = "Device Drivers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-alsa-subsystem"
+description = "ALSA sound subsystem: PCM and control devices"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-alsa-subsystem"
+engine = "hardware_driver"
+category = "Device Drivers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bluetooth-protocol"
+description = "Bluetooth protocol stack: L2CAP channels"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bluetooth-protocol"
+engine = "network"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-netlink"
+description = "Netlink: kernel-userspace message socket"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-netlink"
+engine = "network"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-io-uring"
+description = "io_uring: async I/O submission/completion rings"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-io-uring"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-linux-audit"
+description = "Linux audit: syscall and event audit records"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-linux-audit"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tracepoints"
+description = "Kernel tracepoints: static instrumentation probes"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tracepoints"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bpf-lsm"
+description = "BPF LSM: eBPF-based security hooks"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bpf-lsm"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-uefi-runtime"
+description = "UEFI runtime services: capsule updates and variables"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-uefi-runtime"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-firmware-loader"
+description = "Firmware loader: device firmware blob loading"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firmware-loader"
+engine = "hardware_driver"
+category = "Device Drivers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
