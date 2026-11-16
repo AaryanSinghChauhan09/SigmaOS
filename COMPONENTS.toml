@@ -28630,3 +28630,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Pomodoro", "pomodoro", "productivity"]
+
+[[component]]
+name = "SigmaOS-file-manager2"
+description = "File Manager file manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["File Manager", "file manager", "file browsing"]
+
+[[component]]
+name = "SigmaOS-archive-manager2"
+description = "Archive Manager archive manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archive-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Archive Manager", "archive manager", "compression"]
+
+[[component]]
+name = "SigmaOS-disk-manager2"
+description = "Disk Manager disk manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-disk-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Disk Manager", "disk manager", "partitioning"]
+
+[[component]]
+name = "SigmaOS-process-manager2"
+description = "Process Manager process manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-process-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Process Manager", "process manager", "process monitoring"]
+
+[[component]]
+name = "SigmaOS-task-manager2"
+description = "Task Manager task manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-task-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Task Manager", "task manager", "task scheduling"]
+
+[[component]]
+name = "SigmaOS-system-monitor2"
+description = "System Monitor system monitor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-monitor2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["System Monitor", "system monitor", "system metrics"]
+
+[[component]]
+name = "SigmaOS-network-manager2"
+description = "Network Manager network manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Network Manager", "network manager", "network configuration"]
+
+[[component]]
+name = "SigmaOS-bluetooth-manager2"
+description = "Bluetooth Manager bluetooth manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bluetooth-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Bluetooth Manager", "bluetooth manager", "bluetooth pairing"]
+
+[[component]]
+name = "SigmaOS-printer-manager2"
+description = "Printer Manager printer manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-printer-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Printer Manager", "printer manager", "printing"]
+
+[[component]]
+name = "SigmaOS-display-manager2"
+description = "Display Manager display manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-display-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Display Manager", "display manager", "session management"]
+
+[[component]]
+name = "SigmaOS-session-manager3"
+description = "Session Manager session manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-manager3"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Session Manager", "session manager", "user sessions"]
+
+[[component]]
+name = "SigmaOS-window-manager2"
+description = "Window Manager window manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-window-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Window Manager", "window manager", "tiling"]
