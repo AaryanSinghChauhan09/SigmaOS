@@ -28762,3 +28762,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Window Manager", "window manager", "tiling"]
+
+[[component]]
+name = "SigmaOS-screen-reader2"
+description = "Screen Reader screen reader compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-reader2"
+engine = "Rust"
+category = "Accessibility"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Screen Reader", "screen reader", "accessibility"]
+
+[[component]]
+name = "SigmaOS-magnifier2"
+description = "Magnifier magnifier compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-magnifier2"
+engine = "Rust"
+category = "Accessibility"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Magnifier", "magnifier", "accessibility"]
+
+[[component]]
+name = "SigmaOS-voice-control2"
+description = "Voice Control voice control compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-voice-control2"
+engine = "Rust"
+category = "Accessibility"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Voice Control", "voice control", "accessibility"]
+
+[[component]]
+name = "SigmaOS-on-screen-keyboard2"
+description = "On-Screen Keyboard on-screen keyboard compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-on-screen-keyboard2"
+engine = "Rust"
+category = "Accessibility"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["On-Screen Keyboard", "on-screen keyboard", "accessibility"]
+
+[[component]]
+name = "SigmaOS-accessibility-manager2"
+description = "Accessibility Manager accessibility manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accessibility-manager2"
+engine = "Rust"
+category = "Accessibility"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Accessibility Manager", "accessibility manager", "accessibility"]
+
+[[component]]
+name = "SigmaOS-font-manager2"
+description = "Font Manager font manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-font-manager2"
+engine = "Rust"
+category = "Customization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Font Manager", "font manager", "customization"]
+
+[[component]]
+name = "SigmaOS-icon-theme2"
+description = "Icon Theme icon theme compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-icon-theme2"
+engine = "Rust"
+category = "Customization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Icon Theme", "icon theme", "customization"]
+
+[[component]]
+name = "SigmaOS-cursor-theme2"
+description = "Cursor Theme cursor theme compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cursor-theme2"
+engine = "Rust"
+category = "Customization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Cursor Theme", "cursor theme", "customization"]
+
+[[component]]
+name = "SigmaOS-wallpaper-manager2"
+description = "Wallpaper Manager wallpaper manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper-manager2"
+engine = "Rust"
+category = "Customization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Wallpaper Manager", "wallpaper manager", "customization"]
+
+[[component]]
+name = "SigmaOS-color-picker2"
+description = "Color Picker color picker compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-color-picker2"
+engine = "Rust"
+category = "Customization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Color Picker", "color picker", "customization"]
+
+[[component]]
+name = "SigmaOS-screenshot-tool2"
+description = "Screenshot Tool screenshot tool compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screenshot-tool2"
+engine = "Rust"
+category = "Accessibility"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Screenshot Tool", "screenshot tool", "screen capture"]
+
+[[component]]
+name = "SigmaOS-screen-recorder2"
+description = "Screen Recorder screen recorder compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-recorder2"
+engine = "Rust"
+category = "Accessibility"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Screen Recorder", "screen recorder", "screen capture"]
