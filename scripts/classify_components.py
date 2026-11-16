@@ -277,6 +277,16 @@ OVERRIDES = {
     "zellij": ("terminal_multiplexer", "Terminal"),
     "zettlr": ("markdown_editor", "Office"),
     "zookeeper": ("coordination_service", "System Services"),
+    "approval": ("meta_concept", "Documentation"),
+    "limiting": ("meta_concept", "Documentation"),
+    "maintenance": ("meta_concept", "Documentation"),
+    "migration": ("meta_concept", "Documentation"),
+    "policy": ("meta_concept", "Documentation"),
+    "recovery": ("meta_concept", "Documentation"),
+    "rollback": ("meta_concept", "Documentation"),
+    "state": ("meta_concept", "Documentation"),
+    "popd": ("shell_tool", "Shell"),
+    "zotero": ("reference_manager", "Office"),
 }
 
 # Prefix rules checked before keyword rules: (prefix, engine, category)
