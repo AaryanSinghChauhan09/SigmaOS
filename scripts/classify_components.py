@@ -65,6 +65,58 @@ RULES = [
 # engine/category used when no rule matches
 DEFAULT = ("unknown", "Unclassified")
 
+# Curated overrides for names that keyword rules cannot classify safely.
+# Reviewed individually; engine values reuse existing registry vocabulary.
+OVERRIDES = {
+    "0ad": ("game_engine", "Games"),
+    "7-days-to-die": ("game_engine", "Games"),
+    "action-center": ("desktop_app", "Desktop"),
+    "active-directory": ("directory_service", "User Management"),
+    "adwaita": ("theme_engine", "Desktop"),
+    "affy": ("language_runtime", "Languages"),
+    "ahci": ("hardware_driver", "Device Drivers"),
+    "aide": ("security_tool", "Security"),
+    "aiops": ("observability", "Debugging"),
+    "akka": ("language_runtime", "Languages"),
+    "akmod": ("kernel_module", "Kernel"),
+    "akonadi": ("desktop_service", "System Services"),
+    "albert": ("desktop_app", "Desktop"),
+    "alerting": ("observability", "Debugging"),
+    "alias": ("shell_tool", "Shell"),
+    "allocation": ("memory_subsystem", "Kernel"),
+    "alpine": ("distribution", "Linux"),
+    "alpm-hooks": ("package_manager", "Package Management"),
+    "alpm-rs": ("package_manager", "Package Management"),
+    "amanda": ("backup_tool", "Storage"),
+    "amarok": ("media_player", "Multimedia"),
+    "amavisd": ("security_tool", "Security"),
+    "amazon-prime-dl": ("media_tool", "Multimedia"),
+    "amber": ("window_manager", "Window Manager"),
+    "amd": ("hardware_driver", "Device Drivers"),
+    "amd-psp": ("hardware_driver", "Device Drivers"),
+    "amdgpu": ("hardware_driver", "Device Drivers"),
+    "amf": ("hardware_driver", "Device Drivers"),
+    "analytics": ("data_engineering", "Data Engineering"),
+    "android-ndk": ("language_runtime", "Languages"),
+    "android-sdk": ("language_runtime", "Languages"),
+    "android-studio": ("ide", "Development Tools"),
+    "animation": ("graphics_lib", "Graphics"),
+    "anjuta": ("ide", "Development Tools"),
+    "anomaly-detection": ("ml_framework", "Science"),
+    "ant": ("build_tool", "DevOps"),
+    "anti-pattern": ("documentation", "Documentation"),
+    "antora": ("documentation", "Documentation"),
+    "anydesk": ("remote_desktop", "Remote Access"),
+    "anyrun": ("launcher", "Desktop"),
+    "api": ("api_framework", "Web Services"),
+    "api-client": ("api_framework", "Web Services"),
+    "apiary": ("api_framework", "Web Services"),
+    "apm": ("observability", "Debugging"),
+    "apollo": ("api_framework", "Web Services"),
+    "app-center": ("app_store", "Applications"),
+    "app-launcher": ("launcher", "Desktop"),
+}
+
 
 # Keywords that are common English substrings — token match only.
 RISKY_TOKENS = {
@@ -90,6 +142,8 @@ def classify(name: str):
     n = name.lower()
     if n.startswith("sigmaos-"):
         n = n[len("sigmaos-"):]
+    if n in OVERRIDES:
+        return OVERRIDES[n]
     for engine, category, kws in RULES:
         for kw in kws:
             if _kw_match(kw, n):
