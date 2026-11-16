@@ -28366,3 +28366,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Redis Commander", "redis client", "database GUI"]
+
+[[component]]
+name = "SigmaOS-jira2"
+description = "Jira project management compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jira2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Jira", "project management", "issue tracking"]
+
+[[component]]
+name = "SigmaOS-trello2"
+description = "Trello project management compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-trello2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Trello", "project management", "kanban"]
+
+[[component]]
+name = "SigmaOS-slack2"
+description = "Slack team communication compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slack2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Slack", "team communication", "messaging"]
+
+[[component]]
+name = "SigmaOS-discord2"
+description = "Discord team communication compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-discord2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Discord", "team communication", "voice chat"]
+
+[[component]]
+name = "SigmaOS-zoom2"
+description = "Zoom video conferencing compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zoom2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Zoom", "video conferencing", "meetings"]
+
+[[component]]
+name = "SigmaOS-teams2"
+description = "Teams video conferencing compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-teams2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Teams", "video conferencing", "Microsoft"]
+
+[[component]]
+name = "SigmaOS-gmail2"
+description = "Gmail email client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gmail2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Gmail", "email client", "Google"]
+
+[[component]]
+name = "SigmaOS-outlook2"
+description = "Outlook email client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-outlook2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Outlook", "email client", "Microsoft"]
+
+[[component]]
+name = "SigmaOS-thunderbird2"
+description = "Thunderbird email client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thunderbird2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Thunderbird", "email client", "Mozilla"]
+
+[[component]]
+name = "SigmaOS-evolution2"
+description = "Evolution email client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-evolution2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Evolution", "email client", "GNOME"]
+
+[[component]]
+name = "SigmaOS-notion2"
+description = "Notion note taking compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notion2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Notion", "note taking", "knowledge management"]
+
+[[component]]
+name = "SigmaOS-asana2"
+description = "Asana project management compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asana2"
+engine = "Rust"
+category = "Collaboration"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Asana", "project management", "task tracking"]
