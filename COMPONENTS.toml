@@ -30049,3 +30049,14 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-hardenedbsd"
+description = "HardenedBSD distribution: security-focused BSD reference"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hardenedbsd"
+engine = "distro_reference"
+category = "BSD"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
