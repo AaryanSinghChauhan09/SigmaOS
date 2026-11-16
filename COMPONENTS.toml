@@ -30335,3 +30335,58 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-package-db"
+description = "Package database: installed package tracking"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-db"
+engine = "package_manager"
+category = "Package Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-signature-verification"
+description = "Package signature verification: authenticity checks"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-signature-verification"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-runuser"
+description = "runuser: run command as another user"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-runuser"
+engine = "cli"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-newgrp"
+description = "newgrp: change primary group"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-newgrp"
+engine = "cli"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fhs"
+description = "Filesystem Hierarchy Standard: root directory layout"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fhs"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
