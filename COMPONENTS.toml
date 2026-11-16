@@ -30797,3 +30797,432 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-are-we-gui-yet"
+description = "are-we-gui-yet platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-are-we-gui-yet"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-avernakis"
+description = "avernakis platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-avernakis"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-blockly"
+description = "blockly platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blockly"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-boson"
+description = "boson platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boson"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bubble"
+description = "bubble platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bubble"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-butter"
+description = "butter platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-butter"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-crystal-webview"
+description = "crystal-webview platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crystal-webview"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-electrino"
+description = "electrino platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-electrino"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-firemonkey"
+description = "firemonkey platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firemonkey"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fbs"
+description = "fbs platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fbs"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fgui"
+description = "fgui platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fgui"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fidget"
+description = "fidget platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fidget"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gpui-kit"
+description = "gpui-kit platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gpui-kit"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-graffiti"
+description = "graffiti platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-graffiti"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-infiniframe"
+description = "infiniframe platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-infiniframe"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-keera-hails"
+description = "keera-hails platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keera-hails"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mobrowser"
+description = "mobrowser platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mobrowser"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mousetrap"
+description = "mousetrap platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mousetrap"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nimanttweakbar"
+description = "nimanttweakbar platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nimanttweakbar"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nimetry"
+description = "nimetry platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nimetry"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nimgml"
+description = "nimgml platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nimgml"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nimgraphviz"
+description = "nimgraphviz platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nimgraphviz"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nimx"
+description = "nimx platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nimx"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-php-tkui"
+description = "php-tkui platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-php-tkui"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-proton-native"
+description = "proton-native platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-proton-native"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-protonshell"
+description = "protonshell platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-protonshell"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pygui"
+description = "pygui platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pygui"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-quile-pstk"
+description = "quile-pstk platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quile-pstk"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-quile-webview"
+description = "quile-webview platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quile-webview"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-unityhub"
+description = "unityhub platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unityhub"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-uno-platforms"
+description = "uno-platforms platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-uno-platforms"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-viup"
+description = "viup platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-viup"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vi-v"
+description = "vi-v platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vi-v"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vxui"
+description = "vxui platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vxui"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-webgui"
+description = "webgui platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webgui"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-webviewhs"
+description = "webviewhs platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webviewhs"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-welsonjs"
+description = "welsonjs platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-welsonjs"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-wnim"
+description = "wnim platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wnim"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-zero-native"
+description = "zero-native platform GUI toolkit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zero-native"
+engine = "gui_toolkit"
+category = "Platform"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
