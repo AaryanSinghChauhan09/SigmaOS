@@ -30621,3 +30621,4260 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-absvolume"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-absvolume"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-acpi-call"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-acpi-call"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-acpica"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-acpica"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-amd-ucode"
+description = "SigmaOS SigmaOS-amd-ucode component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-amd-ucode"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-lock"
+description = "SigmaOS SigmaOS-arch-lock component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lock"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-low-latency-kernel"
+description = "SigmaOS SigmaOS-arch-low-latency-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-low-latency-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-lts"
+description = "SigmaOS SigmaOS-arch-lts component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lts"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-lts-kernel"
+description = "SigmaOS SigmaOS-arch-lts-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lts-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-lxc"
+description = "SigmaOS SigmaOS-arch-lxc component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lxc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-lxd"
+description = "SigmaOS SigmaOS-arch-lxd component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lxd"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-make"
+description = "SigmaOS SigmaOS-arch-make component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-make"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-meson"
+description = "SigmaOS SigmaOS-arch-meson component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-meson"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-metal-kernel"
+description = "SigmaOS SigmaOS-arch-metal-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-metal-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-metal-shader-kernel"
+description = "SigmaOS SigmaOS-arch-metal-shader-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-metal-shader-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-metaverse-kernel"
+description = "SigmaOS SigmaOS-arch-metaverse-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-metaverse-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-mipmapping-kernel"
+description = "SigmaOS SigmaOS-arch-mipmapping-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mipmapping-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-mirror"
+description = "SigmaOS SigmaOS-arch-mirror component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mirror"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-mixed-reality-kernel"
+description = "SigmaOS SigmaOS-arch-mixed-reality-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mixed-reality-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-mkinitcpio"
+description = "SigmaOS SigmaOS-arch-mkinitcpio component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mkinitcpio"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-ml-kernel"
+description = "SigmaOS SigmaOS-arch-ml-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ml-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-mobile-kernel"
+description = "SigmaOS SigmaOS-arch-mobile-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mobile-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-msl-kernel"
+description = "SigmaOS SigmaOS-arch-msl-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-msl-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-multilib"
+description = "SigmaOS SigmaOS-arch-multilib component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-multilib"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-nft-kernel"
+description = "SigmaOS SigmaOS-arch-nft-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-nft-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-ninja"
+description = "SigmaOS SigmaOS-arch-ninja component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ninja"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-normal-mapping-kernel"
+description = "SigmaOS SigmaOS-arch-normal-mapping-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-normal-mapping-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-nspawn"
+description = "SigmaOS SigmaOS-arch-nspawn component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-nspawn"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-ocaml"
+description = "SigmaOS SigmaOS-arch-ocaml component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ocaml"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-opencl-kernel"
+description = "SigmaOS SigmaOS-arch-opencl-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-opencl-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-opengl-kernel"
+description = "SigmaOS SigmaOS-arch-opengl-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-opengl-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-opera-kernel"
+description = "SigmaOS SigmaOS-arch-opera-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-opera-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-optimization"
+description = "SigmaOS SigmaOS-arch-optimization component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-optimization"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-optimized-kernel"
+description = "SigmaOS SigmaOS-arch-optimized-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-optimized-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-owned"
+description = "SigmaOS SigmaOS-arch-owned component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-owned"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-packaging"
+description = "SigmaOS SigmaOS-arch-packaging component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-packaging"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-pacman-mirrors"
+description = "SigmaOS SigmaOS-arch-pacman-mirrors component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pacman-mirrors"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-parallax-mapping-kernel"
+description = "SigmaOS SigmaOS-arch-parallax-mapping-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-parallax-mapping-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-patched-kernel"
+description = "SigmaOS SigmaOS-arch-patched-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-patched-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-path-tracing-kernel"
+description = "SigmaOS SigmaOS-arch-path-tracing-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-path-tracing-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-peer-to-peer-kernel"
+description = "SigmaOS SigmaOS-arch-peer-to-peer-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-peer-to-peer-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-performance-kernel"
+description = "SigmaOS SigmaOS-arch-performance-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-perl"
+description = "SigmaOS SigmaOS-arch-perl component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-perl"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-photon-mapping-kernel"
+description = "SigmaOS SigmaOS-arch-photon-mapping-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-photon-mapping-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-php"
+description = "SigmaOS SigmaOS-arch-php component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-php"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-podman"
+description = "SigmaOS SigmaOS-arch-podman component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-podman"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-power-shell"
+description = "SigmaOS SigmaOS-arch-power-shell component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power-shell"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-privacy-kernel"
+description = "SigmaOS SigmaOS-arch-privacy-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-privacy-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-profile"
+description = "SigmaOS SigmaOS-arch-profile component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-profile"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-provides"
+description = "SigmaOS SigmaOS-arch-provides component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-provides"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-python"
+description = "SigmaOS SigmaOS-arch-python component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-python"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-quantum-kernel"
+description = "SigmaOS SigmaOS-arch-quantum-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-quantum-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-query"
+description = "SigmaOS SigmaOS-arch-query component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-query"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-rate-mirrors"
+description = "SigmaOS SigmaOS-arch-rate-mirrors component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rate-mirrors"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-ray-tracing-kernel"
+description = "SigmaOS SigmaOS-arch-ray-tracing-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ray-tracing-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-react-native"
+description = "SigmaOS SigmaOS-arch-react-native component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-react-native"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-realtime-kernel"
+description = "SigmaOS SigmaOS-arch-realtime-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-realtime-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-reflections-kernel"
+description = "SigmaOS SigmaOS-arch-reflections-kernel component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-reflections-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-reflector"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-reflector"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-refractions-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-refractions-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-refresh"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-refresh"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-release"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-release"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-rendering-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rendering-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-replaces"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-replaces"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-repository"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repository"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-rocm-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rocm-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-rolling"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rolling"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-ruby"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ruby"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-rust"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rust"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-safari-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-safari-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-security-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-security-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-server-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-server-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-accountability-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-accountability-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-accountable-learning-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-accountable-learning-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-accreditation-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-accreditation-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-accuracy-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-accuracy-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-acquisitions-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-acquisitions-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-active-learning-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-active-learning-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-actuator-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-actuator-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-adaptability-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-adaptability-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-adaptation-inspired-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-adaptation-inspired-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-administration-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-administration-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-adversarial-learning-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-adversarial-learning-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-agency-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-agency-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-ai-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-ai-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-allegory-inspired-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-allegory-inspired-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-alliance-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-alliance-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-alliances-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-alliances-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-allusion-inspired-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-allusion-inspired-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-analysis-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-analysis-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-analytics-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-analytics-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-analyzer-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-analyzer-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-animal-behavior-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-animal-behavior-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-anonymous-learning-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-anonymous-learning-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-ant-colony-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-ant-colony-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-anti-patterns-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-anti-patterns-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-antithesis-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-antithesis-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-api-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-api-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-apprenticeships-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-apprenticeships-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-architecture-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-architecture-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-audit-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-audit-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-arch-shader-auditability-kernel"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-auditability-kernel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-aide"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-aide"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-alsa"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-alsa"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-apparmor"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-apparmor"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-archiso"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-archiso"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-artwork"
+description = "SigmaOS SigmaOS-archlinux-artwork component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-artwork"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-atril"
+description = "SigmaOS archlinux-atril component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-atril"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-audit"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-audit"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-avast"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-avast"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-build-scripts"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-build-scripts"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-cvs"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-cvs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-darcs"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-darcs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-denyhosts"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-denyhosts"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-docker"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-docker"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-dotfiles"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-dotfiles"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-drone"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-drone"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-ecryptfs"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-ecryptfs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-emacs"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-emacs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-enpass"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-enpass"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-evince"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-evince"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-evm"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-evm"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-exiftool"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-exiftool"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-fail2ban"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-fail2ban"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-fossil"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-fossil"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-freetype"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-freetype"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-freshclam"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-freshclam"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-fscrypt"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-fscrypt"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gcc"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gcc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gd"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gd"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-ghostscript"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-ghostscript"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-git"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-git"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gitea"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gitea"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-github"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-github"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-github-actions"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-github-actions"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gitlab"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gitlab"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gitlab-runner"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gitlab-runner"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gitolite"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gitolite"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gnupg"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gnupg"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-go"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-go"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-graphicsmagick"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-graphicsmagick"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-grsec"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-grsec"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gst-rpi"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gst-rpi"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gst-vaapi"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gst-vaapi"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gst-vdpau"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gst-vdpau"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gstreamer0.10"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gstreamer0.10"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-gstreamer1"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-gstreamer1"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-hardening"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-hardening"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-hardware"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-hardware"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-harfbuzz"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-harfbuzz"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-haskell"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-haskell"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-hg"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-hg"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-hsm-keyring"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-hsm-keyring"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-icons"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-icons"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-ima"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-ima"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-imagemagick"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-imagemagick"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-initialize"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-initialize"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-initramfs"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-initramfs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-install"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-install"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-install-scripts"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-install-scripts"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-iptables"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-iptables"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-keyring"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-keyring"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-kvm"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-kvm"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-landlock"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-landlock"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-lastpass"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-lastpass"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-libav"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-libav"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-link"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-link"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-llvm"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-llvm"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-lockdown"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-lockdown"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-logos"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-logos"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-luks"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-luks"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-lxc"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-lxc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-lxd"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-lxd"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-m-codecs"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-m-codecs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-makepkg"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-makepkg"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-mascot"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-mascot"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-mcafee"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-mcafee"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-mcomix"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-mcomix"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-mediainfo"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-mediainfo"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-mirrorlist"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-mirrorlist"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-nftables"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-nftables"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-node"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-node"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-norton"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-norton"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-nvimrc"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-nvimrc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-okular"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-okular"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-opencv"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-opencv"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-oss"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-oss"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-pacman"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-pacman"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-pass"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-pass"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-patch"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-patch"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-pax"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-pax"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-php"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-php"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-portsentry"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-portsentry"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-profile"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-profile"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-rkhunter"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-rkhunter"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-screen"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-screen"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-selinux"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-selinux"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-settings"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-settings"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-snort"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-snort"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-sophos"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-sophos"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-svn"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-svn"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-themes-gnome"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-themes-gnome"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-themes-kde"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-themes-kde"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-themes-lxde"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-themes-lxde"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-themes-lxqt"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-themes-lxqt"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-themes-mate"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-themes-mate"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-themes-slim"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-themes-slim"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-themes-xfce"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-themes-xfce"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-thumbnailer"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-thumbnailer"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tmux"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tmux"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tomoyo"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tomoyo"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tpm"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tpm"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tpm2-abrmd"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tpm2-abrmd"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tpm2-pkcs11"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tpm2-pkcs11"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tpm2-tools"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tpm2-tools"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tripwire"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tripwire"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-truecrypt"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-truecrypt"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tss2"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tss2"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tweak-tool"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tweak-tool"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-vagrant"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-vagrant"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-veracrypt"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-veracrypt"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-vimrc"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-vimrc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-vlc"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-vlc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-wallpaper"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-wallpaper"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-workflows"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-workflows"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-yama"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-yama"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-zathura"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-zathura"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-zshrc"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-zshrc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux32-keyring"
+description = "SigmaOS SigmaOS-archlinux32-keyring component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux32-keyring"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinuxarm-keyring"
+description = "SigmaOS SigmaOS-archlinuxarm-keyring component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinuxarm-keyring"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-asp-rs"
+description = "SigmaOS SigmaOS-asp-rs component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asp-rs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-avahi"
+description = "SigmaOS SigmaOS-avahi component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-avahi"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-avfoundation"
+description = "avfoundation component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-avfoundation"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bash-completion"
+description = "SigmaOS SigmaOS-bash-completion component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bash-completion"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-betteroffice-docs"
+description = "betteroffice docs component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-betteroffice-docs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-betteroffice-sheets"
+description = "betteroffice sheets component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-betteroffice-sheets"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-block"
+description = "SigmaOS SigmaOS-block component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-block"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bluez-tools"
+description = "SigmaOS SigmaOS-bluez-tools component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bluez-tools"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bolt"
+description = "SigmaOS SigmaOS-bolt component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bolt"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-brightnessctl"
+description = "SigmaOS SigmaOS-brightnessctl component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-brightnessctl"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-free"
+description = "SigmaOS BSD component - Rust implementation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-free"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-fury"
+description = "SigmaOS BSD Fury - Realtime scheduling and high-performance BSD variant"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-fury"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-ghost"
+description = "SigmaOS BSD Ghost - Privacy-preserving BSD with secure memory zeroization"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-ghost"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-hardened"
+description = "SigmaOS BSD Hardened - Security-hardened BSD with ASLR and canary verification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-hardened"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-karma"
+description = "SigmaOS BSD Karma - Community-driven BSD with package reputation scoring"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-karma"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-liberty"
+description = "SigmaOS BSD Liberty - Freedom-focused BSD with libre software policy enforcement"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-liberty"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-midnight"
+description = "SigmaOS BSD Midnight - Desktop-oriented BSD with dark theme management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-midnight"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-nomad"
+description = "SigmaOS BSD Nomad - Portable BSD for live USB environments"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-nomad"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-open"
+description = "SigmaOS BSD component - Rust implementation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-open"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bsd-star"
+description = "SigmaOS BSD Star - Astronomy and science BSD with precision timer support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-star"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-btop-gui"
+description = "SigmaOS SigmaOS-btop-gui component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-btop-gui"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cava"
+description = "SigmaOS SigmaOS-cava component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cava"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-char"
+description = "SigmaOS SigmaOS-char component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-char"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cliphist"
+description = "SigmaOS SigmaOS-cliphist component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cliphist"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cups-pk-helper"
+description = "SigmaOS SigmaOS-cups-pk-helper component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cups-pk-helper"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dhcp-client"
+description = "SigmaOS SigmaOS-dhcp-client component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dhcp-client"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dmi"
+description = "SigmaOS SigmaOS-dmi component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dmi"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dos-basic"
+description = "SigmaOS DOS BASIC - GW-BASIC / QBasic interpreter for DOS subsystem"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dos-basic"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dos-free"
+description = "FreeDOS compatibility and real-mode execution bridge for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dos-free"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dos-ms"
+description = "MS-DOS execution and interrupt vector bridge for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dos-ms"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dos-reactos"
+description = "SigmaOS DOS ReactOS - ReactOS DOS subsystem INT 21h compatibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dos-reactos"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-efivar"
+description = "SigmaOS SigmaOS-efivar component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-efivar"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-elfutils"
+description = "SigmaOS SigmaOS-elfutils component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-elfutils"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ethereum-cex"
+description = "ethereum cex component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ethereum-cex"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-eza"
+description = "SigmaOS SigmaOS-eza component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-eza"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fakeroot"
+description = "SigmaOS SigmaOS-fakeroot component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fakeroot"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ffmpegthumbnailer"
+description = "SigmaOS SigmaOS-ffmpegthumbnailer component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ffmpegthumbnailer"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fprintd"
+description = "SigmaOS SigmaOS-fprintd component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fprintd"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fuse2"
+description = "SigmaOS SigmaOS-fuse2 component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fuse2"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fuse3"
+description = "SigmaOS SigmaOS-fuse3 component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fuse3"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gamemode"
+description = "SigmaOS SigmaOS-gamemode component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gamemode"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gdb-multiarch"
+description = "SigmaOS SigmaOS-gdb-multiarch component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gdb-multiarch"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-genoffice-sheets"
+description = "genoffice sheets component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-genoffice-sheets"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ghostty"
+description = "SigmaOS SigmaOS-ghostty component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ghostty"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gpart"
+description = "SigmaOS SigmaOS-gpart component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gpart"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gpm"
+description = "SigmaOS SigmaOS-gpm component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gpm"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-groff"
+description = "SigmaOS SigmaOS-groff component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-groff"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gsettings-desktop-schemas"
+description = "SigmaOS SigmaOS-gsettings-desktop-schemas component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gsettings-desktop-schemas"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hunspell"
+description = "SigmaOS SigmaOS-hunspell component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hunspell"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hwdb"
+description = "SigmaOS SigmaOS-hwdb component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hwdb"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hypridle"
+description = "SigmaOS SigmaOS-hypridle component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hypridle"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hyprlock"
+description = "SigmaOS SigmaOS-hyprlock component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hyprlock"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hyprpicker"
+description = "SigmaOS SigmaOS-hyprpicker component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hyprpicker"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-inxi"
+description = "SigmaOS SigmaOS-inxi component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-inxi"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-iputils"
+description = "SigmaOS SigmaOS-iputils component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-iputils"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ironbar"
+description = "SigmaOS SigmaOS-ironbar component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ironbar"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-irqbalance"
+description = "SigmaOS SigmaOS-irqbalance component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-irqbalance"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-jansson"
+description = "SigmaOS SigmaOS-jansson component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jansson"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-jq"
+description = "SigmaOS SigmaOS-jq component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jq"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kbd"
+description = "SigmaOS SigmaOS-kbd component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kbd"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-gnu"
+description = "SigmaOS Kernel component - Rust implementation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-gnu"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-linux"
+description = "SigmaOS Kernel component - Rust implementation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-linux"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-minix"
+description = "Minix 3 multiserver and reincarnation server integration for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-minix"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-reactos"
+description = "ReactOS NT-compatible kernel architecture integration for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-reactos"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-xnu"
+description = "Apple XNU Mach and BSD hybrid kernel architecture integration for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-xnu"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-krb5"
+description = "SigmaOS SigmaOS-krb5 component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-krb5"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libnotify"
+description = "SigmaOS SigmaOS-libnotify component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libnotify"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libreoffice-base"
+description = "SigmaOS LibreOffice Base - Database frontend and SQL table designer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-base"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libreoffice-calc"
+description = "LibreOffice Calc spreadsheet engine & A1 formula solver for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-calc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libreoffice-draw"
+description = "SigmaOS LibreOffice Draw - Vector drawing and spatial geometry engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-draw"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libreoffice-impress"
+description = "SigmaOS LibreOffice Impress - Presentation slide engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-impress"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libreoffice-math"
+description = "SigmaOS LibreOffice Math - Formula editor and symbolic equation evaluator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-math"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libreoffice-writer"
+description = "LibreOffice Writer ODF document processor & markdown export engine for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-writer"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libsecret"
+description = "SigmaOS SigmaOS-libsecret component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libsecret"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libusb"
+description = "SigmaOS SigmaOS-libusb component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libusb"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libxkbcommon"
+description = "SigmaOS SigmaOS-libxkbcommon component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libxkbcommon"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-linux-aether"
+description = "SigmaOS Linux Aether - Native theming engine (omacom/aether parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-linux-aether"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-linux-lfs"
+description = "SigmaOS Linux LFS - Linux From Scratch build orchestrator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-linux-lfs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mangohud"
+description = "SigmaOS SigmaOS-mangohud component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mangohud"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mesa-utils"
+description = "SigmaOS SigmaOS-mesa-utils component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mesa-utils"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-modules-load"
+description = "SigmaOS SigmaOS-modules-load component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-modules-load"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nat"
+description = "SigmaOS SigmaOS-nat component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nat"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-networkmanager-applet"
+description = "SigmaOS SigmaOS-networkmanager-applet component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-networkmanager-applet"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-networkmanager-openvpn"
+description = "SigmaOS SigmaOS-networkmanager-openvpn component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-networkmanager-openvpn"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-noctalia"
+description = "SigmaOS SigmaOS-noctalia component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-noctalia"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nspr"
+description = "SigmaOS SigmaOS-nspr component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nspr"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nss"
+description = "SigmaOS SigmaOS-nss component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nss"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nvtop"
+description = "SigmaOS SigmaOS-nvtop component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nvtop"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-omarchy"
+description = "SigmaOS SigmaOS-omarchy component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-omarchy-menu"
+description = "SigmaOS SigmaOS-omarchy-menu component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-menu"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-onlyoffice"
+description = "onlyoffice component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-onlyoffice-document"
+description = "SigmaOS OnlyOffice component - Rust implementation with AAA tests"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice-document"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-onlyoffice-forms"
+description = "SigmaOS OnlyOffice component - Rust implementation with AAA tests"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice-forms"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-onlyoffice-pdf"
+description = "SigmaOS OnlyOffice component - Rust implementation with AAA tests"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice-pdf"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-onlyoffice-presentation"
+description = "onlyoffice presentation component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice-presentation"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-onlyoffice-spreadsheet"
+description = "onlyoffice spreadsheet component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice-spreadsheet"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-openjpeg2"
+description = "SigmaOS SigmaOS-openjpeg2 component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openjpeg2"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-p11-kit"
+description = "SigmaOS SigmaOS-p11-kit component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-p11-kit"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pamixer"
+description = "SigmaOS SigmaOS-pamixer component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pamixer"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pciutils"
+description = "SigmaOS SigmaOS-pciutils component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pciutils"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-playerctl"
+description = "SigmaOS SigmaOS-playerctl component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-playerctl"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-plocate"
+description = "SigmaOS SigmaOS-plocate component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plocate"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-power-profiles-daemon"
+description = "SigmaOS SigmaOS-power-profiles-daemon component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-profiles-daemon"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-qrencode"
+description = "SigmaOS SigmaOS-qrencode component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qrencode"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rdbms-apache"
+description = "Apache ecosystem RDBMS connectors & analytics bridges for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms-apache"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rdbms-duckdb"
+description = "SigmaOS DuckDB in-process analytics RDBMS component - Rust implementation with AAA tests"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms-duckdb"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rdbms-metabase"
+description = "SigmaOS RDBMS Metabase - Metabase analytics query engine integration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms-metabase"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rdbms-postgresql"
+description = "SigmaOS PostgreSQL RDBMS component - Rust implementation with AAA tests"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms-postgresql"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rdbms-superset"
+description = "SigmaOS RDBMS Superset - Apache Superset dashboard and chart engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms-superset"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-swaylock-effects"
+description = "SigmaOS SigmaOS-swaylock-effects component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-swaylock-effects"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-swaync"
+description = "SigmaOS SigmaOS-swaync component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-swaync"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-syslinux"
+description = "SigmaOS SigmaOS-syslinux component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-syslinux"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-test-probe"
+description = "probe"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-test-probe"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-airbyte"
+description = "SigmaOS Tools Airbyte - ELT data pipeline connector engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-airbyte"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-bigquery"
+description = "SigmaOS Tools BigQuery - Columnar SQL query planner and cost estimator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-bigquery"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-codex-cli"
+description = "tools codex cli component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-codex-cli"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-databricks"
+description = "SigmaOS Tools Databricks - Interactive notebook cell execution environment"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-databricks"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-dbt"
+description = "SigmaOS Tools dbt - DAG compiler and model topological sorter"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-dbt"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-fivetran"
+description = "SigmaOS Tools Fivetran - Connector schema validation and sync engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-fivetran"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-folio"
+description = "SigmaOS Tools folio - Fast native file manager (omacom/folio parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-folio"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-gliff"
+description = "tools gliff component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-gliff"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-hadoop"
+description = "SigmaOS Tools Hadoop - HDFS distributed block manager and replicator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-hadoop"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-hermes"
+description = "tools hermes component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-hermes"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-hype"
+description = "SigmaOS Tools hype - Markdown presentation engine (omacom/hype parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-hype"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-knime"
+description = "tools knime component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-knime"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-looker"
+description = "tools looker component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-looker"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-mongodb"
+description = "tools mongodb component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-mongodb"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-monologue"
+description = "tools monologue component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-monologue"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-ms-powerbi"
+description = "tools ms powerbi component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-ms-powerbi"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-omacalc"
+description = "SigmaOS Tools omacalc - Desktop calculator engine (omacom/omacalc parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-omacalc"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-omacut"
+description = "SigmaOS Tools omacut - Video and audio trimming engine (omacom/omacut parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-omacut"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-omafind"
+description = "tools omafind component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-omafind"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-omareel"
+description = "SigmaOS Tools omareel - Screen recording engine (omacom/omareel parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-omareel"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-omasnap"
+description = "SigmaOS Tools omasnap - Wayland screenshot utility (omacom/omasnap parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-omasnap"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-omawrite"
+description = "SigmaOS Tools omawrite - Writing and text editor (omacom/omawrite parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-omawrite"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-owe"
+description = "tools owe component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-owe"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-plain"
+description = "tools plain component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-plain"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-python-ds"
+description = "tools python ds component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-python-ds"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-r-ds"
+description = "tools r ds component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-r-ds"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-sas"
+description = "tools sas component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-sas"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-signed"
+description = "SigmaOS Tools signed - Cryptographic PDF signing utility (omacom/signed parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-signed"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-skyvia"
+description = "tools skyvia component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-skyvia"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-snowflake"
+description = "tools snowflake component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-snowflake"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-spark"
+description = "SigmaOS Tools Spark - Apache Spark RDD transformation and action engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-spark"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-speedtest"
+description = "SigmaOS Tools speedtest - Network speed test client (omacom/omarchy-speedtest parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-speedtest"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-sql-ds"
+description = "tools sql ds component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-sql-ds"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-tableau"
+description = "tools tableau component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-tableau"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-tensorflow"
+description = "tools tensorflow component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-tensorflow"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tools-ttfx"
+description = "SigmaOS Tools ttfx - Terminal text animation effects (omacom/ttfx parity)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-ttfx"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-udev-rules"
+description = "SigmaOS SigmaOS-udev-rules component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-udev-rules"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-wl-clipboard"
+description = "SigmaOS SigmaOS-wl-clipboard component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wl-clipboard"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xdotool"
+description = "SigmaOS SigmaOS-xdotool component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xdotool"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xfsprogs"
+description = "SigmaOS SigmaOS-xfsprogs component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfsprogs"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xkeyboard-config"
+description = "SigmaOS SigmaOS-xkeyboard-config component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xkeyboard-config"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xorg-xauth"
+description = "SigmaOS SigmaOS-xorg-xauth component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xorg-xauth"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-yazi"
+description = "SigmaOS SigmaOS-yazi component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yazi"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-zlib"
+description = "SigmaOS SigmaOS-zlib component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zlib"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-zoxide"
+description = "SigmaOS SigmaOS-zoxide component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zoxide"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
