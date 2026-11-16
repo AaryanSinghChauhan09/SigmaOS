@@ -30390,3 +30390,69 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-gnu-as"
+description = "GNU assembler: assembly source to object code"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-as"
+engine = "compiler"
+category = "Compilers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nasm"
+description = "NASM: Netwide assembler for x86"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nasm"
+engine = "compiler"
+category = "Compilers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gnu-ld"
+description = "GNU linker: object linking and symbol resolution"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-ld"
+engine = "compiler"
+category = "Compilers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-lld"
+description = "LLD: LLVM linker"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lld"
+engine = "compiler"
+category = "Compilers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-lamp"
+description = "LAMP stack: Linux Apache MySQL PHP bundle"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lamp"
+engine = "system_service"
+category = "System Services"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mit-scratch"
+description = "MIT Scratch: visual block programming environment"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mit-scratch"
+engine = "application"
+category = "Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
