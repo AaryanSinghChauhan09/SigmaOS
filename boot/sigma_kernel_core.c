@@ -1108,6 +1108,14 @@ static void ata_identify_model(uint16_t base, int slave, char out[41]) {
     }
 }
 
+/* Wait for the drive to not be busy (!BSY). Prevents issuing a command
+ * while the previous one is still in flight (writes especially). */
+static void ata_wait_ready(uint16_t base) {
+    for (int spins = 0; spins < 500000; spins++) {
+        if (!(inb(base + 7) & 0x80)) return;
+    }
+}
+
 /* Wait for !BSY && DRQ (data ready) or error. Returns 0 on success. */
 static int ata_wait_drq(uint16_t base) {
     for (int spins = 0; spins < 500000; spins++) {
@@ -1127,6 +1135,7 @@ static int ata_read_lba28(uint16_t base, int slave, uint32_t lba, uint8_t* buf, 
     outb(base + 3, (uint8_t)(lba & 0xFF));                   /* LBA low  */
     outb(base + 4, (uint8_t)((lba >> 8) & 0xFF));            /* LBA mid  */
     outb(base + 5, (uint8_t)((lba >> 16) & 0xFF));           /* LBA high */
+    ata_wait_ready(base);
     outb(base + 7, 0x20);                                    /* READ SECTORS */
 
     for (int s = 0; s < sectors; s++) {
@@ -1146,6 +1155,7 @@ static int ata_write_lba28(uint16_t base, int slave, uint32_t lba, const uint8_t
     outb(base + 3, (uint8_t)(lba & 0xFF));
     outb(base + 4, (uint8_t)((lba >> 8) & 0xFF));
     outb(base + 5, (uint8_t)((lba >> 16) & 0xFF));
+    ata_wait_ready(base);
     outb(base + 7, 0x30);                          /* WRITE SECTORS */
     for (int s = 0; s < sectors; s++) {
         if (ata_wait_drq(base) != 0) return -1;
@@ -2179,7 +2189,9 @@ static int fat_set_entry(int kind, uint32_t clus, uint32_t val) {
         else          v = (uint16_t)((v & 0xF000) | (val & 0x0FFFu));
         tmp[off] = (uint8_t)(v & 0xFF); tmp[off+1] = (uint8_t)(v >> 8);
     }
-    return blk_write_lba(g_vol_fat_lba + sec, tmp, nsec);
+    /* normalize: callers expect 0 ok / <0 error; blk_write_lba returns
+     * sectors-written (positive) on success */
+    return blk_write_lba(g_vol_fat_lba + sec, tmp, nsec) < 0 ? -1 : 0;
 }
 
 /* Allocate `count` clusters as a linked chain (last = EOC).
@@ -2263,7 +2275,9 @@ static int fat_find_dir_slot(int kind, int in_root,
 static int fat_write_dirent(uint32_t lba, uint32_t off, const uint8_t* e) {
     if (blk_read_lba(lba, g_file_buf, 1) < 0) return -1;
     for (int i = 0; i < 32; i++) g_file_buf[off + i] = e[i];
-    return blk_write_lba(lba, g_file_buf, 1);
+    /* normalize: callers expect 0 ok / <0 error; blk_write_lba returns
+     * sectors-written (positive) on success */
+    return blk_write_lba(lba, g_file_buf, 1) < 0 ? -1 : 0;
 }
 
 /* returns 0 ok, -1..-6 error (no printing) */
@@ -3010,6 +3024,7 @@ static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen)
     if (!chain) { return -1; }
     uint32_t ncl = 0;
     uint32_t c = clus;
+    uint32_t first_clus = 0;
     int guard = 0;
     while (c >= 2 && !fat_eoc_any(kind, c) && ncl < maxc && guard++ < 8192) {
         chain[ncl++] = c;
@@ -3026,8 +3041,8 @@ static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen)
         if (ncl > 0) {
             if (fat_set_entry(kind, chain[ncl - 1], nc) != 0) { fail = 1; break; }
         } else {
-            /* empty file: first cluster goes into dirent */
-            fat_dirent_set_cluster(kind, de, nc);
+            /* empty file: first cluster goes into dirent (persisted below) */
+            first_clus = nc;
         }
         chain[ncl++] = nc;
         have_bytes += clus_bytes;
@@ -3063,20 +3078,17 @@ static int fat_append_impl(const char* name, const uint8_t* text, uint32_t tlen)
     kfree(chain);
     if (fail) { return -1; }
 
-
-    /* update dirent size + persist */
+    /* update dirent size + persist. `de` aliases g_file_buf which the
+     * data-write loop clobbered — re-read the dir sector and patch the
+     * live dirent directly. */
     fsize += tlen - remaining;
-    de[28] = (uint8_t)(fsize & 0xFF); de[29] = (uint8_t)((fsize >> 8) & 0xFF);
-    de[30] = (uint8_t)((fsize >> 16) & 0xFF); de[31] = (uint8_t)(fsize >> 24);
-    /* re-read sector: g_file_buf clobbered */
     if (blk_read_lba(slot.lba, g_file_buf, 1) < 0) {
         return -1;
     }
     uint8_t* de2 = g_file_buf + slot.off;
-    de2[28] = de[28]; de2[29] = de[29]; de2[30] = de[30]; de2[31] = de[31];
-    /* also persist first-cluster field if file was empty */
-    for (int i = 20; i <= 21; i++) de2[i] = de[i];
-    if (kind == 2) { de2[26] = de[26]; de2[27] = de[27]; }
+    de2[28] = (uint8_t)(fsize & 0xFF); de2[29] = (uint8_t)((fsize >> 8) & 0xFF);
+    de2[30] = (uint8_t)((fsize >> 16) & 0xFF); de2[31] = (uint8_t)(fsize >> 24);
+    if (first_clus) fat_dirent_set_cluster(kind, de2, first_clus);
     if (blk_write_lba(slot.lba, g_file_buf, 1) != 1) {
         return -1;
     }
@@ -4168,19 +4180,20 @@ static void show_cat(const char* args) {
     if (hit.is_dir) { kputs("cat: '"); kputs(rpath); kputs("' is a directory (use ls).\n"); return; }
     if (hit.cluster < 2) { kputs("cat: empty file.\n"); return; }
 
-    /* walk cluster chain, print printable content (cap 4KB) */
+    /* walk cluster chain, print printable content; stop at declared size */
     uint32_t clus = hit.cluster;
     uint32_t printed = 0;
     const uint32_t PRINT_CAP = 4096;
+    uint32_t limit = hit.size < PRINT_CAP ? hit.size : PRINT_CAP;
     int guard = 0;
-    while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 1024 && printed < PRINT_CAP) {
+    while (clus >= 2 && !fat_eoc_any(kind, clus) && guard++ < 1024 && printed < limit) {
         uint32_t clus_lba = data_lba + (clus - 2) * spc;
-        for (uint32_t s = 0; s < spc && printed < PRINT_CAP; s++) {
+        for (uint32_t s = 0; s < spc && printed < limit; s++) {
             if (blk_read_lba(clus_lba + s, g_file_buf, 1) < 0) {
                 kputs("\ncat: read error mid-file.\n");
                 return;
             }
-            for (int i = 0; i < 512 && printed < PRINT_CAP; i++) {
+            for (int i = 0; i < 512 && printed < limit; i++) {
                 uint8_t c = g_file_buf[i];
                 if (c == '\n' || c == '\r' || c == '\t' || (c >= 32 && c <= 126)) {
                     kputc((c == '\r') ? '\n' : (char)c);
@@ -8907,7 +8920,10 @@ void _start(void) {
         "subl %edi, %ecx\n"
         "shrl $2, %ecx\n"
         "rep stosl\n"
-        "mov $stack_top, %esp\n"
+        /* stack_top is a pointer VARIABLE in .data — load its value,
+         * not its address (mov $sym would set esp into .data and the
+         * stack would grow down over .data/.rodata/.text) */
+        "movl stack_top, %esp\n"
         "push %ebx\n"          /* Multiboot info pointer */
         "push %edx\n"          /* Multiboot magic */
         "call kernel_main\n"
