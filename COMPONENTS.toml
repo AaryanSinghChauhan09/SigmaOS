@@ -30247,3 +30247,36 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-xhci"
+description = "xHCI: USB 3.0 extensible host controller driver"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xhci"
+engine = "hardware_driver"
+category = "Device Drivers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pcie"
+description = "PCIe: PCI Express bus enumeration and capability parsing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pcie"
+engine = "hardware_driver"
+category = "Device Drivers"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-netfilter"
+description = "Netfilter: packet filtering hook framework"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-netfilter"
+engine = "network"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
