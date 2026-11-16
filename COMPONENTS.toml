@@ -29378,3 +29378,69 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Fish", "shell", "friendly interactive shell"]
+
+[[component]]
+name = "SigmaOS-pcre"
+description = "PCRE regex library compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pcre"
+engine = "Rust"
+category = "Library"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["PCRE", "regex", "pattern matching"]
+
+[[component]]
+name = "SigmaOS-oniguruma"
+description = "Oniguruma regex library compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-oniguruma"
+engine = "Rust"
+category = "Library"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Oniguruma", "regex", "pattern matching"]
+
+[[component]]
+name = "SigmaOS-readline"
+description = "Readline library compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-readline"
+engine = "Rust"
+category = "Library"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Readline", "line editing", "command history"]
+
+[[component]]
+name = "SigmaOS-glib"
+description = "GLib library compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-glib"
+engine = "Rust"
+category = "Library"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GLib", "utility library", "data structures"]
+
+[[component]]
+name = "SigmaOS-gobject"
+description = "GObject library compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gobject"
+engine = "Rust"
+category = "Library"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GObject", "object system", "type system"]
+
+[[component]]
+name = "SigmaOS-gio"
+description = "GIO library compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gio"
+engine = "Rust"
+category = "Library"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GIO", "I/O library", "file operations"]
