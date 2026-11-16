@@ -37079,3 +37079,2820 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+
+[[component]]
+name = "SigmaOS-wireplumber"
+description = "WirePlumber"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wireplumber"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-a2dp"
+description = "A2DP"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-a2dp"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hfp-hsp"
+description = "HFP/HSP"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hfp-hsp"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vdpau"
+description = "VDPAU"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vdpau"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vulkan-video"
+description = "Vulkan Video"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vulkan-video"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-video-codec-libraries"
+description = "Video Codec Libraries"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-video-codec-libraries"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-subtitle-rendering"
+description = "Subtitle Rendering"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-subtitle-rendering"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-media-thumbnail-generation"
+description = "Media Thumbnail Generation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-media-thumbnail-generation"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-media-playback-backend"
+description = "Media Playback Backend"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-media-playback-backend"
+engine = "multimedia"
+category = "Multimedia"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vxlan"
+description = "VXLAN"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vxlan"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gre-tunnels"
+description = "GRE Tunnels"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gre-tunnels"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ike"
+description = "IKE"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ike"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-iwd"
+description = "iwd"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-iwd"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hostapd"
+description = "Hostapd"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hostapd"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mdns"
+description = "mDNS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mdns"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dnssec-validation"
+description = "DNSSEC Validation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dnssec-validation"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dns-over-tls"
+description = "DNS-over-TLS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dns-over-tls"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dhcp-relay"
+description = "DHCP Relay"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dhcp-relay"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ppp"
+description = "PPP"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ppp"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pppoe"
+description = "PPPoE"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pppoe"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-reverse-proxy"
+description = "Reverse Proxy"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-reverse-proxy"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-network-performance-monitoring"
+description = "Network Performance Monitoring"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-performance-monitoring"
+engine = "networking"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-jfs"
+description = "JFS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jfs"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-udf"
+description = "UDF"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-udf"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-lustre"
+description = "Lustre"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lustre"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-logical-volume-snapshotting"
+description = "Logical Volume Snapshotting"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-logical-volume-snapshotting"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-thin-provisioning"
+description = "Thin Provisioning"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thin-provisioning"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dm-integrity"
+description = "dm-integrity"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dm-integrity"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dm-verity"
+description = "dm-verity"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dm-verity"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-automatic-mount-management"
+description = "Automatic Mount Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-automatic-mount-management"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-removable-media-management"
+description = "Removable Media Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-removable-media-management"
+engine = "filesystem"
+category = "Filesystem"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-package-compilation-environment"
+description = "Package Compilation Environment"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-compilation-environment"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-build-isolation"
+description = "Build Isolation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-build-isolation"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-repository-synchronization"
+description = "Repository Synchronization"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-repository-synchronization"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-repository-signing"
+description = "Repository Signing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-repository-signing"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dependency-conflict-resolver"
+description = "Dependency Conflict Resolver"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dependency-conflict-resolver"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dependency-version-solver"
+description = "Dependency Version Solver"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dependency-version-solver"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dependency-pinning"
+description = "Dependency Pinning"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dependency-pinning"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-package-transaction-management"
+description = "Package Transaction Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-transaction-management"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-package-reproducibility-verification"
+description = "Package Reproducibility Verification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-reproducibility-verification"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-package-vulnerability-scanning"
+description = "Package Vulnerability Scanning"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-vulnerability-scanning"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-software-provenance-verification"
+description = "Software Provenance Verification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-provenance-verification"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-distribution-release-engineering"
+description = "Distribution Release Engineering"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distribution-release-engineering"
+engine = "package_infra"
+category = "Package Infrastructure"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-flatpak-sandbox-management"
+description = "Flatpak Sandbox Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flatpak-sandbox-management"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-flatpak-portals"
+description = "Flatpak Portals"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flatpak-portals"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-snap-confinement"
+description = "Snap Confinement"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snap-confinement"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-flatpak-builder"
+description = "Flatpak Builder"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flatpak-builder"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-snapcraft"
+description = "Snapcraft"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snapcraft"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-appstream-metadata"
+description = "AppStream Metadata"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-appstream-metadata"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mime-association-management"
+description = "MIME Association Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mime-association-management"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-default-application-manager"
+description = "Default Application Manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-default-application-manager"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-application-uninstallation"
+description = "Application Uninstallation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-application-uninstallation"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bottles"
+description = "Bottles"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bottles"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-winetricks"
+description = "Winetricks"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-winetricks"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-application-permission-management"
+description = "Application Permission Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-application-permission-management"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-application-autostart-management"
+description = "Application Autostart Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-application-autostart-management"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-application-crash-reporting"
+description = "Application Crash Reporting"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-application-crash-reporting"
+engine = "deployment"
+category = "Deployment"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hardware-abstraction-layer"
+description = "Hardware Abstraction Layer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hardware-abstraction-layer"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dmi-information"
+description = "DMI Information"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dmi-information"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-evdev"
+description = "evdev"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-evdev"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-touchscreen-support"
+description = "Touchscreen Support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-touchscreen-support"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-touchpad-gesture-management"
+description = "Touchpad Gesture Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-touchpad-gesture-management"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-stylus-support"
+description = "Stylus Support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stylus-support"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gyroscope-support"
+description = "Gyroscope Support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gyroscope-support"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ambient-light-sensors"
+description = "Ambient Light Sensors"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ambient-light-sensors"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-laptop-platform-profiles"
+description = "Laptop Platform Profiles"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-laptop-platform-profiles"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fan-control"
+description = "Fan Control"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fan-control"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-thermal-zones"
+description = "Thermal Zones"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thermal-zones"
+engine = "hardware"
+category = "Hardware"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-extended-verification-module"
+description = "Extended Verification Module"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-extended-verification-module"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-control-flow-integrity"
+description = "Control Flow Integrity"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-control-flow-integrity"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-yama-lsm"
+description = "Yama LSM"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yama-lsm"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-landlock-lsm"
+description = "Landlock LSM"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-landlock-lsm"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-certificate-authority-management"
+description = "Certificate Authority Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-certificate-authority-management"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-system-certificate-store"
+description = "System Certificate Store"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-certificate-store"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-openssl-provider-management"
+description = "OpenSSL Provider Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openssl-provider-management"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gnutls"
+description = "GnuTLS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnutls"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kwallet"
+description = "KWallet"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kwallet"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rootkit-detection"
+description = "Rootkit Detection"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rootkit-detection"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gnu-find-utilities"
+description = "GNU Find Utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-find-utilities"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gnu-diff-utilities"
+description = "GNU Diff Utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-diff-utilities"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gnu-xz"
+description = "GNU XZ"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-xz"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-procps-ng"
+description = "Procps-ng"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-procps-ng"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-psmisc"
+description = "Psmisc"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-psmisc"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-moreutils"
+description = "Moreutils"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-moreutils"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-command-completion"
+description = "Command Completion"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-command-completion"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-shell-autocompletion-framework"
+description = "Shell Autocompletion Framework"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shell-autocompletion-framework"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-environment-configuration-manager"
+description = "Environment Configuration Manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-environment-configuration-manager"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-system-configuration-editor"
+description = "System Configuration Editor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-configuration-editor"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-backup"
+description = "Configuration Backup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-backup"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-version-control"
+description = "Configuration Version Control"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-version-control"
+engine = "system_utilities"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-journald"
+description = "Journald"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-journald"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-glances"
+description = "Glances"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-glances"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-prometheus-node-exporter"
+description = "Prometheus Node Exporter"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-prometheus-node-exporter"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-collectd"
+description = "Collectd"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-collectd"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pcp-performance-co-pilot"
+description = "PCP Performance Co-Pilot"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pcp-performance-co-pilot"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-flamegraph"
+description = "FlameGraph"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flamegraph"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-resource-utilization-monitoring"
+description = "Resource Utilization Monitoring"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-resource-utilization-monitoring"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-system-performance-profiling"
+description = "System Performance Profiling"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-performance-profiling"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-log-aggregation"
+description = "Log Aggregation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-log-aggregation"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-metrics-collection"
+description = "Metrics Collection"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-metrics-collection"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-distributed-tracing"
+description = "Distributed Tracing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distributed-tracing"
+engine = "observability"
+category = "Observability"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cups-filters"
+description = "CUPS Filters"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cups-filters"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-printer-discovery"
+description = "Printer Discovery"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-printer-discovery"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-printer-sharing"
+description = "Printer Sharing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-printer-sharing"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-printer-queue-management"
+description = "Printer Queue Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-printer-queue-management"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-sane"
+description = "SANE"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sane"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-scanner-backend"
+description = "Scanner Backend"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scanner-backend"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-scanner-discovery"
+description = "Scanner Discovery"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scanner-discovery"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-multifunction-printer-support"
+description = "Multifunction Printer Support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-multifunction-printer-support"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-serial-port-management"
+description = "Serial Port Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-serial-port-management"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-modem-management"
+description = "Modem Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-modem-management"
+engine = "printing"
+category = "Printing"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gnu-gettext"
+description = "GNU gettext"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-gettext"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-locale-generation"
+description = "Locale Generation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-locale-generation"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-keyboard-layout-management"
+description = "Keyboard Layout Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keyboard-layout-management"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fcitx5"
+description = "Fcitx5"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fcitx5"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-scim"
+description = "SCIM"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scim"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-unicode-support"
+description = "Unicode Support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unicode-support"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-icu"
+description = "ICU"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-icu"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-time-synchronization"
+description = "Time Synchronization"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-time-synchronization"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-chrony"
+description = "Chrony"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-chrony"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ntp"
+description = "NTP"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ntp"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-regional-format-management"
+description = "Regional Format Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-regional-format-management"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pango"
+description = "Pango"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pango"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-emoji-font-support"
+description = "Emoji Font Support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-emoji-font-support"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-speech-synthesis"
+description = "Speech Synthesis"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-speech-synthesis"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-text-to-speech"
+description = "Text-to-Speech"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-text-to-speech"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-speech-recognition"
+description = "Speech Recognition"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-speech-recognition"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-orca"
+description = "Orca"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-orca"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-keyboard-navigation"
+description = "Keyboard Navigation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keyboard-navigation"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-slow-keys"
+description = "Slow Keys"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slow-keys"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bounce-keys"
+description = "Bounce Keys"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bounce-keys"
+engine = "localization"
+category = "Localization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gallium3d"
+description = "Gallium3D"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gallium3d"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vulkan-validation-layers"
+description = "Vulkan Validation Layers"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vulkan-validation-layers"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-opengl-egl"
+description = "OpenGL EGL"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-opengl-egl"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-glx"
+description = "GLX"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-glx"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-glvnd"
+description = "GLVND"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-glvnd"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-glu"
+description = "GLU"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-glu"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-glx-vendor-libraries"
+description = "GLX Vendor Libraries"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-glx-vendor-libraries"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-direct-rendering-infrastructure"
+description = "Direct Rendering Infrastructure"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-direct-rendering-infrastructure"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gbm-generic-buffer-management"
+description = "GBM Generic Buffer Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gbm-generic-buffer-management"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-spir-v"
+description = "SPIR-V"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-spir-v"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-anv"
+description = "ANV"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-anv"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nvk"
+description = "NVK"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nvk"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-zink"
+description = "Zink"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zink"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-panfrost"
+description = "Panfrost"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-panfrost"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-lima"
+description = "Lima"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lima"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-freedreno"
+description = "Freedreno"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-freedreno"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vulkan-compute"
+description = "Vulkan Compute"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vulkan-compute"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-opengl-es"
+description = "OpenGL ES"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-opengl-es"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-software-rendering"
+description = "Software Rendering"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-rendering"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hdr-display-support"
+description = "HDR Display Support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hdr-display-support"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-display-hotplug"
+description = "Display Hotplug"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-display-hotplug"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gpu-performance-monitoring"
+description = "GPU Performance Monitoring"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gpu-performance-monitoring"
+engine = "graphics"
+category = "Graphics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-autoconf"
+description = "Autoconf"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-autoconf"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bazel"
+description = "Bazel"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bazel"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-buck2"
+description = "Buck2"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-buck2"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-buildroot"
+description = "Buildroot"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-buildroot"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-yocto-project"
+description = "Yocto Project"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yocto-project"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libubsan"
+description = "libubsan"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libubsan"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libtsan"
+description = "libtsan"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libtsan"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-elf-utilities"
+description = "ELF Utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-elf-utilities"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-elf-symbol-management"
+description = "ELF Symbol Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-elf-symbol-management"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-debug-symbol-management"
+description = "Debug Symbol Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-debug-symbol-management"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-binary-stripping"
+description = "Binary Stripping"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-binary-stripping"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cross-compilation-toolchains"
+description = "Cross Compilation Toolchains"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cross-compilation-toolchains"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-doxygen"
+description = "Doxygen"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-doxygen"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-sphinx"
+description = "Sphinx"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sphinx"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-jvm"
+description = "JVM"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jvm"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-webassembly-runtime"
+description = "WebAssembly Runtime"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webassembly-runtime"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-coccinelle"
+description = "Coccinelle"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-coccinelle"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-addresssanitizer"
+description = "AddressSanitizer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-addresssanitizer"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-threadsanitizer"
+description = "ThreadSanitizer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-threadsanitizer"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-undefinedbehaviorsanitizer"
+description = "UndefinedBehaviorSanitizer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-undefinedbehaviorsanitizer"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libfuzzer"
+description = "libFuzzer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libfuzzer"
+engine = "development"
+category = "Development"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-virsh"
+description = "virsh"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virsh"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-virt-install"
+description = "virt-install"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virt-install"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vhost"
+description = "vhost"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vhost"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vhost-user"
+description = "vhost-user"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vhost-user"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cloud-hypervisor"
+description = "Cloud Hypervisor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cloud-hypervisor"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bhyve"
+description = "bhyve"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bhyve"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-crun"
+description = "crun"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crun"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-youki"
+description = "youki"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-youki"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-skopeo"
+description = "Skopeo"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-skopeo"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-oci-distribution-specification"
+description = "OCI Distribution Specification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-oci-distribution-specification"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vm-snapshot-management"
+description = "VM Snapshot Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vm-snapshot-management"
+engine = "virtualization"
+category = "Virtualization"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-snapper"
+description = "Snapper"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snapper"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-restic"
+description = "Restic"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-restic"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rsnapshot"
+description = "Rsnapshot"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rsnapshot"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rsync"
+description = "Rsync"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rsync"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rclone"
+description = "Rclone"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rclone"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rescuezilla"
+description = "Rescuezilla"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rescuezilla"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-clonezilla"
+description = "Clonezilla"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clonezilla"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-incremental-backup"
+description = "Incremental Backup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-incremental-backup"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-differential-backup"
+description = "Differential Backup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-differential-backup"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-backup-deduplication"
+description = "Backup Deduplication"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-backup-deduplication"
+engine = "backup"
+category = "Backup"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-camera-application"
+description = "Camera Application"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-camera-application"
+engine = "desktop_applications"
+category = "Desktop Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-weather-application"
+description = "Weather Application"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-weather-application"
+engine = "desktop_applications"
+category = "Desktop Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-maps-application"
+description = "Maps Application"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-maps-application"
+engine = "desktop_applications"
+category = "Desktop Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-settings-application"
+description = "Settings Application"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-settings-application"
+engine = "desktop_applications"
+category = "Desktop Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ftp-sftp-client"
+description = "FTP/SFTP Client"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ftp-sftp-client"
+engine = "desktop_applications"
+category = "Desktop Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-torrent-client"
+description = "Torrent Client"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-torrent-client"
+engine = "desktop_applications"
+category = "Desktop Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-backup-application"
+description = "Backup Application"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-backup-application"
+engine = "desktop_applications"
+category = "Desktop Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-accessibility-applications"
+description = "Accessibility Applications"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accessibility-applications"
+engine = "desktop_applications"
+category = "Desktop Applications"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rdp-client"
+description = "RDP Client"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rdp-client"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ldap-client"
+description = "LDAP Client"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ldap-client"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kerberos"
+description = "Kerberos"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kerberos"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-samba"
+description = "Samba"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-samba"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nginx"
+description = "Nginx"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nginx"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-reverse-proxy-management"
+description = "Reverse Proxy Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-reverse-proxy-management"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-haproxy"
+description = "HAProxy"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-haproxy"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-keepalived"
+description = "Keepalived"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keepalived"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-corosync"
+description = "Corosync"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-corosync"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-distributed-storage"
+description = "Distributed Storage"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distributed-storage"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ceph"
+description = "Ceph"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ceph"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-puppet"
+description = "Puppet"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-puppet"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-chef"
+description = "Chef"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-chef"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-salt"
+description = "Salt"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-salt"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fleet-management"
+description = "Fleet Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fleet-management"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-remote-software-deployment"
+description = "Remote Software Deployment"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-remote-software-deployment"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-automated-installation"
+description = "Automated Installation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-automated-installation"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-preseed"
+description = "Preseed"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-preseed"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-subiquity"
+description = "Subiquity"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-subiquity"
+engine = "cloud"
+category = "Cloud"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-live-environment"
+description = "Live Environment"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-live-environment"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-installation-wizard"
+description = "Installation Wizard"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-installation-wizard"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bootloader-installation"
+description = "Bootloader Installation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bootloader-installation"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hostname-configuration"
+description = "Hostname Configuration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hostname-configuration"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-timezone-configuration"
+description = "Timezone Configuration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timezone-configuration"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-driver-installation"
+description = "Driver Installation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-driver-installation"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-firmware-installation"
+description = "Firmware Installation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firmware-installation"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-post-installation-configuration"
+description = "Post-Installation Configuration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-post-installation-configuration"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-oem-installation-mode"
+description = "OEM Installation Mode"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-oem-installation-mode"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-unattended-installation"
+description = "Unattended Installation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unattended-installation"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-installation-logging"
+description = "Installation Logging"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-installation-logging"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-installation-recovery"
+description = "Installation Recovery"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-installation-recovery"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-migration"
+description = "Configuration Migration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-migration"
+engine = "installer"
+category = "Installer"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xdg-mime-applications-specification"
+description = "XDG MIME Applications Specification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xdg-mime-applications-specification"
+engine = "compatibility"
+category = "Compatibility"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xdg-icon-theme-specification"
+description = "XDG Icon Theme Specification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xdg-icon-theme-specification"
+engine = "compatibility"
+category = "Compatibility"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-legacy-application-support"
+description = "Legacy Application Support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-legacy-application-support"
+engine = "compatibility"
+category = "Compatibility"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-declarative-operating-system-configuration"
+description = "Declarative Operating System Configuration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-declarative-operating-system-configuration"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-management-engine"
+description = "Configuration Management Engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-management-engine"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-file-validation"
+description = "Configuration File Validation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-file-validation"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-schema"
+description = "Configuration Schema"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-schema"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-rollback"
+description = "Configuration Rollback"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-rollback"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-diff"
+description = "Configuration Diff"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-diff"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-configuration-drift-detection"
+description = "Configuration Drift Detection"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configuration-drift-detection"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-boot-environment-management"
+description = "Boot Environment Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot-environment-management"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-environment-reproducibility"
+description = "Environment Reproducibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-environment-reproducibility"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nixos-configuration"
+description = "NixOS Configuration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nixos-configuration"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ostree"
+description = "OSTree"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ostree"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rpm-ostree"
+description = "rpm-ostree"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rpm-ostree"
+engine = "declarative_config"
+category = "Declarative Config"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-distribution-identity-manager"
+description = "Distribution Identity Manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distribution-identity-manager"
+engine = "distribution"
+category = "Distribution"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-release-engineering"
+description = "Release Engineering"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-release-engineering"
+engine = "distribution"
+category = "Distribution"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-distribution-kernel-configuration"
+description = "Distribution Kernel Configuration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distribution-kernel-configuration"
+engine = "distribution"
+category = "Distribution"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-distribution-patch-management"
+description = "Distribution Patch Management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distribution-patch-management"
+engine = "distribution"
+category = "Distribution"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-community-contribution-system"
+description = "Community Contribution System"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-community-contribution-system"
+engine = "distribution"
+category = "Distribution"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-distribution-testing-infrastructure"
+description = "Distribution Testing Infrastructure"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-distribution-testing-infrastructure"
+engine = "distribution"
+category = "Distribution"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
