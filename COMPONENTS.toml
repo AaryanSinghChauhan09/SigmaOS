@@ -28234,3 +28234,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["MS Excel", "spreadsheet", "Microsoft"]
+
+[[component]]
+name = "SigmaOS-android-studio2"
+description = "Android Studio IDE compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-android-studio2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Android Studio", "IDE", "Android development"]
+
+[[component]]
+name = "SigmaOS-intellij-idea2"
+description = "IntelliJ IDEA IDE compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-intellij-idea2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["IntelliJ IDEA", "IDE", "JetBrains"]
+
+[[component]]
+name = "SigmaOS-eclipse2"
+description = "Eclipse IDE compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-eclipse2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Eclipse", "IDE", "open source"]
+
+[[component]]
+name = "SigmaOS-atom-editor2"
+description = "Atom text editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-atom-editor2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Atom", "text editor", "GitHub"]
+
+[[component]]
+name = "SigmaOS-sublime-text2"
+description = "Sublime Text text editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sublime-text2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Sublime Text", "text editor", "commercial"]
+
+[[component]]
+name = "SigmaOS-gitkraken2"
+description = "GitKraken git client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gitkraken2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GitKraken", "git client", "version control"]
+
+[[component]]
+name = "SigmaOS-postman2"
+description = "Postman API client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-postman2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Postman", "API client", "API testing"]
+
+[[component]]
+name = "SigmaOS-insomnia2"
+description = "Insomnia API client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-insomnia2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Insomnia", "API client", "open source"]
+
+[[component]]
+name = "SigmaOS-dbeaver2"
+description = "DBeaver database client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dbeaver2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["DBeaver", "database client", "open source"]
+
+[[component]]
+name = "SigmaOS-datagrip2"
+description = "DataGrip database IDE compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-datagrip2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["DataGrip", "database IDE", "JetBrains"]
+
+[[component]]
+name = "SigmaOS-tableplus2"
+description = "TablePlus database GUI compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tableplus2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["TablePlus", "database GUI", "commercial"]
+
+[[component]]
+name = "SigmaOS-redis-commander2"
+description = "Redis Commander redis client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-redis-commander2"
+engine = "Rust"
+category = "Dev Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Redis Commander", "redis client", "database GUI"]
