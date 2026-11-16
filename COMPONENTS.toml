@@ -26969,3 +26969,14 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["s6", "skarnet init system", "service supervision"]
+
+[[component]]
+name = "SigmaOS-gnome-desktop"
+description = "GNOME desktop environment compatibility layer (session, shell, windows, applications, settings, notifications, workspaces, panels, docks)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-desktop"
+engine = "Rust"
+category = "Desktop/UI"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GNOME", "Arch Linux", "https://wiki.gnome.org"]
