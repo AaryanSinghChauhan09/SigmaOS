@@ -5007,20 +5007,20 @@ void show_banner(void) {
     vga_set_color(0x0A, 0x00); /* Green on black */
     kputs("  Architecture: x86_64 / i386 Bare-Metal Multiboot Kernel\n");
     kputs("  Subsystems  : VGA Console, Serial COM1, PS/2 Keyboard, Scheduler, VFS\n");
-    kputs("  Inspirations: Arch Linux (Minimal) | Omarchy (Tiling) | Mint (Ergonomic)\n\n");
+    kputs("  Design     : Minimal kernel, modular userland, sovereign package stack\n\n");
 }
 
 void show_craft_suite(void) {
     vga_set_color(0x0D, 0x00); /* Magenta on black */
     kputs("--- 20-Module Craft Creative Suite ---\n");
     vga_set_color(0x0F, 0x00); /* White on black */
-    kputs(" 1. 3DCraft    - 3D Modeling & Rendering (Blender parity)\n");
+    kputs(" 1. 3DCraft    - 3D Modeling & Rendering (professional 3D suite)\n");
     kputs(" 2. AniCraft   - Vector & Traditional 2D Animation\n");
     kputs(" 3. ArtCraft   - Digital Painting & Concept Art\n");
     kputs(" 4. CADCraft   - Parametric Solid Modeling & CAM/CAE\n");
     kputs(" 5. CraftLibs  - Unified Creative Core & Shader Pipeline\n");
     kputs(" 6. DeckCraft  - Interactive Presentation Decks\n");
-    kputs(" 7. DesignCraft- Vector UI/UX Design (Figma parity)\n");
+    kputs(" 7. DesignCraft- Vector UI/UX Design (professional design suite)\n");
     kputs(" 8. EffectCraft- Node-Based Visual Effects & Compositing\n");
     kputs(" 9. FigCraft   - Technical Figures & Schematics\n");
     kputs("10. FilmCraft  - Non-Linear Video Editor & Audio Timeline\n");
@@ -5038,19 +5038,19 @@ void show_craft_suite(void) {
 
 void show_distro_parity(void) {
     vga_set_color(0x0E, 0x00); /* Yellow on black */
-    kputs("--- Linux & BSD Distro Parity ---\n");
+    kputs("--- SigmaOS Platform Capabilities ---\n");
     vga_set_color(0x0F, 0x00);
-    kputs(" * Arch Linux   : Rolling release model, pacman/PKGBUILD integration\n");
-    kputs(" * Omarchy      : Hyprland tiling WM, Quickshell bar, keyboard navigation\n");
-    kputs(" * Linux Mint   : User ergonomics, update safety levels, driver autodetect\n");
-    kputs(" * CachyOS      : BORE/EEVDF scheduler, AutoBOLT, zram-zstd memory tier\n");
-    kputs(" * Debian       : Multiarch package management, dpkg compatibility\n");
-    kputs(" * DragonFlyBSD : HAMMER2 transactional VFS, lightweight kernel threads\n");
-    kputs(" * FreeBSD      : Capsicum capability isolation, kqueue event multiplexing\n");
-    kputs(" * OpenBSD      : pledge() & unveil() security enforcement, W^X pages\n\n");
+    kputs(" * Rolling release model with atomic package transactions\n");
+    kputs(" * Tiling window manager, unified shell bar, keyboard navigation\n");
+    kputs(" * Ergonomic defaults, staged update safety levels, driver autodetect\n");
+    kputs(" * Multi-tier scheduler, compressed memory tier, auto-optimisation\n");
+    kputs(" * Multiarch package management with dependency resolution\n");
+    kputs(" * Transactional VFS with lightweight kernel threads\n");
+    kputs(" * Capability-based isolation, event multiplexing subsystem\n");
+    kputs(" * Least-privilege permission enforcement, W^X memory protection\n\n");
 }
 
-/* Command aliases — Omarchy-style opinionated shortcuts. */
+/* Command aliases — opinionated shell shortcuts. */
 static const struct { const char* alias; const char* target; } g_aliases[] = {
     { "ll",     "ls" },
     { "la",     "ls" },
@@ -5491,7 +5491,7 @@ void kernel_shell(void) {
             kputs("  help    - Show available commands\n");
             kputs("  status  - Display kernel and hardware status\n");
             kputs("  craft   - List 20-module Craft Creative Suite\n");
-            kputs("  distro  - Display Linux (Arch/Cachy/Debian) & BSD parity\n");
+            kputs("  distro  - Display SigmaOS platform capabilities\n");
             kputs("  mem     - Show memory size and memory map\n");
             kputs("  modules - List Multiboot modules\n");
             kputs("  cmdline - Show kernel command line\n");
@@ -8574,7 +8574,7 @@ static void show_uname(const char* args) {
     kputs("\n");
 }
 
-/* fastfetch — Omarchy-style one-screen system summary. */
+/* fastfetch — one-screen system summary. */
 static void show_fastfetch(void) {
     kputs("\n");
     vga_set_color(0x0A, 0x04);   /* green on blue-ish */
