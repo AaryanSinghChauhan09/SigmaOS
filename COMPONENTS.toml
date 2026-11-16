@@ -1301,17 +1301,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-quickshell"
-description = "Quick shell command runner"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quickshell"
-engine = "quickshell"
-category = "Developer Tools"
-language = "shell"
-inspirations = ["https://github.com/omacom/quickshell"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-herdr-runtime-live-coding-agents"
 description = "Live-coding agent runtime (herdr)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-herdr-runtime-live-coding-agents"
@@ -1680,17 +1669,6 @@ description = "APT kit component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-aptkit"
 engine = "sources_manager"
 category = "Package Management"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-blueferry"
-description = "Blueberry fork for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blueferry"
-engine = "common_lib"
-category = "Developer Tools"
 language = "unknown"
 inspirations = "None"
 visibility = "public"
@@ -3328,17 +3306,6 @@ depends_on = ["SigmaOS-system"]
 name = "SigmaOS-automation"
 description = "Automation component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-automation"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-scheduler"
-description = "Scheduler component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scheduler"
 engine = "common_lib"
 category = "Developer Tools"
 language = "unknown"
@@ -11861,17 +11828,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-update-manager"
-description = "Update manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-manager"
-engine = "update_manager"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/update-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-update"
 description = "Update manager for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update"
@@ -11890,17 +11846,6 @@ engine = "update_manager"
 category = "Utilities"
 language = "rust"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/update-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-help-center"
-description = "Help center for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-center"
-engine = "support_system"
-category = "System Services"
-language = "shell"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/help-center"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -12917,17 +12862,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-firewall"
-description = "Firewall for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-firewall"
-engine = "firewall"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/firewall"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-fw"
 description = "Firewall for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-firewall"
@@ -13111,17 +13045,6 @@ engine = "shell"
 category = "Utilities"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/shell"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-terminal"
-description = "Terminal for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal"
-engine = "terminal"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/terminal"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -13540,17 +13463,6 @@ engine = "accessibility"
 category = "Utilities"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/accessibility"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-network-manager"
-description = "Network manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-manager"
-engine = "network_manager"
-category = "Network"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -14237,17 +14149,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-calculator"
-description = "Calculator for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-calculator"
-engine = "calculator"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/calculator"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-calc"
 description = "Calculator for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-calculator"
@@ -14270,72 +14171,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-reader"
-description = "RSS Reader for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-reader"
-engine = "rss_reader"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/rss-reader"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-rss"
-description = "RSS Reader for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-rss"
-engine = "rss_reader"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/rss-reader"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-rss"
-description = "RSS Reader for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rss"
-engine = "rss_reader"
-category = "Utilities"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/rss-reader"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-file-manager"
-description = "File Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-file-manager"
-engine = "file_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/file-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-filesystem", "SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-file"
-description = "File Manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-file"
-engine = "file_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/file-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-filesystem", "SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-file"
-description = "File Manager for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file"
-engine = "file_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/file-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-filesystem", "SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-mint-editor"
 description = "Text Editor for SigmaOS inspired by Linux Mint"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-editor"
@@ -14343,149 +14178,6 @@ engine = "text_editor"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/text-editor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-edit"
-description = "Text Editor for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-edit"
-engine = "text_editor"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/text-editor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-edit"
-description = "Text Editor for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-edit"
-engine = "text_editor"
-category = "Utilities"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/text-editor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-image-viewer"
-description = "Image Viewer for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-image-viewer"
-engine = "image_viewer"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/image-viewer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-viewer"
-description = "Image Viewer for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-viewer"
-engine = "image_viewer"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/image-viewer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-viewer"
-description = "Image Viewer for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-viewer"
-engine = "image_viewer"
-category = "Utilities"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/image-viewer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-media-player"
-description = "Media Player for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-media-player"
-engine = "media_player"
-category = "Creative"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/media-player"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-player"
-description = "Media Player for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-player"
-engine = "media_player"
-category = "Creative"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/media-player"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-player"
-description = "Media Player for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-player"
-engine = "media_player"
-category = "Creative"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/media-player"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-minimizer"
-description = "Window Minimizer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-minimizer"
-engine = "window_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/window-minimizer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-maximizer"
-description = "Window Maximizer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-maximizer"
-engine = "window_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/window-maximizer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-terminal-emulator"
-description = "Terminal Emulator for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal-emulator"
-engine = "terminal"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/terminal-emulator"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-terminal-emulator"
-description = "Terminal Emulator for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal-emulator"
-engine = "terminal"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal-emulator"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-terminal-emulator"
-description = "Terminal Emulator for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal-emulator"
-engine = "terminal"
-category = "Utilities"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/terminal-emulator"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -14655,39 +14347,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-system-monitor"
-description = "System Monitor for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-monitor"
-engine = "system_monitor"
-category = "System Services"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-system-monitor"
-description = "System Monitor for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-monitor"
-engine = "system_monitor"
-category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-system-monitor"
-description = "System Monitor for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-monitor"
-engine = "system_monitor"
-category = "System Services"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-fedora-system-monitor"
 description = "System Monitor for SigmaOS inspired by Fedora Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-system-monitor"
@@ -14695,17 +14354,6 @@ engine = "system_monitor"
 category = "System Services"
 language = "c"
 inspirations = ["https://fedoraproject.org", "https://github.com/fedora/system-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-package-manager"
-description = "Package Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-manager"
-engine = "package_manager"
-category = "Package Management"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/package-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -14743,17 +14391,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-software-center"
-description = "Software Center for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-software-center"
-engine = "software_center"
-category = "Package Management"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/software-center"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-software-center"
 description = "Software Center for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-software-center"
@@ -14783,17 +14420,6 @@ engine = "software_center"
 category = "Package Management"
 language = "c"
 inspirations = ["https://fedoraproject.org", "https://github.com/fedora/software-center"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-update-manager"
-description = "Update Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-manager"
-engine = "update_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/update-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -14831,17 +14457,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-network-manager"
-description = "Network Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-manager"
-engine = "network_manager"
-category = "Network"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-network-manager"
 description = "Network Manager for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-network-manager"
@@ -14864,17 +14479,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-bluetooth-manager"
-description = "Bluetooth Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bluetooth-manager"
-engine = "bluetooth_manager"
-category = "Drivers & Hardware"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/bluetooth-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-bluetooth-manager"
 description = "Bluetooth Manager for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth-manager"
@@ -14893,17 +14497,6 @@ engine = "bluetooth_manager"
 category = "Drivers & Hardware"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/bluetooth-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-printer-manager"
-description = "Printer Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-printer-manager"
-engine = "printer_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/printer-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -14996,17 +14589,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-session-manager"
-description = "Session Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-session-manager"
-engine = "session_manager"
-category = "System Services"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/session-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-session-manager"
 description = "Session Manager for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-session-manager"
@@ -15062,17 +14644,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-service-manager"
-description = "Service Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-service-manager"
-engine = "service_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/service-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-service-manager"
 description = "Service Manager for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-manager"
@@ -15095,17 +14666,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-log-viewer"
-description = "Log Viewer for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-log-viewer"
-engine = "log_viewer"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/log-viewer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-log-viewer"
 description = "Log Viewer for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log-viewer"
@@ -15124,17 +14684,6 @@ engine = "log_viewer"
 category = "Utilities"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/log-viewer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-help-center"
-description = "Help Center for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-center"
-engine = "help_center"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/help-center"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -15223,17 +14772,6 @@ engine = "package_querier"
 category = "Package Management"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/package-querier"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-dependency-resolver"
-description = "Dependency Resolver for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-dependency-resolver"
-engine = "dependency_resolver"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/dependency-resolver"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -15344,17 +14882,6 @@ engine = "keyring_manager"
 category = "Utilities"
 language = "c"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/keyring-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-keyring-manager"
-description = "Keyring Manager for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-keyring-manager"
-engine = "keyring_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/keyring-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -15722,17 +15249,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-disk-utility"
-description = "Disk Utility for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-disk-utility"
-engine = "disk_utility"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/disk-utility"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-disk-utility"
 description = "Disk Utility for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disk-utility"
@@ -15887,17 +15403,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-update-notifier"
-description = "Update Notifier for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-notifier"
-engine = "update_notifier"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/update-notifier"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-update-notifier"
 description = "Update Notifier for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update-notifier"
@@ -16017,17 +15522,6 @@ language = "c"
 inspirations = ["https://fedoraproject.org", "https://github.com/fedora/log-rotator"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-theme-installer"
-description = "Theme Installer for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme-installer"
-engine = "theme_installer"
-category = "Desktop/UI"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/theme-installer"]
-visibility = "public"
-depends_on = []
 
 [[component]]
 name = "SigmaOS-omarchy-theme-installer"
@@ -16151,17 +15645,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-system-configurator"
-description = "System Configurator for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-configurator"
-engine = "system_configurator"
-category = "System Services"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-configurator"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-system-configurator"
 description = "System Configurator for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-configurator"
@@ -16246,17 +15729,6 @@ engine = "storage_manager"
 category = "Utilities"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/storage-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-permission-manager"
-description = "Permission Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-permission-manager"
-engine = "permission_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/permission-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -16448,17 +15920,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-performance-monitor"
-description = "Performance Monitor for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-performance-monitor"
-engine = "performance_monitor"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/performance-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-performance-monitor"
 description = "Performance Monitor for SigmaOS inspired by Omarchy Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-performance-monitor"
@@ -16477,17 +15938,6 @@ engine = "performance_monitor"
 category = "Utilities"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/performance-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-resource-manager"
-description = "Resource Manager for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-resource-manager"
-engine = "resource_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/resource-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -16543,39 +15993,6 @@ engine = "load_balancer"
 category = "Utilities"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/load-balancer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-system-monitor"
-description = "System Monitor for SigmaOS inspired by Linux Mint"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-monitor"
-engine = "system_monitor"
-category = "System Services"
-language = "c"
-inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-system-monitor"
-description = "System Monitor for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-monitor"
-engine = "system_monitor"
-category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-system-monitor"
-description = "System Monitor for SigmaOS inspired by Arch Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-monitor"
-engine = "system_monitor"
-category = "System Services"
-language = "c"
-inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-monitor"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -21261,16 +20678,6 @@ description = "GitHub description is a placeholder; component scope remains uncl
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-aufs"
 engine = "filesystem"
 category = "Filesystems"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-aur-helper"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-aur-helper"
-engine = "package_manager"
-category = "Package Management"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -26891,18 +26298,6 @@ language = "rust"
 inspirations = ["Linux kernel", "TCP/IP", "IPv4", "IPv6", "TCP", "UDP", "ICMP", "ARP", "netfilter", "network namespaces"]
 visibility = "public"
 depends_on = []
-
-[[component]]
-name = "SigmaOS-pacman"
-description = "Package manager implementation for SigmaOS inspired by Arch Linux pacman"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman"
-engine = "rust"
-category = "Package Management"
-language = "rust"
-inspirations = ["Arch Linux", "pacman", "AUR", "package management", "dependency resolution"]
-visibility = "public"
-depends_on = []
-
 
 [[component]]
 name = "SigmaOS-systemd-compat"
