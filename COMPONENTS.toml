@@ -35780,3 +35780,1302 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+
+[[component]]
+name = "SigmaOS-agetty"
+description = " agetty"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-agetty"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-app-indicator"
+description = " app indicator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-app-indicator"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-app-switcher"
+description = " app switcher"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-app-switcher"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-auth-agents"
+description = " auth agents"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-auth-agents"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-clipboard-manager"
+description = " clipboard manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clipboard-manager"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-clipboard-sync"
+description = " clipboard sync"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clipboard-sync"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-color-management"
+description = " color management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-color-management"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-compositor-effects"
+description = " compositor effects"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-compositor-effects"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-concurrent-login"
+description = " concurrent login"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-concurrent-login"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-accessibility"
+description = " desktop accessibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-accessibility"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-autostart"
+description = " desktop autostart"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-autostart"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-background"
+description = " desktop background"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-background"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-compositor"
+description = " desktop compositor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-compositor"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-config"
+description = " desktop config"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-config"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-lockscreen"
+description = " desktop lockscreen"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-lockscreen"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-notification"
+description = " desktop notification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-notification"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-remote"
+description = " desktop remote"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-remote"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-search"
+description = " desktop search"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-search"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-session-manager"
+description = " desktop session manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-session-manager"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-settings-daemon"
+description = " desktop settings daemon"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-settings-daemon"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-shell"
+description = " desktop shell"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-shell"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-desktop-startup"
+description = " desktop startup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-startup"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-display-config"
+description = " display config"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-display-config"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-drag-drop"
+description = " drag drop"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-drag-drop"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dynamic-user"
+description = " dynamic user"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dynamic-user"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-enlightenment"
+description = " enlightenment"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-enlightenment"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-etc-group"
+description = " etc group"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-etc-group"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-etc-passwd"
+description = " etc passwd"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-etc-passwd"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-etc-shadow"
+description = " etc shadow"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-etc-shadow"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fast-user-switching"
+description = " fast user switching"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fast-user-switching"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-file-indexing"
+description = " file indexing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-indexing"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fractional-scaling"
+description = " fractional scaling"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fractional-scaling"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-getty"
+description = " getty"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-getty"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-group-database"
+description = " group database"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-group-database"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hidpi"
+description = " hidpi"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hidpi"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-home-provisioning"
+description = " home provisioning"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-home-provisioning"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-labwc"
+description = " labwc"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-labwc"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-login"
+description = " login"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-login"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-login-manager-backend"
+description = " login manager backend"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-login-manager-backend"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-login-shell"
+description = " login shell"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-login-shell"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mingetty"
+description = " mingetty"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mingetty"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-multi-monitor"
+description = " multi monitor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-multi-monitor"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-multi-user"
+description = " multi user"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-multi-user"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-night-light"
+description = " night light"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-night-light"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-notification-center"
+description = " notification center"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notification-center"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-nsswitch"
+description = " nsswitch"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nsswitch"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-openrc-scripts"
+description = " openrc scripts"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openrc-scripts"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pam-modules"
+description = " pam modules"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pam-modules"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-password-complexity"
+description = " password complexity"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-password-complexity"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-password-expiration"
+description = " password expiration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-password-expiration"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-password-recovery"
+description = " password recovery"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-password-recovery"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-river"
+description = " river"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-river"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-runit-supervision"
+description = " runit supervision"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-runit-supervision"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-s6-supervision"
+description = " s6 supervision"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-s6-supervision"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-screen-recording"
+description = " screen recording"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-recording"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-screenshot-service"
+description = " screenshot service"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screenshot-service"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-service-dependency"
+description = " service dependency"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-service-dependency"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-service-failure-recovery"
+description = " service failure recovery"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-service-failure-recovery"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-service-health"
+description = " service health"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-service-health"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-service-isolation"
+description = " service isolation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-service-isolation"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-service-resource-limits"
+description = " service resource limits"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-service-resource-limits"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-service-restart"
+description = " service restart"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-service-restart"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-service-sandboxing"
+description = " service sandboxing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-service-sandboxing"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-session-isolation"
+description = " session isolation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-isolation"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-session-lifecycle"
+description = " session lifecycle"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-lifecycle"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-session-switching"
+description = " session switching"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-switching"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-session-tracking"
+description = " session tracking"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-tracking"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-shadow-passwd"
+description = " shadow passwd"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shadow-passwd"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-status-notifier"
+description = " status notifier"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-status-notifier"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-automount"
+description = " systemd automount"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-automount"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-coredump"
+description = " systemd coredump"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-coredump"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-cryptsetup"
+description = " systemd cryptsetup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-cryptsetup"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-dependency-graph"
+description = " systemd dependency graph"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-dependency-graph"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-firstboot"
+description = " systemd firstboot"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-firstboot"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-fsck"
+description = " systemd fsck"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-fsck"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-generator"
+description = " systemd generator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-generator"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-homed"
+description = " systemd homed"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-homed"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-importd"
+description = " systemd importd"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-importd"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-machined"
+description = " systemd machined"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-machined"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-mount"
+description = " systemd mount"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-mount"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-notifications"
+description = " systemd notifications"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-notifications"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-nspawn"
+description = " systemd nspawn"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-nspawn"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-oomd"
+description = " systemd oomd"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-oomd"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-path"
+description = " systemd path"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-path"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-random-seed"
+description = " systemd random seed"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-random-seed"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-repart"
+description = " systemd repart"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-repart"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-resource-control"
+description = " systemd resource control"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-resource-control"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-sockets"
+description = " systemd sockets"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-sockets"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-startup-ordering"
+description = " systemd startup ordering"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-startup-ordering"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-sysctl"
+description = " systemd sysctl"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-sysctl"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-sysusers"
+description = " systemd sysusers"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-sysusers"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-targets"
+description = " systemd targets"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-targets"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-timers"
+description = " systemd timers"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-timers"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-tmpfiles"
+description = " systemd tmpfiles"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-tmpfiles"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-transient"
+description = " systemd transient"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-transient"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-watchdog"
+description = " systemd watchdog"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-watchdog"
+engine = "init_system"
+category = "Init System"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-system-tray"
+description = " system tray"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-tray"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-uid-gid"
+description = " uid gid"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-uid-gid"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ulimit"
+description = " ulimit"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ulimit"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-user-database"
+description = " user database"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-database"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-user-env-init"
+description = " user env init"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-env-init"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-user-expiration"
+description = " user expiration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-expiration"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-user-quota"
+description = " user quota"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-quota"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-user-resource-limits"
+description = " user resource limits"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-resource-limits"
+engine = "user_management"
+category = "User Management"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-virtual-desktop"
+description = " virtual desktop"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virtual-desktop"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-wayfire"
+description = " wayfire"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wayfire"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-wayland-compositor"
+description = " wayland compositor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wayland-compositor"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-weston"
+description = " weston"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-weston"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-widget-framework"
+description = " widget framework"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-widget-framework"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-window-compositor"
+description = " window compositor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-window-compositor"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-window-decoration"
+description = " window decoration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-window-decoration"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-workspace-manager"
+description = " workspace manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-workspace-manager"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-x11-session-management"
+description = " x11 session management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-x11-session-management"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-x11-wm-protocol"
+description = " x11 wm protocol"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-x11-wm-protocol"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-x11-wm-selection"
+description = " x11 wm selection"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-x11-wm-selection"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xdg-desktop-portal"
+description = " xdg desktop portal"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xdg-desktop-portal"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xdg-desktop-portal-gtk"
+description = " xdg desktop portal gtk"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xdg-desktop-portal-gtk"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xdg-desktop-portal-kde"
+description = " xdg desktop portal kde"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xdg-desktop-portal-kde"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
