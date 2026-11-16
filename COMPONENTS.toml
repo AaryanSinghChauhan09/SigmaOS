@@ -29290,3 +29290,91 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Proxy Server", "proxy server", "network proxy"]
+
+[[component]]
+name = "SigmaOS-wayland-display-server"
+description = "Wayland Display Server display server compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wayland-display-server"
+engine = "Rust"
+category = "Display"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Wayland", "display server", "windowing system"]
+
+[[component]]
+name = "SigmaOS-x11-display-server"
+description = "X11 Display Server display server compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-x11-display-server"
+engine = "Rust"
+category = "Display"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["X11", "display server", "windowing system"]
+
+[[component]]
+name = "SigmaOS-unix-shell"
+description = "Unix Shell shell compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unix-shell"
+engine = "Rust"
+category = "Shell"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Unix Shell", "shell", "command line"]
+
+[[component]]
+name = "SigmaOS-busybox"
+description = "BusyBox shell compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-busybox"
+engine = "Rust"
+category = "Shell"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["BusyBox", "shell", "embedded utilities"]
+
+[[component]]
+name = "SigmaOS-toybox"
+description = "ToyBox shell compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-toybox"
+engine = "Rust"
+category = "Shell"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["ToyBox", "shell", "embedded utilities"]
+
+[[component]]
+name = "SigmaOS-bash-shell"
+description = "Bash Shell shell compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bash-shell"
+engine = "Rust"
+category = "Shell"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Bash", "shell", "POSIX shell"]
+
+[[component]]
+name = "SigmaOS-zsh-shell"
+description = "Zsh Shell shell compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zsh-shell"
+engine = "Rust"
+category = "Shell"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Zsh", "shell", "interactive shell"]
+
+[[component]]
+name = "SigmaOS-fish-shell"
+description = "Fish Shell shell compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fish-shell"
+engine = "Rust"
+category = "Shell"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Fish", "shell", "friendly interactive shell"]
