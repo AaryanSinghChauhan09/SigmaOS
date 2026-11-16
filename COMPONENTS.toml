@@ -29026,3 +29026,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Flatpak Manager", "flatpak manager", "flatpak packages"]
+
+[[component]]
+name = "SigmaOS-virtualbox2"
+description = "VirtualBox virtualization compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virtualbox2"
+engine = "Rust"
+category = "Virtualization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["VirtualBox", "virtualization", "VM management"]
+
+[[component]]
+name = "SigmaOS-vmware2"
+description = "VMware virtualization compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vmware2"
+engine = "Rust"
+category = "Virtualization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["VMware", "virtualization", "VM management"]
+
+[[component]]
+name = "SigmaOS-qemu2"
+description = "QEMU virtualization compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qemu2"
+engine = "Rust"
+category = "Virtualization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["QEMU", "virtualization", "VM emulation"]
+
+[[component]]
+name = "SigmaOS-virtual-machine-manager2"
+description = "Virtual Machine Manager virtualization compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virtual-machine-manager2"
+engine = "Rust"
+category = "Virtualization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Virtual Machine Manager", "virtualization", "VM management"]
+
+[[component]]
+name = "SigmaOS-waydroid2"
+description = "Waydroid Android container compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-waydroid2"
+engine = "Rust"
+category = "Virtualization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Waydroid", "Android container", "virtualization"]
+
+[[component]]
+name = "SigmaOS-android-emulator2"
+description = "Android Emulator emulator compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-android-emulator2"
+engine = "Rust"
+category = "Virtualization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Android Emulator", "emulator", "Android development"]
+
+[[component]]
+name = "SigmaOS-ios-emulator2"
+description = "iOS Emulator emulator compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ios-emulator2"
+engine = "Rust"
+category = "Virtualization"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["iOS Emulator", "emulator", "iOS development"]
+
+[[component]]
+name = "SigmaOS-game-engine2"
+description = "Game Engine game engine compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-game-engine2"
+engine = "Rust"
+category = "Game Development"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Game Engine", "game engine", "game development"]
+
+[[component]]
+name = "SigmaOS-unreal-engine2"
+description = "Unreal Engine game engine compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unreal-engine2"
+engine = "Rust"
+category = "Game Development"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Unreal Engine", "game engine", "Epic Games"]
+
+[[component]]
+name = "SigmaOS-unity2"
+description = "Unity game engine compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unity2"
+engine = "Rust"
+category = "Game Development"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Unity", "game engine", "Unity Technologies"]
+
+[[component]]
+name = "SigmaOS-godot2"
+description = "Godot game engine compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-godot2"
+engine = "Rust"
+category = "Game Development"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Godot", "game engine", "open source"]
+
+[[component]]
+name = "SigmaOS-game-development2"
+description = "Game Development game development compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-game-development2"
+engine = "Rust"
+category = "Game Development"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Game Development", "game development", "game tools"]
