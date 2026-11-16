@@ -115,7 +115,32 @@ OVERRIDES = {
     "apollo": ("api_framework", "Web Services"),
     "app-center": ("app_store", "Applications"),
     "app-launcher": ("launcher", "Desktop"),
+    "burp": ("security_tool", "Security"),
+    "cadvisor": ("observability", "Debugging"),
+    "caja": ("file_manager", "File Manager"),
+    "clamav": ("security_tool", "Security"),
+    "collabora-online": ("office_suite", "Office"),
+    "crictl": ("virtualization", "Virtualization"),
+    "curl": ("network_tool", "Networking"),
+    "craft-ani": ("creative_suite", "Office"),
+    "craft-animation": ("creative_suite", "Office"),
+    "craft-art": ("creative_suite", "Office"),
+    "craft-craftlibs": ("creative_suite", "Office"),
+    "craft-deck": ("creative_suite", "Office"),
+    "craft-design": ("creative_suite", "Office"),
+    "craft-effect": ("creative_suite", "Office"),
+    "craft-fig": ("creative_suite", "Office"),
+    "craft-film": ("creative_suite", "Office"),
+    "craft-grid": ("creative_suite", "Office"),
+    "craft-libs": ("creative_suite", "Office"),
+    "craft-light": ("creative_suite", "Office"),
 }
+
+# Prefix rules checked before keyword rules: (prefix, engine, category)
+PREFIX_RULES = [
+    ("data-", "data_engineering", "Data Engineering"),
+    ("craft-", "creative_suite", "Office"),
+]
 
 
 # Keywords that are common English substrings — token match only.
@@ -144,6 +169,9 @@ def classify(name: str):
         n = n[len("sigmaos-"):]
     if n in OVERRIDES:
         return OVERRIDES[n]
+    for prefix, engine, category in PREFIX_RULES:
+        if n.startswith(prefix):
+            return engine, category
     for engine, category, kws in RULES:
         for kw in kws:
             if _kw_match(kw, n):
