@@ -27805,3 +27805,146 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["CrewAI", "AI framework", "multi-agent systems"]
+
+[[component]]
+name = "SigmaOS-chromium4"
+description = "Chromium browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-chromium4"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Chromium", "web browser", "open source browser"]
+
+[[component]]
+name = "SigmaOS-brave-browser2"
+description = "Brave browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-brave-browser2"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Brave", "privacy-focused browser", "web browser"]
+
+[[component]]
+name = "SigmaOS-edge-browser2"
+description = "Edge browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-edge-browser2"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Edge", "Microsoft browser", "web browser"]
+
+[[component]]
+name = "SigmaOS-safari-browser"
+description = "Safari browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-safari-browser"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Safari", "Apple browser", "web browser"]
+
+[[component]]
+name = "SigmaOS-opera-browser"
+description = "Opera browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-opera-browser"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Opera", "web browser", "browser with built-in VPN"]
+
+[[component]]
+name = "SigmaOS-vivaldi-browser"
+description = "Vivaldi browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vivaldi-browser"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Vivaldi", "power user browser", "web browser"]
+
+[[component]]
+name = "SigmaOS-arc-browser"
+description = "Arc browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arc-browser"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Arc", "modern browser", "web browser"]
+
+[[component]]
+name = "SigmaOS-ungoogled-chromium"
+description = "Ungoogled Chromium browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ungoogled-chromium"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Ungoogled Chromium", "privacy-focused Chromium", "web browser"]
+
+[[component]]
+name = "SigmaOS-librewolf"
+description = "LibreWolf browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-librewolf"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["LibreWolf", "privacy-focused Firefox", "web browser"]
+
+[[component]]
+name = "SigmaOS-tor-browser"
+description = "Tor Browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tor-browser"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Tor Browser", "anonymous browsing", "web browser"]
+
+[[component]]
+name = "SigmaOS-waterfox"
+description = "Waterfox browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-waterfox"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Waterfox", "Firefox fork", "web browser"]
+
+[[component]]
+name = "SigmaOS-floorp"
+description = "Floorp browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-floorp"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Floorp", "Firefox fork", "web browser"]
+
+[[component]]
+name = "SigmaOS-zen-browser"
+description = "Zen Browser compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zen-browser"
+engine = "Rust"
+category = "Browser"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Zen Browser", "Firefox fork", "web browser"]
