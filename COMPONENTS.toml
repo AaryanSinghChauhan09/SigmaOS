@@ -26947,3 +26947,14 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["OpenRC", "Gentoo init system", "service management"]
+
+[[component]]
+name = "SigmaOS-runit"
+description = "runit init system compatibility layer with service management, runlevels, dependency resolution, and service supervision"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-runit"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["runit", "Void Linux init system", "service supervision"]
