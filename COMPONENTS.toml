@@ -26936,3 +26936,14 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["GNU libc", "POSIX", "C standard library"]
+
+[[component]]
+name = "SigmaOS-openrc"
+description = "OpenRC init system compatibility layer with service management, runlevels, dependency resolution, and service scripts"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openrc"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["OpenRC", "Gentoo init system", "service management"]
