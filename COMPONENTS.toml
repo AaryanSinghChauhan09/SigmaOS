@@ -30148,3 +30148,102 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-sosreport"
+description = "sosreport: system diagnostic report collection"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sosreport"
+engine = "diagnostics"
+category = "Diagnostics"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libdl"
+description = "libdl: dynamic loading and symbol resolution"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libdl"
+engine = "system_library"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libcrypt"
+description = "libcrypt: password hashing and encryption"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libcrypt"
+engine = "system_library"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libm"
+description = "libm: mathematical functions library"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libm"
+engine = "system_library"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libnss"
+description = "libnss: name service switch database lookup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libnss"
+engine = "system_library"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libpthread"
+description = "libpthread: POSIX thread API compatibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libpthread"
+engine = "system_library"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-librt"
+description = "librt: POSIX realtime extensions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-librt"
+engine = "system_library"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-libsystemd"
+description = "libsystemd: sd-bus/sd-event systemd library API"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libsystemd"
+engine = "system_library"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-vulkan-loader"
+description = "Vulkan loader: ICD and layer dispatch"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vulkan-loader"
+engine = "system_library"
+category = "System Libraries"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
