@@ -30280,3 +30280,58 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-rcu"
+description = "RCU: read-copy-update grace period and callbacks"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rcu"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-module-loader"
+description = "Kernel module loader: load/unload/loadable modules"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-module-loader"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dma"
+description = "DMA: direct memory access buffer management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dma"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-xdp"
+description = "XDP: eXpress Data Path packet processing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xdp"
+engine = "network"
+category = "Networking"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kwin"
+description = "KWin: KDE window manager and compositor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kwin"
+engine = "desktop"
+category = "Desktop"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
