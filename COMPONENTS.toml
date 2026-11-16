@@ -27519,3 +27519,157 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["GUI framework", "application platform", "desktop development"]
+
+[[component]]
+name = "SigmaOS-data-science-tools"
+description = "Data science tools compatibility layer for SigmaOS with data analysis, visualization, and machine learning"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-data-science-tools"
+engine = "Rust"
+category = "Data Science"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["data science", "machine learning", "data analysis"]
+
+[[component]]
+name = "SigmaOS-apache-spark"
+description = "Apache Spark big data processing compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apache-spark"
+engine = "Rust"
+category = "Big Data"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Apache Spark", "big data processing", "distributed computing"]
+
+[[component]]
+name = "SigmaOS-apache-hadoop"
+description = "Apache Hadoop distributed storage compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apache-hadoop"
+engine = "Rust"
+category = "Big Data"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Apache Hadoop", "distributed storage", "HDFS"]
+
+[[component]]
+name = "SigmaOS-postgresql2"
+description = "PostgreSQL database compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-postgresql2"
+engine = "Rust"
+category = "Database"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["PostgreSQL", "relational database", "SQL"]
+
+[[component]]
+name = "SigmaOS-mysql2"
+description = "MySQL database compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mysql2"
+engine = "Rust"
+category = "Database"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["MySQL", "relational database", "SQL"]
+
+[[component]]
+name = "SigmaOS-redis2"
+description = "Redis in-memory data store compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-redis2"
+engine = "Rust"
+category = "Database"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Redis", "in-memory data store", "cache"]
+
+[[component]]
+name = "SigmaOS-qt3"
+description = "Qt GUI framework compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qt3"
+engine = "Rust"
+category = "GUI Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Qt", "GUI framework", "cross-platform"]
+
+[[component]]
+name = "SigmaOS-wxwidgets2"
+description = "WxWidgets GUI framework compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wxwidgets2"
+engine = "Rust"
+category = "GUI Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["WxWidgets", "GUI framework", "cross-platform"]
+
+[[component]]
+name = "SigmaOS-electron2"
+description = "Electron application framework compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-electron2"
+engine = "Rust"
+category = "Application Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Electron", "desktop application framework", "web technologies"]
+
+[[component]]
+name = "SigmaOS-tauri"
+description = "Tauri application framework compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tauri"
+engine = "Rust"
+category = "Application Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Tauri", "desktop application framework", "Rust"]
+
+[[component]]
+name = "SigmaOS-react-native2"
+description = "React Native mobile framework compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-react-native2"
+engine = "Rust"
+category = "Application Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["React Native", "mobile application framework", "cross-platform"]
+
+[[component]]
+name = "SigmaOS-vscode2"
+description = "VS Code editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vscode2"
+engine = "Rust"
+category = "Application"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["VS Code", "code editor", "development environment"]
+
+[[component]]
+name = "SigmaOS-blender2"
+description = "Blender 3D software compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blender2"
+engine = "Rust"
+category = "Application"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Blender", "3D software", "creative tools"]
+
+[[component]]
+name = "SigmaOS-vlc2"
+description = "VLC media player compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vlc2"
+engine = "Rust"
+category = "Application"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["VLC", "media player", "multimedia"]
