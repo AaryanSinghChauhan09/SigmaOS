@@ -58,11 +58,20 @@ copy_grub_config() {
 # Create minimal kernel stub (for demonstration)
 create_kernel_stub() {
     log_info "Creating kernel stub..."
-    # In a real implementation, this would be the actual kernel
-    # For now, we create a placeholder
-    echo "#!/bin/bash" > "${ISO_DIR}/boot/vmlinuz"
-    echo "echo 'SigmaOS Kernel Stub'" >> "${ISO_DIR}/boot/vmlinuz"
-    chmod +x "${ISO_DIR}/boot/vmlinuz"
+    
+    # Check if compiled kernel stub exists
+    if [ -f "${SCRIPT_DIR}/kernel-stub" ]; then
+        log_info "Using compiled kernel stub..."
+        cp "${SCRIPT_DIR}/kernel-stub" "${ISO_DIR}/boot/vmlinuz"
+    else
+        # Fallback to shell script stub
+        log_warn "Compiled kernel not found, using script stub..."
+        echo "#!/bin/bash" > "${ISO_DIR}/boot/vmlinuz"
+        echo "echo 'SigmaOS Kernel Stub v0.1.0'" >> "${ISO_DIR}/boot/vmlinuz"
+        echo "echo 'Kernel initialization started...'" >> "${ISO_DIR}/boot/vmlinuz"
+        echo "echo 'This is a stub - actual kernel implementation in progress'" >> "${ISO_DIR}/boot/vmlinuz"
+        chmod +x "${ISO_DIR}/boot/vmlinuz"
+    fi
 }
 
 # Create initramfs stub
@@ -105,6 +114,10 @@ create_rootfs() {
     log_info "Creating root filesystem..."
     local rootfs_dir="${SCRIPT_DIR}/rootfs-temp"
     
+    # Clean up any existing rootfs
+    rm -rf "${rootfs_dir}"
+    rm -f "${ISO_DIR}/live/filesystem.squashfs"
+    
     mkdir -p "${rootfs_dir}"
     
     # Create basic directory structure
@@ -112,8 +125,11 @@ create_rootfs() {
     mkdir -p "${rootfs_dir}/sbin"
     mkdir -p "${rootfs_dir}/usr/bin"
     mkdir -p "${rootfs_dir}/usr/sbin"
+    mkdir -p "${rootfs_dir}/usr/lib"
     mkdir -p "${rootfs_dir}/etc"
     mkdir -p "${rootfs_dir}/var"
+    mkdir -p "${rootfs_dir}/var/log"
+    mkdir -p "${rootfs_dir}/var/cache"
     mkdir -p "${rootfs_dir}/tmp"
     mkdir -p "${rootfs_dir}/home"
     mkdir -p "${rootfs_dir}/root"
@@ -121,6 +137,8 @@ create_rootfs() {
     mkdir -p "${rootfs_dir}/proc"
     mkdir -p "${rootfs_dir}/sys"
     mkdir -p "${rootfs_dir}/mnt"
+    mkdir -p "${rootfs_dir}/opt"
+    mkdir -p "${rootfs_dir}/srv"
     
     # Create SigmaOS-specific files
     cat > "${rootfs_dir}/etc/os-release" << 'EOF'
@@ -132,14 +150,93 @@ PRETTY_NAME="SigmaOS 0.1.0"
 ID_LIKE=arch
 ANSI_COLOR="38;2;23;147;209"
 HOME_URL="https://github.com/AaryanSinghChauhan09/SigmaOS"
+DOCUMENTATION_URL="https://github.com/AaryanSinghChauhan09/SigmaOS/wiki"
+SUPPORT_URL="https://github.com/AaryanSinghChauhan09/SigmaOS/issues"
+BUG_REPORT_URL="https://github.com/AaryanSinghChauhan09/SigmaOS/issues"
+PRIVACY_POLICY_URL="https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Privacy"
 EOF
     
     cat > "${rootfs_dir}/etc/hostname" << 'EOF'
 sigmaos
 EOF
     
+    # Create package manager configuration
+    mkdir -p "${rootfs_dir}/etc/sigmaos"
+    cat > "${rootfs_dir}/etc/sigmaos/pacman.conf" << 'EOF'
+[options]
+HoldPkg     = pacman glibc
+Architecture = auto
+CheckSpace
+SigLevel    = Required
+LocalFileSigLevel = Optional
+
+[core]
+Include = /etc/sigmaos/pacman.d/mirrorlist
+
+[extra]
+Include = /etc/sigmaos/pacman.d/mirrorlist
+
+[community]
+Include = /etc/sigmaos/pacman.d/mirrorlist
+EOF
+    
+    mkdir -p "${rootfs_dir}/etc/sigmaos/pacman.d"
+    cat > "${rootfs_dir}/etc/sigmaos/pacman.d/mirrorlist" << 'EOF'
+## SigmaOS Repository Mirrors
+Server = https://sigmaos.org/packages/$repo/os/$arch
+Server = https://mirror.sigmaos.org/$repo/os/$arch
+EOF
+    
+    # Create basic package database
+    mkdir -p "${rootfs_dir}/var/lib/pacman/local"
+    cat > "${rootfs_dir}/var/lib/pacman/local/sigmaos-db" << 'EOF'
+%NAME%
+sigmaos-db
+%VERSION%
+0.1.0
+%DESC%
+SigmaOS package database
+%URL%
+https://github.com/AaryanSinghChauhan09/SigmaOS
+%LICENSE%
+MIT
+EOF
+    
+    # Create basic shell scripts
+    cat > "${rootfs_dir}/bin/sigmaos-shell" << 'EOF'
+#!/bin/sh
+# SigmaOS Shell
+echo "SigmaOS Shell v0.1.0"
+echo "Type 'help' for available commands"
+while true; do
+    printf "sigmaos> "
+    read cmd
+    case "$cmd" in
+        help)
+            echo "Available commands:"
+            echo "  help    - Show this help"
+            echo "  version - Show SigmaOS version"
+            echo "  exit    - Exit shell"
+            ;;
+        version)
+            cat /etc/os-release
+            ;;
+        exit)
+            echo "Goodbye!"
+            exit 0
+            ;;
+        "")
+            ;;
+        *)
+            echo "Unknown command: $cmd"
+            ;;
+    esac
+done
+EOF
+    chmod +x "${rootfs_dir}/bin/sigmaos-shell"
+    
     # Create squashfs
-    mksquashfs "${rootfs_dir}" "${ISO_DIR}/live/filesystem.squashfs" -comp xz
+    mksquashfs "${rootfs_dir}" "${ISO_DIR}/live/filesystem.squashfs" -comp xz -noappend
     
     # Cleanup
     rm -rf "${rootfs_dir}"
