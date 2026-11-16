@@ -495,7 +495,6 @@ static int fat_read_to_buf(int kind, uint32_t fat_lba, uint32_t data_lba,
                            uint8_t spc, uint32_t cluster, uint32_t size,
                            uint8_t* dst);
 void resume_user(void);   /* naked asm: restore preempted user ctx */
-static uint32_t find_user_region(void);
 static void enter_user(uint32_t eip, uint32_t esp);
 static uint32_t g_user_base;
 static uint32_t g_user_pd;   /* phys addr of user page directory, 0 = none */
@@ -8801,47 +8800,6 @@ static void show_free(void) {
  * -------------------------------------------------------------------------- */
 static uint32_t g_user_base = 0;
 
-/* First-fit: 4 MiB-aligned physical block inside a type-1 (available) region. */
-static uint32_t find_user_region(void) {
-    if (!g_mb_info) return 0;
-    uint32_t flags = mbi_rd32(MBI_FLAGS);
-    if (!(flags & MB_MMAP_FLAG)) return 0;
-    uint32_t size = mbi_rd32(MBI_MMAP_SIZE);
-    uint32_t addr = mbi_rd32(MBI_MMAP_ADDR);
-    volatile uint8_t* p = (volatile uint8_t*)(size_t)addr;
-    volatile uint8_t* end = p + size;
-    /* kernel image occupies roughly [1MiB, 2MiB); start search at 4MiB */
-    while (p + 24 <= end) {
-        uint32_t esize = *(volatile uint32_t*)p;
-        if (esize < 24 || p + esize > end) break;
-        uint64_t base = ((uint64_t)*(volatile uint32_t*)(p + 8) << 32) | *(volatile uint32_t*)(p + 4);
-        uint64_t len  = ((uint64_t)*(volatile uint32_t*)(p + 16) << 32) | *(volatile uint32_t*)(p + 12);
-        uint32_t type = *(volatile uint32_t*)(p + 20);
-        if (type == 1 && len >= 4096) {
-            uint64_t aligned = (base + 0x3FFFFFu) & ~0x3FFFFFuLL;
-            /* whole 4 MiB PDE must be backed by available RAM */
-            if (aligned >= 0x400000ULL && aligned + 0x400000ULL <= base + len) {
-                /* reject if it overlaps any Multiboot module */
-                uint32_t mcount = mbi_rd32(MBI_MODS_COUNT);
-                uint32_t maddr  = mbi_rd32(MBI_MODS_ADDR);
-                int overlap = 0;
-                for (uint32_t m = 0; m < mcount; m++) {
-                    volatile uint8_t* mp = (volatile uint8_t*)(size_t)maddr + m * 16;
-                    uint32_t ms = *(volatile uint32_t*)(mp + 0);
-                    uint32_t me = *(volatile uint32_t*)(mp + 4);
-                    if (aligned < (uint64_t)me && (uint64_t)ms < aligned + 0x400000ULL) {
-                        overlap = 1;
-                        break;
-                    }
-                }
-                if (!overlap) return (uint32_t)aligned;
-            }
-        }
-        p += esize;
-    }
-    return 0;
-}
-
 /* Resume a preempted user context: rebuild the pushal block, popal,
  * then iret with the saved user frame. Never returns to caller —
  * control comes back via SYS_EXIT/preempt paths. */
@@ -8894,7 +8852,7 @@ static void enter_user(uint32_t eip, uint32_t esp) {
 
 static void show_user(void) {
     if (!g_user_base) {
-        g_user_base = find_user_region();
+        g_user_base = find_free_user_region();
         if (!g_user_base) { kputs("user: no free 4MiB-aligned RAM region found.\n"); return; }
         /* mark the covering PDE user-accessible (PTE_USER = 0x4) */
         uint32_t pde = g_user_base >> 22;
