@@ -34878,3 +34878,839 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-ab-boot-slot"
+description = "ab boot slot component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ab-boot-slot"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-bios-boot"
+description = "bios boot component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bios-boot"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-boot-dependency"
+description = "boot dependency component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot-dependency"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-boot-entry"
+description = "boot entry component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot-entry"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-boot-failure-recovery"
+description = "boot failure recovery component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot-failure-recovery"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-boot-performance"
+description = "boot performance component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot-performance"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-early-userspace"
+description = "early userspace component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-early-userspace"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-extlinux"
+description = "extlinux component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-extlinux"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fallback-boot"
+description = "fallback boot component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fallback-boot"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-initramfs-tools"
+description = "initramfs tools component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-initramfs-tools"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-initrd"
+description = "initrd component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-initrd"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-cmdline"
+description = "kernel cmdline component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-cmdline"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-image"
+description = "kernel image component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-image"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-panic"
+description = "kernel panic component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-panic"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-parameter"
+description = "kernel parameter component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-parameter"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-version"
+description = "kernel version component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-version"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-recovery-boot"
+description = "recovery boot component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-recovery-boot"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rootfs-discovery"
+description = "rootfs discovery component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rootfs-discovery"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rootfs-mount"
+description = "rootfs mount component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rootfs-mount"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-systemd-boot"
+description = "systemd boot component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-boot"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-uefi-boot"
+description = "uefi boot component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-uefi-boot"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-secure-boot-shim"
+description = "secure boot shim component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-secure-boot-shim"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-esp"
+description = "esp component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-esp"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-efi-boot-services"
+description = "efi boot services component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-efi-boot-services"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-efi-variables"
+description = "efi variables component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-efi-variables"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-dracut"
+description = "dracut component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dracut"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-limine"
+description = "limine component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-limine"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kdump"
+description = "kdump component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kdump"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-oom-killer"
+description = "oom killer component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-oom-killer"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cfs"
+description = "cfs component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cfs"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-eevdf"
+description = "eevdf component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-eevdf"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rt-scheduler"
+description = "rt scheduler component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rt-scheduler"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-deadline-scheduler"
+description = "deadline scheduler component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deadline-scheduler"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cpu-affinity"
+description = "cpu affinity component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cpu-affinity"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cpu-frequency"
+description = "cpu frequency component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cpu-frequency"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cpu-hotplug"
+description = "cpu hotplug component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cpu-hotplug"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cpu-idle"
+description = "cpu idle component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cpu-idle"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-numa-management"
+description = "numa management component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-numa-management"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-timer"
+description = "kernel timer component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-timer"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-hrtimer"
+description = "hrtimer component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hrtimer"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tick-management"
+description = "tick management component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tick-management"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-irq-management"
+description = "irq management component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-irq-management"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-softirq"
+description = "softirq component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-softirq"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-tasklets"
+description = "tasklets component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tasklets"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-threads"
+description = "kernel threads component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-threads"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-preemption"
+description = "kernel preemption component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-preemption"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-spinlocks"
+description = "spinlocks component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-spinlocks"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mutexes"
+description = "mutexes component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mutexes"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rwlocks"
+description = "rwlocks component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rwlocks"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rcu-sync"
+description = "rcu sync component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rcu-sync"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-semaphores"
+description = "kernel semaphores component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-semaphores"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-atomic-counters"
+description = "atomic counters component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-atomic-counters"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-wait-queues"
+description = "wait queues component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wait-queues"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-signals"
+description = "kernel signals component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-signals"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-ipc-shm"
+description = "ipc shm component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ipc-shm"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-msg-queues"
+description = "msg queues component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-msg-queues"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pipes-uds"
+description = "pipes uds component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pipes-uds"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-page-cache"
+description = "page cache component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-page-cache"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-buffer-cache"
+description = "buffer cache component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-buffer-cache"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-memory-compaction"
+description = "memory compaction component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-memory-compaction"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-memory-reclaim"
+description = "memory reclaim component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-memory-reclaim"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-swap"
+description = "kernel swap component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-swap"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-memory-accounting"
+description = "kernel memory accounting component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-memory-accounting"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-object"
+description = "kernel object component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-object"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-slab-cache"
+description = "slab cache component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slab-cache"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-security-hooks"
+description = "kernel security hooks component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-security-hooks"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-notifier-chains"
+description = "notifier chains component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notifier-chains"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-device-model"
+description = "device model component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-device-model"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-sysfs-device-model"
+description = "sysfs device model component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sysfs-device-model"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-module-deps"
+description = "module deps component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-module-deps"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-module-signing"
+description = "module signing component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-module-signing"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-module-blacklist"
+description = "module blacklist component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-module-blacklist"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-core-dump"
+description = "core dump component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-core-dump"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-diagnostics"
+description = "kernel diagnostics component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-diagnostics"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kconfig"
+description = "kconfig component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kconfig"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kbuild"
+description = "kbuild component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kbuild"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
