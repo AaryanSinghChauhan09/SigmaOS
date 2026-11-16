@@ -30060,3 +30060,91 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-top"
+description = "top process viewer: live process table snapshots"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-top"
+engine = "cli"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-chgrp"
+description = "chgrp: change group ownership of files"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-chgrp"
+engine = "cli"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-umask"
+description = "umask: file mode creation mask policy"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-umask"
+engine = "cli"
+category = "System Utilities"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-aliases"
+description = "Shell aliases: command shortcut expansion"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-aliases"
+engine = "shell"
+category = "Shell"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-env-vars"
+description = "Environment variables: shell variable store"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-env-vars"
+engine = "shell"
+category = "Shell"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pipes"
+description = "Pipes: inter-process data channels"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pipes"
+engine = "shell"
+category = "Shell"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-redirection"
+description = "Redirection: stdin/stdout/stderr stream routing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-redirection"
+engine = "shell"
+category = "Shell"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-shell-script"
+description = "Shell scripts: script definition and execution"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shell-script"
+engine = "shell"
+category = "Shell"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
