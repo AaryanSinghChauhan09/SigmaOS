@@ -26958,3 +26958,14 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["runit", "Void Linux init system", "service supervision"]
+
+[[component]]
+name = "SigmaOS-s6"
+description = "s6 init system compatibility layer with service management, supervision trees, dependency resolution, and service supervision"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-s6"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["s6", "skarnet init system", "service supervision"]
