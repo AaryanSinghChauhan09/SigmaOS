@@ -6005,14 +6005,10 @@ __asm__(
     "    addl $4, %esp\n"               /* drop saved frame ptr */
     "    movl g_isr_frame_dw, %eax\n"
     "    lea (%esp,%eax,4), %esp\n"     /* drop whole exception frame */
-    "    pushl $0x10\n"
-    "    movl g_resume_esp, %eax\n"
-    "    pushl %eax\n"
-    "    pushl $0x202\n"
-    "    pushl $0x08\n"
-    "    movl g_resume_eip, %eax\n"
-    "    pushl %eax\n"
-    "    iret\n"
+    /* ring0 resume: iret cannot switch esp at same privilege, so restore
+     * the saved kernel stack and jump to the saved kernel eip directly */
+    "    movl g_resume_esp, %esp\n"
+    "    jmp *g_resume_eip\n"
     "1:\n"
     "    cli\n"
     "    hlt\n"
@@ -6065,14 +6061,10 @@ __asm__(
     "    cmpl $0, g_user_dead\n"
     "    je 1f\n"
     "    addl $20, %esp\n"
-    "    pushl $0x10\n"               /* kernel data selector */
-    "    movl g_resume_esp, %eax\n"
-    "    pushl %eax\n"
-    "    pushl $0x202\n"              /* eflags: IF=1 */
-    "    pushl $0x08\n"               /* kernel code selector */
-    "    movl g_resume_eip, %eax\n"
-    "    pushl %eax\n"
-    "    iret\n"
+    /* ring0 resume: restore saved kernel stack, jump to saved kernel eip
+     * (iret cannot switch esp at same privilege) */
+    "    movl g_resume_esp, %esp\n"
+    "    jmp *g_resume_eip\n"
     "1:\n"
     "    iret\n"
     /* catch-all for unhandled vectors 48-255 */
@@ -6093,18 +6085,20 @@ __asm__(
     "    popal\n"
     "    addl $4, %esp\n"      /* drop pushed vector number -> cpu frame top */
     /* Preemption divert: handler may set g_preempt_pending (user-mode tick).
-     * Drop the 5-dword user iret frame, return to kernel resume context. */
+     * Only divert when the IRQ actually interrupted ring-3 code — the flag
+     * stays set while the user program is suspended awaiting 'fg', and a
+     * kernel-mode IRQ frame is only 3 dwords (no esp/ss), not 5. */
     "    cmpl $0, g_preempt_pending\n"
     "    je 2f\n"
+    "    movl 4(%esp), %eax\n"      /* interrupted cs */
+    "    testl $3, %eax\n"
+    "    jz 2f\n"                    /* kernel-mode IRQ: plain iret */
     "    addl $20, %esp\n"
-    "    pushl $0x10\n"
-    "    movl g_resume_esp, %eax\n"
-    "    pushl %eax\n"
-    "    pushl $0x202\n"
-    "    pushl $0x08\n"
-    "    movl g_resume_eip, %eax\n"
-    "    pushl %eax\n"
-    "    iret\n"
+    /* ring0 resume: restore saved kernel stack, jump to saved kernel eip
+     * (iret cannot switch esp at same privilege) */
+    "    movl g_resume_esp, %esp\n"
+    "    sti\n"                      /* irq_common_entry ran cli; restore IF */
+    "    jmp *g_resume_eip\n"
     "2:\n"
     "    iret\n"
     ".macro IRQ_STUB n\n"
