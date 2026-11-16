@@ -27673,3 +27673,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["VLC", "media player", "multimedia"]
+
+[[component]]
+name = "SigmaOS-docker3"
+description = "Docker container platform compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-docker3"
+engine = "Rust"
+category = "Container"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Docker", "container platform", "containerization"]
+
+[[component]]
+name = "SigmaOS-warp2"
+description = "Warp terminal emulator compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-warp2"
+engine = "Rust"
+category = "Terminal"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Warp", "terminal emulator", "modern terminal"]
+
+[[component]]
+name = "SigmaOS-cline2"
+description = "Cline AI coding assistant compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cline2"
+engine = "Rust"
+category = "AI Tool"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Cline", "AI coding assistant", "development tool"]
+
+[[component]]
+name = "SigmaOS-codex-cli2"
+description = "CodexCLI AI coding tool compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-codex-cli2"
+engine = "Rust"
+category = "AI Tool"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["CodexCLI", "AI coding tool", "development tool"]
+
+[[component]]
+name = "SigmaOS-crewai2"
+description = "CrewAI AI agent framework compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crewai2"
+engine = "Rust"
+category = "AI Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["CrewAI", "AI agent framework", "multi-agent systems"]
+
+[[component]]
+name = "SigmaOS-deepseek-coder"
+description = "DeepSeek Coder AI model compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deepseek-coder"
+engine = "Rust"
+category = "AI Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["DeepSeek Coder", "AI model", "code generation"]
+
+[[component]]
+name = "SigmaOS-hermes-agent"
+description = "Hermes Agent AI agent compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hermes-agent"
+engine = "Rust"
+category = "AI Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Hermes Agent", "AI agent", "autonomous systems"]
+
+[[component]]
+name = "SigmaOS-langchain"
+description = "LangChain AI framework compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-langchain"
+engine = "Rust"
+category = "AI Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["LangChain", "AI framework", "LLM applications"]
+
+[[component]]
+name = "SigmaOS-openclaw"
+description = "OpenClaw AI agent compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openclaw"
+engine = "Rust"
+category = "AI Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["OpenClaw", "AI agent", "autonomous systems"]
+
+[[component]]
+name = "SigmaOS-notepad-plus-plus2"
+description = "Notepad++ text editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notepad-plus-plus2"
+engine = "Rust"
+category = "Text Editor"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Notepad++", "text editor", "code editor"]
+
+[[component]]
+name = "SigmaOS-command-code2"
+description = "Command Code AI tool compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-command-code2"
+engine = "Rust"
+category = "AI Tool"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Command Code", "AI tool", "development tool"]
+
+[[component]]
+name = "SigmaOS-crew-ai2"
+description = "CrewAI AI framework compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crew-ai2"
+engine = "Rust"
+category = "AI Framework"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["CrewAI", "AI framework", "multi-agent systems"]
