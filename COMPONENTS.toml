@@ -29675,3 +29675,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Kivy", "platform", "mobile"]
+
+[[component]]
+name = "SigmaOS-bevy"
+description = "Bevy game engine runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bevy"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Bevy", "game engine", "Rust"]
+
+[[component]]
+name = "SigmaOS-godot-rust"
+description = "Godot Rust runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-godot-rust"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Godot Rust", "game engine", "Rust"]
+
+[[component]]
+name = "SigmaOS-threejs"
+description = "Three.js graphics runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-threejs"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Three.js", "graphics", "JavaScript"]
+
+[[component]]
+name = "SigmaOS-wgpu"
+description = "wgpu graphics runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wgpu"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["wgpu", "graphics", "WebGPU"]
+
+[[component]]
+name = "SigmaOS-ash2"
+description = "Ash Vulkan runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ash2"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Ash", "Vulkan", "graphics"]
+
+[[component]]
+name = "SigmaOS-java"
+description = "Java runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-java"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Java", "runtime", "JVM"]
+
+[[component]]
+name = "SigmaOS-kotlin2"
+description = "Kotlin runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kotlin2"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Kotlin", "runtime", "JVM"]
+
+[[component]]
+name = "SigmaOS-swift2"
+description = "Swift runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-swift2"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Swift", "runtime", "Apple"]
+
+[[component]]
+name = "SigmaOS-dotnet2"
+description = ".NET runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dotnet2"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = [".NET", "runtime", "Microsoft"]
+
+[[component]]
+name = "SigmaOS-csharp"
+description = "C# runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-csharp"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["C#", "runtime", ".NET"]
+
+[[component]]
+name = "SigmaOS-fsharp2"
+description = "F# runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fsharp2"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["F#", "runtime", ".NET"]
+
+[[component]]
+name = "SigmaOS-vbnet"
+description = "VB.NET runtime compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vbnet"
+engine = "Rust"
+category = "Runtime"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["VB.NET", "runtime", ".NET"]
