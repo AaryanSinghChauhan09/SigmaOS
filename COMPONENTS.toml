@@ -27233,3 +27233,223 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["libstdc++", "C++ standard library", "GNU C++"]
+
+[[component]]
+name = "SigmaOS-freebsd-kernel"
+description = "FreeBSD kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-freebsd-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["FreeBSD", "BSD kernel", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-netbsd-kernel"
+description = "NetBSD kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-netbsd-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["NetBSD", "BSD kernel", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-openbsd-kernel"
+description = "OpenBSD kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openbsd-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["OpenBSD", "BSD kernel", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-dragonfly-kernel"
+description = "DragonFlyBSD kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dragonfly-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["DragonFlyBSD", "BSD kernel", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-haiku-kernel"
+description = "Haiku kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-haiku-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Haiku", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-minix-kernel"
+description = "Minix kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-minix-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Minix", "microkernel", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-reactos-kernel"
+description = "ReactOS kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-reactos-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["ReactOS", "Windows-compatible OS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-redox-kernel"
+description = "RedoxOS kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-redox-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["RedoxOS", "Rust-based OS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-serenityos-kernel"
+description = "SerenityOS kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-serenityos-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["SerenityOS", "Unix-like OS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-xnu-kernel"
+description = "XNU kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xnu-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["XNU", "macOS kernel", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-zircon-kernel"
+description = "Zircon kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zircon-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Zircon", "Fuchsia OS kernel", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-illumos-kernel"
+description = "illumos kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-illumos-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["illumos", "Solaris-derived OS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-genode-kernel"
+description = "Genode kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-genode-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Genode", "capability-based OS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-hurd-kernel"
+description = "GNU Hurd kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hurd-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GNU Hurd", "GNU OS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-freertos-kernel"
+description = "FreeRTOS kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-freertos-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["FreeRTOS", "real-time OS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-zephyr-kernel"
+description = "Zephyr kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zephyr-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Zephyr", "embedded RTOS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-nuttx-kernel"
+description = "NuttX kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nuttx-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["NuttX", "embedded RTOS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-openharmony-kernel"
+description = "OpenHarmony kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openharmony-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["OpenHarmony", "HarmonyOS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-plan9-kernel"
+description = "Plan 9 kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plan9-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Plan 9", "distributed OS", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-linux-libre-kernel"
+description = "Linux-libre kernel compatibility layer for SigmaOS with kernel abstractions and system calls"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-linux-libre-kernel"
+engine = "Rust"
+category = "Kernel"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Linux-libre", "free Linux kernel", "operating system kernel"]
