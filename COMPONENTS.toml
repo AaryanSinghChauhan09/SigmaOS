@@ -29444,3 +29444,124 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["GIO", "I/O library", "file operations"]
+
+[[component]]
+name = "SigmaOS-ghostbsd"
+description = "GhostBSD distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ghostbsd"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GhostBSD", "BSD distribution", "desktop BSD"]
+
+[[component]]
+name = "SigmaOS-furybsd"
+description = "FuryBSD distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-furybsd"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["FuryBSD", "BSD distribution", "desktop BSD"]
+
+[[component]]
+name = "SigmaOS-karmabsd"
+description = "KarmaBSD distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-karmabsd"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["KarmaBSD", "BSD distribution", "desktop BSD"]
+
+[[component]]
+name = "SigmaOS-libertybsd"
+description = "LibertyBSD distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libertybsd"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["LibertyBSD", "BSD distribution", "security"]
+
+[[component]]
+name = "SigmaOS-midnightbsd"
+description = "MidnightBSD distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-midnightbsd"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["MidnightBSD", "BSD distribution", "desktop BSD"]
+
+[[component]]
+name = "SigmaOS-nomadbsd"
+description = "NomadBSD distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nomadbsd"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["NomadBSD", "BSD distribution", "portable BSD"]
+
+[[component]]
+name = "SigmaOS-starbsd"
+description = "StarBSD distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-starbsd"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["StarBSD", "BSD distribution", "desktop BSD"]
+
+[[component]]
+name = "SigmaOS-cachyos"
+description = "CachyOS distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cachyos"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["CachyOS", "Arch derivative", "performance"]
+
+[[component]]
+name = "SigmaOS-endeavouros"
+description = "EndeavourOS distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-endeavouros"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["EndeavourOS", "Arch derivative", "user-friendly"]
+
+[[component]]
+name = "SigmaOS-kali"
+description = "Kali distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kali"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Kali", "penetration testing", "security"]
+
+[[component]]
+name = "SigmaOS-parrot"
+description = "Parrot distribution compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-parrot"
+engine = "Rust"
+category = "Distribution"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Parrot", "security", "privacy"]
