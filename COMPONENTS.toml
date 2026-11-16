@@ -29158,3 +29158,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Game Development", "game development", "game tools"]
+
+[[component]]
+name = "SigmaOS-security-scanner2"
+description = "Security Scanner security scanner compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security-scanner2"
+engine = "Rust"
+category = "Security"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Security Scanner", "security scanner", "vulnerability scanning"]
+
+[[component]]
+name = "SigmaOS-antivirus2"
+description = "Antivirus antivirus compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-antivirus2"
+engine = "Rust"
+category = "Security"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Antivirus", "antivirus", "malware protection"]
+
+[[component]]
+name = "SigmaOS-firewall2"
+description = "Firewall firewall compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firewall2"
+engine = "Rust"
+category = "Security"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Firewall", "firewall", "network security"]
+
+[[component]]
+name = "SigmaOS-vpn2"
+description = "VPN vpn compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vpn2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["VPN", "vpn", "virtual private network"]
+
+[[component]]
+name = "SigmaOS-ssh-server2"
+description = "SSH Server ssh server compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ssh-server2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["SSH Server", "ssh server", "remote access"]
+
+[[component]]
+name = "SigmaOS-ssh-client2"
+description = "SSH Client ssh client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ssh-client2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["SSH Client", "ssh client", "remote access"]
+
+[[component]]
+name = "SigmaOS-ftp-server2"
+description = "FTP Server ftp server compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ftp-server2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["FTP Server", "ftp server", "file transfer"]
+
+[[component]]
+name = "SigmaOS-ftp-client2"
+description = "FTP Client ftp client compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ftp-client2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["FTP Client", "ftp client", "file transfer"]
+
+[[component]]
+name = "SigmaOS-web-server2"
+description = "Web Server web server compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-web-server2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Web Server", "web server", "HTTP server"]
+
+[[component]]
+name = "SigmaOS-database-server2"
+description = "Database Server database server compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-database-server2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Database Server", "database server", "data storage"]
+
+[[component]]
+name = "SigmaOS-mail-server2"
+description = "Mail Server mail server compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mail-server2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Mail Server", "mail server", "email services"]
+
+[[component]]
+name = "SigmaOS-proxy-server2"
+description = "Proxy Server proxy server compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-proxy-server2"
+engine = "Rust"
+category = "Network"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Proxy Server", "proxy server", "network proxy"]
