@@ -28894,3 +28894,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Screen Recorder", "screen recorder", "screen capture"]
+
+[[component]]
+name = "SigmaOS-gpu-manager2"
+description = "GPU Manager gpu manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gpu-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GPU Manager", "gpu manager", "hardware management"]
+
+[[component]]
+name = "SigmaOS-power-manager2"
+description = "Power Manager power manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Power Manager", "power manager", "power management"]
+
+[[component]]
+name = "SigmaOS-thermal-manager2"
+description = "Thermal Manager thermal manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thermal-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Thermal Manager", "thermal manager", "thermal management"]
+
+[[component]]
+name = "SigmaOS-firmware-manager2"
+description = "Firmware Manager firmware manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firmware-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Firmware Manager", "firmware manager", "firmware management"]
+
+[[component]]
+name = "SigmaOS-driver-manager2"
+description = "Driver Manager driver manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-driver-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Driver Manager", "driver manager", "driver management"]
+
+[[component]]
+name = "SigmaOS-module-manager2"
+description = "Module Manager module manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-module-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Module Manager", "module manager", "module management"]
+
+[[component]]
+name = "SigmaOS-kernel-manager2"
+description = "Kernel Manager kernel manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Kernel Manager", "kernel manager", "kernel management"]
+
+[[component]]
+name = "SigmaOS-package-manager2"
+description = "Package Manager package manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Package Manager", "package manager", "package management"]
+
+[[component]]
+name = "SigmaOS-software-updater2"
+description = "Software Updater software updater compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-updater2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Software Updater", "software updater", "software updates"]
+
+[[component]]
+name = "SigmaOS-software-center2"
+description = "Software Center software center compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-center2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Software Center", "software center", "software discovery"]
+
+[[component]]
+name = "SigmaOS-app-store2"
+description = "App Store app store compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-app-store2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["App Store", "app store", "application distribution"]
+
+[[component]]
+name = "SigmaOS-flatpak-manager2"
+description = "Flatpak Manager flatpak manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flatpak-manager2"
+engine = "Rust"
+category = "System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Flatpak Manager", "flatpak manager", "flatpak packages"]
