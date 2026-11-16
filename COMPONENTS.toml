@@ -35714,3 +35714,69 @@ inspirations = []
 visibility = "public"
 depends_on = []
 
+[[component]]
+name = "SigmaOS-bootloader-theme"
+description = "bootloader theme manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bootloader-theme"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-uefi-boot-manager"
+description = "UEFI boot manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-uefi-boot-manager"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-grub-config-manager"
+description = "GRUB configuration manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grub-config-manager"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-boot-performance-analyzer"
+description = "boot performance analyzer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-boot-performance-analyzer"
+engine = "boot"
+category = "Boot"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-panic-handler"
+description = "kernel panic handler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-panic-handler"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kernel-version-selection"
+description = "kernel version selection"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-version-selection"
+engine = "kernel_subsystem"
+category = "Kernel"
+language = "rust"
+inspirations = []
+visibility = "public"
+depends_on = []
+
