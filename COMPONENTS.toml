@@ -27948,3 +27948,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Zen Browser", "Firefox fork", "web browser"]
+
+[[component]]
+name = "SigmaOS-gimp2"
+description = "GIMP image editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gimp2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GIMP", "image editor", "GNU Image Manipulation Program"]
+
+[[component]]
+name = "SigmaOS-inkscape2"
+description = "Inkscape vector editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-inkscape2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Inkscape", "vector graphics editor", "SVG editor"]
+
+[[component]]
+name = "SigmaOS-krita2"
+description = "Krita digital painting compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-krita2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Krita", "digital painting", "illustration"]
+
+[[component]]
+name = "SigmaOS-audacity2"
+description = "Audacity audio editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-audacity2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Audacity", "audio editor", "sound recording"]
+
+[[component]]
+name = "SigmaOS-obs-studio2"
+description = "OBS Studio screen recorder compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-obs-studio2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["OBS Studio", "screen recorder", "live streaming"]
+
+[[component]]
+name = "SigmaOS-handbrake2"
+description = "HandBrake media converter compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-handbrake2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["HandBrake", "media converter", "video transcoding"]
+
+[[component]]
+name = "SigmaOS-ffmpeg2"
+description = "FFmpeg media converter compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ffmpeg2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["FFmpeg", "media converter", "audio/video processing"]
+
+[[component]]
+name = "SigmaOS-shotcut2"
+description = "Shotcut video editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shotcut2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Shotcut", "video editor", "open source video editor"]
+
+[[component]]
+name = "SigmaOS-kdenlive2"
+description = "Kdenlive video editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kdenlive2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Kdenlive", "video editor", "KDE video editor"]
+
+[[component]]
+name = "SigmaOS-lightworks2"
+description = "Lightworks video editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lightworks2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Lightworks", "video editor", "professional video editor"]
+
+[[component]]
+name = "SigmaOS-openshot2"
+description = "OpenShot video editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openshot2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["OpenShot", "video editor", "open source video editor"]
+
+[[component]]
+name = "SigmaOS-pitivi2"
+description = "Pitivi video editor compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pitivi2"
+engine = "Rust"
+category = "Creative"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Pitivi", "video editor", "GNOME video editor"]
