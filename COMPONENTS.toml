@@ -28498,3 +28498,135 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Asana", "project management", "task tracking"]
+
+[[component]]
+name = "SigmaOS-calibre2"
+description = "Calibre e-book manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calibre2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Calibre", "e-book manager", "library"]
+
+[[component]]
+name = "SigmaOS-zotero2"
+description = "Zotero reference manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zotero2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Zotero", "reference manager", "citation"]
+
+[[component]]
+name = "SigmaOS-mendeley2"
+description = "Mendeley reference manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mendeley2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Mendeley", "reference manager", "citation"]
+
+[[component]]
+name = "SigmaOS-endnote2"
+description = "EndNote reference manager compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-endnote2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["EndNote", "reference manager", "citation"]
+
+[[component]]
+name = "SigmaOS-dictionary2"
+description = "Dictionary dictionary compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dictionary2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Dictionary", "dictionary", "thesaurus"]
+
+[[component]]
+name = "SigmaOS-translate2"
+description = "Translate translation compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-translate2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Translate", "translation", "language"]
+
+[[component]]
+name = "SigmaOS-calculator2"
+description = "Calculator calculator compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calculator2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Calculator", "calculator", "computation"]
+
+[[component]]
+name = "SigmaOS-weather2"
+description = "Weather weather compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-weather2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Weather", "weather", "forecast"]
+
+[[component]]
+name = "SigmaOS-clock2"
+description = "Clock clock compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clock2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Clock", "clock", "time"]
+
+[[component]]
+name = "SigmaOS-timer2"
+description = "Timer timer compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timer2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Timer", "timer", "countdown"]
+
+[[component]]
+name = "SigmaOS-stopwatch2"
+description = "Stopwatch stopwatch compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stopwatch2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Stopwatch", "stopwatch", "timing"]
+
+[[component]]
+name = "SigmaOS-pomodoro2"
+description = "Pomodoro pomodoro compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pomodoro2"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Pomodoro", "pomodoro", "productivity"]
