@@ -27453,3 +27453,69 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Linux-libre", "free Linux kernel", "operating system kernel"]
+
+[[component]]
+name = "SigmaOS-betteroffice"
+description = "BetterOffice office suite compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-betteroffice"
+engine = "Rust"
+category = "Office"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["BetterOffice", "office suite", "productivity"]
+
+[[component]]
+name = "SigmaOS-genoffice2"
+description = "GenOffice office suite compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-genoffice2"
+engine = "Rust"
+category = "Office"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GenOffice", "office suite", "productivity"]
+
+[[component]]
+name = "SigmaOS-libreoffice2"
+description = "LibreOffice compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice2"
+engine = "Rust"
+category = "Office"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["LibreOffice", "open source office suite", "productivity"]
+
+[[component]]
+name = "SigmaOS-onlyoffice2"
+description = "OnlyOffice compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice2"
+engine = "Rust"
+category = "Office"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["OnlyOffice", "office suite", "productivity"]
+
+[[component]]
+name = "SigmaOS-rdbms"
+description = "RDBMS compatibility layer for SigmaOS with database management and query execution"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms"
+engine = "Rust"
+category = "Database"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["RDBMS", "database management", "SQL"]
+
+[[component]]
+name = "SigmaOS-platform2"
+description = "Platform compatibility layer for SigmaOS with GUI framework and application platform"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-platform2"
+engine = "Rust"
+category = "Platform"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GUI framework", "application platform", "desktop development"]
