@@ -26903,3 +26903,36 @@ inspirations = ["Arch Linux", "pacman", "AUR", "package management", "dependency
 visibility = "public"
 depends_on = []
 
+
+[[component]]
+name = "SigmaOS-systemd-compat"
+description = "systemd compatibility layer with service management, unit file parsing, target management, journal logging, and cgroup support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-compat"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["systemd", "init systems", "service management"]
+
+[[component]]
+name = "SigmaOS-coreutils"
+description = "GNU Coreutils compatibility layer with file, text, system, archive, process, network, and terminal utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-coreutils"
+engine = "Rust"
+category = "Utilities"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GNU Coreutils", "POSIX", "Linux utilities"]
+
+[[component]]
+name = "SigmaOS-glibc-compat"
+description = "GNU libc compatibility layer with standard C library functions, POSIX compliance, system calls, thread support, and dynamic loading"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-glibc-compat"
+engine = "Rust"
+category = "Libraries"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GNU libc", "POSIX", "C standard library"]
