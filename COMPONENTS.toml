@@ -28080,3 +28080,157 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["Pitivi", "video editor", "GNOME video editor"]
+
+[[component]]
+name = "SigmaOS-wireshark2"
+description = "Wireshark network analyzer compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wireshark2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Wireshark", "network analyzer", "packet analysis"]
+
+[[component]]
+name = "SigmaOS-nmap2"
+description = "Nmap network scanner compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nmap2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Nmap", "network scanner", "security auditing"]
+
+[[component]]
+name = "SigmaOS-metabase2"
+description = "Metabase business intelligence compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-metabase2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Metabase", "business intelligence", "data visualization"]
+
+[[component]]
+name = "SigmaOS-airbyte2"
+description = "Airbyte data integration compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-airbyte2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Airbyte", "data integration", "ETL"]
+
+[[component]]
+name = "SigmaOS-dbt2"
+description = "dbt data transformation compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dbt2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["dbt", "data transformation", "data modeling"]
+
+[[component]]
+name = "SigmaOS-tableau2"
+description = "Tableau data visualization compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tableau2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Tableau", "data visualization", "business intelligence"]
+
+[[component]]
+name = "SigmaOS-powerbi2"
+description = "PowerBI business intelligence compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-powerbi2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["PowerBI", "business intelligence", "Microsoft"]
+
+[[component]]
+name = "SigmaOS-superset2"
+description = "Superset data visualization compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-superset2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Superset", "data visualization", "Apache"]
+
+[[component]]
+name = "SigmaOS-knime2"
+description = "KNIME data analytics compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-knime2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["KNIME", "data analytics", "machine learning"]
+
+[[component]]
+name = "SigmaOS-jupyter2"
+description = "Jupyter notebook compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jupyter2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Jupyter", "notebook", "interactive computing"]
+
+[[component]]
+name = "SigmaOS-rstudio2"
+description = "RStudio IDE compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rstudio2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["RStudio", "IDE", "R programming"]
+
+[[component]]
+name = "SigmaOS-sas2"
+description = "SAS statistical software compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sas2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["SAS", "statistical software", "data analysis"]
+
+[[component]]
+name = "SigmaOS-ms-access2"
+description = "MS Access database compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ms-access2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["MS Access", "database", "Microsoft"]
+
+[[component]]
+name = "SigmaOS-ms-excel2"
+description = "MS Excel spreadsheet compatibility layer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ms-excel2"
+engine = "Rust"
+category = "Data Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["MS Excel", "spreadsheet", "Microsoft"]
