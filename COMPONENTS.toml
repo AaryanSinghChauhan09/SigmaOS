@@ -26980,3 +26980,256 @@ languages = ["Rust"]
 dependencies = []
 public = true
 inspirations = ["GNOME", "Arch Linux", "https://wiki.gnome.org"]
+
+[[component]]
+name = "SigmaOS-dinit"
+description = "dinit init system compatibility layer with service management, supervision, and dependency resolution"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dinit"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["dinit", "service supervision", "dependency-based init"]
+
+[[component]]
+name = "SigmaOS-gnu-shepherd"
+description = "GNU Shepherd init system compatibility layer with Guile-based configuration and provision-based dependencies"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-shepherd"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GNU Shepherd", "Guile", "provision-based dependencies"]
+
+[[component]]
+name = "SigmaOS-sysvinit2"
+description = "SysVinit init system compatibility layer with runlevels and init scripts"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sysvinit2"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["SysVinit", "runlevels", "init scripts"]
+
+[[component]]
+name = "SigmaOS-bsd-rc2"
+description = "BSD rc.d init system compatibility layer with service management and rc scripts"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-rc2"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["BSD rc.d", "FreeBSD init", "service management"]
+
+[[component]]
+name = "SigmaOS-busybox-init2"
+description = "BusyBox init compatibility layer with simple init and service management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-busybox-init2"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["BusyBox init", "minimal init", "embedded systems"]
+
+[[component]]
+name = "SigmaOS-sixty-six2"
+description = "66 init system compatibility layer with service management and s6-66 compatibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sixty-six2"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["66 init", "s6-66", "service supervision"]
+
+[[component]]
+name = "SigmaOS-finit2"
+description = "Finit init system compatibility layer with fast init and service management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-finit2"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Finit", "fast init", "service management"]
+
+[[component]]
+name = "SigmaOS-epoch2"
+description = "Epoch init system compatibility layer with service management and dependency tracking"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-epoch2"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Epoch init", "dependency tracking", "service management"]
+
+[[component]]
+name = "SigmaOS-dumb-init2"
+description = "dumb-init compatibility layer with minimal init and PID 1 reaping"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dumb-init2"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["dumb-init", "minimal init", "PID 1 reaping"]
+
+[[component]]
+name = "SigmaOS-upstart2"
+description = "Upstart init system compatibility layer with event-based init and job management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-upstart2"
+engine = "Rust"
+category = "Init System"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Upstart", "event-based init", "job management"]
+
+[[component]]
+name = "SigmaOS-kde-desktop2"
+description = "KDE desktop environment compatibility layer with session, windows, settings, and panel"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kde-desktop2"
+engine = "Rust"
+category = "Desktop/UI"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["KDE", "Plasma", "desktop environment"]
+
+[[component]]
+name = "SigmaOS-xfce-desktop2"
+description = "Xfce desktop environment compatibility layer with session, windows, settings, and panel"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfce-desktop2"
+engine = "Rust"
+category = "Desktop/UI"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["Xfce", "desktop environment", "lightweight"]
+
+[[component]]
+name = "SigmaOS-dnf-compat3"
+description = "DNF package management compatibility layer with RPM package management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dnf-compat3"
+engine = "Rust"
+category = "Package Management"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["DNF", "Fedora", "RPM package management"]
+
+[[component]]
+name = "SigmaOS-yum-compat3"
+description = "YUM package management compatibility layer with RPM package management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yum-compat3"
+engine = "Rust"
+category = "Package Management"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["YUM", "CentOS", "RPM package management"]
+
+[[component]]
+name = "SigmaOS-bash3"
+description = "BASH shell compatibility layer with shell scripting and command execution"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bash3"
+engine = "Rust"
+category = "Shell"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["BASH", "shell scripting", "command execution"]
+
+[[component]]
+name = "SigmaOS-gnu-binutils2"
+description = "GNU Binutils compatibility layer with assembler, linker, and binary tools"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-binutils2"
+engine = "Rust"
+category = "GNU Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["GNU Binutils", "assembler", "linker"]
+
+[[component]]
+name = "SigmaOS-pthread2"
+description = "Pthread library compatibility layer with thread management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pthread2"
+engine = "Rust"
+category = "GNU Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["pthread", "thread management", "POSIX threads"]
+
+[[component]]
+name = "SigmaOS-libdl2"
+description = "Libdl library compatibility layer with dynamic loading"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libdl2"
+engine = "Rust"
+category = "GNU Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["libdl", "dynamic loading", "shared libraries"]
+
+[[component]]
+name = "SigmaOS-libm2"
+description = "Libm library compatibility layer with math functions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libm2"
+engine = "Rust"
+category = "GNU Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["libm", "math functions", "mathematical library"]
+
+[[component]]
+name = "SigmaOS-librt2"
+description = "Librt library compatibility layer with real-time extensions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-librt2"
+engine = "Rust"
+category = "GNU Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["librt", "real-time extensions", "POSIX real-time"]
+
+[[component]]
+name = "SigmaOS-libcrypt2"
+description = "Libcrypt library compatibility layer with cryptographic functions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libcrypt2"
+engine = "Rust"
+category = "GNU Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["libcrypt", "cryptographic functions", "encryption"]
+
+[[component]]
+name = "SigmaOS-libnss2"
+description = "Libnss library compatibility layer with name service switch"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libnss2"
+engine = "Rust"
+category = "GNU Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["libnss", "name service switch", "NSS"]
+
+[[component]]
+name = "SigmaOS-libstdc2"
+description = "Libstdc++ library compatibility layer with C++ standard library"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libstdc2"
+engine = "Rust"
+category = "GNU Tools"
+languages = ["Rust"]
+dependencies = []
+public = true
+inspirations = ["libstdc++", "C++ standard library", "GNU C++"]
