@@ -6691,17 +6691,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-core-service-2"
-description = "Core service 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-core-service-2"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-core-daemon-service-2"
 description = "Core daemon service 2 component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-core-daemon-service-2"
@@ -6727,17 +6716,6 @@ depends_on = ["SigmaOS-system"]
 name = "SigmaOS-user-service-3"
 description = "User service 3 component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-service-3"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-core-service-3"
-description = "Core service 3 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-core-service-3"
 engine = "common_lib"
 category = "Developer Tools"
 language = "unknown"
@@ -6793,17 +6771,6 @@ depends_on = ["SigmaOS-system"]
 name = "SigmaOS-user-service-4"
 description = "User service 4 component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-service-4"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-core-service-4"
-description = "Core service 4 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-core-service-4"
 engine = "common_lib"
 category = "Developer Tools"
 language = "unknown"
