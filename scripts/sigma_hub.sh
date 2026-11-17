@@ -19,6 +19,9 @@
 #   sigma_hub.sh search <regex>        # pacman -Ss / apt search
 #   sigma_hub.sh info <name>           # apt show / pacman -Qi
 #   sigma_hub.sh depends <name>        # apt-cache depends
+#   sigma_hub.sh families              # scaffold-fleet consolidation analyzer
+#   sigma_hub.sh consolidate [family]  # dry-run merge plan
+#   sigma_hub.sh test [name ...]       # cargo test across the fleet (CI)
 #
 # PRINCIPLES: MODULARITY, SINGLE RESPONSIBILITY, DRY, KISS, SEPARATION OF
 # CONCERNS, UNIFORM INFORMATION, OPEN/CLOSED, DEFENSIVE PROGRAMMING.
@@ -500,6 +503,32 @@ cmd_depends() {
     done
 }
 
+# test [name ...] — run `cargo test` across local component repos (CI-inspired).
+# Reports per-repo pass/fail and a fleet summary. Use --local to limit to
+# locally-present checkouts; names restrict to specific components.
+cmd_test() {
+    require_cmd cargo
+    local targets=("${TARGETS[@]}")
+    [[ ${#targets[@]} -eq 0 ]] && {
+        targets=()
+        while IFS=$'\t' read -r name repo cat lang; do
+            [[ "$lang" == "rust" ]] && targets+=("$name")
+        done < <(iter_components)
+    }
+    local pass=0 fail=0 skip=0 failed=()
+    for name in "${targets[@]}"; do
+        local path; path="$(component_local_path "$name")"
+        [[ -f "$path/Cargo.toml" ]] || { skip=$((skip+1)); continue; }
+        if ( cd "$path" && timeout 120 cargo test --offline -q >/dev/null 2>&1 ); then
+            pass=$((pass+1))
+        else
+            fail=$((fail+1)); failed+=("$name")
+        fi
+    done
+    hub_ok "cargo test: pass=$pass fail=$fail skip=$skip"
+    [[ ${#failed[@]} -gt 0 ]] && { hub_info "failed:"; printf '  %s\n' "${failed[@]:0:30}"; }
+}
+
 cmd_sync() {
     require_cmd git
     local targets=("${TARGETS[@]}")
@@ -527,7 +556,7 @@ cmd_sync() {
 # --- main --------------------------------------------------------------------
 cmd="${1:-help}"; shift || true
 case "$cmd" in
-    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate)
+    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate|test)
         parse_common "$@"
         "cmd_${cmd}"
         ;;
