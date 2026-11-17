@@ -17402,7 +17402,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-data-completeness"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Data completeness checker with coverage requirements and field validation"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-data-completeness"
 engine = "data_engineering"
 category = "Data Engineering"
@@ -20912,7 +20912,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-pyalpm"
-description = "SigmaOS pyalpm component (Arch Linux inspired)"
+description = "ALPM package management interface with database sync, install, remove, and query"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pyalpm"
 engine = "package_manager"
 category = "Package Management"
@@ -26333,7 +26333,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-absvolume"
-description = "SigmaOS component repository"
+description = "Audio volume manager with channels, levels, and mixer control"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-absvolume"
 engine = "component"
 category = "Components"
