@@ -170,15 +170,24 @@ make hub                 # help
 make hub-list            # components + local git status
 make hub-status NAME=SigmaOS-kernel   # per-repo detail + github check
 make hub-audit           # COMPONENT.toml coverage / upgrade candidates
+make hub-search ARGS=kernel           # pacman -Ss / apt search
+make hub-info NAME=SigmaOS-kernel     # apt show / pacman -Qi
+make hub-depends NAME=SigmaOS-kernel  # apt-cache depends
+make hub-families        # scaffold-fleet consolidation analyzer
+make hub-consolidate ARGS=omarchy     # dry-run merge plan
+make hub-test ARGS=--local            # cargo test across the fleet (CI)
 make hub-create NAME=SigmaOS-foo ARGS="--desc 'Foo' --cat Utilities --dry-run"
 make hub-upgrade NAME=--all ARGS="--dry-run"
 make hub-sync ARGS="--push"
 ```
 
-- **connect** — clone/link a declared component into the fleet dir (optionally as a submodule)
+- **connect** (`<name|--all>`) — clone declared component repo(s) into the fleet dir (optionally as a submodule)
 - **create** — scaffold a new component repo from `templates/component/` (COMPONENT.toml, README, Apache-2.0 LICENSE, CI, Rust src + AAA tests), register it in `COMPONENTS.toml`, and create the GitHub repo
-- **upgrade** — non-destructively bring an existing repo up to the component standard (adds only missing files, language-aware)
+- **upgrade** (`<name|--all>`) — non-destructively bring an existing repo up to the component standard (adds only missing files, language-aware)
 - **sync/push** — pull or push component checkouts in bulk
+- **search/info/depends** — package-query commands modeled on Arch `pacman`/`alpm`, Debian `apt`, Fedora `dnf`, Mint `mintinstall`, Omarchy, Ubuntu `apt`
+- **families/consolidate** — analyze and plan consolidation of scaffold-fleet repos (`arch`, `omarchy`, `mint`, `archlinux`, `system-feature`, …) into canonical parents; `consolidate` is a non-destructive dry-run
+- **test** — run `cargo test` across component checkouts (CI-inspired fleet health)
 
 ---
 
