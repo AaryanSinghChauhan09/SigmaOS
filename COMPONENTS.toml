@@ -29555,8 +29555,7 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-libreoffice-base"
-description = "SigmaOS LibreOffice Base - Database frontend and SQL table designer"
+description = "In-memory relational database with schema, rows, queries, and CSV export"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-base"
 engine = "component"
 category = "Components"
@@ -29577,8 +29576,7 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-libreoffice-draw"
-description = "SigmaOS LibreOffice Draw - Vector drawing and spatial geometry engine"
+description = "Vector drawing document engine with layers, styles, and SVG export"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-draw"
 engine = "component"
 category = "Components"
@@ -29588,8 +29586,7 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-libreoffice-impress"
-description = "SigmaOS LibreOffice Impress - Presentation slide engine"
+description = "Presentation slide engine with layouts, notes, transitions, and HTML export"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-impress"
 engine = "component"
 category = "Components"
@@ -29599,8 +29596,7 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-libreoffice-math"
-description = "SigmaOS LibreOffice Math - Formula editor and symbolic equation evaluator"
+description = "Formula and equation editor with expression parser and evaluator"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-math"
 engine = "component"
 category = "Components"
