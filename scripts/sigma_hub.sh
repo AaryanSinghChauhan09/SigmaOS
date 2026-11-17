@@ -363,6 +363,41 @@ cmd_upgrade() {
     hub_ok "upgrade complete: $upgraded upgraded, $skipped already-standard/absent"
 }
 
+# families — cluster local SigmaOS-* repos by name-prefix family and report
+# scaffold vs real-code counts. Supports CONSOLIDATE-GITHUB-REPOS-OF-SIMILAR-
+# COMPONENTS: identical-prefix scaffold fleets are consolidation candidates,
+# not candidates for blind per-repo metadata upgrades.
+cmd_families() {
+    require_cmd python3
+    python3 - "$SIGMA_FLEET_DIR" <<'PY'
+import os, sys, re, collections
+root = sys.argv[1]
+fam = collections.defaultdict(lambda: [0,0])  # family -> [repos, with_real_code]
+for d in os.listdir(root):
+    if not d.startswith("SigmaOS-") or not os.path.isdir(os.path.join(root,d,".git")):
+        continue
+    rest = d[len("SigmaOS-"):]
+    # family = leading alpha prefix up to first digit or '-' boundary groups
+    m = re.match(r"^([a-zA-Z]+)", rest)
+    key = (m.group(1).lower() if m else rest.split("-")[0].lower())
+    # refine: keep known multi-word families
+    for pref in ("archlinux","system-feature","omarchy","mint","arch-"):
+        if rest.lower().startswith(pref): key = pref.rstrip("-"); break
+    src = os.path.join(root,d,"src")
+    size = 0
+    if os.path.isdir(src):
+        for r,_,fs in os.walk(src):
+            for f in fs:
+                if f.endswith(".rs"): size += os.path.getsize(os.path.join(r,f))
+    fam[key][0]+=1
+    if size>20000: fam[key][1]+=1
+print(f"{'FAMILY':<22} {'REPOS':>6} {'REALCODE':>8}")
+for k,(n,real) in sorted(fam.items(), key=lambda x:-x[1][0]):
+    print(f"{k:<22} {n:>6} {real:>8}")
+print(f"\nTotal families={len(fam)} repos={sum(v[0] for v in fam.values())} realcode={sum(v[1] for v in fam.values())}")
+PY
+}
+
 # search <regex> — pacman -Ss / apt search over the component registry.
 cmd_search() {
     [[ ${#TARGETS[@]} -eq 0 ]] && hub_die "search requires a pattern"
@@ -447,7 +482,7 @@ cmd_sync() {
 # --- main --------------------------------------------------------------------
 cmd="${1:-help}"; shift || true
 case "$cmd" in
-    list|status|audit|connect|create|upgrade|sync|search|info|depends)
+    list|status|audit|connect|create|upgrade|sync|search|info|depends|families)
         parse_common "$@"
         "cmd_${cmd}"
         ;;
