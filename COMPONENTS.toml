@@ -19872,7 +19872,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-iso-tests"
-description = "ISO smoke tests: boot, install, desktop, app, and recovery test automation"
+description = "ISO image validation and boot testing framework with integrity checks"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-iso-tests"
 engine = "testing"
 category = "Testing"
@@ -26894,7 +26894,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-query"
-description = "SigmaOS SigmaOS-arch-query component"
+description = "Package metadata query engine with name, description, and dependency search"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-query"
 engine = "component"
 category = "Components"
