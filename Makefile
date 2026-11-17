@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -40,6 +40,24 @@ hub-upgrade:
 
 hub-sync:
 	@bash scripts/sigma_hub.sh sync $(ARGS)
+
+hub-search:
+	@bash scripts/sigma_hub.sh search $(ARGS)
+
+hub-info:
+	@bash scripts/sigma_hub.sh info $(NAME)
+
+hub-depends:
+	@bash scripts/sigma_hub.sh depends $(NAME)
+
+hub-families:
+	@bash scripts/sigma_hub.sh families $(ARGS)
+
+hub-consolidate:
+	@bash scripts/sigma_hub.sh consolidate $(ARGS)
+
+hub-test:
+	@bash scripts/sigma_hub.sh test $(ARGS)
 
 # 1. Code formatting
 fmt-fix:
@@ -189,6 +207,12 @@ help:
 	@echo "  make hub-create   - Scaffold new component repo (NAME=..., ARGS=--desc ... --dry-run)"
 	@echo "  make hub-upgrade  - Bring repos up to component standard (NAME=--all)"
 	@echo "  make hub-sync     - Pull/push component checkouts (ARGS=--push)"
+	@echo "  make hub-search   - Search components (ARGS=<regex>)"
+	@echo "  make hub-info     - Show component metadata (NAME=SigmaOS-foo)"
+	@echo "  make hub-depends  - Show component deps (NAME=SigmaOS-foo)"
+	@echo "  make hub-families - Scaffold-fleet consolidation analyzer"
+	@echo "  make hub-consolidate - Dry-run merge plan (ARGS=<family>)"
+	@echo "  make hub-test     - cargo test across fleet (ARGS=<name|--local>)"
 	@echo "  make fmt-fix      - Auto-apply rustfmt across workspace"
 	@echo "  make iso          - Full Desktop ISO build (GRUB2 + initramfs + installer) ✓"
 	@echo "  make iso-stub     - Stub ISO build (GRUB2, boots NOW in QEMU) ✓"
