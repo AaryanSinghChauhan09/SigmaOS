@@ -19562,7 +19562,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-genoffice-html"
-description = "No GitHub description is set; component scope remains unclassified."
+description = "HTML parser, sanitizer, validator, and text extractor with CLI"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-genoffice-html"
 engine = "office"
 category = "Office"
