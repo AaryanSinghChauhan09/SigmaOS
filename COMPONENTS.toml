@@ -11344,17 +11344,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-update-manager"
-description = "Update Manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update-manager"
-engine = "update_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/update-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-update-manager"
 description = "Update Manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update-manager"
@@ -11377,17 +11366,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-network-manager"
-description = "Network Manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-network-manager"
-engine = "network_manager"
-category = "Network"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/network-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-network-manager"
 description = "Network Manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-manager"
@@ -11395,17 +11373,6 @@ engine = "network_manager"
 category = "Network"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/network-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-bluetooth-manager"
-description = "Bluetooth Manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth-manager"
-engine = "bluetooth_manager"
-category = "Drivers & Hardware"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/bluetooth-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11450,17 +11417,6 @@ engine = "volume_controller"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/volume-controller"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-volume-controller"
-description = "Volume Controller for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-volume-controller"
-engine = "volume_controller"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/volume-controller"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -12598,17 +12554,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-network-configurator"
-description = "Network Configurator for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-network-configurator"
-engine = "network_configurator"
-category = "Network"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/network-configurator"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-network-configurator"
 description = "Network Configurator for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-configurator"
@@ -12682,17 +12627,6 @@ engine = "update_manager"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/update-manager-v2"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-update-manager-v2"
-description = "Update Manager v2 for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update-manager-v2"
-engine = "update_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/update-manager-v2"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -12836,17 +12770,6 @@ engine = "system_optimizer"
 category = "System Services"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-optimizer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-performance-monitor"
-description = "Performance Monitor for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-performance-monitor"
-engine = "performance_monitor"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/performance-monitor"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
