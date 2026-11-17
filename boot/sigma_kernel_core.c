@@ -6013,9 +6013,11 @@ static void gdt_init(void) {
     g_gdt[3] = gdt_make(0, 0xFFFFF, ucode_acc, gran_4g);
     g_gdt[4] = gdt_make(0, 0xFFFFF, udata_acc, gran_4g);
 
-    /* TSS: esp0 = kernel stack top so interrupts from ring 3 land safely */
-    extern uint8_t* stack_top;
-    g_tss.esp0 = (uint32_t)(size_t)stack_top;
+    /* TSS: esp0 = dedicated IRQ/syscall stack top so ring-3 exceptions,
+     * IRQs and int 0x80 land on irq_stack[] — never on the live kernel
+     * stack whose frames would be overwritten by the new interrupt frame. */
+    extern uint8_t* irq_stack_top;
+    g_tss.esp0 = (uint32_t)(size_t)irq_stack_top;
     g_tss.ss0  = GDT_KDATA;
     g_tss.cr3  = (uint32_t)(size_t)&g_page_dir[0];
 
@@ -6291,7 +6293,12 @@ void isr_common(uint32_t* frame) {
         __asm__ volatile("movl %%cr2, %0" : "=r"(cr2));
         kputs(" cr2=");
         kprint_hex32(cr2);
-        /* debug: dump exception frame neighborhood to expose return addrs */
+        kputs(" r_eip="); kprint_hex32(g_resume_eip);
+        kputs(" r_esp="); kprint_hex32(g_resume_esp);
+        kputs(" cur=");   kprint_hex32((uint32_t)g_cur_proc);
+        kputs(" act=");   kprint_dec64(g_user_active);
+        kputs(" dead=");  kprint_dec64(g_user_dead);
+        kputs(" pp=");    kprint_dec64(g_preempt_pending);
         kputs(" stk:");
         for (int i = -4; i < 64; i++) {
             kputs(" ");
@@ -9059,3 +9066,13 @@ void _start(void) {
 __attribute__((section(".bss"), aligned(16)))
 static uint8_t stack[131072];
 uint8_t* stack_top = stack + sizeof(stack);
+
+/* Dedicated ring3->ring0 exception/IRQ/syscall stack. TSS.esp0 must NOT
+ * alias the main kernel stack: int 0x80 / IRQ frames would grow down
+ * through the live shell->exec->sched->proc_run frames and corrupt their
+ * return addresses (deep FAT/ATA syscall chains reach far enough to smash
+ * them -> wild control transfer on unwind). Handlers run here; the resume
+ * paths switch back to stack[] via g_resume_esp. */
+__attribute__((section(".bss"), aligned(16)))
+static uint8_t irq_stack[131072];
+uint8_t* irq_stack_top = irq_stack + sizeof(irq_stack);
