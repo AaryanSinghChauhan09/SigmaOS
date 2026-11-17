@@ -23,6 +23,7 @@
 #   sigma_hub.sh consolidate [family]  # dry-run merge plan
 #   sigma_hub.sh test [name ...]       # cargo test across the fleet (CI)
 #   sigma_hub.sh health                # fleet-health summary
+#   sigma_hub.sh dupes                 # X/X2 variant-pair analyzer
 #
 # PRINCIPLES: MODULARITY, SINGLE RESPONSIBILITY, DRY, KISS, SEPARATION OF
 # CONCERNS, UNIFORM INFORMATION, OPEN/CLOSED, DEFENSIVE PROGRAMMING.
@@ -452,6 +453,47 @@ for key in sorted(fam, key=lambda k:-len(fam[k])):
 PY
 }
 
+# dupes — detect X / X2 / X3 variant pairs and classify real-vs-scaffold.
+# Read-only consolidation analyzer: recommends which member is canonical.
+cmd_dupes() {
+    require_cmd python3
+    python3 - "$SIGMA_FLEET_DIR" <<'PY'
+import os, sys, re
+root=sys.argv[1]
+dirs=[d for d in os.listdir(root) if d.startswith("SigmaOS-") and os.path.isdir(os.path.join(root,d,".git"))]
+def info(d):
+    src=os.path.join(root,d,"src"); size=0
+    if os.path.isdir(src):
+        for r,_,fs in os.walk(src):
+            for f in fs:
+                if f.endswith(".rs"): size+=os.path.getsize(os.path.join(r,f))
+    stab="?"
+    ct=os.path.join(root,d,"COMPONENT.toml")
+    if os.path.exists(ct):
+        m=re.search(r'stability\s*=\s*"([^"]+)"',open(ct,errors="replace").read())
+        if m: stab=m.group(1)
+    return size,stab
+groups={}
+for d in dirs:
+    rest=d[len("SigmaOS-"):]
+    m=re.match(r"^(.*?)(\d+)$",rest)
+    if m and m.group(1): groups.setdefault(m.group(1),[]).append(d)
+pairs=[v for v in groups.values() if len(v)>1]
+print(f"{'PAIR':<40} {'SIZES':<22} {'STABILITY':<28} VERDICT")
+real=0
+for g in sorted(pairs):
+    infos={d:info(d) for d in g}
+    canon=max(g,key=lambda d:infos[d][0])
+    stabs=",".join(f"{d.split('SigmaOS-')[-1]}={infos[d][1]}" for d in sorted(g))
+    szs=",".join(str(infos[d][0]) for d in sorted(g))
+    verdict=f"keep {canon.split('SigmaOS-')[-1]} (largest src)"
+    if any(infos[d][1]!="scaffold" for d in g): real+=1; verdict+=" [has-real]"
+    print(f"{','.join(sorted(d.split('SigmaOS-')[-1] for d in g)):<40} {szs:<22} {stabs:<28} {verdict}")
+print(f"\nvariant groups={len(pairs)}  groups-with-real-code={real}")
+print("NOTE: verify each pair before archiving — *N suffix often marks the NEWER real impl.")
+PY
+}
+
 # search <regex> — pacman -Ss / apt search over the component registry.
 cmd_search() {
     [[ ${#TARGETS[@]} -eq 0 ]] && hub_die "search requires a pattern"
@@ -590,7 +632,7 @@ cmd_sync() {
 # --- main --------------------------------------------------------------------
 cmd="${1:-help}"; shift || true
 case "$cmd" in
-    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate|test|health)
+    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate|test|health|dupes)
         parse_common "$@"
         "cmd_${cmd}"
         ;;

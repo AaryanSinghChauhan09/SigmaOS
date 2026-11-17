@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -61,6 +61,9 @@ hub-test:
 
 hub-health:
 	@bash scripts/sigma_hub.sh health
+
+hub-dupes:
+	@bash scripts/sigma_hub.sh dupes
 
 # 1. Code formatting
 fmt-fix:
