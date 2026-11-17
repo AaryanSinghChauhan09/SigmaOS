@@ -2489,19 +2489,60 @@ static int fat_truncate_impl(const char* name, uint32_t newsize) {
 static void show_mkdir(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
+    char raw[160];
+    int rl = 0;
+    while (*p && *p != ' ' && rl < 159) raw[rl++] = *p++;
+    raw[rl] = '\0';
+    if (!rl) { kputs("usage: mkdir <path>\n"); return; }
+    char parent[160];
+    parent[0] = '\0';
     char name[64];
-    int nl = 0;
-    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
-    name[nl] = '\0';
-    if (!nl) { kputs("usage: mkdir <name>\n"); return; }
-    if (kstrlen(name) > 12) { kputs("mkdir: name too long (8.3 only).\n"); return; }
-    for (const char* q = name; *q; q++) {
-        if (*q == '/' || *q == '\\') { kputs("mkdir: single component only.\n"); return; }
+    name[0] = '\0';
+    int sep = -1;
+    for (int i = rl - 1; i >= 0; i--) {
+        if (raw[i] == '/' || raw[i] == '\\') { sep = i; break; }
     }
+    if (sep >= 0) {
+        char ppart[160];
+        int pl = sep < 159 ? sep : 159;
+        for (int i = 0; i < pl; i++) ppart[i] = raw[i];
+        ppart[pl] = '\0';
+        if (fs_resolve(ppart, parent, (int)sizeof parent) != 0) {
+            kputs("mkdir: path too long.\n"); return;
+        }
+        int bl = 0;
+        for (int i = sep + 1; i < rl && bl < 63; i++) name[bl++] = raw[i];
+        name[bl] = '\0';
+    } else {
+        int cl = kstrlen(g_cwd);
+        if (cl > (int)sizeof parent - 1) cl = (int)sizeof parent - 1;
+        for (int i = 0; i < cl; i++) parent[i] = g_cwd[i];
+        parent[cl] = '\0';
+        int nl = rl < 63 ? rl : 63;
+        for (int i = 0; i < nl; i++) name[i] = raw[i];
+        name[nl] = '\0';
+    }
+    if (!name[0]) { kputs("mkdir: empty name.\n"); return; }
+    if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0'))) {
+        kputs("mkdir: invalid name.\n"); return;
+    }
+    if (kstrlen(name) > 12) { kputs("mkdir: name too long (8.3 only).\n"); return; }
+    /* fat_mkdir_impl resolves g_cwd for the parent — point it at the
+     * resolved parent dir for the duration of the call. */
+    char saved_cwd[160];
+    int sl = kstrlen(g_cwd);
+    for (int i = 0; i < sl; i++) saved_cwd[i] = g_cwd[i];
+    saved_cwd[sl] = '\0';
+    int pl2 = kstrlen(parent);
+    for (int i = 0; i < pl2; i++) g_cwd[i] = parent[i];
+    g_cwd[pl2] = '\0';
     int r = fat_mkdir_impl(name);
+    sl = kstrlen(saved_cwd);
+    for (int i = 0; i < sl; i++) g_cwd[i] = saved_cwd[i];
+    g_cwd[sl] = '\0';
     if (r == 0) {
         kputs("mkdir: created /");
-        if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+        if (parent[0]) { kputs(parent); kputs("/"); }
         kputs(name);
         kputs("\n");
     } else {
@@ -2516,16 +2557,46 @@ static void show_mkdir(const char* args) {
 static void show_write(const char* args) {
     const char* p = args;
     while (*p == ' ') p++;
-    char name[64];
-    int nl = 0;
-    while (*p && *p != ' ' && nl < 63) name[nl++] = *p++;
-    name[nl] = '\0';
+    /* first token may be a path: split into resolved parent + base name */
+    char raw[160];
+    int rl = 0;
+    while (*p && *p != ' ' && rl < 159) raw[rl++] = *p++;
+    raw[rl] = '\0';
     while (*p == ' ') p++;
-    if (!nl || !*p) { kputs("usage: write <name> <text>\n"); return; }
-    if (kstrlen(name) > 12) { kputs("write: name too long (8.3 only).\n"); return; }
-    for (const char* q = name; *q; q++) {
-        if (*q == '/' || *q == '\\') { kputs("write: single component only.\n"); return; }
+    if (!rl || !*p) { kputs("usage: write <path> <text>\n"); return; }
+    char parent[160];
+    parent[0] = '\0';
+    char name[64];
+    name[0] = '\0';
+    int sep = -1;
+    for (int i = rl - 1; i >= 0; i--) {
+        if (raw[i] == '/' || raw[i] == '\\') { sep = i; break; }
     }
+    if (sep >= 0) {
+        char ppart[160];
+        int pl = sep < 159 ? sep : 159;
+        for (int i = 0; i < pl; i++) ppart[i] = raw[i];
+        ppart[pl] = '\0';
+        if (fs_resolve(ppart, parent, (int)sizeof parent) != 0) {
+            kputs("write: path too long.\n"); return;
+        }
+        int bl = 0;
+        for (int i = sep + 1; i < rl && bl < 63; i++) name[bl++] = raw[i];
+        name[bl] = '\0';
+    } else {
+        int cl = kstrlen(g_cwd);
+        if (cl > (int)sizeof parent - 1) cl = (int)sizeof parent - 1;
+        for (int i = 0; i < cl; i++) parent[i] = g_cwd[i];
+        parent[cl] = '\0';
+        int nl = rl < 63 ? rl : 63;
+        for (int i = 0; i < nl; i++) name[i] = raw[i];
+        name[nl] = '\0';
+    }
+    if (!name[0]) { kputs("write: empty file name.\n"); return; }
+    if (name[0] == '.' && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0'))) {
+        kputs("write: invalid name.\n"); return;
+    }
+    if (kstrlen(name) > 12) { kputs("write: name too long (8.3 only).\n"); return; }
     uint32_t tlen = kstrlen(p);
 
     if (fat_ensure_mounted() != 0) { kputs("write: no FAT volume.\n"); return; }
@@ -2535,14 +2606,14 @@ static void show_write(const char* args) {
         kputs("write: text empty or exceeds one cluster.\n"); return;
     }
 
-    /* resolve parent (same policy as mkdir) */
+    /* resolve parent directory (explicit path or cwd) */
     int in_root = 1;
     uint32_t dir_cluster = 0;
-    if (g_cwd[0]) {
+    if (parent[0]) {
         struct fat_hit hit;
         int lr = fat_lookup(kind, g_vol_root_clus, g_vol_root_lba, g_vol_root_secs,
-                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, g_cwd, &hit);
-        if (lr <= 0 || !hit.is_dir) { kputs("write: cwd not a directory.\n"); return; }
+                            g_vol_fat_lba, g_vol_data_lba, g_vol_spc, parent, &hit);
+        if (lr <= 0 || !hit.is_dir) { kputs("write: parent not a directory.\n"); return; }
         in_root = 0;
         dir_cluster = hit.cluster;
     }
@@ -2585,7 +2656,7 @@ static void show_write(const char* args) {
         kputs("write: dirent write failed.\n"); return;
     }
     kputs("write: created /");
-    if (g_cwd[0]) { kputs(g_cwd); kputs("/"); }
+    if (parent[0]) { kputs(parent); kputs("/"); }
     kputs(name);
     kputs(" (");
     kprint_dec64(tlen);
