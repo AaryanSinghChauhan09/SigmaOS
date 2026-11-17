@@ -29258,17 +29258,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-fuse3"
-description = "SigmaOS SigmaOS-fuse3 component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fuse3"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-gamemode"
 description = "SigmaOS SigmaOS-gamemode component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gamemode"
