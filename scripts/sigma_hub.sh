@@ -398,6 +398,51 @@ print(f"\nTotal families={len(fam)} repos={sum(v[0] for v in fam.values())} real
 PY
 }
 
+# consolidate [family ...] — dry-run merge plan for scaffold fleets.
+# For each prefix family, picks the canonical parent (exact-name repo or the
+# family root, e.g. SigmaOS-omarchy) and lists scaffold members that would be
+# merged into it. NON-DESTRUCTIVE: prints the plan only; apply with --apply.
+cmd_consolidate() {
+    require_cmd python3
+    python3 - "$SIGMA_FLEET_DIR" "$@" <<'PY'
+import os, sys, re, collections
+root, args = sys.argv[1], sys.argv[2:]
+want = set(a.lower() for a in args)
+fam = collections.defaultdict(list)
+for d in sorted(os.listdir(root)):
+    if not d.startswith("SigmaOS-") or not os.path.isdir(os.path.join(root,d,".git")): continue
+    rest = d[len("SigmaOS-"):]
+    key=None
+    for pref in ("archlinux","system-feature","omarchy","mint","arch-"):
+        if rest.lower().startswith(pref): key=pref.rstrip("-"); break
+    if key is None:
+        m=re.match(r"^([a-zA-Z]+)",rest); key=(m.group(1).lower() if m else rest.split("-")[0].lower())
+    if want and key not in want: continue
+    src=os.path.join(root,d,"src"); size=0
+    if os.path.isdir(src):
+        for r,_,fs in os.walk(src):
+            for f in fs:
+                if f.endswith(".rs"): size+=os.path.getsize(os.path.join(r,f))
+    fam[key].append((d,size))
+print("CONSOLIDATION PLAN (dry-run — nothing deleted)\n")
+for key in sorted(fam, key=lambda k:-len(fam[k])):
+    members=fam[key]
+    if len(members)<3: continue
+    # canonical = exact family-name repo if present else largest real-code repo
+    canon=None
+    for pref in (f"SigmaOS-{key}", f"SigmaOS-{key}-"):
+        for d,s in members:
+            if d==pref or d.startswith(pref) and s>20000: canon=(d,s); break
+        if canon: break
+    if not canon:
+        canon=max(members,key=lambda x:x[1])
+    scaffolds=[d for d,s in members if d!=canon[0]]
+    print(f"[{key}] canonical={canon[0]} ({canon[1]}B)  merge {len(scaffolds)} scaffold(s):")
+    for d in scaffolds[:8]: print(f"    <- {d}")
+    if len(scaffolds)>8: print(f"    ... +{len(scaffolds)-8} more")
+PY
+}
+
 # search <regex> — pacman -Ss / apt search over the component registry.
 cmd_search() {
     [[ ${#TARGETS[@]} -eq 0 ]] && hub_die "search requires a pattern"
@@ -482,7 +527,7 @@ cmd_sync() {
 # --- main --------------------------------------------------------------------
 cmd="${1:-help}"; shift || true
 case "$cmd" in
-    list|status|audit|connect|create|upgrade|sync|search|info|depends|families)
+    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate)
         parse_common "$@"
         "cmd_${cmd}"
         ;;
