@@ -20032,7 +20032,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-libudev0-shim"
-description = "SigmaOS libudev0-shim component (Arch Linux inspired)"
+description = "libudev.so.0 compatibility shim for SigmaOS with symbol mapping"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libudev0-shim"
 engine = "system_library"
 category = "System Libraries"
@@ -24189,7 +24189,7 @@ inspirations = "None"
 
 [[component]]
 name = "SigmaOS-android-emulator2"
-description = "Android Emulator emulator compatibility layer for SigmaOS"
+description = "Android emulator profile manager with device specs and CPU architecture options"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-android-emulator2"
 engine = "Rust"
 category = "Virtualization"
@@ -30183,7 +30183,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-tools-knime"
-description = "tools knime component"
+description = "KNIME-style workflow pipeline engine with normalization and filter nodes"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tools-knime"
 engine = "component"
 category = "Components"
