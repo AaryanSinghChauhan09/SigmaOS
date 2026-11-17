@@ -15462,7 +15462,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-docker"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Docker-like container management interface with lifecycle and image operations"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-docker"
 engine = "virtualization"
 category = "Virtualization"
@@ -26828,7 +26828,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-power-shell"
-description = "SigmaOS SigmaOS-arch-power-shell component"
+description = "PowerShell-like command interpreter with cmdlets and pipeline execution"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power-shell"
 engine = "component"
 category = "Components"
