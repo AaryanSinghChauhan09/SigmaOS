@@ -2314,11 +2314,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-port-forward-plugin"
-description = "Omarchy port forward plugin component for SigmaOS"
+description = "TCP/UDP port forwarding rule manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-port-forward-plugin"
 engine = "plugin_registry"
 category = "Utilities"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -7022,12 +7022,12 @@ depends_on = ["SigmaOS-desktop", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-module-loader"
-description = "Module loader for SigmaOS inspired by Omarchy Linux architecture"
+description = "Kernel/user module discovery and loading manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-module-loader"
 engine = "module_loader"
 category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/module-loader"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -7341,12 +7341,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-subsystem"
-description = "Subsystem manager for SigmaOS inspired by Omarchy Linux"
+description = "Subsystem lifecycle manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-subsystem"
 engine = "subsystem_manager"
 category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/subsystem"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -7462,12 +7462,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-driver"
-description = "Driver component for SigmaOS inspired by Omarchy Linux"
+description = "Driver and device registry with modalias matching"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-driver"
 engine = "driver"
 category = "Drivers & Hardware"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/driver"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -7511,7 +7511,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-theme"
 engine = "theme_manager"
 category = "Desktop/UI"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/theme"]
+inspirations = "None"
 visibility = "public"
 depends_on = []
 
@@ -7852,7 +7852,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth"
 engine = "bluetooth_manager"
 category = "Drivers & Hardware"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/bluetooth"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -7885,7 +7885,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio"
 engine = "audio_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/audio"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -7918,7 +7918,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-video"
 engine = "video_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/video"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -7984,7 +7984,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-subprocess"
 engine = "subprocess_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/subprocess"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8017,7 +8017,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dev-tools"
 engine = "dev_tools"
 category = "Developer Tools"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/dev-tools"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8094,7 +8094,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-wallpaper"
 engine = "wallpaper"
 category = "Desktop/UI"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/wallpaper"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8127,7 +8127,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-calculator"
 engine = " calculator"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/calculator"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8160,7 +8160,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-rss"
 engine = " rss_reader"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/rss"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8237,7 +8237,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-viewer"
 engine = " image_viewer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/viewer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8270,7 +8270,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-player"
 engine = " media_player"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/player"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8347,7 +8347,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-monitor"
 engine = "monitor"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-monitor"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8380,7 +8380,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-installer"
 engine = "installer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/installer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
@@ -8446,7 +8446,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update"
 engine = "update_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/update-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8512,7 +8512,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-power"
 engine = "power_manager"
 category = "System Services"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/power-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8545,7 +8545,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dt"
 engine = "date_time"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/date-time"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8688,7 +8688,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-cln"
 engine = "cleanup"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/cleanup"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8721,7 +8721,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-fi"
 engine = "font_installer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/font-installer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8820,7 +8820,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-device-manager"
 engine = "device_manager"
 category = "Developer Tools"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/device-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8941,7 +8941,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-display-manager"
 engine = "display_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/display-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9128,7 +9128,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-flatpak-manager"
 engine = "flatpak_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/flatpak-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9161,7 +9161,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-appstream"
 engine = "appstream"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/appstream"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9216,7 +9216,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-antivirus"
 engine = "antivirus"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/antivirus"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9260,7 +9260,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-crypto-wallet"
 engine = "crypto_wallet"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/crypto-wallet"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9293,7 +9293,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-password-manager
 engine = "password_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/password-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9326,7 +9326,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-encryption-tool"
 engine = "encryption_tool"
 category = "Developer Tools"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/encryption-tool"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9359,7 +9359,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-security-auditor
 engine = "security_auditor"
 category = "Security"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/security-auditor"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9403,7 +9403,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal"
 engine = "terminal"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9502,7 +9502,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-signal-handler"
 engine = "signal_handler"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/signal-handler"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9645,7 +9645,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-path-monitor"
 engine = "path_monitor"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/path-monitor"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9700,7 +9700,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-accessibility"
 engine = "accessibility"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/accessibility"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9783,12 +9783,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-mm2"
-description = "Modem manager for SigmaOS inspired by Omarchy Linux"
+description = "Modem manager with AT profiles and SMS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-modem-manager"
 engine = "modem_manager"
 category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/modem-manager"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9821,7 +9821,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-voice-manager"
 engine = "voice_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/voice-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9854,7 +9854,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-call-manager"
 engine = "call_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/call-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9887,7 +9887,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio-recorder"
 engine = "audio_recorder"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/audio-recorder"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9986,7 +9986,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-task-scheduler"
 engine = "task_scheduler"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/task-scheduler"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10019,7 +10019,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-job-tracker"
 engine = "job_tracker"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/job-tracker"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10228,7 +10228,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-context-switcher
 engine = "context_switcher"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/context-switcher"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10283,7 +10283,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal-text-ef
 engine = "text_effects"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal-text-effects"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10311,12 +10311,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-drawing"
-description = "Drawing Tool for SigmaOS inspired by Omarchy Linux"
+description = "Vector drawing document engine"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-drawing"
 engine = "drawing"
 category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/drawing"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10344,12 +10344,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-graphing-calculator"
-description = "Graphing Calculator for SigmaOS inspired by Omarchy Linux"
+description = "Graphing calculator with expression evaluation"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-graphing-calculator"
 engine = "graphing_calculator"
 category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/graphing-calculator"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10377,12 +10377,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-code-editor"
-description = "Code Editor for SigmaOS inspired by Omarchy Linux"
+description = "Text code editor buffer and search"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-code-editor"
 engine = "code_editor"
 category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/code-editor"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10415,7 +10415,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-pdf-viewer"
 engine = "pdf_viewer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/pdf-viewer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10448,7 +10448,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-manager"
 engine = "package_manager"
 category = "Package Management"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/package-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10547,7 +10547,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-printer-manager"
 engine = "printer_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/printer-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10602,7 +10602,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-power-profiles"
 engine = "power_profiles"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/power-profiles"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10624,7 +10624,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-session-manager"
 engine = "session_manager"
 category = "System Services"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/session-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10657,7 +10657,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-firewall"
 engine = "firewall"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/firewall"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10679,7 +10679,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-manager"
 engine = "service_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/service-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10701,7 +10701,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log-viewer"
 engine = "log_viewer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/log-viewer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10723,7 +10723,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-help-center"
 engine = "help_center"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/help-center"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10811,7 +10811,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-transaction-mana
 engine = "transaction_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/transaction-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10866,7 +10866,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-keyring-manager"
 engine = "keyring_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/keyring-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10932,7 +10932,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-launcher"
 engine = "launcher"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/launcher"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10987,7 +10987,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-diagnostic-tool"
 engine = "diagnostic"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/diagnostic-tool"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11020,7 +11020,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-recovery-tool"
 engine = "recovery"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/recovery-tool"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11048,12 +11048,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-debugger"
-description = "Debugger for SigmaOS inspired by Omarchy Linux"
+description = "Debugger target and breakpoint manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-debugger"
 engine = "debugger"
 category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/debugger"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11086,7 +11086,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-profiler"
 engine = "profiler"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/profiler"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11141,7 +11141,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-iso-builder"
 engine = "iso_builder"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/iso-builder"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
@@ -11174,7 +11174,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-boot-manager"
 engine = "boot_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/boot-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11196,7 +11196,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disk-utility"
 engine = "disk_utility"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/disk-utility"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11246,12 +11246,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-kernel-builder"
-description = "Kernel Builder for SigmaOS inspired by Omarchy Linux"
+description = "Kernel build profile and config manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-kernel-builder"
 engine = "kernel_builder"
 category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/kernel-builder"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11279,12 +11279,12 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-module-compiler"
-description = "Module Compiler for SigmaOS inspired by Omarchy Linux"
+description = "Module build pipeline and recipe compiler"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-module-compiler"
 engine = "module_compiler"
 category = "Developer Tools"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/module-compiler"]
+language = "rust"
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11317,7 +11317,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-deployer
 engine = "service_deployer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/service-deployer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11372,7 +11372,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-session-logger"
 engine = "session_logger"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/session-logger"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11416,7 +11416,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log-rotator"
 engine = "log_rotator"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/log-rotator"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11471,7 +11471,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-icon-packer"
 engine = "icon_packer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/icon-packer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11581,7 +11581,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-storage-manager"
 engine = "storage_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/storage-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11603,7 +11603,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-permission-manag
 engine = "permission_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/permission-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11724,7 +11724,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-optimizer
 engine = "system_optimizer"
 category = "System Services"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-optimizer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11757,7 +11757,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-resource-manager
 engine = "resource_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/resource-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11790,7 +11790,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-load-balancer"
 engine = "load_balancer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/load-balancer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11823,7 +11823,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-process-manager"
 engine = "process_manager"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/process-manager"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11856,7 +11856,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-file-indexer"
 engine = "file_indexer"
 category = "Utilities"
 language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/file-indexer"]
+inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -29924,7 +29924,7 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-menu"
 engine = "component"
 category = "Components"
 language = "rust"
-inspirations = []
+inspirations = "None"
 visibility = "public"
 depends_on = []
 
