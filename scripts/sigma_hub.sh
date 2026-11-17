@@ -162,9 +162,14 @@ cmd_audit() {
 }
 
 cmd_connect() {
-    [[ ${#TARGETS[@]} -eq 0 ]] && hub_die "connect requires a component name"
+    local targets=("${TARGETS[@]}")
+    if [[ ${#targets[@]} -eq 0 || "${targets[0]}" == "--all" ]]; then
+        targets=()
+        while IFS=$'\t' read -r name repo cat lang; do targets+=("$name"); done < <(iter_components)
+    fi
+    [[ ${#targets[@]} -eq 0 ]] && hub_die "connect requires a component name (or --all)"
     require_cmd git
-    for name in "${TARGETS[@]}"; do
+    for name in "${targets[@]}"; do
         local row; row="$(component_get "$name")"
         [[ -z "$row" ]] && { hub_err "$name: not declared"; continue; }
         IFS=$'\t' read -r cname repo engine cat lang vis deps <<<"$row"
