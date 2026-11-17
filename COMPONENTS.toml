@@ -2248,66 +2248,66 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-audio-tuner"
-description = "Omarchy audio tuner component for SigmaOS"
+description = "Audio tuning and equalizer profiles"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio-tuner"
 engine = "audio_tuner"
 category = "System Services"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-chromium"
-description = "Omarchy chromium component for SigmaOS"
+description = "Chromium browser integration manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-chromium"
 engine = "common_lib"
 category = "Developer Tools"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-fish"
-description = "Omarchy fish component for SigmaOS"
+description = "Fish shell integration manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-fish"
 engine = "shell_config"
 category = "Developer Tools"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-lazyvim"
-description = "Omarchy lazyvim component for SigmaOS"
+description = "Neovim/LazyVim config manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-lazyvim"
 engine = "nvim_distro"
 category = "Developer Tools"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-plugin-marketplace"
-description = "Omarchy plugin marketplace component for SigmaOS"
+description = "Plugin catalog, install, and update"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-plugin-marketplace"
 engine = "theme_marketplace"
 category = "Desktop/UI"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-plugin-registry"
-description = "Omarchy plugin registry component for SigmaOS"
+description = "Plugin metadata and dependency resolver"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-plugin-registry"
 engine = "try_live"
 category = "Utilities"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -7506,11 +7506,11 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-omarchy-theme"
-description = "Theme for SigmaOS inspired by Omarchy Linux"
+description = "Theme manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-theme"
 engine = "theme_manager"
 category = "Desktop/UI"
-language = "shell"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/theme"]
 visibility = "public"
 depends_on = []
@@ -7847,7 +7847,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-bluetooth"
-description = "Bluetooth manager for SigmaOS inspired by Omarchy Linux"
+description = "Bluetooth device manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth"
 engine = "bluetooth_manager"
 category = "Drivers & Hardware"
@@ -7880,7 +7880,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-audio"
-description = "Audio manager for SigmaOS inspired by Omarchy Linux"
+description = "Audio device and mixer manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio"
 engine = "audio_manager"
 category = "Utilities"
@@ -7913,11 +7913,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-video"
-description = "Video manager for SigmaOS inspired by Omarchy Linux"
+description = "Video library manager (collections, watch progress)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-video"
 engine = "video_manager"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/video"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -7979,11 +7979,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-subprocess"
-description = "Subprocess manager for SigmaOS inspired by Omarchy Linux"
+description = "Subprocess spawn/monitor manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-subprocess"
 engine = "subprocess_manager"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/subprocess"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8012,7 +8012,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-dev-tools"
-description = "Development tools for SigmaOS inspired by Omarchy Linux"
+description = "Development toolchain manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dev-tools"
 engine = "dev_tools"
 category = "Developer Tools"
@@ -8089,11 +8089,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-wallpaper"
-description = "Wallpaper setter for SigmaOS inspired by Omarchy Linux"
+description = "Wallpaper manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-wallpaper"
 engine = "wallpaper"
 category = "Desktop/UI"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/wallpaper"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8122,11 +8122,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-calculator"
-description = "Calculator for SigmaOS inspired by Omarchy Linux"
+description = "Expression calculator with history"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-calculator"
 engine = " calculator"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/calculator"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8155,11 +8155,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-rss"
-description = "RSS reader for SigmaOS inspired by Omarchy Linux"
+description = "RSS/Atom feed reader"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-rss"
 engine = " rss_reader"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/rss"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8232,11 +8232,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-viewer"
-description = "Image viewer for SigmaOS inspired by Omarchy Linux"
+description = "Image viewer (formats, gallery, annotations)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-viewer"
 engine = " image_viewer"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/viewer"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8265,7 +8265,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-player"
-description = "Media player for SigmaOS inspired by Omarchy Linux"
+description = "MPRIS media player controller"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-player"
 engine = " media_player"
 category = "Utilities"
@@ -8342,11 +8342,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-system-monitor"
-description = "System monitor for SigmaOS inspired by Omarchy Linux"
+description = "System resource monitor"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-monitor"
 engine = "monitor"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-monitor"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8375,11 +8375,11 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-installer"
-description = "Package installer for SigmaOS inspired by Omarchy Linux"
+description = "System installer"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-installer"
 engine = "installer"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/installer"]
 visibility = "public"
 depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
@@ -8441,11 +8441,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-update"
-description = "Update manager for SigmaOS inspired by Omarchy Linux"
+description = "System update manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update"
 engine = "update_manager"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/update-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8507,11 +8507,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-power"
-description = "Power manager for SigmaOS inspired by Omarchy Linux"
+description = "Power management"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-power"
 engine = "power_manager"
 category = "System Services"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/power-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8540,7 +8540,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-dt"
-description = "Date and time manager for SigmaOS inspired by Omarchy Linux"
+description = "Date and time manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dt"
 engine = "date_time"
 category = "Utilities"
@@ -8683,11 +8683,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-cln"
-description = "Disk cleanup for SigmaOS inspired by Omarchy Linux"
+description = "Disk cleanup and junk finder"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-cln"
 engine = "cleanup"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/cleanup"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8716,7 +8716,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-fi"
-description = "Font installer for SigmaOS inspired by Omarchy Linux"
+description = "Font manager (fontconfig)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-fi"
 engine = "font_installer"
 category = "Utilities"
@@ -8815,11 +8815,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-dm"
-description = "Device manager for SigmaOS inspired by Omarchy Linux"
+description = "Device manager (sysfs device tree, drivers, uaccess)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-device-manager"
 engine = "device_manager"
 category = "Developer Tools"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/device-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8936,11 +8936,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-disp"
-description = "Display manager for SigmaOS inspired by Omarchy Linux"
+description = "Display/output manager (DRM connectors, modes, brightness)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-display-manager"
 engine = "display_manager"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/display-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -9123,7 +9123,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-fm"
-description = "Flatpak manager for SigmaOS inspired by Omarchy Linux"
+description = "File manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-flatpak-manager"
 engine = "flatpak_manager"
 category = "Utilities"
@@ -9156,7 +9156,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-as"
-description = "AppStream for SigmaOS inspired by Omarchy Linux"
+description = "AppStream software metadata catalog"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-appstream"
 engine = "appstream"
 category = "Utilities"
@@ -9211,7 +9211,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-av"
-description = "Antivirus for SigmaOS inspired by Omarchy Linux"
+description = "Antivirus/malware scanner with signature DB"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-antivirus"
 engine = "antivirus"
 category = "Utilities"
@@ -9255,7 +9255,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-cw"
-description = "Crypto wallet for SigmaOS inspired by Omarchy Linux"
+description = "Watch-only crypto wallet manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-crypto-wallet"
 engine = "crypto_wallet"
 category = "Utilities"
@@ -9288,7 +9288,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-password-manager"
-description = "Password manager for SigmaOS inspired by Omarchy Linux"
+description = "Password vault and generator"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-password-manager"
 engine = "password_manager"
 category = "Utilities"
@@ -9321,7 +9321,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-et"
-description = "Encryption tool for SigmaOS inspired by Omarchy Linux"
+description = "Encryption tool (file encrypt/decrypt/sign via openssl/gpg)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-encryption-tool"
 engine = "encryption_tool"
 category = "Developer Tools"
@@ -9354,7 +9354,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-sa"
-description = "Security auditor for SigmaOS inspired by Omarchy Linux"
+description = "Security auditor"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-security-auditor"
 engine = "security_auditor"
 category = "Security"
@@ -9398,7 +9398,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-tm"
-description = "Terminal for SigmaOS inspired by Omarchy Linux"
+description = "Terminal emulator profile manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal"
 engine = "terminal"
 category = "Utilities"
@@ -9497,11 +9497,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-sh2"
-description = "Signal handler for SigmaOS inspired by Omarchy Linux"
+description = "POSIX signal handler framework"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-signal-handler"
 engine = "signal_handler"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/signal-handler"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -9640,11 +9640,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-pm3"
-description = "Path monitor for SigmaOS inspired by Omarchy Linux"
+description = "Filesystem path monitor"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-path-monitor"
 engine = "path_monitor"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/path-monitor"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -9695,7 +9695,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-at"
-description = "Accessibility tools for SigmaOS inspired by Omarchy Linux"
+description = "Accessibility settings manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-accessibility"
 engine = "accessibility"
 category = "Utilities"
@@ -9816,7 +9816,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-vm"
-description = "Voice manager for SigmaOS inspired by Omarchy Linux"
+description = "Voice/speech manager (TTS/STT)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-voice-manager"
 engine = "voice_manager"
 category = "Utilities"
@@ -9849,7 +9849,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-cm"
-description = "Call manager for SigmaOS inspired by Omarchy Linux"
+description = "Call management"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-call-manager"
 engine = "call_manager"
 category = "Utilities"
@@ -9882,7 +9882,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-ar"
-description = "Audio recorder for SigmaOS inspired by Omarchy Linux"
+description = "Audio recorder for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio-recorder"
 engine = "audio_recorder"
 category = "Utilities"
@@ -9981,7 +9981,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-ts"
-description = "Task scheduler for SigmaOS inspired by Omarchy Linux"
+description = "Task scheduler (cron/at jobs)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-task-scheduler"
 engine = "task_scheduler"
 category = "Utilities"
@@ -10014,7 +10014,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-jt"
-description = "Job tracker for SigmaOS inspired by Omarchy Linux"
+description = "Job/task tracker"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-job-tracker"
 engine = "job_tracker"
 category = "Utilities"
@@ -10223,7 +10223,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-cs"
-description = "Context switcher for SigmaOS inspired by Omarchy Linux"
+description = "Window/context switcher"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-context-switcher"
 engine = "context_switcher"
 category = "Utilities"
@@ -10278,11 +10278,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-terminal-text-effects"
-description = "Terminal Text Effects for SigmaOS inspired by Omarchy Linux"
+description = "Terminal ASCII art and text effects"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal-text-effects"
 engine = "text_effects"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal-text-effects"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10410,11 +10410,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-pdf-viewer"
-description = "PDF Viewer for SigmaOS inspired by Omarchy Linux"
+description = "PDF metadata and text extraction"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-pdf-viewer"
 engine = "pdf_viewer"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/pdf-viewer"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10443,7 +10443,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-package-manager"
-description = "Package Manager for SigmaOS inspired by Omarchy Linux"
+description = "Package repository and transaction manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-manager"
 engine = "package_manager"
 category = "Package Management"
@@ -10542,7 +10542,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-printer-manager"
-description = "Printer Manager for SigmaOS inspired by Omarchy Linux"
+description = "Printer queue and driver manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-printer-manager"
 engine = "printer_manager"
 category = "Utilities"
@@ -10597,7 +10597,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-power-profiles"
-description = "Power Profiles for SigmaOS inspired by Omarchy Linux"
+description = "Power profile manager (governors, boost, triggers)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-power-profiles"
 engine = "power_profiles"
 category = "Utilities"
@@ -10619,7 +10619,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-session-manager"
-description = "Session Manager for SigmaOS inspired by Omarchy Linux"
+description = "Login/session manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-session-manager"
 engine = "session_manager"
 category = "System Services"
@@ -10652,7 +10652,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-firewall"
-description = "Firewall Configuration for SigmaOS inspired by Omarchy Linux"
+description = "Firewall rule manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-firewall"
 engine = "firewall"
 category = "Utilities"
@@ -10674,7 +10674,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-service-manager"
-description = "Service Manager for SigmaOS inspired by Omarchy Linux"
+description = "Service lifecycle manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-manager"
 engine = "service_manager"
 category = "Utilities"
@@ -10696,11 +10696,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-log-viewer"
-description = "Log Viewer for SigmaOS inspired by Omarchy Linux"
+description = "Structured log parser, filter, and viewer"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log-viewer"
 engine = "log_viewer"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/log-viewer"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10718,7 +10718,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-help-center"
-description = "Help Center for SigmaOS inspired by Omarchy Linux"
+description = "In-app help and documentation browser"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-help-center"
 engine = "help_center"
 category = "Utilities"
@@ -10806,11 +10806,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-transaction-manager"
-description = "Transaction Manager for SigmaOS inspired by Omarchy Linux"
+description = "Journaled transaction engine"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-transaction-manager"
 engine = "transaction_manager"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/transaction-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10861,7 +10861,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-keyring-manager"
-description = "Keyring Manager for SigmaOS inspired by Omarchy Linux"
+description = "Secret keyring manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-keyring-manager"
 engine = "keyring_manager"
 category = "Utilities"
@@ -10927,7 +10927,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-launcher"
-description = "Application Launcher for SigmaOS inspired by Omarchy Linux"
+description = "Application launcher"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-launcher"
 engine = "launcher"
 category = "Utilities"
@@ -10982,7 +10982,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-diagnostic-tool"
-description = "Diagnostic Tool for SigmaOS inspired by Omarchy Linux"
+description = "System diagnostic collector"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-diagnostic-tool"
 engine = "diagnostic"
 category = "Utilities"
@@ -11015,7 +11015,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-recovery-tool"
-description = "Recovery Tool for SigmaOS inspired by Omarchy Linux"
+description = "Recovery profiles and diagnostics"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-recovery-tool"
 engine = "recovery"
 category = "Utilities"
@@ -11081,7 +11081,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-profiler"
-description = "Profiler for SigmaOS inspired by Omarchy Linux"
+description = "Process sampling profiler (/proc)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-profiler"
 engine = "profiler"
 category = "Utilities"
@@ -11136,7 +11136,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-iso-builder"
-description = "ISO Builder for SigmaOS inspired by Omarchy Linux"
+description = "Bootable ISO builder"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-iso-builder"
 engine = "iso_builder"
 category = "Utilities"
@@ -11169,7 +11169,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-boot-manager"
-description = "Boot Manager for SigmaOS inspired by Omarchy Linux"
+description = "Boot entry and bootloader manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-boot-manager"
 engine = "boot_manager"
 category = "Utilities"
@@ -11191,11 +11191,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-disk-utility"
-description = "Disk Utility for SigmaOS inspired by Omarchy Linux"
+description = "Disk usage, mounts, and health inspection"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disk-utility"
 engine = "disk_utility"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/disk-utility"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -11312,7 +11312,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-service-deployer"
-description = "Service Deployer for SigmaOS inspired by Omarchy Linux"
+description = "Service deployment manager (units, rollback)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-deployer"
 engine = "service_deployer"
 category = "Utilities"
@@ -11367,11 +11367,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-session-logger"
-description = "Session Logger for SigmaOS inspired by Omarchy Linux"
+description = "Session and command audit logger"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-session-logger"
 engine = "session_logger"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/session-logger"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -11411,11 +11411,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-log-rotator"
-description = "Log Rotator for SigmaOS inspired by Omarchy Linux"
+description = "Log rotation engine (size/time policies, generations)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log-rotator"
 engine = "log_rotator"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = ["https://omarchy.org", "https://github.com/omarchy/log-rotator"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -11466,7 +11466,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-icon-packer"
-description = "Icon Packer for SigmaOS inspired by Omarchy Linux"
+description = "Icon theme packer"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-icon-packer"
 engine = "icon_packer"
 category = "Utilities"
@@ -11576,7 +11576,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-storage-manager"
-description = "Storage Manager for SigmaOS inspired by Omarchy Linux"
+description = "Block device and filesystem manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-storage-manager"
 engine = "storage_manager"
 category = "Utilities"
@@ -11598,7 +11598,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-permission-manager"
-description = "Permission Manager for SigmaOS inspired by Omarchy Linux"
+description = "File permission policy engine"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-permission-manager"
 engine = "permission_manager"
 category = "Utilities"
@@ -11719,7 +11719,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-system-optimizer"
-description = "System Optimizer for SigmaOS inspired by Omarchy Linux"
+description = "sysctl tuning profile manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-optimizer"
 engine = "system_optimizer"
 category = "System Services"
@@ -11752,7 +11752,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-resource-manager"
-description = "Resource Manager for SigmaOS inspired by Omarchy Linux"
+description = "cgroup v2 resource limits manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-resource-manager"
 engine = "resource_manager"
 category = "Utilities"
@@ -11785,7 +11785,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-load-balancer"
-description = "Load Balancer for SigmaOS inspired by Omarchy Linux"
+description = "Backend pool load balancer with health checks"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-load-balancer"
 engine = "load_balancer"
 category = "Utilities"
@@ -11818,7 +11818,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-process-manager"
-description = "Process Manager for SigmaOS inspired by Omarchy Linux"
+description = "Process manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-process-manager"
 engine = "process_manager"
 category = "Utilities"
@@ -11851,7 +11851,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-omarchy-file-indexer"
-description = "File Indexer for SigmaOS inspired by Omarchy Linux"
+description = "File indexing and search"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-file-indexer"
 engine = "file_indexer"
 category = "Utilities"
@@ -29919,7 +29919,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-omarchy-menu"
-description = "SigmaOS SigmaOS-omarchy-menu component"
+description = "Menu/panel system manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-menu"
 engine = "component"
 category = "Components"
