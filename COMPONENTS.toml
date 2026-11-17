@@ -29555,6 +29555,7 @@ visibility = "public"
 depends_on = []
 
 [[component]]
+name = "SigmaOS-libreoffice-base"
 description = "In-memory relational database with schema, rows, queries, and CSV export"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-base"
 engine = "component"
