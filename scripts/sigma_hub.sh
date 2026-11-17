@@ -22,6 +22,7 @@
 #   sigma_hub.sh families              # scaffold-fleet consolidation analyzer
 #   sigma_hub.sh consolidate [family]  # dry-run merge plan
 #   sigma_hub.sh test [name ...]       # cargo test across the fleet (CI)
+#   sigma_hub.sh health                # fleet-health summary
 #
 # PRINCIPLES: MODULARITY, SINGLE RESPONSIBILITY, DRY, KISS, SEPARATION OF
 # CONCERNS, UNIFORM INFORMATION, OPEN/CLOSED, DEFENSIVE PROGRAMMING.
@@ -534,6 +535,34 @@ cmd_test() {
     [[ ${#failed[@]} -gt 0 ]] && { hub_info "failed:"; printf '  %s\n' "${failed[@]:0:30}"; }
 }
 
+# health — one-shot fleet-health summary: registry coverage, local checkouts,
+# COMPONENT.toml coverage, scaffold vs implemented ratio. Fast (no builds).
+cmd_health() {
+    local declared=0 local_n=0 manifest=0 scaffold=0 implemented=0
+    local scaffold_fams=()
+    while IFS=$'\t' read -r name repo cat lang; do
+        [[ -z "$name" ]] && continue
+        declared=$((declared+1))
+        local path; path="$(component_local_path "$name")"
+        [[ -d "$path/.git" ]] && local_n=$((local_n+1))
+        if [[ -f "$path/COMPONENT.toml" ]]; then
+            manifest=$((manifest+1))
+            if grep -q 'stability = "scaffold"' "$path/COMPONENT.toml" 2>/dev/null; then
+                scaffold=$((scaffold+1))
+            else
+                implemented=$((implemented+1))
+            fi
+        fi
+    done < <(iter_components)
+    echo "=== SigmaOS fleet health ==="
+    printf '  declared components : %s\n' "$declared"
+    printf '  local checkouts     : %s\n' "$local_n"
+    printf '  COMPONENT.toml      : %s (%.0f%% of local)\n' "$manifest" "$(( local_n ? manifest*100/local_n : 0 ))"
+    printf '  implemented         : %s\n' "$implemented"
+    printf '  scaffold (placeholder): %s\n' "$scaffold"
+    hub_info "scaffold repos are consolidation candidates (see: families / consolidate)"
+}
+
 cmd_sync() {
     require_cmd git
     local targets=("${TARGETS[@]}")
@@ -561,7 +590,7 @@ cmd_sync() {
 # --- main --------------------------------------------------------------------
 cmd="${1:-help}"; shift || true
 case "$cmd" in
-    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate|test)
+    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate|test|health)
         parse_common "$@"
         "cmd_${cmd}"
         ;;

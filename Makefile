@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -58,6 +58,9 @@ hub-consolidate:
 
 hub-test:
 	@bash scripts/sigma_hub.sh test $(ARGS)
+
+hub-health:
+	@bash scripts/sigma_hub.sh health
 
 # 1. Code formatting
 fmt-fix:
@@ -213,6 +216,7 @@ help:
 	@echo "  make hub-families - Scaffold-fleet consolidation analyzer"
 	@echo "  make hub-consolidate - Dry-run merge plan (ARGS=<family>)"
 	@echo "  make hub-test     - cargo test across fleet (ARGS=<name|--local>)"
+	@echo "  make hub-health   - Fleet-health summary (coverage/scaffold/git)"
 	@echo "  make fmt-fix      - Auto-apply rustfmt across workspace"
 	@echo "  make iso          - Full Desktop ISO build (GRUB2 + initramfs + installer) ✓"
 	@echo "  make iso-stub     - Stub ISO build (GRUB2, boots NOW in QEMU) ✓"
