@@ -22197,17 +22197,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-sysvinit2"
-description = "SysVinit init system compatibility layer with runlevels and init scripts"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sysvinit2"
-engine = "Rust"
-category = "Init System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-bsd-rc2"
 description = "BSD rc.d init system compatibility layer with service management and rc scripts"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-rc2"
@@ -23429,17 +23418,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-android-studio2"
-description = "Android Studio IDE compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-android-studio2"
-engine = "Rust"
-category = "Dev Tools"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-intellij-idea2"
 description = "IntelliJ IDEA IDE compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-intellij-idea2"
@@ -24191,17 +24169,6 @@ inspirations = "None"
 name = "SigmaOS-software-center2"
 description = "Software Center software center compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-center2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-app-store2"
-description = "App Store app store compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-app-store2"
 engine = "Rust"
 category = "System"
 languages = ["Rust"]
