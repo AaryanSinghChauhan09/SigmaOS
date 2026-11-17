@@ -2291,28 +2291,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-mac-installer"
-description = "Omarchy mac installer component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-mac-installer"
-engine = "installer"
-category = "Utilities"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-mac-pkgs"
-description = "Omarchy mac pkgs component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-mac-pkgs"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-plugin-marketplace"
 description = "Omarchy plugin marketplace component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-plugin-marketplace"
@@ -7230,17 +7208,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-core"
-description = "Core components for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-core"
-engine = "core_lib"
-category = "System Services"
-language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/core"]
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-kernel-headers"
 description = "Arch Linux kernel headers for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel-headers"
@@ -7336,17 +7303,6 @@ engine = "font_manager"
 category = "Utilities"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/fonts"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-shell"
-description = "Shell component for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-shell"
-engine = "shell"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/shell"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8473,17 +8429,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-log"
-description = "Log viewer for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log"
-engine = "log_viewer"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/log-viewer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-log"
 description = "Log viewer for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-log"
@@ -8627,17 +8572,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-cal"
-description = "Calendar for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-cal"
-engine = "calendar"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/calendar"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-cal"
 description = "Calendar for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cal"
@@ -8722,17 +8656,6 @@ engine = "backup"
 category = "Utilities"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-backup"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-bak"
-description = "System backup for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bak"
-engine = "backup"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/backup"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10035,17 +9958,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-rm2"
-description = "Resource manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-resource-manager"
-engine = "resource_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/resource-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-rm2"
 description = "Resource manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-manager"
@@ -10328,17 +10240,6 @@ engine = "context_switcher"
 category = "Utilities"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/context-switcher"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-calc"
-description = "Calculator for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-calculator"
-engine = "calculator"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/calculator"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10999,17 +10900,6 @@ engine = "executor"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/executor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-executor"
-description = "Command Executor for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-executor"
-engine = "executor"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/executor"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
