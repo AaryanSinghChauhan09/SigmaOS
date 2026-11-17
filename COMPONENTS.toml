@@ -6494,7 +6494,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-systemd-integration"
-description = "Systemd integration component for SigmaOS inspired by Arch Linux systemd setup"
+description = "Systemd integration component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-integration"
 engine = "systemd_integration"
 category = "System Services"
@@ -6505,7 +6505,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-kernel-optimization"
-description = "Kernel optimization component for SigmaOS inspired by Arch Linux kernel configs"
+description = "Kernel optimization component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-optimization"
 engine = "kernel_optimization"
 category = "System Services"
@@ -6527,7 +6527,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-btrfs"
-description = "Btrfs filesystem component for SigmaOS inspired by Arch Linux Btrfs setup"
+description = "Btrfs filesystem component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-btrfs"
 engine = "filesystem"
 category = "System Services"
@@ -6538,7 +6538,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-grub"
-description = "GRUB bootloader component for SigmaOS inspired by Arch Linux GRUB config"
+description = "GRUB bootloader component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grub"
 engine = "bootloader"
 category = "System Services"
@@ -6560,7 +6560,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-keyserver"
-description = "GPG keyserver component for SigmaOS inspired by Arch Linux keyring"
+description = "GPG keyserver component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keyserver"
 engine = "security"
 category = "Security"
@@ -6571,7 +6571,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-software-collections"
-description = "Software collections component for SigmaOS inspired by Arch Linux repos"
+description = "Software collections component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-collections"
 engine = "repo_manager"
 category = "Utilities"
@@ -6582,7 +6582,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-documentation-wiki"
-description = "Documentation wiki component for SigmaOS inspired by Arch Wiki"
+description = "Documentation wiki component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-documentation-wiki"
 engine = "doc_generator"
 category = "Documentation"
@@ -6593,7 +6593,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-console-utilities"
-description = "Console utilities component for SigmaOS inspired by Arch Linux tools"
+description = "Console utilities component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-console-utilities"
 engine = "utilities"
 category = "Utilities"
@@ -6604,7 +6604,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-repo-mirror"
-description = "Repository mirror component for SigmaOS inspired by Arch Linux mirrors"
+description = "Repository mirror component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-repo-mirror"
 engine = "mirror_manager"
 category = "Utilities"
@@ -6615,7 +6615,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-dependency-resolver"
-description = "Dependency resolution component for SigmaOS inspired by Pacman"
+description = "Dependency resolution component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dependency-resolver"
 engine = "resolver"
 category = "Utilities"
@@ -6626,7 +6626,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-grub-themes"
-description = "GRUB themes component for SigmaOS inspired by Arch Linux themes"
+description = "GRUB themes component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grub-themes"
 engine = "bootloader"
 category = "System Services"
@@ -6648,7 +6648,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-pipewire"
-description = "Pipewire audio/server component for SigmaOS inspired by Arch Linux audio"
+description = "Pipewire audio/server component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pipewire"
 engine = "audio_server"
 category = "Utilities"
@@ -6681,7 +6681,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-system-configs"
-description = "System configuration component for SigmaOS inspired by Arch configs"
+description = "System configuration component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-configs"
 engine = "config_manager"
 category = "Utilities"
@@ -6714,7 +6714,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-efi-manager"
-description = "EFI manager component for SigmaOS inspired by Arch Linux EFI setup"
+description = "EFI manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-efi-manager"
 engine = "efi_manager"
 category = "Utilities"
@@ -6725,7 +6725,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-linux-live"
-description = "Linux live component for SigmaOS inspired by Arch Live USB"
+description = "Linux live component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-linux-live"
 engine = "live_system"
 category = "System Services"
@@ -6758,7 +6758,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-cinnamon"
-description = "Cinnamon desktop component for SigmaOS inspired by Linux Mint"
+description = "Cinnamon desktop component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon"
 engine = "desktop_env"
 category = "Desktop/UI"
@@ -6769,7 +6769,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-update-manager"
-description = "Update manager component for SigmaOS inspired by Linux Mint Update Manager"
+description = "Update manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-manager"
 engine = "update_manager"
 category = "Utilities"
@@ -6780,7 +6780,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-timeshift"
-description = "System snapshot and restore tool using rsync-style and Btrfs snapshot modes, inspired by Linux Mint Timeshift"
+description = "System snapshot and restore tool using rsync-style and Btrfs snapshot modes,"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timeshift"
 engine = "snapshot"
 category = "Utilities"
@@ -6791,7 +6791,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-installer"
-description = "Installer component for SigmaOS inspired by Linux Mint installer"
+description = "Installer component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-installer"
 engine = "installer"
 category = "Utilities"
@@ -6802,7 +6802,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-drivers"
-description = "Driver manager component for SigmaOS inspired by Linux Mint drivers"
+description = "Driver manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers"
 engine = "driver_manager"
 category = "Drivers & Hardware"
@@ -6824,7 +6824,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-theme"
-description = "Theme component for SigmaOS inspired by Linux Mint themes"
+description = "Theme component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme"
 engine = "theme_manager"
 category = "Desktop/UI"
@@ -6835,7 +6835,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-mint-system-adjustments"
-description = "System adjustments component for SigmaOS inspired by Linux Mint"
+description = "System adjustments component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-adjustments"
 engine = "config_manager"
 category = "Utilities"
@@ -6846,7 +6846,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-mirrors"
-description = "Repository mirrors component for SigmaOS inspired by Linux Mint mirrors"
+description = "Repository mirrors component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-mirrors"
 engine = "mirror_manager"
 category = "Utilities"
@@ -6868,7 +6868,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-xfce"
-description = "Xfce desktop variant for SigmaOS inspired by Linux Mint Xfce"
+description = "Xfce desktop variant for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-xfce"
 engine = "desktop_env"
 category = "Desktop/UI"
@@ -6890,7 +6890,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-kde-plasma"
-description = "KDE Plasma component for SigmaOS inspired by Arch Linux"
+description = "KDE Plasma component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kde-plasma"
 engine = "desktop_env"
 category = "Desktop/UI"
@@ -6901,7 +6901,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-bspwm"
-description = "BSPWM window manager for SigmaOS inspired by Arch Linux"
+description = "BSPWM window manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bspwm"
 engine = "window_manager"
 category = "Utilities"
@@ -6912,7 +6912,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-sway"
-description = "Sway compositor for SigmaOS inspired by Arch Linux"
+description = "Sway compositor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sway"
 engine = "window_manager"
 category = "Utilities"
@@ -6934,7 +6934,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-polybar"
-description = "Polybar component for SigmaOS inspired by Arch Linux"
+description = "Polybar component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-polybar"
 engine = "panel"
 category = "Desktop/UI"
@@ -6945,7 +6945,7 @@ depends_on = ["SigmaOS-desktop", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-conky"
-description = "Conky system monitor for SigmaOS inspired by Arch Linux"
+description = "Conky system monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-conky"
 engine = "system_monitor"
 category = "System Services"
@@ -6978,7 +6978,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-gtk-themes"
-description = "GTK themes component for SigmaOS inspired by Linux Mint"
+description = "GTK themes component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gtk-themes"
 engine = "theme_manager"
 category = "Desktop/UI"
@@ -6989,7 +6989,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-icon-themes"
-description = "Icon themes component for SigmaOS inspired by Arch Linux"
+description = "Icon themes component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-icon-themes"
 engine = "theme_manager"
 category = "Desktop/UI"
@@ -7011,7 +7011,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-screensavers"
-description = "Screensavers component for SigmaOS inspired by Linux Mint"
+description = "Screensavers component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-screensavers"
 engine = "screensaver"
 category = "Desktop/UI"
@@ -7088,7 +7088,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-systemd-units"
-description = "Custom systemd units for SigmaOS inspired by Arch Linux"
+description = "Custom systemd units for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-systemd-units"
 engine = "systemd_units"
 category = "System Services"
@@ -7099,7 +7099,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-auto-mounter"
-description = "Auto-mounter for SigmaOS inspired by Linux Mint"
+description = "Auto-mounter for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-auto-mounter"
 engine = "auto_mounter"
 category = "Utilities"
@@ -7110,7 +7110,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-fstab-generator"
-description = "Fstab generator for SigmaOS inspired by Arch Linux"
+description = "Fstab generator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-fstab-generator"
 engine = "fstab_generator"
 category = "Utilities"
@@ -7132,7 +7132,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-drivers-detector"
-description = "Driver detector for SigmaOS inspired by Linux Mint"
+description = "Driver detector for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers-detector"
 engine = "driver_detector"
 category = "Drivers & Hardware"
@@ -7143,7 +7143,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-optimization-tweaks"
-description = "Optimization tweaks for SigmaOS inspired by Arch Linux"
+description = "Optimization tweaks for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-optimization-tweaks"
 engine = "optimization"
 category = "Utilities"
@@ -7154,7 +7154,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-colorschemes"
-description = "Color schemes component for SigmaOS inspired by Linux Mint"
+description = "Color schemes component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-colorschemes"
 engine = "theme_manager"
 category = "Desktop/UI"
@@ -7198,7 +7198,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-look"
-description = "System look and feel for SigmaOS inspired by Linux Mint"
+description = "System look and feel for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-look"
 engine = "system_config"
 category = "System Services"
@@ -7220,7 +7220,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-drivers-pack"
-description = "Driver pack for SigmaOS inspired by Linux Mint"
+description = "Driver pack for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers-pack"
 engine = "driver_pack"
 category = "Drivers & Hardware"
@@ -7253,7 +7253,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-update-notifier"
-description = "Update notifier for SigmaOS inspired by Linux Mint"
+description = "Update notifier for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-notifier"
 engine = "update_notifier"
 category = "Utilities"
@@ -7264,7 +7264,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-keyring-manager"
-description = "Keyring manager for SigmaOS inspired by Arch Linux"
+description = "Keyring manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-keyring-manager"
 engine = "keyring_manager"
 category = "Utilities"
@@ -7275,7 +7275,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-theme-installer"
-description = "Theme installer for SigmaOS inspired by Linux Mint"
+description = "Theme installer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme-installer"
 engine = "theme_installer"
 category = "Desktop/UI"
@@ -7286,7 +7286,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-system-configs-backup"
-description = "System configs backup for SigmaOS inspired by Arch Linux"
+description = "System configs backup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-configs-backup"
 engine = "config_backup"
 category = "Utilities"
@@ -7297,7 +7297,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-fonts"
-description = "Fonts component for SigmaOS inspired by Linux Mint"
+description = "Fonts component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-fonts"
 engine = "font_manager"
 category = "Utilities"
@@ -7308,7 +7308,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-shell-themes"
-description = "Shell themes for SigmaOS inspired by Arch Linux"
+description = "Shell themes for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shell-themes"
 engine = "theme_manager"
 category = "Desktop/UI"
@@ -7330,7 +7330,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-artwork-share"
-description = "Artwork sharing for SigmaOS inspired by Linux Mint"
+description = "Artwork sharing for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-artwork-share"
 engine = "artwork_sharer"
 category = "Utilities"
@@ -7352,7 +7352,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-systemd-service"
-description = "Systemd service for SigmaOS inspired by Arch Linux"
+description = "Systemd service for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-systemd-service"
 engine = "systemd_service"
 category = "System Services"
@@ -7363,7 +7363,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-user-guide"
-description = "User guide for SigmaOS inspired by Linux Mint"
+description = "User guide for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-user-guide"
 engine = "doc_generator"
 category = "Documentation"
@@ -7374,7 +7374,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-wiki-integration"
-description = "Wiki integration for SigmaOS inspired by Arch Linux"
+description = "Wiki integration for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wiki-integration"
 engine = "wiki_integration"
 category = "Utilities"
@@ -7396,7 +7396,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-faq"
-description = "FAQ component for SigmaOS inspired by Linux Mint"
+description = "FAQ component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-faq"
 engine = "doc_generator"
 category = "Documentation"
@@ -7407,7 +7407,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-forums"
-description = "Forums integration for SigmaOS inspired by Arch Linux"
+description = "Forums integration for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-forums"
 engine = "community_portal"
 category = "Utilities"
@@ -7418,7 +7418,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-support"
-description = "Support component for SigmaOS inspired by Linux Mint"
+description = "Support component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-support"
 engine = "support_system"
 category = "System Services"
@@ -7429,7 +7429,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-documentation"
-description = "Documentation for SigmaOS inspired by Arch Linux"
+description = "Documentation for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-documentation"
 engine = "doc_generator"
 category = "Documentation"
@@ -7440,7 +7440,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-community"
-description = "Community component for SigmaOS inspired by Linux Mint"
+description = "Community component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-community"
 engine = "community_portal"
 category = "Utilities"
@@ -7451,7 +7451,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-drivers-extra"
-description = "Extra drivers for SigmaOS inspired by Linux Mint"
+description = "Extra drivers for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers-extra"
 engine = "driver_manager"
 category = "Drivers & Hardware"
@@ -7495,7 +7495,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-theme-collection"
-description = "Theme collection for SigmaOS inspired by Linux Mint"
+description = "Theme collection for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme-collection"
 engine = "theme_manager"
 category = "Desktop/UI"
@@ -7528,7 +7528,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-mint-icon-set"
-description = "Icon set for SigmaOS inspired by Linux Mint"
+description = "Icon set for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-icon-set"
 engine = "icon_manager"
 category = "Utilities"
@@ -7561,7 +7561,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-help-center"
-description = "Help center for SigmaOS inspired by Linux Mint"
+description = "Help center for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-center"
 engine = "support_system"
 category = "System Services"
@@ -7572,7 +7572,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-wiki"
-description = "Wiki component for SigmaOS inspired by Arch Linux"
+description = "Wiki component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wiki"
 engine = "wiki"
 category = "Utilities"
@@ -7583,7 +7583,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-knowledge-base"
-description = "Knowledge base for SigmaOS inspired by Linux Mint"
+description = "Knowledge base for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-knowledge-base"
 engine = "doc_generator"
 category = "Documentation"
@@ -7594,7 +7594,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-manual"
-description = "Manual for SigmaOS inspired by Arch Linux"
+description = "Manual for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-manual"
 engine = "doc_generator"
 category = "Documentation"
@@ -7605,7 +7605,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-faq-system"
-description = "FAQ system for SigmaOS inspired by Linux Mint"
+description = "FAQ system for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-faq-system"
 engine = "faq_system"
 category = "System Services"
@@ -7616,7 +7616,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-forum-integration"
-description = "Forum integration for SigmaOS inspired by Arch Linux"
+description = "Forum integration for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-forum-integration"
 engine = "community_portal"
 category = "Utilities"
@@ -7627,7 +7627,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-software-manager"
-description = "Software manager for SigmaOS inspired by Linux Mint"
+description = "Software manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-software-manager"
 engine = "software_manager"
 category = "Package Management"
@@ -7638,7 +7638,7 @@ depends_on = ["SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-software"
-description = "Software manager for SigmaOS inspired by Arch Linux"
+description = "Software manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software"
 engine = "software_manager"
 category = "Package Management"
@@ -7660,7 +7660,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-repositories"
-description = "Repository manager for SigmaOS inspired by Linux Mint"
+description = "Repository manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-repositories"
 engine = "repo_manager"
 category = "Utilities"
@@ -7671,7 +7671,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-repos-full"
-description = "Full repository list for SigmaOS inspired by Arch Linux"
+description = "Full repository list for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repos-full"
 engine = "repo_manager"
 category = "Utilities"
@@ -7693,7 +7693,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-customize"
-description = "Customize component for SigmaOS inspired by Linux Mint"
+description = "Customize component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-customize"
 engine = "customizer"
 category = "Utilities"
@@ -7704,7 +7704,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-customize"
-description = "Customize component for SigmaOS inspired by Arch Linux"
+description = "Customize component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-customize"
 engine = "customizer"
 category = "Utilities"
@@ -7715,7 +7715,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-helpdesk"
-description = "Helpdesk component for SigmaOS inspired by Linux Mint"
+description = "Helpdesk component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-helpdesk"
 engine = "support_system"
 category = "System Services"
@@ -7726,7 +7726,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-helpdesk"
-description = "Helpdesk component for SigmaOS inspired by Arch Linux"
+description = "Helpdesk component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-helpdesk"
 engine = "support_system"
 category = "System Services"
@@ -7737,7 +7737,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-bugtracker"
-description = "Bug tracker for SigmaOS inspired by Linux Mint"
+description = "Bug tracker for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bugtracker"
 engine = "issue_tracker"
 category = "Utilities"
@@ -7748,7 +7748,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-issue-tracker"
-description = "Issue tracker for SigmaOS inspired by Arch Linux"
+description = "Issue tracker for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-issue-tracker"
 engine = "issue_tracker"
 category = "Utilities"
@@ -7759,7 +7759,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-packages"
-description = "Packages manager for SigmaOS inspired by Linux Mint"
+description = "Packages manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-packages"
 engine = "package_manager"
 category = "Package Management"
@@ -7770,7 +7770,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-packages-full"
-description = "Full packages list for SigmaOS inspired by Arch Linux"
+description = "Full packages list for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-packages-full"
 engine = "package_manager"
 category = "Package Management"
@@ -7792,7 +7792,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-disk-utility"
-description = "Disk utility for SigmaOS inspired by Linux Mint"
+description = "Disk utility for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-disk-utility"
 engine = "disk_tool"
 category = "Developer Tools"
@@ -7803,7 +7803,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-disk"
-description = "Disk manager for SigmaOS inspired by Arch Linux"
+description = "Disk manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disk"
 engine = "disk_manager"
 category = "Utilities"
@@ -7814,7 +7814,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-network-manager"
-description = "Network manager for SigmaOS inspired by Linux Mint"
+description = "Network manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-manager"
 engine = "network_manager"
 category = "Network"
@@ -7825,7 +7825,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-network"
-description = "Network manager for SigmaOS inspired by Arch Linux"
+description = "Network manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network"
 engine = "network_manager"
 category = "Network"
@@ -7836,7 +7836,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-bluetooth"
-description = "Bluetooth manager for SigmaOS inspired by Linux Mint"
+description = "Bluetooth manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bluetooth"
 engine = "bluetooth_manager"
 category = "Drivers & Hardware"
@@ -7858,7 +7858,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-bluetooth"
-description = "Bluetooth manager for SigmaOS inspired by Arch Linux"
+description = "Bluetooth manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth"
 engine = "bluetooth_manager"
 category = "Drivers & Hardware"
@@ -7869,7 +7869,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-audio"
-description = "Audio manager for SigmaOS inspired by Linux Mint"
+description = "Audio manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-audio"
 engine = "audio_manager"
 category = "Utilities"
@@ -7891,7 +7891,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-audio"
-description = "Audio manager for SigmaOS inspired by Arch Linux"
+description = "Audio manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-audio"
 engine = "audio_manager"
 category = "Utilities"
@@ -7902,7 +7902,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-video"
-description = "Video manager for SigmaOS inspired by Linux Mint"
+description = "Video manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-video"
 engine = "video_manager"
 category = "Utilities"
@@ -7924,7 +7924,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-video"
-description = "Video manager for SigmaOS inspired by Arch Linux"
+description = "Video manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-video"
 engine = "video_manager"
 category = "Utilities"
@@ -7935,7 +7935,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-security"
-description = "Security manager for SigmaOS inspired by Linux Mint"
+description = "Security manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-security"
 engine = "security"
 category = "Security"
@@ -7946,7 +7946,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-security"
-description = "Security manager for SigmaOS inspired by Arch Linux"
+description = "Security manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-security"
 engine = "security"
 category = "Security"
@@ -7990,7 +7990,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-subprocess"
-description = "Subprocess manager for SigmaOS inspired by Arch Linux"
+description = "Subprocess manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-subprocess"
 engine = "subprocess_manager"
 category = "Utilities"
@@ -8001,7 +8001,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-dev-tools"
-description = "Development tools for SigmaOS inspired by Linux Mint"
+description = "Development tools for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-dev-tools"
 engine = "dev_tools"
 category = "Developer Tools"
@@ -8023,7 +8023,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-dev-tools"
-description = "Development tools for SigmaOS inspired by Arch Linux"
+description = "Development tools for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dev-tools"
 engine = "dev_tools"
 category = "Developer Tools"
@@ -8034,7 +8034,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-info"
-description = "System info for SigmaOS inspired by Linux Mint"
+description = "System info for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-info"
 engine = "system_info"
 category = "System Services"
@@ -8045,7 +8045,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-system-info"
-description = "System info for SigmaOS inspired by Arch Linux"
+description = "System info for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-info"
 engine = "system_info"
 category = "System Services"
@@ -8056,7 +8056,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-terminal"
-description = "Terminal emulator for SigmaOS inspired by Linux Mint"
+description = "Terminal emulator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal"
 engine = "terminal"
 category = "Utilities"
@@ -8067,7 +8067,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-terminal"
-description = "Terminal emulator for SigmaOS inspired by Arch Linux"
+description = "Terminal emulator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal"
 engine = "terminal"
 category = "Utilities"
@@ -8078,7 +8078,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-wallpaper"
-description = "Wallpaper setter for SigmaOS inspired by Linux Mint"
+description = "Wallpaper setter for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-wallpaper"
 engine = "wallpaper"
 category = "Desktop/UI"
@@ -8100,7 +8100,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-wallpaper"
-description = "Wallpaper setter for SigmaOS inspired by Arch Linux"
+description = "Wallpaper setter for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wallpaper"
 engine = "wallpaper"
 category = "Desktop/UI"
@@ -8111,7 +8111,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-calculator"
-description = "Calculator for SigmaOS inspired by Linux Mint"
+description = "Calculator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-calculator"
 engine = " calculator"
 category = "Utilities"
@@ -8133,7 +8133,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-calculator"
-description = "Calculator for SigmaOS inspired by Arch Linux"
+description = "Calculator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-calculator"
 engine = " calculator"
 category = "Utilities"
@@ -8144,7 +8144,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-reader"
-description = "RSS reader for SigmaOS inspired by Linux Mint"
+description = "RSS reader for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-reader"
 engine = " rss_reader"
 category = "Utilities"
@@ -8166,7 +8166,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-rss"
-description = "RSS reader for SigmaOS inspired by Arch Linux"
+description = "RSS reader for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rss"
 engine = " rss_reader"
 category = "Utilities"
@@ -8177,7 +8177,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-file-manager"
-description = "File manager for SigmaOS inspired by Linux Mint"
+description = "File manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-file-manager"
 engine = " file_manager"
 category = "Utilities"
@@ -8188,7 +8188,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-file"
-description = "File manager for SigmaOS inspired by Arch Linux"
+description = "File manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file"
 engine = " file_manager"
 category = "Utilities"
@@ -8199,7 +8199,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mit-editor"
-description = "Text editor for SigmaOS inspired by Linux Mint"
+description = "Text editor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mit-editor"
 engine = " text_editor"
 category = "Utilities"
@@ -8210,7 +8210,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-edit"
-description = "Text editor for SigmaOS inspired by Arch Linux"
+description = "Text editor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-edit"
 engine = " text_editor"
 category = "Utilities"
@@ -8221,7 +8221,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-image-viewer"
-description = "Image viewer for SigmaOS inspired by Linux Mint"
+description = "Image viewer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-image-viewer"
 engine = " image_viewer"
 category = "Utilities"
@@ -8243,7 +8243,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-viewer"
-description = "Image viewer for SigmaOS inspired by Arch Linux"
+description = "Image viewer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-viewer"
 engine = " image_viewer"
 category = "Utilities"
@@ -8254,7 +8254,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-media-player"
-description = "Media player for SigmaOS inspired by Linux Mint"
+description = "Media player for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-media-player"
 engine = " media_player"
 category = "Utilities"
@@ -8276,7 +8276,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-player"
-description = "Media player for SigmaOS inspired by Arch Linux"
+description = "Media player for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-player"
 engine = " media_player"
 category = "Utilities"
@@ -8309,7 +8309,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-terminal-emulator"
-description = "Terminal emulator for SigmaOS inspired by Linux Mint"
+description = "Terminal emulator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal-emulator"
 engine = "terminal"
 category = "Utilities"
@@ -8320,7 +8320,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-terminal-emulator"
-description = "Terminal emulator for SigmaOS inspired by Arch Linux"
+description = "Terminal emulator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal-emulator"
 engine = "terminal"
 category = "Utilities"
@@ -8331,7 +8331,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-monitor"
-description = "System monitor for SigmaOS inspired by Linux Mint"
+description = "System monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-monitor"
 engine = "monitor"
 category = "Utilities"
@@ -8353,7 +8353,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-system-monitor"
-description = "System monitor for SigmaOS inspired by Arch Linux"
+description = "System monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-monitor"
 engine = "monitor"
 category = "Utilities"
@@ -8364,7 +8364,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-package-installer"
-description = "Package installer for SigmaOS inspired by Linux Mint"
+description = "Package installer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-installer"
 engine = "installer"
 category = "Utilities"
@@ -8386,7 +8386,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-installer"
-description = "Package installer for SigmaOS inspired by Arch Linux"
+description = "Package installer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-installer"
 engine = "installer"
 category = "Utilities"
@@ -8397,7 +8397,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-service-manager"
-description = "Service manager for SigmaOS inspired by Linux Mint"
+description = "Service manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-service-manager"
 engine = "service_manager"
 category = "Utilities"
@@ -8408,7 +8408,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-service"
-description = "Service manager for SigmaOS inspired by Arch Linux"
+description = "Service manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service"
 engine = "service_manager"
 category = "Utilities"
@@ -8419,7 +8419,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-log-viewer"
-description = "Log viewer for SigmaOS inspired by Linux Mint"
+description = "Log viewer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-log-viewer"
 engine = "log_viewer"
 category = "Utilities"
@@ -8430,7 +8430,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-log"
-description = "Log viewer for SigmaOS inspired by Arch Linux"
+description = "Log viewer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-log"
 engine = "log_viewer"
 category = "Utilities"
@@ -8452,7 +8452,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-update"
-description = "Update manager for SigmaOS inspired by Arch Linux"
+description = "Update manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update"
 engine = "update_manager"
 category = "Utilities"
@@ -8463,7 +8463,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-help"
-description = "Help center for SigmaOS inspired by Arch Linux"
+description = "Help center for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-help"
 engine = "support_system"
 category = "System Services"
@@ -8474,7 +8474,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-configurator"
-description = "System configurator for SigmaOS inspired by Linux Mint"
+description = "System configurator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-configurator"
 engine = "configurator"
 category = "System Services"
@@ -8485,7 +8485,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-configurator"
-description = "System configurator for SigmaOS inspired by Arch Linux"
+description = "System configurator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-configurator"
 engine = "configurator"
 category = "System Services"
@@ -8496,7 +8496,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-power-manager"
-description = "Power manager for SigmaOS inspired by Linux Mint"
+description = "Power manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-power-manager"
 engine = "power_manager"
 category = "System Services"
@@ -8518,7 +8518,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-power"
-description = "Power manager for SigmaOS inspired by Arch Linux"
+description = "Power manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power"
 engine = "power_manager"
 category = "System Services"
@@ -8529,7 +8529,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-date-time"
-description = "Date and time manager for SigmaOS inspired by Linux Mint"
+description = "Date and time manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-date-time"
 engine = "date_time"
 category = "Utilities"
@@ -8551,7 +8551,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-dt"
-description = "Date and time manager for SigmaOS inspired by Arch Linux"
+description = "Date and time manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dt"
 engine = "date_time"
 category = "Utilities"
@@ -8562,7 +8562,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-calendar"
-description = "Calendar for SigmaOS inspired by Linux Mint"
+description = "Calendar for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-calendar"
 engine = "calendar"
 category = "Utilities"
@@ -8573,7 +8573,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-cal"
-description = "Calendar for SigmaOS inspired by Arch Linux"
+description = "Calendar for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cal"
 engine = "calendar"
 category = "Utilities"
@@ -8584,7 +8584,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-printer-manager"
-description = "Printer manager for SigmaOS inspired by Linux Mint"
+description = "Printer manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-printer-manager"
 engine = "printer_manager"
 category = "Utilities"
@@ -8595,7 +8595,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-print"
-description = "Printer manager for SigmaOS inspired by Arch Linux"
+description = "Printer manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-print"
 engine = "printer_manager"
 category = "Utilities"
@@ -8606,7 +8606,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-scanner"
-description = "Scanner manager for SigmaOS inspired by Linux Mint"
+description = "Scanner manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-scanner"
 engine = "scanner_manager"
 category = "Utilities"
@@ -8617,7 +8617,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-scan"
-description = "Scanner manager for SigmaOS inspired by Arch Linux"
+description = "Scanner manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-scan"
 engine = "scanner_manager"
 category = "Utilities"
@@ -8628,7 +8628,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-network-tools"
-description = "Network tools for SigmaOS inspired by Linux Mint"
+description = "Network tools for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-tools"
 engine = "network_tools"
 category = "Network"
@@ -8639,7 +8639,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-net"
-description = "Network tools for SigmaOS inspired by Arch Linux"
+description = "Network tools for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-net"
 engine = "network_tools"
 category = "Network"
@@ -8650,7 +8650,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-backup"
-description = "System backup for SigmaOS inspired by Linux Mint"
+description = "System backup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-backup"
 engine = "backup"
 category = "Utilities"
@@ -8661,7 +8661,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-bak"
-description = "System backup for SigmaOS inspired by Arch Linux"
+description = "System backup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bak"
 engine = "backup"
 category = "Utilities"
@@ -8672,7 +8672,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-disk-cleanup"
-description = "Disk cleanup for SigmaOS inspired by Linux Mint"
+description = "Disk cleanup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-disk-cleanup"
 engine = "cleanup"
 category = "Utilities"
@@ -8694,7 +8694,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-cln"
-description = "Disk cleanup for SigmaOS inspired by Arch Linux"
+description = "Disk cleanup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cln"
 engine = "cleanup"
 category = "Utilities"
@@ -8705,7 +8705,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-font-installer"
-description = "Font installer for SigmaOS inspired by Linux Mint"
+description = "Font installer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-font-installer"
 engine = "font_installer"
 category = "Utilities"
@@ -8727,7 +8727,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-fi"
-description = "Font installer for SigmaOS inspired by Arch Linux"
+description = "Font installer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-fi"
 engine = "font_installer"
 category = "Utilities"
@@ -8738,7 +8738,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-themes-manager"
-description = "Themes manager for SigmaOS inspired by Linux Mint"
+description = "Themes manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-themes-manager"
 engine = "themes_manager"
 category = "Desktop/UI"
@@ -8749,7 +8749,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-themes-manager"
-description = "Themes manager for SigmaOS inspired by Arch Linux"
+description = "Themes manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-themes-manager"
 engine = "themes_manager"
 category = "Desktop/UI"
@@ -8760,7 +8760,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-mint-updater-scheduler"
-description = "Updater scheduler for SigmaOS inspired by Linux Mint"
+description = "Updater scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-updater-scheduler"
 engine = "updater_scheduler"
 category = "Utilities"
@@ -8771,7 +8771,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-us"
-description = "Updater scheduler for SigmaOS inspired by Arch Linux"
+description = "Updater scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-us"
 engine = "updater_scheduler"
 category = "Utilities"
@@ -8782,7 +8782,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-session-manager"
-description = "Session manager for SigmaOS inspired by Linux Mint"
+description = "Session manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-session-manager"
 engine = "session_manager"
 category = "System Services"
@@ -8793,7 +8793,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-sm"
-description = "Session manager for SigmaOS inspired by Arch Linux"
+description = "Session manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-sm"
 engine = "session_manager"
 category = "System Services"
@@ -8804,7 +8804,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-device-manager"
-description = "Device manager for SigmaOS inspired by Linux Mint"
+description = "Device manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-device-manager"
 engine = "device_manager"
 category = "Developer Tools"
@@ -8826,7 +8826,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-dm"
-description = "Device manager for SigmaOS inspired by Arch Linux"
+description = "Device manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-device-manager"
 engine = "device_manager"
 category = "Developer Tools"
@@ -8837,7 +8837,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-audio-manager"
-description = "Audio manager for SigmaOS inspired by Linux Mint"
+description = "Audio manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-audio-manager"
 engine = "audio_manager"
 category = "Utilities"
@@ -8848,7 +8848,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-am"
-description = "Audio manager for SigmaOS inspired by Arch Linux"
+description = "Audio manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-audio-manager"
 engine = "audio_manager"
 category = "Utilities"
@@ -8859,7 +8859,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-volume-control"
-description = "Volume control for SigmaOS inspired by Linux Mint"
+description = "Volume control for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-volume-control"
 engine = "volume_control"
 category = "Utilities"
@@ -8870,7 +8870,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-vc"
-description = "Volume control for SigmaOS inspired by Arch Linux"
+description = "Volume control for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-volume-control"
 engine = "volume_control"
 category = "Utilities"
@@ -8881,7 +8881,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-bluetooth-manager"
-description = "Bluetooth manager for SigmaOS inspired by Linux Mint"
+description = "Bluetooth manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bluetooth-manager"
 engine = "bluetooth_manager"
 category = "Drivers & Hardware"
@@ -8892,7 +8892,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-bt"
-description = "Bluetooth manager for SigmaOS inspired by Arch Linux"
+description = "Bluetooth manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth-manager"
 engine = "bluetooth_manager"
 category = "Drivers & Hardware"
@@ -8903,7 +8903,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-power-supplier"
-description = "Power supplier manager for SigmaOS inspired by Linux Mint"
+description = "Power supplier manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-power-supplier"
 engine = "power_supplier"
 category = "Utilities"
@@ -8914,7 +8914,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-ps"
-description = "Power supplier manager for SigmaOS inspired by Arch Linux"
+description = "Power supplier manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power-supplier"
 engine = "power_supplier"
 category = "Utilities"
@@ -8925,7 +8925,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-display-manager"
-description = "Display manager for SigmaOS inspired by Linux Mint"
+description = "Display manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-display-manager"
 engine = "display_manager"
 category = "Utilities"
@@ -8947,7 +8947,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-disp"
-description = "Display manager for SigmaOS inspired by Arch Linux"
+description = "Display manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-display-manager"
 engine = "display_manager"
 category = "Utilities"
@@ -8958,7 +8958,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-graphics-renderer"
-description = "Graphics renderer for SigmaOS inspired by Linux Mint"
+description = "Graphics renderer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-graphics-renderer"
 engine = "graphics_renderer"
 category = "Drivers & Hardware"
@@ -8969,7 +8969,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-gr"
-description = "Graphics renderer for SigmaOS inspired by Arch Linux"
+description = "Graphics renderer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-graphics-renderer"
 engine = "graphics_renderer"
 category = "Drivers & Hardware"
@@ -8980,7 +8980,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-software-center"
-description = "Software center for SigmaOS inspired by Linux Mint"
+description = "Software center for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-software-center"
 engine = "software_center"
 category = "Package Management"
@@ -8991,7 +8991,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-sc"
-description = "Software center for SigmaOS inspired by Arch Linux"
+description = "Software center for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software-center"
 engine = "software_center"
 category = "Package Management"
@@ -9002,7 +9002,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-package-manager"
-description = "Package manager for SigmaOS inspired by Linux Mint"
+description = "Package manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-manager"
 engine = "package_manager"
 category = "Package Management"
@@ -9013,7 +9013,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-pm"
-description = "Package manager for SigmaOS inspired by Arch Linux"
+description = "Package manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-manager"
 engine = "package_manager"
 category = "Package Management"
@@ -9024,7 +9024,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-dependency-resolver"
-description = "Dependency resolver for SigmaOS inspired by Linux Mint"
+description = "Dependency resolver for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-dependency-resolver"
 engine = "dependency_resolver"
 category = "Utilities"
@@ -9035,7 +9035,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-dr"
-description = "Dependency resolver for SigmaOS inspired by Arch Linux"
+description = "Dependency resolver for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dependency-resolver"
 engine = "dependency_resolver"
 category = "Utilities"
@@ -9046,7 +9046,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-uninstaller"
-description = "Uninstaller for SigmaOS inspired by Linux Mint"
+description = "Uninstaller for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-uninstaller"
 engine = "uninstaller"
 category = "Utilities"
@@ -9057,7 +9057,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-un"
-description = "Uninstaller for SigmaOS inspired by Arch Linux"
+description = "Uninstaller for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-uninstaller"
 engine = "uninstaller"
 category = "Utilities"
@@ -9068,7 +9068,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-repo-manager"
-description = "Repository manager for SigmaOS inspired by Linux Mint"
+description = "Repository manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-repo-manager"
 engine = "repo_manager"
 category = "Utilities"
@@ -9079,7 +9079,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-rm"
-description = "Repository manager for SigmaOS inspired by Arch Linux"
+description = "Repository manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repo-manager"
 engine = "repo_manager"
 category = "Utilities"
@@ -9090,7 +9090,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-snap-store"
-description = "Snap store for SigmaOS inspired by Linux Mint"
+description = "Snap store for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-snap-store"
 engine = "snap_store"
 category = "Utilities"
@@ -9101,7 +9101,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-snap-store"
-description = "Snap store for SigmaOS inspired by Arch Linux"
+description = "Snap store for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-snap-store"
 engine = "snap_store"
 category = "Utilities"
@@ -9112,7 +9112,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-flatpak-manager"
-description = "Flatpak manager for SigmaOS inspired by Linux Mint"
+description = "Flatpak manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-flatpak-manager"
 engine = "flatpak_manager"
 category = "Utilities"
@@ -9134,7 +9134,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-fm"
-description = "Flatpak manager for SigmaOS inspired by Arch Linux"
+description = "Flatpak manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-flatpak-manager"
 engine = "flatpak_manager"
 category = "Utilities"
@@ -9145,7 +9145,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-appstream"
-description = "AppStream for SigmaOS inspired by Linux Mint"
+description = "AppStream for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-appstream"
 engine = "appstream"
 category = "Utilities"
@@ -9167,7 +9167,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-as"
-description = "AppStream for SigmaOS inspired by Arch Linux"
+description = "AppStream for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-appstream"
 engine = "appstream"
 category = "Utilities"
@@ -9178,7 +9178,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-security"
-description = "System security for SigmaOS inspired by Linux Mint"
+description = "System security for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-security"
 engine = "system_security"
 category = "System Services"
@@ -9189,7 +9189,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-system-security"
-description = "System security for SigmaOS inspired by Arch Linux"
+description = "System security for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-security"
 engine = "system_security"
 category = "System Services"
@@ -9200,7 +9200,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-antivirus"
-description = "Antivirus for SigmaOS inspired by Linux Mint"
+description = "Antivirus for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-antivirus"
 engine = "antivirus"
 category = "Utilities"
@@ -9222,7 +9222,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-av"
-description = "Antivirus for SigmaOS inspired by Arch Linux"
+description = "Antivirus for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-antivirus"
 engine = "antivirus"
 category = "Utilities"
@@ -9233,7 +9233,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-fw"
-description = "Firewall for SigmaOS inspired by Arch Linux"
+description = "Firewall for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-firewall"
 engine = "firewall"
 category = "Utilities"
@@ -9244,7 +9244,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-crypto-wallet"
-description = "Crypto wallet for SigmaOS inspired by Linux Mint"
+description = "Crypto wallet for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-crypto-wallet"
 engine = "crypto_wallet"
 category = "Utilities"
@@ -9266,7 +9266,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-cw"
-description = "Crypto wallet for SigmaOS inspired by Arch Linux"
+description = "Crypto wallet for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-crypto-wallet"
 engine = "crypto_wallet"
 category = "Utilities"
@@ -9277,7 +9277,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-password-manager"
-description = "Password manager for SigmaOS inspired by Linux Mint"
+description = "Password manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-password-manager"
 engine = "password_manager"
 category = "Utilities"
@@ -9299,7 +9299,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-password-manager"
-description = "Password manager for SigmaOS inspired by Arch Linux"
+description = "Password manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-password-manager"
 engine = "password_manager"
 category = "Utilities"
@@ -9310,7 +9310,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-encryption-tool"
-description = "Encryption tool for SigmaOS inspired by Linux Mint"
+description = "Encryption tool for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-encryption-tool"
 engine = "encryption_tool"
 category = "Developer Tools"
@@ -9332,7 +9332,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-et"
-description = "Encryption tool for SigmaOS inspired by Arch Linux"
+description = "Encryption tool for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-encryption-tool"
 engine = "encryption_tool"
 category = "Developer Tools"
@@ -9343,7 +9343,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-security-auditor"
-description = "Security auditor for SigmaOS inspired by Linux Mint"
+description = "Security auditor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-security-auditor"
 engine = "security_auditor"
 category = "Security"
@@ -9365,7 +9365,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-sa"
-description = "Security auditor for SigmaOS inspired by Arch Linux"
+description = "Security auditor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-security-auditor"
 engine = "security_auditor"
 category = "Security"
@@ -9376,7 +9376,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-shell"
-description = "Shell for SigmaOS inspired by Linux Mint"
+description = "Shell for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-shell"
 engine = "shell"
 category = "Utilities"
@@ -9387,7 +9387,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-sh"
-description = "Shell for SigmaOS inspired by Arch Linux"
+description = "Shell for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shell"
 engine = "shell"
 category = "Utilities"
@@ -9409,7 +9409,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-tm"
-description = "Terminal for SigmaOS inspired by Arch Linux"
+description = "Terminal for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal"
 engine = "terminal"
 category = "Utilities"
@@ -9420,7 +9420,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-command-processor"
-description = "Command processor for SigmaOS inspired by Linux Mint"
+description = "Command processor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-command-processor"
 engine = "command_processor"
 category = "Utilities"
@@ -9431,7 +9431,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-cp"
-description = "Command processor for SigmaOS inspired by Arch Linux"
+description = "Command processor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-command-processor"
 engine = "command_processor"
 category = "Utilities"
@@ -9442,7 +9442,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-job-scheduler"
-description = "Job scheduler for SigmaOS inspired by Linux Mint"
+description = "Job scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-job-scheduler"
 engine = "job_scheduler"
 category = "Utilities"
@@ -9453,7 +9453,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-js"
-description = "Job scheduler for SigmaOS inspired by Arch Linux"
+description = "Job scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-job-scheduler"
 engine = "job_scheduler"
 category = "Utilities"
@@ -9464,7 +9464,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-event-handler"
-description = "Event handler for SigmaOS inspired by Linux Mint"
+description = "Event handler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-event-handler"
 engine = "event_handler"
 category = "Utilities"
@@ -9475,7 +9475,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-eh"
-description = "Event handler for SigmaOS inspired by Arch Linux"
+description = "Event handler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-event-handler"
 engine = "event_handler"
 category = "Utilities"
@@ -9486,7 +9486,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-signal-handler"
-description = "Signal handler for SigmaOS inspired by Linux Mint"
+description = "Signal handler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-signal-handler"
 engine = "signal_handler"
 category = "Utilities"
@@ -9508,7 +9508,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-sh2"
-description = "Signal handler for SigmaOS inspired by Arch Linux"
+description = "Signal handler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-signal-handler"
 engine = "signal_handler"
 category = "Utilities"
@@ -9519,7 +9519,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-memory-manager"
-description = "Memory manager for SigmaOS inspired by Linux Mint"
+description = "Memory manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-memory-manager"
 engine = "memory_manager"
 category = "Utilities"
@@ -9530,7 +9530,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-mm"
-description = "Memory manager for SigmaOS inspired by Arch Linux"
+description = "Memory manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-memory-manager"
 engine = "memory_manager"
 category = "Utilities"
@@ -9541,7 +9541,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-file-browser"
-description = "File browser for SigmaOS inspired by Linux Mint"
+description = "File browser for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-file-browser"
 engine = "file_browser"
 category = "Utilities"
@@ -9552,7 +9552,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-fb"
-description = "File browser for SigmaOS inspired by Arch Linux"
+description = "File browser for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file-browser"
 engine = "file_browser"
 category = "Utilities"
@@ -9563,7 +9563,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-directory-manager"
-description = "Directory manager for SigmaOS inspired by Linux Mint"
+description = "Directory manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-directory-manager"
 engine = "directory_manager"
 category = "Utilities"
@@ -9574,7 +9574,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-dm2"
-description = "Directory manager for SigmaOS inspired by Arch Linux"
+description = "Directory manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-directory-manager"
 engine = "directory_manager"
 category = "Utilities"
@@ -9585,7 +9585,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-path-resolver"
-description = "Path resolver for SigmaOS inspired by Linux Mint"
+description = "Path resolver for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-path-resolver"
 engine = "path_resolver"
 category = "Utilities"
@@ -9596,7 +9596,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-pr"
-description = "Path resolver for SigmaOS inspired by Arch Linux"
+description = "Path resolver for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-path-resolver"
 engine = "path_resolver"
 category = "Utilities"
@@ -9607,7 +9607,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-link-manager"
-description = "Link manager for SigmaOS inspired by Linux Mint"
+description = "Link manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-link-manager"
 engine = "link_manager"
 category = "Utilities"
@@ -9618,7 +9618,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-lm"
-description = "Link manager for SigmaOS inspired by Arch Linux"
+description = "Link manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-link-manager"
 engine = "link_manager"
 category = "Utilities"
@@ -9629,7 +9629,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-path-monitor"
-description = "Path monitor for SigmaOS inspired by Linux Mint"
+description = "Path monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-path-monitor"
 engine = "path_monitor"
 category = "Utilities"
@@ -9651,18 +9651,18 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-pm3"
-description = "Path monitor for SigmaOS inspired by Arch Linux"
+description = "Path monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-path-monitor"
 engine = "path_monitor"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-permission-manager"
-description = "Permission manager for SigmaOS inspired by Linux Mint"
+description = "Permission manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-permission-manager"
 engine = "permission_manager"
 category = "Utilities"
@@ -9673,18 +9673,18 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-pm4"
-description = "Permission manager for SigmaOS inspired by Arch Linux"
+description = "Permission manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-permission-manager"
 engine = "permission_manager"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-accessibility"
-description = "Accessibility tools for SigmaOS inspired by Linux Mint"
+description = "Accessibility tools for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-accessibility"
 engine = "accessibility"
 category = "Utilities"
@@ -9706,7 +9706,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-at"
-description = "Accessibility tools for SigmaOS inspired by Arch Linux"
+description = "Accessibility tools for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-accessibility"
 engine = "accessibility"
 category = "Utilities"
@@ -9717,7 +9717,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-nm"
-description = "Network manager for SigmaOS inspired by Arch Linux"
+description = "Network manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-manager"
 engine = "network_manager"
 category = "Network"
@@ -9728,7 +9728,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-wifi-manager"
-description = "WiFi manager for SigmaOS inspired by Linux Mint"
+description = "WiFi manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-wifi-manager"
 engine = "wifi_manager"
 category = "Utilities"
@@ -9739,7 +9739,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-wm"
-description = "WiFi manager for SigmaOS inspired by Arch Linux"
+description = "WiFi manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wifi-manager"
 engine = "wifi_manager"
 category = "Utilities"
@@ -9750,7 +9750,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-bluetooth-setup"
-description = "Bluetooth setup for SigmaOS inspired by Linux Mint"
+description = "Bluetooth setup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bluetooth-setup"
 engine = "bluetooth_setup"
 category = "Drivers & Hardware"
@@ -9761,7 +9761,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-bs"
-description = "Bluetooth setup for SigmaOS inspired by Arch Linux"
+description = "Bluetooth setup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth-setup"
 engine = "bluetooth_setup"
 category = "Drivers & Hardware"
@@ -9772,7 +9772,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-modem-manager"
-description = "Modem manager for SigmaOS inspired by Linux Mint"
+description = "Modem manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-modem-manager"
 engine = "modem_manager"
 category = "Utilities"
@@ -9794,7 +9794,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-mm2"
-description = "Modem manager for SigmaOS inspired by Arch Linux"
+description = "Modem manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-modem-manager"
 engine = "modem_manager"
 category = "Utilities"
@@ -9805,7 +9805,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-voice-manager"
-description = "Voice manager for SigmaOS inspired by Linux Mint"
+description = "Voice manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-voice-manager"
 engine = "voice_manager"
 category = "Utilities"
@@ -9827,7 +9827,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-vm"
-description = "Voice manager for SigmaOS inspired by Arch Linux"
+description = "Voice manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-voice-manager"
 engine = "voice_manager"
 category = "Utilities"
@@ -9838,7 +9838,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-call-manager"
-description = "Call manager for SigmaOS inspired by Linux Mint"
+description = "Call manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-call-manager"
 engine = "call_manager"
 category = "Utilities"
@@ -9860,7 +9860,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-cm"
-description = "Call manager for SigmaOS inspired by Arch Linux"
+description = "Call manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-call-manager"
 engine = "call_manager"
 category = "Utilities"
@@ -9871,7 +9871,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-audio-recorder"
-description = "Audio recorder for SigmaOS inspired by Linux Mint"
+description = "Audio recorder for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-audio-recorder"
 engine = "audio_recorder"
 category = "Utilities"
@@ -9893,7 +9893,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-ar"
-description = "Audio recorder for SigmaOS inspired by Arch Linux"
+description = "Audio recorder for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-audio-recorder"
 engine = "audio_recorder"
 category = "Utilities"
@@ -9904,7 +9904,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-tracer"
-description = "System tracer for SigmaOS inspired by Linux Mint"
+description = "System tracer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-tracer"
 engine = "system_tracer"
 category = "System Services"
@@ -9915,7 +9915,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-st"
-description = "System tracer for SigmaOS inspired by Arch Linux"
+description = "System tracer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-tracer"
 engine = "system_tracer"
 category = "System Services"
@@ -9926,7 +9926,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-performance-monitor"
-description = "Performance monitor for SigmaOS inspired by Linux Mint"
+description = "Performance monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-performance-monitor"
 engine = "performance_monitor"
 category = "Utilities"
@@ -9937,18 +9937,18 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-pm2"
-description = "Performance monitor for SigmaOS inspired by Arch Linux"
+description = "Performance monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-monitor"
 engine = "performance_monitor"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-resource-manager"
-description = "Resource manager for SigmaOS inspired by Linux Mint"
+description = "Resource manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-resource-manager"
 engine = "resource_manager"
 category = "Utilities"
@@ -9959,18 +9959,18 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-rm2"
-description = "Resource manager for SigmaOS inspired by Arch Linux"
+description = "Resource manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-manager"
 engine = "resource_manager"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-task-scheduler"
-description = "Task scheduler for SigmaOS inspired by Linux Mint"
+description = "Task scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-task-scheduler"
 engine = "task_scheduler"
 category = "Utilities"
@@ -9992,7 +9992,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-ts"
-description = "Task scheduler for SigmaOS inspired by Arch Linux"
+description = "Task scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-task-scheduler"
 engine = "task_scheduler"
 category = "Utilities"
@@ -10003,7 +10003,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-job-tracker"
-description = "Job tracker for SigmaOS inspired by Linux Mint"
+description = "Job tracker for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-job-tracker"
 engine = "job_tracker"
 category = "Utilities"
@@ -10025,7 +10025,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-jt"
-description = "Job tracker for SigmaOS inspired by Arch Linux"
+description = "Job tracker for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-job-tracker"
 engine = "job_tracker"
 category = "Utilities"
@@ -10036,7 +10036,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-resource-monitor"
-description = "Resource monitor for SigmaOS inspired by Linux Mint"
+description = "Resource monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-resource-monitor"
 engine = "resource_monitor"
 category = "Utilities"
@@ -10047,18 +10047,18 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-rm3"
-description = "Resource monitor for SigmaOS inspired by Arch Linux"
+description = "Resource monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-monitor"
 engine = "resource_monitor"
 category = "Utilities"
-language = "c"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-performance-analyzer"
-description = "Performance analyzer for SigmaOS inspired by Linux Mint"
+description = "Performance analyzer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-performance-analyzer"
 engine = "performance_analyzer"
 category = "Utilities"
@@ -10069,7 +10069,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-pa"
-description = "Performance analyzer for SigmaOS inspired by Arch Linux"
+description = "Performance analyzer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-analyzer"
 engine = "performance_analyzer"
 category = "Utilities"
@@ -10080,7 +10080,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-updater"
-description = "System updater for SigmaOS inspired by Linux Mint"
+description = "System updater for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-updater"
 engine = "system_updater"
 category = "System Services"
@@ -10091,7 +10091,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-su"
-description = "System updater for SigmaOS inspired by Arch Linux"
+description = "System updater for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-updater"
 engine = "system_updater"
 category = "System Services"
@@ -10102,7 +10102,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-kernel-manager"
-description = "Kernel manager for SigmaOS inspired by Linux Mint"
+description = "Kernel manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-kernel-manager"
 engine = "kernel_manager"
 category = "System Services"
@@ -10113,7 +10113,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-km"
-description = "Kernel manager for SigmaOS inspired by Arch Linux"
+description = "Kernel manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel-manager"
 engine = "kernel_manager"
 category = "System Services"
@@ -10124,7 +10124,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-modules-loader"
-description = "Modules loader for SigmaOS inspired by Linux Mint"
+description = "Modules loader for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-modules-loader"
 engine = "modules_loader"
 category = "Utilities"
@@ -10135,7 +10135,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-ml"
-description = "Modules loader for SigmaOS inspired by Arch Linux"
+description = "Modules loader for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-modules-loader"
 engine = "modules_loader"
 category = "Utilities"
@@ -10146,7 +10146,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-service-wrapper"
-description = "Service wrapper for SigmaOS inspired by Linux Mint"
+description = "Service wrapper for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-service-wrapper"
 engine = "service_wrapper"
 category = "Utilities"
@@ -10157,7 +10157,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-sw"
-description = "Service wrapper for SigmaOS inspired by Arch Linux"
+description = "Service wrapper for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service-wrapper"
 engine = "service_wrapper"
 category = "Utilities"
@@ -10168,7 +10168,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-process-handler"
-description = "Process handler for SigmaOS inspired by Linux Mint"
+description = "Process handler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-process-handler"
 engine = "process_handler"
 category = "Utilities"
@@ -10179,7 +10179,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-ph"
-description = "Process handler for SigmaOS inspired by Arch Linux"
+description = "Process handler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-process-handler"
 engine = "process_handler"
 category = "Utilities"
@@ -10190,7 +10190,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-interrupt-handler"
-description = "Interrupt handler for SigmaOS inspired by Linux Mint"
+description = "Interrupt handler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-interrupt-handler"
 engine = "interrupt_handler"
 category = "Utilities"
@@ -10201,7 +10201,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-ih"
-description = "Interrupt handler for SigmaOS inspired by Arch Linux"
+description = "Interrupt handler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-interrupt-handler"
 engine = "interrupt_handler"
 category = "Utilities"
@@ -10212,7 +10212,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-context-switcher"
-description = "Context switcher for SigmaOS inspired by Linux Mint"
+description = "Context switcher for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-context-switcher"
 engine = "context_switcher"
 category = "Utilities"
@@ -10234,7 +10234,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-cs"
-description = "Context switcher for SigmaOS inspired by Arch Linux"
+description = "Context switcher for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-context-switcher"
 engine = "context_switcher"
 category = "Utilities"
@@ -10245,7 +10245,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-calc"
-description = "Calculator for SigmaOS inspired by Arch Linux"
+description = "Calculator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-calculator"
 engine = "calculator"
 category = "Utilities"
@@ -10256,7 +10256,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-editor"
-description = "Text Editor for SigmaOS inspired by Linux Mint"
+description = "Text Editor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-editor"
 engine = "text_editor"
 category = "Utilities"
@@ -10267,7 +10267,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-terminal-text-effects"
-description = "Terminal Text Effects for SigmaOS inspired by Linux Mint"
+description = "Terminal Text Effects for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal-text-effects"
 engine = "text_effects"
 category = "Utilities"
@@ -10289,7 +10289,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-terminal-text-effects"
-description = "Terminal Text Effects for SigmaOS inspired by Arch Linux"
+description = "Terminal Text Effects for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal-text-effects"
 engine = "text_effects"
 category = "Utilities"
@@ -10300,7 +10300,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-drawing"
-description = "Drawing Tool for SigmaOS inspired by Linux Mint"
+description = "Drawing Tool for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drawing"
 engine = "drawing"
 category = "Utilities"
@@ -10322,7 +10322,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-drawing"
-description = "Drawing Tool for SigmaOS inspired by Arch Linux"
+description = "Drawing Tool for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-drawing"
 engine = "drawing"
 category = "Utilities"
@@ -10333,7 +10333,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-graphing-calculator"
-description = "Graphing Calculator for SigmaOS inspired by Linux Mint"
+description = "Graphing Calculator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-graphing-calculator"
 engine = "graphing_calculator"
 category = "Utilities"
@@ -10355,7 +10355,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-graphing-calculator"
-description = "Graphing Calculator for SigmaOS inspired by Arch Linux"
+description = "Graphing Calculator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-graphing-calculator"
 engine = "graphing_calculator"
 category = "Utilities"
@@ -10366,7 +10366,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-code-editor"
-description = "Code Editor for SigmaOS inspired by Linux Mint"
+description = "Code Editor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-code-editor"
 engine = "code_editor"
 category = "Utilities"
@@ -10388,7 +10388,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-code-editor"
-description = "Code Editor for SigmaOS inspired by Arch Linux"
+description = "Code Editor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-code-editor"
 engine = "code_editor"
 category = "Utilities"
@@ -10399,7 +10399,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-pdf-viewer"
-description = "PDF Viewer for SigmaOS inspired by Linux Mint"
+description = "PDF Viewer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-pdf-viewer"
 engine = "pdf_viewer"
 category = "Utilities"
@@ -10421,7 +10421,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-pdf-viewer"
-description = "PDF Viewer for SigmaOS inspired by Arch Linux"
+description = "PDF Viewer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pdf-viewer"
 engine = "pdf_viewer"
 category = "Utilities"
@@ -10432,7 +10432,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-fedora-system-monitor"
-description = "System Monitor for SigmaOS inspired by Fedora Linux"
+description = "System Monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-system-monitor"
 engine = "system_monitor"
 category = "System Services"
@@ -10454,7 +10454,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-package-manager"
-description = "Package Manager for SigmaOS inspired by Arch Linux"
+description = "Package Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-manager"
 engine = "package_manager"
 category = "Package Management"
@@ -10465,7 +10465,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-fedora-package-manager"
-description = "Package Manager for SigmaOS inspired by Fedora Linux"
+description = "Package Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-package-manager"
 engine = "package_manager"
 category = "Package Management"
@@ -10476,7 +10476,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-software-center"
-description = "Software Center for SigmaOS inspired by Arch Linux"
+description = "Software Center for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software-center"
 engine = "software_center"
 category = "Package Management"
@@ -10487,7 +10487,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-fedora-software-center"
-description = "Software Center for SigmaOS inspired by Fedora Linux"
+description = "Software Center for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-software-center"
 engine = "software_center"
 category = "Package Management"
@@ -10498,7 +10498,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-update-manager"
-description = "Update Manager for SigmaOS inspired by Arch Linux"
+description = "Update Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update-manager"
 engine = "update_manager"
 category = "Utilities"
@@ -10509,7 +10509,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-fedora-update-manager"
-description = "Update Manager for SigmaOS inspired by Fedora Linux"
+description = "Update Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-update-manager"
 engine = "update_manager"
 category = "Utilities"
@@ -10520,7 +10520,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-network-manager"
-description = "Network Manager for SigmaOS inspired by Arch Linux"
+description = "Network Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-manager"
 engine = "network_manager"
 category = "Network"
@@ -10531,7 +10531,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-bluetooth-manager"
-description = "Bluetooth Manager for SigmaOS inspired by Arch Linux"
+description = "Bluetooth Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth-manager"
 engine = "bluetooth_manager"
 category = "Drivers & Hardware"
@@ -10553,7 +10553,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-printer-manager"
-description = "Printer Manager for SigmaOS inspired by Arch Linux"
+description = "Printer Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-printer-manager"
 engine = "printer_manager"
 category = "Utilities"
@@ -10564,7 +10564,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-volume-controller"
-description = "Volume Controller for SigmaOS inspired by Linux Mint"
+description = "Volume Controller for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-volume-controller"
 engine = "volume_controller"
 category = "Utilities"
@@ -10575,7 +10575,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-volume-controller"
-description = "Volume Controller for SigmaOS inspired by Arch Linux"
+description = "Volume Controller for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-volume-controller"
 engine = "volume_controller"
 category = "Utilities"
@@ -10586,7 +10586,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-power-profiles"
-description = "Power Profiles for SigmaOS inspired by Linux Mint"
+description = "Power Profiles for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-power-profiles"
 engine = "power_profiles"
 category = "Utilities"
@@ -10608,7 +10608,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-power-profiles"
-description = "Power Profiles for SigmaOS inspired by Arch Linux"
+description = "Power Profiles for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power-profiles"
 engine = "power_profiles"
 category = "Utilities"
@@ -10630,7 +10630,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-session-manager"
-description = "Session Manager for SigmaOS inspired by Arch Linux"
+description = "Session Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-session-manager"
 engine = "session_manager"
 category = "System Services"
@@ -10641,7 +10641,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-firewall"
-description = "Firewall Configuration for SigmaOS inspired by Linux Mint"
+description = "Firewall Configuration for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-firewall"
 engine = "firewall"
 category = "Utilities"
@@ -10663,7 +10663,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-firewall"
-description = "Firewall Configuration for SigmaOS inspired by Arch Linux"
+description = "Firewall Configuration for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-firewall"
 engine = "firewall"
 category = "Utilities"
@@ -10685,7 +10685,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-service-manager"
-description = "Service Manager for SigmaOS inspired by Arch Linux"
+description = "Service Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service-manager"
 engine = "service_manager"
 category = "Utilities"
@@ -10707,7 +10707,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-log-viewer"
-description = "Log Viewer for SigmaOS inspired by Arch Linux"
+description = "Log Viewer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-log-viewer"
 engine = "log_viewer"
 category = "Utilities"
@@ -10729,7 +10729,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-help-center"
-description = "Help Center for SigmaOS inspired by Arch Linux"
+description = "Help Center for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-help-center"
 engine = "help_center"
 category = "Utilities"
@@ -10740,7 +10740,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-help-tips"
-description = "Help Tips for SigmaOS inspired by Linux Mint"
+description = "Help Tips for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-tips"
 engine = "help_tips"
 category = "Utilities"
@@ -10751,7 +10751,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-help-tips"
-description = "Help Tips for SigmaOS inspired by Arch Linux"
+description = "Help Tips for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-help-tips"
 engine = "help_tips"
 category = "Utilities"
@@ -10762,7 +10762,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-package-querier"
-description = "Package Querier for SigmaOS inspired by Linux Mint"
+description = "Package Querier for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-querier"
 engine = "package_querier"
 category = "Package Management"
@@ -10773,7 +10773,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-package-querier"
-description = "Package Querier for SigmaOS inspired by Arch Linux"
+description = "Package Querier for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-querier"
 engine = "package_querier"
 category = "Package Management"
@@ -10784,7 +10784,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-dependency-resolver"
-description = "Dependency Resolver for SigmaOS inspired by Arch Linux"
+description = "Dependency Resolver for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dependency-resolver"
 engine = "dependency_resolver"
 category = "Utilities"
@@ -10795,7 +10795,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-transaction-manager"
-description = "Transaction Manager for SigmaOS inspired by Linux Mint"
+description = "Transaction Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-transaction-manager"
 engine = "transaction_manager"
 category = "Utilities"
@@ -10817,7 +10817,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-transaction-manager"
-description = "Transaction Manager for SigmaOS inspired by Arch Linux"
+description = "Transaction Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-transaction-manager"
 engine = "transaction_manager"
 category = "Utilities"
@@ -10828,7 +10828,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-repository-browser"
-description = "Repository Browser for SigmaOS inspired by Linux Mint"
+description = "Repository Browser for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-repository-browser"
 engine = "repository_browser"
 category = "Utilities"
@@ -10839,7 +10839,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-repository-browser"
-description = "Repository Browser for SigmaOS inspired by Arch Linux"
+description = "Repository Browser for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repository-browser"
 engine = "repository_browser"
 category = "Utilities"
@@ -10850,7 +10850,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-keyring-manager"
-description = "Keyring Manager for SigmaOS inspired by Linux Mint"
+description = "Keyring Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-keyring-manager"
 engine = "keyring_manager"
 category = "Utilities"
@@ -10872,7 +10872,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-scheduler"
-description = "Scheduler for SigmaOS inspired by Linux Mint"
+description = "Scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-scheduler"
 engine = "scheduler"
 category = "Utilities"
@@ -10883,7 +10883,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-scheduler"
-description = "Scheduler for SigmaOS inspired by Arch Linux"
+description = "Scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-scheduler"
 engine = "scheduler"
 category = "Utilities"
@@ -10894,7 +10894,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-executor"
-description = "Command Executor for SigmaOS inspired by Linux Mint"
+description = "Command Executor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-executor"
 engine = "executor"
 category = "Utilities"
@@ -10905,7 +10905,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-executor"
-description = "Command Executor for SigmaOS inspired by Arch Linux"
+description = "Command Executor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-executor"
 engine = "executor"
 category = "Utilities"
@@ -10916,7 +10916,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-launcher"
-description = "Application Launcher for SigmaOS inspired by Linux Mint"
+description = "Application Launcher for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-launcher"
 engine = "launcher"
 category = "Utilities"
@@ -10938,7 +10938,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-launcher"
-description = "Application Launcher for SigmaOS inspired by Arch Linux"
+description = "Application Launcher for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-launcher"
 engine = "launcher"
 category = "Utilities"
@@ -10949,7 +10949,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-task-manager"
-description = "Task Manager for SigmaOS inspired by Linux Mint"
+description = "Task Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-task-manager"
 engine = "task_manager"
 category = "Utilities"
@@ -10960,7 +10960,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-task-manager"
-description = "Task Manager for SigmaOS inspired by Arch Linux"
+description = "Task Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-task-manager"
 engine = "task_manager"
 category = "Utilities"
@@ -10971,7 +10971,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-diagnostic-tool"
-description = "Diagnostic Tool for SigmaOS inspired by Linux Mint"
+description = "Diagnostic Tool for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-diagnostic-tool"
 engine = "diagnostic"
 category = "Utilities"
@@ -10993,7 +10993,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-diagnostic-tool"
-description = "Diagnostic Tool for SigmaOS inspired by Arch Linux"
+description = "Diagnostic Tool for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-diagnostic-tool"
 engine = "diagnostic"
 category = "Utilities"
@@ -11004,7 +11004,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-recovery-tool"
-description = "Recovery Tool for SigmaOS inspired by Linux Mint"
+description = "Recovery Tool for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-recovery-tool"
 engine = "recovery"
 category = "Utilities"
@@ -11026,7 +11026,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-recovery-tool"
-description = "Recovery Tool for SigmaOS inspired by Arch Linux"
+description = "Recovery Tool for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-recovery-tool"
 engine = "recovery"
 category = "Utilities"
@@ -11037,7 +11037,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-debugger"
-description = "Debugger for SigmaOS inspired by Linux Mint"
+description = "Debugger for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-debugger"
 engine = "debugger"
 category = "Utilities"
@@ -11059,7 +11059,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-debugger"
-description = "Debugger for SigmaOS inspired by Arch Linux"
+description = "Debugger for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-debugger"
 engine = "debugger"
 category = "Utilities"
@@ -11070,7 +11070,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-profiler"
-description = "Profiler for SigmaOS inspired by Linux Mint"
+description = "Profiler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-profiler"
 engine = "profiler"
 category = "Utilities"
@@ -11092,7 +11092,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-profiler"
-description = "Profiler for SigmaOS inspired by Arch Linux"
+description = "Profiler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-profiler"
 engine = "profiler"
 category = "Utilities"
@@ -11103,7 +11103,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-package-verify"
-description = "Package Verifier for SigmaOS inspired by Linux Mint"
+description = "Package Verifier for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-verify"
 engine = "package_verify"
 category = "Package Management"
@@ -11114,7 +11114,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-package-verify"
-description = "Package Verifier for SigmaOS inspired by Arch Linux"
+description = "Package Verifier for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-verify"
 engine = "package_verify"
 category = "Package Management"
@@ -11125,7 +11125,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-iso-builder"
-description = "ISO Builder for SigmaOS inspired by Linux Mint"
+description = "ISO Builder for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-iso-builder"
 engine = "iso_builder"
 category = "Utilities"
@@ -11147,7 +11147,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-iso-builder"
-description = "ISO Builder for SigmaOS inspired by Arch Linux"
+description = "ISO Builder for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-iso-builder"
 engine = "iso_builder"
 category = "Utilities"
@@ -11158,7 +11158,7 @@ depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-boot-manager"
-description = "Boot Manager for SigmaOS inspired by Linux Mint"
+description = "Boot Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-boot-manager"
 engine = "boot_manager"
 category = "Utilities"
@@ -11180,7 +11180,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-boot-manager"
-description = "Boot Manager for SigmaOS inspired by Arch Linux"
+description = "Boot Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-boot-manager"
 engine = "boot_manager"
 category = "Utilities"
@@ -11202,7 +11202,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-disk-utility"
-description = "Disk Utility for SigmaOS inspired by Arch Linux"
+description = "Disk Utility for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disk-utility"
 engine = "disk_utility"
 category = "Utilities"
@@ -11213,7 +11213,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-updater-v2"
-description = "System Updater v2 for SigmaOS inspired by Linux Mint"
+description = "System Updater v2 for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-updater-v2"
 engine = "system_updater"
 category = "System Services"
@@ -11224,7 +11224,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-system-updater-v2"
-description = "System Updater v2 for SigmaOS inspired by Arch Linux"
+description = "System Updater v2 for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-updater-v2"
 engine = "system_updater"
 category = "System Services"
@@ -11235,7 +11235,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-kernel-builder"
-description = "Kernel Builder for SigmaOS inspired by Linux Mint"
+description = "Kernel Builder for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-kernel-builder"
 engine = "kernel_builder"
 category = "System Services"
@@ -11257,7 +11257,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-kernel-builder"
-description = "Kernel Builder for SigmaOS inspired by Arch Linux"
+description = "Kernel Builder for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel-builder"
 engine = "kernel_builder"
 category = "System Services"
@@ -11268,7 +11268,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-module-compiler"
-description = "Module Compiler for SigmaOS inspired by Linux Mint"
+description = "Module Compiler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-module-compiler"
 engine = "module_compiler"
 category = "Developer Tools"
@@ -11290,7 +11290,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-module-compiler"
-description = "Module Compiler for SigmaOS inspired by Arch Linux"
+description = "Module Compiler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-module-compiler"
 engine = "module_compiler"
 category = "Developer Tools"
@@ -11301,7 +11301,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-service-deployer"
-description = "Service Deployer for SigmaOS inspired by Linux Mint"
+description = "Service Deployer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-service-deployer"
 engine = "service_deployer"
 category = "Utilities"
@@ -11323,7 +11323,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-service-deployer"
-description = "Service Deployer for SigmaOS inspired by Arch Linux"
+description = "Service Deployer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service-deployer"
 engine = "service_deployer"
 category = "Utilities"
@@ -11334,7 +11334,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-update-notifier"
-description = "Update Notifier for SigmaOS inspired by Arch Linux"
+description = "Update Notifier for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update-notifier"
 engine = "update_notifier"
 category = "Utilities"
@@ -11345,7 +11345,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-fedora-update-notifier"
-description = "Update Notifier for SigmaOS inspired by Fedora Linux"
+description = "Update Notifier for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-update-notifier"
 engine = "update_notifier"
 category = "Utilities"
@@ -11356,7 +11356,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-session-logger"
-description = "Session Logger for SigmaOS inspired by Linux Mint"
+description = "Session Logger for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-session-logger"
 engine = "session_logger"
 category = "Utilities"
@@ -11378,7 +11378,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-session-logger"
-description = "Session Logger for SigmaOS inspired by Arch Linux"
+description = "Session Logger for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-session-logger"
 engine = "session_logger"
 category = "Utilities"
@@ -11389,7 +11389,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-fedora-session-logger"
-description = "Session Logger for SigmaOS inspired by Fedora Linux"
+description = "Session Logger for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-session-logger"
 engine = "session_logger"
 category = "Utilities"
@@ -11400,7 +11400,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-log-rotator"
-description = "Log Rotator for SigmaOS inspired by Linux Mint"
+description = "Log Rotator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-log-rotator"
 engine = "log_rotator"
 category = "Utilities"
@@ -11422,7 +11422,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-log-rotator"
-description = "Log Rotator for SigmaOS inspired by Arch Linux"
+description = "Log Rotator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-log-rotator"
 engine = "log_rotator"
 category = "Utilities"
@@ -11433,7 +11433,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-fedora-log-rotator"
-description = "Log Rotator for SigmaOS inspired by Fedora Linux"
+description = "Log Rotator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-log-rotator"
 engine = "log_rotator"
 category = "Utilities"
@@ -11444,7 +11444,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-theme-installer"
-description = "Theme Installer for SigmaOS inspired by Arch Linux"
+description = "Theme Installer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-theme-installer"
 engine = "theme_installer"
 category = "Desktop/UI"
@@ -11455,7 +11455,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-mint-icon-packer"
-description = "Icon Packer for SigmaOS inspired by Linux Mint"
+description = "Icon Packer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-icon-packer"
 engine = "icon_packer"
 category = "Utilities"
@@ -11477,7 +11477,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-icon-packer"
-description = "Icon Packer for SigmaOS inspired by Arch Linux"
+description = "Icon Packer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-icon-packer"
 engine = "icon_packer"
 category = "Utilities"
@@ -11488,7 +11488,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-wallpaper-setup"
-description = "Wallpaper Setup for SigmaOS inspired by Linux Mint"
+description = "Wallpaper Setup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-wallpaper-setup"
 engine = "wallpaper_setup"
 category = "Utilities"
@@ -11499,7 +11499,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-wallpaper-setup"
-description = "Wallpaper Setup for SigmaOS inspired by Arch Linux"
+description = "Wallpaper Setup for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wallpaper-setup"
 engine = "wallpaper_setup"
 category = "Utilities"
@@ -11510,7 +11510,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-desktop-config-importer"
-description = "Desktop Config Importer for SigmaOS inspired by Linux Mint"
+description = "Desktop Config Importer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-desktop-config-importer"
 engine = "desktop_config_importer"
 category = "Desktop/UI"
@@ -11521,7 +11521,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-desktop-config-importer"
-description = "Desktop Config Importer for SigmaOS inspired by Arch Linux"
+description = "Desktop Config Importer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-desktop-config-importer"
 engine = "desktop_config_importer"
 category = "Desktop/UI"
@@ -11532,7 +11532,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-system-configurator"
-description = "System Configurator for SigmaOS inspired by Arch Linux"
+description = "System Configurator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-configurator"
 engine = "system_configurator"
 category = "System Services"
@@ -11543,7 +11543,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-network-configurator"
-description = "Network Configurator for SigmaOS inspired by Linux Mint"
+description = "Network Configurator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-configurator"
 engine = "network_configurator"
 category = "Network"
@@ -11554,7 +11554,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-network-configurator"
-description = "Network Configurator for SigmaOS inspired by Arch Linux"
+description = "Network Configurator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-configurator"
 engine = "network_configurator"
 category = "Network"
@@ -11565,7 +11565,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-storage-manager"
-description = "Storage Manager for SigmaOS inspired by Linux Mint"
+description = "Storage Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-storage-manager"
 engine = "storage_manager"
 category = "Utilities"
@@ -11587,7 +11587,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-storage-manager"
-description = "Storage Manager for SigmaOS inspired by Arch Linux"
+description = "Storage Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-storage-manager"
 engine = "storage_manager"
 category = "Utilities"
@@ -11609,7 +11609,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-permission-manager"
-description = "Permission Manager for SigmaOS inspired by Arch Linux"
+description = "Permission Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-permission-manager"
 engine = "permission_manager"
 category = "Utilities"
@@ -11620,7 +11620,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-update-manager-v2"
-description = "Update Manager v2 for SigmaOS inspired by Linux Mint"
+description = "Update Manager v2 for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-manager-v2"
 engine = "update_manager"
 category = "Utilities"
@@ -11631,7 +11631,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-update-manager-v2"
-description = "Update Manager v2 for SigmaOS inspired by Arch Linux"
+description = "Update Manager v2 for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update-manager-v2"
 engine = "update_manager"
 category = "Utilities"
@@ -11642,7 +11642,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-package-lister"
-description = "Package Lister for SigmaOS inspired by Linux Mint"
+description = "Package Lister for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-lister"
 engine = "package_lister"
 category = "Package Management"
@@ -11653,7 +11653,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-package-lister"
-description = "Package Lister for SigmaOS inspired by Arch Linux"
+description = "Package Lister for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-lister"
 engine = "package_lister"
 category = "Package Management"
@@ -11664,7 +11664,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-repo-sync"
-description = "Repo Sync for SigmaOS inspired by Linux Mint"
+description = "Repo Sync for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-repo-sync"
 engine = "repo_sync"
 category = "Utilities"
@@ -11675,7 +11675,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-repo-sync"
-description = "Repo Sync for SigmaOS inspired by Arch Linux"
+description = "Repo Sync for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repo-sync"
 engine = "repo_sync"
 category = "Utilities"
@@ -11686,7 +11686,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-dependency-tracker"
-description = "Dependency Tracker for SigmaOS inspired by Linux Mint"
+description = "Dependency Tracker for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-dependency-tracker"
 engine = "dependency_tracker"
 category = "Utilities"
@@ -11697,7 +11697,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-dependency-tracker"
-description = "Dependency Tracker for SigmaOS inspired by Arch Linux"
+description = "Dependency Tracker for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dependency-tracker"
 engine = "dependency_tracker"
 category = "Utilities"
@@ -11708,7 +11708,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-system-optimizer"
-description = "System Optimizer for SigmaOS inspired by Linux Mint"
+description = "System Optimizer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-optimizer"
 engine = "system_optimizer"
 category = "System Services"
@@ -11730,7 +11730,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-system-optimizer"
-description = "System Optimizer for SigmaOS inspired by Arch Linux"
+description = "System Optimizer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-optimizer"
 engine = "system_optimizer"
 category = "System Services"
@@ -11741,7 +11741,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-performance-monitor"
-description = "Performance Monitor for SigmaOS inspired by Arch Linux"
+description = "Performance Monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-monitor"
 engine = "performance_monitor"
 category = "Utilities"
@@ -11763,7 +11763,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-resource-manager"
-description = "Resource Manager for SigmaOS inspired by Arch Linux"
+description = "Resource Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-manager"
 engine = "resource_manager"
 category = "Utilities"
@@ -11774,7 +11774,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-load-balancer"
-description = "Load Balancer for SigmaOS inspired by Linux Mint"
+description = "Load Balancer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-load-balancer"
 engine = "load_balancer"
 category = "Utilities"
@@ -11796,7 +11796,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-load-balancer"
-description = "Load Balancer for SigmaOS inspired by Arch Linux"
+description = "Load Balancer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-load-balancer"
 engine = "load_balancer"
 category = "Utilities"
@@ -11807,7 +11807,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-process-manager"
-description = "Process Manager for SigmaOS inspired by Linux Mint"
+description = "Process Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-process-manager"
 engine = "process_manager"
 category = "Utilities"
@@ -11829,7 +11829,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-process-manager"
-description = "Process Manager for SigmaOS inspired by Arch Linux"
+description = "Process Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-process-manager"
 engine = "process_manager"
 category = "Utilities"
@@ -11840,7 +11840,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-file-indexer"
-description = "File Indexer for SigmaOS inspired by Linux Mint"
+description = "File Indexer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-file-indexer"
 engine = "file_indexer"
 category = "Utilities"
@@ -11862,7 +11862,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-file-indexer"
-description = "File Indexer for SigmaOS inspired by Arch Linux"
+description = "File Indexer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file-indexer"
 engine = "file_indexer"
 category = "Utilities"
@@ -11873,7 +11873,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-search-index"
-description = "Search Index for SigmaOS inspired by Linux Mint"
+description = "Search Index for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-search-index"
 engine = "search_index"
 category = "Utilities"
@@ -11884,7 +11884,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-search-index"
-description = "Search Index for SigmaOS inspired by Arch Linux"
+description = "Search Index for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-search-index"
 engine = "search_index"
 category = "Utilities"
@@ -22066,7 +22066,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-scheduler"
-description = "CPU scheduling implementation for SigmaOS inspired by Linux kernel CFS and EEVDF"
+description = "CPU scheduling implementation for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scheduler"
 engine = "rust"
 category = "Scheduler"
@@ -22077,7 +22077,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-vfs"
-description = "Virtual Filesystem implementation for SigmaOS inspired by Linux kernel VFS"
+description = "Virtual Filesystem implementation for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vfs"
 engine = "rust"
 category = "Filesystem"
@@ -22088,7 +22088,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-netstack"
-description = "Networking stack implementation for SigmaOS inspired by Linux kernel networking"
+description = "Networking stack implementation for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-netstack"
 engine = "rust"
 category = "Networking"
