@@ -1162,6 +1162,7 @@ static int ata_write_lba28(uint16_t base, int slave, uint32_t lba, const uint8_t
         const uint16_t* w = (const uint16_t*)(buf + s * 512);
         for (int i = 0; i < 256; i++) outw(base, w[i]);
     }
+    ata_wait_ready(base);   /* let the drive finish committing */
     return sectors;
 }
 
@@ -1677,6 +1678,18 @@ static void show_ls(const char* args) {
         uint8_t* e = g_sector_buf + 446;
         lba = (uint32_t)e[8] | ((uint32_t)e[9] << 8) | ((uint32_t)e[10] << 16) | ((uint32_t)e[11] << 24);
     } else {
+        /* no arg: list the current directory. At root (empty cwd) fall
+         * through to the fixed root-dir listing below; inside a
+         * subdirectory resolve cwd as an absolute path ('/' prefix pins
+         * it against fs_resolve's cwd-joining). */
+        const char* cwd = (g_cur_proc >= 0 && g_cur_proc < MAX_PROCS && g_procs[g_cur_proc].used)
+                          ? g_procs[g_cur_proc].cwd : g_cwd;
+        if (cwd[0]) {
+            dirname[0] = '/';
+            int dl = 1;
+            while (cwd[dl - 1] && dl < 63) { dirname[dl] = cwd[dl - 1]; dl++; }
+            dirname[dl] = '\0';
+        }
         /* default: first partition's start LBA from MBR */
         if (blk_read_lba(0, g_sector_buf, 1) < 0) { kputs("ls: no MBR.\n"); return; }
         uint8_t* e = g_sector_buf + 446;
@@ -2191,7 +2204,11 @@ static int fat_set_entry(int kind, uint32_t clus, uint32_t val) {
     }
     /* normalize: callers expect 0 ok / <0 error; blk_write_lba returns
      * sectors-written (positive) on success */
-    return blk_write_lba(g_vol_fat_lba + sec, tmp, nsec) < 0 ? -1 : 0;
+    if (blk_write_lba(g_vol_fat_lba + sec, tmp, nsec) < 0) return -1;
+    /* keep the FAT mirror in sync (FAT12/16/32 keep 2 copies) */
+    if (g_vol_fatsz && blk_write_lba(g_vol_fat_lba + g_vol_fatsz + sec, tmp, nsec) < 0)
+        return -1;
+    return 0;
 }
 
 /* Allocate `count` clusters as a linked chain (last = EOC).
