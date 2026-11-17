@@ -2313,28 +2313,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-mullion"
-description = "Omarchy mullion component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-mullion"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-pkgs"
-description = "Omarchy pkgs component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-pkgs"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-plugin-marketplace"
 description = "Omarchy plugin marketplace component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-plugin-marketplace"
@@ -2461,17 +2439,6 @@ description = "Signed component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-signed"
 engine = "common_lib"
 category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-iso"
-description = "Omarchy ISO component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-iso"
-engine = "iso_builder"
-category = "Utilities"
 language = "unknown"
 inspirations = "None"
 visibility = "public"
@@ -6900,39 +6867,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-architecture"
-description = "Omarchy Linux architecture inspired component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-architecture"
-engine = "sub_repo_manager"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-sub-repos"
-description = "Sub-repository manager for SigmaOS inspired by Omarchy Linux philosophy"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-sub-repos"
-engine = "repo_manager"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/sub-repos"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-philosophy"
-description = "Omarchy Linux philosophy component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-philosophy"
-engine = "doc_generator"
-category = "Documentation"
-language = "markdown"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/philosophy"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-mint-mirrors"
 description = "Repository mirrors component for SigmaOS inspired by Linux Mint mirrors"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-mirrors"
@@ -7109,17 +7043,6 @@ visibility = "public"
 depends_on = ["SigmaOS-desktop", "SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-sub-repo-creator"
-description = "Sub-repo creator for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-sub-repo-creator"
-engine = "repo_creator"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/repo-creator"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-module-loader"
 description = "Module loader for SigmaOS inspired by Omarchy Linux architecture"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-module-loader"
@@ -7263,17 +7186,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-omarchy-repository"
-description = "Repository manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-repository"
-engine = "repo_manager"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/repository"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-repos"
 description = "Arch Linux repos integration for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repos"
@@ -7404,17 +7316,6 @@ language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/theme-installer"]
 visibility = "public"
 depends_on = []
-
-[[component]]
-name = "SigmaOS-omarchy-philosophy-docs"
-description = "Philosophy documentation for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-philosophy-docs"
-engine = "doc_generator"
-category = "Documentation"
-language = "markdown"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/philosophy-docs"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-arch-system-configs-backup"
@@ -7780,17 +7681,6 @@ visibility = "public"
 depends_on = ["SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-software"
-description = "Software manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-software"
-engine = "software_manager"
-category = "Package Management"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/software"]
-visibility = "public"
-depends_on = ["SigmaOS-packages", "SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-software"
 description = "Software manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software"
@@ -7820,17 +7710,6 @@ engine = "repo_manager"
 category = "Utilities"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/repositories"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-repos"
-description = "Repository manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-repos"
-engine = "repo_manager"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/repos"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -7868,17 +7747,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-customize"
-description = "Customize component for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-customize"
-engine = "customizer"
-category = "Utilities"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/customize"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-customize"
 description = "Customize component for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-customize"
@@ -7897,17 +7765,6 @@ engine = "support_system"
 category = "System Services"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/helpdesk"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-helpdesk"
-description = "Helpdesk component for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-helpdesk"
-engine = "support_system"
-category = "System Services"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/helpdesk"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -7956,17 +7813,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-packages"
-description = "Packages manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-packages"
-engine = "package_manager"
-category = "Package Management"
-language = "shell"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/packages"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-packages-full"
 description = "Full packages list for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-packages-full"
@@ -8000,17 +7846,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-disk"
-description = "Disk manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disk"
-engine = "disk_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/disk"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-disk"
 description = "Disk manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disk"
@@ -8029,17 +7864,6 @@ engine = "network_manager"
 category = "Network"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-network"
-description = "Network manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-network"
-engine = "network_manager"
-category = "Network"
-language = "rust"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/network"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8165,17 +7989,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-security"
-description = "Security manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-security"
-engine = "security"
-category = "Security"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/security"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-security"
 description = "Security manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-security"
@@ -8275,17 +8088,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-system-info"
-description = "System info for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-info"
-engine = "system_info"
-category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-info"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-system-info"
 description = "System info for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-info"
@@ -8304,17 +8106,6 @@ engine = "terminal"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/terminal"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-terminal"
-description = "Terminal emulator for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal"
-engine = "terminal"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8462,17 +8253,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-edit"
-description = "Text editor for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-edit"
-engine = " text_editor"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/edit"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-edit"
 description = "Text editor for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-edit"
@@ -8583,17 +8363,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-terminal-emulator"
-description = "Terminal emulator for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal-emulator"
-engine = "terminal"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal-emulator"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-terminal-emulator"
 description = "Terminal emulator for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal-emulator"
@@ -8682,17 +8451,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-service"
-description = "Service manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service"
-engine = "service_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/service-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-service"
 description = "Service manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service"
@@ -8759,17 +8517,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-help"
-description = "Help center for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-help"
-engine = "support_system"
-category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/help-center"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-help"
 description = "Help center for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-help"
@@ -8788,17 +8535,6 @@ engine = "configurator"
 category = "System Services"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-configurator"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-configurator"
-description = "System configurator for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-configurator"
-engine = "configurator"
-category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/configurator"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -8924,17 +8660,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-print"
-description = "Printer manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-print"
-engine = "printer_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/print-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-print"
 description = "Printer manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-print"
@@ -8957,17 +8682,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-scan"
-description = "Scanner manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-scan"
-engine = "scanner_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/scan-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-scan"
 description = "Scanner manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-scan"
@@ -8986,17 +8700,6 @@ engine = "network_tools"
 category = "Network"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-tools"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-net"
-description = "Network tools for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-net"
-engine = "network_tools"
-category = "Network"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/network-tools"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9118,17 +8821,6 @@ engine = "themes_manager"
 category = "Desktop/UI"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/themes-manager"]
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-omarchy-themes-manager"
-description = "Themes manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-themes-manager"
-engine = "themes_manager"
-category = "Desktop/UI"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/themes-manager"]
 visibility = "public"
 depends_on = []
 
@@ -9485,17 +9177,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-snap-store"
-description = "Snap store for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-snap-store"
-engine = "snap_store"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/snap-store"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-snap-store"
 description = "Snap store for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-snap-store"
@@ -9580,17 +9261,6 @@ engine = "system_security"
 category = "System Services"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-security"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-system-security"
-description = "System security for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-security"
-engine = "system_security"
-category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-security"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -9980,17 +9650,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-dm2"
-description = "Directory manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-directory-manager"
-engine = "directory_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/directory-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-dm2"
 description = "Directory manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-directory-manager"
@@ -10086,17 +9745,6 @@ engine = "permission_manager"
 category = "Utilities"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/permission-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-pm4"
-description = "Permission manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-permission-manager"
-engine = "permission_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/permission-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10365,17 +10013,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-pm2"
-description = "Performance monitor for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-performance-monitor"
-engine = "performance_monitor"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/performance-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-pm2"
 description = "Performance monitor for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-monitor"
@@ -10493,17 +10130,6 @@ engine = "resource_monitor"
 category = "Utilities"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/resource-monitor"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-rm3"
-description = "Resource monitor for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-resource-monitor"
-engine = "resource_monitor"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/resource-monitor"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -10948,17 +10574,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-software-center"
-description = "Software Center for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-software-center"
-engine = "software_center"
-category = "Package Management"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/software-center"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-software-center"
 description = "Software Center for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software-center"
@@ -11234,17 +10849,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-help-tips"
-description = "Help Tips for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-help-tips"
-engine = "help_tips"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/help-tips"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-help-tips"
 description = "Help Tips for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-help-tips"
@@ -11267,17 +10871,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-package-querier"
-description = "Package Querier for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-querier"
-engine = "package_querier"
-category = "Package Management"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/package-querier"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-package-querier"
 description = "Package Querier for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-querier"
@@ -11285,17 +10878,6 @@ engine = "package_querier"
 category = "Package Management"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/package-querier"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-dependency-resolver"
-description = "Dependency Resolver for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dependency-resolver"
-engine = "dependency_resolver"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/dependency-resolver"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11355,17 +10937,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-repository-browser"
-description = "Repository Browser for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-repository-browser"
-engine = "repository_browser"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/repository-browser"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-repository-browser"
 description = "Repository Browser for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repository-browser"
@@ -11406,17 +10977,6 @@ engine = "scheduler"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/scheduler"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-scheduler"
-description = "Scheduler for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-scheduler"
-engine = "scheduler"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/scheduler"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11505,17 +11065,6 @@ engine = "task_manager"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/task-manager"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-task-manager"
-description = "Task Manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-task-manager"
-engine = "task_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/task-manager"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11674,17 +11223,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-package-verify"
-description = "Package Verifier for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-verify"
-engine = "package_verify"
-category = "Package Management"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/package-verify"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-package-verify"
 description = "Package Verifier for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-verify"
@@ -11791,17 +11329,6 @@ engine = "system_updater"
 category = "System Services"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-updater-v2"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-system-updater-v2"
-description = "System Updater v2 for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-updater-v2"
-engine = "system_updater"
-category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-updater-v2"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -11916,17 +11443,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-update-notifier"
-description = "Update Notifier for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update-notifier"
-engine = "update_notifier"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/update-notifier"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-update-notifier"
 description = "Update Notifier for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update-notifier"
@@ -12037,17 +11553,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-theme-installer"
-description = "Theme Installer for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-theme-installer"
-engine = "theme_installer"
-category = "Desktop/UI"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/theme-installer"]
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-theme-installer"
 description = "Theme Installer for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-theme-installer"
@@ -12103,17 +11608,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-wallpaper-setup"
-description = "Wallpaper Setup for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-wallpaper-setup"
-engine = "wallpaper_setup"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/wallpaper-setup"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-wallpaper-setup"
 description = "Wallpaper Setup for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wallpaper-setup"
@@ -12136,17 +11630,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-desktop-config-importer"
-description = "Desktop Config Importer for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-desktop-config-importer"
-engine = "desktop_config_importer"
-category = "Desktop/UI"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/desktop-config-importer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-desktop-config-importer"
 description = "Desktop Config Importer for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-desktop-config-importer"
@@ -12154,17 +11637,6 @@ engine = "desktop_config_importer"
 category = "Desktop/UI"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/desktop-config-importer"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-system-configurator"
-description = "System Configurator for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-configurator"
-engine = "system_configurator"
-category = "System Services"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-configurator"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -12290,17 +11762,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-package-lister"
-description = "Package Lister for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-lister"
-engine = "package_lister"
-category = "Package Management"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/package-lister"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-package-lister"
 description = "Package Lister for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-lister"
@@ -12323,17 +11784,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-repo-sync"
-description = "Repo Sync for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-repo-sync"
-engine = "repo_sync"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/repo-sync"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-repo-sync"
 description = "Repo Sync for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repo-sync"
@@ -12352,17 +11802,6 @@ engine = "dependency_tracker"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/dependency-tracker"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-dependency-tracker"
-description = "Dependency Tracker for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dependency-tracker"
-engine = "dependency_tracker"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/dependency-tracker"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
@@ -12550,17 +11989,6 @@ engine = "search_index"
 category = "Utilities"
 language = "c"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/search-index"]
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-search-index"
-description = "Search Index for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-search-index"
-engine = "search_index"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/search-index"]
 visibility = "public"
 depends_on = ["SigmaOS-system"]
 
