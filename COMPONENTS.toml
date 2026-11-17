@@ -8440,17 +8440,6 @@ visibility = "public"
 depends_on = ["SigmaOS-filesystem", "SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-file"
-description = "File manager for SigmaOS inspired by Omarchy Linux"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-file"
-engine = " file_manager"
-category = "Utilities"
-language = "c"
-inspirations = ["https://omarchy.org", "https://github.com/omarchy/file"]
-visibility = "public"
-depends_on = ["SigmaOS-filesystem", "SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-file"
 description = "File manager for SigmaOS inspired by Arch Linux"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file"
