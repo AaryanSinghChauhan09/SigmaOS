@@ -15262,7 +15262,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-csh"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "C shell command interpreter with parsing, history, and basic command execution"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-csh"
 engine = "messaging"
 category = "Messaging"
@@ -20642,7 +20642,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-package-signing"
-description = "Package signing infrastructure: Ed25519 signatures, GPG keys, repo metadata signing"
+description = "Package signature generation and verification with key management"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-signing"
 engine = "package_manager"
 category = "Package Management"
