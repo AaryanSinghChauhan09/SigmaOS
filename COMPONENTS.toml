@@ -5316,17 +5316,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-library-2"
-description = "Library 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library-2"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-laboratory"
 description = "Laboratory component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-laboratory"
@@ -5756,75 +5745,9 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-library-3"
-description = "Library 3 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library-3"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-framework"
 description = "Framework component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-framework"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-library-4"
-description = "Library 4 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library-4"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-library-5"
-description = "Library 5 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library-5"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-library-6"
-description = "Library 6 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library-6"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-library-7"
-description = "Library 7 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library-7"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-library-8"
-description = "Library 8 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library-8"
 engine = "common_lib"
 category = "Developer Tools"
 language = "unknown"
@@ -6295,83 +6218,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-layer-2"
-description = "Layer 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-layer-2"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-layer-3"
-description = "Layer 3 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-layer-3"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-layer-4"
-description = "Layer 4 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-layer-4"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-layer-5"
-description = "Layer 5 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-layer-5"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-layer-6"
-description = "Layer 6 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-layer-6"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-layer-7"
-description = "Layer 7 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-layer-7"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-layer-8"
-description = "Layer 8 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-layer-8"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-system-call"
 description = "System call component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-call"
@@ -6430,17 +6276,6 @@ depends_on = ["SigmaOS-system"]
 name = "SigmaOS-tool-call"
 description = "Tool call component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tool-call"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-library-apis-2"
-description = "Library APIs 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-library-apis-2"
 engine = "common_lib"
 category = "Developer Tools"
 language = "unknown"
