@@ -29577,6 +29577,7 @@ visibility = "public"
 depends_on = []
 
 [[component]]
+name = "SigmaOS-libreoffice-draw"
 description = "Vector drawing document engine with layers, styles, and SVG export"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-draw"
 engine = "component"
@@ -29587,6 +29588,7 @@ visibility = "public"
 depends_on = []
 
 [[component]]
+name = "SigmaOS-libreoffice-impress"
 description = "Presentation slide engine with layouts, notes, transitions, and HTML export"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-impress"
 engine = "component"
@@ -29597,6 +29599,7 @@ visibility = "public"
 depends_on = []
 
 [[component]]
+name = "SigmaOS-libreoffice-math"
 description = "Formula and equation editor with expression parser and evaluator"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice-math"
 engine = "component"
