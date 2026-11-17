@@ -5684,7 +5684,7 @@ description = "Package component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package"
 engine = "sources_manager"
 category = "Package Management"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -18242,7 +18242,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-docker"
-description = "No GitHub description is set; component scope remains unclassified."
+description = "Docker-compatible container platform with image, container, build, compose, and volume management"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-docker"
 engine = "virtualization"
 category = "Virtualization"
@@ -19542,7 +19542,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-genoffice"
-description = "No GitHub description is set; component scope remains unclassified."
+description = "GenOffice office suite component family root"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-genoffice"
 engine = "office"
 category = "Office"
@@ -22648,17 +22648,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-genoffice2"
-description = "GenOffice office suite compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-genoffice2"
-engine = "Rust"
-category = "Office"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-libreoffice2"
 description = "LibreOffice compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice2"
@@ -22851,17 +22840,6 @@ description = "VLC media player compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vlc2"
 engine = "Rust"
 category = "Application"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-docker3"
-description = "Docker container platform compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-docker3"
-engine = "Rust"
-category = "Container"
 languages = ["Rust"]
 dependencies = []
 public = true
@@ -24078,17 +24056,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-power-manager2"
-description = "Power Manager power manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-thermal-manager2"
 description = "Thermal Manager thermal manager compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thermal-manager2"
@@ -24103,17 +24070,6 @@ inspirations = "None"
 name = "SigmaOS-firmware-manager2"
 description = "Firmware Manager firmware manager compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firmware-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-driver-manager2"
-description = "Driver Manager driver manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-driver-manager2"
 engine = "Rust"
 category = "System"
 languages = ["Rust"]
@@ -24158,17 +24114,6 @@ inspirations = "None"
 name = "SigmaOS-software-updater2"
 description = "Software Updater software updater compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-updater2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-software-center2"
-description = "Software Center software center compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-center2"
 engine = "Rust"
 category = "System"
 languages = ["Rust"]
