@@ -6291,6 +6291,12 @@ void isr_common(uint32_t* frame) {
         __asm__ volatile("movl %%cr2, %0" : "=r"(cr2));
         kputs(" cr2=");
         kprint_hex32(cr2);
+        /* debug: dump exception frame neighborhood to expose return addrs */
+        kputs(" stk:");
+        for (int i = -8; i < 16; i++) {
+            kputs(" ");
+            kprint_hex32(frame[i]);
+        }
     }
     kputs(" ***\n");
     klog("exception: vec=");
@@ -8916,6 +8922,11 @@ static uint32_t g_user_base = 0;
 __attribute__((section(".text"), naked))
 void resume_user(void) {
     __asm__ volatile(
+        "movl (%%esp), %%eax\n"          /* return address -> resume eip */
+        "movl %%eax, g_resume_eip\n"
+        "movl %%esp, %%eax\n"
+        "addl $4, %%eax\n"               /* caller esp after ret -> resume esp */
+        "movl %%eax, g_resume_esp\n"
         "movl %%ebx, g_kregs+0\n"
         "movl %%esi, g_kregs+4\n"
         "movl %%edi, g_kregs+8\n"
