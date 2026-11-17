@@ -189,22 +189,32 @@ render_template() {
     local year; year="$(date +%Y)"
     # TOML-quoted variants for the [contract] arrays; plain for README.
     local provides_q depends_q
-    provides_q="$(printf '%s' "$provides" | tr ',' '\n' | sed 's/^ *//;s/ *$//' | grep . | sed 's/.*/"&"/' | paste -sd', ' -)"
-    depends_q="$(printf '%s' "$depends" | tr ',' '\n' | sed 's/^ *//;s/ *$//' | grep . | sed 's/.*/"&"/' | paste -sd', ' -)"
+    provides_q="$(printf '%s' "$provides" | tr ',' '\n' | sed 's/^ *//;s/ *$//' | sed '/^$/d' | sed 's/.*/"&"/' | paste -sd', ' -)"
+    depends_q="$(printf '%s' "$depends" | tr ',' '\n' | sed 's/^ *//;s/ *$//' | sed '/^$/d' | sed 's/.*/"&"/' | paste -sd', ' -)"
     [[ -z "$provides_q" ]] && provides_q='"component"'
     [[ -d "$SIGMA_TEMPLATE_DIR" ]] || hub_die "template dir missing: $SIGMA_TEMPLATE_DIR"
+    # escape sed replacement metacharacters (&, /, \) in every substituted value
+    local e_name e_desc e_cat e_tier e_prov e_dep e_eng e_provlist
+    e_name="$(printf '%s' "$name" | sed 's/[&/\\]/\\&/g')"
+    e_desc="$(printf '%s' "$desc" | sed 's/[&/\\]/\\&/g')"
+    e_cat="$(printf '%s' "$cat" | sed 's/[&/\\]/\\&/g')"
+    e_tier="$(printf '%s' "$tier" | sed 's/[&/\\]/\\&/g')"
+    e_prov="$(printf '%s' "$provides_q" | sed 's/[&/\\]/\\&/g')"
+    e_dep="$(printf '%s' "$depends_q" | sed 's/[&/\\]/\\&/g')"
+    e_eng="$(printf '%s' "$engine" | sed 's/[&/\\]/\\&/g')"
+    e_provlist="$(printf '%s' "$provides" | sed 's/[&/\\]/\\&/g')"
     ( cd "$SIGMA_TEMPLATE_DIR" && find . -type f ) | while read -r f; do
         local rel="${f#./}"
         local out="$dest/$rel"
         mkdir -p "$(dirname "$out")"
-        sed -e "s/__COMPONENT_NAME__/$name/g" \
-            -e "s/__COMPONENT_DESC__/$desc/g" \
-            -e "s/__COMPONENT_CATEGORY__/$cat/g" \
-            -e "s/__COMPONENT_TIER__/$tier/g" \
-            -e "s/__COMPONENT_PROVIDES__/$provides_q/g" \
-            -e "s/__COMPONENT_DEPENDS__/$depends_q/g" \
-            -e "s/__COMPONENT_ENGINE__/$engine/g" \
-            -e "s/__COMPONENT_PROVIDES_LIST__/$provides/g" \
+        sed -e "s/__COMPONENT_NAME__/$e_name/g" \
+            -e "s/__COMPONENT_DESC__/$e_desc/g" \
+            -e "s/__COMPONENT_CATEGORY__/$e_cat/g" \
+            -e "s/__COMPONENT_TIER__/$e_tier/g" \
+            -e "s/__COMPONENT_PROVIDES__/$e_prov/g" \
+            -e "s/__COMPONENT_DEPENDS__/$e_dep/g" \
+            -e "s/__COMPONENT_ENGINE__/$e_eng/g" \
+            -e "s/__COMPONENT_PROVIDES_LIST__/$e_provlist/g" \
             -e "s/__COMPONENT_CRATE__/$crate_lib/g" \
             -e "s/__COMPONENT_CRATE_LIB__/${crate_lib}_lib/g" \
             -e "s/__GITHUB_ORG__/$SIGMA_GITHUB_ORG/g" \
@@ -320,11 +330,11 @@ cmd_upgrade() {
         if [[ $DRY_RUN -eq 1 ]]; then upgraded=$((upgraded+1)); continue; fi
         # scaffold only the missing pieces from the template (non-destructive)
         local desc engine tier provides depends
-        desc="$(component_file_field "$path/COMPONENT.toml" component description 2>/dev/null || echo "SigmaOS $name component")"
-        engine="$(component_file_field "$path/COMPONENT.toml" component name 2>/dev/null || echo "${name#SigmaOS-}")"
-        tier="$(component_file_field "$path/COMPONENT.toml" component tier 2>/dev/null || echo 2)"
-        provides="$(component_file_field "$path/COMPONENT.toml" contract provides 2>/dev/null || echo component)"
-        depends="$(component_file_field "$path/COMPONENT.toml" contract depends_on 2>/dev/null || echo '')"
+        desc="$(component_file_field "$path/COMPONENT.toml" component description 2>/dev/null)"; desc="${desc:-${name#SigmaOS-} component}"
+        engine="$(component_file_field "$path/COMPONENT.toml" component name 2>/dev/null)"; engine="${engine:-${name#SigmaOS-}}"
+        tier="$(component_file_field "$path/COMPONENT.toml" component tier 2>/dev/null)"; tier="${tier:-2}"
+        provides="$(component_file_field "$path/COMPONENT.toml" contract provides 2>/dev/null)"; provides="${provides:-component}"
+        depends="$(component_file_field "$path/COMPONENT.toml" contract depends_on 2>/dev/null)"
         # render full template to a temp dir then copy only missing files
         local tmp; tmp="$(mktemp -d)"
         render_template "$tmp" "$name" "$desc" "$cat" "$tier" "$provides" "$depends" "$engine"
