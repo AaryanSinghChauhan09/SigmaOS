@@ -26718,7 +26718,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-pacman-mirrors"
-description = "SigmaOS SigmaOS-arch-pacman-mirrors component"
+description = "Package mirror management with ranking, speed testing, and sync"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pacman-mirrors"
 engine = "component"
 category = "Components"
@@ -27026,7 +27026,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-repository"
-description = "SigmaOS component repository"
+description = "Package repository management with sync operations and package queries"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repository"
 engine = "component"
 category = "Components"
