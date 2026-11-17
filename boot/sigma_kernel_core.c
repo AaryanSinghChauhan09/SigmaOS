@@ -6293,7 +6293,7 @@ void isr_common(uint32_t* frame) {
         kprint_hex32(cr2);
         /* debug: dump exception frame neighborhood to expose return addrs */
         kputs(" stk:");
-        for (int i = -8; i < 16; i++) {
+        for (int i = -4; i < 64; i++) {
             kputs(" ");
             kprint_hex32(frame[i]);
         }
