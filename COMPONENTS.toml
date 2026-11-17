@@ -29248,7 +29248,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-fuse2"
-description = "SigmaOS SigmaOS-fuse2 component"
+description = "Userspace virtual filesystem namespace and mount table"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fuse2"
 engine = "component"
 category = "Components"
