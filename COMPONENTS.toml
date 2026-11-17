@@ -12137,7 +12137,7 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-accelerate"
-description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-accelerate."
+description = "Hardware acceleration framework with GPU/CPU/NPU detection, compute capability, and memory management"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accelerate"
 engine = "common_lib"
 category = "Developer Tools"
@@ -26850,7 +26850,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-profile"
-description = "SigmaOS SigmaOS-arch-profile component"
+description = "System profiling tool collecting CPU, memory, disk, OS, and hardware information"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-profile"
 engine = "component"
 category = "Components"
