@@ -14062,7 +14062,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-analytics"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Event aggregation and analytics with counters, histograms, and persistence"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-analytics"
 engine = "data_engineering"
 category = "Data Engineering"
@@ -14352,7 +14352,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-api-gateway"
-description = "No GitHub description is set; component scope remains unclassified."
+description = "Simple API gateway with route-based request routing and middleware"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-api-gateway"
 engine = "web_server"
 category = "Web Services"
