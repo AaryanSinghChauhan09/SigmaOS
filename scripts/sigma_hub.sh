@@ -16,6 +16,9 @@
 #   sigma_hub.sh upgrade <name|--all> [--dry-run]
 #   sigma_hub.sh sync [--pull|--push] [name ...]
 #   sigma_hub.sh push [name|--all]
+#   sigma_hub.sh search <regex>        # pacman -Ss / apt search
+#   sigma_hub.sh info <name>           # apt show / pacman -Qi
+#   sigma_hub.sh depends <name>        # apt-cache depends
 #
 # PRINCIPLES: MODULARITY, SINGLE RESPONSIBILITY, DRY, KISS, SEPARATION OF
 # CONCERNS, UNIFORM INFORMATION, OPEN/CLOSED, DEFENSIVE PROGRAMMING.
@@ -360,6 +363,63 @@ cmd_upgrade() {
     hub_ok "upgrade complete: $upgraded upgraded, $skipped already-standard/absent"
 }
 
+# search <regex> — pacman -Ss / apt search over the component registry.
+cmd_search() {
+    [[ ${#TARGETS[@]} -eq 0 ]] && hub_die "search requires a pattern"
+    local pat="${TARGETS[0]}"
+    printf '%-38s %-22s %-10s %s\n' COMPONENT CATEGORY LANG DESCRIPTION
+    components_all | while IFS=$'\t' read -r name repo engine cat lang vis dep desc; do
+        [[ -z "$name" ]] && continue
+        [[ -n "$CATEGORY_FILTER" && "$cat" != "$CATEGORY_FILTER" ]] && continue
+        [[ "$name$desc$cat" =~ $pat ]] || continue
+        printf '%-38s %-22s %-10s %s\n' "$name" "$cat" "$lang" "${desc:0:60}"
+    done
+}
+
+# info <name> — apt show / pacman -Qi style full metadata for one component.
+cmd_info() {
+    [[ ${#TARGETS[@]} -eq 0 ]] && hub_die "info requires a component name"
+    local name="${TARGETS[0]}" row
+    row="$(component_get "$name")"
+    [[ -z "$row" ]] && hub_die "$name not in COMPONENTS.toml"
+    local repo engine cat lang vis dep desc
+    IFS=$'\t' read -r _ repo engine cat lang vis dep desc <<<"$row"
+    local path; path="$(component_local_path "$name")"
+    echo "Name:        $name"
+    echo "Repository:  $repo"
+    echo "Engine:      $engine"
+    echo "Category:    $cat"
+    echo "Language:    $lang"
+    echo "Visibility:  $vis"
+    [[ "$dep" == "-" ]] && dep=""
+    echo "Depends on:  ${dep:- (none)}"
+    echo "Local path:  $path $([[ -d "$path" ]] && echo '[present]' || echo '[absent]')"
+    [[ -n "$desc" ]] && echo "Description: $desc"
+    if [[ -f "$path/COMPONENT.toml" ]]; then
+        echo "--- COMPONENT.toml ---"
+        cat "$path/COMPONENT.toml"
+    fi
+}
+
+# depends <name> — apt-cache depends: show declared dependency closure (1 level + count).
+cmd_depends() {
+    [[ ${#TARGETS[@]} -eq 0 ]] && hub_die "depends requires a component name"
+    local name="${TARGETS[0]}" row dep
+    row="$(component_get "$name")"
+    [[ -z "$row" ]] && hub_die "$name not in COMPONENTS.toml"
+    IFS=$'\t' read -r _ _ _ _ _ _ dep _ <<<"$row"
+    [[ "$dep" == "-" || -z "$dep" ]] && { echo "$name depends on: (none)"; return; }
+    echo "$name depends on:"
+    local d
+    IFS=',' read -ra arr <<<"$dep"
+    for d in "${arr[@]}"; do
+        d="${d// /}"
+        local st="?"; component_exists "$d" && st="ok"
+        local p; p="$(component_local_path "$d")"; [[ -d "$p" ]] && st="$st+local"
+        printf '  %-40s %s\n' "$d" "$st"
+    done
+}
+
 cmd_sync() {
     require_cmd git
     local targets=("${TARGETS[@]}")
@@ -387,7 +447,7 @@ cmd_sync() {
 # --- main --------------------------------------------------------------------
 cmd="${1:-help}"; shift || true
 case "$cmd" in
-    list|status|audit|connect|create|upgrade|sync)
+    list|status|audit|connect|create|upgrade|sync|search|info|depends)
         parse_common "$@"
         "cmd_${cmd}"
         ;;

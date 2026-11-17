@@ -50,7 +50,8 @@ try:
 except Exception as e:
     sys.stderr.write(f"components_all: {e}\n"); sys.exit(1)
 for c in data.get("component", []):
-    dep = ",".join(c.get("depends_on", []))
+    dep = ",".join(c.get("depends_on", [])) or "-"
+    desc = str(c.get("description","")).replace("\t"," ").replace("\n"," ")
     print("\t".join([
         str(c.get("name","")),
         str(c.get("repo","")),
@@ -59,6 +60,7 @@ for c in data.get("component", []):
         str(c.get("language","rust")),
         str(c.get("visibility","private")),
         dep,
+        desc,
     ]))
 PY
 }
