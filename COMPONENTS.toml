@@ -15482,7 +15482,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-electron"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Electron-like desktop application framework with window and process management"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-electron"
 engine = "gui_toolkit"
 category = "GUI Frameworks"
@@ -26421,12 +26421,11 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-lxc"
-description = "SigmaOS SigmaOS-arch-lxc component"
+description = "LXC container management interface with lifecycle and configuration"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lxc"
-engine = "component"
-category = "Components"
+engine = "container_runtime"
+category = "Containers"
 language = "rust"
-inspirations = "None"
 visibility = "public"
 depends_on = []
 
