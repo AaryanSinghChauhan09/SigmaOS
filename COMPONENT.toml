@@ -1,0 +1,16 @@
+[component]
+name = "SigmaOS"
+tier = 0
+stability = "stable"
+language = "rust"
+description = "Central sovereign operating system umbrella repository linking all ecosystem components"
+upstream = []
+
+[contract]
+provides = ["component_registry", "fleet_hub"]
+depends_on = []
+
+[maturity]
+status = "Implemented"
+test_evidence = "Registry validation and hub health checks pass"
+next_milestone = "Component fleet completion and bootable image verification"
