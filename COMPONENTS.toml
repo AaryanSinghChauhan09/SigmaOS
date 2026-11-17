@@ -13792,7 +13792,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-alerting"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Comprehensive monitoring and alerting with rules, channels, incidents, escalation, and monitors"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-alerting"
 engine = "observability"
 category = "Debugging"
@@ -17712,7 +17712,7 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-data-processing"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Data processing engine with jobs, tasks, dependencies, and validation"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-data-processing"
 engine = "data_engineering"
 category = "Data Engineering"
