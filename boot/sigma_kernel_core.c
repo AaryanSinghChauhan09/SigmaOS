@@ -522,6 +522,11 @@ static uint32_t g_map_mb;
 int      g_user_dead   = 0;
 uint32_t g_resume_eip  = 0;
 uint32_t g_resume_esp  = 0;
+/* Kernel callee-saved regs saved on ring-3 entry, restored on kernel resume.
+ * resume_user's popal loads USER reg values; without this the kernel resumes
+ * with user ebx/esi/edi/ebp live, breaking the callee-saved contract (edi is
+ * used as a global anchor in sched_loop -> wild pointer #PF). */
+uint32_t g_kregs[4] __attribute__((section(".bss")));
 /* Preemptive scheduling state (timer-tick context switch) */
 int      g_preempt_pending = 0;
 int      g_user_active     = 0;
@@ -6163,7 +6168,12 @@ __asm__(
     "    je 1f\n"
     "    addl $20, %esp\n"
     /* ring0 resume: restore saved kernel stack, jump to saved kernel eip
-     * (iret cannot switch esp at same privilege) */
+     * (iret cannot switch esp at same privilege). popal above loaded USER
+     * reg values — restore kernel callee-saved regs from g_kregs first. */
+    "    movl g_kregs+0, %ebx\n"
+    "    movl g_kregs+4, %esi\n"
+    "    movl g_kregs+8, %edi\n"
+    "    movl g_kregs+12, %ebp\n"
     "    movl g_resume_esp, %esp\n"
     "    jmp *g_resume_eip\n"
     "1:\n"
@@ -6196,7 +6206,12 @@ __asm__(
     "    jz 2f\n"                    /* kernel-mode IRQ: plain iret */
     "    addl $20, %esp\n"
     /* ring0 resume: restore saved kernel stack, jump to saved kernel eip
-     * (iret cannot switch esp at same privilege) */
+     * (iret cannot switch esp at same privilege). popal above loaded USER
+     * reg values — restore kernel callee-saved regs from g_kregs first. */
+    "    movl g_kregs+0, %ebx\n"
+    "    movl g_kregs+4, %esi\n"
+    "    movl g_kregs+8, %edi\n"
+    "    movl g_kregs+12, %ebp\n"
     "    movl g_resume_esp, %esp\n"
     "    sti\n"                      /* irq_common_entry ran cli; restore IF */
     "    jmp *g_resume_eip\n"
@@ -8901,6 +8916,10 @@ static uint32_t g_user_base = 0;
 __attribute__((section(".text"), naked))
 void resume_user(void) {
     __asm__ volatile(
+        "movl %%ebx, g_kregs+0\n"
+        "movl %%esi, g_kregs+4\n"
+        "movl %%edi, g_kregs+8\n"
+        "movl %%ebp, g_kregs+12\n"
         "movl g_user_ctx+28, %%eax\n pushl %%eax\n"   /* eax */
         "movl g_user_ctx+24, %%ecx\n pushl %%ecx\n"   /* ecx */
         "movl g_user_ctx+20, %%edx\n pushl %%edx\n"   /* edx */
@@ -8924,6 +8943,10 @@ void resume_user(void) {
 __attribute__((section(".text"), naked))
 static void enter_user(uint32_t eip, uint32_t esp) {
     __asm__ volatile(
+        "movl %%ebx, g_kregs+0\n"
+        "movl %%esi, g_kregs+4\n"
+        "movl %%edi, g_kregs+8\n"
+        "movl %%ebp, g_kregs+12\n"
         "movl (%%esp), %%eax\n"       /* return address -> resume eip */
         "movl %%eax, g_resume_eip\n"
         "movl %%esp, %%eax\n"
