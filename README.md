@@ -159,6 +159,27 @@ SigmaOS follows **one repo per component** (Omarchy-inspired multi-subrepo model
 
 Full index: [SigmaOS GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
 
+### Component Hub (`scripts/sigma_hub.sh`)
+
+This repository is the **connector** for the component fleet. The hub reads
+`COMPONENTS.toml` + `components/*.toml` as the single source of truth and
+drives every `SigmaOS-*` repo through one shell interface:
+
+```sh
+make hub                 # help
+make hub-list            # components + local git status
+make hub-status NAME=SigmaOS-kernel   # per-repo detail + github check
+make hub-audit           # COMPONENT.toml coverage / upgrade candidates
+make hub-create NAME=SigmaOS-foo ARGS="--desc 'Foo' --cat Utilities --dry-run"
+make hub-upgrade NAME=--all ARGS="--dry-run"
+make hub-sync ARGS="--push"
+```
+
+- **connect** — clone/link a declared component into the fleet dir (optionally as a submodule)
+- **create** — scaffold a new component repo from `templates/component/` (COMPONENT.toml, README, Apache-2.0 LICENSE, CI, Rust src + AAA tests), register it in `COMPONENTS.toml`, and create the GitHub repo
+- **upgrade** — non-destructively bring an existing repo up to the component standard (adds only missing files, language-aware)
+- **sync/push** — pull or push component checkouts in bulk
+
 ---
 
 ## 📋 Principles

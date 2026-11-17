@@ -1,0 +1,32 @@
+[package]
+name = "__COMPONENT_CRATE__"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+authors = ["SigmaOS Contributors"]
+description = "SigmaOS component: __COMPONENT_NAME__"
+repository = "https://github.com/__GITHUB_ORG__/__COMPONENT_NAME__"
+license = "Apache-2.0"
+keywords = ["sigmaos", "os", "systems"]
+categories = ["os"]
+publish = false
+
+[lib]
+name = "__COMPONENT_CRATE_LIB__"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
+[dependencies]
+thiserror = "1.0"
+log = "0.4"
+
+[dev-dependencies]
+pretty_assertions = "1.4"
+
+[features]
+default = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

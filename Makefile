@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -17,6 +17,29 @@ registry-audit:
 # Read-only validation of canonical suite mappings and unresolved constituents.
 consolidation-audit:
 	@$(PYTHON) scripts/audit_consolidation.py
+
+# Component-repository hub: this repo is the connector for the SigmaOS-*
+# fleet. See scripts/sigma_hub.sh --help for the full command set.
+hub:
+	@bash scripts/sigma_hub.sh help
+
+hub-list:
+	@bash scripts/sigma_hub.sh list $(FILTER)
+
+hub-status:
+	@bash scripts/sigma_hub.sh status $(NAME)
+
+hub-audit:
+	@bash scripts/sigma_hub.sh audit
+
+hub-create:
+	@bash scripts/sigma_hub.sh create $(NAME) $(ARGS)
+
+hub-upgrade:
+	@bash scripts/sigma_hub.sh upgrade $(NAME) $(ARGS)
+
+hub-sync:
+	@bash scripts/sigma_hub.sh sync $(ARGS)
 
 # 1. Code formatting
 fmt-fix:
@@ -159,6 +182,13 @@ help:
 	@echo "  make bench        - Benchmarks on thin-LTO release-fast profile"
 	@echo "  make fmt          - Verify formatting style (strict)"
 	@echo "  make registry-audit - Audit managed component checkouts and metadata (read-only)"
+	@echo "  make hub          - Component-repo hub help (connect/create/upgrade/sync)"
+	@echo "  make hub-list     - List components + local git status (FILTER=--category X)"
+	@echo "  make hub-status   - Fleet or per-repo status (NAME=SigmaOS-foo)"
+	@echo "  make hub-audit    - Count COMPONENT.toml coverage / upgrade candidates"
+	@echo "  make hub-create   - Scaffold new component repo (NAME=..., ARGS=--desc ... --dry-run)"
+	@echo "  make hub-upgrade  - Bring repos up to component standard (NAME=--all)"
+	@echo "  make hub-sync     - Pull/push component checkouts (ARGS=--push)"
 	@echo "  make fmt-fix      - Auto-apply rustfmt across workspace"
 	@echo "  make iso          - Full Desktop ISO build (GRUB2 + initramfs + installer) ✓"
 	@echo "  make iso-stub     - Stub ISO build (GRUB2, boots NOW in QEMU) ✓"

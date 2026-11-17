@@ -1,0 +1,16 @@
+[component]
+name = "__COMPONENT_NAME__"
+tier = __COMPONENT_TIER__
+stability = "scaffold"
+language = "rust"
+description = "__COMPONENT_DESC__"
+upstream = []
+
+[contract]
+provides = [__COMPONENT_PROVIDES__]
+depends_on = [__COMPONENT_DEPENDS__]
+
+[maturity]
+status = "Scaffold"
+test_evidence = "Compiles and passes AAA unit tests"
+next_milestone = "Hardware and runtime integration"
