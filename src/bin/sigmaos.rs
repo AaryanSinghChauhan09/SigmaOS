@@ -637,8 +637,14 @@ fn main() {
                 print!("{}", BANNER);
                 print_status();
             }
-            "--doctor" => {
-                run_doctor();
+            "--doctor" | "doctor" => {
+                let base = find_base_dir();
+                let doctor_sh = base.join("scripts/sigmaos_doctor.sh");
+                if doctor_sh.exists() {
+                    let _ = Command::new("bash").arg(&doctor_sh).status();
+                } else {
+                    run_doctor();
+                }
             }
             "--craft" | "-c" => {
                 print!("{}", BANNER);
@@ -703,6 +709,9 @@ fn main() {
             "--gui" | "gui" | "--desktop" | "desktop" => {
                 run_script("sigmaos_gui.py");
             }
+            "--native" | "native" => {
+                run_script("sigmaos_native_app.py");
+            }
             "--qemu" | "qemu" | "--boot" | "boot" | "--run" | "run" => {
                 let base = find_base_dir();
                 let iso_path = base.join("build/sigmaos-desktop-preview.iso");
@@ -749,6 +758,8 @@ fn main() {
                 println!("  --sigpkg, sigpkg   Execute SigPkg package manager CLI");
                 println!("  --mint, mint       Launch Linux Mint Ergonomic Desktop Persona");
                 println!("  --doctor           Execute Omarchy system diagnostics health check");
+                println!("  --gui, --desktop   Launch SigmaOS Graphical Desktop (GTK3 + WebKit2)");
+                println!("  --native           Launch SigmaOS Native GTK3 Desktop (pure GTK3)");
                 println!("  --check            Execute launch readiness validation");
                 println!("  --status, -s       Display system and launch status");
                 println!("  --craft, -c        Display Craft Creative Suite catalog");
