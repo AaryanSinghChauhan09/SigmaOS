@@ -1188,3 +1188,6 @@ pub use arch_omarchy_live_installer::*;
 
 pub mod arch_mkinitcpio_v35;
 pub use arch_mkinitcpio_v35::*;
+
+pub mod omarchy_wallust_audio_v35;
+pub use omarchy_wallust_audio_v35::*;
