@@ -1209,3 +1209,6 @@ pub use arch_omarchy_hotplug_display_v35::*;
 
 pub mod arch_omarchy_keyboard_input_v35;
 pub use arch_omarchy_keyboard_input_v35::*;
+
+pub mod arch_omarchy_notification_daemon_v35;
+pub use arch_omarchy_notification_daemon_v35::*;
