@@ -66,3 +66,31 @@ if command -v Hyprland &>/dev/null || [ -d "${HOME}/.config/hypr" ]; then
         echo "  [✓] Hyprland config deployed to ~/.config/hypr/hyprland.conf"
     fi
 fi
+
+# Live interactive session launcher
+if [ -t 0 ] && [ "${SIGMAOS_NON_INTERACTIVE:-0}" != "1" ]; then
+    echo -e "\033[1;36m==> Dropping into live Arch Linux interactive environment...\033[0m"
+    echo -e "    Type \033[1;32mexit\033[0m to return from the Arch persona session.\n"
+    
+    TEMP_RC="$(mktemp /tmp/arch_rc.XXXXXX)"
+    cat << EOF > "$TEMP_RC"
+[ -f ~/.bashrc ] && source ~/.bashrc 2>/dev/null
+export PATH="${HOME}/.local/bin:${ROOT_DIR}/scripts:${PATH}"
+export PS1="\[\033[1;36m\][arch@sigmaos \W]\$\[\033[0m\] "
+export SIGMAOS_PERSONA="arch"
+alias pacman="sigpkg pacman"
+alias yay="sigpkg"
+alias paru="sigpkg"
+alias aur="sigpkg aur"
+alias update="sigpkg update"
+alias doctor="sigpkg doctor"
+alias checkupdates="sigpkg checkupdates"
+alias mkinitcpio="sigpkg mkinitcpio"
+alias archinstall="sigpkg archinstall"
+alias pactree="sigpkg tree"
+alias fastfetch="neofetch 2>/dev/null || echo 'SigmaOS Arch Workstation'"
+alias neofetch="neofetch 2>/dev/null || echo 'SigmaOS Arch Workstation'"
+EOF
+    trap 'rm -f "$TEMP_RC"' EXIT
+    bash --rcfile "$TEMP_RC" -i
+fi

@@ -27,8 +27,29 @@ echo -e "  \033[1;32msigmaos --status\033[0m         - View kernel and launch st
 echo -e "  \033[1;33mexit\033[0m                     - Return to host shell"
 echo ""
 
-# Custom prompt
-export PS1="\[\033[1;35m\]sigmaos\[\033[0m\]:\[\033[1;34m\]\w\[\033[0m\]\$ "
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
-# Start subshell
-exec bash --noprofile --norc
+# Ensure ~/.local/bin and scripts are in PATH
+export PATH="${HOME}/.local/bin:${ROOT_DIR}/scripts:${PATH}"
+
+# Create interactive rcfile for pristine live environment
+TEMP_RC="$(mktemp /tmp/sigmaos_rc.XXXXXX)"
+cat << 'EOF' > "$TEMP_RC"
+[ -f ~/.bashrc ] && source ~/.bashrc 2>/dev/null
+export PATH="${HOME}/.local/bin:${PATH}"
+export PS1="\[\033[1;35m\]󰣇 sigmaos\[\033[0m\]:\[\033[1;34m\]\w\[\033[0m\]\$ "
+export SIGMAOS_LIVE=1
+alias pacman="sigpkg pacman"
+alias yay="sigpkg"
+alias paru="sigpkg"
+alias aur="sigpkg aur"
+alias update="sigpkg update"
+alias doctor="omarchy doctor"
+alias theme="omarchy theme"
+alias fastfetch="neofetch 2>/dev/null || echo 'SigmaOS Sovereign Workstation'"
+alias neofetch="neofetch 2>/dev/null || echo 'SigmaOS Sovereign Workstation'"
+EOF
+
+trap 'rm -f "$TEMP_RC"' EXIT
+exec bash --rcfile "$TEMP_RC" -i

@@ -411,7 +411,7 @@ fn run_interactive_repl() {
     print_status();
 
     println!("\x1b[1mWelcome to the SigmaOS Sovereign Workstation.\x1b[0m");
-    println!("Type \x1b[32mhelp\x1b[0m to list commands, or \x1b[32mexit\x1b[0m to quit.\n");
+    println!("Type \x1b[32mhelp\x1b[0m for commands, \x1b[32momarchy\x1b[0m / \x1b[32march\x1b[0m for live persona shells, or \x1b[32mexit\x1b[0m to quit.\n");
 
     let base = find_base_dir();
 
@@ -424,7 +424,15 @@ fn run_interactive_repl() {
             break;
         }
 
-        let cmd = input.trim();
+        let line = input.trim();
+        if line.is_empty() {
+            continue;
+        }
+
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        let cmd = parts[0];
+        let args = &parts[1..];
+
         match cmd {
             "help" | "?" => {
                 println!("\nAvailable Commands:");
@@ -433,15 +441,23 @@ fn run_interactive_repl() {
                 );
                 println!("  doctor         - Run Omarchy diagnostic health checks");
                 println!("  craft          - Explore the 20-module Craft Creative Suite");
-                println!("  distro         - Inspect Linux (Arch/Cachy/Debian) and BSD (DragonFly/Free/Open) parity");
-                println!("  mint           - Launch the Linux Mint Ergonomic Desktop Persona (Cinnamon / XApps)");
-                println!("  arch           - Launch the Arch Linux Minimalist Persona (Pacman / Rolling Release)");
-                println!("  omarchy        - Launch the Omarchy Aesthetic Persona (Hyprland / Wallust Wayland)");
-                println!("  shell          - Ping the SigmaOS unified desktop shell controller");
+                println!("  distro         - Inspect Linux (Arch/Cachy/Debian) and BSD parity");
+                println!("  omarchy        - Launch Omarchy Aesthetic Persona (Hyprland / Wallust Wayland)");
+                println!("  arch           - Launch Arch Linux Minimalist Persona (Pacman / Rolling Release)");
+                println!("  mint           - Launch Linux Mint Ergonomic Desktop Persona (Cinnamon / XApps)");
+                println!("  pacman [args]  - Execute native Arch Linux ALPM pacman commands (e.g. pacman -Syu)");
+                println!("  sigpkg [args]  - Execute SigPkg unified package manager and ALPM bridge");
+                println!("  aur <query>    - Query Arch User Repository (AUR v5 RPC)");
+                println!("  yay | paru     - Execute Arch Linux AUR helper commands");
+                println!("  gui | desktop  - Launch SigmaOS Graphical Desktop Window");
+                println!("  shell | bash   - Spawn a live interactive shell session");
+                println!("  fastfetch      - Display system hardware & OS fetch banner");
                 println!("  iso            - Report built bootable ISO image information");
-                println!("  check          - Run the 21-point automated launch readiness check");
+                println!("  check          - Run automated launch readiness check");
+                println!("  cd <dir>       - Change current working directory");
                 println!("  clear          - Clear the terminal screen");
                 println!("  exit | quit    - Exit the workstation\n");
+                println!("  [Transparent Unix Execution]: any standard command (ls, cat, uname, etc.) runs directly.\n");
             }
             "status" => {
                 println!();
@@ -474,6 +490,60 @@ fn run_interactive_repl() {
                 run_script("launch_omarchy_persona.sh");
                 println!();
             }
+            "pacman" => {
+                let sigpkg = base.join("scripts/sigpkg");
+                let status = Command::new("bash")
+                    .arg(&sigpkg)
+                    .arg("pacman")
+                    .args(args)
+                    .status();
+                if let Err(e) = status {
+                    eprintln!("Failed to execute pacman: {}", e);
+                }
+            }
+            "sigpkg" => {
+                let sigpkg = base.join("scripts/sigpkg");
+                let status = Command::new("bash")
+                    .arg(&sigpkg)
+                    .args(args)
+                    .status();
+                if let Err(e) = status {
+                    eprintln!("Failed to execute sigpkg: {}", e);
+                }
+            }
+            "aur" => {
+                let sigpkg = base.join("scripts/sigpkg");
+                let status = Command::new("bash")
+                    .arg(&sigpkg)
+                    .arg("aur")
+                    .args(args)
+                    .status();
+                if let Err(e) = status {
+                    eprintln!("Failed to execute aur query: {}", e);
+                }
+            }
+            "yay" | "paru" => {
+                let sigpkg = base.join("scripts/sigpkg");
+                let status = Command::new("bash")
+                    .arg(&sigpkg)
+                    .args(args)
+                    .status();
+                if let Err(e) = status {
+                    eprintln!("Failed to execute AUR helper: {}", e);
+                }
+            }
+            "fastfetch" | "neofetch" | "fetch" | "pfetch" => {
+                let which_neo = Command::new("which").arg("neofetch").output();
+                if let Ok(out) = which_neo {
+                    if out.status.success() {
+                        let _ = Command::new("neofetch").status();
+                    } else {
+                        print_status();
+                    }
+                } else {
+                    print_status();
+                }
+            }
             "gui" | "desktop" => {
                 println!("\nLaunching SigmaOS Graphical Desktop Window...");
                 run_script("sigmaos_gui.py");
@@ -498,7 +568,7 @@ fn run_interactive_repl() {
                         println!("\x1b[33m[!] QEMU (qemu-system-x86_64) not found in PATH.\x1b[0m");
                         println!("    To run the bootable ISO in a virtual machine, install QEMU:");
                         println!("    \x1b[1;32msudo apt install -y qemu-system-x86 nasm xorriso\x1b[0m\n");
-                        println!("    You can also run the native personas right now:");
+                        println!("    You can also run native personas right now:");
                         println!("    - omarchy : Omarchy Aesthetic Persona (Hyprland / Wayland)");
                         println!("    - mint    : Linux Mint Persona (Cinnamon / XApps)");
                         println!("    - arch    : Arch Linux Persona (Pacman / Rolling)");
@@ -506,13 +576,9 @@ fn run_interactive_repl() {
                 }
                 println!();
             }
-            "shell" => {
-                println!("\n[Pinging bin/sigmaos-shell...]");
-                let shell_bin = base.join("bin/sigmaos-shell");
-                let status = Command::new("bash").arg(&shell_bin).arg("ping").status();
-                if let Err(e) = status {
-                    println!("Failed to invoke shell: {}", e);
-                }
+            "shell" | "bash" | "sh" | "zsh" => {
+                println!("\n[Entering interactive shell... Type 'exit' to return to SigmaOS]");
+                let _ = Command::new("bash").status();
                 println!();
             }
             "iso" => {
@@ -529,6 +595,21 @@ fn run_interactive_repl() {
                 run_script("check_launch_ready.sh");
                 println!();
             }
+            "cd" => {
+                let target = if !args.is_empty() { args[0] } else { "~" };
+                let expanded = if target.starts_with('~') {
+                    if let Ok(home) = env::var("HOME") {
+                        target.replacen('~', &home, 1)
+                    } else {
+                        target.to_string()
+                    }
+                } else {
+                    target.to_string()
+                };
+                if let Err(e) = env::set_current_dir(&expanded) {
+                    eprintln!("cd: {}: {}", target, e);
+                }
+            }
             "clear" => {
                 print!("\x1b[2J\x1b[H");
                 print!("{}", BANNER);
@@ -537,12 +618,12 @@ fn run_interactive_repl() {
                 println!("Shutting down SigmaOS Sovereign Workstation. Goodbye!");
                 break;
             }
-            "" => {}
-            other => {
-                println!(
-                    "Unknown command: '{}'. Type 'help' for available commands.",
-                    other
-                );
+            _ => {
+                // Transparent Unix execution: execute via bash
+                let status = Command::new("bash").arg("-c").arg(line).status();
+                if let Err(e) = status {
+                    println!("Execution error for '{}': {}", line, e);
+                }
             }
         }
     }
@@ -586,6 +667,29 @@ fn main() {
                 if let Err(e) = status {
                     eprintln!("Failed to invoke sigpkg: {}", e);
                 }
+            }
+            "--aur" | "aur" => {
+                let base = find_base_dir();
+                let sigpkg = base.join("scripts/sigpkg");
+                let status = Command::new("bash")
+                    .arg(&sigpkg)
+                    .arg("aur")
+                    .args(&args[2..])
+                    .status();
+                if let Err(e) = status {
+                    eprintln!("Failed to invoke aur search: {}", e);
+                }
+            }
+            "--yay" | "yay" | "--paru" | "paru" => {
+                let base = find_base_dir();
+                let sigpkg = base.join("scripts/sigpkg");
+                let status = Command::new("bash").arg(&sigpkg).args(&args[2..]).status();
+                if let Err(e) = status {
+                    eprintln!("Failed to invoke AUR helper: {}", e);
+                }
+            }
+            "--shell" | "shell" | "-i" | "--interactive" => {
+                run_script("sigmaos_interactive_shell.sh");
             }
             "--mint" | "mint" => {
                 run_script("launch_mint_persona.sh");

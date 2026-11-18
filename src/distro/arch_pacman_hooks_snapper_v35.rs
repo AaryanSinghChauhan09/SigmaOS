@@ -28,12 +28,12 @@ impl fmt::Display for HookOperation {
 
 /// Execution phase for ALPM hook
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HookWhen {
+pub enum AlpmHookWhen {
     PreTransaction,
     PostTransaction,
 }
 
-impl fmt::Display for HookWhen {
+impl fmt::Display for AlpmHookWhen {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::PreTransaction => write!(f, "PreTransaction"),
@@ -47,7 +47,7 @@ impl fmt::Display for HookWhen {
 pub struct AlpmHook {
     pub name: String,
     pub description: String,
-    pub when: HookWhen,
+    pub when: AlpmHookWhen,
     pub operations: Vec<HookOperation>,
     pub target_pattern: String,
     pub exec: String,
@@ -58,7 +58,7 @@ impl AlpmHook {
         Self {
             name: name.to_string(),
             description: "Create pre-transaction Btrfs snapshot".to_string(),
-            when: HookWhen::PreTransaction,
+            when: AlpmHookWhen::PreTransaction,
             operations: vec![HookOperation::Install, HookOperation::Upgrade, HookOperation::Remove],
             target_pattern: "*".to_string(),
             exec: "/usr/bin/snapper-timeline pre".to_string(),
@@ -69,7 +69,7 @@ impl AlpmHook {
         Self {
             name: name.to_string(),
             description: "Create post-transaction Btrfs snapshot and calculate diff".to_string(),
-            when: HookWhen::PostTransaction,
+            when: AlpmHookWhen::PostTransaction,
             operations: vec![HookOperation::Install, HookOperation::Upgrade, HookOperation::Remove],
             target_pattern: "*".to_string(),
             exec: "/usr/bin/snapper-timeline post".to_string(),

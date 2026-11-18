@@ -95,12 +95,12 @@ def main():
     print("║        Launching SigmaOS Sovereign GUI Desktop           ║")
     print("╚══════════════════════════════════════════════════════════╝")
 
-    # 1. Try native WebKit2 GTK3 window
-    if launch_gtk_webkit(html_uri):
+    # Prioritize Chrome App Window for instant interactive response
+    if launch_chrome_fallback(html_uri):
         sys.exit(0)
 
-    # 2. Try Chrome App Window
-    if launch_chrome_fallback(html_uri):
+    # Fallback to GTK3 WebKit2
+    if launch_gtk_webkit(html_uri):
         sys.exit(0)
 
     # 3. Try Firefox
