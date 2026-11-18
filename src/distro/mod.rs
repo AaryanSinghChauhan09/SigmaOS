@@ -1191,3 +1191,6 @@ pub use arch_mkinitcpio_v35::*;
 
 pub mod omarchy_wallust_audio_v35;
 pub use omarchy_wallust_audio_v35::*;
+
+pub mod arch_pacman_hooks_snapper_v35;
+pub use arch_pacman_hooks_snapper_v35::*;
