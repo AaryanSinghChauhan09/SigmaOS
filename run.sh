@@ -89,10 +89,10 @@ case "$ACTION" in
         exec "$SCRIPT_DIR/bin/sigmaos" --help
         ;;
     "")
-        # In a graphical desktop session (X11 or Wayland), launch the visible GUI desktop directly!
-        if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
-            exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py"
-        elif [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
+        # Direct, zero-friction launch: if in an interactive terminal, launch the live TUI menu!
+        if [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
+            exec "$SCRIPT_DIR/bin/sigmaos-launch"
+        elif [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
             exec "$SCRIPT_DIR/bin/sigmaos-launch"
         else
             exec "$SCRIPT_DIR/bin/sigmaos"
