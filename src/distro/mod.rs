@@ -1180,5 +1180,8 @@ pub use omarchy_v35_hyprland_v2::*;
 pub mod sigma_init_v1;
 pub use sigma_init_v1::{
     InitManager, InitError, BootTarget, RestartPolicy,
-    ServiceUnit, sigma_default_units,
+    ServiceUnit as SigmaInitServiceUnit, sigma_default_units,
 };
+
+pub mod arch_omarchy_live_installer;
+pub use arch_omarchy_live_installer::*;
