@@ -15292,10 +15292,10 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-dao-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "DAO kernel with data access abstraction, CRUD operations, and transactions"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dao-kernel"
-engine = "kernel_core"
-category = "Kernel"
+engine = "data_layer"
+category = "Data"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -15522,10 +15522,10 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-encryption-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Kernel-level encryption framework with key management and cipher operations"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-encryption-kernel"
-engine = "kernel_core"
-category = "Kernel"
+engine = "crypto"
+category = "Security"
 language = "rust"
 visibility = "public"
 depends_on = []
