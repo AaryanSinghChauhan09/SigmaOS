@@ -1221,3 +1221,15 @@ pub use arch_omarchy_xdg_mime_v35::*;
 
 pub mod arch_omarchy_session_env_v35;
 pub use arch_omarchy_session_env_v35::*;
+
+pub mod arch_omarchy_network_manager_v35;
+pub use arch_omarchy_network_manager_v35::*;
+
+pub mod arch_omarchy_useradd_pam_v35;
+pub use arch_omarchy_useradd_pam_v35::*;
+
+pub mod arch_omarchy_theme_font_v35;
+pub use arch_omarchy_theme_font_v35::*;
+
+pub mod arch_omarchy_update_scheduler_v35;
+pub use arch_omarchy_update_scheduler_v35::*;
