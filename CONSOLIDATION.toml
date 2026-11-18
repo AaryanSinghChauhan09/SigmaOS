@@ -38,23 +38,13 @@ consolidates = [
     "SigmaOS-openoffice-impress",
     "SigmaOS-openoffice-math",
     "SigmaOS-openoffice-writer",
-    "SigmaOS-office-core",
-    "SigmaOS-office-diagrams",
-    "SigmaOS-office-documents",
-    "SigmaOS-office-html",
     "SigmaOS-office-integration",
     "SigmaOS-office-interop",
-    "SigmaOS-office-markdown",
     "SigmaOS-office-packaging",
-    "SigmaOS-office-pdf",
-    "SigmaOS-office-slides",
-    "SigmaOS-office-spreadsheets",
     "SigmaOS-office-tests",
     "SigmaOS-office-web",
     "SigmaOS-onlyoffice",
-    "SigmaOS-spreadsheet",
-    "SigmaOS-diagram",
-    "SigmaOS-presentation"
+    "SigmaOS-spreadsheet"
 ]
 provides = ["document-engine", "spreadsheet-engine", "presentation-engine", "vector-draw-engine", "math-engine", "database-engine", "odf-ooxml-bridge"]
 
@@ -294,7 +284,7 @@ upstream = ["native"]
 consolidates = [
     "SigmaOS-rdbms-apache",
     "SigmaOS-rdbms-dbearer",
-    "SigmaOS-rdbms-dbeaver",
+    "SigmaOS-dbeaver2",
     "SigmaOS-rdbms-duckdb",
     "SigmaOS-rdbms-metabase",
     "SigmaOS-rdbms-postgresql",
@@ -313,13 +303,9 @@ description = "Consolidated developer toolchain and autonomous coding assistant 
 upstream = ["https://github.com/linuxmint/mint-dev-tools", "https://github.com/omacom/herdr"]
 consolidates = [
     "SigmaOS-tools-command-code",
-    "SigmaOS-tools-commandcode",
     "SigmaOS-tools-deepseek-coder",
-    "SigmaOS-tools-deepseekcoder",
     "SigmaOS-tools-hermes-agent",
-    "SigmaOS-tools-hermesagent",
     "SigmaOS-tools-notepadpp",
-    "SigmaOS-tools-notepadplusplus",
     "SigmaOS-ai-assistant",
     "SigmaOS-ai-governance",
     "SigmaOS-ai-models",
