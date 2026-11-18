@@ -1218,3 +1218,6 @@ pub use arch_omarchy_session_lock_v35::*;
 
 pub mod arch_omarchy_xdg_mime_v35;
 pub use arch_omarchy_xdg_mime_v35::*;
+
+pub mod arch_omarchy_session_env_v35;
+pub use arch_omarchy_session_env_v35::*;
