@@ -7,6 +7,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Default behavior: launch native desktop window directly
+if [ $# -eq 0 ] || [ "${1:-}" = "--desktop" ] || [ "${1:-}" = "desktop" ] || [ "${1:-}" = "--gui" ]; then
+    exec python3 "$SCRIPT_DIR/sigmaos_gui.py"
+fi
+
 if ! command -v zenity >/dev/null 2>&1; then
     echo "zenity is not installed. Running terminal workstation instead..."
     exec "$ROOT_DIR/bin/sigmaos"

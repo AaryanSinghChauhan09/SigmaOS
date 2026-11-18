@@ -20,29 +20,6 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SCRIPT_DIR)
 HTML_PATH = os.path.join(ROOT_DIR, "ui", "desktop", "index.html")
 
-def launch_chrome_fallback(html_uri):
-    """Fallback: launch in Chrome application window mode."""
-    chrome = shutil.which("google-chrome") or shutil.which("chromium")
-    if chrome:
-        print(f"==> Launching SigmaOS Desktop in application mode via {chrome}...")
-        subprocess.Popen([
-            chrome,
-            f"--app={html_uri}",
-            "--window-size=1280,820",
-            "--window-position=100,60"
-        ])
-        return True
-    return False
-
-def launch_firefox_fallback(html_uri):
-    """Fallback: launch in Firefox."""
-    firefox = shutil.which("firefox")
-    if firefox:
-        print(f"==> Launching SigmaOS Desktop via {firefox}...")
-        subprocess.Popen([firefox, html_uri])
-        return True
-    return False
-
 def launch_gtk_webkit(html_uri):
     """Native: launch GTK3 + WebKit2 Window."""
     try:
@@ -55,7 +32,7 @@ def launch_gtk_webkit(html_uri):
         return False
 
     try:
-        window = Gtk.Window(title="SigmaOS Sovereign Desktop Environment")
+        window = Gtk.Window(title="󰣇 SigmaOS Sovereign Desktop (Arch & Omarchy Edition)")
         window.set_default_size(1280, 820)
         window.set_position(Gtk.WindowPosition.CENTER)
 
@@ -64,6 +41,8 @@ def launch_gtk_webkit(html_uri):
         settings.set_enable_javascript(True)
         settings.set_enable_developer_extras(True)
         settings.set_enable_webgl(True)
+        settings.set_allow_file_access_from_file_urls(True)
+        settings.set_allow_universal_access_from_file_urls(True)
 
         webview = WebKit2.WebView.new_with_settings(settings)
         webview.load_uri(html_uri)
@@ -73,11 +52,62 @@ def launch_gtk_webkit(html_uri):
         window.show_all()
 
         print("==> SigmaOS Sovereign Desktop Environment Window Active.")
+        print("==> Running on native GTK3 + WebKit2 4.1 engine. Close window to exit.")
         Gtk.main()
         return True
     except Exception as e:
         print(f"[!] Native GTK window launch encountered: {e}")
         return False
+
+def launch_native_gtk_app():
+    """Fallback: launch native pure GTK3 desktop interface."""
+    native_script = os.path.join(SCRIPT_DIR, "sigmaos_native_app.py")
+    if os.path.isfile(native_script):
+        print("==> Launching SigmaOS Native GTK3 Desktop Interface...")
+        try:
+            res = subprocess.run([sys.executable, native_script])
+            return res.returncode == 0
+        except Exception as e:
+            print(f"[!] Native GTK3 app error: {e}")
+            return False
+    return False
+
+def launch_chrome_fallback(html_uri):
+    """Fallback: launch in dedicated standalone Chrome application window."""
+    chrome = shutil.which("google-chrome") or shutil.which("chromium")
+    if chrome:
+        profile_dir = "/tmp/sigmaos-chrome-profile"
+        print(f"==> Launching SigmaOS Desktop in dedicated app window via {chrome}...")
+        try:
+            proc = subprocess.Popen([
+                chrome,
+                f"--user-data-dir={profile_dir}",
+                f"--app={html_uri}",
+                "--window-size=1280,820",
+                "--window-position=100,60",
+                "--no-first-run",
+                "--no-default-browser-check"
+            ])
+            proc.wait()
+            return True
+        except Exception as e:
+            print(f"[!] Chrome app launch error: {e}")
+            return False
+    return False
+
+def launch_firefox_fallback(html_uri):
+    """Fallback: launch in Firefox."""
+    firefox = shutil.which("firefox")
+    if firefox:
+        print(f"==> Launching SigmaOS Desktop via {firefox}...")
+        try:
+            proc = subprocess.Popen([firefox, "--new-window", html_uri])
+            proc.wait()
+            return True
+        except Exception as e:
+            print(f"[!] Firefox launch error: {e}")
+            return False
+    return False
 
 def main():
     if not os.path.isfile(HTML_PATH):
@@ -93,17 +123,22 @@ def main():
 
     print("╔══════════════════════════════════════════════════════════╗")
     print("║        Launching SigmaOS Sovereign GUI Desktop           ║")
+    print("║     Omarchy Aesthetic & Arch Linux Substrate Studio     ║")
     print("╚══════════════════════════════════════════════════════════╝")
 
-    # Prioritize Chrome App Window for instant interactive response
-    if launch_chrome_fallback(html_uri):
-        sys.exit(0)
-
-    # Fallback to GTK3 WebKit2
+    # 1. Native WebKit2 GTK3 window (FIRST PRIORITY - true native OS window)
     if launch_gtk_webkit(html_uri):
         sys.exit(0)
 
-    # 3. Try Firefox
+    # 2. Native Pure GTK3 desktop app
+    if launch_native_gtk_app():
+        sys.exit(0)
+
+    # 3. Dedicated Chrome App Window
+    if launch_chrome_fallback(html_uri):
+        sys.exit(0)
+
+    # 4. Firefox fallback
     if launch_firefox_fallback(html_uri):
         sys.exit(0)
 

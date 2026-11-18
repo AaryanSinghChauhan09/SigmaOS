@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy gui desktop tray install diagnose boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -202,6 +202,24 @@ arch:
 omarchy:
 	@bash scripts/launch_omarchy_persona.sh
 
+# 13. Graphical Desktop Launcher
+gui:
+	@python3 scripts/sigmaos_gui.py
+
+desktop: gui
+
+# 13a. System tray / status indicator
+tray:
+	@python3 scripts/sigmaos_tray.py &
+
+# 14. Install SigmaOS desktop entry (.desktop file + icon in ~/.local)
+install:
+	@bash scripts/install_desktop_entry.sh
+
+# 15. Run startup diagnostics
+diagnose:
+	@python3 scripts/sigmaos_startup_diagnostics.py
+
 help:
 	@echo "SigmaOS Unified Build & Test Interface"
 	@echo "  make check        - Static analysis via cargo check (timed)"
@@ -236,4 +254,9 @@ help:
 	@echo "  make mint         - Launch Linux Mint Ergonomic Persona ✓"
 	@echo "  make arch         - Launch Arch Linux Minimalist Persona ✓"
 	@echo "  make omarchy      - Launch Omarchy Linux Aesthetic Persona ✓"
+	@echo "  make gui          - Launch SigmaOS Graphical Desktop (GTK3 + WebKit2) ✓"
+	@echo "  make desktop      - Alias for 'make gui' ✓"
+	@echo "  make tray         - Launch SigmaOS System Tray indicator ✓"
+	@echo "  make install      - Install .desktop entry + icon to ~/.local ✓"
+	@echo "  make diagnose     - Run SigmaOS startup health diagnostics ✓"
 	@echo "  make clean        - Remove build artifacts"

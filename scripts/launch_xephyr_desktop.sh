@@ -26,8 +26,13 @@ for i in {1..20}; do
     sleep 0.2
 done
 
-# Launch SigmaOS Native Desktop inside :2
-DISPLAY=:2 python3 "$SCRIPT_DIR/sigmaos_native_app.py" &
+# Launch SigmaOS Desktop inside :2
+MODE="${1:-native}"
+if [ "$MODE" = "webkit" ] || [ "$MODE" = "gui" ]; then
+    DISPLAY=:2 python3 "$SCRIPT_DIR/sigmaos_gui.py" &
+else
+    DISPLAY=:2 python3 "$SCRIPT_DIR/sigmaos_native_app.py" &
+fi
 APP_PID=$!
 
 wait $XEPHYR_PID

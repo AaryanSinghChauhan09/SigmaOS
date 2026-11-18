@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Catppuccin Mocha background -->
+  <rect width="128" height="128" rx="24" fill="#1e1e2e"/>
+  <!-- Sigma symbol (Σ) in Catppuccin Mauve/Lavender -->
+  <text x="64" y="94" font-family="monospace,serif" font-size="88" font-weight="bold"
+        text-anchor="middle" fill="#cba6f7">Σ</text>
+  <!-- Bottom accent bar -->
+  <rect x="20" y="110" width="88" height="4" rx="2" fill="#89b4fa"/>
+</svg>

@@ -14,6 +14,10 @@ if command -v gnome-terminal >/dev/null 2>&1; then
         --geometry=110x32 \
         --title="SigmaOS Sovereign Workstation (Arch & Omarchy)" \
         -- bash -c "$SCRIPT_DIR/sigmaos_interactive_shell.sh"
+elif command -v x-terminal-emulator >/dev/null 2>&1; then
+    exec x-terminal-emulator \
+        -title "SigmaOS Sovereign Workstation (Arch & Omarchy)" \
+        -e "$SCRIPT_DIR/sigmaos_interactive_shell.sh"
 else
     exec "$SCRIPT_DIR/sigmaos_interactive_shell.sh"
 fi
