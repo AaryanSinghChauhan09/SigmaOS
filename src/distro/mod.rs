@@ -1194,3 +1194,6 @@ pub use omarchy_wallust_audio_v35::*;
 
 pub mod arch_pacman_hooks_snapper_v35;
 pub use arch_pacman_hooks_snapper_v35::*;
+
+pub mod arch_omarchy_xdg_desktop_v35;
+pub use arch_omarchy_xdg_desktop_v35::*;
