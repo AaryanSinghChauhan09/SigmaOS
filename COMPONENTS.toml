@@ -15012,10 +15012,10 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-build"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Build system with configuration, dependency resolution, and compilation pipeline"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-build"
-engine = "build_ci"
-category = "DevOps"
+engine = "build"
+category = "Developer Tools"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -27399,12 +27399,11 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-shader-apprenticeships-kernel"
-description = "SigmaOS component repository"
+description = "Apprenticeships shader kernel with compilation and rendering pipeline"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-apprenticeships-kernel"
-engine = "component"
-category = "Components"
+engine = "graphics"
+category = "Graphics"
 language = "rust"
-inspirations = "None"
 visibility = "public"
 depends_on = []
 
