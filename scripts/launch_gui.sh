@@ -8,6 +8,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Default behavior: launch native desktop window directly
+if [ "${1:-}" = "--native" ] || [ "${1:-}" = "native" ]; then
+    exec python3 "$SCRIPT_DIR/sigmaos_native_app.py"
+fi
+
 if [ $# -eq 0 ] || [ "${1:-}" = "--desktop" ] || [ "${1:-}" = "desktop" ] || [ "${1:-}" = "--gui" ]; then
     exec python3 "$SCRIPT_DIR/sigmaos_gui.py"
 fi

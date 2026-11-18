@@ -15,5 +15,9 @@ echo -e "\033[1;36m==> Starting SigmaOS Desktop Experience...\033[0m"
 export DISPLAY="${DISPLAY:-:0}"
 export PATH="${HOME}/.local/bin:${PATH}"
 
-# Launch the graphical desktop directly
-exec python3 "$ROOT_DIR/scripts/sigmaos_gui.py"
+# Launch the graphical desktop directly (WebKit2 or native GTK3)
+if [ "${1:-}" = "--native" ] || [ "${1:-}" = "native" ]; then
+    exec python3 "$ROOT_DIR/scripts/sigmaos_native_app.py"
+else
+    exec python3 "$ROOT_DIR/scripts/sigmaos_gui.py"
+fi

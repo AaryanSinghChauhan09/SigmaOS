@@ -35,7 +35,11 @@ IPC_JS = r"""
 
   // Send a command to Python backend
   window.sigmaExec = function(cmd) {
-    window.webkit.messageHandlers.sigmaExec.postMessage(cmd);
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.sigmaExec) {
+      window.webkit.messageHandlers.sigmaExec.postMessage(cmd);
+    } else {
+      console.log('[IPC fallback]', cmd);
+    }
   };
 
   // Python calls this to deliver output back to the terminal
@@ -173,8 +177,8 @@ def launch_gtk_webkit(html_uri):
         def on_load_changed(wv, event):
             if event == WebKit2.LoadEvent.FINISHED:
                 _inject(wv, IPC_JS)
-                # Auto-open terminal window on startup
-                _inject(wv, "setTimeout(function(){ window.summonWindow && window.summonWindow('win-term'); }, 600);")
+                # Auto-open terminal window on startup and focus command prompt
+                _inject(wv, "setTimeout(function(){ window.summonWindow && window.summonWindow('win-term'); var inp = document.getElementById('term-in'); if (inp) { inp.focus(); } }, 400);")
                 print("==> SigmaOS IPC bridge injected.")
 
         def on_script_message(ucm, result):
@@ -210,6 +214,7 @@ def launch_gtk_webkit(html_uri):
         window.add(webview)
         window.connect("destroy", Gtk.main_quit)
         window.show_all()
+        window.present()
 
         webview.load_uri(html_uri)
 
