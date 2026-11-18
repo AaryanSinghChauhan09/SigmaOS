@@ -6,6 +6,45 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Direct subcommand dispatch (avoids banner when used as CLI tool)
+if [ $# -gt 0 ]; then
+    case "${1:-}" in
+        doctor)
+            exec "$ROOT_DIR/bin/sigmaos-doctor" "${@:2}"
+            ;;
+        theme)
+            if [ "${2:-}" = "list" ] || [ -z "${2:-}" ]; then
+                echo "Available Wallust Themes: Catppuccin Mocha, Tokyo Night, Nord, Gruvbox, Cyber, Mint, Arch"
+                exec "$ROOT_DIR/bin/sigmaos-theme-current"
+            else
+                exec "$ROOT_DIR/bin/sigmaos-theme-bg-switcher" "${2:-}"
+            fi
+            ;;
+        gui|desktop)
+            exec "$ROOT_DIR/bin/sigmaos-gui" "${@:2}"
+            ;;
+        native)
+            exec "$ROOT_DIR/bin/sigmaos-native" "${@:2}"
+            ;;
+        settings)
+            exec "$ROOT_DIR/bin/sigmaos-settings" "${@:2}"
+            ;;
+        version|--version|-v)
+            exec "$ROOT_DIR/bin/sigmaos-version"
+            ;;
+        help|--help|-h)
+            echo "Omarchy Aesthetic Persona CLI"
+            echo "Usage: omarchy [doctor | theme [list|<name>] | gui | native | settings | version | help]"
+            exit 0
+            ;;
+        *)
+            echo "Unknown subcommand: $1" >&2
+            echo "Usage: omarchy [doctor | theme [list|<name>] | gui | native | settings | version | help]" >&2
+            exit 1
+            ;;
+    esac
+fi
+
 echo -e "\033[1;35m"
 cat <<'EOF'
  ╭──────────────────────────────────────────────────────────────────╮

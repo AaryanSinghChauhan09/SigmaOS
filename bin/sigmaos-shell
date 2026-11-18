@@ -18,7 +18,10 @@
 
 set -uo pipefail
 
-SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+REAL_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "$REAL_PATH")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+SIGMAOS_PATH="${SIGMAOS_PATH:-$ROOT_DIR}"
 export SIGMAOS_PATH
 
 PLUGIN_STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/sigmaos-shell"
