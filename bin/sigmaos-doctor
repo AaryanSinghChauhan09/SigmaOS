@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+REAL_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "$REAL_PATH")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+exec bash "$ROOT_DIR/scripts/sigmaos_doctor.sh" "$@"

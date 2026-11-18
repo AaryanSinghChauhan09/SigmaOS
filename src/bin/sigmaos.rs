@@ -697,6 +697,21 @@ fn main() {
             "--shell" | "shell" | "-i" | "--interactive" => {
                 run_script("sigmaos_interactive_shell.sh");
             }
+            "--version" | "-v" | "version" => {
+                let base = find_base_dir();
+                let ver_file = base.join("version");
+                if let Ok(v) = std::fs::read_to_string(&ver_file) {
+                    println!("SigmaOS Workstation v{}", v.trim());
+                } else {
+                    println!("SigmaOS Workstation v1.0.0-alpha.1");
+                }
+            }
+            "--dotfiles" | "dotfiles" => {
+                run_script("setup_omarchy_dotfiles.sh");
+            }
+            "--sandbox" | "sandbox" => {
+                run_script("sigmaos_sandbox_container.sh");
+            }
             "--mint" | "mint" => {
                 run_script("launch_mint_persona.sh");
             }
@@ -758,6 +773,9 @@ fn main() {
                 println!("  --sigpkg, sigpkg   Execute SigPkg package manager CLI");
                 println!("  --mint, mint       Launch Linux Mint Ergonomic Desktop Persona");
                 println!("  --doctor           Execute Omarchy system diagnostics health check");
+                println!("  --dotfiles         Deploy modular Omarchy dotfiles to ~/.config/omarchy");
+                println!("  --sandbox          Launch isolated bubblewrap user namespace sandbox");
+                println!("  --version, -v      Display SigmaOS version");
                 println!("  --gui, --desktop   Launch SigmaOS Graphical Desktop (GTK3 + WebKit2)");
                 println!("  --native           Launch SigmaOS Native GTK3 Desktop (pure GTK3)");
                 println!("  --check            Execute launch readiness validation");

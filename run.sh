@@ -51,6 +51,12 @@ case "$ACTION" in
     --dotfiles|dotfiles)
         exec bash "$SCRIPT_DIR/scripts/setup_omarchy_dotfiles.sh"
         ;;
+    --sandbox|sandbox)
+        exec bash "$SCRIPT_DIR/scripts/sigmaos_sandbox_container.sh" "${@:2}"
+        ;;
+    --version|-v|version)
+        exec "$SCRIPT_DIR/bin/sigmaos" --version
+        ;;
     --check|check)
         exec "$SCRIPT_DIR/bin/sigmaos" --check
         ;;
@@ -113,6 +119,8 @@ case "$ACTION" in
         echo "  --mint        Launch Linux Mint ergonomic persona"
         echo "  --doctor      Run Omarchy 39-point system health diagnostics"
         echo "  --dotfiles    Deploy Omarchy desktop configs to ~/.config"
+        echo "  --sandbox     Launch isolated bubblewrap sandbox with GUI passthrough"
+        echo "  --version     Display SigmaOS version"
         echo "  --check       Run 21-point launch readiness validation"
         echo "  --status      Display system and subsystem status"
         echo "  --iso         Build and verify bootable ISO image"

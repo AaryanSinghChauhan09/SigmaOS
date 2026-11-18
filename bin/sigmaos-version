@@ -1,14 +1,20 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # sigmaos-version - Report SigmaOS version
-# Modeled on Omancy 4.0.5 omancy-version
+# Modeled on Omarchy 4.0.5 omarchy-version
 
 set -euo pipefail
 
-SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
-VERSION_FILE="${SIGMAOS_PATH}/version"
+REAL_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "$REAL_PATH")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+SIGMAOS_PATH="${SIGMAOS_PATH:-$ROOT_DIR}"
 
-if [ -f "${VERSION_FILE}" ]; then
-  cat "${VERSION_FILE}"
+if [ -f "${SIGMAOS_PATH}/version" ]; then
+  cat "${SIGMAOS_PATH}/version"
+elif [ -f "${ROOT_DIR}/version" ]; then
+  cat "${ROOT_DIR}/version"
+elif [ -f "/usr/share/sigmaos/version" ]; then
+  cat "/usr/share/sigmaos/version"
 else
-  echo "0.1.0"
+  echo "1.0.0-alpha.1"
 fi
