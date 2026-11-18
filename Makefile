@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy gui desktop native tray install diagnose doctor fonts install-deps boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy gui desktop native tray install diagnose doctor fonts install-deps sandbox dotfiles settings boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -231,8 +231,28 @@ doctor:
 # 16. Install system fonts
 fonts:
 	@mkdir -p $(HOME)/.local/share/fonts
+	@if [ ! -f $(HOME)/.local/share/fonts/JetBrainsMono-Regular.ttf ]; then \
+		echo "==> Fetching JetBrains Mono font..."; \
+		curl -Lfs "https://github.com/JetBrains/JetBrainsMono/raw/master/fonts/ttf/JetBrainsMono-Regular.ttf" -o $(HOME)/.local/share/fonts/JetBrainsMono-Regular.ttf 2>/dev/null || true; \
+	fi
+	@if [ ! -f $(HOME)/.local/share/fonts/SymbolsNerdFont-Regular.ttf ]; then \
+		echo "==> Fetching Symbols Nerd Font..."; \
+		curl -Lfs "https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/NerdFontsSymbolsOnly/SymbolsNerdFont-Regular.ttf" -o $(HOME)/.local/share/fonts/SymbolsNerdFont-Regular.ttf 2>/dev/null || true; \
+	fi
 	@echo "==> Updating font cache..."
-	@fc-cache -fv 2>/dev/null || true
+	@fc-cache -fv $(HOME)/.local/share/fonts 2>/dev/null || true
+
+# 16a. Launch Isolated Sandbox Container (Bubblewrap GUI passthrough)
+sandbox:
+	@bash scripts/sigmaos_sandbox_container.sh $(ARGS)
+
+# 16b. Deploy Omarchy modular dotfiles to ~/.config
+dotfiles:
+	@bash scripts/setup_omarchy_dotfiles.sh $(ARGS)
+
+# 16c. System Settings Manager
+settings:
+	@bash bin/sigmaos-settings $(ARGS)
 
 # 17. Install GUI dependencies
 install-deps:
