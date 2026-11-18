@@ -1,10 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # sigmaos-settings - SigmaOS system settings manager
-# Modeled on Omancy 4.0.6 omarchy-settings
+# Modeled on Omarchy 4.0.6 omarchy-settings
 
 set -euo pipefail
 
-SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+REAL_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "$REAL_PATH")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+SIGMAOS_PATH="${SIGMAOS_PATH:-$ROOT_DIR}"
 SETTINGS_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/sigmaos/settings.conf"
 
 show_settings() {
@@ -12,13 +15,14 @@ show_settings() {
     if [ -f "$SETTINGS_FILE" ]; then
         cat "$SETTINGS_FILE"
     else
-        echo "Using default settings"
-        echo "theme=sigmaos"
+        echo "Using default settings (Catppuccin Mocha / Omarchy):"
+        echo "theme=catppuccin-mocha"
         echo "background=default"
-        echo "font=JetBrainsMono Nerd Font"
+        echo "font=JetBrains Mono"
         echo "terminal=foot"
         echo "editor=micro"
         echo "browser=chromium"
+        echo "persona=omarchy"
     fi
 }
 
@@ -38,15 +42,31 @@ set_setting() {
     echo "Set ${key}=${value}"
 }
 
-case "${1:-}" in
-    show)
+gui_settings() {
+    if command -v zenity >/dev/null 2>&1 && [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
+        local current
+        current=$(show_settings)
+        zenity --info --title="SigmaOS System Settings" --text="$current" --width=400 --height=300 2>/dev/null || show_settings
+    else
         show_settings
+    fi
+}
+
+case "${1:-}" in
+    show|"")
+        show_settings
+        ;;
+    --gui|gui)
+        gui_settings
         ;;
     set)
         set_setting "${2:-}" "${3:-}"
         ;;
+    --help|-h|help)
+        echo "Usage: sigmaos-settings [show | set <key> <value> | gui]"
+        ;;
     *)
-        echo "Usage: sigmaos-settings <show|set <key> <value>>" >&2
+        echo "Usage: sigmaos-settings [show | set <key> <value> | gui]" >&2
         exit 1
         ;;
 esac
