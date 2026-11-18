@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy gui desktop tray install diagnose boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy gui desktop native tray install diagnose doctor fonts install-deps boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -212,6 +212,10 @@ desktop: gui
 tray:
 	@python3 scripts/sigmaos_tray.py &
 
+# 13b. Pure GTK3 Native Desktop
+native:
+	@python3 scripts/sigmaos_native_app.py
+
 # 14. Install SigmaOS desktop entry (.desktop file + icon in ~/.local)
 install:
 	@bash scripts/install_desktop_entry.sh
@@ -219,6 +223,21 @@ install:
 # 15. Run startup diagnostics
 diagnose:
 	@python3 scripts/sigmaos_startup_diagnostics.py
+
+# 15a. Omarchy System Doctor (39-point comprehensive audit)
+doctor:
+	@bash scripts/sigmaos_doctor.sh
+
+# 16. Install system fonts
+fonts:
+	@mkdir -p $(HOME)/.local/share/fonts
+	@echo "==> Updating font cache..."
+	@fc-cache -fv 2>/dev/null || true
+
+# 17. Install GUI dependencies
+install-deps:
+	@echo "==> Ensuring GUI dependencies are installed..."
+	@sudo apt-get install -y python3-gi python3-gi-cairo gir1.2-webkit2-4.1 gir1.2-gtk-3.0 fonts-jetbrains-mono 2>/dev/null || true
 
 help:
 	@echo "SigmaOS Unified Build & Test Interface"
@@ -256,7 +275,11 @@ help:
 	@echo "  make omarchy      - Launch Omarchy Linux Aesthetic Persona ✓"
 	@echo "  make gui          - Launch SigmaOS Graphical Desktop (GTK3 + WebKit2) ✓"
 	@echo "  make desktop      - Alias for 'make gui' ✓"
+	@echo "  make native       - Launch SigmaOS Native GTK3 Desktop (pure GTK3) ✓"
 	@echo "  make tray         - Launch SigmaOS System Tray indicator ✓"
 	@echo "  make install      - Install .desktop entry + icon to ~/.local ✓"
 	@echo "  make diagnose     - Run SigmaOS startup health diagnostics ✓"
+	@echo "  make doctor       - Run Omarchy 39-point system health diagnostics ✓"
+	@echo "  make fonts        - Update local font cache ✓"
+	@echo "  make install-deps - Install GTK3/WebKit2 GUI dependencies ✓"
 	@echo "  make clean        - Remove build artifacts"

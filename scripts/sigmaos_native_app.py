@@ -115,23 +115,23 @@ class SigmaOSWindow(Gtk.Window):
         btn_theme.connect("clicked", self.on_run_cmd, "omarchy theme list")
         btn_box.pack_start(btn_theme, False, False, 0)
 
-        btn_pacman = Gtk.Button(label="󰮯 Pacman Update")
+        btn_pacman = Gtk.Button(label="[Pkg] Pacman Update")
         btn_pacman.connect("clicked", self.on_run_cmd, "sigpkg update")
         btn_box.pack_start(btn_pacman, False, False, 0)
 
-        btn_doctor = Gtk.Button(label="󰀻 Omarchy Doctor")
-        btn_doctor.connect("clicked", self.on_run_cmd, "omarchy doctor")
+        btn_doctor = Gtk.Button(label="[Doctor] System Doctor")
+        btn_doctor.connect("clicked", self.on_run_cmd, "bash " + os.path.join(SCRIPT_DIR, "sigmaos_doctor.sh"))
         btn_box.pack_start(btn_doctor, False, False, 0)
 
-        btn_neofetch = Gtk.Button(label="󰙵 Neofetch")
+        btn_neofetch = Gtk.Button(label="[SysInfo] Neofetch")
         btn_neofetch.connect("clicked", self.on_run_cmd, "neofetch 2>&1 || fastfetch 2>&1")
         btn_box.pack_start(btn_neofetch, False, False, 0)
 
-        btn_uname = Gtk.Button(label=" uname -a")
+        btn_uname = Gtk.Button(label="[Kernel] uname -a")
         btn_uname.connect("clicked", self.on_run_cmd, "uname -a && lsb_release -d 2>/dev/null || true")
         btn_box.pack_start(btn_uname, False, False, 0)
 
-        btn_status = Gtk.Button(label="󰒋 System Status")
+        btn_status = Gtk.Button(label="[Status] System Status")
         btn_status.connect("clicked", self.on_run_cmd, "sigmaos --status")
         btn_box.pack_start(btn_status, False, False, 0)
 

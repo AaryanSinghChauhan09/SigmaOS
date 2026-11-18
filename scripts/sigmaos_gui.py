@@ -188,9 +188,25 @@ def launch_gtk_webkit(html_uri):
         webview.connect("load-changed", on_load_changed)
         ucm.connect("script-message-received::sigmaExec", on_script_message)
 
+        GLib.set_prgname("SigmaOS")
+        GLib.set_application_name("SigmaOS")
+
         window = Gtk.Window(title="SigmaOS \u2014 Sovereign Desktop")
+        window.set_wmclass("SigmaOS", "SigmaOS")
         window.set_default_size(1280, 820)
         window.set_position(Gtk.WindowPosition.CENTER)
+
+        icon_paths = [
+            os.path.expanduser("~/.local/share/icons/hicolor/scalable/apps/sigmaos.svg"),
+            os.path.join(ROOT_DIR, "assets", "sigmaos.svg"),
+        ]
+        for ip in icon_paths:
+            if os.path.isfile(ip):
+                try:
+                    window.set_icon_from_file(ip)
+                    break
+                except Exception:
+                    pass
         window.add(webview)
         window.connect("destroy", Gtk.main_quit)
         window.show_all()

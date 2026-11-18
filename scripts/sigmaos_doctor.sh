@@ -112,18 +112,18 @@ section "Fonts"
 
 check_font() {
   local name="$1"; local pattern="$2"
-  if fc-list 2>/dev/null | grep -qi "$pattern"; then
+  if (fc-list 2>/dev/null || true) | grep -iE "$pattern" >/dev/null; then
     check "Font: $name" pass
   else
     check "Font: $name" warn "not installed"
   fi
 }
 
-check_font "JetBrains Mono" "JetBrainsMono\|JetBrains Mono"
-check_font "Nerd Fonts (any)" "NerdFont\|Nerd Font"
-check_font "Noto Sans" "NotoSans\|Noto Sans"
+check_font "JetBrains Mono" "JetBrainsMono|JetBrains Mono"
+check_font "Nerd Fonts (any)" "NerdFont|Nerd Font"
+check_font "Noto Sans" "NotoSans|Noto Sans"
 check_font "Ubuntu" "Ubuntu"
-check_font "FiraCode" "FiraCode\|Fira Code"
+check_font "FiraCode" "FiraCode|Fira Code"
 
 # ── 4. Python3 & GTK / WebKit2 ───────────────────────────────────────────────
 section "Python3 & GTK / WebKit2"

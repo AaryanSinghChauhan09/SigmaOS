@@ -4,10 +4,13 @@
 # Turnkey, zero-friction execution inspired by Omarchy Linux & Arch Linux.
 #
 # Usage:
-#   ./run.sh              # Launch interactive sovereign workstation
+#   ./run.sh              # Launch sovereign workstation (GUI on desktop, TUI in terminal)
+#   ./run.sh --gui        # Launch sovereign GUI desktop (GTK3 + WebKit2)
+#   ./run.sh --native     # Launch native GTK3 desktop app (pure GTK3)
 #   ./run.sh --omarchy    # Launch Omarchy aesthetic persona (Hyprland / Wallust)
 #   ./run.sh --arch       # Launch Arch Linux minimalist persona (Pacman / Rolling)
-#   ./run.sh --doctor     # Run Omarchy diagnostic health checks
+#   ./run.sh --doctor     # Run Omarchy diagnostic health checks (39-point audit)
+#   ./run.sh --dotfiles   # Deploy Omarchy dotfiles to ~/.config
 #   ./run.sh --check      # Run 21-point launch readiness validation
 #   ./run.sh --iso        # Build & verify bootable ISO image
 #   ./run.sh --qemu       # Boot ISO in QEMU virtual machine
@@ -39,7 +42,14 @@ case "$ACTION" in
         exec "$SCRIPT_DIR/bin/sigmaos" --mint
         ;;
     --doctor|doctor)
-        exec "$SCRIPT_DIR/bin/sigmaos" --doctor
+        if [ -f "$SCRIPT_DIR/scripts/sigmaos_doctor.sh" ]; then
+            exec bash "$SCRIPT_DIR/scripts/sigmaos_doctor.sh"
+        else
+            exec "$SCRIPT_DIR/bin/sigmaos" --doctor
+        fi
+        ;;
+    --dotfiles|dotfiles)
+        exec bash "$SCRIPT_DIR/scripts/setup_omarchy_dotfiles.sh"
         ;;
     --check|check)
         exec "$SCRIPT_DIR/bin/sigmaos" --check
@@ -55,6 +65,9 @@ case "$ACTION" in
         ;;
     --gui|gui|--desktop|desktop)
         exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py"
+        ;;
+    --native|native)
+        exec python3 "$SCRIPT_DIR/scripts/sigmaos_native_app.py"
         ;;
     --cli|cli|--tui|tui)
         if [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
@@ -86,11 +99,34 @@ case "$ACTION" in
         fi
         ;;
     --help|-h|help)
-        exec "$SCRIPT_DIR/bin/sigmaos" --help
+        echo "SigmaOS — Sovereign Operating System Runner"
+        echo ""
+        echo "Usage: ./run.sh [OPTION]"
+        echo ""
+        echo "Options:"
+        echo "  (none)        Launch GUI desktop if DISPLAY/WAYLAND available, else interactive TUI"
+        echo "  --gui         Launch full graphical desktop (GTK3 + WebKit2 + IPC)"
+        echo "  --native      Launch pure GTK3 desktop interface (no WebKit2 requirement)"
+        echo "  --cli, --tui  Launch interactive terminal menu"
+        echo "  --omarchy     Launch Omarchy aesthetic persona (Hyprland / Wallust)"
+        echo "  --arch        Launch Arch Linux minimalist persona (Pacman / Rolling)"
+        echo "  --mint        Launch Linux Mint ergonomic persona"
+        echo "  --doctor      Run Omarchy 39-point system health diagnostics"
+        echo "  --dotfiles    Deploy Omarchy desktop configs to ~/.config"
+        echo "  --check       Run 21-point launch readiness validation"
+        echo "  --status      Display system and subsystem status"
+        echo "  --iso         Build and verify bootable ISO image"
+        echo "  --qemu        Boot ISO in QEMU virtual machine"
+        echo "  --help        Show this help message"
+        exit 0
         ;;
     "")
-        # Direct, zero-friction launch: if in an interactive terminal, launch the live TUI menu!
-        if [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
+        # Direct, zero-friction launch:
+        # If graphical display is active, launch GUI desktop!
+        if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+            echo "==> Graphical display detected ($DISPLAY). Launching SigmaOS Desktop GUI..."
+            exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py"
+        elif [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
             exec "$SCRIPT_DIR/bin/sigmaos-launch"
         elif [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then
             exec "$SCRIPT_DIR/bin/sigmaos-launch"

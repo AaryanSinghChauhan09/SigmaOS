@@ -57,6 +57,7 @@ fn print_help() {
     println!("  --doctor           Execute Omarchy system diagnostics health check");
     println!("  --check            Execute launch readiness validation");
     println!("  --gui, --desktop   Launch SigmaOS Graphical Desktop Window");
+    println!("  --native           Launch SigmaOS Native GTK3 Desktop Window");
     println!("  --shell, -i        Launch live interactive shell session");
     println!("  --status, -s       Display system and launch status");
     println!("  --help, -h         Show this help");
@@ -91,7 +92,12 @@ fn main() {
                 return;
             }
             "--doctor" => {
-                let _ = Command::new("omarchy").arg("doctor").status();
+                let doctor_script = "/home/aaryansinghchauhan/SigmaOS/scripts/sigmaos_doctor.sh";
+                if std::path::Path::new(doctor_script).exists() {
+                    let _ = Command::new("bash").arg(doctor_script).status();
+                } else {
+                    let _ = Command::new("omarchy").arg("doctor").status();
+                }
                 return;
             }
             "--check" => {
@@ -100,6 +106,10 @@ fn main() {
             }
             "--gui" | "--desktop" | "gui" | "desktop" => {
                 let _ = Command::new("python3").arg("-c").arg("import os, subprocess; subprocess.run(['python3', os.path.expanduser('~/SigmaOS/scripts/sigmaos_gui.py')])").status();
+                return;
+            }
+            "--native" | "native" => {
+                let _ = Command::new("python3").arg("-c").arg("import os, subprocess; subprocess.run(['python3', os.path.expanduser('~/SigmaOS/scripts/sigmaos_native_app.py')])").status();
                 return;
             }
             "--shell" | "-i" | "--interactive" => {
@@ -167,7 +177,12 @@ fn main() {
                 run_cmd("omarchy theme list");
             }
             "6" => {
-                run_cmd("omarchy doctor");
+                let doctor_script = "/home/aaryansinghchauhan/SigmaOS/scripts/sigmaos_doctor.sh";
+                if std::path::Path::new(doctor_script).exists() {
+                    run_cmd(&format!("bash {}", doctor_script));
+                } else {
+                    run_cmd("omarchy doctor");
+                }
             }
             "7" => {
                 println!("\n\x1b[1;32mEntering SigmaOS Interactive Live Shell. Type 'exit' to return.\x1b[0m");
