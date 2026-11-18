@@ -17,7 +17,7 @@ Fallback chain:
 import sys, os, subprocess, shutil, threading, json, time
 
 # ── Additional WebKit env vars to prevent blank window ───────────────────────
-os.environ.setdefault("WEBKIT_FORCE_SANDBOX", "0")
+# WEBKIT_FORCE_SANDBOX is no longer supported in WebKit2 4.1+; use the replacement below
 os.environ.setdefault("WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS", "1")
 os.environ.setdefault("WEBKIT_DISABLE_COMPOSITING_MODE", "1")
 os.environ.setdefault("LIBGL_ALWAYS_SOFTWARE", "1")
@@ -153,12 +153,14 @@ def handle_exec(webview, cmd):
     threading.Thread(target=_run, daemon=True).start()
 
 def _inject(webview, js):
-    """Inject JS into the webview, trying run_javascript first (more stable in GTK3)."""
+    """Inject JS into the webview using evaluate_javascript (WebKit2 4.x preferred)."""
     try:
-        webview.run_javascript(js, None, None, None)
+        # evaluate_javascript is the modern API in WebKit2 4.1+
+        webview.evaluate_javascript(js, -1, None, None, None, None, None)
     except Exception:
         try:
-            webview.evaluate_javascript(js, -1, None, None, None, None, None)
+            # run_javascript is deprecated but kept as fallback for older WebKit2
+            webview.run_javascript(js, None, None, None)
         except Exception:
             pass
     return False
@@ -263,7 +265,11 @@ def launch_gtk_webkit(html_uri):
         GLib.set_application_name("SigmaOS")
 
         window = Gtk.Window(title="SigmaOS \u2014 Sovereign Desktop")
-        window.set_wmclass("SigmaOS", "SigmaOS")
+        # set_wmclass is deprecated in GTK3 3.22+ — use GLib application name instead
+        try:
+            window.set_wmclass("SigmaOS", "SigmaOS")
+        except Exception:
+            pass
         window.set_default_size(1280, 820)
         window.set_position(Gtk.WindowPosition.CENTER)
 
