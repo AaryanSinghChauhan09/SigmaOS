@@ -54,7 +54,7 @@ button:hover {
 #term_view {
     background-color: #11111b;
     color: #a6adc8;
-    font-family: 'JetBrainsMono Nerd Font', 'Monospace', monospace;
+    font-family: 'JetBrains Mono', 'Courier New', Monospace, monospace;
     font-size: 13px;
     padding: 12px;
 }
@@ -82,7 +82,7 @@ class SigmaOSWindow(Gtk.Window):
         header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
         header.set_name("header_bar")
 
-        title = Gtk.Label(label="󰣇 SigmaOS Sovereign Workstation")
+        title = Gtk.Label(label="[SigmaOS] Sovereign Workstation")
         title.set_name("brand_title")
         header.pack_start(title, False, False, 0)
 
@@ -99,19 +99,19 @@ class SigmaOSWindow(Gtk.Window):
         btn_box.set_margin_start(16)
         btn_box.set_margin_end(16)
 
-        btn_omarchy = Gtk.Button(label="󰄛 Omarchy Persona")
+        btn_omarchy = Gtk.Button(label="[Omarchy] Omarchy Persona")
         btn_omarchy.connect("clicked", self.on_run_cmd, "sigmaos --omarchy")
         btn_box.pack_start(btn_omarchy, False, False, 0)
 
-        btn_arch = Gtk.Button(label="󰣇 Arch Persona")
+        btn_arch = Gtk.Button(label="[Arch] Arch Persona")
         btn_arch.connect("clicked", self.on_run_cmd, "sigmaos --arch")
         btn_box.pack_start(btn_arch, False, False, 0)
 
-        btn_aur = Gtk.Button(label="󰚰 AUR Hyprland Query")
+        btn_aur = Gtk.Button(label="[AUR] AUR Hyprland Query")
         btn_aur.connect("clicked", self.on_run_cmd, "sigpkg aur hyprland")
         btn_box.pack_start(btn_aur, False, False, 0)
 
-        btn_theme = Gtk.Button(label="󰏘 Wallust Themes")
+        btn_theme = Gtk.Button(label="[Theme] Wallust Themes")
         btn_theme.connect("clicked", self.on_run_cmd, "omarchy theme list")
         btn_box.pack_start(btn_theme, False, False, 0)
 
@@ -122,6 +122,14 @@ class SigmaOSWindow(Gtk.Window):
         btn_doctor = Gtk.Button(label="󰀻 Omarchy Doctor")
         btn_doctor.connect("clicked", self.on_run_cmd, "omarchy doctor")
         btn_box.pack_start(btn_doctor, False, False, 0)
+
+        btn_neofetch = Gtk.Button(label="󰙵 Neofetch")
+        btn_neofetch.connect("clicked", self.on_run_cmd, "neofetch 2>&1 || fastfetch 2>&1")
+        btn_box.pack_start(btn_neofetch, False, False, 0)
+
+        btn_uname = Gtk.Button(label=" uname -a")
+        btn_uname.connect("clicked", self.on_run_cmd, "uname -a && lsb_release -d 2>/dev/null || true")
+        btn_box.pack_start(btn_uname, False, False, 0)
 
         btn_status = Gtk.Button(label="󰒋 System Status")
         btn_status.connect("clicked", self.on_run_cmd, "sigmaos --status")

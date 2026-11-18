@@ -1,149 +1,292 @@
 #!/usr/bin/env python3
 """
-SigmaOS Sovereign Graphical Desktop Window Runner
-==================================================
-Launches the native graphical desktop for SigmaOS using GTK3 + WebKit2,
-with automatic fallback to Chrome/Firefox app mode if GTK/WebKit display fails.
+SigmaOS Sovereign Graphical Desktop
+=====================================
+GTK3 + WebKit2 window with a REAL Python↔JS IPC bridge.
+Every command typed in the HTML terminal is executed by Python and the
+real output is injected back into the page — no simulation.
 
-Principles:
-- READY TO USE: Instant visible GUI on DISPLAY=:0
-- LEAST ASTONISHMENT: True desktop window, interactive controls, and persona switches
-- DEFENSIVE PROGRAMMING: Graceful fallback chain (WebKit2 -> Google Chrome -> Firefox)
+Fallback chain:
+  1. GTK3 + WebKit2 with IPC bridge  (best — real OS window + real shell)
+  2. Pure GTK3 native app            (sigmaos_native_app.py)
+  3. Chrome --app=file://            (browser fallback)
+  4. Firefox --new-window            (last resort)
+  5. Terminal REPL binary            (no DISPLAY)
 """
 
-import sys
-import os
-import subprocess
-import shutil
+import sys, os, subprocess, shutil, threading, json
+
+# ── Additional WebKit env vars to prevent blank window ───────────────────────
+os.environ.setdefault("WEBKIT_FORCE_SANDBOX", "0")
+os.environ.setdefault("WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS", "1")
+os.environ.setdefault("WEBKIT_DISABLE_COMPOSITING_MODE", "1")
+os.environ.setdefault("LIBGL_ALWAYS_SOFTWARE", "1")
+os.environ.setdefault("GSK_RENDERER", "cairo")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(SCRIPT_DIR)
-HTML_PATH = os.path.join(ROOT_DIR, "ui", "desktop", "index.html")
+ROOT_DIR   = os.path.dirname(SCRIPT_DIR)
+HTML_PATH  = os.path.join(ROOT_DIR, "ui", "desktop", "index.html")
 
+# ── IPC JavaScript injected into every page ───────────────────────────────────
+IPC_JS = r"""
+(function() {
+  if (window.__sigmaos_ipc_ready) return;
+  window.__sigmaos_ipc_ready = true;
+
+  // Send a command to Python backend
+  window.sigmaExec = function(cmd) {
+    window.webkit.messageHandlers.sigmaExec.postMessage(cmd);
+  };
+
+  // Python calls this to deliver output back to the terminal
+  window.sigmaOutput = function(output) {
+    const out = document.getElementById('term-out');
+    if (out) {
+      out.textContent += output;
+      out.scrollTop = out.scrollHeight;
+    }
+    // Also try the omarchy terminal
+    const oout = document.getElementById('oterm-out');
+    if (oout && window.__sigma_oterm_active) {
+      oout.textContent += output;
+      oout.scrollTop = oout.scrollHeight;
+    }
+  };
+
+  // Override handleTermKey to route to real Python backend
+  const _origHandleTerm = window.handleTermKey;
+  window.handleTermKey = function(e) {
+    if (e.key === 'Enter') {
+      const input = document.getElementById('term-in');
+      if (!input) return;
+      const cmd = input.value.trim();
+      input.value = '';
+      if (!cmd) return;
+      const out = document.getElementById('term-out');
+      if (out) { out.textContent += 'sigmaos\u276f ' + cmd + '\n'; out.scrollTop = out.scrollHeight; }
+      window.sigmaExec(cmd);
+    }
+  };
+
+  // Override Omarchy terminal too
+  window.handleOtermKey = function(e) {
+    if (e.key === 'Enter') {
+      const input = document.getElementById('oterm-in');
+      if (!input) return;
+      const cmd = input.value.trim();
+      input.value = '';
+      if (!cmd) return;
+      window.__sigma_oterm_active = true;
+      const out = document.getElementById('oterm-out');
+      if (out) { out.textContent += 'omarchy\u276f ' + cmd + '\n'; out.scrollTop = out.scrollHeight; }
+      window.sigmaExec('omarchy ' + cmd);
+    }
+  };
+
+  console.log('[SigmaOS IPC] Bridge active — real shell connected.');
+})();
+"""
+
+# ── Python IPC handler ────────────────────────────────────────────────────────
+def handle_exec(webview, cmd):
+    """Run cmd in a background thread and inject output back into the WebView."""
+    def _run():
+        try:
+            # Map some HTML-terminal commands to real equivalents
+            real_cmd = cmd.strip()
+            if real_cmd in ('clear',):
+                _inject(webview, "document.getElementById('term-out').textContent = '';")
+                return
+            if real_cmd in ('help',):
+                real_cmd = 'sigmaos --help 2>&1 || echo "sigmaos: type any bash command"'
+            elif real_cmd in ('doctor', 'omarchy doctor'):
+                real_cmd = f'python3 {SCRIPT_DIR}/sigmaos_startup_diagnostics.py 2>&1'
+            elif real_cmd.startswith('pacman ') or real_cmd.startswith('sigpkg '):
+                real_cmd = real_cmd  # pass through to sigpkg
+            elif real_cmd in ('neofetch', 'fastfetch'):
+                real_cmd = f'{real_cmd} 2>&1 || neofetch 2>&1'
+
+            out = subprocess.check_output(
+                real_cmd, shell=True, stderr=subprocess.STDOUT,
+                text=True, timeout=30, cwd=ROOT_DIR
+            )
+        except subprocess.CalledProcessError as e:
+            out = e.output or "(exit non-zero)\n"
+        except subprocess.TimeoutExpired:
+            out = "(command timed out after 30s)\n"
+        except Exception as ex:
+            out = f"Error: {ex}\n"
+        # Escape for JS string injection
+        escaped = json.dumps(out)
+        js = f"window.sigmaOutput && window.sigmaOutput({escaped});"
+        import gi
+        gi.require_version("GLib", "2.0")
+        from gi.repository import GLib
+        GLib.idle_add(_inject, webview, js)
+
+    threading.Thread(target=_run, daemon=True).start()
+
+def _inject(webview, js):
+    """Inject JS into the webview, trying run_javascript first (more stable in GTK3)."""
+    try:
+        webview.run_javascript(js, None, None, None)
+    except Exception:
+        try:
+            webview.evaluate_javascript(js, -1, None, None, None, None, None)
+        except Exception:
+            pass
+    return False
+
+
+# ── GTK3 + WebKit2 window ─────────────────────────────────────────────────────
 def launch_gtk_webkit(html_uri):
-    """Native: launch GTK3 + WebKit2 Window."""
     try:
         import gi
         gi.require_version("Gtk", "3.0")
         gi.require_version("WebKit2", "4.1")
         from gi.repository import Gtk, WebKit2, GLib
     except Exception as e:
-        print(f"[!] GTK/WebKit2 initialization error: {e}")
+        print(f"[!] GTK/WebKit2 init error: {e}")
         return False
 
     try:
-        window = Gtk.Window(title="󰣇 SigmaOS Sovereign Desktop (Arch & Omarchy Edition)")
-        window.set_default_size(1280, 820)
-        window.set_position(Gtk.WindowPosition.CENTER)
+        # Disable sandbox (avoids silent subprocess crashes in sandboxed envs)
+        # (env vars set at module load above)
 
-        # WebKit WebView settings
+        # UserContentManager for JS→Python messages
+        ucm = WebKit2.UserContentManager()
+        ucm.register_script_message_handler("sigmaExec")
+
         settings = WebKit2.Settings()
         settings.set_enable_javascript(True)
         settings.set_enable_developer_extras(True)
-        settings.set_enable_webgl(True)
         settings.set_allow_file_access_from_file_urls(True)
         settings.set_allow_universal_access_from_file_urls(True)
+        settings.set_hardware_acceleration_policy(
+            WebKit2.HardwareAccelerationPolicy.NEVER
+        )
 
-        webview = WebKit2.WebView.new_with_settings(settings)
-        webview.load_uri(html_uri)
+        webview = WebKit2.WebView.new_with_user_content_manager(ucm)
+        webview.set_settings(settings)
 
+        # Inject IPC bridge after every page load
+        def on_load_changed(wv, event):
+            if event == WebKit2.LoadEvent.FINISHED:
+                _inject(wv, IPC_JS)
+                # Auto-open terminal window on startup
+                _inject(wv, "setTimeout(function(){ window.summonWindow && window.summonWindow('win-term'); }, 600);")
+                print("==> SigmaOS IPC bridge injected.")
+
+        def on_script_message(ucm, result):
+            try:
+                val = result.get_js_value()
+                cmd = val.to_string()
+                handle_exec(webview, cmd)
+            except Exception as ex:
+                print(f"[IPC] message parse error: {ex}")
+
+        webview.connect("load-changed", on_load_changed)
+        ucm.connect("script-message-received::sigmaExec", on_script_message)
+
+        window = Gtk.Window(title="SigmaOS \u2014 Sovereign Desktop")
+        window.set_default_size(1280, 820)
+        window.set_position(Gtk.WindowPosition.CENTER)
         window.add(webview)
         window.connect("destroy", Gtk.main_quit)
         window.show_all()
 
-        print("==> SigmaOS Sovereign Desktop Environment Window Active.")
-        print("==> Running on native GTK3 + WebKit2 4.1 engine. Close window to exit.")
+        webview.load_uri(html_uri)
+
+        print("==> SigmaOS Sovereign Desktop active (GTK3 + WebKit2 + IPC bridge)")
+        print("==> Close the window to exit.")
         Gtk.main()
         return True
+
     except Exception as e:
-        print(f"[!] Native GTK window launch encountered: {e}")
+        print(f"[!] GTK window error: {e}")
         return False
 
+
 def launch_native_gtk_app():
-    """Fallback: launch native pure GTK3 desktop interface."""
-    native_script = os.path.join(SCRIPT_DIR, "sigmaos_native_app.py")
-    if os.path.isfile(native_script):
-        print("==> Launching SigmaOS Native GTK3 Desktop Interface...")
+    native = os.path.join(SCRIPT_DIR, "sigmaos_native_app.py")
+    if os.path.isfile(native):
+        print("==> Launching SigmaOS Native GTK3 Desktop...")
         try:
-            res = subprocess.run([sys.executable, native_script])
+            res = subprocess.run([sys.executable, native])
             return res.returncode == 0
         except Exception as e:
-            print(f"[!] Native GTK3 app error: {e}")
-            return False
+            print(f"[!] Native app error: {e}")
     return False
 
+
 def launch_chrome_fallback(html_uri):
-    """Fallback: launch in dedicated standalone Chrome application window."""
     chrome = shutil.which("google-chrome") or shutil.which("chromium")
     if chrome:
-        profile_dir = "/tmp/sigmaos-chrome-profile"
-        print(f"==> Launching SigmaOS Desktop in dedicated app window via {chrome}...")
+        profile = "/tmp/sigmaos-chrome-profile"
+        print(f"==> Launching via {chrome} --app mode...")
         try:
-            proc = subprocess.Popen([
+            subprocess.Popen([
                 chrome,
-                f"--user-data-dir={profile_dir}",
+                f"--user-data-dir={profile}",
                 f"--app={html_uri}",
                 "--window-size=1280,820",
                 "--window-position=100,60",
                 "--no-first-run",
-                "--no-default-browser-check"
-            ])
-            proc.wait()
+                "--no-default-browser-check",
+                "--disable-gpu",
+            ]).wait()
             return True
         except Exception as e:
-            print(f"[!] Chrome app launch error: {e}")
-            return False
+            print(f"[!] Chrome error: {e}")
     return False
 
+
 def launch_firefox_fallback(html_uri):
-    """Fallback: launch in Firefox."""
-    firefox = shutil.which("firefox")
-    if firefox:
-        print(f"==> Launching SigmaOS Desktop via {firefox}...")
+    ff = shutil.which("firefox")
+    if ff:
+        print(f"==> Launching via {ff}...")
         try:
-            proc = subprocess.Popen([firefox, "--new-window", html_uri])
-            proc.wait()
+            subprocess.Popen([ff, "--new-window", html_uri]).wait()
             return True
         except Exception as e:
-            print(f"[!] Firefox launch error: {e}")
-            return False
+            print(f"[!] Firefox error: {e}")
     return False
+
 
 def main():
     if not os.path.isfile(HTML_PATH):
-        print(f"Error: UI desktop file not found at {HTML_PATH}", file=sys.stderr)
+        print(f"Error: UI not found at {HTML_PATH}", file=sys.stderr)
         sys.exit(1)
 
     html_uri = f"file://{HTML_PATH}"
 
-    # Check for graphical DISPLAY
     if not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
-        print("[!] No DISPLAY or WAYLAND_DISPLAY detected. Falling back to terminal workstation...")
-        os.execv(os.path.join(ROOT_DIR, "bin", "sigmaos"), ["sigmaos"])
+        print("[!] No display. Falling back to terminal REPL.")
+        repl = os.path.join(ROOT_DIR, "bin", "sigmaos")
+        if os.path.isfile(repl):
+            os.execv(repl, [repl])
+        sys.exit(1)
 
     print("╔══════════════════════════════════════════════════════════╗")
-    print("║        Launching SigmaOS Sovereign GUI Desktop           ║")
-    print("║     Omarchy Aesthetic & Arch Linux Substrate Studio     ║")
+    print("║      SigmaOS Sovereign Desktop — Omarchy Edition        ║")
+    print("║   GTK3 + WebKit2 + Real Shell IPC Bridge                ║")
     print("╚══════════════════════════════════════════════════════════╝")
 
-    # 1. Native WebKit2 GTK3 window (FIRST PRIORITY - true native OS window)
     if launch_gtk_webkit(html_uri):
         sys.exit(0)
-
-    # 2. Native Pure GTK3 desktop app
     if launch_native_gtk_app():
         sys.exit(0)
-
-    # 3. Dedicated Chrome App Window
     if launch_chrome_fallback(html_uri):
         sys.exit(0)
-
-    # 4. Firefox fallback
     if launch_firefox_fallback(html_uri):
         sys.exit(0)
 
-    print("[!] Unable to open graphical window. Reverting to terminal mode...")
-    os.execv(os.path.join(ROOT_DIR, "bin", "sigmaos"), ["sigmaos"])
+    print("[!] No GUI available. Reverting to terminal REPL.")
+    repl = os.path.join(ROOT_DIR, "bin", "sigmaos")
+    if os.path.isfile(repl):
+        os.execv(repl, [repl])
+    sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

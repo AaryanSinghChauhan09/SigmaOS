@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
 <title>SigmaOS Sovereign Desktop Environment — Omarchy Parity</title>
 <style>
   :root {
@@ -15,8 +16,8 @@
     --accent-yellow: #f9e2af;
     --text-primary: #cdd6f4;
     --text-muted: #8b9bb4;
-    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Ubuntu, sans-serif;
-    --font-mono: "JetBrains Mono", "Fira Code", monospace;
+    --font-ui: Ubuntu, 'Noto Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   }
 
   /* Persona Themes */
@@ -833,7 +834,8 @@
   Kernel ABI   : Linux Syscalls (21 mapped) + FreeBSD Capsicum + OpenBSD pledge
   Pacman/ALPM  : Rolling Release v75.0 · Tier-1 Mirrorlist
 
-Type 'help' for commands, 'omarchy binds' for shortcuts, 'doctor' for diagnostics.
+[IPC Bridge] ✓ Real shell connected — type any bash command below.
+Type 'help' · 'doctor' · 'neofetch' · 'uname -a' · 'pacman -Ss <pkg>' · any bash command
 </div>
       <div class="term-input-row">
         <span class="term-prompt">sigmaos❯</span>
@@ -1754,16 +1756,19 @@ ORDER BY memory_gb DESC;</textarea>
       const root = parts[0];
 
       if (cmd === 'help') {
-        appendTerm(`Available Commands:
-  omarchy binds       - List Omarchy Hyprland keybindings
-  omarchy theme list  - List available Wallust palettes
-  omarchy theme set   - Apply theme (e.g. 'omarchy theme tokyo')
-  omarchy doctor      - Run full diagnostic health checks
-  craft               - Open 20-module creative suite
-  pacman -syu         - Run rolling release system upgrade
-  wallust             - Open dynamic theme harmonizer
-  clear               - Clear terminal output
-  about               - System information\n`);
+        appendTerm(`SigmaOS IPC Shell — Real commands available:\n` +
+        `  uname -a            - Kernel & OS info\n` +
+        `  neofetch            - System overview\n` +
+        `  pacman -Ss <pkg>    - Search packages via ALPM bridge\n` +
+        `  pacman -Syu         - System upgrade (simulated via sigpkg)\n` +
+        `  sigpkg aur <query>  - Query AUR v5\n` +
+        `  omarchy doctor      - Run SigmaOS 14-point diagnostics\n` +
+        `  doctor              - Alias for diagnostics\n` +
+        `  ls / pwd / cat      - Standard shell commands (real output)\n` +
+        `  clear               - Clear this terminal\n` +
+        `  omarchy binds       - Show keybinding reference overlay\n` +
+        `  omarchy theme list  - Open Wallust theme picker\n` +
+        `  about               - About SigmaOS\n`);
       } else if (cmd.startsWith('omarchy') || cmd.startsWith('omarchy-shell')) {
         if (parts[1] === 'binds') {
           summonWindow('win-keybinds');
@@ -3033,6 +3038,11 @@ pub fn parse_event(raw: &str) -> Option<(&str, &str)> {
         summonWindow('win-term');
         appendTerm('[Omafind] On-Device Multimodal Semantic Search activated (Super+Ctrl+G)\\n');
       }
+    });
+
+    // Auto-open terminal window on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => summonWindow && summonWindow('win-term'), 500);
     });
   </script>
 

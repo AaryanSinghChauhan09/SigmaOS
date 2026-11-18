@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "persona": "sigmaos-omarchy",
+  "bar": {
+    "modules_left": ["launcher", "workspaces"],
+    "modules_center": ["clock"],
+    "modules_right": ["tray", "battery", "volume", "network"]
+  },
+  "theme": {
+    "palette": "catppuccin-mocha",
+    "accent": "#89b4fa",
+    "border_radius": 8
+  },
+  "terminal": "kitty",
+  "editor": "nvim",
+  "launcher": "rofi"
+}
