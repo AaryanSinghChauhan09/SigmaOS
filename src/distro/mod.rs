@@ -1176,3 +1176,9 @@ pub use arch_pacman_v7_bridge::*;
 
 pub mod omarchy_v35_hyprland_v2;
 pub use omarchy_v35_hyprland_v2::*;
+
+pub mod sigma_init_v1;
+pub use sigma_init_v1::{
+    InitManager, InitError, BootTarget, RestartPolicy,
+    ServiceUnit, sigma_default_units,
+};
