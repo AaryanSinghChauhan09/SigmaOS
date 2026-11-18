@@ -16042,10 +16042,10 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-shader-government-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
+description = "Government kernel shader management with compilation and rendering pipeline"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-government-kernel"
-engine = "kernel_core"
-category = "Kernel"
+engine = "graphics"
+category = "Graphics"
 language = "rust"
 visibility = "public"
 depends_on = []
