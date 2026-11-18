@@ -1185,3 +1185,6 @@ pub use sigma_init_v1::{
 
 pub mod arch_omarchy_live_installer;
 pub use arch_omarchy_live_installer::*;
+
+pub mod arch_mkinitcpio_v35;
+pub use arch_mkinitcpio_v35::*;
