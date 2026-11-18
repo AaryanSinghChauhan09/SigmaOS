@@ -1431,6 +1431,11 @@ input {
           </tr>
         </tbody>
       </table>
+      <div style="margin-top: 14px; display: flex; gap: 10px; align-items: center;">
+        <button onclick="runLiveDoctorAudit()" style="background: var(--accent-cyan); color: #000; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">⚡ Run Live 39-Point Doctor Audit</button>
+        <span style="font-size: 11px; color: var(--text-muted);">Inspects display, GPUs, fonts, bindings, binaries, configs</span>
+      </div>
+      <pre id="doctor-live-out" style="display: none; margin-top: 12px; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 8px; font-family: var(--font-mono); font-size: 11px; max-height: 200px; overflow-y: auto; color: #a6e3a1; border: 1px solid var(--glass-border); white-space: pre-wrap; line-height: 1.4;"></pre>
     </div>
   </div>
 
@@ -1819,6 +1824,25 @@ ORDER BY memory_gb DESC;</textarea>
  there is nothing to do (system rolling release v75.0 is current)\n`);
       } else {
         appendTerm(`sigmaos: command '${cmd}' executed. Type 'help' for manual.\n`);
+      }
+    }
+  }
+
+  function runLiveDoctorAudit() {
+    const docOut = document.getElementById('doctor-live-out');
+    if (docOut) {
+      docOut.style.display = 'block';
+      docOut.textContent = '==> Launching SigmaOS 39-Point System Health Audit...\n';
+    }
+    window.__sigma_doctor_active = true;
+    if (window.sigmaExec) {
+      window.sigmaExec('doctor');
+    } else {
+      summonWindow('win-term');
+      const input = document.getElementById('term-in');
+      if (input) {
+        input.value = 'doctor';
+        handleTermKey({ key: 'Enter' });
       }
     }
   }

@@ -55,6 +55,12 @@ IPC_JS = r"""
       oout.textContent += output;
       oout.scrollTop = oout.scrollHeight;
     }
+    // Also try the doctor live output
+    const docOut = document.getElementById('doctor-live-out');
+    if (docOut && window.__sigma_doctor_active) {
+      docOut.textContent += output;
+      docOut.scrollTop = docOut.scrollHeight;
+    }
   };
 
   // Override handleTermKey to route to real Python backend
