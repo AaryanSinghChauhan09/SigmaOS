@@ -137,6 +137,11 @@ bin/sigmaos: src/bin/sigmaos.rs
 	@echo "==> Building native SigmaOS Workstation binary..."
 	@rustc -O src/bin/sigmaos.rs -o bin/sigmaos
 
+# 7d. Build native launcher controller
+bin/sigmaos-launch: src/bin/sigmaos_launch.rs
+	@echo "==> Building native SigmaOS Launch controller..."
+	@rustc -O src/bin/sigmaos_launch.rs -o bin/sigmaos-launch
+
 # 8. Build bootable QEMU / ISO image (M1 milestone)
 iso: kernel
 	@echo "==> Building SigmaOS Desktop Preview ISO image..."
@@ -162,14 +167,14 @@ boot-img:
 	@bash scripts/build_standalone_boot_image.sh
 
 # 9. Run SigmaOS (boots in QEMU if installed; gracefully falls back to native workstation)
-run: iso-stub bin/sigmaos
+run: iso-stub bin/sigmaos bin/sigmaos-launch
 	@image=build/sigmaos-desktop-preview.iso; \
 	if command -v qemu-system-x86_64 >/dev/null 2>&1 && [ -s "$$image" ]; then \
 		echo "==> Booting SigmaOS Desktop Preview in QEMU..."; \
 		exec qemu-system-x86_64 -m 2048 -cdrom "$$image" -serial stdio -no-reboot; \
 	else \
 		echo "==> QEMU not found in PATH or running headlessly. Launching native SigmaOS Workstation..."; \
-		bash bin/sigmaos-launch; \
+		./bin/sigmaos-launch; \
 	fi
 
 # 9b. Run stub ISO in QEMU (GALL'S LAW: start simple — works now!)
@@ -182,8 +187,8 @@ launch-check:
 	@bash scripts/check_launch_ready.sh
 
 # 11. Interactive OS launch & workstation dashboard (READY TO WORK & LAUNCH)
-launch: bin/sigmaos
-	@bash bin/sigmaos-launch
+launch: bin/sigmaos bin/sigmaos-launch
+	@./bin/sigmaos-launch
 
 start: launch
 
