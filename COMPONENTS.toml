@@ -27264,12 +27264,11 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-shader-alliances-kernel"
-description = "SigmaOS component repository"
+description = "Alliances shader kernel with compilation and rendering pipeline"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-alliances-kernel"
-engine = "component"
-category = "Components"
+engine = "graphics"
+category = "Graphics"
 language = "rust"
-inspirations = "None"
 visibility = "public"
 depends_on = []
 
