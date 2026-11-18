@@ -55,6 +55,41 @@ set_bg_hyprpaper() {
     return 1
 }
 
+# Set background via desktop environment or X11 tool
+set_bg_desktop() {
+    local wallpaper="$1"
+    local set_done=0
+    if command -v gsettings >/dev/null 2>&1; then
+        gsettings set org.cinnamon.desktop.background picture-uri "file://${wallpaper}" 2>/dev/null && set_done=1
+        gsettings set org.gnome.desktop.background picture-uri "file://${wallpaper}" 2>/dev/null && set_done=1
+        gsettings set org.gnome.desktop.background picture-uri-dark "file://${wallpaper}" 2>/dev/null && set_done=1
+    fi
+    if command -v feh >/dev/null 2>&1; then
+        feh --bg-fill "${wallpaper}" 2>/dev/null && set_done=1
+    fi
+    if [ "$set_done" -eq 1 ]; then
+        echo "${wallpaper}" > "${BG_STATE_FILE}"
+        echo "Desktop background set to ${wallpaper}"
+        return 0
+    fi
+    return 1
+}
+
+apply_wallpaper() {
+    local wp="$1"
+    if set_bg_swww "${wp}" || set_bg_hyprpaper "${wp}" || set_bg_desktop "${wp}"; then
+        echo "${wp}" > "${BG_STATE_FILE}"
+        local reloader="$(dirname "${BASH_SOURCE[0]}")/sigmaos-theme-reload"
+        if [ -x "${reloader}" ]; then
+            bash "${reloader}" 2>/dev/null || true
+        fi
+        return 0
+    fi
+    echo "Warning: no wallpaper setter found (tried swww, hyprpaper, gsettings, feh)" >&2
+    echo "${wp}" > "${BG_STATE_FILE}"
+    return 0
+}
+
 case "${1:-}" in
     list)
         echo "Available wallpapers:"
@@ -86,7 +121,7 @@ case "${1:-}" in
         if [ -z "${next}" ]; then
             next=$(echo "${wallpapers}" | head -n1)
         fi
-        set_bg_swww "${next}" || set_bg_hyprpaper "${next}"
+        apply_wallpaper "${next}"
         ;;
     set)
         wallpaper="${2:-}"
@@ -94,7 +129,7 @@ case "${1:-}" in
             echo "Usage: sigmaos-theme-bg-switcher set <wallpaper-path>" >&2
             exit 1
         fi
-        set_bg_swww "${wallpaper}" || set_bg_hyprpaper "${wallpaper}"
+        apply_wallpaper "${wallpaper}"
         ;;
     *)
         echo "Usage: sigmaos-theme-bg-switcher <list|current|next|set <path>>" >&2
