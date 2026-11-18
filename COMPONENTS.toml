@@ -27213,23 +27213,21 @@ depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-shader-adversarial-learning-kernel"
-description = "SigmaOS component repository"
+description = "Adversarial learning shader kernel with compilation and rendering pipeline"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-adversarial-learning-kernel"
-engine = "component"
-category = "Components"
+engine = "graphics"
+category = "Graphics"
 language = "rust"
-inspirations = "None"
 visibility = "public"
 depends_on = []
 
 [[component]]
 name = "SigmaOS-arch-shader-agency-kernel"
-description = "SigmaOS component repository"
+description = "Agency shader kernel with compilation and rendering pipeline"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-agency-kernel"
-engine = "component"
-category = "Components"
+engine = "graphics"
+category = "Graphics"
 language = "rust"
-inspirations = "None"
 visibility = "public"
 depends_on = []
 
