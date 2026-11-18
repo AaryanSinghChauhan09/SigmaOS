@@ -22,6 +22,7 @@ SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
 export SIGMAOS_PATH
 
 PLUGIN_STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/sigmaos-shell"
+mkdir -p "${PLUGIN_STATE_DIR}" 2>/dev/null || PLUGIN_STATE_DIR="/tmp/sigmaos-shell"
 PLUGIN_REGISTRY="${PLUGIN_STATE_DIR}/plugins"
 PLUGIN_DIR="${SIGMAOS_PATH}/shell/plugins"
 mkdir -p "${PLUGIN_STATE_DIR}"

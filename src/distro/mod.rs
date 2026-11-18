@@ -1170,3 +1170,9 @@ pub use open_source_os_and_cachy_linux_v86_pr::*;
 
 pub mod continuous_open_source_os_improvement_pr;
 pub use continuous_open_source_os_improvement_pr::*;
+
+pub mod arch_pacman_v7_bridge;
+pub use arch_pacman_v7_bridge::*;
+
+pub mod omarchy_v35_hyprland_v2;
+pub use omarchy_v35_hyprland_v2::*;
