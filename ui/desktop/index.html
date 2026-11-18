@@ -1624,6 +1624,14 @@ ORDER BY memory_gb DESC;</textarea>
   setInterval(updateClock, 1000);
   updateClock();
 
+  // Real telemetry updater called from Python backend
+  window.sigmaUpdateStats = function(cpu, mem) {
+    const c = document.getElementById('cpu-stat');
+    if (c) c.textContent = cpu;
+    const m = document.getElementById('mem-stat');
+    if (m) m.textContent = mem;
+  };
+
   // Workspace Switcher
   function switchWorkspace(id) {
     document.querySelectorAll('.ws-tag').forEach((w, idx) => {

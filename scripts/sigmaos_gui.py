@@ -14,7 +14,7 @@ Fallback chain:
   5. Terminal REPL binary            (no DISPLAY)
 """
 
-import sys, os, subprocess, shutil, threading, json
+import sys, os, subprocess, shutil, threading, json, time
 
 # ── Additional WebKit env vars to prevent blank window ───────────────────────
 os.environ.setdefault("WEBKIT_FORCE_SANDBOX", "0")
@@ -142,6 +142,50 @@ def _inject(webview, js):
     return False
 
 
+def start_telemetry(webview):
+    """Background thread that pushes live CPU & memory metrics to the UI every 2 seconds."""
+    def _loop():
+        prev_idle = 0.0
+        prev_total = 0.0
+        while True:
+            try:
+                # CPU usage from /proc/stat
+                with open("/proc/stat") as f:
+                    fields = [float(x) for x in f.readline().strip().split()[1:]]
+                idle = fields[3] + fields[4]
+                total = sum(fields)
+                if prev_total > 0:
+                    diff_idle = idle - prev_idle
+                    diff_total = total - prev_total
+                    cpu_pct = 100.0 * (1.0 - diff_idle / diff_total) if diff_total > 0 else 0.0
+                else:
+                    cpu_pct = 0.0
+                prev_idle, prev_total = idle, total
+
+                # Memory usage from /proc/meminfo
+                mem = {}
+                with open("/proc/meminfo") as f:
+                    for line in f:
+                        parts = line.split(":")
+                        if len(parts) == 2:
+                            mem[parts[0].strip()] = int(parts[1].split()[0])
+                total_kb = mem.get("MemTotal", 1)
+                avail_kb = mem.get("MemAvailable", 0)
+                used_gb = (total_kb - avail_kb) / (1024 * 1024)
+
+                cpu_str = f"{cpu_pct:.1f}%"
+                mem_str = f"{used_gb:.1f} GB"
+
+                js = f"window.sigmaUpdateStats && window.sigmaUpdateStats({json.dumps(cpu_str)}, {json.dumps(mem_str)});"
+                from gi.repository import GLib
+                GLib.idle_add(_inject, webview, js)
+            except Exception:
+                pass
+            time.sleep(2.0)
+
+    threading.Thread(target=_loop, daemon=True).start()
+
+
 # ── GTK3 + WebKit2 window ─────────────────────────────────────────────────────
 def launch_gtk_webkit(html_uri):
     try:
@@ -179,7 +223,8 @@ def launch_gtk_webkit(html_uri):
                 _inject(wv, IPC_JS)
                 # Auto-open terminal window on startup and focus command prompt
                 _inject(wv, "setTimeout(function(){ window.summonWindow && window.summonWindow('win-term'); var inp = document.getElementById('term-in'); if (inp) { inp.focus(); } }, 400);")
-                print("==> SigmaOS IPC bridge injected.")
+                start_telemetry(wv)
+                print("==> SigmaOS IPC bridge injected and live telemetry started.")
 
         def on_script_message(ucm, result):
             try:

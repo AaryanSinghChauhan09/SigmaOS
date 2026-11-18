@@ -88,7 +88,9 @@ class SigmaOSWindow(Gtk.Window):
 
         badge = Gtk.Label(label="● Arch ALPM Engine: Online | Omarchy Hyprland: Active")
         badge.set_name("status_badge")
+        self.status_badge = badge
         header.pack_start(badge, False, False, 0)
+        GLib.timeout_add_seconds(2, self.update_telemetry)
 
         main_box.pack_start(header, False, False, 0)
 
@@ -226,6 +228,23 @@ class SigmaOSWindow(Gtk.Window):
         diag_script = os.path.join(SCRIPT_DIR, "sigmaos_startup_diagnostics.py")
         if os.path.isfile(diag_script):
             self.on_run_cmd(None, f"python3 {diag_script}")
+
+    def update_telemetry(self):
+        try:
+            mem = {}
+            with open("/proc/meminfo") as f:
+                for line in f:
+                    parts = line.split(":")
+                    if len(parts) == 2:
+                        mem[parts[0].strip()] = int(parts[1].split()[0])
+            total_kb = mem.get("MemTotal", 1)
+            avail_kb = mem.get("MemAvailable", 0)
+            used_gb = (total_kb - avail_kb) / (1024 * 1024)
+            total_gb = total_kb / (1024 * 1024)
+            self.status_badge.set_text(f"● ALPM: Online | Omarchy: Active | RAM: {used_gb:.1f}/{total_gb:.1f} GB")
+        except Exception:
+            pass
+        return True
 
     def append_text(self, text):
         end_iter = self.buffer.get_end_iter()
