@@ -103,12 +103,28 @@ def handle_exec(webview, cmd):
                 return
             if real_cmd in ('help',):
                 real_cmd = 'sigmaos --help 2>&1 || echo "sigmaos: type any bash command"'
-            elif real_cmd in ('doctor', 'omarchy doctor'):
-                real_cmd = f'python3 {SCRIPT_DIR}/sigmaos_startup_diagnostics.py 2>&1'
-            elif real_cmd.startswith('pacman ') or real_cmd.startswith('sigpkg '):
-                real_cmd = real_cmd  # pass through to sigpkg
+            elif real_cmd in ('doctor', 'omarchy doctor', 'sigmaos doctor', 'sigmaos --doctor'):
+                real_cmd = f'bash {SCRIPT_DIR}/sigmaos_doctor.sh 2>&1'
+            elif real_cmd in ('version', 'sigmaos --version', 'sigmaos-version'):
+                real_cmd = f'{ROOT_DIR}/bin/sigmaos-version 2>&1'
             elif real_cmd in ('neofetch', 'fastfetch'):
-                real_cmd = f'{real_cmd} 2>&1 || neofetch 2>&1'
+                real_cmd = f'{real_cmd} 2>&1 || echo "neofetch: not installed (install with: sudo apt install neofetch)"'
+            elif real_cmd in ('uname -a', 'uname'):
+                real_cmd = 'uname -a'
+            elif real_cmd in ('whoami', 'hostname', 'pwd', 'id'):
+                pass  # run as-is
+            elif real_cmd.startswith('pacman ') or real_cmd.startswith('sigpkg '):
+                # Route through sigpkg ALPM bridge
+                sigpkg = os.path.join(ROOT_DIR, 'bin', 'sigpkg')
+                if real_cmd.startswith('pacman '):
+                    real_cmd = f'{sigpkg} pacman {real_cmd[7:]} 2>&1'
+                else:
+                    real_cmd = f'{sigpkg} {real_cmd[7:]} 2>&1'
+            elif real_cmd in ('ls', 'ls -la', 'ls -l', 'ls -a'):
+                real_cmd = f'{real_cmd} --color=never 2>&1'
+            else:
+                # Pass all other commands to bash directly (real IPC)
+                pass
 
             out = subprocess.check_output(
                 real_cmd, shell=True, stderr=subprocess.STDOUT,
