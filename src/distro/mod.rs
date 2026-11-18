@@ -1203,3 +1203,6 @@ pub use arch_omarchy_live_tui_v35::*;
 
 pub mod arch_omarchy_battery_power_v35;
 pub use arch_omarchy_battery_power_v35::*;
+
+pub mod arch_omarchy_hotplug_display_v35;
+pub use arch_omarchy_hotplug_display_v35::*;
