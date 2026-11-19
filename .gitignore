@@ -133,8 +133,11 @@ __pycache__/
 !docs/wiki/SigmaOS-Package-Manager.md
 !docs/wiki/SigmaOS-Update-Manager.md
 !docs/wiki/SigmaOS-Snapshot-Manager.md
+!docs/wiki/SigmaOS-Notifications.md
+!docs/wiki/SigmaOS-Network-Manager.md
 !PHASE-2-COMPLETE.md
 !IMPLEMENTATION-PROGRESS.md
 !FINAL-IMPLEMENTATION-SUMMARY.md
+!SECURITY-AUDIT-REPORT.md
 
 .agents/
