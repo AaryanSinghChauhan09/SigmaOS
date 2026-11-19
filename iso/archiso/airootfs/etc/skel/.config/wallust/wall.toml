@@ -1,0 +1,13 @@
+# SigmaOS Wallust Configuration
+# Dynamic color theming engine
+
+[config]
+backend = "wal"
+color_space = "lch"
+threshold = 10
+saturation = 0.5
+lightness = 0.5
+
+[templates]
+hyprland = "~/.config/hyprland/hyprland.conf"
+waybar = "~/.config/waybar/style.css"

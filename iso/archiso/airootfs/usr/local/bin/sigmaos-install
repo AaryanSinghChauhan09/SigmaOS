@@ -147,4 +147,28 @@ LABEL=SIGMA_ROOT  /var/log   btrfs  rw,noatime,compress=zstd:3,subvol=@var_log  
 LABEL=SIGMA_BOOT  /boot      vfat   rw,relatime,fmask=0022,dmask=0022,codepage=437 0 2
 EOF
 
-echo "[7/7] Installation complete! You may now run 'arch-chroot /mnt/target' or reboot."
+echo "[7/7] Installing base system and desktop packages..."
+pacstrap -K /mnt/target base base-devel linux linux-firmware linux-headers \
+    systemd systemd-sysvcompat sudo networkmanager bluez bluez-utils \
+    btrfs-progs efibootmgr grub hyprland hyprpaper waybar wallust foot \
+    pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
+    xdg-desktop-portal-hyprland xdg-desktop-portal-gtk polkit-gnome \
+    brightnessctl playerctl rofi-wayland mako dunst grim slurp swappy \
+    wl-clipboard cliphist ttf-jetbrains-mono ttf-jetbrains-mono-nerd \
+    noto-fonts noto-fonts-cjk noto-fonts-emoji thunar neovim starship \
+    git curl wget openssh rsync
+
+echo "[8/8] Configuring system..."
+arch-chroot /mnt/target genfstab -U / >> /mnt/target/etc/fstab
+arch-chroot /mnt/target systemctl enable NetworkManager bluetoothd
+arch-chroot /mnt/target systemctl enable fstrim.timer
+
+echo "Installation complete! Next steps:"
+echo "  1. arch-chroot /mnt/target"
+echo "  2. Set root password: passwd"
+echo "  3. Create user: useradd -m -G wheel -s /bin/bash sigma"
+echo "  4. Configure sudo: EDITOR=nano visudo (uncomment %wheel ALL=(ALL) ALL)"
+echo "  5. Install bootloader: bootctl install"
+echo "  6. Configure locale: echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && locale-gen"
+echo "  7. Set hostname: echo 'sigmaos' > /etc/hostname"
+echo "  8. Reboot into installed system"

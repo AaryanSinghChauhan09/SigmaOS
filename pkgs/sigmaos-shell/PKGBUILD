@@ -1,0 +1,77 @@
+# Maintainer: SigmaOS Project <sigmaos@example.com>
+pkgname=sigmaos-shell
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="SigmaOS shell configuration with Starship prompt"
+arch=('any')
+url="https://github.com/AaryanSinghChauhan09/SigmaOS"
+license=('MIT')
+depends=('starship' 'zsh' 'fish' 'bash')
+
+package() {
+    install -d "${pkgdir}/etc/skel"
+    
+    # Starship prompt configuration
+    cat > "${pkgdir}/etc/skel/.config/starship.toml" <<'EOF'
+# SigmaOS Starship Prompt Configuration
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
+
+[username]
+show_always = true
+style_user = "bold green"
+style_root = "bold red"
+
+[hostname]
+ssh_only = false
+style = "bold dimmed green"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = false
+style = "bold cyan"
+
+[git_branch]
+style = "bold purple"
+
+[git_status]
+style = "bold yellow"
+
+[package]
+style = "bold red"
+
+[nodejs]
+style = "bold green"
+
+[rust]
+style = "bold orange"
+
+[python]
+style = "bold yellow"
+
+[time]
+disabled = false
+style = "bold dimmed white"
+format = " [$time]($style) "
+EOF
+    
+    # Bash integration
+    cat > "${pkgdir}/etc/skel/.bashrc.sigmaos" <<'EOF'
+# SigmaOS Bash Configuration
+eval "$(starship init bash)"
+EOF
+    
+    # Zsh integration
+    cat > "${pkgdir}/etc/skel/.zshrc.sigmaos" <<'EOF'
+# SigmaOS Zsh Configuration
+eval "$(starship init zsh)"
+EOF
+    
+    # Fish integration
+    cat > "${pkgdir}/etc/skel/config/fish/config.fish.sigmaos" <<'EOF'
+# SigmaOS Fish Configuration
+starship init fish | source
+EOF
+}
