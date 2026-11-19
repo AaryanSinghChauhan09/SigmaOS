@@ -87,6 +87,7 @@ language = "rust"
 inspirations = "SigmaOS"
 visibility = "public"
 depends_on = []
+wiki = "docs/wiki/SigmaOS-Notifications.md"
 
 # System Tools
 [[component]]
@@ -99,6 +100,7 @@ language = "rust"
 inspirations = "SigmaOS"
 visibility = "public"
 depends_on = []
+wiki = "docs/wiki/SigmaOS-Network-Manager.md"
 
 # Sub-components (managed within SigmaOS-themes repo):
 # - sigmaos-theme-core (core theming engine)
