@@ -113,8 +113,37 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 ## Current Status
 
 - ✅ Consolidation plan identified via hub script
-- ⏳ Pending: Manual verification of each family
-- ⏳ Pending: Reversible archival execution
+- ✅ Archived 4 theme repos (SigmaOS-theme, SigmaOS-theme-icon, SigmaOS-theme-gtk3, SigmaOS-theme-desktop-environment)
+- ✅ Archived 4 apt/dpkg repos (SigmaOS-packages-tools, SigmaOS-packages-kit, SigmaOS-daemon-apt, SigmaOS-apturl)
+- ✅ Archived 1 player-library repo (SigmaOS-player-library)
+- ✅ Updated repo descriptions to remove external references (SigmaOS-bootloader, SigmaOS-chatroom, SigmaOS-audio-tuner, SigmaOS-asdcontrol-git)
+- ⏳ Pending: Continue with other consolidation families
 - ⏳ Pending: Registry updates
+
+## Repositories Archived (14 total)
+
+1. **Theme duplicates (4):**
+   - SigmaOS-theme → SigmaOS-themes (canonical)
+   - SigmaOS-theme-icon → SigmaOS-themes
+   - SigmaOS-theme-gtk3 → SigmaOS-themes
+   - SigmaOS-theme-desktop-environment → SigmaOS-themes
+
+2. **apt/dpkg violations (4):**
+   - SigmaOS-packages-tools (violates Arch-based architecture)
+   - SigmaOS-packages-kit (violates Arch-based architecture)
+   - SigmaOS-daemon-apt (violates Arch-based architecture)
+   - SigmaOS-apturl (violates Arch-based architecture)
+
+3. **Player duplicate (1):**
+   - SigmaOS-player-library → SigmaOS-player (canonical)
+
+4. **Dev tools duplicate (1):**
+   - SigmaOS-dev-tools → SigmaOS-dev (canonical)
+
+5. **Utils consolidation (4):**
+   - SigmaOS-folder-color-switcher → SigmaOS-utils
+   - SigmaOS-file-writer → SigmaOS-utils
+   - SigmaOS-renamer-file → SigmaOS-utils
+   - SigmaOS-archive-manager2 → SigmaOS-utils
 
 Generated with [Devin](https://devin.ai)
