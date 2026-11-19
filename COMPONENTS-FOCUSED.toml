@@ -167,59 +167,22 @@ depends_on = []
 
 # Development Tools
 [[component]]
-name = "SigmaOS-dev-tools"
-description = "Developer toolchain helpers"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dev-tools"
-engine = "dev_tool"
+name = "SigmaOS-dev"
+description = "Unified development tools: toolchain, shell configs, agent CLI, workspace management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dev"
+engine = "dev_tools_collection"
 category = "Developer Tools"
-language = "shell"
-inspirations = "Arch Linux"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-fish"
-description = "Fish config & plugins"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fish"
-engine = "shell_config"
-category = "Developer Tools"
-language = "shell"
+language = "rust"
 inspirations = "SigmaOS"
 visibility = "public"
 depends_on = []
 
-[[component]]
-name = "SigmaOS-agent-cli"
-description = "AI agent CLI interface"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-agent-cli"
-engine = "agent_cli"
-category = "Developer Tools"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-quickshell"
-description = "Quick shell command runner"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quickshell"
-engine = "shell_runner"
-category = "Developer Tools"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-workspace"
-description = "Workspace management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-workspace"
-engine = "workspace"
-category = "Developer Tools"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
+# Sub-components (managed within SigmaOS-dev repo):
+# - sigmaos-toolchain (developer toolchain helpers)
+# - sigmaos-fish (fish config & plugins)
+# - sigmaos-agent-cli (AI agent CLI interface)
+# - sigmaos-quickshell (quick shell command runner)
+# - sigmaos-workspace (workspace management)
 
 [[component]]
 name = "SigmaOS-skills"
