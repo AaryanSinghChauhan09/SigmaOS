@@ -52,6 +52,18 @@ inspirations = "SigmaOS"
 visibility = "public"
 depends_on = ["sigmaos-package-manager", "sigmaos-snapshot-manager"]
 
+# Snapshot Manager
+[[component]]
+name = "SigmaOS-snapshot-manager"
+description = "BTRFS snapshot lifecycle management with Command, Factory, Singleton patterns"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snapshot-manager"
+engine = "snapshot_manager"
+category = "System"
+language = "rust"
+inspirations = "SigmaOS"
+visibility = "public"
+depends_on = ["btrfs-progs"]
+
 # Desktop Components
 [[component]]
 name = "SigmaOS-themes"
