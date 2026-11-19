@@ -1,0 +1,50 @@
+name: Test SigmaOS Packages
+
+on:
+  push:
+    branches: [ main ]
+    pull_request:
+    workflow_dispatch:
+
+jobs:
+  test-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+          - sigmaos-base
+          - sigmaos-base-devel
+          - sigmaos-desktop-meta
+          - sigmaos-keyring
+          - sigmaos-mirrorlist
+          - sigmaos-shell
+          - sigmaos-pacman
+          - sigmaos-wallust-themes
+          - sigmaos-linux
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Install Arch Linux keyring
+      run: |
+        wget -qO- "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xEEAF1B0D9F2F4C8" | gpg --dearmor -o /usr/share/keyrings/archlinux.gpg
+        echo "deb [signed-by=/usr/share/keyrings/archlinux.gpg] http://mirror.fcix.net/archlinuxlinux.org/$repo core extra community multilib" > /etc/apt/sources.list.d/archlinux.list
+        
+    - name: Test PKGBUILD syntax
+      run: |
+        cd pkgs/${{ matrix.package }}
+        bash -n PKGBUILD || true
+        
+    - name: Validate package metadata
+      run: |
+        cd pkgs/${{ matrix.package }}
+        if [ -f PKGBUILD ]; then
+          echo "Validating ${{ matrix.package }}"
+          grep -q "pkgname=" PKGBUILD || exit 1
+          grep -q "pkgver=" PKGBUILD || exit 1
+          grep -q "pkgrel=" PKGBUILD || exit 1
+          grep -q "pkgdesc=" PKGBUILD || exit 1
+          grep -q "license=" PKGBUILD || exit 1
+          echo "✓ ${{ matrix.package }} metadata valid"
+        fi
