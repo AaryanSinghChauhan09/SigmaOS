@@ -1,0 +1,391 @@
+# SigmaOS Component Registry (Focused)
+
+# This is a focused registry of actual, working SigmaOS components.
+# Following OPTIMISE FOR DELETION and CREATE COMPONENTS WHICH ARE NECESSARY.
+# Only components that exist on GitHub and serve a purpose are included.
+
+# Core System
+[[component]]
+name = "SigmaOS"
+description = "Main SigmaOS repository - Arch-based Linux distribution"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+engine = "distro"
+category = "System"
+language = "shell"
+inspirations = "Arch Linux"
+visibility = "public"
+depends_on = []
+
+# Desktop Components
+[[component]]
+name = "SigmaOS-theme"
+description = "SigmaOS Theming, Design Tokens & Color Palettes"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme"
+engine = "theme"
+category = "Desktop/UI"
+language = "shell"
+inspirations = "Omarchy Linux"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-theme-icon"
+description = "Icon theme pack"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-icon"
+engine = "theme"
+category = "Desktop/UI"
+language = "shell"
+inspirations = "Linux Mint"
+visibility = "public"
+depends_on = ["SigmaOS-theme"]
+
+[[component]]
+name = "SigmaOS-theme-gtk3"
+description = "GTK3 theme engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-gtk3"
+engine = "theme"
+category = "Desktop/UI"
+language = "shell"
+inspirations = "Omarchy Linux"
+visibility = "public"
+depends_on = ["SigmaOS-theme"]
+
+[[component]]
+name = "SigmaOS-theme-desktop-environment"
+description = "Desktop-shell theme"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-desktop-environment"
+engine = "theme"
+category = "Desktop/UI"
+language = "shell"
+inspirations = "Cinnamon"
+visibility = "public"
+depends_on = ["SigmaOS-theme"]
+
+# System Components
+[[component]]
+name = "SigmaOS-greeter"
+description = "Login greeter with user list & accessibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-greeter"
+engine = "greeter"
+category = "System Services"
+language = "shell"
+inspirations = "Omarchy Linux"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-rollback"
+description = "BTRFS snapshot management, pre-update snapshots, restore on failure"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rollback"
+engine = "snapshot"
+category = "System Services"
+language = "shell"
+inspirations = "Timeshift"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-permissions"
+description = "App permission model: network, filesystem, camera, microphone, notification access"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-permissions"
+engine = "permissions"
+category = "System Services"
+language = "shell"
+inspirations = "Flatpak"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-migration"
+description = "System migration: import from other distros, data transfer, dual-boot setup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-migration"
+engine = "migration"
+category = "System Services"
+language = "shell"
+inspirations = "Arch Linux"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-media-codecs"
+description = "Media codec support: GStreamer plugins, FFmpeg, hardware decode"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-media-codecs"
+engine = "codecs"
+category = "System Services"
+language = "shell"
+inspirations = "Arch Linux"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-office-interop"
+description = "Office interoperability: ODF, OOXML, PDF import/export, font compatibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-office-interop"
+engine = "interop"
+category = "System Services"
+language = "shell"
+inspirations = "LibreOffice"
+visibility = "public"
+depends_on = []
+
+# Package Management
+[[component]]
+name = "SigmaOS-packages-tools"
+description = "Package install/remove CLI"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-packages-tools"
+engine = "pkg_tool"
+category = "Package Management"
+language = "shell"
+inspirations = "GDebi"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-packages-kit"
+description = "apt/dpkg transaction kit"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-packages-kit"
+engine = "pkg_backend"
+category = "Package Management"
+language = "shell"
+inspirations = "AptKit"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-daemon-apt"
+description = "Privileged apt D-Bus daemon"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-daemon-apt"
+engine = "pkg_daemon"
+category = "Package Management"
+language = "shell"
+inspirations = "Software Manager"
+visibility = "public"
+depends_on = ["SigmaOS-packages-kit"]
+
+[[component]]
+name = "SigmaOS-apturl"
+description = "apt:// URL handler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apturl"
+engine = "pkg_handler"
+category = "Package Management"
+language = "shell"
+inspirations = "Ubuntu"
+visibility = "public"
+depends_on = ["SigmaOS-packages-tools"]
+
+# Desktop Applications
+[[component]]
+name = "SigmaOS-office"
+description = "Office suite integration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-office"
+engine = "office"
+category = "Applications"
+language = "shell"
+inspirations = "LibreOffice"
+visibility = "public"
+depends_on = ["SigmaOS-office-interop"]
+
+[[component]]
+name = "SigmaOS-player"
+description = "Media player"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-player"
+engine = "media"
+category = "Applications"
+language = "shell"
+inspirations = "Xine"
+visibility = "public"
+depends_on = ["SigmaOS-media-codecs"]
+
+[[component]]
+name = "SigmaOS-player-library"
+description = "Media player library"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-player-library"
+engine = "media_lib"
+category = "Applications"
+language = "shell"
+inspirations = "GStreamer"
+visibility = "public"
+depends_on = ["SigmaOS-player"]
+
+# Utilities
+[[component]]
+name = "SigmaOS-file-writer"
+description = "Minimal distraction-free text writer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-writer"
+engine = "editor"
+category = "Utilities"
+language = "shell"
+inspirations = "FocusWriter"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-folder-color-switcher"
+description = "Colour-code folders in the file manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-folder-color-switcher"
+engine = "file_util"
+category = "Utilities"
+language = "shell"
+inspirations = "Folder Color"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-renamer-file"
+description = "Single & batch file renamer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-renamer-file"
+engine = "file_util"
+category = "Utilities"
+language = "shell"
+inspirations = "pyRenamer"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-domain-blocker"
+description = "Block domains system-wide via /etc/hosts"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-domain-blocker"
+engine = "network_util"
+category = "Utilities"
+language = "shell"
+inspirations = "Hostsblock"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-chatroom"
+description = "LAN chat server & client"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-chatroom"
+engine = "chat"
+category = "Utilities"
+language = "shell"
+inspirations = "Jargonaut"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-automate"
+description = "Task automation engine (hooks, rules, schedules)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-automate"
+engine = "automation"
+category = "Utilities"
+language = "shell"
+inspirations = "Automate"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-audio-tuner"
+description = "Audio tuning utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-audio-tuner"
+engine = "audio_util"
+category = "Utilities"
+language = "shell"
+inspirations = "Omarchy"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-asdcontrol-git"
+description = "Hard drive control utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asdcontrol-git"
+engine = "hardware_util"
+category = "Utilities"
+language = "shell"
+inspirations = "Omarchy"
+visibility = "public"
+depends_on = []
+
+# Development Tools
+[[component]]
+name = "SigmaOS-dev-tools"
+description = "Developer toolchain helpers"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dev-tools"
+engine = "dev_tool"
+category = "Developer Tools"
+language = "shell"
+inspirations = "Arch Linux"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-fish"
+description = "Fish config & plugins"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fish"
+engine = "shell_config"
+category = "Developer Tools"
+language = "shell"
+inspirations = "Fish Shell"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-agent-cli"
+description = "AI agent CLI interface"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-agent-cli"
+engine = "agent_cli"
+category = "Developer Tools"
+language = "shell"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-quickshell"
+description = "Quick shell command runner"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quickshell"
+engine = "shell_runner"
+category = "Developer Tools"
+language = "shell"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-workspace"
+description = "Workspace management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-workspace"
+engine = "workspace"
+category = "Developer Tools"
+language = "shell"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-skills"
+description = "AI agent skills repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-skills"
+engine = "skills"
+category = "Developer Tools"
+language = "markdown"
+inspirations = "Devin"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-deskland"
+description = "Web browser-based desktop environment"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deskland"
+engine = "web_desktop"
+category = "Desktop/UI"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+# Desktop Portal
+[[component]]
+name = "SigmaOS-desktop-portal"
+description = "XDG desktop portal backend (screenshot, files)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-portal"
+engine = "portal"
+category = "Desktop/UI"
+language = "shell"
+inspirations = "Flatpak"
+visibility = "public"
+depends_on = []
+
+# Arch Linux Infrastructure (Consolidate these)
+# These 50+ "SigmaOS-arch-*" repos are placeholders for Arch infrastructure
+# They should be consolidated or removed as SigmaOS uses standard Arch repos
