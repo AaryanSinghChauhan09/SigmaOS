@@ -152,8 +152,8 @@ def handle_exec(webview, cmd):
                 real_cmd = f'bash {SCRIPT_DIR}/sigmaos_doctor.sh 2>&1'
             elif real_cmd in ('version', 'sigmaos --version', 'sigmaos-version'):
                 real_cmd = f'{ROOT_DIR}/bin/sigmaos-version 2>&1'
-            elif real_cmd in ('neofetch', 'fastfetch'):
-                real_cmd = f'{real_cmd} 2>&1 || echo "neofetch: not installed (install with: sudo apt install neofetch)"'
+            elif real_cmd in ('neofetch', 'fastfetch', 'sigmafetch', 'fetch'):
+                real_cmd = f'{ROOT_DIR}/bin/sigmafetch 2>&1'
             elif real_cmd in ('uname -a', 'uname'):
                 real_cmd = 'uname -a'
             elif real_cmd in ('whoami', 'hostname', 'pwd', 'id'):

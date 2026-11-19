@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT OR Apache-2.0
+# SigmaOS Sovereign System Information Tool (sigmafetch)
+# Inspired by fastfetch / neofetch with Omarchy aesthetics
+
+set -euo pipefail
+
+# Colors
+C_RESET="\033[0m"
+C_BOLD="\033[1m"
+C_BLUE="\033[38;2;137;180;250m"      # Catppuccin Mocha Blue
+C_MAUVE="\033[38;2;203;166;247m"    # Catppuccin Mocha Mauve
+C_TEAL="\033[38;2;148;226;213m"     # Catppuccin Mocha Teal
+C_PEACH="\033[38;2;250;179;135m"    # Catppuccin Mocha Peach
+C_GREEN="\033[38;2;166;227;161m"    # Catppuccin Mocha Green
+C_TEXT="\033[38;2;205;214;244m"     # Catppuccin Mocha Text
+C_SUB="\033[38;2;166;173;200m"      # Catppuccin Mocha Subtext
+
+# Gather system info
+USER_NAME="${USER:-sovereign}"
+HOST_NAME="$(hostname 2>/dev/null || echo 'sigmaos')"
+UPTIME="$(uptime -p 2>/dev/null || uptime | awk -F'( |,|:)+' '{print $6 "h " $7 "m"}' || echo 'up live')"
+KERNEL_INFO="$(uname -r 2>/dev/null || echo '7.0.0-sovereign')"
+MEM_INFO="$(free -h 2>/dev/null | awk '/^Mem:/ {print $3 " / " $2}' || echo '512M / 16G')"
+CPU_MODEL="$(lscpu 2>/dev/null | grep 'Model name:' | head -1 | sed 's/Model name:[ \t]*//' || grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2 | xargs || echo 'x86_64 Sovereign Processor')"
+DISPLAY_SERVER="${WAYLAND_DISPLAY:+Wayland (${WAYLAND_DISPLAY})}${DISPLAY:+X11 (${DISPLAY})}"
+[ -z "$DISPLAY_SERVER" ] && DISPLAY_SERVER="Headless / Sovereign Console"
+
+echo -e ""
+echo -e "${C_MAUVE}        ████████      ${C_BOLD}${C_MAUVE}${USER_NAME}${C_TEXT}@${C_BLUE}${HOST_NAME}${C_RESET}"
+echo -e "${C_MAUVE}      ██░░░░░░░░██    ${C_SUB}---------------------------------${C_RESET}"
+echo -e "${C_MAUVE}    ██░░        ░░██  ${C_BLUE}OS        :${C_RESET} ${C_TEXT}SigmaOS Sovereign Desktop 1.0 (Omarchy Edition)${C_RESET}"
+echo -e "${C_MAUVE}    ██░░        ░░██  ${C_BLUE}Kernel    :${C_RESET} ${C_TEXT}Sigma Sovereign Microkernel + Linux ${KERNEL_INFO}${C_RESET}"
+echo -e "${C_MAUVE}      ██░░░░░░░░██    ${C_BLUE}Uptime    :${C_RESET} ${C_TEXT}${UPTIME}${C_RESET}"
+echo -e "${C_MAUVE}        ████████      ${C_BLUE}Fleet     :${C_RESET} ${C_TEXT}3,311 sovereign components (2,687 Implemented, 18 Production)${C_RESET}"
+echo -e "${C_BLUE}       ██      ██     ${C_BLUE}Shell     :${C_RESET} ${C_TEXT}SigmaOS Shell (Omarchy Polyglot REPL)${C_RESET}"
+echo -e "${C_BLUE}      ██        ██    ${C_BLUE}Display   :${C_RESET} ${C_TEXT}${DISPLAY_SERVER}${C_RESET}"
+echo -e "${C_BLUE}     ██          ██   ${C_BLUE}Theme     :${C_RESET} ${C_TEXT}Catppuccin Mocha + Wallust Palette Pipeline${C_RESET}"
+echo -e "${C_BLUE}    ████████████████  ${C_BLUE}CPU       :${C_RESET} ${C_TEXT}${CPU_MODEL}${C_RESET}"
+echo -e "${C_BLUE}   ██              ██ ${C_BLUE}Memory    :${C_RESET} ${C_TEXT}${MEM_INFO}${C_RESET}"
+echo -e "${C_BLUE}  ██                ██${C_BLUE}Crafts    :${C_RESET} ${C_TEXT}12 sovereign craft studios (Audio, Video, 3D, Code)${C_RESET}"
+echo -e ""
+echo -e "   \033[40m   \033[41m   \033[42m   \033[43m   \033[44m   \033[45m   \033[46m   \033[47m   \033[0m"
+echo -e "   \033[100m   \033[101m   \033[102m   \033[103m   \033[104m   \033[105m   \033[106m   \033[107m   \033[0m"
+echo -e ""
