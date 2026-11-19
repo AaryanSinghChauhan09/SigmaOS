@@ -120,7 +120,7 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 - ⏳ Pending: Continue with other consolidation families
 - ⏳ Pending: Registry updates
 
-## Repositories Archived (36 total)
+## Repositories Archived (51 total)
 
 1. **Theme duplicates (4):**
    - SigmaOS-theme → SigmaOS-themes (canonical)
@@ -172,5 +172,12 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 
 8. **Arch config placeholder (1):**
    - SigmaOS-conf-archlinux-org (use official Arch config)
+
+9. **Arch language/tool placeholders (15):**
+   - SigmaOS-arch-defi-kernel, SigmaOS-arch-laptop-kernel, SigmaOS-arch-default-kernel
+   - SigmaOS-arch-decentralization-kernel, SigmaOS-arch-javascript-kernel
+   - SigmaOS-arch-list, SigmaOS-arch-lisp, SigmaOS-arch-ksh, SigmaOS-arch-kotlin
+   - SigmaOS-arch-db, SigmaOS-arch-database, SigmaOS-arch-java, SigmaOS-arch-dash
+   - SigmaOS-arch-iso, SigmaOS-arch-dart (use standard Arch tools/stock kernel)
 
 Generated with [Devin](https://devin.ai)
