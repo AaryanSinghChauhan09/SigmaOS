@@ -120,7 +120,7 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 - ⏳ Pending: Continue with other consolidation families
 - ⏳ Pending: Registry updates
 
-## Repositories Archived (82 total)
+## Repositories Archived (84 total)
 
 1. **Theme duplicates (4):**
    - SigmaOS-theme → SigmaOS-themes (canonical)
@@ -226,5 +226,9 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 
 19. **CLI scaffold (1):**
     - SigmaOS-agent-cli (consolidate into SigmaOS-dev)
+
+20. **Desktop/greeter components (2):**
+    - SigmaOS-greeter (use standard greeter components)
+    - SigmaOS-desktop-portal (use standard XDG portals)
 
 Generated with [Devin](https://devin.ai)
