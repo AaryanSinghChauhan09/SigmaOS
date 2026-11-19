@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-install - SigmaOS full installation script
-# Implements end-to-end installation modeled on Omarchy 4.0.5 install flow.
+# SigmaOS end-to-end installer.
 #
 # Usage: sigmaos-install [--target /dev/sda] [--hostname sigmaos] [--username sigma]
 #

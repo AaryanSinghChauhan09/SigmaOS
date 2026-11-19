@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-emoji-picker - Emoji picker for SigmaOS shell
-# Modeled on Omancy 4.0.5 emoji picker (omancy.emojis shell plugin)
+# SigmaOS emoji picker.
 # Accepts typed input via wtype-compatible interface and inserts selected emoji.
 
 set -euo pipefail

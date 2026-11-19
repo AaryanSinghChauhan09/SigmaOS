@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # sigmaos-theme-system - SigmaOS theme applier
 # Applies theme templates from default/themed/ to user config locations.
-# Inspired by Omarchy 4.0.5 install/config/theme-system.sh
+# SigmaOS desktop theme applicator.
 
 set -euo pipefail
 

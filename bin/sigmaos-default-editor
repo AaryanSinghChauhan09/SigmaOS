@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-default-editor - Report/set default editor
-# Modeled on Omancy 4.0.5 omancy-default-editor
+# SigmaOS default editor manager.
 
 set -euo pipefail
 

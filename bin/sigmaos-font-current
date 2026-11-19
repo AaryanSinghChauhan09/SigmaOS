@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-font-current - Report current monospace font
-# Modeled on Omancy 4.0.5 omancy-font-current
+# SigmaOS active font inspector.
 
 set -euo pipefail
 

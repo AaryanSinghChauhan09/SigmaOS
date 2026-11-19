@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-reminderd - SigmaOS reminder daemon
-# Implements omancy-reminder semantics: fire notifications at due times.
+# SigmaOS reminder and notification daemon.
 # Reads reminders from a state directory and sends notifications via notify-send.
 #
 # Design: single responsibility, deterministic tick loop, fail-fast.

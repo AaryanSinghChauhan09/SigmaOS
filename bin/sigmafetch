@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT OR Apache-2.0
 # SigmaOS Sovereign System Information Tool (sigmafetch)
-# Inspired by fastfetch / neofetch with Omarchy aesthetics
+# Fast system information fetch tool for SigmaOS
 
 set -euo pipefail
 
@@ -29,11 +29,11 @@ DISPLAY_SERVER="${WAYLAND_DISPLAY:+Wayland (${WAYLAND_DISPLAY})}${DISPLAY:+X11 (
 echo -e ""
 echo -e "${C_MAUVE}        ████████      ${C_BOLD}${C_MAUVE}${USER_NAME}${C_TEXT}@${C_BLUE}${HOST_NAME}${C_RESET}"
 echo -e "${C_MAUVE}      ██░░░░░░░░██    ${C_SUB}---------------------------------${C_RESET}"
-echo -e "${C_MAUVE}    ██░░        ░░██  ${C_BLUE}OS        :${C_RESET} ${C_TEXT}SigmaOS Sovereign Desktop 1.0 (Omarchy Edition)${C_RESET}"
+echo -e "${C_MAUVE}    ██░░        ░░██  ${C_BLUE}OS        :${C_RESET} ${C_TEXT}SigmaOS Sovereign Desktop 1.0 (Zenith Edition)${C_RESET}"
 echo -e "${C_MAUVE}    ██░░        ░░██  ${C_BLUE}Kernel    :${C_RESET} ${C_TEXT}Sigma Sovereign Microkernel + Linux ${KERNEL_INFO}${C_RESET}"
 echo -e "${C_MAUVE}      ██░░░░░░░░██    ${C_BLUE}Uptime    :${C_RESET} ${C_TEXT}${UPTIME}${C_RESET}"
 echo -e "${C_MAUVE}        ████████      ${C_BLUE}Fleet     :${C_RESET} ${C_TEXT}3,311 sovereign components (2,687 Implemented, 18 Production)${C_RESET}"
-echo -e "${C_BLUE}       ██      ██     ${C_BLUE}Shell     :${C_RESET} ${C_TEXT}SigmaOS Shell (Omarchy Polyglot REPL)${C_RESET}"
+echo -e "${C_BLUE}       ██      ██     ${C_BLUE}Shell     :${C_RESET} ${C_TEXT}SigmaOS Shell (Sovereign Polyglot REPL)${C_RESET}"
 echo -e "${C_BLUE}      ██        ██    ${C_BLUE}Display   :${C_RESET} ${C_TEXT}${DISPLAY_SERVER}${C_RESET}"
 echo -e "${C_BLUE}     ██          ██   ${C_BLUE}Theme     :${C_RESET} ${C_TEXT}Catppuccin Mocha + Wallust Palette Pipeline${C_RESET}"
 echo -e "${C_BLUE}    ████████████████  ${C_BLUE}CPU       :${C_RESET} ${C_TEXT}${CPU_MODEL}${C_RESET}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sigmaos-voxtype - Sovereign Push-to-Talk Speech Recognition & Dictation Daemon
-# Modeled on Omarchy 4.0.6 voxtype & SigmaOS VoiceCraft
+# SigmaOS voice transcription utility.
 #
 # Principles: FAIL-FAST, DEFENSIVE PROGRAMMING, ZERO-COPY, USER FREEDOM AND CONTROL
 # Keybinding target: Super + D

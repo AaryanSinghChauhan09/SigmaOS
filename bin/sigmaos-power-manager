@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-power-manager - SigmaOS power management daemon
-# Implements omancy-power-present / omancy-powerprofiles-set semantics.
+# SigmaOS power profile manager.
 # Monitors battery and AC state, adjusts power profile accordingly.
 #
 # Design: single responsibility, fail-fast, efficient polling.

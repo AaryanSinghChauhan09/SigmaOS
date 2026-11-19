@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-default-terminal - Report/set default terminal
-# Modeled on Omancy 4.0.5 omancy-default-terminal
+# SigmaOS default terminal manager.
 
 set -euo pipefail
 

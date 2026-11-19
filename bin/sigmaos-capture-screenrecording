@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-capture-screenrecording - SigmaOS screen recording
-# Implements omancy-capture-screenrecording semantics.
+# SigmaOS screen recording utility.
 
 set -euo pipefail
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sigmaos-bar - Desktop Shell Status Stream & Metrics Provider
-# Modeled on Omarchy 4.0.6 quickshell top bar engine
+# SigmaOS Waybar and top status bar engine
 #
 # Outputs JSON-formatted telemetry for Waybar / Quickshell:
 # CPU, Memory, Workspaces, Battery, Audio, and Security status (OpenBSD pledge).
@@ -52,6 +52,6 @@ cat << JSON
   "compositor": "Hyprland",
   "kernel": "SigmaOS-x86_64",
   "text": "SigmaOS | CPU $(get_cpu_usage) | RAM $(get_mem_usage) | $(get_battery)",
-  "tooltip": "SigmaOS Sovereign Workstation\nSecurity: $(get_pledge_status)\nBase: Arch/Omarchy/Mint Parity"
+  "tooltip": "SigmaOS Sovereign Workstation\nSecurity: $(get_pledge_status)\nArchitecture: Sovereign Desktop Parity"
 }
 JSON

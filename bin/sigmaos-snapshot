@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sigmaos-snapshot - Automated Btrfs System Snapshot & Rollback Controller
-# Modeled on Omarchy snapper / Timeshift snapshot architecture
+# SigmaOS Btrfs/Snapper snapshot utility.
 #
 # Principles: RESILIENCE & SELF-HEALING, DEFENSIVE PROGRAMMING, FAIL-FAST
 set -euo pipefail

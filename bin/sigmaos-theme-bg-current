@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-theme-bg-current - Report current background
-# Modeled on Omancy 4.0.5 omancy-theme-bg-current
+# SigmaOS current background inspector.
 
 set -euo pipefail
 

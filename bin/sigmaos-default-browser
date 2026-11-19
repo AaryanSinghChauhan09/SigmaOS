@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-default-browser - Report/set default browser
-# Modeled on Omancy 4.0.5 omancy-default-browser
+# SigmaOS default browser manager.
 
 set -euo pipefail
 

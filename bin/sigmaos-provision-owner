@@ -1,12 +1,12 @@
 #!/bin/bash
 # sigmaos-provision-owner - SigmaOS first-boot provisioning
-# Inspired by Omarchy 4.0.5 install/provisioning/setup-form.sh
+# SigmaOS user account provisioning utility.
 #
 # Runs on first boot via sigmaos-provision-owner.service.
 # Prompts for keyboard, user account, hostname, timezone; applies system
 # configuration; schedules desktop session startup.
 #
-# Exit statuses (omarchy convention):
+# Exit statuses:
 #   0   field set, move on
 #   1   Esc — unwind to start of form
 #   130 Ctrl+C — deferred provisioning / reboot

@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-weather-location - Set/get weather location
-# Modeled on Omancy 4.0.5 omancy-weather-location
+# SigmaOS weather location detector.
 
 set -euo pipefail
 

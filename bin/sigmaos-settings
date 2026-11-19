@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sigmaos-settings - SigmaOS system settings manager
-# Modeled on Omarchy 4.0.6 omarchy-settings
+# SigmaOS settings manager.
 
 set -euo pipefail
 
@@ -15,14 +15,14 @@ show_settings() {
     if [ -f "$SETTINGS_FILE" ]; then
         cat "$SETTINGS_FILE"
     else
-        echo "Using default settings (Catppuccin Mocha / Omarchy):"
+        echo "Using default settings (Catppuccin Mocha / Zenith):"
         echo "theme=catppuccin-mocha"
         echo "background=default"
         echo "font=JetBrains Mono"
         echo "terminal=foot"
         echo "editor=micro"
         echo "browser=chromium"
-        echo "persona=omarchy"
+        echo "persona=desktop"
     fi
 }
 

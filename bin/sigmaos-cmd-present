@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-cmd-present - SigmaOS command presence checker
-# Implements omancy-cmd-present semantics.
+# SigmaOS command availability inspector.
 # Returns 0 if the command is available, 1 otherwise.
 
 if command -v "$1" >/dev/null 2>&1; then

@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-theme-bg-switcher - Switch SigmaOS background/wallpaper
-# Modeled on Omancy 4.0.5 omancy-theme-bg-switcher
+# SigmaOS wallpaper switcher utility.
 #
 # Switches the desktop wallpaper using swww (preferred) or hyprpaper.
 # Stores the current background in state for persistence across sessions.

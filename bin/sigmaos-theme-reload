@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # sigmaos-theme-reload - Live Dynamic Theme Hot-Reload Dispatcher
-# Modeled on Omarchy 4.0.6 live theming pipeline (wallust / matugen / hyprland)
+# SigmaOS dynamic theming reload pipeline.
 #
 # Principles: COMMAND-QUERY SEPARATION, FAIL-FAST, LOOSE COUPLING, DEFENSIVE PROGRAMMING
 set -uo pipefail

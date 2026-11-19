@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-capture-region - SigmaOS region screenshot capture
-# Implements omancy-capture-region semantics.
+# SigmaOS desktop capture region utility.
 # Captures a selected region of the screen to a file.
 
 set -euo pipefail

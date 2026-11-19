@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-capture-screenshot - SigmaOS screenshot capture
-# Implements omancy-capture-screenshot semantics.
+# SigmaOS screenshot utility.
 # Captures the entire screen to a file.
 
 set -euo pipefail

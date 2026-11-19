@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-theme-current - Report current theme
-# Modeled on Omancy 4.0.5 omancy-theme-current
+# SigmaOS current theme inspector.
 
 set -euo pipefail
 

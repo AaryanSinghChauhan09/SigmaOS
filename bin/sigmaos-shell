@@ -1,6 +1,6 @@
 #!/bin/bash
 # sigmaos-shell - SigmaOS unified shell controller
-# Modeled on Omancy 4.0.5 omancy-shell
+# SigmaOS polyglot shell environment.
 #
 # Commands:
 #   sigmaos-shell ping                          - Check shell responsiveness
