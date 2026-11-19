@@ -1,35 +1,102 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT
-# sigmaos-install: Production Arch Linux Installer with Btrfs, LUKS, Systemd-boot, and Hyprland
+# sigmaos-install: Production Arch Linux Installer with Btrfs, Systemd-boot, and Hyprland
+# DEFENSIVE SAFETY: Defaults to DRY_RUN=1. Destructive install requires --destructive AND --confirm-disk <DEV>
 set -euo pipefail
 
+DRY_RUN=1
+DESTRUCTIVE_AUTH=0
+CONFIRM_DISK_MATCH=""
+TARGET_DEV=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -d|--dry-run)
+            DRY_RUN=1
+            shift
+            ;;
+        --destructive)
+            DESTRUCTIVE_AUTH=1
+            shift
+            ;;
+        --confirm-disk)
+            CONFIRM_DISK_MATCH="${2:-}"
+            shift 2
+            ;;
+        -h|--help)
+            echo "Usage: $(basename "$0") [OPTIONS] [DEVICE]"
+            echo "Options:"
+            echo "  -d, --dry-run          Simulate installation without writing changes (DEFAULT)"
+            echo "  --destructive          Allow destructive formatting and partition writes"
+            echo "  --confirm-disk DEV     Explicit verification of target disk (e.g. --confirm-disk /dev/vda)"
+            exit 0
+            ;;
+        *)
+            if [[ -z "$TARGET_DEV" ]]; then
+                TARGET_DEV="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
 echo "=========================================================="
-echo "  SigmaOS Arch Linux Automated & Sovereign Installer"
+echo "  SigmaOS Arch Linux Sovereign Installer"
 echo "=========================================================="
 
-if [[ $EUID -ne 0 ]]; then
-    echo "Error: sigmaos-install must be run as root." >&2
-    exit 1
-fi
-
-TARGET_DEV="${1:-}"
 if [[ -z "$TARGET_DEV" ]]; then
     echo "Available storage block devices:"
-    lsblk -dpno NAME,SIZE,MODEL | grep -v "loop"
+    lsblk -dpno NAME,SIZE,MODEL 2>/dev/null | grep -v "loop" || true
     echo ""
-    read -rp "Enter target disk (e.g. /dev/nvme0n1 or /dev/sda): " TARGET_DEV
+    read -rp "Enter target disk (e.g. /dev/vda): " TARGET_DEV
 fi
 
-if [[ ! -b "$TARGET_DEV" ]]; then
-    echo "Error: Target disk $TARGET_DEV is not a valid block device." >&2
+if [[ -z "$TARGET_DEV" || ! -b "$TARGET_DEV" ]]; then
+    echo "Error: Target disk '$TARGET_DEV' is not a valid block device." >&2
     exit 1
 fi
 
-echo "Selected disk: $TARGET_DEV"
-read -rp "WARNING: All data on $TARGET_DEV will be destroyed! Proceed? (y/N): " CONFIRM
-if [[ "${CONFIRM,,}" != "y" ]]; then
-    echo "Installation aborted."
+# Detect active host root drive to prevent self-destruction
+ACTIVE_ROOT_SRC="$(findmnt -no SOURCE / 2>/dev/null || true)"
+ACTIVE_ROOT_DISK=""
+if [[ -n "$ACTIVE_ROOT_SRC" ]]; then
+    ACTIVE_ROOT_DISK="$(lsblk -no PKNAME "$ACTIVE_ROOT_SRC" 2>/dev/null || true)"
+    if [[ -n "$ACTIVE_ROOT_DISK" ]]; then
+        ACTIVE_ROOT_DISK="/dev/$ACTIVE_ROOT_DISK"
+    fi
+fi
+
+if [[ -n "$ACTIVE_ROOT_DISK" && "$TARGET_DEV" == "$ACTIVE_ROOT_DISK" ]]; then
+    echo "FATAL: Target disk $TARGET_DEV hosts the active operating system root." >&2
+    echo "Destructive operations on active root drive are forbidden." >&2
+    exit 1
+fi
+
+# Safety check for mounted partitions on target device
+if grep -qs "^$TARGET_DEV" /proc/mounts 2>/dev/null; then
+    echo "FATAL: Partitions on $TARGET_DEV are actively mounted. Unmount before proceeding." >&2
+    exit 1
+fi
+
+if [[ $DESTRUCTIVE_AUTH -eq 1 && "$CONFIRM_DISK_MATCH" == "$TARGET_DEV" ]]; then
+    DRY_RUN=0
+fi
+
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "[WARN] DRY RUN MODE: Default safety protection active."
+    echo "[INFO] Simulating partitioning and installation plan on $TARGET_DEV:"
+    echo "[INFO]   - Partition table: GPT"
+    echo "[INFO]   - EFI partition:   1024M FAT32"
+    echo "[INFO]   - Root partition:  Btrfs with @, @home, @snapshots, @var_log"
+    echo "[INFO] To execute a destructive install to this disk, you must explicitly supply:"
+    echo "[INFO]   --destructive --confirm-disk $TARGET_DEV"
+    echo "[✓] DRY RUN complete. Zero mutations were written to $TARGET_DEV."
     exit 0
+fi
+
+if [[ $EUID -ne 0 ]]; then
+    echo "Error: Destructive sigmaos-install must be run as root." >&2
+    exit 1
 fi
 
 echo "[1/7] Partitioning target device with GPT..."

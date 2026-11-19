@@ -91,48 +91,45 @@ qemu-system-x86_64 \
 3. Mount the ISO as CD/DVD drive
 4. Start the VM
 
-## Current State
+## Architecture Tracks
 
-The current ISO is a **demonstration/boot stub** that shows:
-- SigmaOS boot process via GRUB
-- Kernel initialization stub
-- Basic root filesystem structure
-- Package management infrastructure
-- SigmaOS shell with basic commands
+SigmaOS development is organized into two distinct, deliberate tracks:
 
-### Limitations
+### Track A: Sovereign Arch-based Desktop Live ISO (Primary Distro Target)
+- **Profile Location**: `iso/archiso/`
+- **Build Script**: `scripts/build_archiso.sh`
+- **Kernel & Drivers**: Production Linux LTS / Zenith kernel with full hardware graphics & networking modules.
+- **Installer**: Defensive sovereign installer (`iso_root/installer/install.sh` and `/usr/local/bin/sigmaos-install`) featuring default `DRY_RUN=1` simulation, active root-disk protection, and multi-flag authentication (`--destructive --confirm-disk <DEV>`).
+- **Desktop Environment**: Wayland compositor (Hyprland), Waybar status line, native settings daemon, and GTK3 application suite.
+- **Package Management**: Arch ALPM / pacman binary format orchestrated by `sigpkg` and `SigmaOS-packages-kit`.
 
-- Kernel is a stub (C program placeholder)
-- No actual kernel subsystems (memory, process, filesystem, etc.)
-- No real package manager (configuration only)
-- No GUI or desktop environment
-- Limited shell functionality
+### Track B: Standalone Sovereign Microkernel Research (Experimental Long-Term Target)
+- **Source**: `iso-build/kernel-stub.c`, `src/kernel/`
+- **Build Script**: `iso-build/build.sh`
+- **Goal**: Long-term clean-slate `#![no_std]` Rust microkernel research. Kept isolated from the daily-driver desktop distribution to ensure immediate installability and user stability.
 
-### Next Steps for Full Implementation
+## Safe Testing in QEMU Virtual Machines
 
-1. **Real Kernel**
-   - Integrate actual Linux kernel or custom kernel
-   - Implement kernel subsystems
-   - Add device drivers
+Always test installation using disposable virtual disks rather than host bare metal:
 
-2. **Package Management**
-   - Implement actual package manager
-   - Set up package repository
-   - Add package building infrastructure
+```bash
+# 1. Create a 32GB disposable virtual disk
+qemu-img create -f qcow2 /tmp/sigmaos_test_disk.qcow2 32G
 
-3. **Userspace**
-   - Add real shell (bash, zsh, or custom)
-   - Add core utilities
-   - Add system libraries
+# 2. Boot ISO with disposable drive attached
+qemu-system-x86_64 \
+  -m 4096 \
+  -enable-kvm \
+  -drive file=/tmp/sigmaos_test_disk.qcow2,format=qcow2,if=virtio \
+  -cdrom out/sigmaos-desktop.iso \
+  -boot d
 
-4. **Desktop Environment**
-   - Add display server (Wayland/X11)
-   - Add desktop environment (GNOME, KDE, etc.)
-   - Add window manager
+# 3. Inside the live VM, test dry-run installer:
+sigmaos-install --dry-run /dev/vda
 
-5. **Integration**
-   - Integrate SigmaOS component repositories
-   - Add compatibility layers for various distributions
+# 4. Destructive installation is executed only within the virtual machine:
+sigmaos-install --destructive --confirm-disk /dev/vda /dev/vda
+```
    - Add proper boot configuration
 
 ## Component Repositories

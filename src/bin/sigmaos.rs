@@ -10,7 +10,7 @@
 // Bridges:
 // - BSD = DragonFly; Free; Open
 // - Craft = 3D; Ani; Art; CAD; CraftLibs; Deck; Design; Effect; Fig; Film; Font; Grid; Light; PDF; Photo; Print; Sound; Vector; Voice; Word
-// - Linux = Arch; Cachy; Debian; Omarchy; Mint
+// - Subsystems = Storage; Network; Display; Audio; Security; Desktop; Core
 
 use std::env;
 use std::io::{self, Write};
@@ -23,12 +23,12 @@ const BANNER: &str = "\x1b[1;36m\
 ║         Turnkey Operating System · Ready to Work & Ready to Launch           ║\n\
 ╚══════════════════════════════════════════════════════════════════════════════╝\x1b[0m\n\
   \x1b[1mArchitecture\x1b[0m : x86_64 Sovereign Microkernel / Hybrid (#![no_std] Rust)\n\
-  \x1b[1mInspirations\x1b[0m : Arch Linux (Minimalist) · Omarchy (Aesthetic) · Mint (Ergonomic)\n\
-  \x1b[1mSecurity\x1b[0m     : OpenBSD pledge/unveil · FreeBSD Capsicum · W^X Memory Hardening\n\
+  \x1b[1mProfiles\x1b[0m     : Sovereign Desktop (Modern Wayland) · Sovereign Minimal (CLI Core)\n\
+  \x1b[1mSecurity\x1b[0m     : Process pledge/unveil isolation · Capability sandboxing · W^X\n\
   \x1b[1mCreativity\x1b[0m   : 20-Module Craft Suite (3D, Ani, Art, CAD, CraftLibs, ...)\n";
 
 fn is_sigmaos_dir(p: &Path) -> bool {
-    p.join("src/bin/sigmaos.rs").exists() && p.join("scripts/launch_omarchy_persona.sh").exists()
+    p.join("src/bin/sigmaos.rs").exists() && (p.join("scripts/launch_sigmaos_desktop.sh").exists() || p.join("scripts/launch_omarchy_persona.sh").exists())
 }
 
 fn find_base_dir() -> PathBuf {
@@ -227,23 +227,21 @@ fn print_craft_suite() {
 
 fn print_distro_parity() {
     println!(
-        "\x1b[1;36m── Linux & BSD Ecosystem Parity ────────────────────────────────────────\x1b[0m"
+        "\x1b[1;36m── Subsystem Architecture & Parity ─────────────────────────────────────\x1b[0m"
     );
-    println!("  • \x1b[1mArch Linux\x1b[0m  : Rolling release, pacman/pkgbuild integration, AUR-style repository");
-    println!("  • \x1b[1mOmarchy\x1b[0m     : Hyprland tiling compositor, Quickshell bar, keyboard navigation");
-    println!("  • \x1b[1mLinux Mint\x1b[0m  : User ergonomics, Nemo file manager, MintUpdate GUI, driver autodetect");
-    println!("  • \x1b[1mCachyOS\x1b[0m     : BORE/EEVDF scheduler, AutoBOLT/PGO profile, zram-zstd pool");
-    println!("  • \x1b[1mDebian\x1b[0m      : Multiarch libraries, DPKG/APT compatibility layer, rock-solid core");
-    println!(
-        "  • \x1b[1mDragonFlyBSD\x1b[0m: HAMMER2 high-throughput VFS, lightweight kernel threads"
-    );
-    println!("  • \x1b[1mFreeBSD\x1b[0m     : Capsicum capability isolation, kqueue event multiplexing, Jails");
-    println!("  • \x1b[1mOpenBSD\x1b[0m     : pledge() promises, unveil() path masking, W^X PTE protection\n");
+    println!("  • \x1b[1mPackaging\x1b[0m    : ALPM / pacman binary format, SigPkg transaction engine");
+    println!("  • \x1b[1mDesktop\x1b[0m      : Hyprland tiling compositor, Waybar status line, keyboard workflow");
+    println!("  • \x1b[1mErgonomics\x1b[0m   : Native settings manager, update notifications, hardware autodetection");
+    println!("  • \x1b[1mPerformance\x1b[0m  : BORE/EEVDF scheduler tuning, AutoBOLT/PGO profile, zram-zstd pool");
+    println!("  • \x1b[1mCore Libs\x1b[0m    : Sovereign system libraries, standard runtime compatibility");
+    println!("  • \x1b[1mStorage\x1b[0m      : High-throughput VFS, lightweight process threads");
+    println!("  • \x1b[1mIsolation\x1b[0m    : Capability-based sandboxing, event multiplexing, container jails");
+    println!("  • \x1b[1mHardening\x1b[0m    : Process pledge contracts, path unveiling, W^X memory protection\n");
 }
 
 fn run_doctor() {
     println!("\x1b[1;35m╔══════════════════════════════════════════════════════════╗\x1b[0m");
-    println!("\x1b[1;35m║             SIGMAOS · OMARCHY DOCTOR                     ║\x1b[0m");
+    println!("\x1b[1;35m║             SIGMAOS SYSTEM DOCTOR                        ║\x1b[0m");
     println!("\x1b[1;35m║        Diagnostic Health & Readiness Inspection          ║\x1b[0m");
     println!("\x1b[1;35m╚══════════════════════════════════════════════════════════╝\x1b[0m\n");
 
@@ -269,7 +267,7 @@ fn run_doctor() {
             "\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m headless/TTY or X11 session",
             "wayland-session"
         );
-        println!("       \x1b[90mfix: launch in Hyprland or run ./run.sh --omarchy\x1b[0m");
+        println!("       \x1b[90mfix: launch in Hyprland or run ./run.sh --desktop\x1b[0m");
         warn += 1;
     }
 
@@ -286,7 +284,7 @@ fn run_doctor() {
             "\x1b[33m[warn]\x1b[0m \x1b[1m{:<18}\x1b[0m compositor not detected in current shell",
             "hyprland"
         );
-        println!("       \x1b[90mfix: start Hyprland session or use ./run.sh --omarchy\x1b[0m");
+        println!("       \x1b[90mfix: start Hyprland session or use ./run.sh --desktop\x1b[0m");
         warn += 1;
     }
 
@@ -439,7 +437,7 @@ fn run_interactive_repl() {
     print_status();
 
     println!("\x1b[1mWelcome to the SigmaOS Sovereign Workstation.\x1b[0m");
-    println!("Type \x1b[32mhelp\x1b[0m for commands, \x1b[32momarchy\x1b[0m / \x1b[32march\x1b[0m for live persona shells, or \x1b[32mexit\x1b[0m to quit.\n");
+    println!("Type \x1b[32mhelp\x1b[0m for commands, \x1b[32mdesktop\x1b[0m for graphical session, or \x1b[32mexit\x1b[0m to quit.\n");
 
     let base = find_base_dir();
 
@@ -467,20 +465,16 @@ fn run_interactive_repl() {
                 println!(
                     "  status         - Display comprehensive system and launch readiness status"
                 );
-                println!("  doctor         - Run Omarchy diagnostic health checks");
+                println!("  doctor         - Run SigmaOS diagnostic health checks");
                 println!("  craft          - Explore the 20-module Craft Creative Suite");
-                println!("  distro         - Inspect Linux (Arch/Cachy/Debian) and BSD parity");
-                println!("  omarchy        - Launch Omarchy Aesthetic Persona (Hyprland / Wallust Wayland)");
-                println!("  arch           - Launch Arch Linux Minimalist Persona (Pacman / Rolling Release)");
-                println!("  mint           - Launch Linux Mint Ergonomic Desktop Persona (Cinnamon / XApps)");
-                println!("  pacman [args]  - Execute native Arch Linux ALPM pacman commands (e.g. pacman -Syu)");
-                println!("  sigpkg [args]  - Execute SigPkg unified package manager and ALPM bridge");
-                println!("  aur <query>    - Query Arch User Repository (AUR v5 RPC)");
-                println!("  yay | paru     - Execute Arch Linux AUR helper commands");
-                println!("  gui | desktop  - Launch SigmaOS Graphical Desktop Window");
+                println!("  distro         - Inspect Subsystem Architecture and Parity");
+                println!("  desktop        - Launch SigmaOS Sovereign Desktop Profile (Wayland / Hyprland)");
+                println!("  minimal        - Launch SigmaOS Minimalist Profile");
+                println!("  sigpkg [args]  - Execute SigPkg unified package manager");
+                println!("  gui            - Launch SigmaOS Graphical Desktop Window");
                 println!("  shell | bash   - Spawn a live interactive shell session");
                 println!("  fastfetch      - Display system hardware & OS fetch banner");
-                println!("  iso            - Report built bootable ISO image information");
+                println!("  iso            - Report bootable ISO image information");
                 println!("  check          - Run automated launch readiness check");
                 println!("  cd <dir>       - Change current working directory");
                 println!("  clear          - Clear the terminal screen");
@@ -503,30 +497,23 @@ fn run_interactive_repl() {
                 println!();
                 print_distro_parity();
             }
-            "mint" => {
+            "desktop" | "omarchy" => {
                 println!();
                 if is_gui_available() && !args.iter().any(|&a| a == "--cli" || a == "--tui") {
-                    launch_gui(Some("mint"));
-                } else {
-                    run_script("launch_mint_persona.sh");
-                }
-                println!();
-            }
-            "arch" => {
-                println!();
-                if is_gui_available() && !args.iter().any(|&a| a == "--cli" || a == "--tui") {
-                    launch_gui(Some("arch"));
-                } else {
-                    run_script("launch_arch_persona.sh");
-                }
-                println!();
-            }
-            "omarchy" => {
-                println!();
-                if is_gui_available() && !args.iter().any(|&a| a == "--cli" || a == "--tui") {
-                    launch_gui(Some("omarchy"));
+                    launch_gui(Some("desktop"));
+                } else if Path::new("scripts/launch_sigmaos_desktop.sh").exists() {
+                    run_script("launch_sigmaos_desktop.sh");
                 } else {
                     run_script("launch_omarchy_persona.sh");
+                }
+                println!();
+            }
+            "minimal" | "arch" => {
+                println!();
+                if is_gui_available() && !args.iter().any(|&a| a == "--cli" || a == "--tui") {
+                    launch_gui(Some("minimal"));
+                } else {
+                    run_script("launch_arch_persona.sh");
                 }
                 println!();
             }
@@ -584,9 +571,9 @@ fn run_interactive_repl() {
                     print_status();
                 }
             }
-            "gui" | "desktop" => {
-                let persona = if !args.is_empty() { Some(args[0]) } else { Some("omarchy") };
-                println!("\nLaunching SigmaOS Sovereign Desktop ({:?})...", persona.unwrap_or("default"));
+            "gui" => {
+                let persona = if !args.is_empty() { Some(args[0]) } else { Some("desktop") };
+                println!("\nLaunching SigmaOS Sovereign Desktop ({:?})...", persona.unwrap_or("desktop"));
                 launch_gui(persona);
                 println!();
             }
@@ -609,10 +596,9 @@ fn run_interactive_repl() {
                         println!("\x1b[33m[!] QEMU (qemu-system-x86_64) not found in PATH.\x1b[0m");
                         println!("    To run the bootable ISO in a virtual machine, install QEMU:");
                         println!("    \x1b[1;32msudo apt install -y qemu-system-x86 nasm xorriso\x1b[0m\n");
-                        println!("    You can also run native personas right now:");
-                        println!("    - omarchy : Omarchy Aesthetic Persona (Hyprland / Wayland)");
-                        println!("    - mint    : Linux Mint Persona (Cinnamon / XApps)");
-                        println!("    - arch    : Arch Linux Persona (Pacman / Rolling)");
+                        println!("    You can also run native profiles right now:");
+                        println!("    - desktop : Sovereign Desktop Profile (Wayland / Hyprland)");
+                        println!("    - minimal : Sovereign Minimalist Profile");
                     }
                 }
                 println!();
@@ -753,39 +739,27 @@ fn main() {
             "--sandbox" | "sandbox" => {
                 run_script("sigmaos_sandbox_container.sh");
             }
-            "--mint" | "mint" => {
+            "--desktop" | "desktop" | "--omarchy" | "omarchy" => {
                 if is_gui_available() && !args.iter().any(|a| a == "--cli" || a == "--tui") {
-                    launch_gui(Some("mint"));
+                    launch_gui(Some("desktop"));
+                } else if Path::new("scripts/launch_sigmaos_desktop.sh").exists() {
+                    run_script("launch_sigmaos_desktop.sh");
                 } else {
-                    run_script("launch_mint_persona.sh");
+                    run_script("launch_omarchy_persona.sh");
                 }
             }
-            "--arch" | "arch" => {
+            "--minimal" | "minimal" | "--arch" | "arch" => {
                 if is_gui_available() && !args.iter().any(|a| a == "--cli" || a == "--tui") {
-                    launch_gui(Some("arch"));
+                    launch_gui(Some("minimal"));
                 } else {
                     run_script("launch_arch_persona.sh");
-                }
-            }
-            "--omarchy" | "omarchy" => {
-                if is_gui_available() && !args.iter().any(|a| a == "--cli" || a == "--tui") {
-                    launch_gui(Some("omarchy"));
-                } else {
-                    run_script("launch_omarchy_persona.sh");
-                }
-            }
-            "--tokyo" | "tokyo" => {
-                if is_gui_available() && !args.iter().any(|a| a == "--cli" || a == "--tui") {
-                    launch_gui(Some("tokyo"));
-                } else {
-                    run_script("launch_omarchy_persona.sh");
                 }
             }
             "--cli" | "cli" | "--tui" | "tui" | "--repl" | "repl" => {
                 run_interactive_repl();
             }
-            "--gui" | "gui" | "--desktop" | "desktop" => {
-                let persona = args.get(2).map(|s| s.as_str()).unwrap_or("omarchy");
+            "--gui" | "gui" => {
+                let persona = args.get(2).map(|s| s.as_str()).unwrap_or("desktop");
                 launch_gui(Some(persona));
             }
             "--native" | "native" => {
@@ -810,10 +784,9 @@ fn main() {
                         println!("\x1b[33m[!] QEMU (qemu-system-x86_64) not found in PATH.\x1b[0m");
                         println!("    To run the bootable ISO in a virtual machine, install QEMU:");
                         println!("    \x1b[1;32msudo apt install -y qemu-system-x86 nasm xorriso\x1b[0m\n");
-                        println!("    You can also run native personas right now:");
-                        println!("    - ./run.sh --omarchy : Omarchy Aesthetic Persona (Hyprland / Wayland)");
-                        println!("    - ./run.sh --mint    : Linux Mint Persona (Cinnamon / XApps)");
-                        println!("    - ./run.sh --arch    : Arch Linux Persona (Pacman / Rolling)");
+                        println!("    You can also run native profiles right now:");
+                        println!("    - ./run.sh --desktop : Sovereign Desktop Profile (Wayland / Hyprland)");
+                        println!("    - ./run.sh --minimal : Sovereign Minimalist Profile");
                         println!("    - ./run.sh --gui     : Graphical Desktop Launcher");
                     }
                 }
@@ -826,18 +799,17 @@ fn main() {
                 println!("Usage: ./run.sh [OPTIONS] or sigmaos [OPTIONS]\n");
                 println!("Options:");
                 println!(
-                    "  --omarchy, omarchy Launch Omarchy Aesthetic Persona (Hyprland / Wallust)"
+                    "  --desktop, desktop Launch SigmaOS Sovereign Desktop Profile (Wayland / Hyprland)"
                 );
                 println!(
-                    "  --arch, arch       Launch Arch Linux Minimalist Persona (Pacman / Rolling)"
+                    "  --minimal, minimal Launch SigmaOS Minimalist Profile (CLI Core)"
                 );
                 println!(
-                    "  --pacman, pacman   Execute native/ALPM pacman command (e.g. pacman -Syu)"
+                    "  --pacman, pacman   Execute native ALPM pacman command (e.g. pacman -Syu)"
                 );
                 println!("  --sigpkg, sigpkg   Execute SigPkg package manager CLI");
-                println!("  --mint, mint       Launch Linux Mint Ergonomic Desktop Persona");
-                println!("  --doctor           Execute Omarchy system diagnostics health check");
-                println!("  --dotfiles         Deploy modular Omarchy dotfiles to ~/.config/omarchy");
+                println!("  --doctor           Execute SigmaOS system diagnostics health check");
+                println!("  --dotfiles         Deploy modular desktop dotfiles to ~/.config");
                 println!("  --sandbox          Launch isolated bubblewrap user namespace sandbox");
                 println!("  --version, -v      Display SigmaOS version");
                 println!("  --gui, --desktop   Launch SigmaOS Graphical Desktop (GTK3 + WebKit2)");
@@ -845,13 +817,13 @@ fn main() {
                 println!("  --check            Execute launch readiness validation");
                 println!("  --status, -s       Display system and launch status");
                 println!("  --craft, -c        Display Craft Creative Suite catalog");
-                println!("  --distro, -d       Display Linux and BSD parity architectures");
+                println!("  --distro, -d       Display Subsystem Architecture and Parity");
                 println!("  --help, -h         Show this help");
             }
             _ => {
                 if is_gui_available() {
                     println!("==> Graphical display detected. Launching SigmaOS Sovereign Desktop...");
-                    launch_gui(Some("omarchy"));
+                    launch_gui(Some("desktop"));
                 } else {
                     run_interactive_repl();
                 }
@@ -860,7 +832,7 @@ fn main() {
     } else {
         if is_gui_available() {
             println!("==> Graphical display detected. Launching SigmaOS Sovereign Desktop...");
-            launch_gui(Some("omarchy"));
+            launch_gui(Some("desktop"));
         } else {
             run_interactive_repl();
         }

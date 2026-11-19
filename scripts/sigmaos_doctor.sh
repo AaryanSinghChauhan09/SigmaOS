@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT
-# sigmaos_doctor.sh — Omarchy-style system health checker for SigmaOS
+# sigmaos_doctor.sh — Comprehensive system health checker for SigmaOS
 # Checks display server, GPU, fonts, Python/GTK, Rust, SigmaOS binaries, and more.
 # ---------------------------------------------------------------------------
 
@@ -54,7 +54,7 @@ cmd_exists() { command -v "$1" &>/dev/null; }
 # ── Header ───────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${BOLD}╔══════════════════════════════════════════════════╗${RESET}"
-echo -e "${BOLD}║        SigmaOS System Doctor  (Omarchy-style)    ║${RESET}"
+echo -e "${BOLD}║             SigmaOS System Doctor                ║${RESET}"
 echo -e "${BOLD}╚══════════════════════════════════════════════════╝${RESET}"
 echo ""
 echo -e "  Root  : ${SIGMA_ROOT}"
@@ -178,13 +178,13 @@ for bin in sigmaos sigmaos-shell sigmaos-bar sigmaos-settings sigmaos-version; d
   fi
 done
 
-# ── 6. omarchy-shell / Omarchy tools ─────────────────────────────────────────
-section "Omarchy Tools"
+# ── 6. SigmaOS Shell & Desktop Tools ─────────────────────────────────────────
+section "Desktop & Shell Tools"
 
-if cmd_exists omarchy-shell || [[ -x "$SIGMA_ROOT/bin/sigmaos-shell" ]]; then
-  check "omarchy-shell / sigmaos-shell" pass
+if [[ -x "$SIGMA_ROOT/bin/sigmaos-shell" ]] || cmd_exists sigmaos-shell; then
+  check "sigmaos-shell" pass
 else
-  check "omarchy-shell" warn "not installed (optional)"
+  check "sigmaos-shell" warn "not installed (optional)"
 fi
 
 for tool in hyprland waybar rofi wallust kitty; do

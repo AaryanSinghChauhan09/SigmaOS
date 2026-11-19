@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # SigmaOS — Sovereign Operating System Runner
-# Turnkey, zero-friction execution inspired by Omarchy Linux & Arch Linux.
+# Turnkey, zero-friction workstation and desktop environment runner.
 #
 # Usage:
 #   ./run.sh              # Launch sovereign workstation (GUI on desktop, TUI in terminal)
 #   ./run.sh --gui        # Launch sovereign GUI desktop (GTK3 + WebKit2)
 #   ./run.sh --native     # Launch native GTK3 desktop app (pure GTK3)
-#   ./run.sh --omarchy    # Launch Omarchy aesthetic persona (Hyprland / Wallust)
-#   ./run.sh --arch       # Launch Arch Linux minimalist persona (Pacman / Rolling)
-#   ./run.sh --doctor     # Run Omarchy diagnostic health checks (39-point audit)
-#   ./run.sh --dotfiles   # Deploy Omarchy dotfiles to ~/.config
+#   ./run.sh --desktop    # Launch SigmaOS Sovereign Desktop Profile (Hyprland / Wayland)
+#   ./run.sh --minimal    # Launch SigmaOS Sovereign Minimalist Profile
+#   ./run.sh --doctor     # Run SigmaOS diagnostic health checks (39-point audit)
+#   ./run.sh --dotfiles   # Deploy SigmaOS desktop dotfiles to ~/.config
 #   ./run.sh --check      # Run 21-point launch readiness validation
 #   ./run.sh --iso        # Build & verify bootable ISO image
 #   ./run.sh --qemu       # Boot ISO in QEMU virtual machine
@@ -32,14 +32,11 @@ fi
 ACTION="${1:-}"
 
 case "$ACTION" in
-    --omarchy|omarchy)
-        exec "$SCRIPT_DIR/bin/sigmaos" --omarchy
+    --desktop|desktop|--omarchy|omarchy)
+        exec "$SCRIPT_DIR/bin/sigmaos" --desktop
         ;;
-    --arch|arch)
-        exec "$SCRIPT_DIR/bin/sigmaos" --arch
-        ;;
-    --mint|mint)
-        exec "$SCRIPT_DIR/bin/sigmaos" --mint
+    --minimal|minimal|--arch|arch)
+        exec "$SCRIPT_DIR/bin/sigmaos" --minimal
         ;;
     --doctor|doctor)
         if [ -f "$SCRIPT_DIR/scripts/sigmaos_doctor.sh" ]; then
@@ -120,11 +117,10 @@ case "$ACTION" in
         echo "  --gui         Launch full graphical desktop (GTK3 + WebKit2 + IPC)"
         echo "  --native      Launch pure GTK3 desktop interface (no WebKit2 requirement)"
         echo "  --cli, --tui  Launch interactive terminal menu"
-        echo "  --omarchy     Launch Omarchy aesthetic persona (Hyprland / Wallust)"
-        echo "  --arch        Launch Arch Linux minimalist persona (Pacman / Rolling)"
-        echo "  --mint        Launch Linux Mint ergonomic persona"
-        echo "  --doctor      Run Omarchy 39-point system health diagnostics"
-        echo "  --dotfiles    Deploy Omarchy desktop configs to ~/.config"
+        echo "  --desktop     Launch SigmaOS Sovereign Desktop Profile (Hyprland / Wayland)"
+        echo "  --minimal     Launch SigmaOS Sovereign Minimalist Profile"
+        echo "  --doctor      Run SigmaOS 39-point system health diagnostics"
+        echo "  --dotfiles    Deploy SigmaOS desktop configs to ~/.config"
         echo "  --sandbox     Launch isolated bubblewrap sandbox with GUI passthrough"
         echo "  --version     Display SigmaOS version"
         echo "  --check       Run 21-point launch readiness validation"

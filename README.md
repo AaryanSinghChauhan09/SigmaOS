@@ -1,203 +1,160 @@
 # SigmaOS — Sovereign Operating System
 
-> **Turnkey, production-ready OS substrate** built on Arch Linux & Omarchy Linux.  
-> Zero stubs · 100% real Rust · 190+ kernel modules · 20-module Craft Suite
+> **A modern, sovereign operating system distribution and workstation environment.**  
+> Delivering an installable desktop distribution, modular system architecture, and defensive tooling.
 
 ```bash
-# One-line quickstart
+# One-line workstation launch
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git && cd SigmaOS && ./run.sh
 ```
 
 ---
 
-## ⚡ One-Line Launch
+## 📊 Subsystem Status & Roadmap
+
+In adherence to engineering integrity, Gall's Law, and defensive programming, SigmaOS distinguishes verified working components from experimental tracks and planned features:
+
+| Subsystem / Capability | Current Status | Description & Verification |
+|---|---|---|
+| **Host Workstation Environment** | **Working** | Native binary (`bin/sigmaos`), interactive TUI, Python/GTK3 desktop launcher (`scripts/sigmaos_gui.py`). |
+| **Defensive System Installer** | **Working** | Industrial installer (`iso_root/installer/install.sh`, `sigmaos-install`). Defaults to `DRY_RUN=1` simulation. Requires `--destructive --confirm-disk <DEV>`. Guards active host root drive. |
+| **Diagnostic Health Suite** | **Working** | 39-point system health audit (`./run.sh --doctor`, `scripts/sigmaos_doctor.sh`). Validates display, GPU, fonts, Rust/Python runtimes, and configs. |
+| **Component Sub-Repositories (22)** | **Working** | 22 implemented sub-repositories in pure `#![forbid(unsafe_code)]` Rust with comprehensive unit and integration test suites passing in CI. |
+| **Desktop Profiles & Configuration** | **Working** | Wayland / Hyprland tiling desktop profile, Waybar configurations, Catppuccin Mocha theme assets, and Starship shell prompts. |
+| **Arch-based Live ISO Media** | **Experimental** | Turnkey Arch-based live ISO profile (`iso/archiso/`, `scripts/build_archiso.sh`) targeting bootable live desktop and virtual disk installation in QEMU. |
+| **Package Management Engine (`sigpkg`)**| **Experimental** | ALPM transaction model, dependency graph solver, and repository query client. |
+| **Custom `#![no_std]` Microkernel** | **Planned / Research** | Clean-slate freestanding Rust/C microkernel research (`src/kernel/`, `iso-build/kernel-stub.c`). Maintained as a separate long-term research track. |
+
+---
+
+## ⚡ Turnkey Launch & Quickstart
 
 | Command | Effect |
 |---|---|
 | `./run.sh` | Interactive sovereign workstation REPL |
-| `./run.sh --omarchy` | **Omarchy Linux aesthetic persona** (Hyprland / Wallust / Waybar) |
-| `./run.sh --arch` | Arch Linux minimalist persona (Pacman / Rolling release) |
-| `./run.sh --mint` | Linux Mint ergonomic persona (Cinnamon / XApps) |
-| `./run.sh --doctor` | Omarchy diagnostic health checks |
-| `./run.sh --check` | 21-point launch readiness validation |
-| `./run.sh --iso` | Build & verify bootable ISO image |
-| `./run.sh --qemu` | Boot ISO in QEMU virtual machine |
+| `./run.sh --desktop` | **Sovereign Desktop Profile** (Hyprland / Wayland / Waybar) |
+| `./run.sh --minimal` | Sovereign Minimalist Profile (CLI core) |
+| `./run.sh --gui` | Launch full graphical desktop application (GTK3 + WebKit2) |
+| `./run.sh --native` | Launch pure GTK3 desktop interface |
+| `./run.sh --doctor` | Run 39-point system health diagnostics |
+| `./run.sh --dotfiles`| Deploy desktop configuration dotfiles to `~/.config` |
+| `./run.sh --check` | Run automated launch readiness validation |
+| `./run.sh --qemu` | Boot test environment in QEMU virtual machine |
 
-## 📦 Install to PATH
+---
+
+## 🛡 Defensive Installation
+
+SigmaOS prioritizes storage safety above all else. The installer protects host operating systems and connected storage devices:
 
 ```bash
-./install.sh
-# → Installs sigmaos CLI to ~/.local/bin/sigmaos
-# → Installs sigpkg and pacman bridge to ~/.local/bin/
-# → Deploys Omarchy dotfiles to ~/.config/sigmaos/omarchy/
-# → Deploys Arch Linux ALPM configs to ~/.config/sigmaos/ (pacman.conf, mirrorlist)
-# → Creates sigmaos.desktop entry
+# 1. Non-destructive simulation (DEFAULT behavior)
+./iso_root/installer/install.sh /dev/vda
+# → Simulates partition table, filesystem creation, and mounts. Writes ZERO bytes to disk.
+
+# 2. Automated dry-run verification
+./iso_root/installer/install.sh --auto --dry-run /dev/vda
+
+# 3. Destructive installation (strictly requires both explicit flags):
+# NOTE: Never run against host disks. Use only inside disposable QEMU virtual machines.
+sudo ./iso_root/installer/install.sh --auto --destructive --confirm-disk /dev/vda /dev/vda
 ```
 
-Then from anywhere:
-```bash
-sigmaos --omarchy
-sigmaos --doctor
-sigmaos --arch
-pacman -Syu
-sigpkg aur hyprland
-```
+### Safety Guarantees:
+- **Default Dry-Run:** `DRY_RUN=1` is enforced unless both `--destructive` and `--confirm-disk <DEVICE>` are supplied.
+- **Active Root Guard:** Automatically identifies the host partition and physical disk hosting `/` and refuses execution if targeted.
+- **Active Mount Protection:** Scans `/proc/mounts` and aborts if any partition on the target device is mounted.
+- **Trap Cleanup:** Handles `SIGINT`, `SIGTERM`, and `EXIT` signals to unmount temporary target mounts and remove runtime lockfiles.
 
 ---
 
-## 🏛 Arch Linux Persona & ALPM Substrate
+## 🖥 Virtual Machine Testing (QEMU)
 
-SigmaOS closes the gap with upstream Arch Linux through full ALPM parity:
-
-- **Package Manager:** Native `pacman` and `sigpkg` ALPM bridge with `-Syu`, `-Ss`, `-Si`, `-Rns`, `-Q` syntax.
-- **AUR Integration:** Real-time query bridge to Arch User Repository v5 RPC (`sigpkg aur <query>`).
-- **ALPM Engine:** Version comparison (`AlpmVersion`), topological dependency resolution (`AlpmTransaction`), and sync database parsing.
-- **Arch Contrib Utilities:** Built-in `checkupdates`, `paccache` (cache cleaner), `pactree` (dependency trees), and `rankmirrors` (latency benchmark).
-- **Configuration Parity:** Production `pacman.conf` (ParallelDownloads, CheckSpace, Color, `[core]`, `[extra]`, `[multilib]`, `[sigmaos]`), `mirrorlist`, and `mkinitcpio.conf` hook pipeline.
+Always verify live boot and installation within an isolated, disposable virtual disk:
 
 ```bash
-# Launch Arch Persona
-./run.sh --arch
+# 1. Create a 32GB disposable virtual test disk
+qemu-img create -f qcow2 /tmp/sigmaos_test_disk.qcow2 32G
 
-# Pacman Operations
-pacman -Syu             # Full rolling upgrade
-pacman -Ss neovim       # Repository search
-sigpkg aur hyprland     # AUR package search
-sigpkg checkupdates     # Safe pending update check
-sigpkg tree hyprland    # View package dependency tree
-sigpkg doctor           # Verify Arch Linux substrate health
+# 2. Validate installer dry-run & boot capabilities via automated script
+bash scripts/qemu_smoke_test.sh
+
+# 3. Boot ISO in QEMU with disposable drive attached
+qemu-system-x86_64 \
+  -m 4096 \
+  -enable-kvm \
+  -drive file=/tmp/sigmaos_test_disk.qcow2,format=qcow2,if=virtio \
+  -cdrom out/sigmaos-desktop.iso \
+  -boot d
 ```
 
 ---
 
-## 🏗 Architecture
+## 🏛 Package Management & Substrate Architecture
 
-```
-SigmaOS
-├── src/                 # Sovereign kernel library (1M+ LOC, Rust #![no_std])
-│   ├── kernel/          # Microkernel (scheduler, IPC, memory, interrupts)
-│   ├── drivers/         # Device driver modules
-│   ├── net/             # Network stack (zero-copy, io_uring)
-│   ├── fs/              # Virtual File System + FAT32/EXT4/BTRFS
-│   └── bin/             # Standalone workstation binaries
-├── boot/                # Bootloader (Limine + GRUB2 El Torito)
-├── build/               # Bootable ISO artifacts
-├── scripts/             # Build, CI, ISO, persona launchers
-├── install/             # Package definitions (sigmaos-base.packages)
-├── installer/           # Calamares/archinstall-style wizard
-├── etc/                 # systemd units, udev rules, NSS config
-├── run.sh               # ← Turnkey entry point (START HERE)
-└── install.sh           # ← Persistent installer
-```
+SigmaOS provides a curated packaging layer built upon standard ALPM binary package definitions and modular service components:
 
-**Kernel:** Freestanding `#![no_std]` Rust + C micro-kernel, Multiboot1/2 ELF, x86_64.  
-**Bootloader:** Limine (primary) + GRUB2 El Torito (ISO fallback).  
-**Desktop:** Hyprland Wayland compositor + Wallust wallpaper theming + Waybar/Quickshell + Starship.  
-**Inspirations:** Arch Linux · Omarchy Linux · Linux Mint · CachyOS · FreeBSD · OpenBSD.
+- **ALPM Engine:** Version comparison, dependency graph resolution, and sync database parsing.
+- **`sigpkg` Interface:** Package transaction engine and system maintenance tools (`checkupdates`, `paccache`, `pactree`).
+- **Hardware Integration:** Automatic graphics driver detection (Intel Iris/Xe, AMD Radeon, NVIDIA, VirtIO GPU) and PipeWire audio stack.
 
 ---
 
-## 🎨 Omarchy Linux Persona
+## 📦 Implemented Component Fleet
 
-SigmaOS ships a full Omarchy-inspired aesthetic desktop persona:
+All component sub-repositories are developed in safe `#![forbid(unsafe_code)]` Rust with automated test coverage:
 
-- **Compositor:** Hyprland dynamic tiling (Wayland-native)  
-- **Theme Engine:** Wallust — wallpaper-driven colour palette harmonisation  
-- **Status Bar:** Waybar / Quickshell aesthetic bar  
-- **Shell:** Starship prompt + Fish/Zsh syntax highlighting  
-- **Editor:** Aether.nvim (Neovim Lua IDE with LSP)  
-- **Terminal:** GPU-accelerated block terminal (Alacritty / Kitty / Warp)
-
-```bash
-./run.sh --omarchy
-```
-
----
-
-## 🎨 Craft Creative Suite (20 modules)
-
-| Module | Description |
-|---|---|
-| 3DCraft | 3D Modeling, Rigging & Rendering (Blender parity) |
-| AniCraft | 2D Vector & Traditional Animation (OpenToonz) |
-| ArtCraft | Digital Painting & Illustration (Krita) |
-| CADCraft | Parametric CAD & CAM (FreeCAD/SolidWorks) |
-| FilmCraft | Non-Linear Video Editor (DaVinci Resolve) |
-| SoundCraft | DAW, Synthesizers & MIDI (Bitwig) |
-| DesignCraft | Vector UI/UX Canvas (Figma) |
-| VectorCraft | SVG Illustration (Inkscape) |
-| *...and 12 more* | FontCraft, GridCraft, PDFCraft, PhotoCraft, ... |
+| Component Repository | Purpose | Test Status |
+|---|---|---|
+| `SigmaOS-domain-blocker` | DNS-level filtering and domain sinkholing engine | 15 Unit Tests Passing |
+| `SigmaOS-fish` | Smart fish-compatible shell and completion system | 15 Unit Tests Passing |
+| `SigmaOS-packages-kit` | Transactional package kit and dependency solver | 20 Unit Tests Passing |
+| `SigmaOS-player` | Media playback engine and audio backend | 15 Unit Tests Passing |
+| `SigmaOS-renamer-file` | Batch regex file renamer and metadata transformer | 14 Unit Tests Passing |
+| `SigmaOS-apturl` | URL protocol handler for package installation | 8 Unit Tests Passing |
+| `SigmaOS-asdcontrol-git` | Display brightness and hardware controller | 7 Unit Tests Passing |
+| `SigmaOS-audio-tuner` | Real-time audio equalization and DSP processor | 6 Unit Tests Passing |
+| `SigmaOS-automate` | System workflow automation and task scheduling | 6 Unit Tests Passing |
+| `SigmaOS-chatroom` | Encrypted peer-to-peer workspace messaging | 6 Unit Tests Passing |
+| `SigmaOS-daemon-apt` | Background package daemon and cache coordinator | 6 Unit Tests Passing |
+| `SigmaOS-desktop-portal` | Desktop portal bridge for sandboxed applications | 5 Unit Tests Passing |
+| `SigmaOS-dev-tools` | Developer workstation diagnostics and profiling | 6 Unit Tests Passing |
+| `SigmaOS-file-writer` | Atomic file writer with integrity validation | 6 Unit Tests Passing |
+| `SigmaOS-folder-color-switcher` | Folder icon color customization daemon | 6 Unit Tests Passing |
+| `SigmaOS-greeter` | Wayland login greeter and session manager | 6 Unit Tests Passing |
+| `SigmaOS-office` | Unified document viewer and office suite bridge | 6 Unit Tests Passing |
+| `SigmaOS-packages-tools` | Package auditing, linting, and verification tools | 6 Unit Tests Passing |
+| `SigmaOS-player-library` | Media library indexer and metadata database | 6 Unit Tests Passing |
+| `SigmaOS-theme-desktop-environment`| Global desktop theme and palette manager | 6 Unit Tests Passing |
+| `SigmaOS-theme-gtk3` | GTK3 stylesheet generator and color harmonizer | 5 Unit Tests Passing |
+| `SigmaOS-theme-icon` | Icon theme indexing and resolution engine | 5 Unit Tests Passing |
 
 ---
 
-## 🚀 Boot in QEMU
+## 🎨 Craft Creative Suite (20 Modules)
 
-```bash
-# Build and boot (requires qemu-system-x86_64)
-./run.sh --qemu
+SigmaOS incorporates a creative production suite across audio, video, vector, and 3D modeling:
 
-# Or manually:
-make iso-stub
-qemu-system-x86_64 -m 2048 -cdrom build/sigmaos-desktop-preview.iso -serial stdio
-```
-
----
-
-## 📚 Repository Ecosystem
-
-SigmaOS follows **one repo per component** (Omarchy-inspired multi-subrepo model):
-
-| Category | Repositories |
-|---|---|
-| **Linux Distros** | SigmaOS-linux-arch, -debian, -fedora, -mint, -omarchy, -ubuntu, ... |
-| **BSD Systems** | SigmaOS-bsd-free, -bsd-open, -bsd-dragon, -bsd-hardened, ... |
-| **Desktop** | SigmaOS-omarchy, SigmaOS-linux-arch, SigmaOS-linux-omarchy |
-| **Craft Suite** | SigmaOS-craft-3d, -ani, -art, -cad, -film, -sound, ... |
-| **Kernel** | SigmaOS-kernel-linux, -gnu, -minix, -xnu |
-| **Office** | SigmaOS-libreoffice-*, SigmaOS-onlyoffice-*, SigmaOS-genoffice-* |
-| **Tools** | SigmaOS-tools-blender, -docker, -neovim, -chromium, ... |
-
-Full index: [SigmaOS GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
-
-### Component Hub (`scripts/sigma_hub.sh`)
-
-This repository is the **connector** for the component fleet. The hub reads
-`COMPONENTS.toml` + `components/*.toml` as the single source of truth and
-drives every `SigmaOS-*` repo through one shell interface:
-
-```sh
-make hub                 # help
-make hub-list            # components + local git status
-make hub-status NAME=SigmaOS-kernel   # per-repo detail + github check
-make hub-audit           # COMPONENT.toml coverage / upgrade candidates
-make hub-search ARGS=kernel           # pacman -Ss / apt search
-make hub-info NAME=SigmaOS-kernel     # apt show / pacman -Qi
-make hub-depends NAME=SigmaOS-kernel  # apt-cache depends
-make hub-families        # scaffold-fleet consolidation analyzer
-make hub-consolidate ARGS=omarchy     # dry-run merge plan
-make hub-test ARGS=--local            # cargo test across the fleet (CI)
-make hub-create NAME=SigmaOS-foo ARGS="--desc 'Foo' --cat Utilities --dry-run"
-make hub-upgrade NAME=--all ARGS="--dry-run"
-make hub-sync ARGS="--push"
-```
-
-- **connect** (`<name|--all>`) — clone declared component repo(s) into the fleet dir (optionally as a submodule)
-- **create** — scaffold a new component repo from `templates/component/` (COMPONENT.toml, README, Apache-2.0 LICENSE, CI, Rust src + AAA tests), register it in `COMPONENTS.toml`, and create the GitHub repo
-- **upgrade** (`<name|--all>`) — non-destructively bring an existing repo up to the component standard (adds only missing files, language-aware)
-- **sync/push** — pull or push component checkouts in bulk
-- **search/info/depends** — package-query commands modeled on Arch `pacman`/`alpm`, Debian `apt`, Fedora `dnf`, Mint `mintinstall`, Omarchy, Ubuntu `apt`
-- **families/consolidate** — analyze and plan consolidation of scaffold-fleet repos (`arch`, `omarchy`, `mint`, `archlinux`, `system-feature`, …) into canonical parents; `consolidate` is a non-destructive dry-run
-- **test** — run `cargo test` across component checkouts (CI-inspired fleet health)
+- **3DCraft:** 3D Modeling, Rigging & Rendering engine
+- **AniCraft:** 2D Vector & Traditional Animation suite
+- **ArtCraft:** Digital Painting & Illustration canvas
+- **CADCraft:** Parametric CAD & Mechanical Design
+- **FilmCraft:** Non-Linear Video Editor & Compositor
+- **SoundCraft:** Digital Audio Workstation (DAW) & Synthesizers
+- **DesignCraft:** Vector UI/UX Canvas & Prototyping
+- **VectorCraft:** Scalable Vector Graphics Editor
+- *...along with FontCraft, GridCraft, PDFCraft, PhotoCraft, PrintCraft, and SoundCraft modules.*
 
 ---
 
-## 📋 Principles
+## 📋 Foundational Principles
 
-This project adheres to 100+ software engineering principles including:  
-DRY · SOLID · GALL'S LAW · MECHANICAL SYMPATHY · ZERO-COPY · LEAST PRIVILEGE  
-FAIL-FAST · MODULAR KERNEL DESIGN · SEPARATION OF MECHANISM & POLICY  
-SINGLE RESPONSIBILITY · COMPOSITION OVER INHERITANCE · OFFENSIVE PROGRAMMING  
-*(See the [GitHub Wiki Architecture page](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Architecture) for details)*
+This project adheres to rigorous software engineering disciplines:
+- **Gall's Law:** A complex system that works is invariably found to have evolved from a simple system that worked.
+- **Defensive Programming:** Fail-safe defaults, dry-run simulations, and active disk protection.
+- **Modularity & High Cohesion:** Isolated components communicating via defined interfaces.
+- **Zero-Copy & Mechanical Sympathy:** Optimized I/O pipelines and memory discipline.
+- **Least Astonishment:** Intuitive CLI semantics and standard Unix conventions.
 
 ---
 
@@ -205,4 +162,3 @@ SINGLE RESPONSIBILITY · COMPOSITION OVER INHERITANCE · OFFENSIVE PROGRAMMING
 
 MIT OR GPL-2.0 — Free and Open Source Software.  
 © SigmaOS Contributors
-# CI/CD Pipeline Test

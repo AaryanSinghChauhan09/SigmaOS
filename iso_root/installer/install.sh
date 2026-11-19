@@ -11,12 +11,14 @@ set -eo pipefail
 LOG_FILE="/tmp/sigma_install.log"
 LOCK_FILE="/tmp/sigma_install.lock"
 
-# Default installer parameters
+# Default installer parameters (Defensive: default to safe DRY_RUN=1)
 AUTO_INSTALL=0
-DRY_RUN=0
+DRY_RUN=1
+DESTRUCTIVE_CONFIRMED=0
+CONFIRM_DISK_INPUT=""
 TARGET_DEVICE=""
 PART_LABEL="GPT"
-FILESYSTEM="SovereignFS"
+FILESYSTEM="Ext4"
 HOSTNAME="sigmaos-node"
 SHARD_PRESET="Standard"
 PASSWORD=""
@@ -24,6 +26,7 @@ ACCESSIBILITY=0
 ARCHINSTALL=0
 CLOUD_INIT=0
 TPM=0
+MOUNT_POINT="/mnt/sigmaos"
 
 # ==============================================================================
 # AUDITING & LOGGING SUBSYSTEM (Debian/Enterprise Linux style)
@@ -62,6 +65,14 @@ log_error() {
 # ==============================================================================
 cleanup() {
     local exit_code=$?
+    # Unmount target filesystems if mounted
+    if mountpoint -q "$MOUNT_POINT/boot" 2>/dev/null; then
+        umount "$MOUNT_POINT/boot" 2>/dev/null || true
+    fi
+    if mountpoint -q "$MOUNT_POINT" 2>/dev/null; then
+        umount -R "$MOUNT_POINT" 2>/dev/null || true
+    fi
+
     # Release installer lock
     if [[ -f "$LOCK_FILE" ]]; then
         rm -f "$LOCK_FILE"
@@ -86,24 +97,27 @@ show_help() {
 Usage: $(basename "$0") [OPTIONS] [DEVICE]
 
 SigmaOS Industrial Sovereign Installer (OOP Edition)
-A robust, flexible, and interactive system installer.
+A robust, flexible, and defensive system installer.
+Defaults to DRY-RUN mode for safety. Destructive installation requires explicit confirmation.
 
 Options:
   -a, --auto             Unattended automatic installation mode (non-interactive)
-  -d, --dry-run          Simulate installation without writing actual state
+  -d, --dry-run          Simulate installation without writing actual state (DEFAULT)
+  --destructive          Allow destructive formatting and partition writes
+  --confirm-disk DEV     Explicit verification of target device name (e.g. --confirm-disk /dev/vda)
   -l, --label LABEL      Partition layout table: GPT, MBR (default: GPT)
-  -f, --fs FILESYSTEM    Root filesystem format: SovereignFS, SemanticFS, Ext4, ZFS, Btrfs (default: SovereignFS)
+  -f, --fs FILESYSTEM    Root filesystem format: Ext4, Btrfs (default: Ext4)
   -n, --hostname NAME    Define custom system hostname (default: sigmaos-node)
-  -p, --preset PRESET    Shard profile preset: Minimal, Standard, Enterprise (default: Standard)
+  -p, --preset PRESET    Profile preset: Minimal, Standard, Enterprise (default: Standard)
   -h, --help             Show this help guide and exit
-  --accessibility        Enable accessibility mode (speakup screen reader)
-  --archinstall          Use archinstall guided installer
+  --accessibility        Enable accessibility mode (screen reader)
+  --archinstall          Use guided installer
   --cloud-init           Enable cloud-init provisioning
   --tpm                  Enable TPM security features
 
 Devices:
-  Specify a target block device path (e.g., /dev/sda). If omitted and running
-  without --auto, the configuration wizard will guide you through selection.
+  Specify a target block device path (e.g., /dev/vda).
+  QEMU / virtual disks are strongly recommended for testing.
 EOF
 }
 
@@ -288,6 +302,20 @@ main() {
                 DRY_RUN=1
                 shift
                 ;;
+            --destructive)
+                DESTRUCTIVE_CONFIRMED=1
+                DRY_RUN=0
+                shift
+                ;;
+            --confirm-disk)
+                if [[ -n "$2" && "$2" != -* ]]; then
+                    CONFIRM_DISK_INPUT="$2"
+                    shift 2
+                else
+                    echo -e "\e[31mError: --confirm-disk requires a device path (e.g. /dev/vda).\e[0m" >&2
+                    exit 1
+                fi
+                ;;
             -l|--label)
                 if [[ -n "$2" && "$2" != -* ]]; then
                     PART_LABEL="$2"
@@ -382,28 +410,61 @@ main() {
     echo "Host Identity (Name):     $HOSTNAME" >> "$LOG_FILE"
     echo "Capability Shard Preset:  $SHARD_PRESET" >> "$LOG_FILE"
 
+    # Safety checks: Prevent wiping running system or unverified devices
+    local active_root
+    active_root=$(findmnt -no SOURCE / 2>/dev/null || true)
+    local active_disk
+    active_disk=$(lsblk -no PKNAME "$active_root" 2>/dev/null || true)
+
+    if [[ -n "$active_disk" && "$TARGET_DEVICE" == "/dev/$active_disk" ]]; then
+        log_error "SAFETY INTERLOCK: Target device '$TARGET_DEVICE' matches the host active root drive ($active_disk)."
+        log_error "Refusing to format the running operating system."
+        exit 1
+    fi
+
+    # Check for active mounted partitions on target device
+    if grep -q "^${TARGET_DEVICE}" /proc/mounts 2>/dev/null; then
+        log_error "SAFETY INTERLOCK: Target device '$TARGET_DEVICE' contains active mounted filesystems:"
+        grep "^${TARGET_DEVICE}" /proc/mounts || true
+        log_error "Unmount all partitions on '$TARGET_DEVICE' before proceeding."
+        exit 1
+    fi
+
     if [[ $DRY_RUN -eq 1 ]]; then
-        log_warn "DRY RUN: Simulating installation sequence (No state mutations)."
-        log_info "DRY RUN complete. No changes were made to $TARGET_DEVICE."
+        log_warn "DRY RUN MODE: Default safety protection active."
+        log_info "Simulating partitioning and installation plan on $TARGET_DEVICE:"
+        log_info "  - Partition table: $PART_LABEL"
+        log_info "  - Root filesystem: $FILESYSTEM"
+        log_info "  - Hostname:        $HOSTNAME"
+        log_info "  - Preset:          $SHARD_PRESET"
+        log_info "To execute a destructive install to this disk, you must explicitly supply:"
+        log_info "  --destructive --confirm-disk $TARGET_DEVICE"
+        log_step "DRY RUN complete. Zero mutations were written to $TARGET_DEVICE."
         exit 0
     fi
 
-    # ========================================================================
-    # PHASE 0: Omarchy 4.0.6 Feature Configuration
-    # ========================================================================
-    log_step "Configuring Omarchy 4.0.6 features"
+    # Verify destructive confirmation
+    if [[ $DESTRUCTIVE_CONFIRMED -ne 1 || "$CONFIRM_DISK_INPUT" != "$TARGET_DEVICE" ]]; then
+        log_error "SAFETY INTERLOCK: Real disk write rejected."
+        log_error "You must pass BOTH '--destructive' AND '--confirm-disk $TARGET_DEVICE' to authorize writing to $TARGET_DEVICE."
+        exit 1
+    fi
 
-    # Accessibility mode (speakup screen reader like Omarchy)
+    # ========================================================================
+    # PHASE 0: SigmaOS Desktop Profile Configuration
+    # ========================================================================
+    log_step "Configuring SigmaOS desktop profiles and accessibility"
+
+    # Accessibility mode (screen reader)
     if [[ $ACCESSIBILITY -eq 1 ]]; then
-        log_info "Accessibility mode enabled (speakup screen reader)"
-        # Accessibility will be configured in the kernel command line
+        log_info "Accessibility mode enabled (screen reader and audio assistance)"
         echo "accessibility=on" >> "$MOUNT_POINT/etc/kernel/cmdline" 2>/dev/null || true
         PKGS="$PKGS speakup espeakup espeak-ng"
     fi
 
-    # archinstall guided installer option
+    # Guided installer option
     if [[ $ARCHINSTALL -eq 1 ]]; then
-        log_info "archinstall guided installer enabled"
+        log_info "Guided installer backend enabled"
         PKGS="$PKGS archinstall arch-install-scripts"
     fi
 

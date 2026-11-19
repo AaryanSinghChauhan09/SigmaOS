@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT
-# profiledef.sh: archiso profile definition for SigmaOS / Omarchy live media
-# Inspires by omacom/omarchy-iso
+# profiledef.sh: archiso profile definition for SigmaOS live media
 
-iso_name="sigmaos-omarchy"
+iso_name="sigmaos-desktop"
 iso_label="SIGMAOS_$(date +%Y%m)"
 iso_publisher="SigmaOS Architecture <https://github.com/AaryanSinghChauhan09/SigmaOS>"
 iso_application="SigmaOS Sovereign Live Desktop"
