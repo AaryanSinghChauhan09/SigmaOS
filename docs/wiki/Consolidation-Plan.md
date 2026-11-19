@@ -120,7 +120,7 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 - ⏳ Pending: Continue with other consolidation families
 - ⏳ Pending: Registry updates
 
-## Repositories Archived (65 total)
+## Repositories Archived (67 total)
 
 1. **Theme duplicates (4):**
    - SigmaOS-theme → SigmaOS-themes (canonical)
@@ -193,5 +193,9 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
     - SigmaOS-arch-refractions-kernel, SigmaOS-arch-compute-shader-kernel (use standard tools)
 
 **All Arch-* repos archived (65 total Arch repos consolidated)**
+
+12. **Arch/GTK infrastructure duplicates (2):**
+    - SigmaOS-mkinitcpio-archiso (use standard mkinitcpio)
+    - SigmaOS-GTK- (consolidate into SigmaOS-themes)
 
 Generated with [Devin](https://devin.ai)
