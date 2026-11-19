@@ -105,5 +105,8 @@ __pycache__/
 !docs/shell/*.md
 !docs/studies/
 !docs/studies/*.md
+!docs/BUILD_INSTRUCTIONS.md
+!docs/DOCKER_SETUP.md
+!docs/ARCH_VM_BUILD.md
 
 .agents/
