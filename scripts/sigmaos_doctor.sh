@@ -263,6 +263,9 @@ check_file "bin/sigmaos-theme"                  "$SIGMA_ROOT/bin/sigmaos-theme"
 check_file "bin/sigmaos-wallpaper-set"          "$SIGMA_ROOT/bin/sigmaos-wallpaper-set"
 check_file "bin/sigmaos-pkgmgr"                 "$SIGMA_ROOT/bin/sigmaos-pkgmgr"
 check_file "bin/sigmaos-network"                "$SIGMA_ROOT/bin/sigmaos-network"
+check_file "bin/sigmaos-audio"                  "$SIGMA_ROOT/bin/sigmaos-audio"
+check_file "bin/sigmaos-bluetooth"              "$SIGMA_ROOT/bin/sigmaos-bluetooth"
+check_file "bin/sigmaos-snapshot"               "$SIGMA_ROOT/bin/sigmaos-snapshot"
 check_file "bin/sigmaos-info"                   "$SIGMA_ROOT/bin/sigmaos-info"
 
 # config/sigmaos mirrors

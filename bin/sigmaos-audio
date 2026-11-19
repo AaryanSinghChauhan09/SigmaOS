@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-audio — SigmaOS PipeWire Audio & Output Controller
+# Provides ergonomic CLI management for volume, sinks, sources, and profiles.
+#
+# Usage:
+#   sigmaos-audio status
+#   sigmaos-audio set-volume <percent>
+#   sigmaos-audio mute
+#   sigmaos-audio unmute
+#   sigmaos-audio toggle-mute
+#   sigmaos-audio mic-mute
+#   sigmaos-audio list-sinks
+#   sigmaos-audio set-sink <id|name>
+#   sigmaos-audio open (opens pavucontrol GUI)
+
+set -euo pipefail
+
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'
+BOLD='\033[1m'; RESET='\033[0m'
+
+info()    { echo -e "${CYAN}[audio]${RESET} $*"; }
+success() { echo -e "${GREEN}[audio]${RESET} $*"; }
+warn()    { echo -e "${YELLOW}[audio]${RESET} $*"; }
+err()     { echo -e "${RED}[audio]${RESET} $*" >&2; }
+
+usage() {
+  cat <<'EOF'
+sigmaos-audio — SigmaOS PipeWire Audio Controller
+
+USAGE
+  sigmaos-audio status                 Show current volume, default sink, and mute status
+  sigmaos-audio volume <percent>       Set output volume (e.g., 50%, +5%, -5%)
+  sigmaos-audio toggle                 Toggle output mute
+  sigmaos-audio mute                   Mute audio output
+  sigmaos-audio unmute                 Unmute audio output
+  sigmaos-audio mic-toggle             Toggle microphone mute
+  sigmaos-audio sinks                  List available audio outputs
+  sigmaos-audio sources                List available audio inputs (microphones)
+  sigmaos-audio set-sink <id|name>     Switch active default output device
+  sigmaos-audio open                   Open Pavucontrol graphical mixer
+EOF
+}
+
+cmd="${1:-status}"
+shift 2>/dev/null || true
+
+# Check for wpctl (PipeWire) or pactl (PulseAudio compatibility)
+has_wpctl() { command -v wpctl &>/dev/null; }
+has_pactl() { command -v pactl &>/dev/null; }
+
+case "$cmd" in
+  status)
+    echo -e "\n${BOLD}${CYAN}  SigmaOS Audio Status${RESET}\n"
+    if has_wpctl; then
+      wpctl status | grep -E "Audio|Sinks|Sources|Streams" -A 10 | head -25 || true
+    elif has_pactl; then
+      pactl info 2>/dev/null | grep -E "Server Name|Default Sink|Default Source" || true
+    else
+      warn "Neither wpctl nor pactl detected. Ensure PipeWire is installed."
+    fi
+    echo ""
+    ;;
+
+  volume|vol)
+    val="${1:-}"
+    [[ -z "$val" ]] && { err "Volume level required (e.g. 50%, +5%, -5%)"; exit 1; }
+    if has_wpctl; then
+      if [[ "$val" =~ ^\+ ]]; then
+        wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ "${val#+}"+
+      elif [[ "$val" =~ ^\- ]]; then
+        wpctl set-volume @DEFAULT_AUDIO_SINK@ "${val#-}"-
+      else
+        # Direct percentage
+        cleaned="${val%\%}"
+        ratio=$(awk "BEGIN {print $cleaned/100}")
+        wpctl set-volume @DEFAULT_AUDIO_SINK@ "$ratio"
+      fi
+      success "Volume adjusted: $val"
+    elif has_pactl; then
+      pactl set-sink-volume @DEFAULT_SINK@ "$val"
+      success "Volume adjusted via pactl: $val"
+    else
+      err "No audio control backend available."
+      exit 1
+    fi
+    ;;
+
+  toggle)
+    if has_wpctl; then
+      wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+      success "Toggled audio output mute"
+    elif has_pactl; then
+      pactl set-sink-mute @DEFAULT_SINK@ toggle
+      success "Toggled sink mute"
+    fi
+    ;;
+
+  mute)
+    if has_wpctl; then
+      wpctl set-mute @DEFAULT_AUDIO_SINK@ 1
+      success "Audio output muted"
+    elif has_pactl; then
+      pactl set-sink-mute @DEFAULT_SINK@ 1
+    fi
+    ;;
+
+  unmute)
+    if has_wpctl; then
+      wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
+      success "Audio output unmuted"
+    elif has_pactl; then
+      pactl set-sink-mute @DEFAULT_SINK@ 0
+    fi
+    ;;
+
+  mic-toggle)
+    if has_wpctl; then
+      wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+      success "Toggled microphone mute"
+    elif has_pactl; then
+      pactl set-source-mute @DEFAULT_SOURCE@ toggle
+    fi
+    ;;
+
+  sinks)
+    info "Available Audio Outputs:"
+    if has_pactl; then
+      pactl list short sinks
+    elif has_wpctl; then
+      wpctl status | grep -A 8 "Sinks:"
+    fi
+    ;;
+
+  sources)
+    info "Available Audio Inputs:"
+    if has_pactl; then
+      pactl list short sources
+    elif has_wpctl; then
+      wpctl status | grep -A 8 "Sources:"
+    fi
+    ;;
+
+  set-sink)
+    target="${1:-}"
+    [[ -z "$target" ]] && { err "Sink name or ID required"; exit 1; }
+    if has_wpctl; then
+      wpctl set-default "$target"
+      success "Default sink switched to: $target"
+    elif has_pactl; then
+      pactl set-default-sink "$target"
+      success "Default sink switched via pactl"
+    fi
+    ;;
+
+  open|gui)
+    if command -v pavucontrol &>/dev/null; then
+      pavucontrol &
+      disown
+    else
+      err "pavucontrol not found. Install: pacman -S pavucontrol"
+    fi
+    ;;
+
+  -h|--help|help)
+    usage
+    ;;
+
+  *)
+    err "Unknown command: $cmd"
+    usage
+    exit 1
+    ;;
+esac

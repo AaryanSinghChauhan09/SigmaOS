@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = SigmaOS: Finalizing post-transaction snapshot & retention audit...
+When = PostTransaction
+Exec = /usr/local/bin/sigmaos-snapshot hook post pacman_tx

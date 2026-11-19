@@ -67,6 +67,15 @@ case "$ACTION" in
     --network|network|--net|net)
         exec bash "$SCRIPT_DIR/bin/sigmaos-network" "${@:2}"
         ;;
+    --audio|audio)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-audio" "${@:2}"
+        ;;
+    --bluetooth|bluetooth|--bt|bt)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-bluetooth" "${@:2}"
+        ;;
+    --snapshot|snapshot|--btrfs|btrfs)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-snapshot" "${@:2}"
+        ;;
     --info|info)
         exec bash "$SCRIPT_DIR/bin/sigmaos-info" "${@:2}"
         ;;
@@ -141,13 +150,16 @@ case "$ACTION" in
         echo "  --cli, --tui  Launch interactive terminal menu"
         echo "  --desktop     Launch SigmaOS Sovereign Desktop Profile (Hyprland / Wayland)"
         echo "  --minimal     Launch SigmaOS Sovereign Minimalist Profile"
-        echo "  --doctor      Run SigmaOS 51-point system health diagnostics"
+        echo "  --doctor      Run SigmaOS 54-point system health diagnostics"
         echo "  --dotfiles    Deploy SigmaOS desktop configs to ~/.config"
         echo "  --update      Update packages + dotfiles + theme (sigmaos-update)"
         echo "  --theme       Manage Wallust desktop themes (list/apply/next/prev)"
         echo "  --wallpaper   Set wallpaper and regenerate dynamic color palette"
         echo "  --pkgmgr      Arch/AUR package manager frontend (install/search/update)"
         echo "  --network     Network manager CLI (wifi/ethernet/vpn/dns/status)"
+        echo "  --audio       PipeWire audio and volume manager (volume/mute/sinks)"
+        echo "  --bluetooth   Bluetooth device manager (scan/pair/connect/status)"
+        echo "  --snapshot    Btrfs snapshot and recovery manager (create/list/rollback)"
         echo "  --info        Show system info (like neofetch, with JSON output)"
         echo "  --sandbox     Launch isolated bubblewrap sandbox with GUI passthrough"
         echo "  --version     Display SigmaOS version"

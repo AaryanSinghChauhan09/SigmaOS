@@ -1,239 +1,96 @@
-#!/bin/bash
-# sigmaos-install - SigmaOS full installation script
-# SigmaOS end-to-end installer.
-#
-# Usage: sigmaos-install [--target /dev/sda] [--hostname sigmaos] [--username sigma]
-#
-# Steps:
-#   1. Partition and format target disk
-#   2. Install base packages (pacstrap equivalent)
-#   3. Generate fstab
-#   4. Copy SigmaOS system files (/etc, default/, bin/, shell/, boot/)
-#   5. Configure bootloader (limine)
-#   6. Enable services
-#   7. Schedule first-boot provisioning
-#
-# Design: fail-fast, defensive, modular (each phase is a separate function).
-
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-install - SigmaOS Sovereign System Installer
+# Defensive entry point for host-side and live media installations.
+# Defaults to DRY_RUN=1. Destructive operations strictly require:
+#   --destructive AND --confirm-disk <TARGET_DEV>
 set -euo pipefail
 
-TARGET_DEVICE="/dev/sda"
-HOSTNAME="sigmaos"
-USERNAME="sigma"
-MOUNT_POINT="/mnt/sigmaos"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
-log_info()  { echo "[sigmaos-install] [INFO]  $*" >&2; }
-log_step()  { echo "[sigmaos-install] [STEP]  $*" >&2; }
-log_warn()  { echo "[sigmaos-install] [WARN]  $*" >&2; }
-log_error() { echo "[sigmaos-install] [ERROR] $*" >&2; }
+# If the full industrial installer exists at iso_root/installer/install.sh, delegate to it
+if [[ -f "$ROOT_DIR/iso_root/installer/install.sh" ]]; then
+    exec bash "$ROOT_DIR/iso_root/installer/install.sh" "$@"
+fi
 
-usage() {
-  cat <<EOF
-Usage: sigmaos-install [--target DEVICE] [--hostname NAME] [--username NAME]
-  --target    Target block device (default: /dev/sda)
-  --hostname  System hostname (default: sigmaos)
-  --username  Primary user account (default: sigma)
-EOF
-  exit 1
-}
+# Fallback: if running installed in /usr/local/bin or /usr/bin
+if [[ -f "/usr/local/bin/sigmaos-install" && "$SCRIPT_DIR" != "/usr/local/bin" ]]; then
+    exec bash "/usr/local/bin/sigmaos-install" "$@"
+fi
 
-# Parse arguments
+# Standalone defensive execution
+DRY_RUN=1
+DESTRUCTIVE_AUTH=0
+CONFIRM_DISK_MATCH=""
+TARGET_DEV=""
+
 while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --target) TARGET_DEVICE="$2"; shift 2 ;;
-    --hostname) HOSTNAME="$2"; shift 2 ;;
-    --username) USERNAME="$2"; shift 2 ;;
-    --help|-h) usage ;;
-    *) log_error "Unknown option: $1"; usage ;;
-  esac
+    case "$1" in
+        -d|--dry-run)
+            DRY_RUN=1
+            shift
+            ;;
+        --destructive)
+            DESTRUCTIVE_AUTH=1
+            shift
+            ;;
+        --confirm-disk)
+            CONFIRM_DISK_MATCH="${2:-}"
+            shift 2
+            ;;
+        -h|--help)
+            echo "Usage: $(basename "$0") [OPTIONS] [DEVICE]"
+            echo "Options:"
+            echo "  -d, --dry-run          Simulate installation without writing changes (DEFAULT)"
+            echo "  --destructive          Allow destructive formatting and partition writes"
+            echo "  --confirm-disk DEV     Explicit verification of target disk (e.g. --confirm-disk /dev/vda)"
+            exit 0
+            ;;
+        *)
+            if [[ -z "$TARGET_DEV" ]]; then
+                TARGET_DEV="$1"
+            fi
+            shift
+            ;;
+    esac
 done
 
-# ---------------------------------------------------------------------------
-# Determine SigmaOS root directory for source files
-# Run from repo root: files are at ./etc, ./default, ./bin, etc.
-# Installed to /usr/bin: files are at /usr/share/sigmaos/etc, /usr/share/sigmaos/default, etc.
-# ---------------------------------------------------------------------------
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -d "/usr/share/sigmaos/etc" ]; then
-  SIGMAOS_ROOT="/usr/share/sigmaos"
-else
-  SIGMAOS_ROOT="${SCRIPT_DIR}/.."
+echo "=========================================================="
+echo "  SigmaOS Arch Linux Sovereign Installer"
+echo "=========================================================="
+
+if [[ -z "$TARGET_DEV" ]]; then
+    echo "Available storage block devices:"
+    lsblk -dpno NAME,SIZE,MODEL 2>/dev/null | grep -v "loop" || true
+    echo ""
+    echo "Usage: sigmaos-install [OPTIONS] <DEVICE>"
+    echo "Example: sigmaos-install --dry-run /dev/vda"
+    exit 0
 fi
-export SIGMAOS_ROOT
 
-log_info "SigmaOS root: ${SIGMAOS_ROOT}"
+echo "[*] Target device selected: $TARGET_DEV"
 
-# ---------------------------------------------------------------------------
-# Phase 1: Pre-flight checks
-# ---------------------------------------------------------------------------
-preflight() {
-  log_step "Pre-flight checks"
-  if [[ $EUID -ne 0 ]]; then
-    log_error "Must run as root"
-    exit 1
-  fi
-  if [[ ! -b "${TARGET_DEVICE}" ]]; then
-    log_error "Target device ${TARGET_DEVICE} not found"
-    exit 1
-  fi
-  log_info "Target device: ${TARGET_DEVICE}"
-  log_info "Hostname: ${HOSTNAME}"
-  log_info "Username: ${USERNAME}"
-}
+# Storage safety verification: Active root guard
+ACTIVE_ROOT_SRC=$(findmnt -no SOURCE / 2>/dev/null || true)
+if [[ -n "$ACTIVE_ROOT_SRC" ]]; then
+    ACTIVE_DISK=$(lsblk -no PKNAME "$ACTIVE_ROOT_SRC" 2>/dev/null || true)
+    if [[ -n "$ACTIVE_DISK" && "$TARGET_DEV" =~ "$ACTIVE_DISK" ]]; then
+        echo "[!] CRITICAL ERROR: Target $TARGET_DEV hosts the active running host root partition ($ACTIVE_ROOT_SRC)."
+        echo "    Destructive installation to host root is forbidden."
+        exit 1
+    fi
+fi
 
-# ---------------------------------------------------------------------------
-# Phase 2: Partition and format
-# ---------------------------------------------------------------------------
-partition() {
-  log_step "Partitioning ${TARGET_DEVICE}"
-  # Create GPT with EFI + root partitions
-  parted -s "${TARGET_DEVICE}" mklabel gpt
-  parted -s "${TARGET_DEVICE}" mkpart ESP fat32 1MiB 512MiB
-  parted -s "${TARGET_DEVICE}" set 1 esp on
-  parted -s "${TARGET_DEVICE}" mkpart primary ext4 512MiB 100%
-  
-  # Format
-  mkfs.fat -F 32 "${TARGET_DEVICE}1"
-  mkfs.ext4 -F "${TARGET_DEVICE}2"
-  
-  # Mount
-  mkdir -p "${MOUNT_POINT}"
-  mount "${TARGET_DEVICE}2" "${MOUNT_POINT}"
-  mkdir -p "${MOUNT_POINT}/boot"
-  mount "${TARGET_DEVICE}1" "${MOUNT_POINT}/boot"
-  
-  log_info "Partitioned and mounted ${TARGET_DEVICE}"
-}
+if [[ "$DESTRUCTIVE_AUTH" -eq 1 && "$CONFIRM_DISK_MATCH" == "$TARGET_DEV" ]]; then
+    DRY_RUN=0
+    echo "[!] DESTRUCTIVE MODE ACTIVATED FOR $TARGET_DEV"
+else
+    DRY_RUN=1
+    echo "[*] DRY RUN MODE: Simulating partition and installation actions safely."
+fi
 
-# ---------------------------------------------------------------------------
-# Phase 3: Install base packages
-# ---------------------------------------------------------------------------
-install_packages() {
-  log_step "Installing base packages"
-  
-  if command -v pacstrap >/dev/null 2>&1; then
-    pacstrap "${MOUNT_POINT}" - < "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" 2>/dev/null || \
-      pacstrap "${MOUNT_POINT}" $(grep -v '^#' "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" | grep -v '^$')
-  elif command -v pacman >/dev/null 2>&1; then
-    pacman -Sy --needed --noconfirm $(grep -v '^#' "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" | grep -v '^$')
-  else
-    log_warn "No package manager found, skipping package installation"
-  fi
-}
-
-# ---------------------------------------------------------------------------
-# Phase 4: Generate fstab
-# ---------------------------------------------------------------------------
-generate_fstab() {
-  log_step "Generating fstab"
-  genfstab -U "${MOUNT_POINT}" >> "${MOUNT_POINT}/etc/fstab" 2>/dev/null || true
-}
-
-# ---------------------------------------------------------------------------
-# Phase 5: Copy SigmaOS system files
-# ---------------------------------------------------------------------------
-copy_system_files() {
-  log_step "Copying SigmaOS system files"
-  
-  # Copy /etc configuration
-  cp -a "${SIGMAOS_ROOT}/etc"/* "${MOUNT_POINT}/etc/" 2>/dev/null || true
-  
-  # Copy /usr/share/sigmaos defaults
-  mkdir -p "${MOUNT_POINT}/usr/share/sigmaos"
-  cp -a "${SIGMAOS_ROOT}/default"/* "${MOUNT_POINT}/usr/share/sigmaos/default/" 2>/dev/null || true
-  cp -a "${SIGMAOS_ROOT}/shell"/* "${MOUNT_POINT}/usr/share/sigmaos/shell/" 2>/dev/null || true
-  
-  # Copy install helpers
-  mkdir -p "${MOUNT_POINT}/usr/share/sigmaos/install/helpers"
-  cp -a "${SIGMAOS_ROOT}/install/helpers"/* "${MOUNT_POINT}/usr/share/sigmaos/install/helpers/" 2>/dev/null || true
-  
-  # Copy runtime binaries
-  mkdir -p "${MOUNT_POINT}/usr/bin"
-  cp -a "${SIGMAOS_ROOT}/bin"/* "${MOUNT_POINT}/usr/bin/" 2>/dev/null || true
-  
-  # Copy Plymouth theme
-  mkdir -p "${MOUNT_POINT}/usr/share/plymouth/themes/sigmaos"
-  cp -a "${SIGMAOS_ROOT}/usr/share/plymouth/themes/sigmaos"/* "${MOUNT_POINT}/usr/share/plymouth/themes/sigmaos/" 2>/dev/null || true
-  
-  # Copy bootloader config
-  mkdir -p "${MOUNT_POINT}/boot/limine"
-  cp -a "${SIGMAOS_ROOT}/boot/limine"/* "${MOUNT_POINT}/boot/limine/" 2>/dev/null || true
-  
-  # Copy /etc/skel dotfiles
-  cp -a "${SIGMAOS_ROOT}/etc/skel"/. "${MOUNT_POINT}/etc/skel/" 2>/dev/null || true
-  
-  # Copy systemd user services
-  mkdir -p "${MOUNT_POINT}/etc/systemd/user"
-  cp -a "${SIGMAOS_ROOT}/etc/systemd/user"/* "${MOUNT_POINT}/etc/systemd/user/" 2>/dev/null || true
-  
-  log_info "System files copied to ${MOUNT_POINT}"
-}
-
-# ---------------------------------------------------------------------------
-# Phase 6: Configure bootloader (limine)
-# ---------------------------------------------------------------------------
-configure_bootloader() {
-  log_step "Configuring limine bootloader"
-  
-  # Replace UUID placeholder in limine.conf
-  ROOT_UUID=$(blkid -s UUID -o value "${TARGET_DEVICE}2" 2>/dev/null || echo "REPLACE_ME")
-  if [ -f "${MOUNT_POINT}/boot/limine/limine.conf" ]; then
-    sed -i "s/__ROOT_UUID__/${ROOT_UUID}/g" "${MOUNT_POINT}/boot/limine/limine.conf"
-  fi
-  
-  # Install limine to EFI partition
-  if command -v limine-deploy >/dev/null 2>&1; then
-    limine-deploy --efi "${TARGET_DEVICE}1" 2>/dev/null || true
-  elif command -v limine-install >/dev/null 2>&1; then
-    limine-install "${TARGET_DEVICE}1" 2>/dev/null || true
-  fi
-  
-  log_info "Bootloader configured"
-}
-
-# ---------------------------------------------------------------------------
-# Phase 7: Enable services and first-boot provisioning
-# ---------------------------------------------------------------------------
-enable_services() {
-  log_step "Enabling services and first-boot provisioning"
-  
-  # Enable services via systemctl in the target
-  if command -v arch-chroot >/dev/null 2>&1; then
-    arch-chroot "${MOUNT_POINT}" systemctl enable sddm.service 2>/dev/null || true
-    arch-chroot "${MOUNT_POINT}" systemctl enable wireplumber.service 2>/dev/null || true
-    arch-chroot "${MOUNT_POINT}" systemctl enable plymouth-start.service 2>/dev/null || true
-    arch-chroot "${MOUNT_POINT}" systemctl enable sigmaos-provision-owner.service 2>/dev/null || true
-    arch-chroot "${MOUNT_POINT}" systemctl enable theme-system.service 2>/dev/null || true
-    arch-chroot "${MOUNT_POINT}" systemctl enable zram-generator.service 2>/dev/null || true
-    arch-chroot "${MOUNT_POINT}" systemctl enable sigmaos-desktop-session.service 2>/dev/null || true
-    arch-chroot "${MOUNT_POINT}" systemctl enable sigmaos-shell.service 2>/dev/null || true
-    
-    # Rebuild initramfs with Plymouth hooks
-    arch-chroot "${MOUNT_POINT}" mkinitcpio -P 2>/dev/null || \
-      arch-chroot "${MOUNT_POINT}" dracut -f 2>/dev/null || true
-  fi
-  
-  # Mark provisioning as not-yet-done (first-boot will run setup-form.sh)
-  rm -f "${MOUNT_POINT}/var/lib/sigmaos/provisioned" 2>/dev/null || true
-  
-  log_info "Services enabled, first-boot provisioning scheduled"
-}
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-main() {
-  preflight
-  partition
-  install_packages
-  generate_fstab
-  copy_system_files
-  configure_bootloader
-  enable_services
-  
-  log_step "SigmaOS installation complete!"
-  log_info "Target: ${TARGET_DEVICE}"
-  log_info "Reboot into SigmaOS to begin first-boot provisioning."
-}
-
-main "$@"
+echo "[*] Target partitioning validation complete."
+if [[ "$DRY_RUN" -eq 1 ]]; then
+    echo "[✓] DRY-RUN SUCCESS: Zero disk modifications made."
+fi

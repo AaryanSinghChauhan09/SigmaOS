@@ -1,0 +1,11 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = SigmaOS: Creating pre-transaction system recovery snapshot...
+When = PreTransaction
+Exec = /usr/local/bin/sigmaos-snapshot hook pre pacman_tx
