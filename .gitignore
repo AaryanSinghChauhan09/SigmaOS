@@ -131,5 +131,6 @@ __pycache__/
 !docs/wiki/SigmaOS-Dev.md
 !docs/wiki/SigmaOS-Bootloader.md
 !docs/wiki/SigmaOS-Package-Manager.md
+!docs/wiki/SigmaOS-Update-Manager.md
 
 .agents/
