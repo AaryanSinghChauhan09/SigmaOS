@@ -734,7 +734,11 @@ fn main() {
                 }
             }
             "--dotfiles" | "dotfiles" => {
-                run_script("setup_omarchy_dotfiles.sh");
+                if Path::new("scripts/setup_desktop_dotfiles.sh").exists() {
+                    run_script("setup_desktop_dotfiles.sh");
+                } else {
+                    run_script("setup_omarchy_dotfiles.sh");
+                }
             }
             "--sandbox" | "sandbox" => {
                 run_script("sigmaos_sandbox_container.sh");

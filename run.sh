@@ -46,7 +46,11 @@ case "$ACTION" in
         fi
         ;;
     --dotfiles|dotfiles)
-        exec bash "$SCRIPT_DIR/scripts/setup_omarchy_dotfiles.sh"
+        if [ -f "$SCRIPT_DIR/scripts/setup_desktop_dotfiles.sh" ]; then
+            exec bash "$SCRIPT_DIR/scripts/setup_desktop_dotfiles.sh" "${@:2}"
+        else
+            exec bash "$SCRIPT_DIR/scripts/setup_omarchy_dotfiles.sh" "${@:2}"
+        fi
         ;;
     --sandbox|sandbox)
         exec bash "$SCRIPT_DIR/scripts/sigmaos_sandbox_container.sh" "${@:2}"
