@@ -88,6 +88,9 @@ case "$ACTION" in
     --local-ai|local-ai|--ollama|ollama)
         exec bash "$SCRIPT_DIR/bin/sigmaos-local-ai" "${@:2}"
         ;;
+    --dev-stacks|dev-stacks|--stacks|stacks)
+        exec bash "$SCRIPT_DIR/scripts/setup_dev_stacks.sh" "${@:2}"
+        ;;
     --screenrecord|screenrecord|--rec|rec)
         exec bash "$SCRIPT_DIR/bin/sigmaos-screenrecord" "${@:2}"
         ;;
@@ -168,7 +171,7 @@ case "$ACTION" in
         echo "  --cli, --tui  Launch interactive terminal menu"
         echo "  --desktop     Launch SigmaOS Sovereign Desktop Profile (Hyprland / Wayland)"
         echo "  --minimal     Launch SigmaOS Sovereign Minimalist Profile"
-        echo "  --doctor      Run SigmaOS 64-point system health diagnostics"
+        echo "  --doctor      Run SigmaOS 67-point system health diagnostics"
         echo "  --dotfiles    Deploy SigmaOS desktop configs to ~/.config"
         echo "  --update      Update packages + dotfiles + theme (sigmaos-update)"
         echo "  --theme       Manage Wallust desktop themes (list/apply/next/prev)"
@@ -182,6 +185,7 @@ case "$ACTION" in
         echo "  --quickshell  Quickshell QML & Waybar desktop shell manager"
         echo "  --agent       Universal AI coding agent switcher (claude/codex/opencode)"
         echo "  --local-ai    Local LLM manager (Ollama / LM Studio GPU inference)"
+        echo "  --dev-stacks  Developer stacks provisioner (Mise/Docker/Rails/Laravel/Node)"
         echo "  --screenrecord Screen recorder with region selection & PipeWire audio"
         echo "  --snapshot    Btrfs snapshot and recovery manager (create/list/rollback)"
         echo "  --info        Show system info (like neofetch, with JSON output)"

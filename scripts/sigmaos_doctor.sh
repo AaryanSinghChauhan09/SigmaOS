@@ -276,6 +276,9 @@ check_file "bin/sigmaos-local-ai"               "$SIGMA_ROOT/bin/sigmaos-local-a
 check_file "bin/sigmaos-screenrecord"           "$SIGMA_ROOT/bin/sigmaos-screenrecord"
 check_file "bin/sigmaos-installer-tui"          "$SIGMA_ROOT/bin/sigmaos-installer-tui"
 check_file "config/omarchy/quickshell/shell.qml" "$SIGMA_ROOT/config/omarchy/quickshell/shell.qml"
+check_file "config/omarchy/quickshell/notifications.qml" "$SIGMA_ROOT/config/omarchy/quickshell/notifications.qml"
+check_file "config/omarchy/quickshell/launcher.qml" "$SIGMA_ROOT/config/omarchy/quickshell/launcher.qml"
+check_file "scripts/setup_dev_stacks.sh"         "$SIGMA_ROOT/scripts/setup_dev_stacks.sh"
 check_file "bin/sigmaos-info"                   "$SIGMA_ROOT/bin/sigmaos-info"
 
 # config/sigmaos mirrors

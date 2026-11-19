@@ -18,7 +18,7 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 |---|---|---|
 | **Host Workstation Environment** | **Working** | Native binary (`bin/sigmaos`), interactive TUI, Python/GTK3 desktop launcher (`scripts/sigmaos_gui.py`). |
 | **Defensive System Installer** | **Working** | Industrial installer (`iso_root/installer/install.sh`, `sigmaos-install`). Defaults to `DRY_RUN=1` simulation. Requires `--destructive --confirm-disk <DEV>`. Guards active host root drive. |
-| **Diagnostic Health Suite** | **Working** | 64-point system health audit (`./run.sh --doctor`, `scripts/sigmaos_doctor.sh`). Validates display, GPU, fonts, Rust/Python runtimes, configs, Quickshell, AI agents, and sovereign tooling. |
+| **Diagnostic Health Suite** | **Working** | 67-point system health audit (`./run.sh --doctor`, `scripts/sigmaos_doctor.sh`). Validates display, GPU, fonts, Rust/Python runtimes, configs, Quickshell, AI agents, dev stacks, and sovereign tooling. |
 | **Component Sub-Repositories (22)** | **Working** | 22 implemented sub-repositories in pure `#![forbid(unsafe_code)]` Rust with comprehensive unit and integration test suites passing in CI. |
 | **Desktop Profiles & Configuration** | **Working** | Wayland / Hyprland tiling desktop, Quickshell QML reactive desktop shell, Waybar configurations, dynamic Wallust theming, multi-monitor scaling, and Starship shell prompts. |
 | **AI & Agentic Suite (Omarchy 4+ Parity)** | **Working** | Universal coding agent switcher (`sigmaos-agent`), usage quota tracking (`sigmaos-agent-usage`), crash-to-agent diagnostics (`sigmaos-crash-diagnostics`), and local LLM acceleration (`sigmaos-local-ai`). |
@@ -38,7 +38,7 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 | `./run.sh --minimal` | Sovereign Minimalist Profile (CLI core) |
 | `./run.sh --gui` | Launch full graphical desktop application (GTK3 + WebKit2) |
 | `./run.sh --native` | Launch pure GTK3 desktop interface |
-| `./run.sh --doctor` | Run 64-point system health diagnostics |
+| `./run.sh --doctor` | Run 67-point system health diagnostics |
 | `./run.sh --dotfiles`| Deploy desktop configuration dotfiles to `~/.config` |
 | `./run.sh --update` | Full update: system packages + dotfiles + Wallust theme |
 | `./run.sh --theme` | Manage Wallust themes (list, apply, cycle next/prev) |
@@ -52,6 +52,7 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 | `./run.sh --quickshell`| Quickshell QML & Waybar desktop shell manager |
 | `./run.sh --agent`   | Universal AI coding agent switcher (claude/codex/opencode) |
 | `./run.sh --local-ai`| Local LLM manager (Ollama / LM Studio GPU inference) |
+| `./run.sh --dev-stacks`| Developer stacks provisioner (Mise/Docker/Rails/Laravel/Node) |
 | `./run.sh --screenrecord`| Screen recorder with region selection & PipeWire audio |
 | `./run.sh --snapshot`| Btrfs snapshot & rollback controller |
 | `./run.sh --info` | System information display (Fastfetch style + JSON mode) |
