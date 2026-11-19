@@ -16,6 +16,18 @@ inspirations = "Arch Linux"
 visibility = "public"
 depends_on = []
 
+# Bootloader
+[[component]]
+name = "SigmaOS-bootloader"
+description = "Unified bootloader configuration - systemd-boot, GRUB, efibootmgr with OOPS principles"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bootloader"
+engine = "bootloader"
+category = "System"
+language = "rust"
+inspirations = "SigmaOS"
+visibility = "public"
+depends_on = ["linux", "linux-firmware", "systemd"]
+
 # Desktop Components
 [[component]]
 name = "SigmaOS-themes"
