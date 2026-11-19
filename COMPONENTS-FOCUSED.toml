@@ -145,92 +145,25 @@ depends_on = ["SigmaOS-player"]
 
 # Utilities
 [[component]]
-name = "SigmaOS-file-writer"
-description = "Minimal distraction-free text writer"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-writer"
-engine = "editor"
+name = "SigmaOS-utils"
+description = "Unified utilities: file tools, network tools, automation, audio, hardware control"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-utils"
+engine = "utils_collection"
 category = "Utilities"
-language = "shell"
+language = "rust"
 inspirations = "SigmaOS"
 visibility = "public"
 depends_on = []
 
-[[component]]
-name = "SigmaOS-folder-color-switcher"
-description = "Colour-code folders in the file manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-folder-color-switcher"
-engine = "file_util"
-category = "Utilities"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-renamer-file"
-description = "Single & batch file renamer"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-renamer-file"
-engine = "file_util"
-category = "Utilities"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-domain-blocker"
-description = "Block domains system-wide via /etc/hosts"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-domain-blocker"
-engine = "network_util"
-category = "Utilities"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-chatroom"
-description = "LAN chat server & client"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-chatroom"
-engine = "chat"
-category = "Utilities"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-automate"
-description = "Task automation engine (hooks, rules, schedules)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-automate"
-engine = "automation"
-category = "Utilities"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-audio-tuner"
-description = "Audio tuning utilities"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-audio-tuner"
-engine = "audio_util"
-category = "Utilities"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-asdcontrol-git"
-description = "Hard drive control utilities"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asdcontrol-git"
-engine = "hardware_util"
-category = "Utilities"
-language = "shell"
-inspirations = "SigmaOS"
-visibility = "public"
-depends_on = []
+# Sub-components (managed within SigmaOS-utils repo):
+# - sigmaos-file-writer (minimal distraction-free text writer)
+# - sigmaos-folder-color (colour-code folders in file manager)
+# - sigmaos-renamer (single & batch file renamer)
+# - sigmaos-domain-blocker (block domains system-wide via /etc/hosts)
+# - sigmaos-chatroom (LAN chat server & client)
+# - sigmaos-automate (task automation engine)
+# - sigmaos-audio-tuner (audio tuning utilities)
+# - sigmaos-hard-drive (hard drive control utilities)
 
 # Development Tools
 [[component]]
