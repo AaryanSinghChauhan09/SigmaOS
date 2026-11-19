@@ -120,7 +120,7 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 - ⏳ Pending: Continue with other consolidation families
 - ⏳ Pending: Registry updates
 
-## Repositories Archived (51 total)
+## Repositories Archived (61 total)
 
 1. **Theme duplicates (4):**
    - SigmaOS-theme → SigmaOS-themes (canonical)
@@ -179,5 +179,13 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
    - SigmaOS-arch-list, SigmaOS-arch-lisp, SigmaOS-arch-ksh, SigmaOS-arch-kotlin
    - SigmaOS-arch-db, SigmaOS-arch-database, SigmaOS-arch-java, SigmaOS-arch-dash
    - SigmaOS-arch-iso, SigmaOS-arch-dart (use standard Arch tools/stock kernel)
+
+10. **Arch kernel/tool/architecture placeholders (10):**
+    - SigmaOS-arch-iot-kernel, SigmaOS-arch-custom-kernel, SigmaOS-arch-info
+    - SigmaOS-arch-cuda-kernel, SigmaOS-arch-hpc-kernel
+    - SigmaOS-arch-cryptocurrency-kernel, SigmaOS-arch-hlsl-kernel
+    - SigmaOS-arch-cpp, SigmaOS-arch-core, SigmaOS-arch-haskell
+    - SigmaOS-arch-container, SigmaOS-arch-hardened-kernel
+    - SigmaOS-arch-conflicts, SigmaOS-arch-hardened, SigmaOS-arch-refresh (use standard tools)
 
 Generated with [Devin](https://devin.ai)
