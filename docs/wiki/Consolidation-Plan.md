@@ -120,7 +120,7 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 - ⏳ Pending: Continue with other consolidation families
 - ⏳ Pending: Registry updates
 
-## Repositories Archived (14 total)
+## Repositories Archived (24 total)
 
 1. **Theme duplicates (4):**
    - SigmaOS-theme → SigmaOS-themes (canonical)
@@ -145,5 +145,17 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
    - SigmaOS-file-writer → SigmaOS-utils
    - SigmaOS-renamer-file → SigmaOS-utils
    - SigmaOS-archive-manager2 → SigmaOS-utils
+
+6. **Arch infrastructure placeholders (10):**
+   - SigmaOS-archwiki (use official Arch Wiki)
+   - SigmaOS-archmanweb (use official Arch Man Pages)
+   - SigmaOS-archlinux-repro (use official Arch repro)
+   - SigmaOS-archivetools (use standard tools)
+   - SigmaOS-archbbs (use official Arch BBS)
+   - SigmaOS-arch-tools (use standard Arch tools)
+   - SigmaOS-arch-signoff (use official process)
+   - SigmaOS-arch-security-tracker (use official tracker)
+   - SigmaOS-arch-repro-status (use official status)
+   - SigmaOS-arch-release-promotion (use official process)
 
 Generated with [Devin](https://devin.ai)
