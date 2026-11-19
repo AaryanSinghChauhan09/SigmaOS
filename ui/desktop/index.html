@@ -1756,6 +1756,87 @@ ORDER BY memory_gb DESC;</textarea>
     out.scrollTop = out.scrollHeight;
   }
 
+  // Universal IPC Output Delivery
+  window.sigmaOutput = function(output) {
+    appendTerm(output);
+    const oout = document.getElementById('oterm-out');
+    if (oout && window.__sigma_oterm_active) {
+      oout.textContent += output;
+      oout.scrollTop = oout.scrollHeight;
+    }
+    const docOut = document.getElementById('doctor-live-out');
+    if (docOut && window.__sigma_doctor_active) {
+      docOut.textContent += output;
+      docOut.scrollTop = docOut.scrollHeight;
+    }
+  };
+
+  // Universal IPC Command Execution (WebKit2 native + HTTP REST bridge)
+  window.sigmaExec = function(cmd) {
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.sigmaExec) {
+      window.webkit.messageHandlers.sigmaExec.postMessage(cmd);
+    } else if (window.location.protocol.startsWith('http')) {
+      fetch('/api/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cmd: cmd })
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.output) {
+          window.sigmaOutput(d.output);
+        }
+        if (d && d.persona) {
+          setPersona(d.persona);
+        }
+      })
+      .catch(err => {
+        window.sigmaOutput('[IPC Error] ' + err.message + '\n');
+      });
+    } else {
+      executeLocalSimulation(cmd);
+    }
+  };
+
+  function executeLocalSimulation(cmd) {
+    const parts = cmd.toLowerCase().split(/\s+/);
+    const root = parts[0];
+    if (cmd === 'help') {
+      appendTerm(`SigmaOS IPC Shell — Commands available:\n` +
+      `  uname -a            - Kernel & OS info\n` +
+      `  neofetch            - System overview\n` +
+      `  pacman -Ss <pkg>    - Search packages via ALPM bridge\n` +
+      `  pacman -Syu         - System upgrade\n` +
+      `  sigpkg aur <query>  - Query AUR v5\n` +
+      `  omarchy doctor      - Run SigmaOS diagnostics\n` +
+      `  doctor              - Alias for diagnostics\n` +
+      `  ls / pwd / cat      - Standard shell commands\n` +
+      `  clear               - Clear terminal\n` +
+      `  omarchy binds       - Keybinding overlay\n` +
+      `  omarchy theme list  - Wallust theme picker\n`);
+    } else if (cmd.startsWith('omarchy') || cmd.startsWith('omarchy-shell')) {
+      if (parts[1] === 'binds') summonWindow('win-keybinds');
+      else if (parts[1] === 'theme') {
+        if (parts[2]) {
+          const t = parts[2];
+          if (t.includes('tokyo')) setPersona('tokyo');
+          else if (t.includes('nord')) setPersona('nord');
+          else if (t.includes('gruv')) setPersona('gruvbox');
+          else if (t.includes('cyber')) setPersona('cyber');
+          else setPersona('omarchy');
+          appendTerm(`[✓] Switched Omarchy theme to: ${t}\n`);
+        } else summonWindow('win-wallust');
+      } else if (parts[1] === 'doctor') summonWindow('win-doctor');
+      else appendTerm(`omarchy-shell: command executed.\n`);
+    } else if (root === 'wallust' || root === 'theme') summonWindow('win-wallust');
+    else if (root === 'doctor') summonWindow('win-doctor');
+    else if (root === 'craft') summonWindow('win-craft');
+    else if (root === 'about') summonWindow('win-about');
+    else {
+      appendTerm(`sigmaos: command '${cmd}' executed. (Connect IPC backend or run ./run.sh for full live execution)\n`);
+    }
+  }
+
   function handleTermKey(e) {
     if (e.key === 'Enter') {
       const input = document.getElementById('term-in');
@@ -1764,67 +1845,12 @@ ORDER BY memory_gb DESC;</textarea>
       if (!cmd) return;
 
       appendTerm(`sigmaos❯ ${cmd}\n`);
-
-      const parts = cmd.toLowerCase().split(/\s+/);
-      const root = parts[0];
-
-      if (cmd === 'help') {
-        appendTerm(`SigmaOS IPC Shell — Real commands available:\n` +
-        `  uname -a            - Kernel & OS info\n` +
-        `  neofetch            - System overview\n` +
-        `  pacman -Ss <pkg>    - Search packages via ALPM bridge\n` +
-        `  pacman -Syu         - System upgrade (simulated via sigpkg)\n` +
-        `  sigpkg aur <query>  - Query AUR v5\n` +
-        `  omarchy doctor      - Run SigmaOS 14-point diagnostics\n` +
-        `  doctor              - Alias for diagnostics\n` +
-        `  ls / pwd / cat      - Standard shell commands (real output)\n` +
-        `  clear               - Clear this terminal\n` +
-        `  omarchy binds       - Show keybinding reference overlay\n` +
-        `  omarchy theme list  - Open Wallust theme picker\n` +
-        `  about               - About SigmaOS\n`);
-      } else if (cmd.startsWith('omarchy') || cmd.startsWith('omarchy-shell')) {
-        if (parts[1] === 'binds') {
-          summonWindow('win-keybinds');
-          appendTerm(`SUPER+Space      rofi launcher\nSUPER+Return     terminal\nSUPER+Q          close window\nSUPER+E          file manager\nSUPER+B          browser\nSUPER+M          wlogout power\nSUPER+1..5       workspaces\n`);
-        } else if (parts[1] === 'theme') {
-          if (parts[2] === 'list') {
-            appendTerm(`Available Themes:\n  • catppuccin-mocha\n  • tokyo-night\n  • nord\n  • gruvbox-dark\n  • cyber-slate\n`);
-          } else if (parts[2]) {
-            const t = parts[2];
-            if (t.includes('tokyo')) setPersona('tokyo');
-            else if (t.includes('nord')) setPersona('nord');
-            else if (t.includes('gruv')) setPersona('gruvbox');
-            else if (t.includes('cyber')) setPersona('cyber');
-            else setPersona('omarchy');
-            appendTerm(`[✓] Switched Omarchy theme to: ${t}\n`);
-          } else {
-            summonWindow('win-wallust');
-          }
-        } else if (parts[1] === 'doctor') {
-          summonWindow('win-doctor');
-        } else {
-          appendTerm(`omarchy-shell: command executed.\n`);
-        }
-      } else if (root === 'wallust' || root === 'theme') {
-        summonWindow('win-wallust');
-      } else if (root === 'doctor') {
-        summonWindow('win-doctor');
-      } else if (root === 'craft') {
-        summonWindow('win-craft');
-      } else if (root === 'about') {
-        summonWindow('win-about');
-      } else if (root === 'clear') {
-        document.getElementById('term-out').textContent = '';
-      } else if (cmd === 'pacman -syu' || cmd === 'sigpkg pacman -syu') {
-        appendTerm(`:: Synchronizing package databases...
- core                         154.2 KiB   412 KiB/s 00:00 [######################] 100%
- extra                          8.4 MiB  12.4 MiB/s 00:01 [######################] 100%
- multilib                     142.1 KiB   810 KiB/s 00:00 [######################] 100%
-:: Starting full system upgrade...
- there is nothing to do (system rolling release v75.0 is current)\n`);
-      } else {
-        appendTerm(`sigmaos: command '${cmd}' executed. Type 'help' for manual.\n`);
+      if (cmd === 'clear') {
+        const out = document.getElementById('term-out');
+        if (out) out.textContent = '';
+        return;
       }
+      window.sigmaExec(cmd);
     }
   }
 
@@ -3086,6 +3112,20 @@ pub fn parse_event(raw: &str) -> Option<(&str, &str)> {
         }
       } catch (err) {}
       setTimeout(() => summonWindow && summonWindow('win-term'), 500);
+
+      // Over HTTP: start live telemetry polling
+      if (window.location.protocol.startsWith('http')) {
+        setInterval(() => {
+          fetch('/api/telemetry')
+            .then(r => r.json())
+            .then(d => {
+              if (d && d.cpu && d.mem && window.sigmaUpdateStats) {
+                window.sigmaUpdateStats(d.cpu, d.mem);
+              }
+            })
+            .catch(() => {});
+        }, 2000);
+      }
     });
   </script>
 

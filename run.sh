@@ -70,10 +70,16 @@ case "$ACTION" in
         exec "$SCRIPT_DIR/bin/sigmaos" --status
         ;;
     --gui|gui|--desktop|desktop)
-        exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py"
+        exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py" "${@:2}"
         ;;
     --native|native)
         exec python3 "$SCRIPT_DIR/scripts/sigmaos_native_app.py"
+        ;;
+    --web|web|--server|server)
+        exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py" --web "${@:2}"
+        ;;
+    --browser|browser)
+        exec python3 "$SCRIPT_DIR/scripts/sigmaos_gui.py" --browser "${@:2}"
         ;;
     --cli|cli|--tui|tui)
         if [ -t 0 ] && [ -f "$SCRIPT_DIR/bin/sigmaos-launch" ]; then

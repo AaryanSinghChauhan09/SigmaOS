@@ -216,6 +216,20 @@ tray:
 native:
 	@python3 scripts/sigmaos_native_app.py
 
+gui-native: native
+
+# 13c. Sovereign Web Desktop (local HTTP server + browser)
+web:
+	@python3 scripts/sigmaos_gui.py --web
+
+gui-web: web
+
+# 13d. Dedicated Browser Application Window
+browser:
+	@python3 scripts/sigmaos_gui.py --browser
+
+gui-browser: browser
+
 # 14. Install SigmaOS desktop entry (.desktop file + icon in ~/.local)
 install:
 	@bash scripts/install_desktop_entry.sh
