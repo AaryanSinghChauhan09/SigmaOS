@@ -1,0 +1,18 @@
+[Unit]
+Description=SigmaOS First-Boot Provisioning
+Documentation=https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
+After=network-online.target systemd-resolved.service
+Wants=network-online.target
+ConditionPathExists=!/var/lib/sigmaos/provisioned
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/sigmaos-provision-owner
+StandardInput=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+
+[Install]
+WantedBy=multi-user.target

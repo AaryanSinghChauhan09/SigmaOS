@@ -1,0 +1,11 @@
+[Unit]
+Description=SigmaOS System Updater
+Documentation=https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/sigmaos-update
+Nice=19
+IOSchedulingClass=idle

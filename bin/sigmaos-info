@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-info — SigmaOS system information display (like neofetch/fastfetch)
+# Shows OS identity, kernel, desktop, packages, theme, and hardware.
+#
+# Usage: sigmaos-info [--json] [-h|--help]
+
+set -euo pipefail
+
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+BOLD='\033[1m'; DIM='\033[2m'; RESET='\033[0m'
+
+JSON_MODE=0
+for arg in "$@"; do
+  case "$arg" in
+    --json) JSON_MODE=1 ;;
+    -h|--help) echo "Usage: sigmaos-info [--json]"; exit 0 ;;
+  esac
+done
+
+# Gather info
+OS_NAME="SigmaOS"
+OS_VERSION="1.0.0-alpha.1"
+KERNEL=$(uname -r 2>/dev/null || echo "unknown")
+ARCH=$(uname -m 2>/dev/null || echo "unknown")
+HOSTNAME=$(hostname 2>/dev/null || cat /etc/hostname 2>/dev/null || echo "unknown")
+USER_NAME="${USER:-$(id -un 2>/dev/null || echo "user")}"
+UPTIME=$(uptime -p 2>/dev/null | sed 's/^up //' || echo "unknown")
+SHELL_NAME=$(basename "${SHELL:-bash}")
+
+# Desktop
+WM="Hyprland"
+if [ -n "${WAYLAND_DISPLAY:-}" ]; then
+  SESSION_TYPE="Wayland"
+elif [ -n "${DISPLAY:-}" ]; then
+  SESSION_TYPE="X11"
+else
+  SESSION_TYPE="TTY"
+fi
+
+# Packages (graceful fallback)
+PKG_COUNT="unknown"
+if command -v pacman &>/dev/null; then
+  PKG_COUNT=$(pacman -Q 2>/dev/null | wc -l || echo "?")
+elif command -v dpkg &>/dev/null; then
+  PKG_COUNT=$(dpkg -l 2>/dev/null | grep -c '^ii' || echo "?")
+fi
+
+# Active Wallust theme
+THEME="default"
+THEME_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/wallust/current-theme"
+[ -f "$THEME_FILE" ] && THEME=$(cat "$THEME_FILE")
+
+# CPU
+CPU="unknown"
+if [ -f /proc/cpuinfo ]; then
+  CPU=$(grep 'model name' /proc/cpuinfo | head -1 | cut -d: -f2 | xargs || echo "unknown")
+fi
+
+# Memory
+MEM_TOTAL="unknown"
+MEM_USED="unknown"
+if [ -f /proc/meminfo ]; then
+  MEM_TOTAL_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+  MEM_AVAIL_KB=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
+  MEM_USED_KB=$(( MEM_TOTAL_KB - MEM_AVAIL_KB ))
+  MEM_TOTAL=$(( MEM_TOTAL_KB / 1024 ))
+  MEM_USED=$(( MEM_USED_KB / 1024 ))
+  MEM_TOTAL="${MEM_TOTAL}MiB"
+  MEM_USED="${MEM_USED}MiB"
+fi
+
+# Disk
+DISK="unknown"
+if command -v df &>/dev/null; then
+  DISK=$(df -h / 2>/dev/null | awk 'NR==2{printf "%s / %s (%s used)", $3, $2, $5}' || echo "unknown")
+fi
+
+if [ "$JSON_MODE" = "1" ]; then
+  cat <<JSON
+{
+  "os": "$OS_NAME",
+  "version": "$OS_VERSION",
+  "kernel": "$KERNEL",
+  "arch": "$ARCH",
+  "hostname": "$HOSTNAME",
+  "user": "$USER_NAME",
+  "uptime": "$UPTIME",
+  "shell": "$SHELL_NAME",
+  "wm": "$WM",
+  "session": "$SESSION_TYPE",
+  "packages": "$PKG_COUNT",
+  "theme": "$THEME",
+  "cpu": "$CPU",
+  "memory_used": "$MEM_USED",
+  "memory_total": "$MEM_TOTAL",
+  "disk": "$DISK"
+}
+JSON
+  exit 0
+fi
+
+# ASCII art logo + info
+echo ""
+echo -e "${CYAN}${BOLD}   ███████╗██╗ ██████╗ ███╗   ███╗ █████╗ ${RESET}"
+echo -e "${CYAN}${BOLD}   ██╔════╝██║██╔════╝ ████╗ ████║██╔══██╗${RESET}"
+echo -e "${CYAN}${BOLD}   ███████╗██║██║  ███╗██╔████╔██║███████║${RESET}"
+echo -e "${CYAN}${BOLD}   ╚════██║██║██║   ██║██║╚██╔╝██║██╔══██║${RESET}"
+echo -e "${CYAN}${BOLD}   ███████║██║╚██████╔╝██║ ╚═╝ ██║██║  ██║${RESET}"
+echo -e "${CYAN}${BOLD}   ╚══════╝╚═╝ ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝${RESET}"
+echo -e "        ${DIM}Sovereign Operating System${RESET}"
+echo ""
+
+label() { echo -e "  ${GREEN}${BOLD}$1${RESET}${RESET}\t$2"; }
+
+label "OS"       "$OS_NAME $OS_VERSION"
+label "Host"     "$HOSTNAME"
+label "User"     "$USER_NAME"
+label "Kernel"   "$KERNEL ($ARCH)"
+label "Uptime"   "$UPTIME"
+label "Shell"    "$SHELL_NAME"
+label "WM"       "$WM ($SESSION_TYPE)"
+label "Theme"    "$THEME"
+label "Packages" "$PKG_COUNT"
+label "CPU"      "$CPU"
+label "Memory"   "$MEM_USED / $MEM_TOTAL"
+label "Disk"     "$DISK"
+
+echo ""
+# Colour palette strip
+echo -n "  "
+for c in 0 1 2 3 4 5 6 7; do
+  echo -ne "\e[4${c}m   \e[0m"
+done
+echo ""
+echo -n "  "
+for c in 0 1 2 3 4 5 6 7; do
+  echo -ne "\e[10${c}m   \e[0m"
+done
+echo -e "\n"

@@ -1,0 +1,11 @@
+[Unit]
+Description=SigmaOS Weekly Package + Dotfile Update
+Documentation=https://github.com/AaryanSinghChauhan09/SigmaOS/wiki
+
+[Timer]
+OnCalendar=weekly
+RandomizedDelaySec=3600
+Persistent=true
+
+[Install]
+WantedBy=timers.target

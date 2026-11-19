@@ -1,4 +1,5 @@
-# SigmaOS Omarchy Starship Shell Prompt
+# SigmaOS Sovereign Desktop — Starship Shell Prompt
+# Managed by: sigmaos-update --dotfiles-only
 
 format = """
 [░▒▓](#89b4fa)\
