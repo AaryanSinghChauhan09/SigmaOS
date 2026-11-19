@@ -11,7 +11,7 @@
 
 # --- paths -------------------------------------------------------------------
 SIGMA_HUB_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-SIGMA_COMPONENTS_TOML="${SIGMA_HUB_ROOT}/COMPONENTS.toml"
+SIGMA_COMPONENTS_TOML="${SIGMA_HUB_ROOT}/COMPONENTS-ACTIVE.toml"
 SIGMA_REGISTRY_TOML="${SIGMA_HUB_ROOT}/components/SIGMAOS_COMPONENT_REGISTRY.toml"
 SIGMA_OWNERSHIP_TOML="${SIGMA_HUB_ROOT}/components/MODULE_OWNERSHIP.toml"
 SIGMA_GITMODULES="${SIGMA_HUB_ROOT}/.gitmodules"
