@@ -1,0 +1,68 @@
+name: Build SigmaOS ISO
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Validate ISO profile
+      run: |
+        bash scripts/build_archiso.sh --validate-only
+        
+    - name: Build ISO with Docker
+      run: |
+        bash scripts/build_archiso.sh --docker
+        
+    - name: Upload ISO artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sigmaos-desktop-iso
+        path: out/*.iso
+        retention-days: 7
+        
+    - name: Upload build log
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-log
+        path: out/build.log
+        retention-days: 7
+        
+    - name: Get ISO filename
+      id: iso-name
+      run: |
+        ISO_FILE=$(ls out/*.iso | head -1)
+        ISO_NAME=$(basename "$ISO_FILE")
+        echo "iso_name=$ISO_NAME" >> $GITHUB_OUTPUT
+        
+    - name: Create release summary
+      run: |
+        echo "## SigmaOS ISO Build Complete" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**ISO Name:** ${{ steps.iso-name.outputs.iso_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Features" >> $GITHUB_STEP_SUMMARY
+        echo "- Stock Arch Linux kernel" >> $GITHUB_STEP_SUMMARY
+        echo "- Hyprland Wayland compositor" >> $GITHUB_STEP_SUMMARY
+        echo "- Waybar status bar" >> $GITHUB_STEP_SUMMARY
+        echo "- Wallust dynamic theming" >> $GITHUB_STEP_SUMMARY
+        echo "- PipeWire audio stack" >> $GITHUB_STEP_SUMMARY
+        echo "- 116 curated packages" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Download" >> $GITHUB_STEP_SUMMARY
+        echo "Download the ISO from the artifacts below." >> $GITHUB_STEP_SUMMARY
