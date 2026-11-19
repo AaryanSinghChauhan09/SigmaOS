@@ -120,7 +120,7 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 - ⏳ Pending: Continue with other consolidation families
 - ⏳ Pending: Registry updates
 
-## Repositories Archived (72 total)
+## Repositories Archived (74 total)
 
 1. **Theme duplicates (4):**
    - SigmaOS-theme → SigmaOS-themes (canonical)
@@ -206,5 +206,9 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
     - SigmaOS-workspace (consolidate into SigmaOS-dev)
     - SigmaOS-rollback (consolidate into SigmaOS-snapshot-manager)
     - SigmaOS-permissions (consolidate into SigmaOS-dev)
+
+15. **Application scaffolds (2):**
+    - SigmaOS-office (use standard office packages)
+    - SigmaOS-player (consolidate into SigmaOS-utils)
 
 Generated with [Devin](https://devin.ai)
