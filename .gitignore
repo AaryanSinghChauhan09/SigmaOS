@@ -117,5 +117,6 @@ __pycache__/
 !docs/wiki/sigmaos-theme-icons.md
 !docs/wiki/sigmaos-theme-gtk3.md
 !docs/wiki/sigmaos-theme-desktop.md
+!docs/wiki/SigmaOS-Utils.md
 
 .agents/
