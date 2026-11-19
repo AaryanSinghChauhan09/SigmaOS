@@ -129,5 +129,6 @@ __pycache__/
 !docs/wiki/sigmaos-theme-desktop.md
 !docs/wiki/SigmaOS-Utils.md
 !docs/wiki/SigmaOS-Dev.md
+!docs/wiki/SigmaOS-Bootloader.md
 
 .agents/
