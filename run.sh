@@ -73,6 +73,12 @@ case "$ACTION" in
     --bluetooth|bluetooth|--bt|bt)
         exec bash "$SCRIPT_DIR/bin/sigmaos-bluetooth" "${@:2}"
         ;;
+    --display|display|--monitors|monitors)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-display" "${@:2}"
+        ;;
+    --keybinds|keybinds|--keys|keys)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-keybinds" "${@:2}"
+        ;;
     --snapshot|snapshot|--btrfs|btrfs)
         exec bash "$SCRIPT_DIR/bin/sigmaos-snapshot" "${@:2}"
         ;;
@@ -150,7 +156,7 @@ case "$ACTION" in
         echo "  --cli, --tui  Launch interactive terminal menu"
         echo "  --desktop     Launch SigmaOS Sovereign Desktop Profile (Hyprland / Wayland)"
         echo "  --minimal     Launch SigmaOS Sovereign Minimalist Profile"
-        echo "  --doctor      Run SigmaOS 54-point system health diagnostics"
+        echo "  --doctor      Run SigmaOS 56-point system health diagnostics"
         echo "  --dotfiles    Deploy SigmaOS desktop configs to ~/.config"
         echo "  --update      Update packages + dotfiles + theme (sigmaos-update)"
         echo "  --theme       Manage Wallust desktop themes (list/apply/next/prev)"
@@ -159,6 +165,8 @@ case "$ACTION" in
         echo "  --network     Network manager CLI (wifi/ethernet/vpn/dns/status)"
         echo "  --audio       PipeWire audio and volume manager (volume/mute/sinks)"
         echo "  --bluetooth   Bluetooth device manager (scan/pair/connect/status)"
+        echo "  --display     Hyprland multi-monitor & HiDPI scaling manager"
+        echo "  --keybinds    Interactive Hyprland keyboard shortcuts cheatsheet"
         echo "  --snapshot    Btrfs snapshot and recovery manager (create/list/rollback)"
         echo "  --info        Show system info (like neofetch, with JSON output)"
         echo "  --sandbox     Launch isolated bubblewrap sandbox with GUI passthrough"

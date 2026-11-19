@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-display — Hyprland Multi-Monitor & HiDPI Fractional Scaling Manager
+# Inspects, configures, and saves monitor layouts for Wayland / Hyprland sessions.
+#
+# Usage:
+#   sigmaos-display list
+#   sigmaos-display scale <monitor> <scale> (e.g., 1.0, 1.25, 1.5, 2.0)
+#   sigmaos-display mode <monitor> <res>@<hz> (e.g., 1920x1080@144)
+#   sigmaos-display position <monitor> <x,y>
+#   sigmaos-display mirror <monitor1> <monitor2>
+#   sigmaos-display open (opens wdisplays GUI if installed)
+#   sigmaos-display reload
+
+set -euo pipefail
+
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'
+BOLD='\033[1m'; RESET='\033[0m'
+
+info()    { echo -e "${CYAN}[display]${RESET} $*"; }
+success() { echo -e "${GREEN}[display]${RESET} $*"; }
+warn()    { echo -e "${YELLOW}[display]${RESET} $*"; }
+err()     { echo -e "${RED}[display]${RESET} $*" >&2; }
+
+CONF_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/monitors.conf"
+mkdir -p "$(dirname "$CONF_FILE")"
+
+usage() {
+  cat <<'EOF'
+sigmaos-display — Hyprland Monitor & HiDPI Configuration Tool
+
+USAGE
+  sigmaos-display list                      List all connected monitors and active resolutions
+  sigmaos-display scale <output> <scale>    Set scale factor (e.g. eDP-1 1.25)
+  sigmaos-display mode <output> <res@hz>    Set resolution and refresh rate (e.g. DP-1 2560x1440@144)
+  sigmaos-display mirror <output> <source>  Mirror output onto another display
+  sigmaos-display reload                    Reload Hyprland monitor configuration
+  sigmaos-display open                      Launch wdisplays graphical display configurator
+EOF
+}
+
+cmd="${1:-list}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  list|status)
+    echo -e "\n${BOLD}${CYAN}  SigmaOS Hyprland Display Outputs${RESET}\n"
+    if command -v hyprctl &>/dev/null && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+      hyprctl monitors -j | jq -r '.[] | "  \u001b[32m●\u001b[0m \u001b[1m\(.name)\u001b[0m: \(.width)x\(.height)@\(.refreshRate | round)Hz | Scale: \(.scale) | Pos: \(.x),\(.y) | Description: \(.description)"' 2>/dev/null || hyprctl monitors
+    elif [ -n "${WAYLAND_DISPLAY:-}" ] && command -v wlr-randr &>/dev/null; then
+      wlr-randr
+    else
+      warn "Hyprland session not active or hyprctl unavailable."
+      if [ -f /sys/class/drm/*/status ]; then
+        grep -H . /sys/class/drm/*/status | sed 's|/sys/class/drm/card[0-9]-||' | sed 's|/status:||' | column -t
+      fi
+    fi
+    echo ""
+    ;;
+
+  scale)
+    mon="${1:-}"
+    scale="${2:-}"
+    [[ -z "$mon" || -z "$scale" ]] && { err "Usage: sigmaos-display scale <monitor> <scale>"; exit 1; }
+    info "Setting monitor $mon scale to $scale..."
+    echo "monitor=$mon,preferred,auto,$scale" >> "$CONF_FILE"
+    if command -v hyprctl &>/dev/null && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+      hyprctl keyword monitor "$mon,preferred,auto,$scale"
+      success "Monitor scale updated dynamically."
+    fi
+    success "Configuration saved to: $CONF_FILE"
+    ;;
+
+  mode)
+    mon="${1:-}"
+    mode="${2:-}"
+    [[ -z "$mon" || -z "$mode" ]] && { err "Usage: sigmaos-display mode <monitor> <resolution@refresh>"; exit 1; }
+    info "Setting monitor $mon mode to $mode..."
+    echo "monitor=$mon,$mode,auto,1" >> "$CONF_FILE"
+    if command -v hyprctl &>/dev/null && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+      hyprctl keyword monitor "$mon,$mode,auto,1"
+      success "Monitor mode applied dynamically."
+    fi
+    success "Configuration saved to: $CONF_FILE"
+    ;;
+
+  reload)
+    if command -v hyprctl &>/dev/null && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+      hyprctl reload
+      success "Hyprland configuration reloaded."
+    fi
+    ;;
+
+  open|gui)
+    if command -v wdisplays &>/dev/null; then
+      wdisplays & disown
+    elif command -v nwg-displays &>/dev/null; then
+      nwg-displays & disown
+    else
+      err "wdisplays or nwg-displays not installed. Install with: pacman -S wdisplays"
+      exit 1
+    fi
+    ;;
+
+  -h|--help|help)
+    usage
+    ;;
+
+  *)
+    err "Unknown command: $cmd"
+    usage
+    exit 1
+    ;;
+esac

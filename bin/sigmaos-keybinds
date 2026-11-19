@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-keybinds — Interactive Keybinding Cheatsheet for Hyprland
+# Pops up a search-as-you-type Rofi or terminal window showing all shortcuts.
+
+set -euo pipefail
+
+KEYBINDS=$(cat <<'EOF'
+SUPER + Enter            Terminal (foot)
+SUPER + SHIFT + Enter    Terminal (alacritty)
+SUPER + Space            Application Launcher (Rofi)
+SUPER + Q                Close focused window
+SUPER + F                Toggle fullscreen
+SUPER + Shift + F        Fake fullscreen
+SUPER + H / J / K / L    Focus window Left / Down / Up / Right (Vim keys)
+SUPER + Shift + HJKL     Move window Left / Down / Up / Right
+SUPER + Ctrl + HJKL      Resize window
+SUPER + 1..10            Switch to Workspace 1..10
+SUPER + Shift + 1..10    Move window to Workspace 1..10
+SUPER + S                Toggle Scratchpad / Magic Workspace
+SUPER + Shift + S        Send active window to Scratchpad
+SUPER + B                Launch Web Browser (Firefox)
+SUPER + E                Launch File Manager (Thunar)
+SUPER + L                Lock Screen (Hyprlock)
+SUPER + Shift + L        Power / Logout Menu (Wlogout)
+SUPER + Shift + U        System Update (sigmaos-update)
+SUPER + T                List & Cycle Desktop Themes
+SUPER + / or ?           Open this Keybinding Cheatsheet
+Print                    Capture Full Screenshot
+Shift + Print            Capture Selected Region Screenshot
+Super + Print            Capture Window Screenshot
+XF86AudioRaiseVolume     Volume Up +5%
+XF86AudioLowerVolume     Volume Down -5%
+XF86AudioMute            Toggle Audio Mute
+XF86MonBrightnessUp      Brightness +10%
+XF86MonBrightnessDown    Brightness -10%
+EOF
+)
+
+if [ -n "${WAYLAND_DISPLAY:-}" ] && command -v rofi &>/dev/null; then
+  echo "$KEYBINDS" | rofi -dmenu -i -p " ⌨  Keybindings " -theme ~/.config/rofi/sigmaos.rasi
+else
+  echo -e "\n\033[1;36m  SigmaOS Hyprland Keyboard Shortcuts\033[0m\n"
+  echo "$KEYBINDS" | column -t -s $'\t'
+  echo ""
+fi

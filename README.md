@@ -18,10 +18,10 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 |---|---|---|
 | **Host Workstation Environment** | **Working** | Native binary (`bin/sigmaos`), interactive TUI, Python/GTK3 desktop launcher (`scripts/sigmaos_gui.py`). |
 | **Defensive System Installer** | **Working** | Industrial installer (`iso_root/installer/install.sh`, `sigmaos-install`). Defaults to `DRY_RUN=1` simulation. Requires `--destructive --confirm-disk <DEV>`. Guards active host root drive. |
-| **Diagnostic Health Suite** | **Working** | 54-point system health audit (`./run.sh --doctor`, `scripts/sigmaos_doctor.sh`). Validates display, GPU, fonts, Rust/Python runtimes, configs, and sovereign tooling. |
+| **Diagnostic Health Suite** | **Working** | 56-point system health audit (`./run.sh --doctor`, `scripts/sigmaos_doctor.sh`). Validates display, GPU, fonts, Rust/Python runtimes, configs, and sovereign tooling. |
 | **Component Sub-Repositories (22)** | **Working** | 22 implemented sub-repositories in pure `#![forbid(unsafe_code)]` Rust with comprehensive unit and integration test suites passing in CI. |
-| **Desktop Profiles & Configuration** | **Working** | Wayland / Hyprland tiling desktop profile, Waybar configurations, dynamic Wallust theming, and Starship shell prompts. |
-| **System CLI Tooling Suite** | **Working** | Full native shell CLI suite (`sigmaos-update`, `sigmaos-theme`, `sigmaos-wallpaper-set`, `sigmaos-pkgmgr`, `sigmaos-network`, `sigmaos-audio`, `sigmaos-bluetooth`, `sigmaos-snapshot`, `sigmaos-info`). |
+| **Desktop Profiles & Configuration** | **Working** | Wayland / Hyprland tiling desktop profile, Waybar configurations, dynamic Wallust theming, multi-monitor scaling, and Starship shell prompts. |
+| **System CLI Tooling Suite** | **Working** | Full native shell CLI suite (`sigmaos-update`, `sigmaos-theme`, `sigmaos-wallpaper-set`, `sigmaos-pkgmgr`, `sigmaos-network`, `sigmaos-audio`, `sigmaos-bluetooth`, `sigmaos-snapshot`, `sigmaos-display`, `sigmaos-keybinds`, `sigmaos-info`). |
 | **Arch-based Live ISO Media** | **Working / Turnkey** | Turnkey Arch-based live ISO profile (`iso/archiso/`, `scripts/build_archiso.sh`) with 100 packages, Docker containerized builds (`--docker`), native Arch builds (`--native`), and defensive installer. |
 | **Package Management Engine (`sigpkg`)**| **Experimental** | ALPM transaction model, dependency graph solver, and repository query client. |
 | **Custom `#![no_std]` Microkernel** | **Planned / Research** | Clean-slate freestanding Rust/C microkernel research (`src/kernel/`, `iso-build/kernel-stub.c`). Maintained as a separate long-term research track. |
@@ -37,7 +37,7 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 | `./run.sh --minimal` | Sovereign Minimalist Profile (CLI core) |
 | `./run.sh --gui` | Launch full graphical desktop application (GTK3 + WebKit2) |
 | `./run.sh --native` | Launch pure GTK3 desktop interface |
-| `./run.sh --doctor` | Run 54-point system health diagnostics |
+| `./run.sh --doctor` | Run 56-point system health diagnostics |
 | `./run.sh --dotfiles`| Deploy desktop configuration dotfiles to `~/.config` |
 | `./run.sh --update` | Full update: system packages + dotfiles + Wallust theme |
 | `./run.sh --theme` | Manage Wallust themes (list, apply, cycle next/prev) |
@@ -46,6 +46,8 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 | `./run.sh --network` | Network connectivity CLI (wifi/ethernet/vpn/dns/speed) |
 | `./run.sh --audio` | PipeWire audio output/input & volume manager |
 | `./run.sh --bluetooth`| Bluetooth device manager (scan/pair/connect/status) |
+| `./run.sh --display` | Hyprland multi-monitor & HiDPI scaling manager |
+| `./run.sh --keybinds`| Interactive Hyprland keyboard shortcuts cheatsheet |
 | `./run.sh --snapshot`| Btrfs snapshot & rollback controller |
 | `./run.sh --info` | System information display (Fastfetch style + JSON mode) |
 | `./run.sh --check` | Run automated launch readiness validation |
@@ -62,10 +64,12 @@ SigmaOS provides a complete set of ergonomic, shell-native management tools:
 - **`sigmaos-network`**: Intuitive terminal network manager for WiFi, Ethernet, VPN, DNS, and speed benchmarking.
 - **`sigmaos-audio`**: PipeWire / WirePlumber audio manager for volume, sink switching, microphone muting, and GUI mixer launch.
 - **`sigmaos-bluetooth`**: BlueZ controller for scanning, pairing, connecting, and managing Bluetooth audio & peripherals.
+- **`sigmaos-display`**: Hyprland multi-monitor layout, resolution, refresh rate, and HiDPI fractional scaling controller.
+- **`sigmaos-keybinds`**: Searchable pop-up cheatsheet for Hyprland shortcuts (bound to `Super + /`).
 - **`sigmaos-snapshot`**: Btrfs system recovery controller with pacman pre/post upgrade transaction hooks and subvolume rollbacks.
 - **`sigmaos-theme`**: Wallpaper and palette engine supporting 6 built-in themes and dynamic Wallust generation.
 - **`sigmaos-wallpaper-set`**: Multi-backend wallpaper switcher (`hyprpaper`, `swaybg`, `feh`, `nitrogen`).
-- **`sigmaos-doctor`**: 54-point comprehensive system diagnostic validating display servers, GPU drivers, audio, and tools.
+- **`sigmaos-doctor`**: 56-point comprehensive system diagnostic validating display servers, GPU drivers, audio, and tools.
 - **`sigmaos-info`**: Fastfetch-style terminal hardware/OS summary with JSON export for scripting.
 
 ---
