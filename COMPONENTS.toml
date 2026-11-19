@@ -5328,11 +5328,11 @@ depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-skills"
-description = "Skills component for SigmaOS"
+description = "Universal Agent Skill Registry and Execution Engine for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-skills"
-engine = "common_lib"
+engine = "skills_registry"
 category = "Developer Tools"
-language = "unknown"
+language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
