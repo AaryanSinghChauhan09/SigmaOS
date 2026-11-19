@@ -2,7 +2,7 @@
 """
 SigmaOS Sovereign Graphical Desktop
 =====================================
-Polyglot GUI desktop interface inspired by Omarchy Linux & Arch Linux.
+Polyglot GUI desktop interface for SigmaOS Sovereign Workstation.
 Provides four execution modalities with zero-friction automatic fallback:
 
   1. GTK3 + WebKit2 native window with bidirectional IPC bridge
@@ -583,8 +583,9 @@ def launch_firefox_fallback(html_uri):
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="SigmaOS Sovereign Graphical Desktop")
-    parser.add_argument("--persona", "-p", default="omarchy",
-                        choices=["omarchy", "arch", "mint", "tokyo", "nord", "gruvbox", "cyber", "sovereign"],
+    parser.add_argument("profile", nargs="?", default=None,
+                        help="Optional positional profile name (e.g. desktop, sovereign, catppuccin)")
+    parser.add_argument("--persona", "-p", default=None,
                         help="Initial desktop persona/theme to activate")
     parser.add_argument("--native", "-n", action="store_true",
                         help="Force pure GTK3 native desktop app (no WebKit2 requirement)")
@@ -595,7 +596,11 @@ def main():
     parser.add_argument("--port", type=int, default=0,
                         help="Port for local web server (default: 8888 or auto)")
     args, _ = parser.parse_known_args()
-    persona = args.persona
+    raw_persona = args.persona or args.profile or "sovereign"
+    if raw_persona in ("desktop", "default", "omarchy"):
+        persona = "sovereign"
+    else:
+        persona = raw_persona
 
     if not os.path.isfile(HTML_PATH):
         print(f"Error: UI not found at {HTML_PATH}", file=sys.stderr)

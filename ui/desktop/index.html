@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
-<title>SigmaOS Sovereign Desktop Environment — Omarchy Parity</title>
+<title>SigmaOS Sovereign Desktop Environment</title>
 <style>
   :root {
     --bg-dark: #0f111a;
@@ -21,7 +21,7 @@
   }
 
   /* Persona Themes */
-  body.persona-omarchy {
+  body.persona-omarchy, body.persona-zenith, body.persona-sovereign {
     --accent-cyan: #89b4fa;
     --accent-magenta: #f5c2e7;
     --accent-green: #a6e3a1;
@@ -711,7 +711,7 @@
 <!-- Waybar Top Panel -->
 <div id="top-bar">
   <div class="bar-left">
-    <div class="logo-badge" onclick="openRofi()" title="Open Omarchy Launcher (Super + Space)">
+    <div class="logo-badge" onclick="openRofi()" title="Open SigmaOS Launcher (Super + Space)">
       <span>⚡</span>
       <span>SIGMAOS</span>
     </div>
@@ -726,7 +726,7 @@
 
   <div class="bar-center">
     <div class="persona-selector">
-      <button class="persona-btn active" onclick="setPersona('omarchy')">Omarchy</button>
+      <button class="persona-btn active" onclick="setPersona('omarchy')">Zenith</button>
       <button class="persona-btn" onclick="setPersona('tokyo')">Tokyo</button>
       <button class="persona-btn" onclick="setPersona('nord')">Nord</button>
       <button class="persona-btn" onclick="setPersona('gruvbox')">Gruvbox</button>
@@ -816,7 +816,7 @@
   <!-- Terminal Window -->
   <div id="win-term" class="window focused" style="top: 60px; left: 200px; width: 740px; height: 460px;">
     <div class="window-header">
-      <div class="window-title">💻 Sovereign Terminal — zsh / omarchy-shell / pacman</div>
+      <div class="window-title">💻 Sovereign Terminal — zsh / sigmaos-shell / pacman</div>
       <div class="window-controls">
         <button class="w-btn min" onclick="minimizeWindow('win-term')"></button>
         <button class="w-btn max"></button>
@@ -826,11 +826,11 @@
     <div class="window-body terminal-body">
       <div class="term-output" id="term-out">╔══════════════════════════════════════════════════════════════════════════════╗
 ║                     SIGMAOS SOVEREIGN WORKSTATION                            ║
-║         Omarchy Linux Aesthetic Parity · Ready to Work & Ready to Launch     ║
+║         SigmaOS Sovereign Desktop · Ready to Work & Ready to Launch     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
   Architecture : x86_64 Sovereign Microkernel / Hybrid (#![no_std] Rust)
-  Desktop Env  : Omarchy Zenith (Hyprland + Waybar + Wallust + Rofi + Mako)
-  CLI Tooling  : omarchy-shell v0.1.0 (Installed at ~/.local/bin/omarchy-shell)
+  Desktop Env  : SigmaOS Zenith (Hyprland + Waybar + Wallust + Rofi + Mako)
+  CLI Tooling  : sigmaos-shell v0.1.0 (Installed at ~/.local/bin/sigmaos-shell)
   Kernel ABI   : Linux Syscalls (21 mapped) + FreeBSD Capsicum + OpenBSD pledge
   Pacman/ALPM  : Rolling Release v75.0 · Tier-1 Mirrorlist
 
@@ -920,7 +920,7 @@ Type 'help' · 'doctor' · 'neofetch' · 'uname -a' · 'pacman -Ss <pkg>' · any
   <!-- Keybindings Window -->
   <div id="win-keybinds" class="window" style="top: 130px; left: 260px; width: 560px; height: 420px; display: none;">
     <div class="window-header">
-      <div class="window-title">⌨️ Omarchy Keybinding Cheatsheet</div>
+      <div class="window-title">⌨️ SigmaOS Keybinding Cheatsheet</div>
       <div class="window-controls">
         <button class="w-btn min" onclick="minimizeWindow('win-keybinds')"></button>
         <button class="w-btn max"></button>
@@ -943,7 +943,7 @@ Type 'help' · 'doctor' · 'neofetch' · 'uname -a' · 'pacman -Ss <pkg>' · any
           <tr><td><kbd>SUPER + E</kbd></td><td>File Manager</td><td><code>file-manager</code></td></tr>
           <tr><td><kbd>SUPER + B</kbd></td><td>Web Browser</td><td><code>browser</code></td></tr>
           <tr><td><kbd>SUPER + M</kbd></td><td>Wlogout Power Menu</td><td><code>wlogout</code></td></tr>
-          <tr><td><kbd>SUPER + T</kbd></td><td>Wallust Theme Picker</td><td><code>omarchy theme next</code></td></tr>
+          <tr><td><kbd>SUPER + T</kbd></td><td>Wallust Theme Picker</td><td><code>sigmaos theme next</code></td></tr>
           <tr><td><kbd>SUPER + 1..5</kbd></td><td>Switch Workspace 1 to 5</td><td><code>workspace [id]</code></td></tr>
           <tr><td><kbd>SUPER + Shift + S</kbd></td><td>Screenshot Region</td><td><code>grimblast copy area</code></td></tr>
           <tr><td><kbd>SUPER + Escape</kbd></td><td>Lock Screen</td><td><code>hyprlock</code></td></tr>
@@ -1020,10 +1020,10 @@ Ok
     </div>
   </div>
 
-  <!-- Omarchy Tools Suite Window -->
+  <!-- SigmaOS Tools Suite Window -->
   <div id="win-tools" class="window" style="top: 100px; left: 220px; width: 720px; height: 500px; display: none;">
     <div class="window-header">
-      <div class="window-title">🛠️ Sovereign Omarchy Tools Suite (Rust Parity)</div>
+      <div class="window-title">🛠️ Sovereign SigmaOS Tools Suite</div>
       <div class="window-controls">
         <button class="w-btn min" onclick="minimizeWindow('win-tools')"></button>
         <button class="w-btn max"></button>
@@ -1042,7 +1042,7 @@ Ok
       <!-- Tab: ttfx -->
       <div id="tpane-ttfx" class="tpane" style="display:flex; flex-direction:column; gap:10px;">
         <div style="display:flex; gap:10px; align-items:center;">
-          <input type="text" id="ttfx-input" value="SigmaOS: Sovereign Omarchy Architecture" style="flex:1; background:var(--bg-input); border:1px solid var(--border); color:var(--text); padding:6px 10px; border-radius:6px; font-family:var(--font-mono);">
+          <input type="text" id="ttfx-input" value="SigmaOS: Sovereign Architecture" style="flex:1; background:var(--bg-input); border:1px solid var(--border); color:var(--text); padding:6px 10px; border-radius:6px; font-family:var(--font-mono);">
           <select id="ttfx-effect" style="background:var(--bg-input); border:1px solid var(--border); color:var(--text); padding:6px 10px; border-radius:6px;">
             <option value="typewriter">Typewriter</option>
             <option value="sparkle">Sparkle ✨</option>
@@ -1053,7 +1053,7 @@ Ok
           <button onclick="runTtfxAnimation()" style="background:var(--accent); color:var(--bg-primary); border:none; padding:6px 14px; border-radius:6px; font-weight:600; cursor:pointer;">Animate</button>
         </div>
         <div id="ttfx-display" style="background:#0a0d14; border:1px solid var(--border); border-radius:8px; height:180px; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:22px; color:var(--accent); text-shadow:0 0 10px var(--accent); padding:20px; text-align:center;">
-          SigmaOS: Sovereign Omarchy Architecture
+          SigmaOS: Sovereign Architecture
         </div>
         <div style="font-size:11px; color:var(--text-muted);">Realtime Rust ANSI text effect generator (`sigmaos-tools-ttfx` parity).</div>
       </div>
@@ -1124,7 +1124,7 @@ Ok
         </div>
         <div id="hype-slide-view" style="background:#111520; border:1px solid var(--border); border-radius:8px; height:190px; padding:24px; display:flex; flex-direction:column; justify-content:center;">
           <h2 id="hype-title" style="color:var(--accent); margin:0 0 10px 0;">⚡ SigmaOS Sovereign Architecture</h2>
-          <p id="hype-body" style="color:var(--text); line-height:1.5; font-size:13px;">Full component parity with Omarchy Linux, featuring 20-module creative suites, microkernel compatibility, and zero stubs.</p>
+          <p id="hype-body" style="color:var(--text); line-height:1.5; font-size:13px;">Sovereign operating system architecture featuring 20-module creative suites and verified components.</p>
         </div>
       </div>
 
@@ -1195,10 +1195,10 @@ Ok
     </div>
   </div>
 
-  <!-- Omarchy Shell Dedicated Terminal Window -->
+  <!-- SigmaOS Shell Dedicated Terminal Window -->
   <div id="win-omarchy-term" class="window" style="top: 130px; left: 260px; width: 700px; height: 440px; display: none;">
     <div class="window-header">
-      <div class="window-title">⚡ Omarchy Desktop Subsystem CLI (`omarchy`)</div>
+      <div class="window-title">⚡ SigmaOS Desktop Subsystem CLI (`sigmaos`)</div>
       <div class="window-controls">
         <button class="w-btn min" onclick="minimizeWindow('win-omarchy-term')"></button>
         <button class="w-btn max"></button>
@@ -1206,11 +1206,11 @@ Ok
       </div>
     </div>
     <div class="window-body" style="background:#0d1117; font-family:var(--font-mono); font-size:12px; display:flex; flex-direction:column; padding:10px; color:#c9d1d9;">
-      <div id="oterm-out" style="flex:1; overflow-y:auto; white-space:pre-wrap; line-height:1.4;">[1;36mSigmaOS Omarchy Desktop Shell v0.1.0[0m
-Type 'help' for available Omarchy subsystem dispatch commands.
+      <div id="oterm-out" style="flex:1; overflow-y:auto; white-space:pre-wrap; line-height:1.4;">[1;36mSigmaOS Desktop Shell v0.1.0[0m
+Type 'help' for available SigmaOS subsystem dispatch commands.
 </div>
       <div style="display:flex; align-items:center; border-top:1px solid #30363d; padding-top:6px;">
-        <span style="color:#58a6ff; margin-right:8px;">omarchy&gt;</span>
+        <span style="color:#58a6ff; margin-right:8px;">sigmaos&gt;</span>
         <input type="text" id="oterm-in" placeholder="Try: theme set tokyo-night | audio volume 75 | battery | binds..." style="flex:1; background:transparent; border:none; outline:none; color:#c9d1d9; font-family:var(--font-mono); font-size:12px;" onkeydown="handleOtermKey(event)">
       </div>
     </div>
@@ -1263,12 +1263,12 @@ input {
 </textarea>
       <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted);">
         <span id="plain-status">Editing ~/.config/hypr/hyprland.conf (UTF-8)</span>
-        <span>Omarchy Fast Text Editor</span>
+        <span>SigmaOS Fast Text Editor</span>
       </div>
     </div>
   </div>
 
-  <!-- Plugin Marketplace & Agent Catalog (inspired by omacom/omarchy-plugin-marketplace & local-ai) -->
+  <!-- Plugin Marketplace & Agent Catalog  -->
   <div id="win-marketplace" class="window" style="top: 100px; left: 240px; width: 760px; height: 500px; display: none;">
     <div class="window-header">
       <div class="window-title">🧩 Plugin Marketplace & Local AI Agent Catalog</div>
@@ -1372,7 +1372,7 @@ input {
   <!-- Doctor Window -->
   <div id="win-doctor" class="window" style="top: 140px; left: 300px; width: 600px; height: 400px; display: none;">
     <div class="window-header">
-      <div class="window-title">🩺 Omarchy Diagnostic Health Inspection</div>
+      <div class="window-title">🩺 SigmaOS Diagnostic Health Inspection</div>
       <div class="window-controls">
         <button class="w-btn min" onclick="minimizeWindow('win-doctor')"></button>
         <button class="w-btn max"></button>
@@ -1390,8 +1390,8 @@ input {
         </thead>
         <tbody>
           <tr>
-            <td>Omarchy Shell</td>
-            <td>~/.local/bin/omarchy-shell CLI & Theme Engine</td>
+            <td>SigmaOS Shell</td>
+            <td>~/.local/bin/sigmaos-shell CLI & Theme Engine</td>
             <td><span class="badge-ok">✓ INSTALLED</span></td>
           </tr>
           <tr>
@@ -1487,7 +1487,7 @@ input {
         <div style="font-size:11px; color:var(--text-muted);">Sovereign Markdown / ODF Typographic Document Processor</div>
         <textarea style="flex:1; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:#fff; padding:10px; font-family:var(--font-mono); font-size:12px; resize:none;"># Sovereign Manifesto
 
-SigmaOS unites the speed of Arch, the beauty of Omarchy, and the safety of Rust.</textarea>
+SigmaOS unites high performance, modern desktop aesthetics, and memory safety.</textarea>
       </div>
       <div id="office-sheet-pane" style="flex:1; display:none; flex-direction:column; gap:8px;">
         <div style="font-size:11px; color:var(--text-muted);">High Throughput A1 Reactive Formula Grid (SUM, AVG, MIN, MAX)</div>
@@ -1575,10 +1575,10 @@ ORDER BY memory_gb DESC;</textarea>
       <h2 style="color: var(--accent-cyan); margin-bottom: 6px;">SigmaOS Sovereign Workstation</h2>
       <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 12px;">Version 0.1-Rolling (Codename: Zenith)</p>
       <p style="line-height: 1.5; font-size: 12px; margin-bottom: 12px;">
-        A sovereign operating system integrating the minimalist power of Arch Linux, the dynamic tiling aesthetics of Omarchy Linux, and the rock-solid ergonomics of Linux Mint.
+        A sovereign operating system integrating high-performance tiling aesthetics, robust ergonomics, and memory-safe architecture.
       </p>
       <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6;">
-        • Complete Omarchy dotfiles (Hyprland, Waybar, Wallust, Rofi, Terminals)<br>
+        • Complete SigmaOS dotfiles (Hyprland, Waybar, Wallust, Rofi, Terminals)<br>
         • 35+ verified green CI component repositories<br>
         • Full 20-Module Craft Creative Suite<br>
         • OpenBSD pledge/unveil & FreeBSD Capsicum security
@@ -1808,12 +1808,12 @@ ORDER BY memory_gb DESC;</textarea>
       `  pacman -Ss <pkg>    - Search packages via ALPM bridge\n` +
       `  pacman -Syu         - System upgrade\n` +
       `  sigpkg aur <query>  - Query AUR v5\n` +
-      `  omarchy doctor      - Run SigmaOS diagnostics\n` +
+      `  sigmaos doctor      - Run SigmaOS diagnostics\n` +
       `  doctor              - Alias for diagnostics\n` +
       `  ls / pwd / cat      - Standard shell commands\n` +
       `  clear               - Clear terminal\n` +
-      `  omarchy binds       - Keybinding overlay\n` +
-      `  omarchy theme list  - Wallust theme picker\n`);
+      `  sigmaos binds       - Keybinding overlay\n` +
+      `  sigmaos theme list  - Wallust theme picker\n`);
     } else if (cmd.startsWith('omarchy') || cmd.startsWith('omarchy-shell')) {
       if (parts[1] === 'binds') summonWindow('win-keybinds');
       else if (parts[1] === 'theme') {
@@ -1824,10 +1824,10 @@ ORDER BY memory_gb DESC;</textarea>
           else if (t.includes('gruv')) setPersona('gruvbox');
           else if (t.includes('cyber')) setPersona('cyber');
           else setPersona('omarchy');
-          appendTerm(`[✓] Switched Omarchy theme to: ${t}\n`);
+          appendTerm(`[✓] Switched desktop theme to: ${t}\n`);
         } else summonWindow('win-wallust');
       } else if (parts[1] === 'doctor') summonWindow('win-doctor');
-      else appendTerm(`omarchy-shell: command executed.\n`);
+      else appendTerm(`sigmaos-shell: command executed.\n`);
     } else if (root === 'wallust' || root === 'theme') summonWindow('win-wallust');
     else if (root === 'doctor') summonWindow('win-doctor');
     else if (root === 'craft') summonWindow('win-craft');
@@ -1880,15 +1880,15 @@ ORDER BY memory_gb DESC;</textarea>
     { name: "Plain Config Editor", sub: "Fast sovereign text editor for system configs", icon: "📝", action: () => summonWindow('win-plain') },
     { name: "Plugin Marketplace & Local AI", sub: "Desktop plugins, SSH port forwards, and local AI catalog", icon: "🧩", action: () => summonWindow('win-marketplace') },
     { name: "Folio File Manager", sub: "Keyboard-first sovereign directory explorer", icon: "📂", action: () => summonWindow('win-folio') },
-    { name: "Omarchy Tools Suite", sub: "ttfx, speedtest, omasnap, hype, and omacalc", icon: "🛠️", action: () => summonWindow('win-tools') },
+    { name: "SigmaOS Tools Suite", sub: "ttfx, speedtest, omasnap, hype, and omacalc", icon: "🛠️", action: () => summonWindow('win-tools') },
     { name: "GW-BASIC Interpreter", sub: "Interactive DOS real-mode BASIC runtime", icon: "📜", action: () => summonWindow('win-basic') },
-    { name: "Omarchy CLI Terminal", sub: "Subsystem dispatch shell for audio, battery, capture", icon: "⚡", action: () => summonWindow('win-omarchy-term') },
+    { name: "SigmaOS CLI Terminal", sub: "Subsystem dispatch shell for audio, battery, capture", icon: "⚡", action: () => summonWindow('win-omarchy-term') },
     // Core Desktop & Terminals
     { name: "Terminal (Foot / Kitty)", sub: "GPU-accelerated fast terminal", icon: "💻", action: () => summonWindow('win-term') },
     { name: "Wallust Theme Harmonizer", sub: "Dynamic palette switcher & config reloader", icon: "🎨", action: () => summonWindow('win-wallust') },
     { name: "Neovim Modern Editor", sub: "Terminal modal editor with LSP & Treesitter", icon: "📝", action: () => summonWindow('win-term') },
-    { name: "Omarchy Keybinds Cheat Sheet", sub: "View active Hyprland keyboard shortcuts", icon: "⌨️", action: () => summonWindow('win-keybinds') },
-    { name: "Omarchy Diagnostic Doctor", sub: "Inspect kernel, ISO, ALPM, and compositor health", icon: "🩺", action: () => summonWindow('win-doctor') },
+    { name: "SigmaOS Keybinds Cheat Sheet", sub: "View active Hyprland keyboard shortcuts", icon: "⌨️", action: () => summonWindow('win-keybinds') },
+    { name: "SigmaOS Diagnostic Doctor", sub: "Inspect kernel, ISO, ALPM, and compositor health", icon: "🩺", action: () => summonWindow('win-doctor') },
     { name: "SigmaOS Calamares Installer", sub: "Install to bare-metal NVMe or dual-boot", icon: "💾", action: () => summonWindow('win-installer') },
     { name: "Wlogout Session Manager", sub: "Lock, suspend, restart, or shutdown session", icon: "🚪", action: () => alert('Wlogout: Session menu invoked') },
 
@@ -1948,7 +1948,7 @@ ORDER BY memory_gb DESC;</textarea>
     { name: "Notepad++ Editor", sub: "Lightweight tabbed text editor with syntax highlighting", icon: "📝", action: () => summonWindow('win-term') },
     { name: "VLC Media Player", sub: "Universal audio and video decoder", icon: "📼", action: () => alert('Launching VLC...') },
     { name: "Warp Fast Terminal", sub: "Modern collaborative terminal with block execution", icon: "⚡", action: () => summonWindow('win-term') },
-    { name: "Plain Editor", sub: "Omarchy text editor for configuration files and dotfiles", icon: "📄", action: () => summonWindow('win-plain') },
+    { name: "Plain Editor", sub: "SigmaOS text editor for configuration files and dotfiles", icon: "📄", action: () => summonWindow('win-plain') },
     { name: "Monologue", sub: "Webcam and microphone recorder with instant trimming", icon: "🎙️", action: () => { summonWindow('win-term'); appendTerm('[Monologue] Camera & Microphone bound. Press SPACE to record.\\n'); } },
     { name: "Gliff Remote Desktop", sub: "Display streaming client for Hyprland sessions", icon: "🖥️", action: () => openGliffModal() },
     { name: "Owe Wallpaper Engine", sub: "High-performance video, GIF & animated wallpaper engine", icon: "🎬", action: () => { summonWindow('win-term'); appendTerm('[Owe] Live wallpaper engine active on eDP-1.\\n'); } },
@@ -1983,7 +1983,7 @@ ORDER BY memory_gb DESC;</textarea>
     { id: "linux-kali", label: "Kali pentest", icon: "⚙" },
     { id: "linux-lfs", label: "Linux From Scratch build", icon: "⚙" },
     { id: "linux-mint", label: "Linux Mint Cinnamon", icon: "⚙" },
-    { id: "linux-omarchy", label: "Omarchy Hyprland config sync", icon: "⚙" },
+    { id: "linux-omarchy", label: "SigmaOS Hyprland config sync", icon: "⚙" },
     { id: "linux-parrot", label: "Parrot AnonSurf Tor", icon: "⚙" },
     { id: "linux-qubes", label: "Qubes Xen compartments", icon: "⚙" },
     { id: "linux-reactos", label: "ReactOS Wine compatibility", icon: "⚙" },
@@ -2212,7 +2212,7 @@ ORDER BY memory_gb DESC;</textarea>
     }
   }
 
-  // Global Keybindings (Omarchy defaults)
+  // Global Keybindings (SigmaOS defaults)
   document.addEventListener('keydown', e => {
     // Super (Meta) or Alt + Space -> Rofi
     if ((e.metaKey || e.altKey) && e.code === 'Space') {
@@ -2250,7 +2250,7 @@ ORDER BY memory_gb DESC;</textarea>
     </div>
   </div>
 
-  <!-- Slide-out Notification Center Drawer (inspired by omacom/omarchy-notification-center-plugin) -->
+  <!-- Slide-out Notification Center Drawer -->
   <div id="notif-drawer">
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px;">
       <span style="font-weight:700; font-size:13px; color:var(--text);">🔔 Quick Settings & Notifications</span>
@@ -2322,7 +2322,7 @@ ORDER BY memory_gb DESC;</textarea>
   <div id="desktop-context-menu" style="display:none; position:fixed; z-index:99999; background:var(--bg-secondary); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.5); min-width:180px; padding:4px; font-size:12px;">
     <div class="ctx-item" onclick="summonWindow('win-wallust'); hideContextMenu();">🎨 Theme Harmonizer</div>
     <div class="ctx-item" onclick="summonWindow('win-term'); hideContextMenu();">💻 Sovereign Terminal</div>
-    <div class="ctx-item" onclick="summonWindow('win-omarchy-term'); hideContextMenu();">⚡ Omarchy Shell</div>
+    <div class="ctx-item" onclick="summonWindow('win-omarchy-term'); hideContextMenu();">⚡ SigmaOS Shell</div>
     <div class="ctx-item" onclick="summonWindow('win-folio'); hideContextMenu();">📂 File Manager (Folio)</div>
     <div class="ctx-item" onclick="summonWindow('win-tools'); hideContextMenu();">🛠️ Tools Suite</div>
     <div class="ctx-item" onclick="summonWindow('win-craft'); hideContextMenu();">🎭 Craft Creative Suite</div>
@@ -2680,7 +2680,7 @@ ORDER BY memory_gb DESC;</textarea>
     }
 
     const HYPE_SLIDES = [
-      { title: "⚡ SigmaOS Sovereign Architecture", body: "Full component parity with Omarchy Linux, featuring 20-module creative suites, microkernel compatibility, and zero stubs." },
+      { title: "⚡ SigmaOS Sovereign Architecture", body: "Sovereign operating system architecture featuring 20-module creative suites and verified components." },
       { title: "🎨 Dynamic Wallust Theming", body: "Automatic real-time color extraction from wallpapers harmonized across Hyprland, Waybar, Rofi, Neovim, and Web." },
       { title: "🛡️ Sovereign Tooling Fleet", body: "Self-contained Rust CLI engines: ttfx, speedtest, omasnap, hype, and omacalc compiled to native ELF binaries." },
       { title: "🌐 Universal Linux & BSD Bridge", body: "Direct native support for Arch, Debian, Fedora, Mint, and 12 Sovereign BSD kernels." }
@@ -2749,7 +2749,7 @@ ORDER BY memory_gb DESC;</textarea>
       ],
       docs: [
         { name: "Architecture_Spec.pdf", type: "file", icon: "📕" },
-        { name: "Omarchy_Parity.md", type: "file", icon: "📝" },
+        { name: "Architecture_Overview.md", type: "file", icon: "📝" },
         { name: "Kernel_Syscalls.txt", type: "file", icon: "📄" }
       ],
       downloads: [
@@ -2770,7 +2770,7 @@ ORDER BY memory_gb DESC;</textarea>
       ],
       projects: [
         { name: "SigmaOS", type: "folder", icon: "⚡" },
-        { name: "SigmaOS-linux-omarchy", type: "folder", icon: "⚡" },
+        { name: "SigmaOS-desktop-profile", type: "folder", icon: "⚡" },
         { name: "SigmaOS-tools-folio", type: "folder", icon: "📂" },
         { name: "SigmaOS-craft-3d", type: "folder", icon: "📐" }
       ],
@@ -2836,7 +2836,7 @@ ORDER BY memory_gb DESC;</textarea>
     renderFolioGrid();
 
     // ==========================================
-    // 8. Dedicated Omarchy Terminal
+    // 8. Dedicated SigmaOS Terminal
     // ==========================================
     function handleOtermKey(e) {
       if (e.key === 'Enter') {
@@ -2846,12 +2846,12 @@ ORDER BY memory_gb DESC;</textarea>
         inp.value = '';
         if (!cmd) return;
 
-        out.textContent += `omarchy> ${cmd}\n`;
+        out.textContent += `sigmaos> ${cmd}\n`;
         const parts = cmd.split(/\s+/);
         const root = parts[0].toLowerCase();
 
         if (root === 'help') {
-          out.textContent += `Omarchy Subsystem Commands:
+          out.textContent += `SigmaOS Subsystem Commands:
   audio [volume <0-100> | mute | unmute]
   brightness [set <10-100> | inc | dec]
   battery [status | health]
@@ -2879,7 +2879,7 @@ ORDER BY memory_gb DESC;</textarea>
         } else if (root === 'battery') {
           out.textContent += `Battery 0: 98% [Discharging, 5:24 remaining, Health: 99.4%]\n`;
         } else if (root === 'binds') {
-          out.textContent += `Omarchy Hyprland Binds:
+          out.textContent += `SigmaOS Hyprland Binds:
 SUPER+Space      rofi launcher
 SUPER+Return     sovereign terminal
 SUPER+.          gliff glyph picker
@@ -2897,9 +2897,9 @@ SUPER+M          wlogout power menu\n`;
         } else if (root === 'doctor') {
           out.textContent += `[✓] Kernel ABI: OK\n[✓] Hyprland Wayland Socket: OK\n[✓] Wallust Presets: OK\n[✓] Neovim Plugins: OK\nAll subsystems 100% operational.\n`;
         } else if (root === 'version') {
-          out.textContent += `SigmaOS Omarchy Subsystem CLI v0.1.0 (Rust Parity Target)\n`;
+          out.textContent += `SigmaOS Desktop Subsystem CLI v0.1.0\n`;
         } else {
-          out.textContent += `omarchy: command '${root}' dispatched successfully.\n`;
+          out.textContent += `sigmaos: command '${root}' dispatched successfully.\n`;
         }
         out.scrollTop = out.scrollHeight;
       }
@@ -2933,7 +2933,7 @@ input {
     "layer": "top",
     "position": "top",
     "height": 34,
-    "modules-left": ["hyprland/workspaces", "custom/omarchy"],
+    "modules-left": ["hyprland/workspaces", "custom/sigmaos"],
     "modules-center": ["clock"],
     "modules-right": ["pulseaudio", "network", "battery", "tray"]
 }`,
@@ -2960,7 +2960,7 @@ error_symbol = "[❯](bold red)"
       sigmaos: `[system]
 distro = "SigmaOS"
 release_model = "rolling"
-parity_target = "omarchy"
+desktop_profile = "sovereign"
 kernel = "linux-zen"
 architecture = "x86_64"
 `
