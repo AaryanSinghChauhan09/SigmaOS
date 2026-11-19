@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-theme — SigmaOS theme manager (Wallust palette switcher)
+#
+# Usage:
+#   sigmaos-theme list
+#   sigmaos-theme apply <theme-name>
+#   sigmaos-theme next
+#   sigmaos-theme current
+#   sigmaos-theme preview <theme-name>
+#   sigmaos-theme wallpaper <image>
+#
+# Themes are Wallust colour schemes. SigmaOS ships 6 built-in themes.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; MAGENTA='\033[0;35m'
+BOLD='\033[1m'; RESET='\033[0m'
+info()    { echo -e "${CYAN}[theme]${RESET} $*"; }
+success() { echo -e "${GREEN}[theme]${RESET} $*"; }
+warn()    { echo -e "${YELLOW}[theme]${RESET} $*"; }
+
+# Theme state files
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/wallust"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos"
+CURRENT_THEME_FILE="$CACHE_DIR/current-theme"
+THEME_ORDER_FILE="$STATE_DIR/theme-order"
+mkdir -p "$CACHE_DIR" "$STATE_DIR"
+
+# Built-in SigmaOS themes (Wallust colour scheme names)
+BUILTIN_THEMES=(
+  "catppuccin-mocha"
+  "tokyo-night"
+  "nord"
+  "gruvbox-dark"
+  "cyber"
+  "zenith"
+)
+
+# Persist theme order for cycling
+if [ ! -f "$THEME_ORDER_FILE" ]; then
+  printf '%s\n' "${BUILTIN_THEMES[@]}" > "$THEME_ORDER_FILE"
+fi
+
+get_current_theme() {
+  [ -f "$CURRENT_THEME_FILE" ] && cat "$CURRENT_THEME_FILE" || echo "catppuccin-mocha"
+}
+
+apply_theme() {
+  local theme="$1"
+  info "Applying theme: ${BOLD}$theme${RESET}"
+
+  if command -v wallust &>/dev/null; then
+    if wallust theme "$theme" 2>/dev/null; then
+      echo "$theme" > "$CURRENT_THEME_FILE"
+      success "Theme applied: $theme"
+    else
+      warn "wallust theme '$theme' failed; trying wallust run with current wallpaper"
+      local wp_file="$STATE_DIR/current-wallpaper"
+      if [ -f "$wp_file" ]; then
+        wallust run "$(cat "$wp_file")" 2>/dev/null || warn "wallust run also failed"
+      fi
+      echo "$theme" > "$CURRENT_THEME_FILE"
+    fi
+  else
+    # Fallback: apply via config template
+    local theme_conf="$ROOT_DIR/config/omarchy/hyprland/colors.conf"
+    warn "wallust not installed; applying via colors.conf if available"
+    if [ -f "$theme_conf" ]; then
+      success "Colour config found; Hyprland will pick up changes on reload"
+    fi
+    echo "$theme" > "$CURRENT_THEME_FILE"
+  fi
+
+  # Reload Waybar colours
+  if pgrep -x waybar &>/dev/null; then
+    pkill -SIGUSR2 waybar 2>/dev/null || true
+    info "Waybar reloaded"
+  fi
+
+  # Reload Hyprland colours
+  if command -v hyprctl &>/dev/null && pgrep -x Hyprland &>/dev/null; then
+    hyprctl reload 2>/dev/null || true
+    info "Hyprland reloaded"
+  fi
+}
+
+cmd="${1:-list}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  list)
+    echo -e "\n${BOLD}${CYAN}  SigmaOS Built-in Themes${RESET}\n"
+    CURRENT=$(get_current_theme)
+    while IFS= read -r t; do
+      if [ "$t" = "$CURRENT" ]; then
+        echo -e "  ${GREEN}▶  $t  (active)${RESET}"
+      else
+        echo -e "     $t"
+      fi
+    done < "$THEME_ORDER_FILE"
+    # Also show any wallust user themes
+    if command -v wallust &>/dev/null; then
+      echo ""
+      info "Run 'wallust list' for all installed palettes"
+    fi
+    echo ""
+    ;;
+
+  apply|set)
+    [ -z "${1:-}" ] && { warn "Usage: sigmaos-theme apply <name>"; exit 1; }
+    apply_theme "$1"
+    ;;
+
+  next|cycle)
+    CURRENT=$(get_current_theme)
+    THEMES=()
+    while IFS= read -r t; do THEMES+=("$t"); done < "$THEME_ORDER_FILE"
+    COUNT=${#THEMES[@]}
+    NEXT_IDX=0
+    for i in "${!THEMES[@]}"; do
+      if [ "${THEMES[$i]}" = "$CURRENT" ]; then
+        NEXT_IDX=$(( (i + 1) % COUNT ))
+        break
+      fi
+    done
+    NEXT="${THEMES[$NEXT_IDX]}"
+    info "Cycling: $CURRENT → $NEXT"
+    apply_theme "$NEXT"
+    ;;
+
+  prev|previous)
+    CURRENT=$(get_current_theme)
+    THEMES=()
+    while IFS= read -r t; do THEMES+=("$t"); done < "$THEME_ORDER_FILE"
+    COUNT=${#THEMES[@]}
+    PREV_IDX=$(( COUNT - 1 ))
+    for i in "${!THEMES[@]}"; do
+      if [ "${THEMES[$i]}" = "$CURRENT" ]; then
+        PREV_IDX=$(( (i - 1 + COUNT) % COUNT ))
+        break
+      fi
+    done
+    PREV="${THEMES[$PREV_IDX]}"
+    info "Cycling back: $CURRENT → $PREV"
+    apply_theme "$PREV"
+    ;;
+
+  current)
+    echo "$(get_current_theme)"
+    ;;
+
+  wallpaper|wp)
+    exec "$SCRIPT_DIR/sigmaos-wallpaper-set" "${@:-}"
+    ;;
+
+  preview)
+    [ -z "${1:-}" ] && { warn "Usage: sigmaos-theme preview <name>"; exit 1; }
+    info "Preview mode: colours will be shown but not saved"
+    warn "(Full preview requires wallust; showing palette name: $1)"
+    if command -v wallust &>/dev/null; then
+      wallust theme "$1" 2>/dev/null || warn "Theme '$1' not found in wallust"
+    fi
+    ;;
+
+  -h|--help|help)
+    cat <<'EOF'
+
+sigmaos-theme — SigmaOS Theme Manager
+
+USAGE
+  sigmaos-theme list              List available themes (built-in + wallust)
+  sigmaos-theme apply <name>      Apply a named theme
+  sigmaos-theme next              Cycle to next theme
+  sigmaos-theme prev              Cycle to previous theme
+  sigmaos-theme current           Print active theme name
+  sigmaos-theme wallpaper <img>   Set wallpaper + generate palette
+  sigmaos-theme preview <name>    Preview a theme (no permanent change)
+
+BUILT-IN THEMES
+  catppuccin-mocha  tokyo-night  nord  gruvbox-dark  cyber  zenith
+
+EOF
+    ;;
+
+  *)
+    warn "Unknown subcommand: $cmd"
+    warn "Run: sigmaos-theme --help"
+    exit 1
+    ;;
+esac

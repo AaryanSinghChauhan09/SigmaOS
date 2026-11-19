@@ -1,17 +1,35 @@
-# Base Arch / Linux System
+# ==============================================================================
+# SigmaOS Live Desktop Package Manifest (x86_64)
+# Sovereign Arch-based Desktop Distribution Profile
+# ==============================================================================
+
+# ── Base System & Kernel ──────────────────────────────────────────────────────
 base
 base-devel
 linux
 linux-firmware
+linux-headers
 systemd
 systemd-sysvcompat
+sudo
+which
+man-db
+man-pages
+bash-completion
+
+# ── Storage & Filesystems ─────────────────────────────────────────────────────
 btrfs-progs
 e2fsprogs
 dosfstools
 xfsprogs
+ntfs-3g
+parted
+smartmontools
 
-# Networking & Connectivity
+# ── Networking & Connectivity ─────────────────────────────────────────────────
 networkmanager
+network-manager-applet
+nm-connection-editor
 wireless_tools
 wpa_supplicant
 iwd
@@ -23,8 +41,12 @@ git
 openssh
 rsync
 
-# Wayland, Compositor & Graphics
+# ── Wayland, Compositor & Graphics Stack ──────────────────────────────────────
 hyprland
+hypridle
+hyprlock
+hyprpaper
+swaybg
 waybar
 wallust
 foot
@@ -36,30 +58,68 @@ dunst
 wlogout
 grim
 slurp
+swappy
 wl-clipboard
+cliphist
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
 polkit-gnome
 brightnessctl
+playerctl
+
+# ── Audio & Media ─────────────────────────────────────────────────────────────
 pipewire
 pipewire-pulse
 pipewire-alsa
+pipewire-jack
 wireplumber
 pavucontrol
+mpv
+imv
 
-# Development, Shells & Modern Editors
-zsh
-fish
-starship
-neovim
+# ── Fonts & Typography ────────────────────────────────────────────────────────
+ttf-jetbrains-mono
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+ttf-font-awesome
+
+# ── File Manager & Archives ───────────────────────────────────────────────────
+thunar
+thunar-volman
+thunar-archive-plugin
+file-roller
+p7zip
+unzip
+zip
+tar
+gzip
+bzip2
+xz
+zstd
+
+# ── System Monitoring & CLI Utilities ─────────────────────────────────────────
+btop
+htop
+fastfetch
+tree
 fzf
 ripgrep
 fd
 bat
+jq
+
+# ── Development & Shells ──────────────────────────────────────────────────────
+bash
+zsh
+fish
+starship
+neovim
 rust
 cargo
 python
 python-pip
 
-# SigmaOS & Omarchy Native Shims
-# (installed via local airootfs or overlay repository)
+# ── SigmaOS Native Distro Integration ─────────────────────────────────────────
+# (Overlay components installed via airootfs and sigmaos-install)

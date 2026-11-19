@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-pkgmgr — SigmaOS package manager frontend
+# Wraps pacman + an AUR helper (yay/paru) with friendly UX.
+#
+# Usage: sigmaos-pkgmgr <command> [args...]
+# Commands: install, remove, search, update, list, info, clean, aur
+
+set -euo pipefail
+
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'
+BOLD='\033[1m'; RESET='\033[0m'
+info()    { echo -e "${CYAN}[pkgmgr]${RESET} $*"; }
+success() { echo -e "${GREEN}[pkgmgr]${RESET} $*"; }
+warn()    { echo -e "${YELLOW}[pkgmgr]${RESET} $*"; }
+err()     { echo -e "${RED}[pkgmgr]${RESET} $*" >&2; }
+
+usage() {
+  cat <<'EOF'
+sigmaos-pkgmgr — SigmaOS Package Manager
+
+USAGE
+  sigmaos-pkgmgr install  <pkg...>    Install package(s) from repos or AUR
+  sigmaos-pkgmgr remove   <pkg...>    Remove package(s) and unneeded deps
+  sigmaos-pkgmgr search   <query>     Search official repos + AUR
+  sigmaos-pkgmgr update               Full system upgrade (pacman -Syu)
+  sigmaos-pkgmgr list                 List explicitly installed packages
+  sigmaos-pkgmgr info     <pkg>       Show package details
+  sigmaos-pkgmgr clean                Clean package cache (keep 2 versions)
+  sigmaos-pkgmgr aur      <pkg...>    Install from AUR explicitly
+  sigmaos-pkgmgr orphans              List/remove orphaned packages
+  sigmaos-pkgmgr check                Verify package database integrity
+
+BACKENDS
+  Official: pacman
+  AUR:      yay (preferred) → paru → makepkg fallback
+EOF
+}
+
+# ── Detect AUR helper ─────────────────────────────────────────────────────────
+AUR_HELPER=""
+for h in yay paru; do
+  if command -v "$h" &>/dev/null; then
+    AUR_HELPER="$h"
+    break
+  fi
+done
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+need_pacman() {
+  if ! command -v pacman &>/dev/null; then
+    err "pacman not found. sigmaos-pkgmgr requires Arch Linux."
+    exit 1
+  fi
+}
+
+pkg_install() {
+  need_pacman
+  if [ -n "$AUR_HELPER" ]; then
+    info "Installing via $AUR_HELPER (repos + AUR): $*"
+    "$AUR_HELPER" -S --needed "$@"
+  else
+    info "Installing via pacman: $*"
+    sudo pacman -S --needed "$@"
+  fi
+}
+
+pkg_remove() {
+  need_pacman
+  info "Removing: $*"
+  sudo pacman -Rs "$@"
+}
+
+pkg_search() {
+  need_pacman
+  info "Searching official repos: $*"
+  pacman -Ss "$@" || true
+  if [ -n "$AUR_HELPER" ]; then
+    echo ""
+    info "Searching AUR: $*"
+    "$AUR_HELPER" -Ss "$@" --aur 2>/dev/null | head -30 || true
+  fi
+}
+
+pkg_update() {
+  need_pacman
+  info "Updating SigmaOS system packages..."
+  if [ -n "$AUR_HELPER" ]; then
+    "$AUR_HELPER" -Syu
+  else
+    sudo pacman -Syu
+  fi
+  success "System updated"
+}
+
+pkg_list() {
+  need_pacman
+  info "Explicitly installed packages:"
+  pacman -Qe | column -t
+}
+
+pkg_info() {
+  need_pacman
+  info "Package info: $1"
+  pacman -Qi "$1" 2>/dev/null || pacman -Si "$1" 2>/dev/null || {
+    [ -n "$AUR_HELPER" ] && "$AUR_HELPER" -Si "$1" || err "Package not found: $1"
+  }
+}
+
+pkg_clean() {
+  need_pacman
+  info "Cleaning package cache (keep 2 versions each)..."
+  if command -v paccache &>/dev/null; then
+    sudo paccache -r -k2
+    sudo paccache -ruk0
+  else
+    sudo pacman -Sc --noconfirm
+  fi
+  success "Cache cleaned"
+}
+
+pkg_aur() {
+  if [ -z "$AUR_HELPER" ]; then
+    err "No AUR helper found. Install yay: pacman -S --needed git base-devel && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
+    exit 1
+  fi
+  info "Installing from AUR via $AUR_HELPER: $*"
+  "$AUR_HELPER" -S "$@"
+}
+
+pkg_orphans() {
+  need_pacman
+  local orphans
+  orphans=$(pacman -Qdt 2>/dev/null) || true
+  if [ -z "$orphans" ]; then
+    success "No orphaned packages found ✓"
+  else
+    echo "$orphans"
+    echo ""
+    read -r -p "Remove all orphans? [y/N] " confirm
+    if [[ "${confirm,,}" == "y" ]]; then
+      sudo pacman -Rs $(pacman -Qdtq)
+      success "Orphans removed"
+    fi
+  fi
+}
+
+pkg_check() {
+  need_pacman
+  info "Checking package database integrity..."
+  sudo pacman -Dk 2>&1 | head -20
+  if command -v paccheck &>/dev/null; then
+    paccheck --md5sum --quiet 2>&1 | head -20
+  fi
+  success "Check complete"
+}
+
+# ── Dispatch ──────────────────────────────────────────────────────────────────
+cmd="${1:-help}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  install|i)   pkg_install "$@" ;;
+  remove|rm|r) pkg_remove "$@" ;;
+  search|s)    pkg_search "$@" ;;
+  update|up|u) pkg_update ;;
+  list|ls|l)   pkg_list ;;
+  info|show)   pkg_info "${1:-}" ;;
+  clean|cc)    pkg_clean ;;
+  aur|a)       pkg_aur "$@" ;;
+  orphans|orph)pkg_orphans ;;
+  check)       pkg_check ;;
+  -h|--help|help) usage ;;
+  *) err "Unknown command: $cmd"; usage; exit 1 ;;
+esac

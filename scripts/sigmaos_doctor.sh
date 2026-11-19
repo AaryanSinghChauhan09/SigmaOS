@@ -259,6 +259,11 @@ check_file "scripts/setup_desktop_dotfiles.sh"  "$SIGMA_ROOT/scripts/setup_deskt
 check_file "scripts/launch_desktop_persona.sh"  "$SIGMA_ROOT/scripts/launch_desktop_persona.sh"
 check_file "bin/sigmaos-desktop"                "$SIGMA_ROOT/bin/sigmaos-desktop"
 check_file "bin/sigmaos-update"                 "$SIGMA_ROOT/bin/sigmaos-update"
+check_file "bin/sigmaos-theme"                  "$SIGMA_ROOT/bin/sigmaos-theme"
+check_file "bin/sigmaos-wallpaper-set"          "$SIGMA_ROOT/bin/sigmaos-wallpaper-set"
+check_file "bin/sigmaos-pkgmgr"                 "$SIGMA_ROOT/bin/sigmaos-pkgmgr"
+check_file "bin/sigmaos-network"                "$SIGMA_ROOT/bin/sigmaos-network"
+check_file "bin/sigmaos-info"                   "$SIGMA_ROOT/bin/sigmaos-info"
 
 # config/sigmaos mirrors
 if [[ -d "$HOME/.config/sigmaos" ]]; then

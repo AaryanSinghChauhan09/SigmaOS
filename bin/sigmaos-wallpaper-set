@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-wallpaper-set — Set desktop wallpaper and optionally generate Wallust palette
+#
+# Usage:
+#   sigmaos-wallpaper-set <image|url> [--no-theme] [--theme-only] [-h]
+#
+# Supports: hyprpaper, swaybg, feh, nitrogen (auto-detects)
+# Integrates: wallust (colour palette from wallpaper)
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'
+BOLD='\033[1m'; RESET='\033[0m'
+info()    { echo -e "${CYAN}[wallpaper]${RESET} $*"; }
+success() { echo -e "${GREEN}[wallpaper]${RESET} $*"; }
+warn()    { echo -e "${YELLOW}[wallpaper]${RESET} $*"; }
+err()     { echo -e "${RED}[wallpaper]${RESET} $*" >&2; }
+
+usage() {
+  cat <<'EOF'
+sigmaos-wallpaper-set — SigmaOS wallpaper manager
+
+USAGE
+  sigmaos-wallpaper-set <path-or-url> [OPTIONS]
+
+ARGUMENTS
+  <path-or-url>   Path to image file, or https:// URL to download
+
+OPTIONS
+  --no-theme      Set wallpaper only; skip Wallust palette generation
+  --theme-only    Re-run Wallust on the current wallpaper without changing it
+  -h, --help      Show this help
+
+WALLPAPER BACKENDS (auto-detected in order)
+  hyprpaper, swaybg, feh, nitrogen
+
+EXAMPLES
+  sigmaos-wallpaper-set ~/Pictures/mountain.png
+  sigmaos-wallpaper-set https://example.com/wallpaper.jpg
+  sigmaos-wallpaper-set --theme-only
+EOF
+}
+
+NO_THEME=0
+THEME_ONLY=0
+IMAGE=""
+
+for arg in "$@"; do
+  case "$arg" in
+    --no-theme)   NO_THEME=1 ;;
+    --theme-only) THEME_ONLY=1 ;;
+    -h|--help)    usage; exit 0 ;;
+    --*)          err "Unknown option: $arg"; usage; exit 1 ;;
+    *)            IMAGE="$arg" ;;
+  esac
+done
+
+WALLPAPER_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/sigmaos/wallpapers"
+CURRENT_WALLPAPER_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos/current-wallpaper"
+mkdir -p "$WALLPAPER_DIR" "$(dirname "$CURRENT_WALLPAPER_FILE")"
+
+# ── Theme-only mode ───────────────────────────────────────────────────────────
+if [ "$THEME_ONLY" = "1" ]; then
+  if [ ! -f "$CURRENT_WALLPAPER_FILE" ]; then
+    err "No current wallpaper recorded. Set one first."
+    exit 1
+  fi
+  CURRENT=$(cat "$CURRENT_WALLPAPER_FILE")
+  info "Re-applying Wallust palette from: $CURRENT"
+  if command -v wallust &>/dev/null; then
+    wallust run "$CURRENT" && success "Wallust palette refreshed"
+  else
+    warn "wallust not installed; skipping theme generation"
+  fi
+  exit 0
+fi
+
+# ── Validate / fetch image ────────────────────────────────────────────────────
+if [ -z "$IMAGE" ]; then
+  err "No image specified. Usage: sigmaos-wallpaper-set <path|url>"
+  exit 1
+fi
+
+if [[ "$IMAGE" == http* ]]; then
+  info "Downloading wallpaper from: $IMAGE"
+  FILENAME="$(basename "$IMAGE" | cut -d? -f1)"
+  DEST="$WALLPAPER_DIR/$FILENAME"
+  if command -v curl &>/dev/null; then
+    curl -fsSL "$IMAGE" -o "$DEST"
+  elif command -v wget &>/dev/null; then
+    wget -q "$IMAGE" -O "$DEST"
+  else
+    err "Neither curl nor wget found"
+    exit 1
+  fi
+  IMAGE="$DEST"
+  success "Downloaded to: $IMAGE"
+fi
+
+if [ ! -f "$IMAGE" ]; then
+  err "File not found: $IMAGE"
+  exit 1
+fi
+
+IMAGE="$(realpath "$IMAGE")"
+info "Setting wallpaper: $IMAGE"
+
+# ── Set wallpaper via best available backend ──────────────────────────────────
+set_wallpaper() {
+  local img="$1"
+
+  if command -v hyprpaper &>/dev/null && [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    info "Backend: hyprpaper"
+    # Write hyprpaper config dynamically
+    local hp_conf="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprpaper.conf"
+    cat > "$hp_conf" <<HPCONF
+preload = $img
+wallpaper = ,$img
+HPCONF
+    # Signal hyprpaper to reload (kill + restart)
+    pkill -x hyprpaper 2>/dev/null || true
+    sleep 0.3
+    hyprpaper &
+    disown
+    success "hyprpaper: wallpaper set"
+
+  elif command -v swaybg &>/dev/null && [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    info "Backend: swaybg"
+    pkill -x swaybg 2>/dev/null || true
+    sleep 0.2
+    swaybg -i "$img" -m fill &
+    disown
+    success "swaybg: wallpaper set"
+
+  elif command -v feh &>/dev/null && [ -n "${DISPLAY:-}" ]; then
+    info "Backend: feh"
+    feh --bg-fill "$img"
+    # Save for session restore
+    echo "feh --bg-fill '$img'" > "$HOME/.fehbg"
+    success "feh: wallpaper set"
+
+  elif command -v nitrogen &>/dev/null && [ -n "${DISPLAY:-}" ]; then
+    info "Backend: nitrogen"
+    nitrogen --set-zoom-fill "$img" --save
+    success "nitrogen: wallpaper set"
+
+  else
+    warn "No supported wallpaper backend found (hyprpaper/swaybg/feh/nitrogen)"
+    warn "On Arch: pacman -S hyprpaper"
+  fi
+}
+
+set_wallpaper "$IMAGE"
+
+# Record current wallpaper
+echo "$IMAGE" > "$CURRENT_WALLPAPER_FILE"
+success "Wallpaper recorded: $CURRENT_WALLPAPER_FILE"
+
+# ── Generate Wallust palette ──────────────────────────────────────────────────
+if [ "$NO_THEME" = "0" ]; then
+  if command -v wallust &>/dev/null; then
+    info "Generating Wallust colour palette..."
+    if wallust run "$IMAGE" 2>/dev/null; then
+      success "Wallust palette generated from wallpaper"
+      # Reload Waybar if running
+      if pgrep -x waybar &>/dev/null; then
+        pkill -SIGUSR2 waybar 2>/dev/null || true
+        info "Waybar reloaded with new colours"
+      fi
+    else
+      warn "wallust run failed; palette not updated"
+    fi
+  else
+    warn "wallust not installed; install: pacman -S wallust"
+  fi
+fi
+
+echo ""
+success "Done. Wallpaper: $(basename "$IMAGE")"
