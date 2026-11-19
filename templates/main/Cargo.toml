@@ -91,7 +91,7 @@ overflow-checks = false
 # -----------------------------------------------------------------------------
 [profile.dev]
 opt-level = 0
-debug = true
+debug = false
 overflow-checks = true
 
 # -----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ overflow-checks = true
 # -----------------------------------------------------------------------------
 [profile.test]
 opt-level = 1
-debug = true
+debug = false
 overflow-checks = true
 
 # Faster link times during iterative development (requires lld or mold)

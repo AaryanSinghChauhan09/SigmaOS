@@ -457,6 +457,7 @@ fn test_alpc_local_procedure_calls() {
         .unwrap();
     server.register_procedure(301, |req| {
         let payload = req.get_payload();
+        // TEST TOKEN ONLY - DO NOT USE IN PRODUCTION
         if payload == b"VERIFY_TOKEN_XYZ" {
             b"TOKEN_VALIDATED_OK".to_vec()
         } else {
