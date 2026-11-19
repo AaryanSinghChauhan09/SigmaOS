@@ -108,5 +108,6 @@ __pycache__/
 !docs/BUILD_INSTRUCTIONS.md
 !docs/DOCKER_SETUP.md
 !docs/ARCH_VM_BUILD.md
+!docs/THEME-CONSOLIDATION-COMPLETE.md
 
 .agents/
