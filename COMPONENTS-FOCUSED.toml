@@ -76,6 +76,30 @@ inspirations = "SigmaOS"
 visibility = "public"
 depends_on = []
 
+# Desktop Environment
+[[component]]
+name = "SigmaOS-notifications"
+description = "Unified notification daemon for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notifications"
+engine = "notifications"
+category = "Desktop/UI"
+language = "rust"
+inspirations = "SigmaOS"
+visibility = "public"
+depends_on = []
+
+# System Tools
+[[component]]
+name = "SigmaOS-network-manager"
+description = "Enhanced network configuration for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-manager"
+engine = "network"
+category = "System Tools"
+language = "rust"
+inspirations = "SigmaOS"
+visibility = "public"
+depends_on = []
+
 # Sub-components (managed within SigmaOS-themes repo):
 # - sigmaos-theme-core (core theming engine)
 # - sigmaos-theme-icons (icon theme pack)
