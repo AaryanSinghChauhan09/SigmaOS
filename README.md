@@ -29,7 +29,75 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 
 ---
 
-## ⚡ Turnkey Launch & Quickstart
+## 🚀 Quick Start
+
+### Build the ISO
+
+**Option 1: Docker (any Linux host)**
+```bash
+# Install Docker
+sudo apt-get install -y docker.io
+sudo systemctl start docker
+sudo usermod -aG docker $USER  # Log out and back in
+
+# Build ISO
+scripts/build_archiso.sh --docker
+```
+
+**Option 2: Native Arch Linux**
+```bash
+sudo pacman -S archiso
+sudo scripts/build_archiso.sh --native
+```
+
+**Option 3: GitHub Actions**
+- Push to GitHub to trigger automated build
+- Download ISO from Actions artifacts
+
+### Test in QEMU
+
+```bash
+qemu-img create -f qcow2 /tmp/sigmaos_test.qcow2 32G
+qemu-system-x86_64 -m 4096 -enable-kvm \
+  -drive file=/tmp/sigmaos_test.qcow2,format=qcow2,if=virtio \
+  -cdrom out/sigmaos-desktop-YYYYMMDD-x86_64.iso -boot d
+```
+
+---
+
+## 📦 Package Set
+
+The ISO includes 116 curated packages:
+
+**Base System**: base, base-devel, linux, linux-firmware, linux-headers, systemd  
+**Desktop**: Hyprland, Waybar, Wallust, Foot, Alacritty, Kitty, Rofi  
+**Audio**: PipeWire, WirePlumber, Pavucontrol  
+**Fonts**: JetBrains Mono, Noto Fonts, Nerd Fonts  
+**Tools**: Neovim, Git, Docker, Python, Rust, Starship  
+
+See `iso/archiso/packages.x86_64` for complete list.
+
+---
+
+## 🔧 Installation
+
+The installer (`sigmaos-install`) includes safety features:
+
+**Default**: Dry-run mode (writes nothing to disk)
+
+**Destructive install** (ONLY in VMs):
+```bash
+sudo sigmaos-install --destructive --confirm-disk /dev/vda /dev/vda
+```
+
+**Safety checks**:
+- Active root guard (refuses to install to host disk)
+- Mount protection (aborts if target is mounted)
+- Explicit confirmation required
+
+---
+
+## 🛠 Development
 
 | Command | Effect |
 |---|---|
