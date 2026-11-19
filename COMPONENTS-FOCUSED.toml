@@ -102,6 +102,19 @@ visibility = "public"
 depends_on = []
 wiki = "docs/wiki/SigmaOS-Network-Manager.md"
 
+# Power Management
+[[component]]
+name = "SigmaOS-power-manager"
+description = "Power efficiency and battery management with State, Strategy, Observer patterns"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-manager"
+engine = "power"
+category = "System Tools"
+language = "rust"
+inspirations = "SigmaOS"
+visibility = "public"
+depends_on = []
+wiki = "docs/wiki/SigmaOS-Power-Manager.md"
+
 # Sub-components (managed within SigmaOS-themes repo):
 # - sigmaos-theme-core (core theming engine)
 # - sigmaos-theme-icons (icon theme pack)
