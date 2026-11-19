@@ -34,16 +34,16 @@ mkdir -p "$CACHE_DIR" "$STATE_DIR"
 BUILTIN_THEMES=(
   "catppuccin-mocha"
   "tokyo-night"
-  "nord"
   "gruvbox-dark"
+  "nord"
+  "everforest"
+  "matte-black"
   "cyber"
   "zenith"
 )
 
 # Persist theme order for cycling
-if [ ! -f "$THEME_ORDER_FILE" ]; then
-  printf '%s\n' "${BUILTIN_THEMES[@]}" > "$THEME_ORDER_FILE"
-fi
+printf '%s\n' "${BUILTIN_THEMES[@]}" > "$THEME_ORDER_FILE"
 
 get_current_theme() {
   [ -f "$CURRENT_THEME_FILE" ] && cat "$CURRENT_THEME_FILE" || echo "catppuccin-mocha"

@@ -1,17 +1,111 @@
-#!/bin/bash
-# sigmaos-default-terminal - Report/set default terminal
-# SigmaOS default terminal manager.
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-default-terminal — Default Terminal Switcher
+# Switch between Foot (default), Alacritty, Ghostty, or Kitty.
+#
+# Usage:
+#   sigmaos-default-terminal [get|list]
+#   sigmaos-default-terminal set <terminal>
+#   sigmaos-default-terminal menu
 
 set -euo pipefail
 
-if command -v foot >/dev/null 2>&1; then
-  echo "foot"
-elif command -v ghostty >/dev/null 2>&1; then
-  echo "ghostty"
-elif command -v kitty >/dev/null 2>&1; then
-  echo "kitty"
-elif command -v alacritty >/dev/null 2>&1; then
-  echo "alacritty"
-else
-  echo "foot"
-fi
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'
+BOLD='\033[1m'; RESET='\033[0m'
+
+STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos/default-terminal"
+ENV_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/environment.d/10-terminal.conf"
+mkdir -p "$(dirname "$STATE_FILE")" "$(dirname "$ENV_FILE")"
+
+TERMINALS=(
+  "foot:Foot Fast, Lightweight Wayland Terminal (Default)"
+  "alacritty:Alacritty GPU-Accelerated Terminal"
+  "ghostty:Ghostty Fast, Native Wayland Terminal"
+  "kitty:Kitty Feature-Rich GPU Terminal"
+)
+
+get_terminal() {
+  if [ -f "$STATE_FILE" ]; then
+    cat "$STATE_FILE"
+  else
+    echo "foot"
+  fi
+}
+
+set_terminal() {
+  local term="$1"
+  local valid=0
+  for item in "${TERMINALS[@]}"; do
+    if [[ "${item%%:*}" == "$term" ]]; then
+      valid=1
+      break
+    fi
+  done
+
+  if [ "$valid" -eq 0 ]; then
+    echo -e "${RED}[error]${RESET} Unsupported terminal: $term. Supported: foot, alacritty, ghostty, kitty" >&2
+    exit 1
+  fi
+
+  echo "$term" > "$STATE_FILE"
+  echo "TERMINAL=$term" > "$ENV_FILE"
+
+  echo -e "${GREEN}[terminal]${RESET} Default terminal set to: ${BOLD}$term${RESET}"
+  echo -e "${CYAN}[terminal]${RESET} Persisted to $ENV_FILE and $STATE_FILE"
+}
+
+cmd="${1:-get}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  get|current)
+    get_terminal
+    ;;
+
+  list)
+    echo -e "\n${BOLD}${CYAN}  SigmaOS Supported Terminals${RESET}\n"
+    current=$(get_terminal)
+    for item in "${TERMINALS[@]}"; do
+      name="${item%%:*}"
+      desc="${item#*:}"
+      installed="not installed"
+      if command -v "$name" &>/dev/null; then
+        installed="${GREEN}installed${RESET}"
+      fi
+      if [ "$name" = "$current" ]; then
+        echo -e "  ${GREEN}▶${RESET} ${BOLD}$name${RESET} \t($installed) — $desc ${CYAN}[active]${RESET}"
+      else
+        echo -e "    ${BOLD}$name${RESET} \t($installed) — $desc"
+      fi
+    done
+    echo ""
+    ;;
+
+  set)
+    target="${1:-}"
+    [[ -z "$target" ]] && { echo "Usage: sigmaos-default-terminal set <terminal>"; exit 1; }
+    set_terminal "$target"
+    ;;
+
+  menu)
+    choices=""
+    for item in "${TERMINALS[@]}"; do
+      name="${item%%:*}"
+      desc="${item#*:}"
+      choices+="$name: $desc\n"
+    done
+    if command -v rofi &>/dev/null && [ -n "${WAYLAND_DISPLAY:-}" ]; then
+      selected=$(echo -e "$choices" | rofi -dmenu -p " 💻 Default Terminal " -theme ~/.config/rofi/sigmaos.rasi | cut -d: -f1)
+      if [ -n "$selected" ]; then
+        set_terminal "$selected"
+      fi
+    else
+      echo -e "$choices"
+    fi
+    ;;
+
+  *)
+    echo "Usage: sigmaos-default-terminal [get|list|set <terminal>|menu]"
+    exit 1
+    ;;
+esac
