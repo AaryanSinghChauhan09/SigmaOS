@@ -134,5 +134,7 @@ __pycache__/
 !docs/wiki/SigmaOS-Update-Manager.md
 !docs/wiki/SigmaOS-Snapshot-Manager.md
 !PHASE-2-COMPLETE.md
+!IMPLEMENTATION-PROGRESS.md
+!FINAL-IMPLEMENTATION-SUMMARY.md
 
 .agents/
