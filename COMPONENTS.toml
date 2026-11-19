@@ -476,6 +476,17 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
+name = "SigmaOS-deskland"
+description = "SigmaOS Deskland — Web browser-based desktop environment clone"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deskland"
+engine = "web_desktop"
+category = "Desktop/UI"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = ["SigmaOS-desktop-environment"]
+
+[[component]]
 name = "SigmaOS-desktop-library"
 description = "Shared desktop library (settings, icons, xapp glue)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-library"
