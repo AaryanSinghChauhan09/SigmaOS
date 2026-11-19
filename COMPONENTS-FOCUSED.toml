@@ -115,6 +115,19 @@ visibility = "public"
 depends_on = []
 wiki = "docs/wiki/SigmaOS-Power-Manager.md"
 
+# Security
+[[component]]
+name = "SigmaOS-keyring-manager"
+description = "Secure credential storage with Singleton, Proxy, Observer patterns"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keyring-manager"
+engine = "keyring"
+category = "Security"
+language = "rust"
+inspirations = "SigmaOS"
+visibility = "public"
+depends_on = []
+wiki = "docs/wiki/SigmaOS-Keyring-Manager.md"
+
 # Sub-components (managed within SigmaOS-themes repo):
 # - sigmaos-theme-core (core theming engine)
 # - sigmaos-theme-icons (icon theme pack)
