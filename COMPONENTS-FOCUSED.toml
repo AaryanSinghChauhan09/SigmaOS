@@ -40,6 +40,18 @@ inspirations = "SigmaOS"
 visibility = "public"
 depends_on = ["pacman"]
 
+# Update Manager
+[[component]]
+name = "SigmaOS-update-manager"
+description = "Rolling release update orchestration with Observer, State, Strategy patterns"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-update-manager"
+engine = "update_manager"
+category = "System"
+language = "rust"
+inspirations = "SigmaOS"
+visibility = "public"
+depends_on = ["sigmaos-package-manager", "sigmaos-snapshot-manager"]
+
 # Desktop Components
 [[component]]
 name = "SigmaOS-themes"
