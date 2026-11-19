@@ -18,48 +18,21 @@ depends_on = []
 
 # Desktop Components
 [[component]]
-name = "SigmaOS-theme"
-description = "SigmaOS Theming, Design Tokens & Color Palettes"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme"
-engine = "theme"
+name = "SigmaOS-themes"
+description = "Unified theming system: icons, GTK3, desktop themes, design tokens"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-themes"
+engine = "theme_system"
 category = "Desktop/UI"
-language = "shell"
-inspirations = "Omarchy Linux"
+language = "rust"
+inspirations = "SigmaOS"
 visibility = "public"
 depends_on = []
 
-[[component]]
-name = "SigmaOS-theme-icon"
-description = "Icon theme pack"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-icon"
-engine = "theme"
-category = "Desktop/UI"
-language = "shell"
-inspirations = "Linux Mint"
-visibility = "public"
-depends_on = ["SigmaOS-theme"]
-
-[[component]]
-name = "SigmaOS-theme-gtk3"
-description = "GTK3 theme engine"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-gtk3"
-engine = "theme"
-category = "Desktop/UI"
-language = "shell"
-inspirations = "Omarchy Linux"
-visibility = "public"
-depends_on = ["SigmaOS-theme"]
-
-[[component]]
-name = "SigmaOS-theme-desktop-environment"
-description = "Desktop-shell theme"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-desktop-environment"
-engine = "theme"
-category = "Desktop/UI"
-language = "shell"
-inspirations = "Cinnamon"
-visibility = "public"
-depends_on = ["SigmaOS-theme"]
+# Sub-components (managed within SigmaOS-themes repo):
+# - sigmaos-theme-core (core theming engine)
+# - sigmaos-theme-icons (icon theme pack)
+# - sigmaos-theme-gtk3 (GTK3 theme engine)
+# - sigmaos-theme-desktop (desktop-shell theme)
 
 # System Components
 [[component]]
