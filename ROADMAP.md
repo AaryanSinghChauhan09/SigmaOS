@@ -7,16 +7,18 @@ SigmaOS has been transformed from a repository with conflicting OS ambitions int
 ## Current State (2026-11-19 - Updated)
 
 ### Repository Status
-- **Main Repo**: SigmaOS - Clean, single main branch
-- **Component Registry**: 2,495 → 17 real components (COMPONENTS-FOCUSED.toml)
+- **Main Repo**: SigmaOS - Clean, single main branch, no PRs
+- **Component Registry**: 2,495 → 12 real components (COMPONENTS-FOCUSED.toml)
   - Removed 4 Debian/Ubuntu-inspired package management components
   - Removed 8 utility components (consolidated into SigmaOS-utils)
+  - Removed 5 dev tool components (consolidated into SigmaOS-dev)
   - All inspirations normalized to SigmaOS or Arch Linux
-- **New Repos**: 
+- **New Repos**:
   - SigmaOS-themes (consolidated from 4 theme repos)
   - SigmaOS-utils (consolidated from 8 utility repos)
+  - SigmaOS-dev (consolidated from 5 dev tool repos)
 - **Arch Repos**: 50+ SigmaOS-arch-* repos identified for deletion
-- **Component Repos**: ~37 SigmaOS-* repos, consolidation in progress
+- **Component Repos**: ~32 SigmaOS-* repos, consolidation in progress
 
 ### ISO Build
 - **Status**: GitHub Actions workflow queued
@@ -104,6 +106,19 @@ SigmaOS has been transformed from a repository with conflicting OS ambitions int
 - Normalized inspirations to SigmaOS only
 - Created Wiki documentation for SigmaOS-utils
 
+### Phase 10: Dev Tool Consolidation (COMPLETED 2026-11-19)
+- Created SigmaOS-dev repository
+- Consolidated 5 dev tool repos into 1 monorepo:
+  - SigmaOS-dev-tools → toolchain/
+  - SigmaOS-fish → fish/
+  - SigmaOS-agent-cli → agent-cli/
+  - SigmaOS-quickshell → quickshell/
+  - SigmaOS-workspace → workspace/
+- All cargo build --offline and cargo test --offline pass (30 tests)
+- Normalized inspirations to SigmaOS only
+- Simplified workspace component to remove kernel-specific dependencies
+- Created Wiki documentation for SigmaOS-dev
+
 ## Roadmap to Production
 
 ### Milestone 1: Working ISO (Current - In Progress)
@@ -148,7 +163,7 @@ SigmaOS has been transformed from a repository with conflicting OS ambitions int
 **Success Criteria**: Only necessary SigmaOS repos remain
 
 ### Milestone 4: Repository Consolidation
-**Status**: In Progress (2/4 completed)
+**Status**: In Progress (3/4 completed)
 
 **Completed**:
 - [x] Create SigmaOS-themes (consolidate 4 theme repos)
@@ -157,10 +172,11 @@ SigmaOS has been transformed from a repository with conflicting OS ambitions int
 - [x] Normalize all inspirations to SigmaOS or Arch Linux
 - [x] Create SigmaOS-utils (consolidate 8 utility repos)
 - [x] Wiki documentation for SigmaOS-utils
+- [x] Create SigmaOS-dev (consolidate 5 dev tool repos)
+- [x] Wiki documentation for SigmaOS-dev
 
 **Remaining**:
-- [ ] Create SigmaOS-dev (consolidate 5 dev tool repos)
-- [ ] Create SigmaOS-system (consolidate 5 system component repos)
+- [ ] Create SigmaOS-system (consolidate 6 system component repos)
 - [ ] Move code from old repos to new repos
 - [ ] Archive old repos after migration
 - [ ] Update scripts/sigma_hub.sh
@@ -168,7 +184,7 @@ SigmaOS has been transformed from a repository with conflicting OS ambitions int
 **Success Criteria**: ~50 repos consolidated into ~7 logical repos
 
 ### Milestone 5: Wiki Creation for Components
-**Status**: In Progress (SigmaOS-themes and SigmaOS-utils completed)
+**Status**: In Progress (SigmaOS-themes, SigmaOS-utils, SigmaOS-dev completed)
 
 **Completed**:
 - [x] Create Wiki documentation for SigmaOS-themes
@@ -177,11 +193,11 @@ SigmaOS has been transformed from a repository with conflicting OS ambitions int
 - [x] Create Wiki documentation for sigmaos-theme-gtk3
 - [x] Create Wiki documentation for sigmaos-theme-desktop
 - [x] Create Wiki documentation for SigmaOS-utils
+- [x] Create Wiki documentation for SigmaOS-dev
 
 **Remaining**:
 - [ ] Manually migrate docs/wiki/*.md to GitHub Wiki
 - [ ] Create GitHub Wiki for SigmaOS (main repo)
-- [ ] Create GitHub Wiki for SigmaOS-dev
 - [ ] Create GitHub Wiki for SigmaOS-system
 - [ ] Connect repositories via wiki cross-references
 
@@ -345,9 +361,10 @@ SigmaOS-skills (separate)
 - **Week 1**: ISO build and testing (current)
 - **Week 1 (completed)**: Theme consolidation and identity normalization
 - **Week 1 (completed)**: Utility consolidation
+- **Week 1 (completed)**: Dev tool consolidation
 - **Week 2**: Wiki migration
 - **Week 3**: Repository cleanup (delete unnecessary repos)
-- **Week 4**: Repository consolidation (dev, system)
+- **Week 4**: Repository consolidation (system components)
 - **Week 5**: Component wiki creation
 - **Week 6**: Hub implementation
 - **Week 7**: End-to-end testing and refinement
