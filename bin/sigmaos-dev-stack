@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# SigmaOS Sovereign Desktop — Developer Runtime Stacks CLI
+# Wrapper around scripts/setup_dev_stacks.sh
+# Usage: sigmaos-dev-stack [core|node|rails|laravel|all] [--dry-run]
+
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+exec bash "$ROOT_DIR/scripts/setup_dev_stacks.sh" "$@"

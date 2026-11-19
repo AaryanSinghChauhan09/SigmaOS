@@ -278,7 +278,13 @@ check_file "bin/sigmaos-installer-tui"          "$SIGMA_ROOT/bin/sigmaos-install
 check_file "config/omarchy/quickshell/shell.qml" "$SIGMA_ROOT/config/omarchy/quickshell/shell.qml"
 check_file "config/omarchy/quickshell/notifications.qml" "$SIGMA_ROOT/config/omarchy/quickshell/notifications.qml"
 check_file "config/omarchy/quickshell/launcher.qml" "$SIGMA_ROOT/config/omarchy/quickshell/launcher.qml"
+check_file "config/omarchy/quickshell/widgets.qml" "$SIGMA_ROOT/config/omarchy/quickshell/widgets.qml"
 check_file "scripts/setup_dev_stacks.sh"         "$SIGMA_ROOT/scripts/setup_dev_stacks.sh"
+check_file "bin/sigmaos-dev-stack"              "$SIGMA_ROOT/bin/sigmaos-dev-stack"
+check_file "bin/sigmaos-theme-install"          "$SIGMA_ROOT/bin/sigmaos-theme-install"
+check_file "bin/sigmaos-hyprshot"               "$SIGMA_ROOT/bin/sigmaos-hyprshot"
+check_file "bin/sigmaos-tpm"                    "$SIGMA_ROOT/bin/sigmaos-tpm"
+check_file "bin/omarchy"                        "$SIGMA_ROOT/bin/omarchy"
 check_file "bin/sigmaos-info"                   "$SIGMA_ROOT/bin/sigmaos-info"
 
 # config/sigmaos mirrors

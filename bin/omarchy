@@ -28,9 +28,14 @@ CORE SYSTEM & DESKTOP SHELL
 
 THEMING & CUSTOMIZATION
   theme           Manage system-wide themes (Catppuccin, Tokyo Night, Nord, etc.)
+  theme-install   Download and manage community themes (Wallust/Pywal)
   wallpaper       Set wallpaper and dynamically generate color palettes
   editor          Switch default editor (nvim, code, cursor, zed, helix, vim)
   terminal        Switch default terminal (foot, alacritty, ghostty, kitty)
+
+DEVELOPER TOOLCHAIN & RUNTIMES
+  stacks          Provision developer stacks (Mise, Docker, Rails, Laravel, Node.js)
+  screenshot      Take screenshot with hyprshot, annotation, and clipboard
 
 AI & AGENTIC SUITE (OMARCHY 4+)
   agent           Universal coding agent launcher & switcher (claude, codex, etc.)
@@ -46,6 +51,7 @@ SYSTEM MAINTENANCE & SECURITY
   net             Network connectivity manager (WiFi / VPN / DNS)
   audio           PipeWire audio and volume controller
   bluetooth       Bluetooth device manager
+  tpm             TPM2 security manager & LUKS auto-unlock
   install         Defensive system installer (with Btrfs/LUKS)
   info            System hardware and environment summary
 EOF
@@ -60,11 +66,14 @@ case "$cmd" in
   display|mon)    exec "$SCRIPT_DIR/sigmaos-display" "$@" ;;
   keybinds|keys)  exec "$SCRIPT_DIR/sigmaos-keybinds" "$@" ;;
   screenrecord|rec) exec "$SCRIPT_DIR/sigmaos-screenrecord" "$@" ;;
+  screenshot|shot) exec "$SCRIPT_DIR/sigmaos-hyprshot" "$@" ;;
 
   theme)          exec "$SCRIPT_DIR/sigmaos-theme" "$@" ;;
+  theme-install)  exec "$SCRIPT_DIR/sigmaos-theme-install" "$@" ;;
   wallpaper|bg)   exec "$SCRIPT_DIR/sigmaos-wallpaper-set" "$@" ;;
   editor)         exec "$SCRIPT_DIR/sigmaos-default-editor" "$@" ;;
   terminal|term)  exec "$SCRIPT_DIR/sigmaos-default-terminal" "$@" ;;
+  stacks|dev-stacks) exec "$SCRIPT_DIR/sigmaos-dev-stack" "$@" ;;
 
   agent|ai)       exec "$SCRIPT_DIR/sigmaos-agent" "$@" ;;
   agent-usage)    exec "$SCRIPT_DIR/sigmaos-agent-usage" "$@" ;;
@@ -78,6 +87,7 @@ case "$cmd" in
   net)            exec "$SCRIPT_DIR/sigmaos-network" "$@" ;;
   audio)          exec "$SCRIPT_DIR/sigmaos-audio" "$@" ;;
   bluetooth|bt)   exec "$SCRIPT_DIR/sigmaos-bluetooth" "$@" ;;
+  tpm)            exec "$SCRIPT_DIR/sigmaos-tpm" "$@" ;;
   install)        exec "$SCRIPT_DIR/sigmaos-install" "$@" ;;
   info)           exec "$SCRIPT_DIR/sigmaos-info" "$@" ;;
 

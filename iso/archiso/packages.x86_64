@@ -119,6 +119,9 @@ neovim
 helix
 tmux
 lazygit
+mise
+docker
+docker-compose
 rust
 cargo
 python
@@ -132,6 +135,9 @@ kdenlive
 obs-studio
 steam
 retroarch
+hyprshot
+tpm2-tools
+sbctl
 
 # ── SigmaOS Native Distro Integration ─────────────────────────────────────────
 # (Overlay components installed via airootfs and sigmaos-install)

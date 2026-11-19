@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+# SigmaOS Sovereign Desktop — TPM2 Security Manager
+# Manage TPM2 key enrollment, LUKS auto-unlock, SecureBoot status
+# Usage: sigmaos-tpm [status|enroll-luks|remove-luks|secureboot|pcr-info|seal|unseal]
+
+set -euo pipefail
+
+BOLD=$'\033[1m'
+GREEN=$'\033[0;32m'
+CYAN=$'\033[0;36m'
+YELLOW=$'\033[1;33m'
+RED=$'\033[0;31m'
+RESET=$'\033[0m'
+
+LUKS_DEVICE="${LUKS_DEVICE:-}"
+SLOT="${TPM_SLOT:-1}"
+
+usage() {
+  cat <<EOF
+${BOLD}sigmaos-tpm${RESET} — TPM2 Security Manager
+
+${BOLD}COMMANDS${RESET}
+  status              Show TPM chip info and PCR measurements
+  secureboot          Show Secure Boot enrollment status
+  enroll-luks <dev>   Enroll TPM2 key for LUKS auto-unlock (systemd-cryptenroll)
+  remove-luks <dev>   Remove TPM2 slot from LUKS device
+  pcr-info            Dump all PCR bank values
+  seal   <file>       Seal a secret file to current PCR state
+  unseal <file>       Unseal a previously sealed secret
+
+${BOLD}ENVIRONMENT${RESET}
+  LUKS_DEVICE         Default LUKS block device (e.g. /dev/sda2)
+  TPM_SLOT            LUKS key slot to use for TPM (default: 1)
+
+${BOLD}EXAMPLES${RESET}
+  sigmaos-tpm status
+  sigmaos-tpm enroll-luks /dev/nvme0n1p2
+  sigmaos-tpm secureboot
+  LUKS_DEVICE=/dev/sda3 sigmaos-tpm enroll-luks
+EOF
+}
+
+require_root() {
+  [[ $EUID -eq 0 ]] || { echo -e "${RED}Error:${RESET} This command requires root. Run with sudo."; exit 1; }
+}
+
+require_cmd() {
+  command -v "$1" &>/dev/null || {
+    echo -e "${RED}Error:${RESET} '$1' not found. Install: ${CYAN}${2:-$1}${RESET}"
+    exit 1
+  }
+}
+
+tpm_status() {
+  echo -e "${BOLD}${CYAN}=== TPM2 Status ===${RESET}"
+  echo ""
+  if command -v tpm2_getcap &>/dev/null; then
+    echo -e "${BOLD}TPM Properties:${RESET}"
+    tpm2_getcap properties-fixed 2>/dev/null | grep -E "TPM2_PT_(MANUFACTURER|VENDOR|FIRMWARE|PCR_COUNT)" | \
+      sed 's/^/  /' || echo "  (tpm2-tools not fully functional)"
+    echo ""
+    echo -e "${BOLD}PCR Banks:${RESET}"
+    tpm2_getcap pcrs 2>/dev/null | head -10 | sed 's/^/  /' || echo "  (unavailable)"
+  else
+    echo -e "${YELLOW}⚠  tpm2-tools not installed${RESET}"
+  fi
+
+  echo ""
+  echo -e "${BOLD}Kernel TPM Devices:${RESET}"
+  ls /dev/tpm* 2>/dev/null | sed 's/^/  /' || echo "  (no TPM device found)"
+
+  echo ""
+  echo -e "${BOLD}systemd-cryptenroll Support:${RESET}"
+  if command -v systemd-cryptenroll &>/dev/null; then
+    echo -e "  ${GREEN}✓ systemd-cryptenroll available${RESET}"
+  else
+    echo -e "  ${YELLOW}✗ systemd-cryptenroll not found${RESET}"
+  fi
+}
+
+secureboot_status() {
+  echo -e "${BOLD}${CYAN}=== Secure Boot Status ===${RESET}"
+  echo ""
+  if command -v bootctl &>/dev/null; then
+    bootctl status 2>/dev/null | grep -E "(Secure Boot|TPM2|Firmware)" | sed 's/^/  /' || true
+  fi
+  if [[ -d /sys/firmware/efi ]]; then
+    local sb_var="/sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c"
+    if [[ -f "$sb_var" ]]; then
+      local sb_byte
+      sb_byte=$(od -An -tu1 "$sb_var" | awk '{print $NF}')
+      if [[ "$sb_byte" == "1" ]]; then
+        echo -e "  ${GREEN}✓ Secure Boot: ENABLED${RESET}"
+      else
+        echo -e "  ${YELLOW}✗ Secure Boot: DISABLED${RESET}"
+      fi
+    else
+      echo -e "  ${YELLOW}? Secure Boot: Unknown (EFI var not readable)${RESET}"
+    fi
+  else
+    echo -e "  ${RED}✗ Not running in UEFI mode${RESET}"
+  fi
+  echo ""
+  if command -v sbctl &>/dev/null; then
+    echo -e "${BOLD}sbctl Status:${RESET}"
+    sbctl status 2>/dev/null | sed 's/^/  /' || true
+  fi
+}
+
+enroll_luks() {
+  local dev="${1:-$LUKS_DEVICE}"
+  [[ -n "$dev" ]] || { echo -e "${RED}Error:${RESET} Specify LUKS device: sigmaos-tpm enroll-luks /dev/nvme0n1p2"; exit 1; }
+  require_root
+  require_cmd "systemd-cryptenroll" "systemd (>=248)"
+
+  echo -e "${CYAN}→ Enrolling TPM2 key for LUKS device:${RESET} $dev"
+  echo -e "${YELLOW}⚠  This will bind auto-unlock to current PCR state (PCR 7 = Secure Boot policy)${RESET}"
+  echo ""
+  read -r -p "Continue? [y/N] " confirm
+  [[ "${confirm,,}" == "y" ]] || { echo "Aborted."; exit 0; }
+
+  systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 "$dev"
+  echo -e "${GREEN}✓ TPM2 enrollment complete${RESET}"
+  echo -e "  Edit /etc/crypttab to add: tpm2-device=auto,tpm2-pcrs=0+7"
+}
+
+remove_luks() {
+  local dev="${1:-$LUKS_DEVICE}"
+  [[ -n "$dev" ]] || { echo -e "${RED}Error:${RESET} Specify LUKS device"; exit 1; }
+  require_root
+  require_cmd "systemd-cryptenroll" "systemd"
+
+  echo -e "${CYAN}→ Removing TPM2 slot $SLOT from:${RESET} $dev"
+  systemd-cryptenroll --wipe-slot=tpm2 "$dev"
+  echo -e "${GREEN}✓ TPM2 slot removed${RESET}"
+}
+
+pcr_info() {
+  echo -e "${BOLD}${CYAN}=== PCR Bank Measurements ===${RESET}"
+  require_cmd "tpm2_pcrread" "tpm2-tools"
+  tpm2_pcrread 2>/dev/null | sed 's/^/  /' || echo "  (TPM unavailable)"
+}
+
+seal_secret() {
+  local file="${1:?Usage: sigmaos-tpm seal <file>}"
+  require_cmd "tpm2_createprimary" "tpm2-tools"
+  local sealed_file="${file}.sealed"
+  echo -e "${CYAN}→ Sealing${RESET} $file to current PCR 0+7 state..."
+  tpm2_createprimary -C e -c /tmp/sigma_tpm_primary.ctx
+  tpm2_create -C /tmp/sigma_tpm_primary.ctx -i "$file" -u "${sealed_file}.pub" -r "${sealed_file}.priv" \
+    -L "pcr:sha256:0,7" 2>/dev/null
+  rm -f /tmp/sigma_tpm_primary.ctx
+  echo -e "${GREEN}✓ Sealed:${RESET} ${sealed_file}.{pub,priv}"
+}
+
+unseal_secret() {
+  local file="${1:?Usage: sigmaos-tpm unseal <file>}"
+  require_cmd "tpm2_unseal" "tpm2-tools"
+  tpm2_createprimary -C e -c /tmp/sigma_tpm_primary.ctx
+  tpm2_load -C /tmp/sigma_tpm_primary.ctx -u "${file}.pub" -r "${file}.priv" -c /tmp/sigma_tpm_obj.ctx
+  tpm2_unseal -c /tmp/sigma_tpm_obj.ctx
+  rm -f /tmp/sigma_tpm_primary.ctx /tmp/sigma_tpm_obj.ctx
+}
+
+cmd="${1:-status}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  status)         tpm_status ;;
+  secureboot)     secureboot_status ;;
+  enroll-luks)    enroll_luks "${1:-}" ;;
+  remove-luks)    remove_luks "${1:-}" ;;
+  pcr-info)       pcr_info ;;
+  seal)           seal_secret "${1:-}" ;;
+  unseal)         unseal_secret "${1:-}" ;;
+  -h|--help|help) usage ;;
+  *)              echo -e "${RED}Unknown command:${RESET} $cmd"; usage; exit 1 ;;
+esac

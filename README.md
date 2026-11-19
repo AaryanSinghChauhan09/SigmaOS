@@ -18,12 +18,12 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 |---|---|---|
 | **Host Workstation Environment** | **Working** | Native binary (`bin/sigmaos`), interactive TUI, Python/GTK3 desktop launcher (`scripts/sigmaos_gui.py`). |
 | **Defensive System Installer** | **Working** | Industrial installer (`iso_root/installer/install.sh`, `sigmaos-install`). Defaults to `DRY_RUN=1` simulation. Requires `--destructive --confirm-disk <DEV>`. Guards active host root drive. |
-| **Diagnostic Health Suite** | **Working** | 67-point system health audit (`./run.sh --doctor`, `scripts/sigmaos_doctor.sh`). Validates display, GPU, fonts, Rust/Python runtimes, configs, Quickshell, AI agents, dev stacks, and sovereign tooling. |
+| **Diagnostic Health Suite** | **Working** | 73-point system health audit (`./run.sh --doctor`, `scripts/sigmaos_doctor.sh`). Validates display, GPU, fonts, Rust/Python runtimes, configs, Quickshell (shell, notifications, launcher, widgets), AI agents, dev stacks, TPM2 security, screenshot tools, and sovereign tooling. |
 | **Component Sub-Repositories (22)** | **Working** | 22 implemented sub-repositories in pure `#![forbid(unsafe_code)]` Rust with comprehensive unit and integration test suites passing in CI. |
-| **Desktop Profiles & Configuration** | **Working** | Wayland / Hyprland tiling desktop, Quickshell QML reactive desktop shell, Waybar configurations, dynamic Wallust theming, multi-monitor scaling, and Starship shell prompts. |
+| **Desktop Profiles & Configuration** | **Working** | Wayland / Hyprland tiling desktop, Quickshell QML reactive desktop shell (bar, notifications, launcher, telemetry widgets), Waybar configurations, dynamic Wallust theming, multi-monitor scaling, and Starship shell prompts. |
 | **AI & Agentic Suite (Omarchy 4+ Parity)** | **Working** | Universal coding agent switcher (`sigmaos-agent`), usage quota tracking (`sigmaos-agent-usage`), crash-to-agent diagnostics (`sigmaos-crash-diagnostics`), and local LLM acceleration (`sigmaos-local-ai`). |
-| **System CLI Tooling Suite** | **Working** | Full native shell CLI suite (`sigmaos-update`, `sigmaos-theme`, `sigmaos-wallpaper-set`, `sigmaos-pkgmgr`, `sigmaos-network`, `sigmaos-audio`, `sigmaos-bluetooth`, `sigmaos-snapshot`, `sigmaos-display`, `sigmaos-keybinds`, `sigmaos-quickshell`, `sigmaos-screenrecord`, `sigmaos-info`). |
-| **Arch-based Live ISO Media** | **Working / Turnkey** | Turnkey Arch-based live ISO profile (`iso/archiso/`, `scripts/build_archiso.sh`) with 100 packages, Docker containerized builds (`--docker`), native Arch builds (`--native`), and defensive installer. |
+| **System CLI Tooling Suite** | **Working** | Full native shell CLI suite (`sigmaos-update`, `sigmaos-theme`, `sigmaos-theme-install`, `sigmaos-wallpaper-set`, `sigmaos-pkgmgr`, `sigmaos-network`, `sigmaos-audio`, `sigmaos-bluetooth`, `sigmaos-snapshot`, `sigmaos-display`, `sigmaos-keybinds`, `sigmaos-quickshell`, `sigmaos-screenrecord`, `sigmaos-hyprshot`, `sigmaos-tpm`, `sigmaos-dev-stack`, `sigmaos-info`, `omarchy`). |
+| **Arch-based Live ISO Media** | **Working / Turnkey** | Turnkey Arch-based live ISO profile (`iso/archiso/`, `scripts/build_archiso.sh`) with 116 verified packages, Docker containerized builds (`--docker`), native Arch builds (`--native`), and defensive installer. |
 | **Package Management Engine (`sigpkg`)**| **Experimental** | ALPM transaction model, dependency graph solver, and repository query client. |
 | **Custom `#![no_std]` Microkernel** | **Planned / Research** | Clean-slate freestanding Rust/C microkernel research (`src/kernel/`, `iso-build/kernel-stub.c`). Maintained as a separate long-term research track. |
 
@@ -38,10 +38,11 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 | `./run.sh --minimal` | Sovereign Minimalist Profile (CLI core) |
 | `./run.sh --gui` | Launch full graphical desktop application (GTK3 + WebKit2) |
 | `./run.sh --native` | Launch pure GTK3 desktop interface |
-| `./run.sh --doctor` | Run 67-point system health diagnostics |
+| `./run.sh --doctor` | Run 73-point system health diagnostics |
 | `./run.sh --dotfiles`| Deploy desktop configuration dotfiles to `~/.config` |
 | `./run.sh --update` | Full update: system packages + dotfiles + Wallust theme |
 | `./run.sh --theme` | Manage Wallust themes (list, apply, cycle next/prev) |
+| `./run.sh --theme-install`| Install & manage community themes (Wallust/Pywal) |
 | `./run.sh --wallpaper`| Set wallpaper and dynamically regenerate color scheme |
 | `./run.sh --pkgmgr` | Arch & AUR package management (install/search/clean/orphans) |
 | `./run.sh --network` | Network connectivity CLI (wifi/ethernet/vpn/dns/speed) |
@@ -53,8 +54,10 @@ In adherence to engineering integrity, Gall's Law, and defensive programming, Si
 | `./run.sh --agent`   | Universal AI coding agent switcher (claude/codex/opencode) |
 | `./run.sh --local-ai`| Local LLM manager (Ollama / LM Studio GPU inference) |
 | `./run.sh --dev-stacks`| Developer stacks provisioner (Mise/Docker/Rails/Laravel/Node) |
+| `./run.sh --screenshot`| Screenshot tool with hyprshot, annotation, and clipboard |
 | `./run.sh --screenrecord`| Screen recorder with region selection & PipeWire audio |
 | `./run.sh --snapshot`| Btrfs snapshot & rollback controller |
+| `./run.sh --tpm`     | TPM2 security manager & LUKS auto-unlock (systemd-cryptenroll) |
 | `./run.sh --info` | System information display (Fastfetch style + JSON mode) |
 | `./run.sh --check` | Run automated launch readiness validation |
 | `./run.sh --qemu` | Boot test environment in QEMU virtual machine |
@@ -72,18 +75,23 @@ SigmaOS provides a complete set of ergonomic, shell-native management tools:
 - **`sigmaos-bluetooth`**: BlueZ controller for scanning, pairing, connecting, and managing Bluetooth audio & peripherals.
 - **`sigmaos-display`**: Hyprland multi-monitor layout, resolution, refresh rate, and HiDPI fractional scaling controller.
 - **`sigmaos-keybinds`**: Searchable pop-up cheatsheet for Hyprland shortcuts (bound to `Super + /` and `Super + Ctrl + K`).
-- **`sigmaos-quickshell`**: Quickshell QML reactive status bar and dock orchestrator with seamless Waybar fallback.
+- **`sigmaos-quickshell`**: Quickshell QML reactive status bar, dock, notifications, launcher, and widget orchestrator.
 - **`sigmaos-agent`**: Lazy-loaded coding agent launcher supporting `claude`, `codex`, `opencode`, `agy`, `copilot`, `crush`, `grok`, `pi`, `omp`, `ori`.
 - **`sigmaos-agent-usage`**: Top-bar metrics provider tracking AI subscription balances and daily token limits.
 - **`sigmaos-crash-diagnostics`**: `systemd-coredump` monitor routing stack traces directly to your default AI coding agent.
 - **`sigmaos-local-ai`**: Turnkey manager for local GPU inference via Ollama and LM Studio.
 - **`sigmaos-screenrecord`**: Region and full-screen video recorder with PipeWire audio capture and Waybar toggle.
+- **`sigmaos-hyprshot`**: Integrated screenshot utility with region, active window, and output capture, swappy annotations, and clipboard support.
+- **`sigmaos-tpm`**: Hardware security manager for TPM2 chip inspection, PCR measurements, SecureBoot status, and LUKS auto-unlock via `systemd-cryptenroll`.
+- **`sigmaos-dev-stack`**: Developer runtime and stack provisioner for Mise, Docker, Tmux, Lazygit, Node.js, Ruby on Rails, and Laravel.
 - **`sigmaos-installer-tui`**: Interactive terminal setup wizard with Btrfs subvolumes, LUKS encryption options, and root protection.
 - **`sigmaos-snapshot`**: Btrfs system recovery controller with pacman pre/post upgrade transaction hooks and subvolume rollbacks.
-- **`sigmaos-theme`**: Wallpaper and palette engine supporting 6 built-in themes and dynamic Wallust generation.
+- **`sigmaos-theme`**: Wallpaper and palette engine supporting 8 built-in themes and dynamic Wallust generation.
+- **`sigmaos-theme-install`**: Community theme package installer fetching, previewing, and applying palettes from the community registry.
 - **`sigmaos-wallpaper-set`**: Multi-backend wallpaper switcher (`hyprpaper`, `swaybg`, `feh`, `nitrogen`).
-- **`sigmaos-doctor`**: 64-point comprehensive system diagnostic validating display servers, GPU drivers, audio, and tools.
+- **`sigmaos-doctor`**: 73-point comprehensive system diagnostic validating display servers, GPU drivers, audio, runtimes, and tools.
 - **`sigmaos-info`**: Fastfetch-style terminal hardware/OS summary with JSON export for scripting.
+- **`omarchy`**: 100% drop-in compatible universal CLI dispatcher routing every command to sovereign tooling.
 
 ---
 

@@ -91,6 +91,15 @@ case "$ACTION" in
     --dev-stacks|dev-stacks|--stacks|stacks)
         exec bash "$SCRIPT_DIR/scripts/setup_dev_stacks.sh" "${@:2}"
         ;;
+    --theme-install|theme-install)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-theme-install" "${@:2}"
+        ;;
+    --screenshot|screenshot|--shot|shot)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-hyprshot" "${@:2}"
+        ;;
+    --tpm|tpm)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-tpm" "${@:2}"
+        ;;
     --screenrecord|screenrecord|--rec|rec)
         exec bash "$SCRIPT_DIR/bin/sigmaos-screenrecord" "${@:2}"
         ;;
@@ -175,6 +184,7 @@ case "$ACTION" in
         echo "  --dotfiles    Deploy SigmaOS desktop configs to ~/.config"
         echo "  --update      Update packages + dotfiles + theme (sigmaos-update)"
         echo "  --theme       Manage Wallust desktop themes (list/apply/next/prev)"
+        echo "  --theme-install Download and manage community themes (Wallust/Pywal)"
         echo "  --wallpaper   Set wallpaper and regenerate dynamic color palette"
         echo "  --pkgmgr      Arch/AUR package manager frontend (install/search/update)"
         echo "  --network     Network manager CLI (wifi/ethernet/vpn/dns/status)"
@@ -186,8 +196,10 @@ case "$ACTION" in
         echo "  --agent       Universal AI coding agent switcher (claude/codex/opencode)"
         echo "  --local-ai    Local LLM manager (Ollama / LM Studio GPU inference)"
         echo "  --dev-stacks  Developer stacks provisioner (Mise/Docker/Rails/Laravel/Node)"
+        echo "  --screenshot  Screenshot tool with hyprshot, annotation, and clipboard"
         echo "  --screenrecord Screen recorder with region selection & PipeWire audio"
         echo "  --snapshot    Btrfs snapshot and recovery manager (create/list/rollback)"
+        echo "  --tpm         TPM2 security manager & LUKS auto-unlock (systemd-cryptenroll)"
         echo "  --info        Show system info (like neofetch, with JSON output)"
         echo "  --sandbox     Launch isolated bubblewrap sandbox with GUI passthrough"
         echo "  --version     Display SigmaOS version"
