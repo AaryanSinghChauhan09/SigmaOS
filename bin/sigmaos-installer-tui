@@ -118,13 +118,18 @@ main_wizard() {
   # 6. Summary & Mode Selection
   local summary="Target Disk:  $target_disk\nFilesystem:   $fs_choice\nLUKS2 Crypt:  $luks_choice\nHostname:     $hostname\nUsername:     $username\nProfile:      $profile"
   
+  local luks_flag=""
+  if [[ "$luks_choice" == "enabled" ]]; then
+    luks_flag="--luks"
+  fi
+
   if yesno "Review Installation Parameters:\n\n$summary\n\nRun in safe DRY-RUN simulation mode?"; then
     echo -e "\n${BOLD}${GREEN}==> Launching installer in DRY-RUN simulation mode...${RESET}\n"
-    bash "$ROOT_DIR/bin/sigmaos-install" --dry-run "$target_disk"
+    bash "$ROOT_DIR/bin/sigmaos-install" -a --dry-run -f "$fs_choice" -n "$hostname" $luks_flag "$target_disk"
   else
     if yesno "WARNING: Destructive mode will format $target_disk.\nAll data on this disk will be permanently destroyed.\n\nAre you absolutely sure?"; then
       echo -e "\n${BOLD}${RED}==> Launching destructive installation on $target_disk...${RESET}\n"
-      sudo bash "$ROOT_DIR/bin/sigmaos-install" --destructive --confirm-disk "$target_disk" "$target_disk"
+      sudo bash "$ROOT_DIR/bin/sigmaos-install" -a --destructive --confirm-disk "$target_disk" -f "$fs_choice" -n "$hostname" $luks_flag "$target_disk"
     else
       echo "Installation cancelled."
     fi

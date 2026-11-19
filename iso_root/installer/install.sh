@@ -26,6 +26,8 @@ ACCESSIBILITY=0
 ARCHINSTALL=0
 CLOUD_INIT=0
 TPM=0
+LUKS=0
+LUKS_PASSPHRASE=""
 MOUNT_POINT="/mnt/sigmaos"
 
 # ==============================================================================
@@ -73,6 +75,11 @@ cleanup() {
         umount -R "$MOUNT_POINT" 2>/dev/null || true
     fi
 
+    # Close LUKS device if opened
+    if [[ -e /dev/mapper/cryptroot ]]; then
+        cryptsetup close cryptroot 2>/dev/null || true
+    fi
+
     # Release installer lock
     if [[ -f "$LOCK_FILE" ]]; then
         rm -f "$LOCK_FILE"
@@ -114,6 +121,8 @@ Options:
   --archinstall          Use guided installer
   --cloud-init           Enable cloud-init provisioning
   --tpm                  Enable TPM security features
+  --luks, --encrypt      Enable LUKS2 full-disk encryption on root partition
+  --luks-passphrase PASS Passphrase for automated LUKS2 encryption
 
 Devices:
   Specify a target block device path (e.g., /dev/vda).
@@ -227,18 +236,42 @@ run_interactive_wizard() {
 
     # 3. Filesystem Selection
     echo -e "\n\e[36m--- Resilient Root Filesystem Format ---\e[0m"
-    echo "1) SovereignFS (Lattice-Optimized, Ultra-Resilient)"
-    echo "2) SemanticFS (Vector-Space Semantic Filesystem)"
-    echo "3) Ext4 (Standard POSIX-compliant Linux journaling filesystem)"
+    echo "1) Btrfs (Advanced subvolumes with Snapper rollback support) [Recommended]"
+    echo "2) Ext4 (Standard POSIX-compliant Linux journaling filesystem)"
+    echo "3) SovereignFS / SemanticFS (Lattice & Vector Experimental)"
     read -rp "Select root filesystem layout [1-3, default: 1]: " fs_opt
     if [[ "$fs_opt" == "2" ]]; then
-        FILESYSTEM="SemanticFS"
-    elif [[ "$fs_opt" == "3" ]]; then
         FILESYSTEM="Ext4"
-    else
+    elif [[ "$fs_opt" == "3" ]]; then
         FILESYSTEM="SovereignFS"
+    else
+        FILESYSTEM="Btrfs"
     fi
     log_info "Target filesystem set to: $FILESYSTEM"
+
+    # 3b. LUKS2 Disk Encryption
+    echo -e "\n\e[36m--- LUKS2 Full Disk Encryption ---\e[0m"
+    echo "Encrypt root partition at rest using Argon2id-hardened LUKS2."
+    read -rp "Enable LUKS2 disk encryption? [y/N, default: N]: " luks_opt
+    if [[ "${luks_opt,,}" == "y" || "${luks_opt,,}" == "yes" ]]; then
+        LUKS=1
+        while true; do
+            read -s -rp "Set LUKS2 encryption passphrase: " lpass1
+            echo
+            read -s -rp "Confirm LUKS2 encryption passphrase: " lpass2
+            echo
+            if [[ "$lpass1" == "$lpass2" && -n "$lpass1" ]]; then
+                LUKS_PASSPHRASE="$lpass1"
+                log_info "LUKS2 disk encryption enabled with passphrase."
+                break
+            else
+                log_error "Passphrases do not match or empty. Please retry."
+            fi
+        done
+    else
+        LUKS=0
+        log_info "LUKS2 disk encryption disabled."
+    fi
 
     # 4. Hostname Configuration
     echo -e "\n\e[36m--- System Hostname Configuration ---\e[0m"
@@ -372,6 +405,20 @@ main() {
                 TPM=1
                 shift
                 ;;
+            --luks|--encrypt)
+                LUKS=1
+                shift
+                ;;
+            --luks-passphrase)
+                if [[ -n "$2" && "$2" != -* ]]; then
+                    LUKS_PASSPHRASE="$2"
+                    LUKS=1
+                    shift 2
+                else
+                    echo -e "\e[31mError: --luks-passphrase requires a passphrase argument.\e[0m" >&2
+                    exit 1
+                fi
+                ;;
             -*)
                 echo -e "\e[31mError: Unrecognized option: $1\e[0m" >&2
                 show_help
@@ -435,6 +482,7 @@ main() {
         log_info "Simulating partitioning and installation plan on $TARGET_DEVICE:"
         log_info "  - Partition table: $PART_LABEL"
         log_info "  - Root filesystem: $FILESYSTEM"
+        log_info "  - Disk Encryption: $([[ $LUKS -eq 1 ]] && echo 'LUKS2 enabled (Argon2id)' || echo 'Disabled')"
         log_info "  - Hostname:        $HOSTNAME"
         log_info "  - Preset:          $SHARD_PRESET"
         log_info "To execute a destructive install to this disk, you must explicitly supply:"
@@ -507,56 +555,75 @@ main() {
     log_info "Root partition: $ROOT_PART"
 
     # ========================================================================
-    # PHASE 2: Format partitions
+    # PHASE 2: LUKS2 Encryption & Formatting
     # ========================================================================
-    log_step "Formatting partitions"
-
-    mkfs.fat -F 32 "$EFI_PART" -n SIGMAOS-EFI
-    log_info "Formatted EFI partition as FAT32"
-
-    if [[ "$FILESYSTEM" == "Btrfs" ]]; then
-        mkfs.btrfs -f -L SIGMAOS-ROOT "$ROOT_PART"
-        log_info "Formatted root partition as Btrfs"
-        # Create btrfs subvolumes for snapper support
-        btrfs subvolume create "${MOUNT_POINT}/@home" 2>/dev/null || true
-        btrfs subvolume create "${MOUNT_POINT}/@snapshots" 2>/dev/null || true
-        btrfs subvolume create "${MOUNT_POINT}/@var_log" 2>/dev/null || true
-        btrfs subvolume create "${MOUNT_POINT}/@var_cache_pacman" 2>/dev/null || true
-        umount "${MOUNT_POINT}" 2>/dev/null || true
-        mount -o subvol=@,compress=zstd "$ROOT_PART" "${MOUNT_POINT}"
-        mkdir -p "${MOUNT_POINT}/@home" "${MOUNT_POINT}/.snapshots" "${MOUNT_POINT}/@var_log" "${MOUNT_POINT}/@var_cache_pacman"
-        mount -o subvol=@home,compress=zstd "$ROOT_PART" "${MOUNT_POINT}/@home"
-        mount -o subvol=@snapshots,compress=zstd "$ROOT_PART" "${MOUNT_POINT}/.snapshots"
-        mount -o subvol=@var_log,compress=zstd "$ROOT_PART" "${MOUNT_POINT}/@var_log"
-        mount -o subvol=@var_cache_pacman,compress=zstd "$ROOT_PART" "${MOUNT_POINT}/@var_cache_pacman"
-        log_info "Created btrfs subvolumes for snapper support"
-    elif [[ "$FILESYSTEM" == "ZFS" ]]; then
-        log_warn "ZFS not supported in installer, falling back to Ext4"
-        mkfs.ext4 -F -L SIGMAOS-ROOT "$ROOT_PART"
-        FILESYSTEM="Ext4"
-    elif [[ "$FILESYSTEM" == "SovereignFS" || "$FILESYSTEM" == "SemanticFS" ]]; then
-        # Map custom names to Ext4 for actual functionality
-        mkfs.ext4 -F -L SIGMAOS-ROOT "$ROOT_PART"
-        log_info "Formatted root partition as Ext4 (mapped from $FILESYSTEM)"
-        FILESYSTEM="Ext4"
-    else
-        mkfs.ext4 -F -L SIGMAOS-ROOT "$ROOT_PART"
-        log_info "Formatted root partition as Ext4"
+    REAL_ROOT_DEV="$ROOT_PART"
+    if [[ $LUKS -eq 1 ]]; then
+        log_step "Configuring LUKS2 Full Disk Encryption on $ROOT_PART"
+        if ! command -v cryptsetup >/dev/null 2>&1; then
+            log_error "cryptsetup not found. Install cryptsetup before running LUKS installation."
+            exit 1
+        fi
+        if [[ -n "$LUKS_PASSPHRASE" ]]; then
+            echo -n "$LUKS_PASSPHRASE" | cryptsetup luksFormat --type luks2 --pbkdf argon2id --batch-mode "$ROOT_PART" -
+            echo -n "$LUKS_PASSPHRASE" | cryptsetup open "$ROOT_PART" cryptroot -
+        else
+            cryptsetup luksFormat --type luks2 --pbkdf argon2id "$ROOT_PART"
+            cryptsetup open "$ROOT_PART" cryptroot
+        fi
+        REAL_ROOT_DEV="/dev/mapper/cryptroot"
+        log_info "LUKS2 container unlocked at $REAL_ROOT_DEV"
     fi
 
-    # ========================================================================
-    # PHASE 3: Mount filesystems
-    # ========================================================================
-    log_step "Mounting target filesystems"
+    log_step "Formatting partitions ($FILESYSTEM on $REAL_ROOT_DEV)"
+
+    mkfs.fat -F 32 "$EFI_PART" -n SIGMAOS-EFI
+    log_info "Formatted EFI partition as FAT32 ($EFI_PART)"
 
     MOUNT_POINT="/mnt/sigmaos"
     mkdir -p "$MOUNT_POINT"
-    mount "$ROOT_PART" "$MOUNT_POINT"
+
+    if [[ "$FILESYSTEM" == "Btrfs" ]]; then
+        mkfs.btrfs -f -L SIGMAOS-ROOT "$REAL_ROOT_DEV"
+        log_info "Formatted root partition as Btrfs"
+        
+        # Temporary mount to create subvolumes
+        mount "$REAL_ROOT_DEV" "${MOUNT_POINT}"
+        btrfs subvolume create "${MOUNT_POINT}/@"
+        btrfs subvolume create "${MOUNT_POINT}/@home"
+        btrfs subvolume create "${MOUNT_POINT}/@snapshots"
+        btrfs subvolume create "${MOUNT_POINT}/@var_log"
+        btrfs subvolume create "${MOUNT_POINT}/@var_cache_pacman"
+        umount "${MOUNT_POINT}"
+
+        # Real subvolume mounts
+        mount -o subvol=@,compress=zstd "$REAL_ROOT_DEV" "${MOUNT_POINT}"
+        mkdir -p "${MOUNT_POINT}/home" "${MOUNT_POINT}/.snapshots" "${MOUNT_POINT}/var/log" "${MOUNT_POINT}/var/cache/pacman"
+        mount -o subvol=@home,compress=zstd "$REAL_ROOT_DEV" "${MOUNT_POINT}/home"
+        mount -o subvol=@snapshots,compress=zstd "$REAL_ROOT_DEV" "${MOUNT_POINT}/.snapshots"
+        mount -o subvol=@var_log,compress=zstd "$REAL_ROOT_DEV" "${MOUNT_POINT}/var/log"
+        mount -o subvol=@var_cache_pacman,compress=zstd "$REAL_ROOT_DEV" "${MOUNT_POINT}/var/cache/pacman"
+        log_info "Created and mounted Btrfs subvolumes (@, @home, @snapshots, @var_log, @var_cache_pacman)"
+    elif [[ "$FILESYSTEM" == "ZFS" ]]; then
+        log_warn "ZFS not supported in installer, falling back to Ext4"
+        mkfs.ext4 -F -L SIGMAOS-ROOT "$REAL_ROOT_DEV"
+        mount "$REAL_ROOT_DEV" "$MOUNT_POINT"
+        FILESYSTEM="Ext4"
+    elif [[ "$FILESYSTEM" == "SovereignFS" || "$FILESYSTEM" == "SemanticFS" ]]; then
+        mkfs.ext4 -F -L SIGMAOS-ROOT "$REAL_ROOT_DEV"
+        mount "$REAL_ROOT_DEV" "$MOUNT_POINT"
+        log_info "Formatted root partition as Ext4 (mapped from $FILESYSTEM)"
+        FILESYSTEM="Ext4"
+    else
+        mkfs.ext4 -F -L SIGMAOS-ROOT "$REAL_ROOT_DEV"
+        mount "$REAL_ROOT_DEV" "$MOUNT_POINT"
+        log_info "Formatted and mounted root partition as Ext4"
+    fi
+
+    # Mount EFI partition
     mkdir -p "$MOUNT_POINT/boot"
     mount "$EFI_PART" "$MOUNT_POINT/boot"
-
-    log_info "Mounted $ROOT_PART -> $MOUNT_POINT"
-    log_info "Mounted $EFI_PART -> $MOUNT_POINT/boot"
+    log_info "Mounted EFI partition $EFI_PART -> $MOUNT_POINT/boot"
 
     # ========================================================================
     # PHASE 4: Install base packages
@@ -663,13 +730,26 @@ EOF
     # ========================================================================
     # PHASE 7: Configure bootloader (limine)
     # ========================================================================
-    log_step "Configuring limine bootloader"
+    log_step "Configuring limine bootloader and crypttab"
 
     # Replace UUID placeholder in limine.conf with actual root UUID
     ROOT_UUID=$(blkid -s UUID -o value "$ROOT_PART" 2>/dev/null || echo "")
+    if [[ $LUKS -eq 1 ]]; then
+        mkdir -p "$MOUNT_POINT/etc"
+        echo "cryptroot UUID=$ROOT_UUID none discard" > "$MOUNT_POINT/etc/crypttab"
+        log_info "Configured /etc/crypttab for LUKS2 container (UUID: $ROOT_UUID)"
+    fi
+
     if [[ -f "$MOUNT_POINT/boot/limine/limine.conf" ]] && [[ -n "$ROOT_UUID" ]]; then
-        sed -i "s/__ROOT_UUID__/$ROOT_UUID/g" "$MOUNT_POINT/boot/limine/limine.conf"
-        log_info "Updated limine.conf with root UUID: $ROOT_UUID"
+        if [[ $LUKS -eq 1 ]]; then
+            sed -i "s/__ROOT_UUID__/$ROOT_UUID/g" "$MOUNT_POINT/boot/limine/limine.conf"
+            # Append cryptdevice mapping to kernel cmdline
+            sed -i "s/root=UUID=$ROOT_UUID/cryptdevice=UUID=$ROOT_UUID:cryptroot root=\/dev\/mapper\/cryptroot/g" "$MOUNT_POINT/boot/limine/limine.conf"
+            log_info "Updated limine.conf with encrypted root mapping"
+        else
+            sed -i "s/__ROOT_UUID__/$ROOT_UUID/g" "$MOUNT_POINT/boot/limine/limine.conf"
+            log_info "Updated limine.conf with root UUID: $ROOT_UUID"
+        fi
     fi
 
     # Install limine to EFI partition
