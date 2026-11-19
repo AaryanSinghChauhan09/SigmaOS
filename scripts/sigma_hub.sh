@@ -2,9 +2,12 @@
 # sigma_hub.sh — SigmaOS component-repository hub.
 #
 # The SigmaOS integration repo is the connector for the component fleet:
-# it owns the registry (COMPONENTS.toml + components/*.toml), the scaffold
-# template, and this shell interface used to inventory, connect, create,
-# upgrade, sync, and publish component repositories.
+# it owns the registry (COMPONENTS-ACTIVE.toml for 12 core components),
+# the scaffold template, and this shell interface used to inventory,
+# connect, create, upgrade, sync, and publish component repositories.
+#
+# Following: INTERCONNECTIVITY OF MULTIPLE REPOSITORY FOR MODULARITY,
+# CONNECT VARIOUS SIGMAOS-RELATED REPOS WITH EACH OTHER, SHELL HUB
 #
 # Usage:
 #   sigma_hub.sh list [--category C] [--local] [--remote] [--missing]
@@ -29,7 +32,8 @@
 #   sigma_hub.sh batch <command>       # run command across all repos
 #
 # PRINCIPLES: MODULARITY, SINGLE RESPONSIBILITY, DRY, KISS, SEPARATION OF
-# CONCERNS, UNIFORM INFORMATION, OPEN/CLOSED, DEFENSIVE PROGRAMMING.
+# CONCERNS, UNIFORM INFORMATION, OPEN/CLOSED, DEFENSIVE PROGRAMMING,
+# INTERCONNECTIVITY, CONNECT VARIOUS SIGMAOS-RELATED REPOS.
 
 set -euo pipefail
 

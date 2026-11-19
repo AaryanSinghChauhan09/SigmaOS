@@ -1,0 +1,152 @@
+# SigmaOS Active Component Registry
+# Single source of truth for the 12 core component repositories.
+# Modelled on Omarchy Linux sub-repository architecture.
+# Following: MODULARITY, SINGLE RESPONSIBILITY, DRY, KISS, SEPARATION OF CONCERNS
+# Last updated: 2026-11-19
+# 84 redundant repositories archived, 12 core components retained
+
+# Core Infrastructure
+[[component]]
+name = "SigmaOS"
+description = "Main repository with shell hub, component registry, and coordination interface"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+engine = "shell_hub"
+category = "Core Infrastructure"
+language = "shell"
+visibility = "public"
+depends_on = []
+provides = ["hub", "registry", "coordination"]
+
+[[component]]
+name = "SigmaOS-dev"
+description = "Unified development tools: toolchain, shell configs, agent CLI, workspace management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dev"
+engine = "dev_tools"
+category = "Core Infrastructure"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["development-tools", "shell-configs", "workspace-management"]
+
+[[component]]
+name = "SigmaOS-utils"
+description = "Unified utilities: file tools, network tools, automation, audio, hardware control"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-utils"
+engine = "utilities"
+category = "Core Infrastructure"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["file-tools", "network-tools", "automation", "audio", "hardware-control"]
+
+[[component]]
+name = "SigmaOS-themes"
+description = "Unified theming system: icons, GTK3, desktop themes, and design tokens"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-themes"
+engine = "theming"
+category = "Core Infrastructure"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["icons", "gtk3-themes", "desktop-themes", "design-tokens"]
+
+# System Managers
+[[component]]
+name = "SigmaOS-bootloader"
+description = "Unified bootloader configuration for SigmaOS: systemd-boot, GRUB, efibootmgr"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bootloader"
+engine = "bootloader"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["bootloader-config", "systemd-boot", "grub", "efibootmgr"]
+
+[[component]]
+name = "SigmaOS-package-manager"
+description = "Package management interface with dependency resolution and rollback support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-manager"
+engine = "package_manager"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["package-management", "dependency-resolution", "rollback"]
+
+[[component]]
+name = "SigmaOS-update-manager"
+description = "Rolling release update orchestration with Observer, State, Strategy patterns"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-update-manager"
+engine = "update_manager"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = ["SigmaOS-package-manager"]
+provides = ["rolling-updates", "update-orchestration", "pattern-based-updates"]
+
+[[component]]
+name = "SigmaOS-snapshot-manager"
+description = "BTRFS snapshot lifecycle management with Command, Factory, Singleton patterns"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snapshot-manager"
+engine = "snapshot_manager"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["btrfs-snapshots", "rollback", "snapshot-lifecycle"]
+
+[[component]]
+name = "SigmaOS-network-manager"
+description = "Enhanced network configuration with WiFi, Ethernet, and VPN support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-manager"
+engine = "network_manager"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["network-config", "wifi", "ethernet", "vpn"]
+
+[[component]]
+name = "SigmaOS-power-manager"
+description = "Battery / power-profile & idle management with TDP control"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-manager"
+engine = "power_manager"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["power-management", "battery", "power-profiles", "idle-management"]
+
+[[component]]
+name = "SigmaOS-keyring-manager"
+description = "Secure credential storage with hardware-backed keyring support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keyring-manager"
+engine = "keyring_manager"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["credential-storage", "keyring", "secrets-management"]
+
+[[component]]
+name = "SigmaOS-notifications"
+description = "Unified notification daemon with urgency levels and action support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notifications"
+engine = "notification_daemon"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["notifications", "notification-daemon", "urgency-levels"]
+
+# Archived Components (Reference Only)
+# The following 84 repositories have been archived following OPTIMISE FOR DELETION
+# and CONSOLIDATE GITHUB REPOS OF SIMILAR COMPONENTS principles.
+# See docs/wiki/Consolidation-Plan.md for detailed archive reasons.
+
+# Theme duplicates (4) → SigmaOS-themes
+# apt/dpkg violations (4) → violates Arch-based architecture
+# Consolidated components (15) → merged into canonical repos
+# Arch infrastructure placeholders (65) → use official Arch
+# Application-level repos (4) → not core OS components
+# CLI scaffold (1) → SigmaOS-dev
