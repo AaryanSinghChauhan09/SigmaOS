@@ -120,7 +120,7 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
 - ⏳ Pending: Continue with other consolidation families
 - ⏳ Pending: Registry updates
 
-## Repositories Archived (61 total)
+## Repositories Archived (65 total)
 
 1. **Theme duplicates (4):**
    - SigmaOS-theme → SigmaOS-themes (canonical)
@@ -187,5 +187,11 @@ Following **CONSOLIDATE similar repos**, **OPTIMISE FOR DELETION**, and **NO DEM
     - SigmaOS-arch-cpp, SigmaOS-arch-core, SigmaOS-arch-haskell
     - SigmaOS-arch-container, SigmaOS-arch-hardened-kernel
     - SigmaOS-arch-conflicts, SigmaOS-arch-hardened, SigmaOS-arch-refresh (use standard tools)
+
+11. **Arch config/tool placeholders (4):**
+    - SigmaOS-arch-config, SigmaOS-arch-group
+    - SigmaOS-arch-refractions-kernel, SigmaOS-arch-compute-shader-kernel (use standard tools)
+
+**All Arch-* repos archived (65 total Arch repos consolidated)**
 
 Generated with [Devin](https://devin.ai)
