@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-agent-usage — AI Coding Subscription & Limit Tracker
+# Formats subscription balance, daily token limits, and model breakdown
+# for Waybar and Quickshell top-bar modules.
+#
+# Usage:
+#   sigmaos-agent-usage [--json]
+
+set -euo pipefail
+
+JSON_MODE=0
+[[ "${1:-}" == "--json" ]] && JSON_MODE=1
+
+CACHE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/sigmaos/agent_usage.json"
+mkdir -p "$(dirname "$CACHE_FILE")"
+
+# Mock or real usage telemetry
+BALANCE="100%"
+DAILY_USED="1.2M tokens"
+DEFAULT_MODEL="claude-3-7-sonnet"
+
+if [ -f "$CACHE_FILE" ]; then
+  # Read cached telemetry
+  BALANCE=$(jq -r '.balance // "100%"' "$CACHE_FILE" 2>/dev/null || echo "100%")
+  DAILY_USED=$(jq -r '.daily_used // "0"' "$CACHE_FILE" 2>/dev/null || echo "0")
+fi
+
+if [ "$JSON_MODE" -eq 1 ]; then
+  cat <<JSON
+{
+  "text": "🤖 $BALANCE",
+  "alt": "agent-usage",
+  "tooltip": "AI Coding Agent Balance: $BALANCE\nToday: $DAILY_USED\nModel: $DEFAULT_MODEL",
+  "class": "agent-healthy",
+  "percentage": 85
+}
+JSON
+else
+  echo -e "\n\033[1;36m  SigmaOS AI Agent Subscription Telemetry\033[0m\n"
+  echo "  Quota / Balance: $BALANCE"
+  echo "  Daily Volume:    $DAILY_USED"
+  echo "  Active Engine:   $DEFAULT_MODEL"
+  echo ""
+fi

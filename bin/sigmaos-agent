@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-agent — Universal Coding Agent Launcher & Switcher (Omarchy 4+ Parity)
+# Lazy-loads and dispatches commands to developer coding agents:
+# claude, codex, opencode, agy, copilot, crush, grok, pi, omp, ori
+#
+# Usage:
+#   sigmaos-agent list
+#   sigmaos-agent default [name]
+#   sigmaos-agent run [name] [args...]
+#   sigmaos-agent menu (Rofi selector)
+
+set -euo pipefail
+
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'
+BOLD='\033[1m'; RESET='\033[0m'
+
+info()    { echo -e "${CYAN}[agent]${RESET} $*"; }
+success() { echo -e "${GREEN}[agent]${RESET} $*"; }
+warn()    { echo -e "${YELLOW}[agent]${RESET} $*"; }
+err()     { echo -e "${RED}[agent]${RESET} $*" >&2; }
+
+STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos/default-agent"
+mkdir -p "$(dirname "$STATE_FILE")"
+
+AGENTS=(
+  "claude:Anthropic Claude Code CLI"
+  "codex:OpenAI Codex CLI"
+  "opencode:OpenCode Open-Source Terminal Agent"
+  "agy:Antigravity Agentic CLI"
+  "copilot:GitHub Copilot CLI"
+  "crush:Crush High-Performance Coding Agent"
+  "grok:xAI Grok Developer CLI"
+  "pi:Inflection Pi Agent"
+  "omp:Oh-My-Prompt Coding Assistant"
+  "ori:Ori Autonomous Workflow Agent"
+)
+
+get_default_agent() {
+  [ -f "$STATE_FILE" ] && cat "$STATE_FILE" || echo "claude"
+}
+
+set_default_agent() {
+  local agent="$1"
+  echo "$agent" > "$STATE_FILE"
+  success "Default coding agent set to: ${BOLD}$agent${RESET}"
+}
+
+cmd="${1:-run}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  list)
+    echo -e "\n${BOLD}${CYAN}  SigmaOS Supported Coding Agents (Omarchy 4+ Parity)${RESET}\n"
+    local def
+    def=$(get_default_agent)
+    for entry in "${AGENTS[@]}"; do
+      name="${entry%%:*}"
+      desc="${entry#*:}"
+      installed="not installed"
+      if command -v "$name" &>/dev/null; then
+        installed="${GREEN}installed${RESET}"
+      fi
+      if [ "$name" = "$def" ]; then
+        echo -e "  ${GREEN}▶${RESET} ${BOLD}$name${RESET} \t($installed) — $desc ${CYAN}[default]${RESET}"
+      else
+        echo -e "    ${BOLD}$name${RESET} \t($installed) — $desc"
+      fi
+    done
+    echo ""
+    ;;
+
+  default)
+    if [ -n "${1:-}" ]; then
+      set_default_agent "$1"
+    else
+      echo "$(get_default_agent)"
+    fi
+    ;;
+
+  menu)
+    local choices=""
+    for entry in "${AGENTS[@]}"; do
+      name="${entry%%:*}"
+      desc="${entry#*:}"
+      choices+="$name: $desc\n"
+    done
+    if command -v rofi &>/dev/null && [ -n "${WAYLAND_DISPLAY:-}" ]; then
+      selected=$(echo -e "$choices" | rofi -dmenu -p " 🤖 Select Coding Agent " -theme ~/.config/rofi/sigmaos.rasi | cut -d: -f1)
+      if [ -n "$selected" ]; then
+        set_default_agent "$selected"
+      fi
+    else
+      echo -e "$choices"
+    fi
+    ;;
+
+  run)
+    target="${1:-$(get_default_agent)}"
+    shift 2>/dev/null || true
+    if command -v "$target" &>/dev/null; then
+      info "Dispatching to agent: ${BOLD}$target${RESET}"
+      exec "$target" "$@"
+    else
+      warn "Agent '$target' is not currently installed."
+      warn "Install instructions: npm install -g @anthropic-ai/claude-code || pip install $target"
+      exit 1
+    fi
+    ;;
+
+  *)
+    echo "Usage: sigmaos-agent [list|default|run|menu]"
+    exit 1
+    ;;
+esac

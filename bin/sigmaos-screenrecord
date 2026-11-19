@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# sigmaos-screenrecord — Screen Recording Daemon & Controller for Hyprland
+# Supports full-screen and region recording, PipeWire audio capture, and Waybar toggle.
+#
+# Usage:
+#   sigmaos-screenrecord toggle [--area] [--audio]
+#   sigmaos-screenrecord start [--area] [--audio]
+#   sigmaos-screenrecord stop
+#   sigmaos-screenrecord status
+
+set -euo pipefail
+
+CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'
+BOLD='\033[1m'; RESET='\033[0m'
+
+info()    { echo -e "${CYAN}[recorder]${RESET} $*"; }
+success() { echo -e "${GREEN}[recorder]${RESET} $*"; }
+warn()    { echo -e "${YELLOW}[recorder]${RESET} $*"; }
+err()     { echo -e "${RED}[recorder]${RESET} $*" >&2; }
+
+PID_FILE="/tmp/sigmaos_screenrecord.pid"
+VIDEOS_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/Recordings"
+mkdir -p "$VIDEOS_DIR"
+
+is_recording() {
+  if [ -f "$PID_FILE" ]; then
+    local pid
+    pid=$(cat "$PID_FILE" 2>/dev/null || echo "")
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+      return 0
+    fi
+  fi
+  return 1
+}
+
+stop_recording() {
+  if is_recording; then
+    local pid
+    pid=$(cat "$PID_FILE")
+    info "Stopping recording (PID: $pid)..."
+    kill -INT "$pid" 2>/dev/null || true
+    sleep 0.5
+    rm -f "$PID_FILE"
+    success "Recording saved."
+    if command -v notify-send &>/dev/null; then
+      notify-send -i video-x-generic "SigmaOS Recorder" "Recording saved to $VIDEOS_DIR"
+    fi
+  else
+    warn "No active screen recording running."
+  fi
+}
+
+start_recording() {
+  if is_recording; then
+    warn "Recording already in progress."
+    exit 0
+  fi
+
+  local use_area=0
+  local use_audio=0
+
+  for arg in "$@"; do
+    case "$arg" in
+      --area|-a)   use_area=1 ;;
+      --audio)     use_audio=1 ;;
+    esac
+  done
+
+  local timestamp
+  timestamp=$(date +%Y%m%d_%H%M%S)
+  local output_file="$VIDEOS_DIR/sigmaos_recording_${timestamp}.mp4"
+
+  local area_args=""
+  if [ "$use_area" -eq 1 ]; then
+    if command -v slurp &>/dev/null; then
+      info "Select screen area with mouse..."
+      local geometry
+      geometry=$(slurp) || { err "Selection cancelled"; exit 1; }
+      area_args="-g $geometry"
+    fi
+  fi
+
+  local audio_args=""
+  if [ "$use_audio" -eq 1 ]; then
+    # Capture default audio sink monitor via PipeWire
+    audio_args="--audio"
+  fi
+
+  info "Starting recording: $output_file"
+  if command -v wf-recorder &>/dev/null; then
+    wf-recorder $area_args $audio_args -f "$output_file" &
+    local rec_pid=$!
+    echo "$rec_pid" > "$PID_FILE"
+    disown
+    success "Recording started (PID: $rec_pid)."
+    if command -v notify-send &>/dev/null; then
+      notify-send -i media-record "SigmaOS Recorder" "Recording started..."
+    fi
+  elif command -v gpu-screen-recorder &>/dev/null; then
+    gpu-screen-recorder -w screen -f 60 -a default_output -o "$output_file" &
+    local rec_pid=$!
+    echo "$rec_pid" > "$PID_FILE"
+    disown
+    success "GPU recording started (PID: $rec_pid)."
+  else
+    err "Neither wf-recorder nor gpu-screen-recorder found. Install: pacman -S wf-recorder"
+    exit 1
+  fi
+}
+
+cmd="${1:-status}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  start)
+    start_recording "$@"
+    ;;
+  stop)
+    stop_recording
+    ;;
+  toggle)
+    if is_recording; then
+      stop_recording
+    else
+      start_recording "$@"
+    fi
+    ;;
+  status)
+    if is_recording; then
+      echo -e "${RED}● RECORDING${RESET} (PID: $(cat "$PID_FILE"))"
+    else
+      echo "IDLE"
+    fi
+    ;;
+  -h|--help|help)
+    echo "Usage: sigmaos-screenrecord [start|stop|toggle|status] [--area] [--audio]"
+    ;;
+  *)
+    err "Unknown command: $cmd"
+    exit 1
+    ;;
+esac

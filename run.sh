@@ -79,6 +79,18 @@ case "$ACTION" in
     --keybinds|keybinds|--keys|keys)
         exec bash "$SCRIPT_DIR/bin/sigmaos-keybinds" "${@:2}"
         ;;
+    --quickshell|quickshell|--qs|qs)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-quickshell" "${@:2}"
+        ;;
+    --agent|agent|--ai|ai)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-agent" "${@:2}"
+        ;;
+    --local-ai|local-ai|--ollama|ollama)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-local-ai" "${@:2}"
+        ;;
+    --screenrecord|screenrecord|--rec|rec)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-screenrecord" "${@:2}"
+        ;;
     --snapshot|snapshot|--btrfs|btrfs)
         exec bash "$SCRIPT_DIR/bin/sigmaos-snapshot" "${@:2}"
         ;;
@@ -156,7 +168,7 @@ case "$ACTION" in
         echo "  --cli, --tui  Launch interactive terminal menu"
         echo "  --desktop     Launch SigmaOS Sovereign Desktop Profile (Hyprland / Wayland)"
         echo "  --minimal     Launch SigmaOS Sovereign Minimalist Profile"
-        echo "  --doctor      Run SigmaOS 56-point system health diagnostics"
+        echo "  --doctor      Run SigmaOS 64-point system health diagnostics"
         echo "  --dotfiles    Deploy SigmaOS desktop configs to ~/.config"
         echo "  --update      Update packages + dotfiles + theme (sigmaos-update)"
         echo "  --theme       Manage Wallust desktop themes (list/apply/next/prev)"
@@ -167,6 +179,10 @@ case "$ACTION" in
         echo "  --bluetooth   Bluetooth device manager (scan/pair/connect/status)"
         echo "  --display     Hyprland multi-monitor & HiDPI scaling manager"
         echo "  --keybinds    Interactive Hyprland keyboard shortcuts cheatsheet"
+        echo "  --quickshell  Quickshell QML & Waybar desktop shell manager"
+        echo "  --agent       Universal AI coding agent switcher (claude/codex/opencode)"
+        echo "  --local-ai    Local LLM manager (Ollama / LM Studio GPU inference)"
+        echo "  --screenrecord Screen recorder with region selection & PipeWire audio"
         echo "  --snapshot    Btrfs snapshot and recovery manager (create/list/rollback)"
         echo "  --info        Show system info (like neofetch, with JSON output)"
         echo "  --sandbox     Launch isolated bubblewrap sandbox with GUI passthrough"

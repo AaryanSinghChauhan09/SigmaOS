@@ -116,10 +116,19 @@ zsh
 fish
 starship
 neovim
+helix
+tmux
+lazygit
 rust
 cargo
 python
 python-pip
+
+# ── Everyday Applications, Media & Gaming ─────────────────────────────────────
+chromium
+obs-studio
+steam
+retroarch
 
 # ── SigmaOS Native Distro Integration ─────────────────────────────────────────
 # (Overlay components installed via airootfs and sigmaos-install)

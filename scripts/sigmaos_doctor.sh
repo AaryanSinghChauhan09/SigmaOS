@@ -268,6 +268,14 @@ check_file "bin/sigmaos-bluetooth"              "$SIGMA_ROOT/bin/sigmaos-bluetoo
 check_file "bin/sigmaos-snapshot"               "$SIGMA_ROOT/bin/sigmaos-snapshot"
 check_file "bin/sigmaos-display"                "$SIGMA_ROOT/bin/sigmaos-display"
 check_file "bin/sigmaos-keybinds"               "$SIGMA_ROOT/bin/sigmaos-keybinds"
+check_file "bin/sigmaos-quickshell"             "$SIGMA_ROOT/bin/sigmaos-quickshell"
+check_file "bin/sigmaos-agent"                  "$SIGMA_ROOT/bin/sigmaos-agent"
+check_file "bin/sigmaos-agent-usage"            "$SIGMA_ROOT/bin/sigmaos-agent-usage"
+check_file "bin/sigmaos-crash-diagnostics"      "$SIGMA_ROOT/bin/sigmaos-crash-diagnostics"
+check_file "bin/sigmaos-local-ai"               "$SIGMA_ROOT/bin/sigmaos-local-ai"
+check_file "bin/sigmaos-screenrecord"           "$SIGMA_ROOT/bin/sigmaos-screenrecord"
+check_file "bin/sigmaos-installer-tui"          "$SIGMA_ROOT/bin/sigmaos-installer-tui"
+check_file "config/omarchy/quickshell/shell.qml" "$SIGMA_ROOT/config/omarchy/quickshell/shell.qml"
 check_file "bin/sigmaos-info"                   "$SIGMA_ROOT/bin/sigmaos-info"
 
 # config/sigmaos mirrors
