@@ -28,6 +28,18 @@ inspirations = "SigmaOS"
 visibility = "public"
 depends_on = ["linux", "linux-firmware", "systemd"]
 
+# Package Manager
+[[component]]
+name = "SigmaOS-package-manager"
+description = "Unified package management with CQRS, Observer, Strategy patterns"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-manager"
+engine = "package_manager"
+category = "System"
+language = "rust"
+inspirations = "SigmaOS"
+visibility = "public"
+depends_on = ["pacman"]
+
 # Desktop Components
 [[component]]
 name = "SigmaOS-themes"
