@@ -6,6 +6,14 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Auto-launch graphical desktop if display environment is active and not explicitly CLI mode
+if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    if [ "${1:-}" != "--cli" ] && [ "${1:-}" != "--tui" ] && [ "${1:-}" != "-i" ]; then
+        echo -e "\033[1;32m==> Graphical display detected. Launching SigmaOS Sovereign Desktop (Mint)...\033[0m"
+        exec python3 "$ROOT_DIR/scripts/sigmaos_gui.py" --persona mint "$@"
+    fi
+fi
+
 echo -e "\033[1;32m"
 cat <<'EOF'
  ____________________________________________________________________

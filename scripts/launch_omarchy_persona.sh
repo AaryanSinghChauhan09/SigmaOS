@@ -45,6 +45,14 @@ if [ $# -gt 0 ]; then
     esac
 fi
 
+# Auto-launch graphical desktop if display environment is active and not explicitly CLI mode
+if [ -n "${DISPLAY:-}" ] || [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    if [ "${1:-}" != "--cli" ] && [ "${1:-}" != "--tui" ] && [ "${1:-}" != "-i" ]; then
+        echo -e "\033[1;35m==> Graphical display detected. Launching SigmaOS Sovereign Desktop (Omarchy)...\033[0m"
+        exec python3 "$ROOT_DIR/scripts/sigmaos_gui.py" --persona omarchy "$@"
+    fi
+fi
+
 echo -e "\033[1;35m"
 cat <<'EOF'
  ╭──────────────────────────────────────────────────────────────────╮

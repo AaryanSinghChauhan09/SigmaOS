@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy gui desktop native tray install diagnose doctor fonts install-deps sandbox dotfiles settings boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify registry-audit consolidation-audit iso iso-stub run run-stub launch launch-check start mint arch omarchy gui desktop native tray install diagnose doctor fonts install-deps sandbox dotfiles settings boot-img clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes kernel
 
 CARGO ?= cargo
 RUSTC ?= rustc

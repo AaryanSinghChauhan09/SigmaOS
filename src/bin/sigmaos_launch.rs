@@ -4,7 +4,47 @@
 
 use std::env;
 use std::io::{self, IsTerminal, Write};
+use std::path::PathBuf;
 use std::process::Command;
+
+fn find_base_dir() -> PathBuf {
+    if let Ok(dir) = env::var("SIGMAOS_DIR") {
+        let p = PathBuf::from(dir);
+        if p.join("scripts/launch_omarchy_persona.sh").exists() {
+            return p;
+        }
+    }
+    if let Ok(exe) = env::current_exe() {
+        if let Some(parent) = exe.parent() {
+            if parent.join("scripts/launch_omarchy_persona.sh").exists() {
+                return parent.to_path_buf();
+            }
+            if let Some(root) = parent.parent() {
+                if root.join("scripts/launch_omarchy_persona.sh").exists() {
+                    return root.to_path_buf();
+                }
+            }
+        }
+    }
+    if let Ok(home) = env::var("HOME") {
+        let p = PathBuf::from(home).join("SigmaOS");
+        if p.join("scripts/launch_omarchy_persona.sh").exists() {
+            return p;
+        }
+    }
+    PathBuf::from("/home/aaryansinghchauhan/SigmaOS")
+}
+
+fn run_script(script_name: &str, extra_args: &[&str]) {
+    let base = find_base_dir();
+    let script_path = base.join("scripts").join(script_name);
+    let runner = if script_name.ends_with(".py") { "python3" } else { "bash" };
+    let _ = Command::new(runner)
+        .arg(&script_path)
+        .args(extra_args)
+        .current_dir(&base)
+        .status();
+}
 
 fn clear_screen() {
     print!("\x1b[2J\x1b[H");
@@ -28,7 +68,7 @@ fn print_menu() {
     println!("  \x1b[1;32m3\x1b[0m) \x1b[1mPacman Update (Syu)\x1b[0m    - Synchronize Arch rolling release packages");
     println!("  \x1b[1;32m4\x1b[0m) \x1b[1mAUR Search\x1b[0m             - Query Arch User Repository (AUR v5 RPC)");
     println!("  \x1b[1;32m5\x1b[0m) \x1b[1mWallust Themes\x1b[0m         - List dynamic wallpaper & palette themes");
-    println!("  \x1b[1;32m6\x1b[0m) \x1b[1mOmarchy Doctor\x1b[0m         - Run 14-point diagnostic system health checks");
+    println!("  \x1b[1;32m6\x1b[0m) \x1b[1mOmarchy Doctor\x1b[0m         - Run 39-point diagnostic system health checks");
     println!("  \x1b[1;32m7\x1b[0m) \x1b[1mLaunch Live Shell\x1b[0m      - Enter live interactive shell with pacman/omarchy tools");
     println!("  \x1b[1;32m8\x1b[0m) \x1b[1mVerify Subsystems\x1b[0m      - Execute sovereign complete readiness test");
     println!("  \x1b[1;32m0\x1b[0m) \x1b[1mLaunch GUI Desktop\x1b[0m     - Open SigmaOS Sovereign Graphical Desktop Window");
@@ -68,15 +108,15 @@ fn main() {
     if args.len() > 1 {
         match args[1].as_str() {
             "--omarchy" | "omarchy" => {
-                let _ = Command::new("bash").arg("-c").arg("launch_omarchy_persona.sh").status();
+                run_script("launch_omarchy_persona.sh", &[]);
                 return;
             }
             "--arch" | "arch" => {
-                let _ = Command::new("bash").arg("-c").arg("launch_arch_persona.sh").status();
+                run_script("launch_arch_persona.sh", &[]);
                 return;
             }
             "--mint" | "mint" => {
-                let _ = Command::new("bash").arg("-c").arg("launch_mint_persona.sh").status();
+                run_script("launch_mint_persona.sh", &[]);
                 return;
             }
             "--pacman" | "pacman" => {
@@ -92,24 +132,19 @@ fn main() {
                 return;
             }
             "--doctor" => {
-                let doctor_script = "/home/aaryansinghchauhan/SigmaOS/scripts/sigmaos_doctor.sh";
-                if std::path::Path::new(doctor_script).exists() {
-                    let _ = Command::new("bash").arg(doctor_script).status();
-                } else {
-                    let _ = Command::new("omarchy").arg("doctor").status();
-                }
+                run_script("sigmaos_doctor.sh", &[]);
                 return;
             }
             "--check" => {
-                let _ = Command::new("bash").arg("-c").arg("check_launch_ready.sh").status();
+                run_script("check_launch_ready.sh", &[]);
                 return;
             }
             "--gui" | "--desktop" | "gui" | "desktop" => {
-                let _ = Command::new("python3").arg("-c").arg("import os, subprocess; subprocess.run(['python3', os.path.expanduser('~/SigmaOS/scripts/sigmaos_gui.py')])").status();
+                run_script("sigmaos_gui.py", &[]);
                 return;
             }
             "--native" | "native" => {
-                let _ = Command::new("python3").arg("-c").arg("import os, subprocess; subprocess.run(['python3', os.path.expanduser('~/SigmaOS/scripts/sigmaos_native_app.py')])").status();
+                run_script("sigmaos_native_app.py", &[]);
                 return;
             }
             "--shell" | "-i" | "--interactive" => {
@@ -154,11 +189,11 @@ fn main() {
         match choice.trim() {
             "1" => {
                 current_persona = "Omarchy Aesthetic (Hyprland / Wallust)".to_string();
-                let _ = Command::new("bash").arg("-c").arg("launch_omarchy_persona.sh").status();
+                run_script("launch_omarchy_persona.sh", &[]);
             }
             "2" => {
                 current_persona = "Arch Linux Minimalist (Pacman / Rolling)".to_string();
-                let _ = Command::new("bash").arg("-c").arg("launch_arch_persona.sh").status();
+                run_script("launch_arch_persona.sh", &[]);
             }
             "3" => {
                 run_cmd("sigpkg update");
@@ -177,22 +212,17 @@ fn main() {
                 run_cmd("omarchy theme list");
             }
             "6" => {
-                let doctor_script = "/home/aaryansinghchauhan/SigmaOS/scripts/sigmaos_doctor.sh";
-                if std::path::Path::new(doctor_script).exists() {
-                    run_cmd(&format!("bash {}", doctor_script));
-                } else {
-                    run_cmd("omarchy doctor");
-                }
+                run_script("sigmaos_doctor.sh", &[]);
             }
             "7" => {
                 println!("\n\x1b[1;32mEntering SigmaOS Interactive Live Shell. Type 'exit' to return.\x1b[0m");
                 let _ = Command::new("sigmaos-interactive").status();
             }
             "8" => {
-                run_cmd("bash /home/aaryansinghchauhan/SigmaOS/scripts/sovereign_arch_omarchy_v36_complete_readiness_test.sh");
+                run_script("sovereign_arch_omarchy_v36_complete_readiness_test.sh", &[]);
             }
             "0" | "desktop" | "gui" => {
-                run_cmd("python3 /home/aaryansinghchauhan/SigmaOS/scripts/sigmaos_gui.py");
+                run_script("sigmaos_gui.py", &[]);
             }
             "9" | "exit" | "quit" | "q" => {
                 println!("\n\x1b[1;32mThank you for testing SigmaOS. Goodbye!\x1b[0m\n");

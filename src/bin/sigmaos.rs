@@ -65,7 +65,11 @@ fn find_base_dir() -> PathBuf {
     cur
 }
 
-fn run_script(script_name: &str) {
+fn is_gui_available() -> bool {
+    env::var("DISPLAY").is_ok() || env::var("WAYLAND_DISPLAY").is_ok()
+}
+
+fn run_script_with_args(script_name: &str, extra_args: &[&str]) {
     let base = find_base_dir();
     let script_path = base.join("scripts").join(script_name);
     if script_path.exists() {
@@ -76,6 +80,7 @@ fn run_script(script_name: &str) {
         };
         let _ = Command::new(runner)
             .arg(&script_path)
+            .args(extra_args)
             .current_dir(&base)
             .status();
     } else {
@@ -83,6 +88,29 @@ fn run_script(script_name: &str) {
             "\x1b[31mError: script '{}' not found at {:?}\x1b[0m",
             script_name, script_path
         );
+    }
+}
+
+fn run_script(script_name: &str) {
+    run_script_with_args(script_name, &[]);
+}
+
+fn launch_gui(persona: Option<&str>) {
+    let base = find_base_dir();
+    let script_path = base.join("scripts/sigmaos_gui.py");
+    if script_path.exists() {
+        let mut cmd = Command::new("python3");
+        cmd.arg(&script_path).current_dir(&base);
+        if let Some(p) = persona {
+            cmd.arg("--persona").arg(p);
+        }
+        let status = cmd.status();
+        if let Err(e) = status {
+            eprintln!("Failed to launch GUI: {}. Reverting to interactive terminal...", e);
+            run_interactive_repl();
+        }
+    } else {
+        println!("\x1b[31mError: GUI script not found at {:?}\x1b[0m", script_path);
     }
 }
 
@@ -477,17 +505,29 @@ fn run_interactive_repl() {
             }
             "mint" => {
                 println!();
-                run_script("launch_mint_persona.sh");
+                if is_gui_available() && !args.iter().any(|&a| a == "--cli" || a == "--tui") {
+                    launch_gui(Some("mint"));
+                } else {
+                    run_script("launch_mint_persona.sh");
+                }
                 println!();
             }
             "arch" => {
                 println!();
-                run_script("launch_arch_persona.sh");
+                if is_gui_available() && !args.iter().any(|&a| a == "--cli" || a == "--tui") {
+                    launch_gui(Some("arch"));
+                } else {
+                    run_script("launch_arch_persona.sh");
+                }
                 println!();
             }
             "omarchy" => {
                 println!();
-                run_script("launch_omarchy_persona.sh");
+                if is_gui_available() && !args.iter().any(|&a| a == "--cli" || a == "--tui") {
+                    launch_gui(Some("omarchy"));
+                } else {
+                    run_script("launch_omarchy_persona.sh");
+                }
                 println!();
             }
             "pacman" => {
@@ -545,8 +585,9 @@ fn run_interactive_repl() {
                 }
             }
             "gui" | "desktop" => {
-                println!("\nLaunching SigmaOS Graphical Desktop Window...");
-                run_script("sigmaos_gui.py");
+                let persona = if !args.is_empty() { Some(args[0]) } else { Some("omarchy") };
+                println!("\nLaunching SigmaOS Sovereign Desktop ({:?})...", persona.unwrap_or("default"));
+                launch_gui(persona);
                 println!();
             }
             "boot" | "run" | "qemu" => {
@@ -713,16 +754,39 @@ fn main() {
                 run_script("sigmaos_sandbox_container.sh");
             }
             "--mint" | "mint" => {
-                run_script("launch_mint_persona.sh");
+                if is_gui_available() && !args.iter().any(|a| a == "--cli" || a == "--tui") {
+                    launch_gui(Some("mint"));
+                } else {
+                    run_script("launch_mint_persona.sh");
+                }
             }
             "--arch" | "arch" => {
-                run_script("launch_arch_persona.sh");
+                if is_gui_available() && !args.iter().any(|a| a == "--cli" || a == "--tui") {
+                    launch_gui(Some("arch"));
+                } else {
+                    run_script("launch_arch_persona.sh");
+                }
             }
             "--omarchy" | "omarchy" => {
-                run_script("launch_omarchy_persona.sh");
+                if is_gui_available() && !args.iter().any(|a| a == "--cli" || a == "--tui") {
+                    launch_gui(Some("omarchy"));
+                } else {
+                    run_script("launch_omarchy_persona.sh");
+                }
+            }
+            "--tokyo" | "tokyo" => {
+                if is_gui_available() && !args.iter().any(|a| a == "--cli" || a == "--tui") {
+                    launch_gui(Some("tokyo"));
+                } else {
+                    run_script("launch_omarchy_persona.sh");
+                }
+            }
+            "--cli" | "cli" | "--tui" | "tui" | "--repl" | "repl" => {
+                run_interactive_repl();
             }
             "--gui" | "gui" | "--desktop" | "desktop" => {
-                run_script("sigmaos_gui.py");
+                let persona = args.get(2).map(|s| s.as_str()).unwrap_or("omarchy");
+                launch_gui(Some(persona));
             }
             "--native" | "native" => {
                 run_script("sigmaos_native_app.py");
@@ -785,10 +849,20 @@ fn main() {
                 println!("  --help, -h         Show this help");
             }
             _ => {
-                run_interactive_repl();
+                if is_gui_available() {
+                    println!("==> Graphical display detected. Launching SigmaOS Sovereign Desktop...");
+                    launch_gui(Some("omarchy"));
+                } else {
+                    run_interactive_repl();
+                }
             }
         }
     } else {
-        run_interactive_repl();
+        if is_gui_available() {
+            println!("==> Graphical display detected. Launching SigmaOS Sovereign Desktop...");
+            launch_gui(Some("omarchy"));
+        } else {
+            run_interactive_repl();
+        }
     }
 }

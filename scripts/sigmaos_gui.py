@@ -14,7 +14,8 @@ Fallback chain:
   5. Terminal REPL binary            (no DISPLAY)
 """
 
-import sys, os, subprocess, shutil, threading, json, time
+import sys, os, subprocess, shutil, threading, json, time, warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # ── Additional WebKit env vars to prevent blank window ───────────────────────
 # WEBKIT_FORCE_SANDBOX is no longer supported in WebKit2 4.1+; use the replacement below
@@ -211,7 +212,7 @@ def start_telemetry(webview):
 
 
 # ── GTK3 + WebKit2 window ─────────────────────────────────────────────────────
-def launch_gtk_webkit(html_uri):
+def launch_gtk_webkit(html_uri, persona="omarchy"):
     try:
         import gi
         gi.require_version("Gtk", "3.0")
@@ -245,10 +246,18 @@ def launch_gtk_webkit(html_uri):
         def on_load_changed(wv, event):
             if event == WebKit2.LoadEvent.FINISHED:
                 _inject(wv, IPC_JS)
-                # Auto-open terminal window on startup and focus command prompt
-                _inject(wv, "setTimeout(function(){ window.summonWindow && window.summonWindow('win-term'); var inp = document.getElementById('term-in'); if (inp) { inp.focus(); } }, 400);")
+                # Auto-apply persona and open terminal window on startup
+                persona_js = (
+                    f"setTimeout(function(){{ "
+                    f"if (window.setPersona) window.setPersona('{persona}'); "
+                    f"window.summonWindow && window.summonWindow('win-term'); "
+                    f"var inp = document.getElementById('term-in'); "
+                    f"if (inp) {{ inp.focus(); }} "
+                    f"}}, 350);"
+                )
+                _inject(wv, persona_js)
                 start_telemetry(wv)
-                print("==> SigmaOS IPC bridge injected and live telemetry started.")
+                print(f"==> SigmaOS IPC bridge injected, persona '{persona}' active, and live telemetry started.")
 
         def on_script_message(ucm, result):
             try:
@@ -264,12 +273,7 @@ def launch_gtk_webkit(html_uri):
         GLib.set_prgname("SigmaOS")
         GLib.set_application_name("SigmaOS")
 
-        window = Gtk.Window(title="SigmaOS \u2014 Sovereign Desktop")
-        # set_wmclass is deprecated in GTK3 3.22+ — use GLib application name instead
-        try:
-            window.set_wmclass("SigmaOS", "SigmaOS")
-        except Exception:
-            pass
+        window = Gtk.Window(title=f"SigmaOS \u2014 Sovereign Desktop ({persona.capitalize()} Edition)")
         window.set_default_size(1280, 820)
         window.set_position(Gtk.WindowPosition.CENTER)
 
@@ -291,7 +295,7 @@ def launch_gtk_webkit(html_uri):
 
         webview.load_uri(html_uri)
 
-        print("==> SigmaOS Sovereign Desktop active (GTK3 + WebKit2 + IPC bridge)")
+        print(f"==> SigmaOS Sovereign Desktop active (GTK3 + WebKit2 + IPC bridge + {persona} persona)")
         print("==> Close the window to exit.")
         Gtk.main()
         return True
@@ -348,11 +352,19 @@ def launch_firefox_fallback(html_uri):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="SigmaOS Sovereign Graphical Desktop")
+    parser.add_argument("--persona", "-p", default="omarchy",
+                        choices=["omarchy", "arch", "mint", "tokyo", "nord", "gruvbox", "cyber", "sovereign"],
+                        help="Initial desktop persona/theme to activate")
+    args, _ = parser.parse_known_args()
+    persona = args.persona
+
     if not os.path.isfile(HTML_PATH):
         print(f"Error: UI not found at {HTML_PATH}", file=sys.stderr)
         sys.exit(1)
 
-    html_uri = f"file://{HTML_PATH}"
+    html_uri = f"file://{HTML_PATH}#persona={persona}"
 
     if not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
         print("[!] No display. Falling back to terminal REPL.")
@@ -362,11 +374,11 @@ def main():
         sys.exit(1)
 
     print("╔══════════════════════════════════════════════════════════╗")
-    print("║      SigmaOS Sovereign Desktop — Omarchy Edition        ║")
+    print(f"║      SigmaOS Sovereign Desktop — {persona.capitalize():<12} Edition        ║")
     print("║   GTK3 + WebKit2 + Real Shell IPC Bridge                ║")
     print("╚══════════════════════════════════════════════════════════╝")
 
-    if launch_gtk_webkit(html_uri):
+    if launch_gtk_webkit(html_uri, persona=persona):
         sys.exit(0)
     if launch_native_gtk_app():
         sys.exit(0)

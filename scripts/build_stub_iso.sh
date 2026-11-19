@@ -141,15 +141,33 @@ set default=0
 set timeout=5
 set timeout_style=menu
 
-menuentry "SigmaOS v0.1 — Sovereign Kernel (Live Shell)" --class sigmaos {
-    echo "Loading SigmaOS Sovereign Kernel..."
+menuentry "SigmaOS v0.1 — Sovereign Desktop (Omarchy Aesthetic)" --class sigmaos {
+    echo "Loading SigmaOS Sovereign Desktop (Omarchy Aesthetic)..."
+    multiboot /boot/sigma_kernel.elf gui omarchy
+    boot
+}
+
+menuentry "SigmaOS v0.1 — Sovereign Desktop (Arch Linux Aesthetic)" --class arch {
+    echo "Loading SigmaOS Sovereign Desktop (Arch Linux Aesthetic)..."
+    multiboot /boot/sigma_kernel.elf gui arch
+    boot
+}
+
+menuentry "SigmaOS v0.1 — Sovereign Desktop (Linux Mint Ergonomic)" --class mint {
+    echo "Loading SigmaOS Sovereign Desktop (Linux Mint Ergonomic)..."
+    multiboot /boot/sigma_kernel.elf gui mint
+    boot
+}
+
+menuentry "SigmaOS v0.1 — Sovereign Kernel (Interactive Shell)" --class sigmaos-shell {
+    echo "Loading SigmaOS Sovereign Kernel (Interactive Shell)..."
     multiboot /boot/sigma_kernel.elf
     boot
 }
 
 menuentry "SigmaOS v0.1 — Kernel (Multiboot2 Mode)" --class sigmaos-mb2 {
     echo "Loading SigmaOS Sovereign Kernel (Multiboot2)..."
-    multiboot2 /boot/sigma_kernel.elf
+    multiboot2 /boot/sigma_kernel.elf gui omarchy
     boot
 }
 

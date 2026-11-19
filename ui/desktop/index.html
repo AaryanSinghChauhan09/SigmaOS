@@ -3072,8 +3072,19 @@ pub fn parse_event(raw: &str) -> Option<(&str, &str)> {
       }
     });
 
-    // Auto-open terminal window on DOMContentLoaded
+    // Auto-open terminal window on DOMContentLoaded & apply URL persona
     document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const hash = window.location.hash || '';
+        const params = new URLSearchParams(window.location.search);
+        let p = params.get('persona');
+        if (!p && hash.includes('persona=')) {
+          p = hash.split('persona=')[1].split('&')[0];
+        }
+        if (p && typeof setPersona === 'function') {
+          setPersona(p);
+        }
+      } catch (err) {}
       setTimeout(() => summonWindow && summonWindow('win-term'), 500);
     });
   </script>
