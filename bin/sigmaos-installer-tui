@@ -99,18 +99,24 @@ main_wizard() {
   local fs_choice
   fs_choice=$(inputbox "Root Filesystem (Btrfs or Ext4)" "Btrfs")
 
-  # 3. Hostname and User
+  # 3. Disk Encryption (LUKS2)
+  local luks_choice="disabled"
+  if yesno "Enable Full Disk Encryption with LUKS2?\n\nProtects root partition at rest with passphrase security."; then
+    luks_choice="enabled"
+  fi
+
+  # 4. Hostname and User
   local hostname
   hostname=$(inputbox "System Hostname" "sigmaos")
   local username
   username=$(inputbox "Primary Username" "sigma")
 
-  # 4. Profile
+  # 5. Profile
   local profile
   profile=$(inputbox "Desktop Profile (Desktop or Minimal)" "Desktop")
 
-  # 5. Summary & Mode Selection
-  local summary="Target Disk:  $target_disk\nFilesystem:   $fs_choice\nHostname:     $hostname\nUsername:     $username\nProfile:      $profile"
+  # 6. Summary & Mode Selection
+  local summary="Target Disk:  $target_disk\nFilesystem:   $fs_choice\nLUKS2 Crypt:  $luks_choice\nHostname:     $hostname\nUsername:     $username\nProfile:      $profile"
   
   if yesno "Review Installation Parameters:\n\n$summary\n\nRun in safe DRY-RUN simulation mode?"; then
     echo -e "\n${BOLD}${GREEN}==> Launching installer in DRY-RUN simulation mode...${RESET}\n"

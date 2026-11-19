@@ -1,5 +1,94 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# omarchy — Universal CLI Interface (Drop-in Parity)
+# Provides complete command compatibility across SigmaOS and Omarchy Linux.
+#
+# Usage:
+#   omarchy <command> [args...]
+
+set -euo pipefail
+
 REAL_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(cd "$(dirname "$REAL_PATH")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
-exec bash "$ROOT_DIR/scripts/launch_omarchy_persona.sh" "$@"
+
+usage() {
+  cat <<'EOF'
+omarchy — Universal Sovereign CLI Interface
+
+USAGE
+  omarchy <command> [options]
+
+CORE SYSTEM & DESKTOP SHELL
+  desktop         Launch Sovereign Desktop (Hyprland Wayland session)
+  quickshell      Quickshell QML & Waybar desktop shell manager
+  display         Hyprland multi-monitor & HiDPI scaling manager
+  keybinds        Searchable keyboard shortcuts cheatsheet
+  screenrecord    Screen recording with PipeWire audio capture
+
+THEMING & CUSTOMIZATION
+  theme           Manage system-wide themes (Catppuccin, Tokyo Night, Nord, etc.)
+  wallpaper       Set wallpaper and dynamically generate color palettes
+  editor          Switch default editor (nvim, code, cursor, zed, helix, vim)
+  terminal        Switch default terminal (foot, alacritty, ghostty, kitty)
+
+AI & AGENTIC SUITE (OMARCHY 4+)
+  agent           Universal coding agent launcher & switcher (claude, codex, etc.)
+  agent-usage     Top-bar AI subscription limits & daily token breakdown
+  crash-diag      Crash-to-agent diagnostics monitor (systemd-coredump)
+  local-ai        Local LLM GPU inference (Ollama / LM Studio)
+
+SYSTEM MAINTENANCE & SECURITY
+  update          Full-system upgrade (packages, dotfiles, theme)
+  doctor          Run comprehensive system health diagnostics
+  snapshot        Btrfs snapshot and recovery manager
+  pkg             Package management frontend (pacman / AUR)
+  net             Network connectivity manager (WiFi / VPN / DNS)
+  audio           PipeWire audio and volume controller
+  bluetooth       Bluetooth device manager
+  install         Defensive system installer (with Btrfs/LUKS)
+  info            System hardware and environment summary
+EOF
+}
+
+cmd="${1:-help}"
+shift 2>/dev/null || true
+
+case "$cmd" in
+  desktop)        exec "$SCRIPT_DIR/sigmaos-desktop" "$@" ;;
+  quickshell|qs)  exec "$SCRIPT_DIR/sigmaos-quickshell" "$@" ;;
+  display|mon)    exec "$SCRIPT_DIR/sigmaos-display" "$@" ;;
+  keybinds|keys)  exec "$SCRIPT_DIR/sigmaos-keybinds" "$@" ;;
+  screenrecord|rec) exec "$SCRIPT_DIR/sigmaos-screenrecord" "$@" ;;
+
+  theme)          exec "$SCRIPT_DIR/sigmaos-theme" "$@" ;;
+  wallpaper|bg)   exec "$SCRIPT_DIR/sigmaos-wallpaper-set" "$@" ;;
+  editor)         exec "$SCRIPT_DIR/sigmaos-default-editor" "$@" ;;
+  terminal|term)  exec "$SCRIPT_DIR/sigmaos-default-terminal" "$@" ;;
+
+  agent|ai)       exec "$SCRIPT_DIR/sigmaos-agent" "$@" ;;
+  agent-usage)    exec "$SCRIPT_DIR/sigmaos-agent-usage" "$@" ;;
+  crash-diag)     exec "$SCRIPT_DIR/sigmaos-crash-diagnostics" "$@" ;;
+  local-ai)       exec "$SCRIPT_DIR/sigmaos-local-ai" "$@" ;;
+
+  update)         exec "$SCRIPT_DIR/sigmaos-update" "$@" ;;
+  doctor)         exec "$SCRIPT_DIR/sigmaos-doctor" "$@" ;;
+  snapshot)       exec "$SCRIPT_DIR/sigmaos-snapshot" "$@" ;;
+  pkg)            exec "$SCRIPT_DIR/sigmaos-pkgmgr" "$@" ;;
+  net)            exec "$SCRIPT_DIR/sigmaos-network" "$@" ;;
+  audio)          exec "$SCRIPT_DIR/sigmaos-audio" "$@" ;;
+  bluetooth|bt)   exec "$SCRIPT_DIR/sigmaos-bluetooth" "$@" ;;
+  install)        exec "$SCRIPT_DIR/sigmaos-install" "$@" ;;
+  info)           exec "$SCRIPT_DIR/sigmaos-info" "$@" ;;
+
+  -h|--help|help) usage ;;
+  *)
+    # Compatibility fallback to launch_omarchy_persona.sh
+    if [ -f "$ROOT_DIR/scripts/launch_desktop_persona.sh" ]; then
+      exec bash "$ROOT_DIR/scripts/launch_desktop_persona.sh" "$cmd" "$@"
+    else
+      usage
+      exit 1
+    fi
+    ;;
+esac
