@@ -16,6 +16,7 @@ from gi.repository import Gtk, Gdk, GLib
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SCRIPT_DIR)
+os.environ["PATH"] = f"{os.path.join(ROOT_DIR, 'bin')}:{SCRIPT_DIR}:{os.environ.get('PATH', '')}"
 
 CSS_DATA = b"""
 window {

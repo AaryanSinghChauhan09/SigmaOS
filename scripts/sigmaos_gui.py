@@ -27,6 +27,7 @@ os.environ.setdefault("GSK_RENDERER", "cairo")
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR   = os.path.dirname(SCRIPT_DIR)
 HTML_PATH  = os.path.join(ROOT_DIR, "ui", "desktop", "index.html")
+os.environ["PATH"] = f"{os.path.join(ROOT_DIR, 'bin')}:{SCRIPT_DIR}:{os.environ.get('PATH', '')}"
 
 # ── IPC JavaScript injected into every page ───────────────────────────────────
 IPC_JS = r"""
@@ -108,7 +109,44 @@ def handle_exec(webview, cmd):
             if real_cmd in ('clear',):
                 _inject(webview, "document.getElementById('term-out').textContent = '';")
                 return
-            if real_cmd in ('help',):
+
+            import gi
+            gi.require_version("GLib", "2.0")
+            from gi.repository import GLib
+
+            if real_cmd.startswith('persona '):
+                parts = real_cmd.split()
+                if len(parts) > 1:
+                    target_p = parts[1].lower()
+                    GLib.idle_add(_inject, webview, f"window.setPersona && window.setPersona('{target_p}');")
+                    out = f"[Persona] Switched desktop layout and theme to '{target_p.upper()}'.\n"
+                    escaped = json.dumps(out)
+                    GLib.idle_add(_inject, webview, f"window.sigmaOutput && window.sigmaOutput({escaped});")
+                    return
+
+            if real_cmd.startswith('theme ') or real_cmd.startswith('omarchy theme ') or real_cmd.startswith('wallust '):
+                parts = real_cmd.split()
+                arg = parts[-1].lower()
+                theme_script = os.path.join(ROOT_DIR, "config", "omarchy", "scripts", "apply_theme.py")
+                if arg in ('list', 'theme'):
+                    real_cmd = f"python3 {theme_script} list 2>&1"
+                else:
+                    mapped = {
+                        'catppuccin-mocha': 'omarchy',
+                        'catppuccin': 'omarchy',
+                        'tokyo-night': 'tokyo',
+                        'tokyo': 'tokyo',
+                        'nord': 'nord',
+                        'gruvbox-dark': 'gruvbox',
+                        'gruvbox': 'gruvbox',
+                        'cyber-slate': 'cyber',
+                        'cyber': 'cyber',
+                        'mint': 'mint',
+                        'arch': 'arch',
+                    }.get(arg, arg)
+                    GLib.idle_add(_inject, webview, f"window.setPersona && window.setPersona('{mapped}');")
+                    real_cmd = f"python3 {theme_script} {arg} 2>&1"
+            elif real_cmd in ('help',):
                 real_cmd = 'sigmaos --help 2>&1 || echo "sigmaos: type any bash command"'
             elif real_cmd in ('doctor', 'omarchy doctor', 'sigmaos doctor', 'sigmaos --doctor'):
                 real_cmd = f'bash {SCRIPT_DIR}/sigmaos_doctor.sh 2>&1'

@@ -173,8 +173,8 @@ run: iso-stub bin/sigmaos bin/sigmaos-launch
 		echo "==> Booting SigmaOS Desktop Preview in QEMU..."; \
 		exec qemu-system-x86_64 -m 2048 -cdrom "$$image" -serial stdio -no-reboot; \
 	else \
-		echo "==> QEMU not found in PATH or running headlessly. Launching native SigmaOS Workstation..."; \
-		./bin/sigmaos-launch; \
+		echo "==> QEMU not found in PATH. Launching turnkey SigmaOS Workstation..."; \
+		./run.sh; \
 	fi
 
 # 9b. Run stub ISO in QEMU (GALL'S LAW: start simple — works now!)
@@ -188,7 +188,7 @@ launch-check:
 
 # 11. Interactive OS launch & workstation dashboard (READY TO WORK & LAUNCH)
 launch: bin/sigmaos bin/sigmaos-launch
-	@./bin/sigmaos-launch
+	@./run.sh
 
 start: launch
 
