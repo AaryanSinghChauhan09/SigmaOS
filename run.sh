@@ -52,6 +52,9 @@ case "$ACTION" in
             exec bash "$SCRIPT_DIR/scripts/setup_omarchy_dotfiles.sh" "${@:2}"
         fi
         ;;
+    --update|update)
+        exec bash "$SCRIPT_DIR/bin/sigmaos-update" "${@:2}"
+        ;;
     --sandbox|sandbox)
         exec bash "$SCRIPT_DIR/scripts/sigmaos_sandbox_container.sh" "${@:2}"
         ;;
@@ -125,6 +128,7 @@ case "$ACTION" in
         echo "  --minimal     Launch SigmaOS Sovereign Minimalist Profile"
         echo "  --doctor      Run SigmaOS 39-point system health diagnostics"
         echo "  --dotfiles    Deploy SigmaOS desktop configs to ~/.config"
+        echo "  --update      Update packages + dotfiles + theme (sigmaos-update)"
         echo "  --sandbox     Launch isolated bubblewrap sandbox with GUI passthrough"
         echo "  --version     Display SigmaOS version"
         echo "  --check       Run 21-point launch readiness validation"

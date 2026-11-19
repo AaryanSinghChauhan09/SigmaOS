@@ -248,9 +248,38 @@ for cf in shell.json theme.conf keybindings.conf; do
   if [[ -f "$SIGMA_ROOT/config/omarchy/$cf" ]]; then
     check "config/omarchy/$cf" pass
   else
-    check "config/omarchy/$cf" warn "missing (run scripts/setup_omarchy_dotfiles.sh)"
+    check "config/omarchy/$cf" warn "missing (run scripts/setup_desktop_dotfiles.sh)"
   fi
 done
+
+# ── Sovereign Desktop Tooling ─────────────────────────────────────────────────
+section "Sovereign Desktop Tooling"
+
+check_file "scripts/setup_desktop_dotfiles.sh"  "$SIGMA_ROOT/scripts/setup_desktop_dotfiles.sh"
+check_file "scripts/launch_desktop_persona.sh"  "$SIGMA_ROOT/scripts/launch_desktop_persona.sh"
+check_file "bin/sigmaos-desktop"                "$SIGMA_ROOT/bin/sigmaos-desktop"
+check_file "bin/sigmaos-update"                 "$SIGMA_ROOT/bin/sigmaos-update"
+
+# config/sigmaos mirrors
+if [[ -d "$HOME/.config/sigmaos" ]]; then
+  check "~/.config/sigmaos/ deployed"    pass
+else
+  check "~/.config/sigmaos/ deployed"    warn "not deployed — run: sigmaos-update --dotfiles-only"
+fi
+
+# launch_desktop_persona target validity
+if [[ -f "$SIGMA_ROOT/scripts/launch_desktop_persona.sh" ]]; then
+  check "launch_desktop_persona.sh exists" pass
+else
+  check "launch_desktop_persona.sh exists" fail "missing sovereign desktop launcher"
+fi
+
+# sigmaos-update sanity
+if [[ -x "$SIGMA_ROOT/bin/sigmaos-update" ]]; then
+  check "sigmaos-update executable"       pass
+else
+  check "sigmaos-update executable"       warn "not executable (chmod +x bin/sigmaos-update)"
+fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 total=$(( pass_count + warn_count + fail_count ))

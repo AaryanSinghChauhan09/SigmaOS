@@ -9,7 +9,7 @@
     "modules-left": [
         "custom/launcher",
         "hyprland/workspaces",
-        "custom/omarchy-theme",
+        "custom/sigma-theme",
         "hyprland/window"
     ],
     "modules-center": [
@@ -19,9 +19,12 @@
         "pulseaudio",
         "cpu",
         "memory",
+        "temperature",
+        "disk",
         "network",
         "battery",
         "tray",
+        "custom/update",
         "custom/power"
     ],
     "hyprland/workspaces": {
@@ -42,11 +45,13 @@
         "on-click": "rofi -show drun -theme ~/.config/rofi/sigmaos.rasi",
         "tooltip": false
     },
-    "custom/omarchy-theme": {
+    "custom/sigma-theme": {
         "format": " 🎨 {} ",
-        "exec": "omarchy-shell theme list | head -1",
-        "on-click": "omarchy-shell theme next",
-        "tooltip": true
+        "exec": "cat ~/.cache/wallust/current-theme 2>/dev/null || echo 'default'",
+        "on-click": "sigmaos-update --theme-only",
+        "interval": 30,
+        "tooltip": true,
+        "tooltip-format": "Active Wallust theme. Click to re-apply."
     },
     "hyprland/window": {
         "format": "{}",
@@ -59,42 +64,73 @@
     },
     "cpu": {
         "interval": 2,
-        "format": "  {usage}%",
-        "max-length": 10
+        "format": "  {usage}%",
+        "max-length": 10,
+        "tooltip-format": "CPU: {usage}% | Load: {load}"
     },
     "memory": {
         "interval": 5,
-        "format": "  {}%",
-        "max-length": 10
+        "format": "  {used:.1f}G / {total:.1f}G",
+        "max-length": 20,
+        "tooltip-format": "RAM: {used:.2f}GiB / {total:.2f}GiB ({percentage}%)\nSwap: {swapUsed:.2f}GiB / {swapTotal:.2f}GiB"
+    },
+    "temperature": {
+        "critical-threshold": 80,
+        "format": "{icon} {temperatureC}°C",
+        "format-critical": "🔥 {temperatureC}°C",
+        "format-icons": ["", "", ""],
+        "tooltip": true
+    },
+    "disk": {
+        "interval": 30,
+        "format": "  {percentage_used}%",
+        "path": "/",
+        "tooltip-format": "Disk /: {used} / {total} ({percentage_used}%)"
     },
     "network": {
-        "format-wifi": "  {essid}",
+        "format-wifi": "  {essid} ({signalStrength}%)",
         "format-ethernet": "󰈀  {ipaddr}",
         "format-linked": "󰈀  (No IP)",
         "format-disconnected": "󰖪  Offline",
-        "tooltip-format": "{ifname}: {ipaddr}/{cidr}"
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}\nGateway: {gwaddr}\nUp: {bandwidthUpBytes} Down: {bandwidthDownBytes}"
     },
     "pulseaudio": {
         "format": "{icon}  {volume}%",
         "format-muted": "󰖁  Muted",
         "format-icons": {
-            "default": ["", "", ""]
+            "headphone": "",
+            "hands-free": "󰂑",
+            "headset": "󰂎",
+            "phone": "",
+            "phone-muted": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
         },
-        "on-click": "pavucontrol"
+        "on-click": "pavucontrol",
+        "tooltip-format": "{desc} — {volume}%"
     },
     "battery": {
         "states": {
+            "good": 90,
             "warning": 30,
             "critical": 15
         },
         "format": "{icon}  {capacity}%",
-        "format-charging": "󰂄  {capacity}%",
+        "format-charging": "󰂄  {capacity}% ⚡",
         "format-plugged": "󰂄  {capacity}%",
-        "format-icons": ["󰂃", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+        "format-icons": ["󰂃", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "tooltip-format": "Battery: {capacity}% ({timeTo})"
     },
     "tray": {
         "icon-size": 16,
         "spacing": 10
+    },
+    "custom/update": {
+        "format": " 🔄 ",
+        "on-click": "foot --title 'SigmaOS Update' bash -c 'sigmaos-update; read -n1 -rp \"Done. Press any key...\"'",
+        "tooltip": true,
+        "tooltip-format": "Run sigmaos-update"
     },
     "custom/power": {
         "format": " ⏻ ",
