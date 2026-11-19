@@ -109,5 +109,10 @@ __pycache__/
 !docs/DOCKER_SETUP.md
 !docs/ARCH_VM_BUILD.md
 !docs/THEME-CONSOLIDATION-COMPLETE.md
+!docs/wiki/SigmaOS-Themes.md
+!docs/wiki/sigmaos-theme-core.md
+!docs/wiki/sigmaos-theme-icons.md
+!docs/wiki/sigmaos-theme-gtk3.md
+!docs/wiki/sigmaos-theme-desktop.md
 
 .agents/
