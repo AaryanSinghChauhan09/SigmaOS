@@ -24,6 +24,9 @@
 #   sigma_hub.sh test [name ...]       # cargo test across the fleet (CI)
 #   sigma_hub.sh health                # fleet-health summary
 #   sigma_hub.sh dupes                 # X/X2 variant-pair analyzer
+#   sigma_hub.sh graph [name]          # dependency graph visualization
+#   sigma_hub.sh verify                # verify interconnections between repos
+#   sigma_hub.sh batch <command>       # run command across all repos
 #
 # PRINCIPLES: MODULARITY, SINGLE RESPONSIBILITY, DRY, KISS, SEPARATION OF
 # CONCERNS, UNIFORM INFORMATION, OPEN/CLOSED, DEFENSIVE PROGRAMMING.
@@ -629,10 +632,133 @@ cmd_sync() {
     hub_ok "sync done: pulled=$pulled pushed=$pushed failed=$failed"
 }
 
+# graph [name] — generate dependency graph visualization (dot format)
+# Shows component dependencies and their relationships
+cmd_graph() {
+    require_cmd python3
+    local name="${TARGETS[0]:-}"
+    python3 - "$SIGMA_COMPONENTS_TOML" "$name" <<'PY'
+import sys, re
+toml, target = sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None
+print("digraph SigmaOS {")
+print("  rankdir=LR;")
+print("  node [shape=box];")
+print("  compound=true;")
+with open(toml) as f:
+    data = f.read()
+    # Parse component blocks
+    for match in re.finditer(r'\[\[component\]\](.*?)(?=\[\[component\]|\Z)', data, re.DOTALL):
+        block = match.group(1)
+        m_name = re.search(r'name\s*=\s*"([^"]+)"', block)
+        m_dep = re.search(r'depends_on\s*=\s*\[(.*?)\]', block, re.DOTALL)
+        if not m_name: continue
+        name = m_name.group(1)
+        if target and name != target: continue
+        deps = []
+        if m_dep:
+            deps = [d.strip().strip('"') for d in m_dep.group(1).split(',') if d.strip()]
+        print(f'  "{name}" [label="{name}"];')
+        for dep in deps:
+            print(f'  "{dep}" -> "{name}";')
+print("}")
+PY
+}
+
+# verify — verify interconnections between component repositories
+# Checks for broken dependencies, missing repos, and circular dependencies
+cmd_verify() {
+    require_cmd python3
+    python3 - "$SIGMA_COMPONENTS_TOML" "$SIGMA_FLEET_DIR" <<'PY'
+import sys, os, re
+toml, fleet_dir = sys.argv[1], sys.argv[2]
+print("=== SigmaOS Interconnection Verification ===\n")
+# Parse all components
+components = {}
+with open(toml) as f:
+    data = f.read()
+    for match in re.finditer(r'\[\[component\]\](.*?)(?=\[\[component\]|\Z)', data, re.DOTALL):
+        block = match.group(1)
+        m_name = re.search(r'name\s*=\s*"([^"]+)"', block)
+        m_dep = re.search(r'depends_on\s*=\s*\[(.*?)\]', block, re.DOTALL)
+        if not m_name: continue
+        name = m_name.group(1)
+        deps = []
+        if m_dep:
+            deps = [d.strip().strip('"') for d in m_dep.group(1).split(',') if d.strip()]
+        components[name] = deps
+
+# Check for missing dependencies
+missing_deps = 0
+for name, deps in components.items():
+    for dep in deps:
+        if dep not in components:
+            print(f"MISSING DEP: {name} depends on {dep} (not in registry)")
+            missing_deps += 1
+
+# Check for missing local checkouts
+missing_local = 0
+for name in components.keys():
+    path = os.path.join(fleet_dir, name)
+    if not os.path.isdir(path):
+        print(f"MISSING LOCAL: {name} (not checked out)")
+        missing_local += 1
+
+# Check for circular dependencies (simple detection)
+circular = []
+visited = set()
+def check_circular(name, path):
+    if name in path:
+        circular.append(path + [name])
+        return
+    if name in visited or name not in components:
+        return
+    visited.add(name)
+    for dep in components[name]:
+        check_circular(dep, path + [name])
+
+for name in components:
+    visited.clear()
+    check_circular(name, [])
+
+if circular:
+    print("CIRCULAR DEPENDENCIES:")
+    for cycle in circular:
+        print(f"  {' -> '.join(cycle)}")
+
+print(f"\nVerification complete:")
+print(f"  Total components: {len(components)}")
+print(f"  Missing dependencies: {missing_deps}")
+print(f"  Missing local checkouts: {missing_local}")
+print(f"  Circular dependencies: {len(circular)}")
+PY
+}
+
+# batch <command> — run a shell command across all component repositories
+# Useful for bulk operations like git status, git log, etc.
+cmd_batch() {
+    [[ ${#TARGETS[@]} -eq 0 ]] && hub_die "batch requires a command"
+    local cmd="${TARGETS[*]}"
+    local targets=()
+    while IFS=$'\t' read -r name repo cat lang; do targets+=("$name"); done < <(iter_components)
+    local success=0 failed=0
+    for name in "${targets[@]}"; do
+        local path; path="$(component_local_path "$name")"
+        [[ -d "$path" ]] || continue
+        printf "[%s] %s\n" "$name" "$cmd"
+        if ( cd "$path" && eval "$cmd" ); then
+            success=$((success+1))
+        else
+            failed=$((failed+1))
+            printf "  (failed)\n"
+        fi
+    done
+    hub_ok "batch complete: success=$success failed=$failed"
+}
+
 # --- main --------------------------------------------------------------------
 cmd="${1:-help}"; shift || true
 case "$cmd" in
-    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate|test|health|dupes)
+    list|status|audit|connect|create|upgrade|sync|search|info|depends|families|consolidate|test|health|dupes|graph|verify|batch|consolidate-all)
         parse_common "$@"
         "cmd_${cmd}"
         ;;
