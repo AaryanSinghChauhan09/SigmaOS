@@ -85,10 +85,46 @@ jobs:
         echo "- Waybar status bar" >> $GITHUB_STEP_SUMMARY
         echo "- Wallust dynamic theming" >> $GITHUB_STEP_SUMMARY
         echo "- PipeWire audio stack" >> $GITHUB_STEP_SUMMARY
-        echo "- 116 curated packages" >> $GITHUB_STEP_SUMMARY
+        echo "- 105 curated packages (lean ~3.3 GB ISO)" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Download" >> $GITHUB_STEP_SUMMARY
         echo "Download the ISO from the artifacts below." >> $GITHUB_STEP_SUMMARY
+
+    # Produce a Secure-Boot-signed ISO variant. Non-fatal: if signing or its
+    # tooling fails, the standard (unsigned) ISO still publishes normally.
+    # Uses secrets SIGMAOS_SB_KEY/SIGMAOS_SB_CRT if set, else a per-build key
+    # whose cert is published for one-time MOK/db enrolment.
+    - name: Sign ISO for Secure Boot
+      if: success()
+      continue-on-error: true
+      run: |
+        set -euo pipefail
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq xorriso mtools sbctl >/dev/null
+        ISO=$(ls out/*.iso | head -1)
+        SB_DIR=secureboot-keys
+        if [[ -n "${SIGMAOS_SB_KEY:-}" && -n "${SIGMAOS_SB_CRT:-}" ]]; then
+          mkdir -p "$SB_DIR"
+          printf '%s' "$SIGMAOS_SB_KEY" | base64 -d > "$SB_DIR/db.key" || true
+          printf '%s' "$SIGMAOS_SB_CRT" | base64 -d > "$SB_DIR/db.crt" || true
+          chmod 600 "$SB_DIR/db.key"
+          echo "Using release signing key from secrets."
+        fi
+        mkdir -p sb_out
+        scripts/sign-iso-secureboot.sh "$ISO" "sb_out/$(basename "${ISO%.iso}")-secureboot.iso" "$SB_DIR"
+        # Split the signed ISO too and stage it + the cert for the release.
+        SBISO="sb_out/$(basename "${ISO%.iso}")-secureboot.iso"
+        [[ -f "$SBISO" ]] || { echo "signed ISO not produced"; exit 0; }
+        mkdir -p release_parts
+        SBASE=$(basename "$SBISO")
+        split -d -b 1900m --additional-suffix=.part "$SBISO" "release_parts/${SBASE}."
+        (cd release_parts && sha256sum *.part > "${SBASE}.parts.sha256")
+        (cd sb_out && sha256sum "$SBASE" > "../release_parts/${SBASE}.sha256")
+        cp "$SB_DIR/db.crt" release_parts/SigmaOS-SecureBoot-CA.crt
+        echo "Secure Boot variant staged: $SBASE"
+      env:
+        SIGMAOS_SB_KEY: ${{ secrets.SIGMAOS_SB_KEY }}
+        SIGMAOS_SB_CRT: ${{ secrets.SIGMAOS_SB_CRT }}
 
     - name: Split ISO and publish rolling release
       if: success()
@@ -110,6 +146,6 @@ jobs:
         TAG="sigmaos-desktop-${STAMP}-run${{ github.run_number }}"
         gh release create "$TAG" \
           --title "SigmaOS Desktop ${STAMP}" \
-          --notes "SigmaOS live ISO (BIOS+UEFI), built by CI run ${{ github.run_number }}. See the Wiki 'ISO Build Guide' for Secure Boot, flashing, and reassembly." \
+          --notes "SigmaOS live ISO (BIOS+UEFI), built by CI run ${{ github.run_number }}. Assets include the standard ISO plus a Secure-Boot-signed variant (*-secureboot.iso) and SigmaOS-SecureBoot-CA.crt for one-time key enrolment. See the Wiki 'ISO Build Guide'." \
           release_parts/*
         echo "Published release: https://github.com/${{ github.repository }}/releases/tag/${TAG}" >> $GITHUB_STEP_SUMMARY
