@@ -65,7 +65,18 @@ jobs:
         name: build-log
         path: out/build.log
         retention-days: 7
-        
+
+    # Real boot regression test: boots the freshly built kernel+initramfs in
+    # QEMU (TCG) and requires a userspace marker on the serial console.
+    # Catches the broken-initramfs class of bug before a release is cut.
+    - name: Install QEMU for boot smoke test
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y -qq qemu-system-x86 xorriso >/dev/null
+
+    - name: Boot smoke test (QEMU)
+      run: bash scripts/ci/qemu_iso_boot.sh "$(ls out/*.iso | head -1)" out/qemu-boot 1500
+
     - name: Get ISO filename
       id: iso-name
       run: |
