@@ -35565,3 +35565,14 @@ inspirations = "None"
 visibility = "public"
 depends_on = []
 
+
+[[component]]
+name = "SigmaOS-component-core"
+description = "Shared ComponentLifecycle contract + ComponentError for SigmaOS service components (dependency-inversion core)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-component-core"
+engine = "component_contract"
+category = "System Services"
+language = "rust"
+inspirations = "Dependency inversion / shared contract (GoF, POSA)"
+visibility = "private"
+depends_on = []
