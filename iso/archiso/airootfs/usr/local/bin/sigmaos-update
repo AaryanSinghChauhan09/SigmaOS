@@ -69,7 +69,12 @@ update_dotfiles() {
         [ -e "$dst" ] || echo "  [dry-run] would deploy $rel -> $dst"
       elif [ ! -e "$dst" ]; then
         mkdir -p "$(dirname "$dst")"
-        cp -a "$src" "$dst" && deployed=$((deployed + 1))
+        chown "$user:$user" "$(dirname "$dst")" 2>/dev/null || true
+        # The timer runs as root — hand the file to the owning user or they
+        # cannot edit their own configs.
+        if cp -a "$src" "$dst" && chown -R "$user:$user" "$dst" 2>/dev/null; then
+          deployed=$((deployed + 1))
+        fi
       fi
     done < <(find "$skel" -type f -print0 2>/dev/null)
   done
@@ -84,13 +89,28 @@ update_theme() {
     return 0
   fi
   if command -v wallust >/dev/null 2>&1; then
-    local theme_file="${XDG_CACHE_HOME:-$HOME/.cache}/wallust/current-theme"
-    local theme=""
-    [ -f "$theme_file" ] && theme="$(cat "$theme_file")"
-    if [ -n "$theme" ]; then
-      wallust theme "$theme" && success "Theme re-applied: $theme" || warn "wallust theme failed"
+    # Re-derive the palette from the current wallpaper and re-render the
+    # Hyprland/Waybar templates. The systemd timer runs as root, so theme
+    # the first real user's config rather than /root's.
+    local home="$HOME" user=""
+    if [ "$(id -u)" -eq 0 ]; then
+      for d in /home/*/; do
+        user="$(basename "$d")"
+        [ "$user" = "liveuser" ] && continue
+        home="${d%/}"; break
+      done
+    fi
+    local wp="$home/.config/hypr/wallpaper.png"
+    if [ -f "$wp" ]; then
+      local ok=1
+      if [ "$(id -u)" -eq 0 ] && [ -n "$user" ]; then
+        runuser -u "$user" -- env HOME="$home" wallust run "$wp" || ok=0
+      else
+        wallust run "$wp" || ok=0
+      fi
+      [ "$ok" = "1" ] && success "Theme re-applied from $wp" || warn "wallust run failed"
     else
-      wallust run 2>/dev/null && success "Theme applied" || warn "wallust run failed"
+      warn "wallpaper not found at $wp; skipping theme step"
     fi
   else
     warn "wallust not installed; skipping theme step"

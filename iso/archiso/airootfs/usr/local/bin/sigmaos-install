@@ -71,13 +71,15 @@ fi
 
 MNT=/mnt/sigmaos-target
 PKGS="base base-devel linux linux-firmware linux-headers intel-ucode amd-ucode \
-systemd systemd-sysvcompat sudo btrfs-progs efibootmgr grub pacman-contrib \
+systemd systemd-sysvcompat sudo btrfs-progs efibootmgr grub os-prober gptfdisk \
+pacman-contrib arch-install-scripts sbctl \
 hyprland hyprpaper hypridle hyprlock waybar foot rofi-wayland mako dunst \
 grim slurp swappy wl-clipboard cliphist \
-xdg-desktop-portal-hyprland xdg-desktop-portal-gtk polkit-gnome \
+xdg-desktop-portal-hyprland xdg-desktop-portal-gtk polkit-gnome xdg-user-dirs \
 pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber pavucontrol \
-brightnessctl playerctl networkmanager iwd bluez bluez-utils \
-noto-fonts ttf-jetbrains-mono thunar neovim bash zsh starship \
+brightnessctl playerctl wallust \
+networkmanager network-manager-applet nm-connection-editor iwd bluez bluez-utils \
+noto-fonts ttf-jetbrains-mono ttf-font-awesome thunar neovim bash zsh starship \
 git curl wget openssh rsync btop fastfetch"
 
 echo "[1/9] Partitioning $TARGET_DEV (GPT)..."

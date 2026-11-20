@@ -1,0 +1,11 @@
+# SigmaOS Wallust configuration (wallust v3 schema)
+# Themes the Hyprland config and Waybar CSS from the wallpaper palette.
+backend = "wal"
+colorspace = "lch"
+check_contrast = true
+
+[templates]
+hyprland.template = "hyprland.conf"
+hyprland.target = "~/.config/hypr/hyprland.conf"
+waybar.template = "waybar.css"
+waybar.target = "~/.config/waybar/style.css"

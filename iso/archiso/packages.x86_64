@@ -69,6 +69,7 @@ xdg-desktop-portal-gtk
 polkit-gnome
 brightnessctl
 playerctl
+wallust
 
 # ── Audio & Media ─────────────────────────────────────────────────────────────
 pipewire
