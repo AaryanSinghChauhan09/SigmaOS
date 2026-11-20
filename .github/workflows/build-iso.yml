@@ -3,8 +3,18 @@ name: Build SigmaOS ISO
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'iso/**'
+      - 'scripts/build_archiso.sh'
+      - 'scripts/reassemble-iso.sh'
+      - '.github/workflows/build-iso.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'iso/**'
+      - 'scripts/build_archiso.sh'
+      - 'scripts/reassemble-iso.sh'
+      - '.github/workflows/build-iso.yml'
   workflow_dispatch:
 
 jobs:
