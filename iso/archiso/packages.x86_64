@@ -54,8 +54,6 @@ hyprpaper
 swaybg
 waybar
 foot
-alacritty
-kitty
 rofi-wayland
 mako
 dunst
@@ -116,27 +114,16 @@ jq
 # ── Development & Shells ──────────────────────────────────────────────────────
 bash
 zsh
-fish
 starship
 neovim
-helix
 tmux
 lazygit
-mise
-docker
-docker-compose
 rust
 python
 python-pip
 
-# ── Everyday Applications, Media & Gaming ─────────────────────────────────────
+# ── Everyday Applications ─────────────────────────────────────────────────────
 chromium
-obsidian
-libreoffice-fresh
-kdenlive
-obs-studio
-steam
-retroarch
 hyprshot
 tpm2-tools
 sbctl

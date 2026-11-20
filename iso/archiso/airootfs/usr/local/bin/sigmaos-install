@@ -150,7 +150,7 @@ EOF
 echo "[7/7] Installing base system and desktop packages..."
 pacstrap -K /mnt/target base base-devel linux linux-firmware linux-headers \
     systemd systemd-sysvcompat sudo networkmanager bluez bluez-utils \
-    btrfs-progs efibootmgr grub hyprland hyprpaper waybar wallust foot \
+    btrfs-progs efibootmgr grub hyprland hyprpaper waybar foot \
     pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
     xdg-desktop-portal-hyprland xdg-desktop-portal-gtk polkit-gnome \
     brightnessctl playerctl rofi-wayland mako dunst grim slurp swappy \
