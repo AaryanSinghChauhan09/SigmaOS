@@ -337,13 +337,17 @@ cmd_clean() {
 cmd_hook() {
   local phase="${1:-pre}"
   local desc="${2:-pacman_transaction}"
+  # Pacman transaction hooks must never abort or fail the transaction.
+  # cmd_create/cmd_clean may call exit 1 on error, so run them in a
+  # subshell and always return 0.
   if [[ "$phase" == "pre" ]]; then
-    cmd_create "pre_upgrade_${desc}"
+    ( cmd_create "pre_upgrade_${desc}" ) || warn "pre-transaction snapshot failed; continuing"
   elif [[ "$phase" == "post" ]]; then
-    cmd_create "post_upgrade_${desc}"
+    ( cmd_create "post_upgrade_${desc}" ) || warn "post-transaction snapshot failed; continuing"
     # Automatic cleanup keeping 15 snapshots
-    cmd_clean --keep 15
+    ( cmd_clean --keep 15 ) || true
   fi
+  return 0
 }
 
 # ── 8. Status ────────────────────────────────────────────────────────────────

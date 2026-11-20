@@ -237,18 +237,19 @@ check_file "scripts/sigmaos_startup_diagnostics.py" "$SIGMA_ROOT/scripts/sigmaos
 check_file "run.sh"                     "$SIGMA_ROOT/run.sh"
 check_file "Makefile"                   "$SIGMA_ROOT/Makefile"
 
-# Config omarchy structure
-if [[ -d "$SIGMA_ROOT/config/omarchy" ]]; then
-  check "config/omarchy/ directory"    pass
+# Shipped desktop configs (ISO skel — the canonical SigmaOS desktop configs)
+SKEL_CONFIG="$SIGMA_ROOT/iso/archiso/airootfs/etc/skel/.config"
+if [[ -d "$SKEL_CONFIG" ]]; then
+  check "skel .config/ directory"       pass
 else
-  check "config/omarchy/ directory"   fail "missing"
+  check "skel .config/ directory"      fail "missing"
 fi
 
-for cf in shell.json theme.conf keybindings.conf; do
-  if [[ -f "$SIGMA_ROOT/config/omarchy/$cf" ]]; then
-    check "config/omarchy/$cf" pass
+for cf in hypr/hyprland.conf waybar/config waybar/style.css wallust/wall.toml; do
+  if [[ -f "$SKEL_CONFIG/$cf" ]]; then
+    check "skel .config/$cf" pass
   else
-    check "config/omarchy/$cf" warn "missing (run scripts/setup_desktop_dotfiles.sh)"
+    check "skel .config/$cf" warn "missing"
   fi
 done
 
@@ -275,10 +276,8 @@ check_file "bin/sigmaos-crash-diagnostics"      "$SIGMA_ROOT/bin/sigmaos-crash-d
 check_file "bin/sigmaos-local-ai"               "$SIGMA_ROOT/bin/sigmaos-local-ai"
 check_file "bin/sigmaos-screenrecord"           "$SIGMA_ROOT/bin/sigmaos-screenrecord"
 check_file "bin/sigmaos-installer-tui"          "$SIGMA_ROOT/bin/sigmaos-installer-tui"
-check_file "config/omarchy/quickshell/shell.qml" "$SIGMA_ROOT/config/omarchy/quickshell/shell.qml"
-check_file "config/omarchy/quickshell/notifications.qml" "$SIGMA_ROOT/config/omarchy/quickshell/notifications.qml"
-check_file "config/omarchy/quickshell/launcher.qml" "$SIGMA_ROOT/config/omarchy/quickshell/launcher.qml"
-check_file "config/omarchy/quickshell/widgets.qml" "$SIGMA_ROOT/config/omarchy/quickshell/widgets.qml"
+check_file "skel hyprland.conf"                 "$SKEL_CONFIG/hypr/hyprland.conf"
+check_file "skel waybar config"                 "$SKEL_CONFIG/waybar/config"
 check_file "scripts/setup_dev_stacks.sh"         "$SIGMA_ROOT/scripts/setup_dev_stacks.sh"
 check_file "bin/sigmaos-dev-stack"              "$SIGMA_ROOT/bin/sigmaos-dev-stack"
 check_file "bin/sigmaos-theme-install"          "$SIGMA_ROOT/bin/sigmaos-theme-install"
