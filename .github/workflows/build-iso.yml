@@ -17,6 +17,11 @@ on:
       - '.github/workflows/build-iso.yml'
   workflow_dispatch:
 
+# contents:write is required so the final step can create the GitHub Release
+# that hosts the split ISO assets (gh release create -> 403 without it).
+permissions:
+  contents: write
+
 jobs:
   build-iso:
     runs-on: ubuntu-latest
