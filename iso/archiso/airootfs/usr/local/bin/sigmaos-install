@@ -70,8 +70,8 @@ fi
 [[ $EUID -eq 0 ]] || { echo "Error: destructive install must run as root." >&2; exit 1; }
 
 MNT=/mnt/sigmaos-target
-PKGS="base base-devel linux linux-firmware linux-headers \
-systemd systemd-sysvcompat sudo btrfs-progs efibootmgr grub \
+PKGS="base base-devel linux linux-firmware linux-headers intel-ucode amd-ucode \
+systemd systemd-sysvcompat sudo btrfs-progs efibootmgr grub pacman-contrib \
 hyprland hyprpaper hypridle hyprlock waybar foot rofi-wayland mako dunst \
 grim slurp swappy wl-clipboard cliphist \
 xdg-desktop-portal-hyprland xdg-desktop-portal-gtk polkit-gnome \
@@ -124,10 +124,36 @@ sed -i '/^IgnorePkg/d' "$MNT/etc/pacman.conf" 2>/dev/null || true
 [[ -s "$MNT/etc/pacman.d/mirrorlist" ]] || echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' > "$MNT/etc/pacman.d/mirrorlist"
 
 # Carry the SigmaOS desktop skeleton (Hyprland config, wallpaper, shell
-# profile) into the installed system so new users get the branded desktop.
+# profile, starship prompt) into the installed system so new users get the
+# branded desktop. /etc/skel/. already contains package-provided files;
+# cp -a merges ours on top.
 mkdir -p "$MNT/etc/skel"
-cp -a /etc/skel/.config "$MNT/etc/skel/" 2>/dev/null || true
-cp -a /etc/skel/.bash_profile "$MNT/etc/skel/" 2>/dev/null || true
+cp -a /etc/skel/. "$MNT/etc/skel/" 2>/dev/null || true
+
+# Carry the SigmaOS user-space tools so the installed system keeps
+# sigmaos-update / sigmaos-snapshot / sigmaos-secureboot / provisioning.
+mkdir -p "$MNT/usr/local/bin"
+for tool in sigmaos-update sigmaos-snapshot sigmaos-secureboot sigmaos-provision-owner sigmaos-install; do
+    [[ -x "/usr/local/bin/$tool" ]] && cp -a "/usr/local/bin/$tool" "$MNT/usr/local/bin/"
+done
+# sigmaos-update.service/.timer expect the tool; ship the units and enable
+# the weekly timer.
+for unit in sigmaos-update.service sigmaos-update.timer sigmaos-provision-owner.service; do
+    [[ -f "/usr/lib/systemd/system/$unit" ]] && \
+        cp -a "/usr/lib/systemd/system/$unit" "$MNT/usr/lib/systemd/system/"
+done
+mkdir -p "$MNT/etc/systemd/system/timers.target.wants"
+[[ -f "$MNT/usr/lib/systemd/system/sigmaos-update.timer" ]] && \
+    ln -sf /usr/lib/systemd/system/sigmaos-update.timer \
+        "$MNT/etc/systemd/system/timers.target.wants/sigmaos-update.timer"
+
+# Ship the SigmaOS pacman hooks (snapshots, cache prune, dotfile refresh)
+# and sudoers drop-in so package transactions stay protected.
+mkdir -p "$MNT/etc/pacman.d/hooks" "$MNT/etc/sudoers.d"
+for hook in /etc/pacman.d/hooks/*sigmaos*.hook /etc/pacman.d/hooks/clean_package_cache.hook; do
+    [[ -f "$hook" ]] && cp -a "$hook" "$MNT/etc/pacman.d/hooks/"
+done
+[[ -f /etc/sudoers.d/wheel ]] && cp -a /etc/sudoers.d/wheel "$MNT/etc/sudoers.d/"
 
 echo "[7/9] Configuring bootloader (GRUB) + initramfs..."
 arch-chroot "$MNT" bash -c '
@@ -145,10 +171,21 @@ arch-chroot "$MNT" bash -c '
 echo "[8/9] First-boot configuration..."
 read -rsp "Root password (leave empty to set later): " ROOT_PW || true
 echo
-[[ -n "$ROOT_PW" ]] && arch-chroot "$MNT" bash -c "echo 'root:$ROOT_PW' | chpasswd"
+# Pipe passwords via stdin — never embed them in the arch-chroot command
+# line where they would be visible in the process list.
+[[ -n "$ROOT_PW" ]] && printf 'root:%s\n' "$ROOT_PW" | arch-chroot "$MNT" chpasswd
 read -rp "Username for daily use [sigma]: " USERNAME
 USERNAME="${USERNAME:-sigma}"
 [[ "$USERNAME" =~ ^[a-z_][a-z0-9_-]*$ ]] || { echo "Error: invalid username '$USERNAME'" >&2; exit 1; }
+# The user gets sudo — they MUST have a password or sudo can never
+# authenticate. Prompt twice and require a non-empty password.
+while :; do
+    read -rsp "Password for $USERNAME: " USER_PW; echo
+    [[ -n "$USER_PW" ]] || { echo "A password is required for sudo access." >&2; continue; }
+    read -rsp "Confirm password: " USER_PW2; echo
+    [[ "$USER_PW" == "$USER_PW2" ]] && break
+    echo "Passwords do not match — try again." >&2
+done
 arch-chroot "$MNT" bash -c "
     useradd -m -G wheel,audio,video,storage,input -s /bin/bash '$USERNAME' 2>/dev/null || true
     echo '$USERNAME ALL=(ALL) ALL' > /etc/sudoers.d/$USERNAME
@@ -158,6 +195,8 @@ arch-chroot "$MNT" bash -c "
     echo 'sigmaos' > /etc/hostname
     ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 "
+printf '%s:%s\n' "$USERNAME" "$USER_PW" | arch-chroot "$MNT" chpasswd
+unset USER_PW USER_PW2 ROOT_PW
 
 # One-step desktop: autologin $USERNAME on tty1 so the installed system boots
 # straight into Hyprland via the skel .bash_profile (same as the live ISO).
