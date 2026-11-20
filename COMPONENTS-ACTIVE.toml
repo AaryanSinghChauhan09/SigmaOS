@@ -285,3 +285,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-resource"
+description = "Resource manager for SigmaOS CPU, memory, and I/O resource management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-resource.git"
+engine = "resource"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-restore"
+description = "Restore manager for SigmaOS backup and restore operations"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-restore.git"
+engine = "restore"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
