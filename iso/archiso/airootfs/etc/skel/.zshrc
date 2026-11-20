@@ -29,6 +29,14 @@ if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
 
+# SigmaOS commands — thin aliases over the sigmaos-* toolchain.
+alias sig-update='sigmaos-update'
+alias sig-snap='sigmaos-snapshot'
+alias sig-secureboot='sigmaos-secureboot'
+alias sig-aur='sigma-aur'
+alias sig-rollbacks='sigmaos-snapshot list'
+sig-backup() { sigmaos-snapshot create "manual-$(date +%Y%m%d-%H%M%S)"; }
+
 # SigmaOS environment
 export EDITOR="${EDITOR:-nvim}"
 export VISUAL="${VISUAL:-nvim}"
