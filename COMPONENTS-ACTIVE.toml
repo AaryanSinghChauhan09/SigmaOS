@@ -369,3 +369,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-kernel-manager"
+description = "Kernel manager for SigmaOS kernel operations and management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-manager.git"
+engine = "kernel-manager"
+category = "kernel"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
