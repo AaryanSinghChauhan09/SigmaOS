@@ -441,3 +441,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmabackup"]
+
+[[component]]
+name = "SigmaOS-jails"
+description = "BSD-style jail container isolation (process isolation, resource limits)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jails.git"
+engine = "jails"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmajails"]
