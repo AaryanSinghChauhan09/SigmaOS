@@ -321,3 +321,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-hardware"
+description = "Hardware manager for SigmaOS hardware detection and management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hardware.git"
+engine = "hardware"
+category = "hardware"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-cleaner"
+description = "System cleaner for SigmaOS disk and cache cleanup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cleaner.git"
+engine = "cleaner"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
