@@ -309,3 +309,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-menu"
+description = "Menu manager for SigmaOS application and system menus"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-menu.git"
+engine = "menu"
+category = "desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
