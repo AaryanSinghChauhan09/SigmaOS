@@ -465,3 +465,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaprocessmonitor"]
+
+[[component]]
+name = "SigmaOS-bsd-ports"
+description = "BSD ports tree manager (port build states, categories)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-ports.git"
+engine = "bsd-ports"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaports"]
