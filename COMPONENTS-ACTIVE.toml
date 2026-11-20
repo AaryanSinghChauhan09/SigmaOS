@@ -489,3 +489,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaautomation"]
+
+[[component]]
+name = "SigmaOS-clipboard-manager"
+description = "Clipboard management (history, formats, items)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clipboard-manager.git"
+engine = "clipboard-manager"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaclipboardmanager"]
