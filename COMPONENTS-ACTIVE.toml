@@ -405,3 +405,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-display"
+description = "Display output manager (modes, connectors, state)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-display.git"
+engine = "display"
+category = "Display"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmadisplaymanager"]
