@@ -153,3 +153,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-cron"
+description = "Cron daemon and job scheduler for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cron.git"
+engine = "cron"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
