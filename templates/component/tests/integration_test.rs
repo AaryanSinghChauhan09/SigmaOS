@@ -1,6 +1,6 @@
 //! Integration tests for __COMPONENT_NAME__.
 
-use __COMPONENT_CRATE_LIB__::Component;
+use __COMPONENT_CRATE_LIB__::{Component, ComponentLifecycle};
 
 #[test]
 fn component_initialises_and_runs() {

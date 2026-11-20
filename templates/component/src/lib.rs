@@ -72,7 +72,6 @@ impl ComponentLifecycle for Component {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pretty_assertions::assert_eq;
 
     // Arrange-Act-Assert
     #[test]
