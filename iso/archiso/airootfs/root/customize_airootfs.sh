@@ -43,4 +43,18 @@ verify_initramfs() {
 verify_initramfs /boot/initramfs-linux.img || exit 1
 verify_initramfs /boot/initramfs-linux-fallback.img || exit 1
 echo "customize: initramfs verification passed"
+
+# Live session user: the shipped /etc/passwd defines liveuser, but nothing
+# creates its home — without it, tty1 autologin lands in a bare shell and
+# .bash_profile (which launches Hyprland) never runs. Populate /home/liveuser
+# from /etc/skel exactly like useradd -m would.
+if id liveuser >/dev/null 2>&1; then
+  mkdir -p /home/liveuser
+  cp -a /etc/skel/. /home/liveuser/
+  chown -R liveuser:liveuser /home/liveuser
+  chmod 750 /home/liveuser
+  echo "customize: liveuser home populated from /etc/skel"
+else
+  echo "customize: WARNING liveuser not in passwd" >&2
+fi
 ls -l /boot/
