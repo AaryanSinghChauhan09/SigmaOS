@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# sigmaos-secureboot — enrol a Machine Owner Key and sign the installed
+# system's EFI binaries so Secure Boot can be re-enabled safely.
+#
+# This operates on an INSTALLED SigmaOS system (needs /boot ESP + bootloader).
+# The live ISO itself is unsigned and cannot be Secure-Boot-signed after the
+# fact — disable Secure Boot to run the live image.
+#
+# Usage:
+#   sigmaos-secureboot keys     # create a new MOK (one time)
+#   sigmaos-secureboot enroll   # enrol the MOK into firmware (reboot required)
+#   sigmaos-secureboot sign     # sign all detected EFI binaries
+#   sigmaos-secureboot status   # show Secure Boot state
+#   sigmaos-secureboot all      # keys -> sign -> instruct enrolment
+set -euo pipefail
+
+SBCTL="$(command -v sbctl || true)"
+[[ -n "$SBCTL" ]] || { echo "error: sbctl not installed (pacman -S sbctl)" >&2; exit 1; }
+
+sb_state() { "$SBCTL" status 2>/dev/null | grep -qi "SecureBoot.*enabled" && echo enabled || echo disabled; }
+
+cmd_keys() {
+    if [[ -f /var/lib/sbctl/keys/Microsoft/cert.pem || -d /var/lib/sbctl/keys ]]; then
+        echo "MOK already present under /var/lib/sbctl/keys — refusing to overwrite."
+        ls -la /var/lib/sbctl/keys 2>/dev/null || true
+        return 0
+    fi
+    echo "Creating Machine Owner Key (MOK)..."
+    "$SBCTL" create-keys
+    chmod 600 /var/lib/sbctl/keys/* 2>/dev/null || true
+    echo "MOK created. Next: 'sigmaos-secureboot sign' then 'sigmaos-secureboot enroll'."
+}
+
+cmd_sign() {
+    echo "Signing EFI binaries..."
+    # Sign every *.efi under the ESP and fallback loader paths sbctl knows.
+    local targets=()
+    while IFS= read -r -d '' f; do targets+=("$f"); done \
+        < <(find /boot /efi /boot/efi -type f -name '*.efi' -print0 2>/dev/null)
+    if [[ ${#targets[@]} -eq 0 ]]; then
+        echo "No *.efi found — is the ESP mounted at /boot?" >&2; return 1
+    fi
+    printf '  %s\n' "${targets[@]}"
+    "$SBCTL" sign-all --yes "${targets[@]}"
+    echo "Signed ${#targets[@]} EFI binaries."
+}
+
+cmd_enroll() {
+    echo "Enrolling MOK into firmware..."
+    echo "You will be prompted to confirm; reboot when asked and enrol the key"
+    echo "in the blue MOK Manager screen (Enroll MOK -> Continue -> Yes)."
+    "$SBCTL" enroll-keys --yes
+}
+
+cmd_status() {
+    echo "Secure Boot: $(sb_state)"
+    "$SBCTL" status || true
+}
+
+cmd_all() {
+    cmd_keys
+    cmd_sign
+    cmd_enroll
+    cat <<'EOF'
+
+After enrolment + reboot:
+  1. Firmware MOK Manager -> Enroll MOK -> Continue -> Yes -> reboot.
+  2. Secure Boot can now be re-enabled in firmware setup.
+  3. Verify with: sigmaos-secureboot status
+EOF
+}
+
+case "${1:-}" in
+    keys)    cmd_keys ;;
+    enroll)  cmd_enroll ;;
+    sign)    cmd_sign ;;
+    status)  cmd_status ;;
+    all)     cmd_all ;;
+    *) echo "usage: sigmaos-secureboot {keys|enroll|sign|status|all}" >&2; exit 2 ;;
+esac
