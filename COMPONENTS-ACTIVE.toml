@@ -417,3 +417,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmadisplaymanager"]
+
+[[component]]
+name = "SigmaOS-package-updates"
+description = "Package update checker (severity, sources, auto-update policy)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-updates.git"
+engine = "package-updates"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmapackageupdates"]
