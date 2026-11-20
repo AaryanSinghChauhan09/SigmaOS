@@ -136,6 +136,21 @@ build_docker() {
   fi
 
   mkdir -p "$OUT_DIR" "$WORK_DIR" "$WORK_DIR/pacman-cache"
+
+  # archlinux:latest ships openssl 4.x which breaks libssl.so=3 consumers and
+  # the erofs-utils dep chain. Pin openssl 3.x + archiso-91 (pre-erofs) from
+  # the Arch archive so the build is reproducible on a fresh clone.
+  ensure_pkg() {
+    local file="$1" url="$2"
+    [ -s "$WORK_DIR/$file" ] && return 0
+    info "Downloading $file ..."
+    curl -fL --retry 3 -o "$WORK_DIR/$file" "$url" \
+      || { err "Failed to download $file"; exit 1; }
+  }
+  ARCH_SNAP="https://archive.archlinux.org/repos/2025/11/20/extra/os/x86_64"
+  ensure_pkg "openssl-3.6.5-1-x86_64.pkg.tar.zst"  "$ARCH_SNAP/openssl-3.6.5-1-x86_64.pkg.tar.zst"
+  ensure_pkg "archiso-91-1-any.pkg.tar.zst"       "$ARCH_SNAP/archiso-91-1-any.pkg.tar.zst"
+
   local abs_profile
   abs_profile="$(realpath "$PROFILE_DIR")"
   local abs_out
