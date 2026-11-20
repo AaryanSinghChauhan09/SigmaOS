@@ -261,3 +261,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-restart"
+description = "Restart manager for SigmaOS system and service restarts"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-restart.git"
+engine = "restart"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-config"
+description = "Configuration manager for SigmaOS system and application settings"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-config.git"
+engine = "config"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
