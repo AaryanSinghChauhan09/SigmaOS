@@ -142,17 +142,17 @@ packages can be added incrementally after the base ISO is working.
 
 ### Current Status
 
-- ✅ Archiso profile validated successfully
+- ✅ Archiso profile validated successfully (105 packages)
 - ✅ Uses stock Arch kernel (no custom kernel stubs)
-- ✅ 116 packages configured for functional desktop
-- ✅ Defensive installer with safety checks
-- ✅ Hyprland configuration with SigmaOS branding added
-- ✅ Wallust theming integration
-- ✅ Waybar status bar configured
+- ✅ Lean live ISO (~3.3 GB) — Hyprland, Waybar, PipeWire, foot, Thunar
+- ✅ Boots to Hyprland desktop via tty1 autologin (UEFI verified in QEMU)
+- ✅ One-step installer (`sigmaos-install`) — real arch-install-scripts,
+  Btrfs+GRUB, guided user setup, dry-run default + destructive guards
+- ✅ Secure Boot helpers (`sigmaos-secureboot`, `scripts/sign-secureboot.sh`)
+- ✅ Component scaffold uses `ComponentLifecycle` trait (OOP/SOLID)
 - ✅ Placeholder packages archived (198 moved to pkgs_archive/)
-- ✅ 9 essential packages remain (all with real functionality)
-- ⏳ Requires Arch host or Docker to build ISO
-- ⏳ QEMU boot test pending after build
+- ✅ CI builds ISO in Docker and auto-publishes split Release assets
+- ⏳ Secure Boot signing of the live ISO's efiboot.img (needs release key)
 
 ### Recent Changes (2026-11-19)
 
