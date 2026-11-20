@@ -1,6 +1,8 @@
 # Build artifacts and temporary files
 /build/
-/bin/
+# Only the compiled workstation binary is ignored — shell scripts under
+# bin/ are source and must remain trackable.
+/bin/sigmaos
 /target/
 **/target/
 *.log

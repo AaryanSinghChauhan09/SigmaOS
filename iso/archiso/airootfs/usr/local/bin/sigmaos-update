@@ -37,7 +37,12 @@ update_packages() {
     return 0
   fi
   if command -v pacman >/dev/null 2>&1; then
-    pacman -Syu --noconfirm || { err "pacman -Syu failed"; return 1; }
+    # The systemd timer runs as root; interactive users need sudo.
+    if [ "$(id -u)" -eq 0 ]; then
+      pacman -Syu --noconfirm || { err "pacman -Syu failed"; return 1; }
+    else
+      sudo pacman -Syu --noconfirm || { err "pacman -Syu failed"; return 1; }
+    fi
     success "Packages up to date"
   else
     warn "pacman not found; skipping package step"
