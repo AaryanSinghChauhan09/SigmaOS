@@ -141,3 +141,15 @@ language = "rust"
 visibility = "public"
 depends_on = ["SigmaOS"]
 provides = ["hub-runtime", "fleet-orchestration"]
+
+[[component]]
+name = "SigmaOS-compress"
+description = "Compression manager (gzip/bzip2/xz/zstd) for SigmaOS filesystem and backup operations"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-compress.git"
+engine = "compress"
+category = "storage"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
