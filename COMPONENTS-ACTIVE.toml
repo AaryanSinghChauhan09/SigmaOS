@@ -453,3 +453,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmajails"]
+
+[[component]]
+name = "SigmaOS-process-monitor"
+description = "Process monitor (states, CPU usage, lookup by name/state)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-process-monitor.git"
+engine = "process-monitor"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaprocessmonitor"]
