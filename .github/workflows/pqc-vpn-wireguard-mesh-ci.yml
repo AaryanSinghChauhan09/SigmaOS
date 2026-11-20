@@ -1,11 +1,7 @@
 name: Post-Quantum Cryptography VPN & WireGuard Mesh Security CI
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+  workflow_dispatch:
 permissions:
   contents: read
 

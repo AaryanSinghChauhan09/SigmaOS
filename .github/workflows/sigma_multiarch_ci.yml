@@ -4,10 +4,6 @@ name: "SigmaOS Multi-Arch CI — x86_64 + ARM64 + RISC-V + QEMU Boot"
 # Runs QEMU smoke boot on x86_64 and ARM64.
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
     inputs:
       run_qemu_boot:

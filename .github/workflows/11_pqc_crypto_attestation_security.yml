@@ -1,10 +1,6 @@
 name: PQC Cryptography & OpenBSD Signify Attestation Security
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 permissions:

@@ -159,6 +159,15 @@ arch-chroot "$MNT" bash -c "
     ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 "
 
+# One-step desktop: autologin $USERNAME on tty1 so the installed system boots
+# straight into Hyprland via the skel .bash_profile (same as the live ISO).
+mkdir -p "$MNT/etc/systemd/system/getty@tty1.service.d"
+cat > "$MNT/etc/systemd/system/getty@tty1.service.d/autologin.conf" <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $USERNAME --noclear %I \$TERM
+EOF
+
 echo "[9/9] Syncing and finishing..."
 sync
 arch-chroot "$MNT" true

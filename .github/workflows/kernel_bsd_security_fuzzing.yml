@@ -1,18 +1,9 @@
 name: Kernel & BSD Security Capability Fuzzing Suite
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 2 * * *' # Daily at 02:00 UTC
-  push:
-    branches: [ main ]
-    paths:
-      - 'src/security/**'
-      - 'src/kernel/**'
-      - 'src/drivers/**'
-      - '.github/workflows/kernel_bsd_security_fuzzing.yml'
-  pull_request:
-    branches: [ main ]
-
 permissions:
   contents: read
   security-events: write
