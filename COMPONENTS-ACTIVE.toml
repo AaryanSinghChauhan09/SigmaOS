@@ -1,152 +1,143 @@
 # SigmaOS Active Component Registry
-# Single source of truth for the 12 core component repositories.
+# Single source of truth for the core component repositories — the repos that
+# actually carry implementation content after the 2026-11-20 modularization.
 # Modelled on Omarchy Linux sub-repository architecture.
 # Following: MODULARITY, SINGLE RESPONSIBILITY, DRY, KISS, SEPARATION OF CONCERNS
-# Last updated: 2026-11-19
-# 84 redundant repositories archived, 12 core components retained
+# Last updated: 2026-11-20
+# 12 core components: 1 connector + 11 implementation repos
 
-# Core Infrastructure
+# ── Connector / control plane ────────────────────────────────────────────────
 [[component]]
 name = "SigmaOS"
-description = "Main repository with shell hub, component registry, and coordination interface"
+description = "Connector/control-plane repo: fleet registry, component scaffold, and shell hub that orchestrates the SigmaOS-* component repositories"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 engine = "shell_hub"
 category = "Core Infrastructure"
 language = "shell"
 visibility = "public"
 depends_on = []
-provides = ["hub", "registry", "coordination"]
+provides = ["hub", "registry", "coordination", "component-scaffold"]
+
+# ── Tier 0: platform ─────────────────────────────────────────────────────────
+[[component]]
+name = "SigmaOS-ISO"
+description = "Archiso live-ISO pipeline: archiso profile, installer payload, QEMU boot verification, release publishing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ISO"
+engine = "archiso"
+category = "Platform"
+language = "shell"
+visibility = "public"
+depends_on = []
+provides = ["live-iso", "installer-payload", "boot-verification"]
 
 [[component]]
-name = "SigmaOS-dev"
-description = "Unified development tools: toolchain, shell configs, agent CLI, workspace management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dev"
-engine = "dev_tools"
+name = "SigmaOS-kernel"
+description = "SigmaOS kernel core: scheduler, VFS, syscall gate, memory, plus the migrated Rust module tree (desktop, filesystem, network, security research modules)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel"
+engine = "rust"
+category = "Platform"
+language = "rust"
+visibility = "public"
+depends_on = []
+provides = ["kernel", "scheduler", "vfs", "syscall-gate", "memory"]
+
+# ── Tier 1: system services ──────────────────────────────────────────────────
+[[component]]
+name = "SigmaOS-system"
+description = "System services layer: init, service management, and OS-level primitives"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system"
+engine = "rust"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = ["SigmaOS-kernel"]
+provides = ["init", "service-management"]
+
+[[component]]
+name = "SigmaOS-network"
+description = "Networking stack: TCP/IP, TLS, mDNS discovery"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network"
+engine = "rust"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = ["SigmaOS-kernel"]
+provides = ["tcp-ip", "tls", "mdns"]
+
+[[component]]
+name = "SigmaOS-security"
+description = "Privilege separation, mandatory access control (MAC) policy engine, and CVE vulnerability auditor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security"
+engine = "rust"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = ["SigmaOS-kernel"]
+provides = ["privilege-separation", "mac-policy", "cve-audit"]
+
+# ── Tier 2: user-facing components ───────────────────────────────────────────
+[[component]]
+name = "SigmaOS-desktop"
+description = "Wayland compositor shell & desktop primitives (Hyprland-based live desktop configs)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop"
+engine = "rust"
+category = "Desktop"
+language = "rust"
+visibility = "public"
+depends_on = ["SigmaOS-kernel", "SigmaOS-system"]
+provides = ["wayland-compositor", "desktop-shell"]
+
+[[component]]
+name = "SigmaOS-installer"
+description = "Graphical live installer (partition, copy, bootloader) — engine/layout/executor/config"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-installer"
+engine = "rust"
+category = "Desktop"
+language = "rust"
+visibility = "public"
+depends_on = ["SigmaOS-ISO", "SigmaOS-system"]
+provides = ["installer-engine", "partitioning", "bootloader-install"]
+
+[[component]]
+name = "SigmaOS-system-tools"
+description = "System tools: sigmaos-* shell toolchain (snapshot, update, provision-owner, doctor, install, sigpkg) and desktop utilities"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-tools"
+engine = "shell"
+category = "System Services"
+language = "shell"
+visibility = "public"
+depends_on = ["SigmaOS-system"]
+provides = ["sigmaos-tools", "snapshot", "update", "provisioning"]
+
+[[component]]
+name = "SigmaOS-filesystem"
+description = "Virtual filesystem layer, journaling & zero-copy paths"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem"
+engine = "rust"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = ["SigmaOS-kernel"]
+provides = ["vfs", "journaling", "zero-copy-io"]
+
+[[component]]
+name = "SigmaOS-packages"
+description = "Validated package catalog, deterministic dependency planning, and installed-package metadata inventory"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-packages"
+engine = "rust"
+category = "System Services"
+language = "rust"
+visibility = "public"
+depends_on = ["SigmaOS-system"]
+provides = ["package-catalog", "dependency-planning", "package-metadata"]
+
+[[component]]
+name = "SigmaOS-hub"
+description = "Hub service component: fleet orchestration runtime backing the connector's sigma_hub.sh"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hub"
+engine = "rust"
 category = "Core Infrastructure"
 language = "rust"
 visibility = "public"
-depends_on = []
-provides = ["development-tools", "shell-configs", "workspace-management"]
-
-[[component]]
-name = "SigmaOS-utils"
-description = "Unified utilities: file tools, network tools, automation, audio, hardware control"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-utils"
-engine = "utilities"
-category = "Core Infrastructure"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["file-tools", "network-tools", "automation", "audio", "hardware-control"]
-
-[[component]]
-name = "SigmaOS-themes"
-description = "Unified theming system: icons, GTK3, desktop themes, and design tokens"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-themes"
-engine = "theming"
-category = "Core Infrastructure"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["icons", "gtk3-themes", "desktop-themes", "design-tokens"]
-
-# System Managers
-[[component]]
-name = "SigmaOS-bootloader"
-description = "Unified bootloader configuration for SigmaOS: systemd-boot, GRUB, efibootmgr"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bootloader"
-engine = "bootloader"
-category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["bootloader-config", "systemd-boot", "grub", "efibootmgr"]
-
-[[component]]
-name = "SigmaOS-package-manager"
-description = "Package management interface with dependency resolution and rollback support"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-manager"
-engine = "package_manager"
-category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["package-management", "dependency-resolution", "rollback"]
-
-[[component]]
-name = "SigmaOS-update-manager"
-description = "Rolling release update orchestration with Observer, State, Strategy patterns"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-update-manager"
-engine = "update_manager"
-category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = ["SigmaOS-package-manager"]
-provides = ["rolling-updates", "update-orchestration", "pattern-based-updates"]
-
-[[component]]
-name = "SigmaOS-snapshot-manager"
-description = "BTRFS snapshot lifecycle management with Command, Factory, Singleton patterns"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snapshot-manager"
-engine = "snapshot_manager"
-category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["btrfs-snapshots", "rollback", "snapshot-lifecycle"]
-
-[[component]]
-name = "SigmaOS-network-manager"
-description = "Enhanced network configuration with WiFi, Ethernet, and VPN support"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-manager"
-engine = "network_manager"
-category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["network-config", "wifi", "ethernet", "vpn"]
-
-[[component]]
-name = "SigmaOS-power-manager"
-description = "Battery / power-profile & idle management with TDP control"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-manager"
-engine = "power_manager"
-category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["power-management", "battery", "power-profiles", "idle-management"]
-
-[[component]]
-name = "SigmaOS-keyring-manager"
-description = "Secure credential storage with hardware-backed keyring support"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keyring-manager"
-engine = "keyring_manager"
-category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["credential-storage", "keyring", "secrets-management"]
-
-[[component]]
-name = "SigmaOS-notifications"
-description = "Unified notification daemon with urgency levels and action support"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notifications"
-engine = "notification_daemon"
-category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = []
-provides = ["notifications", "notification-daemon", "urgency-levels"]
-
-# Archived Components (Reference Only)
-# The following 84 repositories have been archived following OPTIMISE FOR DELETION
-# and CONSOLIDATE GITHUB REPOS OF SIMILAR COMPONENTS principles.
-# See docs/wiki/Consolidation-Plan.md for detailed archive reasons.
-
-# Theme duplicates (4) → SigmaOS-themes
-# apt/dpkg violations (4) → violates Arch-based architecture
-# Consolidated components (15) → merged into canonical repos
-# Arch infrastructure placeholders (65) → use official Arch
-# Application-level repos (4) → not core OS components
-# CLI scaffold (1) → SigmaOS-dev
+depends_on = ["SigmaOS"]
+provides = ["hub-runtime", "fleet-orchestration"]
