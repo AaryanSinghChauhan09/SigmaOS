@@ -345,3 +345,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-toggle"
+description = "Toggle manager for SigmaOS feature and setting toggles"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-toggle.git"
+engine = "toggle"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-launch"
+description = "Launch manager for SigmaOS application and service launching"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-launch.git"
+engine = "launch"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
