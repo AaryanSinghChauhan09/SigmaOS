@@ -1,4 +1,4 @@
-.PHONY: all verify registry-audit consolidation-audit doctor sync-wiki sync-github lint clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes hub-connect hub-graph
+.PHONY: all verify registry-audit consolidation-audit doctor sync-wiki sync-github lint clean help hub hub-list hub-status hub-audit hub-create hub-upgrade hub-sync hub-search hub-info hub-depends hub-families hub-consolidate hub-test hub-health hub-dupes hub-connect hub-graph hub-wire
 
 PYTHON ?= python3
 BASH ?= bash
@@ -73,6 +73,8 @@ hub-dupes:
 
 hub-graph:
 	@$(BASH) scripts/sigma_hub.sh graph $(ARGS)
+hub-wire:
+	@$(BASH) scripts/sigma_hub.sh wire $(ARGS)
 
 # Shell syntax check across all connector scripts.
 lint:
