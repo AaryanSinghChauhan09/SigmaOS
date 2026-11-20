@@ -52,9 +52,11 @@ mkdir -p "$WORK/efi" "$WORK/efisrc"
 echo "Extracting .efi payloads ..."
 # Recursively copy all files out of the FAT image.
 ( cd "$WORK/efisrc" && mcopy -s -i "$WORK/efiboot.img" :: . ) 2>/dev/null || true
-mapfile -d '' EFIS < <(find "$WORK/efisrc" -type f -iname '*.efi' -print0)
+# Sign .efi bootloaders AND the kernel EFI stub (vmlinuz-*) — Secure Boot
+# requires every EFI application in the chain to carry a trusted signature.
+mapfile -d '' EFIS < <(find "$WORK/efisrc" -type f \( -iname '*.efi' -o -iname 'vmlinuz*' \) -print0)
 if [[ ${#EFIS[@]} -eq 0 ]]; then
-    echo "error: no .efi files found inside efiboot.img" >&2; exit 1
+    echo "error: no signable EFI binaries found inside efiboot.img" >&2; exit 1
 fi
 
 # --- sign ------------------------------------------------------------------
