@@ -40,12 +40,40 @@ if [[ ! -f "$KEY" || ! -f "$CRT" ]]; then
 fi
 
 # --- extract efiboot.img ---------------------------------------------------
-# archiso stores the EFI system partition image at the ISO root.
+# archiso does NOT store efiboot.img as a regular ISO9660 file — it is the
+# El Torito EFI boot image and/or an appended GPT partition (isohybrid).
+# Try, in order: (a) a real file in the ISO, (b) an appended FAT partition
+# carved out with dd, (c) fail loudly.
 echo "Extracting efiboot.img ..."
-xorriso -osirrox on -indev "$ISO_IN" -extract /efiboot.img "$WORK/efiboot.img" 2>/dev/null \
-    || xorriso -osirrox on -indev "$ISO_IN" -find / -name 'efiboot.img' -exec extract / {} \; 2>/dev/null \
-    || { echo "error: could not locate efiboot.img in ISO" >&2; exit 1; }
-[[ -f "$WORK/efiboot.img" ]] || { echo "error: efiboot.img not extracted" >&2; exit 1; }
+
+is_fat_esp() { # $1 = candidate image; true if it looks like the ESP
+    [[ -f "$1" ]] || return 1
+    # mdir lists the root; the ESP always has an EFI/ directory.
+    mdir -i "$1" ::/EFI >/dev/null 2>&1
+}
+
+xorriso -osirrox on -indev "$ISO_IN" -extract /efiboot.img "$WORK/efiboot.img" 2>/dev/null || true
+if ! is_fat_esp "$WORK/efiboot.img"; then
+    rm -f "$WORK/efiboot.img"
+    # Fallback: scan appended partitions for a FAT ESP and carve it out.
+    echo "efiboot.img not a plain file — scanning appended partitions ..."
+    local_start=0
+    # fdisk -l reports appended partitions with start sector + size.
+    while read -r _ part_start part_sectors _; do
+        [[ "$part_start" =~ ^[0-9]+$ && "$part_sectors" =~ ^[0-9]+$ ]] || continue
+        [[ "$part_start" -gt 0 ]] || continue
+        dd if="$ISO_IN" of="$WORK/esp_candidate.img" bs=512 \
+            skip="$part_start" count="$part_sectors" status=none 2>/dev/null || continue
+        if is_fat_esp "$WORK/esp_candidate.img"; then
+            mv "$WORK/esp_candidate.img" "$WORK/efiboot.img"
+            echo "  carved ESP from appended partition @sector $part_start"
+            break
+        fi
+    done < <(fdisk -l "$ISO_IN" 2>/dev/null | awk '/\.img|^\/|^Disk/{next} $2 ~ /^[0-9]+$/ && $4 ~ /^[0-9]+$/ {print $2, $4}')
+fi
+[[ -f "$WORK/efiboot.img" ]] && is_fat_esp "$WORK/efiboot.img" \
+    || { echo "error: could not locate a valid EFI system partition in ISO" >&2; exit 1; }
+echo "efiboot.img ready ($(du -h "$WORK/efiboot.img" | cut -f1))."
 
 # --- extract .efi files via mtools (no root/mount needed) -------------------
 mkdir -p "$WORK/efi" "$WORK/efisrc"
