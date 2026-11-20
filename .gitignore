@@ -146,3 +146,8 @@ __pycache__/
 !FINAL-STATUS-ALL-PHASES.md
 
 .agents/
+
+# Build artifacts
+work/
+out/
+.wiki/

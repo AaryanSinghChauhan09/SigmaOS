@@ -8,9 +8,14 @@ base
 base-devel
 linux
 linux-firmware
+intel-ucode
+amd-ucode
 linux-headers
 systemd
 systemd-sysvcompat
+syslinux
+mkinitcpio-archiso
+gptfdisk
 sudo
 which
 man-db
@@ -48,14 +53,12 @@ hyprlock
 hyprpaper
 swaybg
 waybar
-wallust
 foot
 alacritty
 kitty
 rofi-wayland
 mako
 dunst
-wlogout
 grim
 slurp
 swappy
@@ -123,7 +126,6 @@ mise
 docker
 docker-compose
 rust
-cargo
 python
 python-pip
 

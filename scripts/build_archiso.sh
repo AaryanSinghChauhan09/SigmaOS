@@ -135,13 +135,15 @@ build_docker() {
     exit 1
   fi
 
-  mkdir -p "$OUT_DIR" "$WORK_DIR"
+  mkdir -p "$OUT_DIR" "$WORK_DIR" "$WORK_DIR/pacman-cache"
   local abs_profile
   abs_profile="$(realpath "$PROFILE_DIR")"
   local abs_out
   abs_out="$(realpath "$OUT_DIR")"
   local abs_work
   abs_work="$(realpath "$WORK_DIR")"
+  local abs_cache
+  abs_cache="$(realpath "$WORK_DIR/pacman-cache")"
 
   info "Profile:   $abs_profile"
   info "Output:    $abs_out/$ISO_NAME"
@@ -153,13 +155,37 @@ build_docker() {
     -v "$abs_profile:/profile:ro" \
     -v "$abs_out:/out" \
     -v "$abs_work:/work" \
+    -v "$abs_cache:/var/cache/pacman/pkg" \
     archlinux:latest \
     bash -c "
       set -euo pipefail
       echo '[docker] Installing archiso...'
-      pacman -Sy --noconfirm archiso
+      pacman -Sy --noconfirm
+      # Pin openssl 3.x: archlinux:latest ships openssl 4.x which breaks
+      # libssl.so=3-64 consumers (curl, pacman deps) needed by archiso.
+      if [ -f /work/openssl-3.6.5-1-x86_64.pkg.tar.zst ]; then
+        pacman -U --noconfirm /work/openssl-3.6.5-1-x86_64.pkg.tar.zst
+        grep -q '^IgnorePkg.*openssl' /etc/pacman.conf || echo 'IgnorePkg = openssl' >> /etc/pacman.conf
+      fi
+      # Current archiso requires erofs-utils -> openssl 4 (conflicts with pin).
+      # Use archived archiso-91 and skip erofs-utils: our profile is squashfs,
+      # so mkarchiso never invokes erofs tools.
+      if [ -f /work/archiso-91-1-any.pkg.tar.zst ]; then
+        pacman -U --noconfirm --assume-installed erofs-utils /work/archiso-91-1-any.pkg.tar.zst
+      else
+        pacman -Sy --noconfirm archiso
+      fi
+      # pacman.conf references /etc/pacman.d/*. Include files that live in
+      # airootfs — copy them into the build container's pacman.d so mkarchiso
+      # can resolve the [sigmaos] repo during package installation.
+      mkdir -p /etc/pacman.d
+      cp -f /profile/airootfs/etc/pacman.d/* /etc/pacman.d/ 2>/dev/null || true
+      # mkarchiso's _run_once markers persist in the mounted work dir across
+      # runs; a stale marker would skip pacman.conf regeneration and reuse an
+      # empty/broken iso.pacman.conf. Always start from a clean work dir.
+      rm -rf /work/iso-work
       echo '[docker] Running mkarchiso...'
-      mkarchiso -v -w /work -o /out /profile
+      mkarchiso -v -w /work/iso-work -o /out /profile
       echo '[docker] Build complete.'
     " 2>&1 | tee "$OUT_DIR/build.log"
 
