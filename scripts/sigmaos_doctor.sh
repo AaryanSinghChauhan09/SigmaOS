@@ -238,7 +238,7 @@ check_file "run.sh"                     "$SIGMA_ROOT/run.sh"
 check_file "Makefile"                   "$SIGMA_ROOT/Makefile"
 
 # Shipped desktop configs (ISO skel — the canonical SigmaOS desktop configs)
-SKEL_CONFIG="$SIGMA_ROOT/iso/archiso/airootfs/etc/skel/.config"
+SKEL_CONFIG="$SIGMA_ROOT/../SigmaOS-ISO/iso/archiso/airootfs/etc/skel/.config"
 if [[ -d "$SKEL_CONFIG" ]]; then
   check "skel .config/ directory"       pass
 else

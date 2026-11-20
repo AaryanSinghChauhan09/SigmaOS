@@ -152,7 +152,7 @@ iso: kernel
 qemu-smoke: kernel
 	@mkdir -p build
 	@bash scripts/build_stub_iso.sh build/sigmaos.iso
-	@bash scripts/ci/qemu_boot_smoke.sh
+	@bash ../SigmaOS-ISO/scripts/ci/qemu_boot_smoke.sh
 
 # 8b. Build minimal stub ISO (GALL'S LAW: working simple > broken complex)
 # Uses GRUB2 + genisoimage; no nasm required. Boots immediately in QEMU.

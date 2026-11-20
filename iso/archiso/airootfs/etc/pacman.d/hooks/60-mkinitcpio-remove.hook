@@ -1,9 +1,0 @@
-[Trigger]
-Type = Path
-Operation = Remove
-Target = usr/lib/modules/*/vmlinuz
-
-[Action]
-Description = Removing unused initramfs image...
-When = PreTransaction
-Exec = /usr/bin/rm -f /boot/initramfs-linux.img /boot/initramfs-linux-fallback.img

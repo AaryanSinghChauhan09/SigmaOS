@@ -55,8 +55,18 @@ TOML; changes committed; push only when asked or via `make hub-sync --push`.
 
 ## Arch-based ISO Build Process
 
+> **Moved (2026-11-20):** the live-ISO pipeline now lives in the
+> **`SigmaOS-ISO` component repo** (fleet sibling `../SigmaOS-ISO`).
+> It owns `iso/archiso/`, `scripts/build_archiso.sh`,
+> `scripts/reassemble-iso.sh`, `scripts/sign-iso-secureboot.sh`,
+> `scripts/ci/qemu_iso_boot.sh`, `scripts/ci/qemu_boot_smoke.sh`, and the
+> `build-iso.yml` / `boot-smoke.yml` workflows. Releases publish under
+> `SigmaOS-ISO` releases going forward. The notes below are kept for
+> historical context.
+
 SigmaOS provides a turnkey Arch-based live ISO via the archiso profile in
-`iso/archiso/`. This uses the stock Arch Linux kernel and standard Arch
+`iso/archiso/` (now `SigmaOS-ISO/iso/archiso/`). This uses the stock Arch
+Linux kernel and standard Arch
 infrastructure - NOT a custom Rust microkernel (that's a separate research track).
 
 ### Architecture

@@ -1,7 +1,0 @@
-Welcome to SigmaOS — Arch-based sovereign desktop (Hyprland).
-
-  Desktop : already running on tty1
-  Install : sudo sigmaos-install            (dry-run, safe)
-            sudo sigmaos-install --destructive --confirm-disk /dev/sdX /dev/sdX
-  Shell   : Ctrl+Alt+F2  ·  back: Ctrl+Alt+F1
-  Help    : sigmaos-install --help

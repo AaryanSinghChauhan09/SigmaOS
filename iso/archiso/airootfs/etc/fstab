@@ -1,3 +1,0 @@
-# /etc/fstab: static file system information
-# <file system> <dir> <type> <options> <dump> <pass>
-tmpfs   /tmp    tmpfs   defaults,noatime,mode=1777 0 0

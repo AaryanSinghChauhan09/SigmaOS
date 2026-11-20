@@ -30,7 +30,7 @@ fi
 
 if [[ -z "$ISO_PATH" ]]; then
     echo "[SKIP] No compiled bootable ISO found (searched out/ and build/)."
-    echo "       To build the live ISO profile: bash scripts/build_archiso.sh"
+    echo "       To build the live ISO: cd ../SigmaOS-ISO && bash scripts/build_archiso.sh --docker"
     exit 0
 fi
 

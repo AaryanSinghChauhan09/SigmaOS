@@ -15,7 +15,8 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 CONFIG_DIR = ROOT_DIR / "config" / "omarchy"
 SCRIPTS_DIR = ROOT_DIR / "scripts"
 UI_INDEX = ROOT_DIR / "ui" / "desktop" / "index.html"
-ISO_DIR = ROOT_DIR / "iso" / "archiso"
+# ISO profile moved to the SigmaOS-ISO component repo (fleet sibling).
+ISO_DIR = ROOT_DIR.parent / "SigmaOS-ISO" / "iso" / "archiso"
 PKGS_DIR = ROOT_DIR / "pkgs"
 
 def test_hyprland_configs_exist_and_nonempty():
@@ -732,7 +733,7 @@ def test_arch_linux_ecosystem_gap_closure_aaa():
         ISO_DIR / "airootfs" / "usr" / "local" / "bin" / "arch-chroot",
         ISO_DIR / "airootfs" / "usr" / "local" / "bin" / "pacstrap",
         ISO_DIR / "airootfs" / "usr" / "local" / "bin" / "sigma-aur",
-        ROOT_DIR / "scripts" / "build_archiso.sh",
+        ROOT_DIR.parent / "SigmaOS-ISO" / "scripts" / "build_archiso.sh",
         ROOT_DIR / "scripts" / "repo_sync.sh",
     ]
     core_pkgbuilds = [
