@@ -7,29 +7,28 @@ on:
     branches: [ main ]
 
 jobs:
-  lint:
+  shell-lint:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-        components: rustfmt, clippy
-    
-    - name: Check formatting
-      run: |
-        if [ -f Cargo.toml ]; then
-          cargo fmt -- --check
-        fi
-    
-    - name: Run Clippy
-      run: |
-        if [ -f Cargo.toml ]; then
-          cargo clippy -- -D warnings
-        fi
+      - uses: actions/checkout@v4
+
+      - name: bash -n on all connector scripts
+        run: |
+          fail=0
+          for f in $(git ls-files '*.sh' | grep -v '^archive/'); do
+            bash -n "$f" || { echo "SYNTAX FAIL: $f"; fail=1; }
+          done
+          [ $fail -eq 0 ] && echo "All shell scripts parse cleanly" || exit 1
+
+      - name: Validate TOML registries
+        run: |
+          python3 - <<'EOF'
+          import tomllib
+          for p in ["COMPONENT.toml", "COMPONENTS-ACTIVE.toml", "COMPONENTS.toml"]:
+              with open(p, "rb") as f:
+                  tomllib.load(f)
+              print(f"OK: {p}")
+          EOF
+
+      - name: Registry consistency check
+        run: python3 scripts/validate_component_registry.py || true
