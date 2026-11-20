@@ -76,6 +76,7 @@ pipewire
 pipewire-pulse
 pipewire-alsa
 pipewire-jack
+alsa-utils
 wireplumber
 pavucontrol
 mpv
