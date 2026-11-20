@@ -429,3 +429,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmapackageupdates"]
+
+[[component]]
+name = "SigmaOS-backup-tool"
+description = "System backup tool (full/incremental/differential, encryption, scheduling)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-backup-tool.git"
+engine = "backup-tool"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmabackup"]
