@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# sigmaos-snapshot — SigmaOS filesystem snapshot helper for pacman hooks.
+#
+# Creates btrfs snapshots around pacman transactions so a broken upgrade can
+# always be rolled back. Snapshots are taken read-only under
+# /.sigmaos-snapshots/ (top-level subvolume) with automatic retention.
+#
+# Usage:
+#   sigmaos-snapshot hook pre  pacman_tx   # pre-transaction snapshot
+#   sigmaos-snapshot hook post pacman_tx   # post-transaction snapshot
+#   sigmaos-snapshot list                  # list snapshots
+#   sigmaos-snapshot restore <name>        # print restore instructions
+#
+# Safety: every code path that cannot snapshot exits 0 — pacman transactions
+# must never be blocked by snapshot failures (e.g. during ISO builds, where
+# the rootfs is not btrfs and no writable subvolumes exist).
+set -uo pipefail
+
+SNAP_DIR="/.sigmaos-snapshots"
+KEEP="${SIGMAOS_SNAPSHOT_KEEP:-10}"
+
+log() { echo "sigmaos-snapshot: $*" >&2; }
+
+on_btrfs() {
+    [ "$(findmnt -n -o FSTYPE / 2>/dev/null)" = "btrfs" ]
+}
+
+snapshot_dir_ready() {
+    # Ensure the snapshot container is a top-level subvolume we can write to.
+    if [ ! -d "$SNAP_DIR" ]; then
+        mkdir -p "$SNAP_DIR" 2>/dev/null || return 1
+    fi
+    [ -w "$SNAP_DIR" ]
+}
+
+subvol_name() {
+    findmnt -n -o SOURCE / 2>/dev/null | sed -n 's/.*\[\(.*\)\].*/\1/p'
+}
+
+do_snapshot() {
+    local tag="$1" ts name src
+    on_btrfs || { log "root is not btrfs; skipping $tag snapshot"; return 0; }
+    command -v btrfs >/dev/null 2>&1 || { log "btrfs-progs not installed; skipping"; return 0; }
+    snapshot_dir_ready || { log "cannot write $SNAP_DIR; skipping"; return 0; }
+
+    ts="$(date +%Y%m%d-%H%M%S)"
+    name="${tag}-${ts}"
+    src="$(subvol_name)"
+    [ -n "$src" ] || src="/"
+
+    if btrfs subvolume snapshot -r "$src" "$SNAP_DIR/$name" 2>/dev/null; then
+        log "created read-only snapshot $SNAP_DIR/$name"
+        prune_snapshots
+    else
+        log "snapshot failed (root may not be a subvolume); skipping"
+    fi
+    return 0
+}
+
+prune_snapshots() {
+    local count
+    count="$(find "$SNAP_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+    [ "$count" -gt "$KEEP" ] || return 0
+    # Delete oldest snapshots beyond the retention limit.
+    find "$SNAP_DIR" -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\n' 2>/dev/null \
+        | sort -n | head -n "$((count - KEEP))" | cut -d' ' -f2- \
+        | while read -r snap; do
+            btrfs subvolume delete "$snap" 2>/dev/null \
+                && log "pruned old snapshot $(basename "$snap")"
+        done
+}
+
+cmd_hook() {
+    local phase="${1:-}" reason="${2:-}"
+    case "$phase" in
+        pre)  do_snapshot "pre-pacman" ;;
+        post) do_snapshot "post-pacman" ;;
+        *)    log "unknown hook phase: $phase"; return 0 ;;
+    esac
+    return 0
+}
+
+cmd_list() {
+    [ -d "$SNAP_DIR" ] || { echo "no snapshots"; return 0; }
+    find "$SNAP_DIR" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | sort
+}
+
+cmd_restore() {
+    local name="${1:-}"
+    [ -n "$name" ] || { log "usage: sigmaos-snapshot restore <name>"; return 1; }
+    [ -d "$SNAP_DIR/$name" ] || { log "snapshot not found: $name"; return 1; }
+    cat <<EOF
+To restore snapshot '$name' on a btrfs system:
+  1. Boot from the live ISO or another working system.
+  2. Mount the btrfs top level:  mount -o subvolid=5 /dev/<dev> /mnt
+  3. Delete the broken subvolume and promote the snapshot, e.g.:
+       btrfs subvolume delete /mnt/<root-subvol>
+       btrfs subvolume snapshot /mnt/.sigmaos-snapshots/$name /mnt/<root-subvol>
+  4. Reboot.
+Snapshot path: $SNAP_DIR/$name
+EOF
+}
+
+case "${1:-}" in
+    hook)     shift; cmd_hook "$@" ;;
+    list)     cmd_list ;;
+    restore)  shift; cmd_restore "$@" ;;
+    -h|--help|help) sed -n '2,20p' "$0" ;;
+    *)        log "usage: sigmaos-snapshot {hook pre|post|list|restore} [args]"; exit 2 ;;
+esac
+exit 0

@@ -16,9 +16,31 @@ mkdir -p /boot
 cp -f "/usr/lib/modules/${KVER}/vmlinuz" /boot/vmlinuz-linux
 # mkinitcpio preset also references the fallback image; regenerate both.
 # mkinitcpio exits non-zero on non-fatal warnings (missing optional firmware
-# modules, crc32c_intel) — tolerate that, but verify the images exist after.
+# modules) — tolerate that, but verify the images exist after.
 mkinitcpio -P || echo "customize: mkinitcpio reported warnings" >&2
 for img in /boot/initramfs-linux.img /boot/initramfs-linux-fallback.img; do
   [ -s "$img" ] || { echo "customize: missing $img" >&2; exit 1; }
 done
+
+# Verify the initramfs can actually boot the live media. A previous build
+# shipped an image whose HOOKS lacked archiso/archiso_loop_mnt and whose
+# MODULES lacked storage drivers, producing an ISO that dropped to an
+# emergency shell with no block devices. Fail the build instead.
+verify_initramfs() {
+  local img="$1" cfg listing
+  cfg="$(lsinitcpio -c "$img" 2>/dev/null)" || { echo "customize: cannot read config of $img" >&2; return 1; }
+  echo "$cfg" | grep -q 'archiso_loop_mnt' || {
+    echo "customize: $img missing archiso_loop_mnt hook" >&2; return 1; }
+  echo "$cfg" | grep -q 'archiso_pxe_nfs' || {
+    echo "customize: $img missing archiso pxe hooks" >&2; return 1; }
+  listing="$(lsinitcpio -l "$img" 2>/dev/null)" || { echo "customize: cannot list $img" >&2; return 1; }
+  local mod
+  for mod in sr_mod ata_piix isofs cdrom; do
+    echo "$listing" | grep -q "/$mod\.ko" || {
+      echo "customize: $img missing required module $mod" >&2; return 1; }
+  done
+}
+verify_initramfs /boot/initramfs-linux.img || exit 1
+verify_initramfs /boot/initramfs-linux-fallback.img || exit 1
+echo "customize: initramfs verification passed"
 ls -l /boot/

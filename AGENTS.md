@@ -152,7 +152,58 @@ packages can be added incrementally after the base ISO is working.
 - ✅ Component scaffold uses `ComponentLifecycle` trait (OOP/SOLID)
 - ✅ Placeholder packages archived (198 moved to pkgs_archive/)
 - ✅ CI builds ISO in Docker and auto-publishes split Release assets
+- ✅ BIOS (syslinux) + UEFI (systemd-boot) boot paths fixed — upstream
+  archiso releng configs, correct COM32 paths, splash.png, serial console
+- ✅ Initramfs ships archiso hooks + explicit storage modules
+  (ata_piix/ata_generic/pata_*/sr_mod/cdrom/isofs/usb-storage/uas/nvme/
+  vmd/mmc/loop/dm-snapshot/overlay .ko's; ahci/sd_mod/virtio/btrfs are
+  builtin) — live media is found on BIOS, UEFI, USB, and NVMe/SATA devices
+- ✅ Build-time initramfs verification in customize_airootfs.sh fails the
+  build if archiso hooks or storage modules are missing
+- ✅ Working pacman hooks: sigmaos-snapshot (btrfs pre/post-transaction
+  snapshots with retention), paccache via pacman-contrib, sigmaos-update
 - ⏳ Secure Boot signing of the live ISO's efiboot.img (needs release key)
+
+### Recent Changes (2026-11-20) — boot fixes
+
+Root-caused "ISO doesn't boot at all" to three independent defects:
+
+1. **syslinux menu failure**: custom configs referenced
+   `boot/syslinux/vesamenu.c32` / `splash.png` by ISO-root-relative paths;
+   isolinux resolves them relative to `/boot/syslinux/`, so the COM32 load
+   failed and BIOS boot dropped to a `boot:` prompt. Replaced with the
+   upstream archiso releng syslinux configs (whichsys.c32 selector, PXE +
+   local + chain.c32 + memtest + hdt entries), rebranded to SigmaOS, and
+   added the missing `splash.png`.
+
+2. **initramfs missing archiso hooks**: the shipped `initramfs-linux.img`
+   was built with `HOOKS="udev keymap consolefont"` only — no
+   `archiso`/`archiso_loop_mnt`, and `autodetect` produced a junk module
+   set with no disk drivers, so the kernel found zero block devices and
+   dropped to an emergency shell. `mkinitcpio.conf` now lists every
+   required storage driver explicitly in `MODULES=` (autodetect cannot
+   work inside the airootfs chroot; only real .ko modules are listed —
+   ahci/sd_mod/virtio/btrfs/zstd are builtin in the Arch kernel), and
+   `customize_airootfs.sh` verifies the built images contain the archiso
+   hooks and `sr_mod`/`ata_piix`/`isofs`/`cdrom` before the ISO is
+   assembled.
+
+3. **Broken pacman hooks**: `05/95-sigmaos-snapshot-*.hook` and
+   `clean_package_cache.hook` called `/usr/local/bin/sigmaos-snapshot` and
+   `paccache`, neither of which existed in the image. Added
+   `usr/local/bin/sigmaos-snapshot` (real btrfs snapshot/rollback helper,
+   fail-safe), shipped `usr/local/bin/sigmaos-update` (self-contained
+   ISO variant used by the post-upgrade hook and the weekly systemd
+   timer), added `pacman-contrib` for `paccache`, and shipped
+   `sigmaos-provision-owner` (referenced by its first-boot systemd unit).
+   Tightened `/etc/sudoers.d/wheel` from `NOPASSWD: ALL` to standard sudo.
+
+Also: systemd-boot entries now use a single `initrd` line (ucodes are
+embedded by the mkinitcpio `microcode` hook), matching upstream archiso.
+
+**Rebuild required**: `scripts/build_archiso.sh --docker` (needs Docker
+access) then re-test with QEMU. `customize_airootfs.sh` will now abort the
+build if the initramfs regresses.
 
 ### Recent Changes (2026-11-19)
 
