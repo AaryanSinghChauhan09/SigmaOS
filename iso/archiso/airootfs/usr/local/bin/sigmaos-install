@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: MIT
-# sigmaos-install: Production Arch Linux Installer with Btrfs, Systemd-boot, and Hyprland
-# DEFENSIVE SAFETY: Defaults to DRY_RUN=1. Destructive install requires --destructive AND --confirm-disk <DEV>
+# sigmaos-install: SigmaOS installer — Btrfs + GRUB + Hyprland.
+# DEFENSIVE SAFETY: defaults to DRY_RUN. A real install requires BOTH
+# --destructive AND --confirm-disk <DEV>, run as root.
 set -euo pipefail
 
 DRY_RUN=1
@@ -11,71 +12,40 @@ TARGET_DEV=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -d|--dry-run)
-            DRY_RUN=1
-            shift
-            ;;
-        --destructive)
-            DESTRUCTIVE_AUTH=1
-            shift
-            ;;
-        --confirm-disk)
-            CONFIRM_DISK_MATCH="${2:-}"
-            shift 2
-            ;;
+        -d|--dry-run)      DRY_RUN=1; shift ;;
+        --destructive)     DESTRUCTIVE_AUTH=1; shift ;;
+        --confirm-disk)    CONFIRM_DISK_MATCH="${2:-}"; shift 2 ;;
         -h|--help)
             echo "Usage: $(basename "$0") [OPTIONS] [DEVICE]"
-            echo "Options:"
-            echo "  -d, --dry-run          Simulate installation without writing changes (DEFAULT)"
-            echo "  --destructive          Allow destructive formatting and partition writes"
-            echo "  --confirm-disk DEV     Explicit verification of target disk (e.g. --confirm-disk /dev/vda)"
-            exit 0
-            ;;
-        *)
-            if [[ -z "$TARGET_DEV" ]]; then
-                TARGET_DEV="$1"
-            fi
-            shift
-            ;;
+            echo "  -d, --dry-run          Simulate only (DEFAULT — writes nothing)"
+            echo "  --destructive          Allow destructive partitioning"
+            echo "  --confirm-disk DEV     Must equal the target disk to proceed"
+            exit 0 ;;
+        *) [[ -z "$TARGET_DEV" ]] && TARGET_DEV="$1"; shift ;;
     esac
 done
 
 echo "=========================================================="
-echo "  SigmaOS Arch Linux Sovereign Installer"
+echo "  SigmaOS Installer — Btrfs + GRUB + Hyprland"
 echo "=========================================================="
 
 if [[ -z "$TARGET_DEV" ]]; then
-    echo "Available storage block devices:"
+    echo "Available storage devices:"
     lsblk -dpno NAME,SIZE,MODEL 2>/dev/null | grep -v "loop" || true
-    echo ""
-    read -rp "Enter target disk (e.g. /dev/vda): " TARGET_DEV
+    read -rp "Target disk (e.g. /dev/vda): " TARGET_DEV
 fi
+[[ -n "$TARGET_DEV" && -b "$TARGET_DEV" ]] || { echo "Error: '$TARGET_DEV' is not a block device." >&2; exit 1; }
 
-if [[ -z "$TARGET_DEV" || ! -b "$TARGET_DEV" ]]; then
-    echo "Error: Target disk '$TARGET_DEV' is not a valid block device." >&2
-    exit 1
-fi
-
-# Detect active host root drive to prevent self-destruction
+# Refuse to touch the disk hosting the live/active root.
 ACTIVE_ROOT_SRC="$(findmnt -no SOURCE / 2>/dev/null || true)"
-ACTIVE_ROOT_DISK=""
-if [[ -n "$ACTIVE_ROOT_SRC" ]]; then
-    ACTIVE_ROOT_DISK="$(lsblk -no PKNAME "$ACTIVE_ROOT_SRC" 2>/dev/null || true)"
-    if [[ -n "$ACTIVE_ROOT_DISK" ]]; then
-        ACTIVE_ROOT_DISK="/dev/$ACTIVE_ROOT_DISK"
-    fi
-fi
-
+ACTIVE_ROOT_DISK="$(lsblk -no PKNAME "$ACTIVE_ROOT_SRC" 2>/dev/null || true)"
+ACTIVE_ROOT_DISK="${ACTIVE_ROOT_DISK:+/dev/$ACTIVE_ROOT_DISK}"
 if [[ -n "$ACTIVE_ROOT_DISK" && "$TARGET_DEV" == "$ACTIVE_ROOT_DISK" ]]; then
-    echo "FATAL: Target disk $TARGET_DEV hosts the active operating system root." >&2
-    echo "Destructive operations on active root drive are forbidden." >&2
-    exit 1
+    echo "FATAL: $TARGET_DEV hosts the running system root. Refusing." >&2; exit 1
 fi
-
-# Safety check for mounted partitions on target device
-if grep -qs "^$TARGET_DEV" /proc/mounts 2>/dev/null; then
-    echo "FATAL: Partitions on $TARGET_DEV are actively mounted. Unmount before proceeding." >&2
-    exit 1
+# Refuse if any partition on the target is mounted.
+if findmnt -rn -S "$TARGET_DEV"* >/dev/null 2>&1 || grep -qs "^$TARGET_DEV" /proc/mounts; then
+    echo "FATAL: partitions on $TARGET_DEV are mounted. Unmount first." >&2; exit 1
 fi
 
 if [[ $DESTRUCTIVE_AUTH -eq 1 && "$CONFIRM_DISK_MATCH" == "$TARGET_DEV" ]]; then
@@ -83,92 +53,117 @@ if [[ $DESTRUCTIVE_AUTH -eq 1 && "$CONFIRM_DISK_MATCH" == "$TARGET_DEV" ]]; then
 fi
 
 if [[ $DRY_RUN -eq 1 ]]; then
-    echo "[WARN] DRY RUN MODE: Default safety protection active."
-    echo "[INFO] Simulating partitioning and installation plan on $TARGET_DEV:"
-    echo "[INFO]   - Partition table: GPT"
-    echo "[INFO]   - EFI partition:   1024M FAT32"
-    echo "[INFO]   - Root partition:  Btrfs with @, @home, @snapshots, @var_log"
-    echo "[INFO] To execute a destructive install to this disk, you must explicitly supply:"
-    echo "[INFO]   --destructive --confirm-disk $TARGET_DEV"
-    echo "[✓] DRY RUN complete. Zero mutations were written to $TARGET_DEV."
+    cat <<EOF
+[WARN] DRY RUN — nothing will be written.
+[PLAN] Disk:        $TARGET_DEV
+[PLAN]   p1: 1 GiB  FAT32   -> /boot   (EFI System Partition)
+[PLAN]   p2: rest   Btrfs   -> /       subvols: @ @home @snapshots @var_log
+[PLAN] FS:          btrfs compress=zstd:3,noatime
+[PLAN] Bootloader:  GRUB (UEFI)
+[PLAN] Desktop:     Hyprland + waybar + foot + thunar + pipewire
+[PLAN] Packages:    ~60 curated (see pacstrap below)
+To execute: sigmaos-install --destructive --confirm-disk $TARGET_DEV
+EOF
     exit 0
 fi
 
-if [[ $EUID -ne 0 ]]; then
-    echo "Error: Destructive sigmaos-install must be run as root." >&2
-    exit 1
-fi
+[[ $EUID -eq 0 ]] || { echo "Error: destructive install must run as root." >&2; exit 1; }
 
-echo "[1/7] Partitioning target device with GPT..."
+MNT=/mnt/sigmaos-target
+PKGS="base base-devel linux linux-firmware linux-headers \
+systemd systemd-sysvcompat sudo btrfs-progs efibootmgr grub \
+hyprland hyprpaper hypridle hyprlock waybar foot rofi-wayland mako dunst \
+grim slurp swappy wl-clipboard cliphist \
+xdg-desktop-portal-hyprland xdg-desktop-portal-gtk polkit-gnome \
+pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber pavucontrol \
+brightnessctl playerctl networkmanager iwd bluez bluez-utils \
+noto-fonts ttf-jetbrains-mono thunar neovim bash zsh starship \
+git curl wget openssh rsync btop fastfetch"
+
+echo "[1/9] Partitioning $TARGET_DEV (GPT)..."
 sgdisk --zap-all "$TARGET_DEV"
-sgdisk -n 1:0:+1024M -t 1:ef00 -c 1:"EFI System" "$TARGET_DEV"
-sgdisk -n 2:0:0      -t 2:8300 -c 2:"SigmaOS Root" "$TARGET_DEV"
+sgdisk -n 1:0:+1024M -t 1:ef00 -c 1:SIGMAOS_EFI "$TARGET_DEV"
+sgdisk -n 2:0:0      -t 2:8300 -c 2:SIGMAOS_ROOT "$TARGET_DEV"
+[[ "$TARGET_DEV" =~ [0-9]$ ]] && { P_EFI="${TARGET_DEV}p1"; P_ROOT="${TARGET_DEV}p2"; } \
+                             || { P_EFI="${TARGET_DEV}1";  P_ROOT="${TARGET_DEV}2"; }
 
-# Handle partition naming (nvme0n1p1 vs sda1)
-if [[ "$TARGET_DEV" =~ [0-9]$ ]]; then
-    PART_EFI="${TARGET_DEV}p1"
-    PART_ROOT="${TARGET_DEV}p2"
-else
-    PART_EFI="${TARGET_DEV}1"
-    PART_ROOT="${TARGET_DEV}2"
-fi
+echo "[2/9] Formatting partitions..."
+mkfs.vfat -F32 -n SIGMAOS_EFI "$P_EFI"
+mkfs.btrfs -f -L SIGMAOS_ROOT "$P_ROOT"
 
-echo "[2/7] Formatting EFI System Partition as FAT32..."
-mkfs.vfat -F32 -n "SIGMA_BOOT" "$PART_EFI"
+echo "[3/9] Creating Btrfs subvolumes..."
+mkdir -p "$MNT"
+mount "$P_ROOT" "$MNT"
+for sv in @ @home @snapshots @var_log; do btrfs subvolume create "$MNT/$sv"; done
+umount "$MNT"
 
-echo "[3/7] Formatting Root Partition as Btrfs with ZSTD compression..."
-mkfs.btrfs -f -L "SIGMA_ROOT" "$PART_ROOT"
+echo "[4/9] Mounting subvolumes..."
+mount -o noatime,compress=zstd:3,subvol=@         "$P_ROOT" "$MNT"
+mkdir -p "$MNT"/{boot,home,.snapshots,var/log}
+mount -o noatime,compress=zstd:3,subvol=@home      "$P_ROOT" "$MNT/home"
+mount -o noatime,compress=zstd:3,subvol=@snapshots "$P_ROOT" "$MNT/.snapshots"
+mount -o noatime,compress=zstd:3,subvol=@var_log   "$P_ROOT" "$MNT/var/log"
+mount "$P_EFI" "$MNT/boot"
 
-echo "[4/7] Creating Btrfs subvolumes (@, @home, @snapshots, @var_log)..."
-mkdir -p /mnt/target
-mount "$PART_ROOT" /mnt/target
-btrfs subvolume create /mnt/target/@
-btrfs subvolume create /mnt/target/@home
-btrfs subvolume create /mnt/target/@snapshots
-btrfs subvolume create /mnt/target/@var_log
-umount /mnt/target
-
-echo "[5/7] Mounting subvolumes with optimized flags (compress=zstd:3,noatime)..."
-mount -o noatime,compress=zstd:3,subvol=@ "$PART_ROOT" /mnt/target
-mkdir -p /mnt/target/{boot,home,.snapshots,var/log}
-mount -o noatime,compress=zstd:3,subvol=@home "$PART_ROOT" /mnt/target/home
-mount -o noatime,compress=zstd:3,subvol=@snapshots "$PART_ROOT" /mnt/target/.snapshots
-mount -o noatime,compress=zstd:3,subvol=@var_log "$PART_ROOT" /mnt/target/var/log
-mount "$PART_EFI" /mnt/target/boot
-
-echo "[6/7] Bootstrapping Arch Linux base + SigmaOS packages with pacstrap..."
-mkdir -p /mnt/target/etc
-cat << 'EOF' > /mnt/target/etc/fstab
-# /etc/fstab generated by sigmaos-install
-LABEL=SIGMA_ROOT  /          btrfs  rw,noatime,compress=zstd:3,subvol=@          0 0
-LABEL=SIGMA_ROOT  /home      btrfs  rw,noatime,compress=zstd:3,subvol=@home      0 0
-LABEL=SIGMA_ROOT  /.snapshots btrfs rw,noatime,compress=zstd:3,subvol=@snapshots 0 0
-LABEL=SIGMA_ROOT  /var/log   btrfs  rw,noatime,compress=zstd:3,subvol=@var_log   0 0
-LABEL=SIGMA_BOOT  /boot      vfat   rw,relatime,fmask=0022,dmask=0022,codepage=437 0 2
+echo "[5/9] Writing fstab..."
+cat > "$MNT/etc/fstab" <<'EOF'
+LABEL=SIGMAOS_ROOT  /            btrfs  rw,noatime,compress=zstd:3,subvol=@          0 0
+LABEL=SIGMAOS_ROOT  /home        btrfs  rw,noatime,compress=zstd:3,subvol=@home      0 0
+LABEL=SIGMAOS_ROOT  /.snapshots  btrfs  rw,noatime,compress=zstd:3,subvol=@snapshots 0 0
+LABEL=SIGMAOS_ROOT  /var/log     btrfs  rw,noatime,compress=zstd:3,subvol=@var_log   0 0
+LABEL=SIGMAOS_EFI   /boot        vfat   rw,relatime,fmask=0022,dmask=0022            0 2
 EOF
 
-echo "[7/7] Installing base system and desktop packages..."
-pacstrap -K /mnt/target base base-devel linux linux-firmware linux-headers \
-    systemd systemd-sysvcompat sudo networkmanager bluez bluez-utils \
-    btrfs-progs efibootmgr grub hyprland hyprpaper waybar foot \
-    pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
-    xdg-desktop-portal-hyprland xdg-desktop-portal-gtk polkit-gnome \
-    brightnessctl playerctl rofi-wayland mako dunst grim slurp swappy \
-    wl-clipboard cliphist ttf-jetbrains-mono ttf-jetbrains-mono-nerd \
-    noto-fonts noto-fonts-cjk noto-fonts-emoji thunar neovim starship \
-    git curl wget openssh rsync
+echo "[6/9] Installing system with pacstrap (~60 packages)..."
+pacstrap "$MNT" $PKGS
 
-echo "[8/8] Configuring system..."
-arch-chroot /mnt/target genfstab -U / >> /mnt/target/etc/fstab
-arch-chroot /mnt/target systemctl enable NetworkManager bluetoothd
-arch-chroot /mnt/target systemctl enable fstrim.timer
+# Strip the build-time IgnorePkg pin that would otherwise leak into the
+# installed system and block openssl updates.
+sed -i '/^IgnorePkg/d' "$MNT/etc/pacman.conf" 2>/dev/null || true
+# Ensure a sane mirrorlist exists in the target.
+[[ -s "$MNT/etc/pacman.d/mirrorlist" ]] || echo 'Server = https://geo.mirror.pkgbuild.com/$repo/os/$arch' > "$MNT/etc/pacman.d/mirrorlist"
 
-echo "Installation complete! Next steps:"
-echo "  1. arch-chroot /mnt/target"
-echo "  2. Set root password: passwd"
-echo "  3. Create user: useradd -m -G wheel -s /bin/bash sigma"
-echo "  4. Configure sudo: EDITOR=nano visudo (uncomment %wheel ALL=(ALL) ALL)"
-echo "  5. Install bootloader: bootctl install"
-echo "  6. Configure locale: echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen && locale-gen"
-echo "  7. Set hostname: echo 'sigmaos' > /etc/hostname"
-echo "  8. Reboot into installed system"
+# Carry the SigmaOS desktop skeleton (Hyprland config, wallpaper, shell
+# profile) into the installed system so new users get the branded desktop.
+mkdir -p "$MNT/etc/skel"
+cp -a /etc/skel/.config "$MNT/etc/skel/" 2>/dev/null || true
+cp -a /etc/skel/.bash_profile "$MNT/etc/skel/" 2>/dev/null || true
+
+echo "[7/9] Configuring bootloader (GRUB) + initramfs..."
+arch-chroot "$MNT" bash -c '
+    set -e
+    # Ensure the kernel + initramfs exist, then build all presets.
+    [[ -e /boot/vmlinuz-linux ]] || cp /usr/lib/modules/*/vmlinuz /boot/vmlinuz-linux
+    mkinitcpio -P
+    # Install GRUB for UEFI into the ESP mounted at /boot.
+    grub-install --target=x86_64-efi --efi-directory=/boot \
+        --bootloader-id=SigmaOS --recheck
+    grub-mkconfig -o /boot/grub/grub.cfg
+    systemctl enable NetworkManager bluetoothd fstrim.timer 2>/dev/null || true
+'
+
+echo "[8/9] First-boot configuration..."
+read -rsp "Root password (leave empty to set later): " ROOT_PW || true
+echo
+[[ -n "$ROOT_PW" ]] && arch-chroot "$MNT" bash -c "echo 'root:$ROOT_PW' | chpasswd"
+read -rp "Username for daily use [sigma]: " USERNAME
+USERNAME="${USERNAME:-sigma}"
+[[ "$USERNAME" =~ ^[a-z_][a-z0-9_-]*$ ]] || { echo "Error: invalid username '$USERNAME'" >&2; exit 1; }
+arch-chroot "$MNT" bash -c "
+    useradd -m -G wheel,audio,video,storage,input -s /bin/bash '$USERNAME' 2>/dev/null || true
+    echo '$USERNAME ALL=(ALL) ALL' > /etc/sudoers.d/$USERNAME
+    chmod 440 /etc/sudoers.d/$USERNAME
+    echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen
+    locale-gen
+    echo 'sigmaos' > /etc/hostname
+    ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+"
+
+echo "[9/9] Syncing and finishing..."
+sync
+arch-chroot "$MNT" true
+echo "=========================================================="
+echo "  SigmaOS installed on $TARGET_DEV"
+echo "  User: $USERNAME (sudo via /etc/sudoers.d)"
+echo "  Reboot and remove install media to boot SigmaOS."
+echo "=========================================================="

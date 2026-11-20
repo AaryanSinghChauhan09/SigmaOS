@@ -15,6 +15,7 @@ systemd
 systemd-sysvcompat
 syslinux
 mkinitcpio-archiso
+arch-install-scripts
 gptfdisk
 sudo
 which
