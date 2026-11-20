@@ -201,3 +201,39 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-updatemanager2"
+description = "Update manager (second implementation) for SigmaOS package and system updates"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-updatemanager2.git"
+engine = "updatemanager2"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-stall"
+description = "Stall detector for SigmaOS process and system monitoring"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stall.git"
+engine = "stall"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-remote"
+description = "Remote management and control for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-remote.git"
+engine = "remote"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
