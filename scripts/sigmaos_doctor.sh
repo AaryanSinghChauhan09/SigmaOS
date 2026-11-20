@@ -245,7 +245,7 @@ else
   check "skel .config/ directory"      fail "missing"
 fi
 
-for cf in hypr/hyprland.conf waybar/config waybar/style.css wallust/wallust.toml wallust/hyprland.conf wallust/waybar.css; do
+for cf in hypr/hyprland.conf waybar/config waybar/style.css wallust/wallust.toml wallust/hyprland.conf wallust/waybar.css hypr/hypridle.conf; do
   if [[ -f "$SKEL_CONFIG/$cf" ]]; then
     check "skel .config/$cf" pass
   else
