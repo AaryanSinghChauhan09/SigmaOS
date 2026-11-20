@@ -2,7 +2,7 @@
 //!
 //! The library lives in `src/lib.rs`; this binary only wires argv/stdout.
 
-use __COMPONENT_CRATE_LIB__::Component;
+use __COMPONENT_CRATE_LIB__::{Component, ComponentLifecycle};
 
 fn main() {
     let mut component = Component::new();

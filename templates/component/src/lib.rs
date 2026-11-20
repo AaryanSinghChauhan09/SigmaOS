@@ -17,6 +17,22 @@ pub enum ComponentError {
 /// Result alias for component operations.
 pub type ComponentResult<T> = Result<T, ComponentError>;
 
+/// The lifecycle contract every SigmaOS component fulfils.
+///
+/// Depending on this trait (rather than a concrete type) is what lets the hub
+/// and other components treat any component polymorphically — interface
+/// segregation + dependency inversion in one place.
+pub trait ComponentLifecycle {
+    /// Initialise the component. Returns `Ok(())` once ready.
+    fn init(&mut self) -> ComponentResult<()>;
+    /// Run the component's primary operation.
+    fn run(&self) -> ComponentResult<()>;
+    /// Release resources. Must be idempotent and safe to call when not ready.
+    fn shutdown(&mut self) -> ComponentResult<()>;
+    /// Whether the component has completed [`ComponentLifecycle::init`].
+    fn is_ready(&self) -> bool;
+}
+
 /// A handle to an initialised component instance.
 #[derive(Debug, Default, Clone)]
 pub struct Component {
@@ -28,27 +44,28 @@ impl Component {
     pub fn new() -> Self {
         Self::default()
     }
+}
 
-    /// Initialise the component. Returns `Ok(())` once ready.
-    pub fn init(&mut self) -> ComponentResult<()> {
+impl ComponentLifecycle for Component {
+    fn init(&mut self) -> ComponentResult<()> {
         self.initialised = true;
         Ok(())
     }
 
-    /// Returns `true` once [`Component::init`] has succeeded.
-    pub fn is_ready(&self) -> bool {
-        self.initialised
-    }
-
-    /// Placeholder for the component's primary operation.
-    ///
-    /// Replace with the real implementation for this component; keep the
-    /// `ComponentResult` contract and update `COMPONENT.toml` accordingly.
-    pub fn run(&self) -> ComponentResult<()> {
+    fn run(&self) -> ComponentResult<()> {
         if !self.initialised {
             return Err(ComponentError::Unsupported("not initialised"));
         }
         Ok(())
+    }
+
+    fn shutdown(&mut self) -> ComponentResult<()> {
+        self.initialised = false;
+        Ok(())
+    }
+
+    fn is_ready(&self) -> bool {
+        self.initialised
     }
 }
 
@@ -81,5 +98,35 @@ mod tests {
 
         // Assert
         assert!(res.is_err());
+    }
+
+    #[test]
+    fn shutdown_resets_readiness() {
+        // Arrange
+        let mut c = Component::new();
+        c.init().unwrap();
+        assert!(c.is_ready());
+
+        // Act
+        c.shutdown().unwrap();
+
+        // Assert
+        assert!(!c.is_ready());
+        assert!(c.run().is_err());
+    }
+
+    // Polymorphism: any ComponentLifecycle can be driven through the trait.
+    #[test]
+    fn lifecycle_works_through_trait_object() {
+        // Arrange
+        let mut c: Box<dyn ComponentLifecycle> = Box::new(Component::new());
+
+        // Act + Assert
+        assert!(!c.is_ready());
+        c.init().unwrap();
+        assert!(c.is_ready());
+        c.run().unwrap();
+        c.shutdown().unwrap();
+        assert!(!c.is_ready());
     }
 }
