@@ -1,2 +1,0 @@
-pub mod sovereign_system_apps_development_and_pr_suite;
-pub use sovereign_system_apps_development_and_pr_suite::*;
