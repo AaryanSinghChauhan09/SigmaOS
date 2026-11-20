@@ -45,6 +45,7 @@ fi
 # Try, in order: (a) a real file in the ISO, (b) an appended FAT partition
 # carved out with dd, (c) fail loudly.
 echo "Extracting efiboot.img ..."
+ESP_OFFSET=""; ESP_SECTORS=""
 
 is_fat_esp() { # $1 = candidate image; true if it looks like the ESP
     [[ -f "$1" ]] || return 1
@@ -66,6 +67,7 @@ if ! is_fat_esp "$WORK/efiboot.img"; then
             skip="$part_start" count="$part_sectors" status=none 2>/dev/null || continue
         if is_fat_esp "$WORK/esp_candidate.img"; then
             mv "$WORK/esp_candidate.img" "$WORK/efiboot.img"
+            ESP_OFFSET="$part_start"; ESP_SECTORS="$part_sectors"
             echo "  carved ESP from appended partition @sector $part_start"
             break
         fi
@@ -102,10 +104,20 @@ echo "Writing signatures back into efiboot.img ..."
 # --- rebuild ISO with the signed efiboot.img --------------------------------
 echo "Rebuilding ISO -> $ISO_OUT ..."
 cp "$ISO_IN" "$ISO_OUT"
-xorriso -indev "$ISO_OUT" -outdev "$ISO_OUT" \
-    -boot_image any replay \
-    -map "$WORK/efiboot.img" /efiboot.img \
-    -commit -end 2>&1 | tail -3
+if [[ -n "$ESP_OFFSET" ]]; then
+    # ESP was an appended partition: write the signed image back to the same
+    # sector offset. The El Torito/partition table is untouched, so the boot
+    # chain still points at the (now signed) ESP.
+    dd if="$WORK/efiboot.img" of="$ISO_OUT" bs=512 \
+        seek="$ESP_OFFSET" conv=notrunc status=none
+    echo "  wrote signed ESP back @sector $ESP_OFFSET"
+else
+    # efiboot.img was a regular ISO file: replace it in-place.
+    xorriso -indev "$ISO_OUT" -outdev "$ISO_OUT" \
+        -boot_image any replay \
+        -map "$WORK/efiboot.img" /efiboot.img \
+        -commit -end 2>&1 | tail -3
+fi
 
 echo "Signed ISO written: $ISO_OUT"
 echo "Enrol cert for trust: $CRT"
