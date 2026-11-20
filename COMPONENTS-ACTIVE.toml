@@ -477,3 +477,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaports"]
+
+[[component]]
+name = "SigmaOS-task-automation"
+description = "Task automation & scheduling (tasks, commands, run counts)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-task-automation.git"
+engine = "task-automation"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaautomation"]
