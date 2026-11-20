@@ -381,3 +381,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-refresh"
+description = "Refresh manager for SigmaOS system and application refresh operations"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-refresh.git"
+engine = "refresh"
+category = "system"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-integrity"
+description = "Integrity manager for SigmaOS system integrity verification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-integrity.git"
+engine = "integrity"
+category = "security"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
