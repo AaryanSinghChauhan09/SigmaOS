@@ -237,3 +237,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-device"
+description = "Device manager for SigmaOS hardware and peripheral management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-device.git"
+engine = "device"
+category = "hardware"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-monitoring2"
+description = "System monitor (second implementation) for SigmaOS metrics and observability"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-monitoring2.git"
+engine = "monitoring2"
+category = "monitoring"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
