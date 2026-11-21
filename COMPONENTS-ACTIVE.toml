@@ -1125,3 +1125,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmamonitor"]
+
+[[component]]
+name = "SigmaOS-http"
+description = "HTTP server: connections, methods, request processing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-http.git"
+engine = "network"
+category = "Network"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmahttp"]
