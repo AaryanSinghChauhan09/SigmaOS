@@ -1233,3 +1233,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmacrypto"]
+
+[[component]]
+name = "SigmaOS-firewall"
+description = "Firewall: chains, rules, actions, enable/disable"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firewall.git"
+engine = "network"
+category = "Network"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmafirewallmanager2", "sigmafirewall"]
