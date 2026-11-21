@@ -34803,16 +34803,6 @@ inspirations = "System shutdown"
 visibility = "public"
 depends_on = []
 [[component]]
-name = "SigmaOS-adwaita"
-description = "SigmaOS integration for Adwaita icon theme: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adwaita"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "Adwaita icon theme"
-visibility = "public"
-depends_on = []
-[[component]]
 name = "SigmaOS-autumn"
 description = "SigmaOS integration for Autumn theme: package management, config deployment, and CLI helpers."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-autumn"
@@ -34850,16 +34840,6 @@ engine = "app_integration"
 category = "Applications"
 language = "shell"
 inspirations = "Berkeley Mono font"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-blueman"
-description = "SigmaOS integration for SigmaOS bluetooth: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blueman"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS bluetooth"
 visibility = "public"
 depends_on = []
 [[component]]
@@ -34903,16 +34883,6 @@ inspirations = "Child theme"
 visibility = "public"
 depends_on = []
 [[component]]
-name = "SigmaOS-clipboard"
-description = "SigmaOS integration for SigmaOS clipboard: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clipboard"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS clipboard"
-visibility = "public"
-depends_on = []
-[[component]]
 name = "SigmaOS-cognitive"
 description = "SigmaOS integration for Cognitive theme: package management, config deployment, and CLI helpers."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cognitive"
@@ -34940,16 +34910,6 @@ engine = "app_integration"
 category = "Applications"
 language = "shell"
 inspirations = "SigmaOS color palette"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-cursor-theme"
-description = "SigmaOS integration for SigmaOS cursor theme: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cursor-theme"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS cursor theme"
 visibility = "public"
 depends_on = []
 [[component]]
@@ -35000,16 +34960,6 @@ engine = "app_integration"
 category = "Applications"
 language = "shell"
 inspirations = "Dyslexia font"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-education"
-description = "SigmaOS integration for Education theme: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-education"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "Education theme"
 visibility = "public"
 depends_on = []
 [[component]]
@@ -35143,16 +35093,6 @@ inspirations = "High Contrast theme"
 visibility = "public"
 depends_on = []
 [[component]]
-name = "SigmaOS-icon-theme"
-description = "SigmaOS integration for SigmaOS icon theme: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-icon-theme"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS icon theme"
-visibility = "public"
-depends_on = []
-[[component]]
 name = "SigmaOS-idle"
 description = "SigmaOS integration for SigmaOS idle manager: package management, config deployment, and CLI helpers."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-idle"
@@ -35243,16 +35183,6 @@ inspirations = "Light theme"
 visibility = "public"
 depends_on = []
 [[component]]
-name = "SigmaOS-lock"
-description = "SigmaOS integration for SigmaOS lock screen: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lock"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS lock screen"
-visibility = "public"
-depends_on = []
-[[component]]
 name = "SigmaOS-matrix"
 description = "SigmaOS integration for Matrix theme: package management, config deployment, and CLI helpers."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-matrix"
@@ -35270,16 +35200,6 @@ engine = "app_integration"
 category = "Applications"
 language = "shell"
 inspirations = "Matte Black theme"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-menu"
-description = "SigmaOS integration for SigmaOS unified menu: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-menu"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS unified menu"
 visibility = "public"
 depends_on = []
 [[component]]
@@ -35393,36 +35313,6 @@ inspirations = "Parental controls"
 visibility = "public"
 depends_on = []
 [[component]]
-name = "SigmaOS-pavucontrol"
-description = "SigmaOS integration for SigmaOS audio mixer: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pavucontrol"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS audio mixer"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-polkit"
-description = "SigmaOS integration for SigmaOS polkit agent: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-polkit"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS polkit agent"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-pomodoro"
-description = "SigmaOS integration for Pomodoro: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pomodoro"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "Pomodoro"
-visibility = "public"
-depends_on = []
-[[component]]
 name = "SigmaOS-poppins"
 description = "SigmaOS integration for Poppins font: package management, config deployment, and CLI helpers."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-poppins"
@@ -35430,26 +35320,6 @@ engine = "app_integration"
 category = "Applications"
 language = "shell"
 inspirations = "Poppins font"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-powermenu"
-description = "SigmaOS integration for SigmaOS power menu: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-powermenu"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS power menu"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-productivity"
-description = "SigmaOS integration for Productivity: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-productivity"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "Productivity"
 visibility = "public"
 depends_on = []
 [[component]]
@@ -35633,16 +35503,6 @@ inspirations = "Tela icon theme"
 visibility = "public"
 depends_on = []
 [[component]]
-name = "SigmaOS-theme"
-description = "SigmaOS integration for SigmaOS theme manager: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS theme manager"
-visibility = "public"
-depends_on = []
-[[component]]
 name = "SigmaOS-tokyo-night"
 description = "SigmaOS integration for Tokyo Night theme: package management, config deployment, and CLI helpers."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tokyo-night"
@@ -35660,16 +35520,6 @@ engine = "app_integration"
 category = "Applications"
 language = "shell"
 inspirations = "Ubuntu font"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-udiskie"
-description = "SigmaOS integration for SigmaOS disk automount: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-udiskie"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS disk automount"
 visibility = "public"
 depends_on = []
 [[component]]
@@ -35700,26 +35550,6 @@ engine = "app_integration"
 category = "Applications"
 language = "shell"
 inspirations = "SigmaOS volume control"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-wallpaper"
-description = "SigmaOS integration for SigmaOS wallpaper: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS wallpaper"
-visibility = "public"
-depends_on = []
-[[component]]
-name = "SigmaOS-wifi-menu"
-description = "SigmaOS integration for SigmaOS WiFi menu: package management, config deployment, and CLI helpers."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wifi-menu"
-engine = "app_integration"
-category = "Applications"
-language = "shell"
-inspirations = "SigmaOS WiFi menu"
 visibility = "public"
 depends_on = []
 [[component]]
