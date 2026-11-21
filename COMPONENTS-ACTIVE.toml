@@ -1281,3 +1281,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaparted"]
+
+[[component]]
+name = "SigmaOS-virtualization"
+description = "Virtualization: VM lifecycle, hypervisor, disks, networks, snapshots"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virtualization.git"
+engine = "virtualization"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmavirtualizationmanager", "sigmavirtualization"]
