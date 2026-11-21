@@ -1005,3 +1005,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmagrid"]
+
+[[component]]
+name = "SigmaOS-flatpak-manager2"
+description = "Flatpak application manager: apps, installs, states, channels"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flatpak-manager2.git"
+engine = "package_manager"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaflatpak"]
