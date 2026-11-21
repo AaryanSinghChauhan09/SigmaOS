@@ -908,7 +908,7 @@ language = "rust"
 inspirations = ["native"]
 visibility = "private"
 depends_on = []
-provides = ["sigmapackagemanager2"]
+provides = ["sigmapackagemanager2", "sigmapkg"]
 
 [[component]]
 name = "SigmaOS-event"
