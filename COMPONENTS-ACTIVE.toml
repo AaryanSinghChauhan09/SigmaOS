@@ -765,3 +765,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaeffect"]
+
+[[component]]
+name = "SigmaOS-light"
+description = "Lighting and color management: light sources, brightness, color temperature, scenes"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-light.git"
+engine = "light"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmalight"]
