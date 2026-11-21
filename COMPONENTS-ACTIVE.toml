@@ -537,3 +537,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmawebcam"]
+
+[[component]]
+name = "SigmaOS-perf-monitor"
+description = "Performance monitoring & profiling (metrics, profiles, bottleneck detection)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-perf-monitor.git"
+engine = "perf-monitor"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaperformancemonitor"]
