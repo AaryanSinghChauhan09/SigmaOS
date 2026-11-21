@@ -875,30 +875,6 @@ depends_on = []
 provides = ["sigmahibernation"]
 
 [[component]]
-name = "SigmaOS-hibernation"
-description = "Hibernation/suspend-to-disk management: power states, hibernation images, resume"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hibernation.git"
-engine = "hibernation"
-category = "System Services"
-language = "rust"
-inspirations = ["native"]
-visibility = "private"
-depends_on = []
-provides = ["sigmahibernation"]
-
-[[component]]
-name = "SigmaOS-design"
-description = "Design system: tokens, UI components, variants, theming"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-design.git"
-engine = "design"
-category = "Graphics"
-language = "rust"
-inspirations = ["native"]
-visibility = "private"
-depends_on = []
-provides = ["sigmadesign"]
-
-[[component]]
 name = "SigmaOS-design"
 description = "Design system: tokens, UI components, variants, theming"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-design.git"
@@ -921,3 +897,39 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmadrivermanager"]
+
+[[component]]
+name = "SigmaOS-package-manager2"
+description = "Package management: install/remove/update, repositories, dependency resolution"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-manager2.git"
+engine = "package-manager2"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmapackagemanager2"]
+
+[[component]]
+name = "SigmaOS-event"
+description = "System event management (udev/dbus-inspired): emit, list, stats"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-event.git"
+engine = "event"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaevent"]
+
+[[component]]
+name = "SigmaOS-samba"
+description = "SMB/CIFS client and server: shares, mounts, dialects, authentication"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-samba.git"
+engine = "samba"
+category = "Network"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasmb"]
