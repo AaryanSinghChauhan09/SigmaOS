@@ -30627,3 +30627,146 @@ language = "shell"
 inspirations = "Jellyfin media server"
 visibility = "public"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-qbittorrent"
+description = "SigmaOS integration for qBittorrent torrent client: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qbittorrent"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "qBittorrent torrent client"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-transmission"
+description = "SigmaOS integration for Transmission torrent client: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-transmission"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Transmission torrent client"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-virt-manager"
+description = "SigmaOS integration for virt-manager VM console: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virt-manager"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "virt-manager VM console"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gparted"
+description = "SigmaOS integration for GParted partition editor: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gparted"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GParted partition editor"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gnome-disk-utility"
+description = "SigmaOS integration for GNOME Disks storage manager: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-disk-utility"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Disks storage manager"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-gnome-calculator"
+description = "SigmaOS integration for GNOME Calculator: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-calculator"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Calculator"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kitty"
+description = "SigmaOS integration for kitty terminal emulator: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kitty"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "kitty terminal emulator"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-wezterm"
+description = "SigmaOS integration for WezTerm terminal emulator: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wezterm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WezTerm terminal emulator"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-calibre"
+description = "SigmaOS integration for Calibre ebook manager: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calibre"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Calibre ebook manager"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-scribus"
+description = "SigmaOS integration for Scribus desktop publishing: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scribus"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Scribus desktop publishing"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-lutris"
+description = "SigmaOS integration for Lutris game launcher: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lutris"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Lutris game launcher"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-syncthing"
+description = "SigmaOS integration for Syncthing file sync: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-syncthing"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Syncthing file sync"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-localsend"
+description = "SigmaOS integration for LocalSend file transfer: default configs and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-localsend"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "LocalSend file transfer"
+visibility = "public"
+depends_on = []
