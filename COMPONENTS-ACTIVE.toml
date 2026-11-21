@@ -1113,3 +1113,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmadeck"]
+
+[[component]]
+name = "SigmaOS-monitor"
+description = "System monitor daemon: CPU/disk/net/mem stats"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-monitor.git"
+engine = "monitoring"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmamonitor"]
