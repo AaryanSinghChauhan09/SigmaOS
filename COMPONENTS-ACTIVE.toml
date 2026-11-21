@@ -1281,3 +1281,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaparted"]
+
+[[component]]
+name = "SigmaOS-device"
+description = "Device manager: devices, events, states, search"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-device.git"
+engine = "hardware"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmadevice"]
