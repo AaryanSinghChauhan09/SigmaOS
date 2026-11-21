@@ -396,7 +396,7 @@ provides = ["component"]
 
 [[component]]
 name = "SigmaOS-integrity"
-description = "Integrity manager for SigmaOS system integrity verification"
+description = "Integrity manager + file integrity daemon: records, hashes"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-integrity.git"
 engine = "integrity"
 category = "security"
@@ -404,7 +404,7 @@ language = "rust"
 inspirations = ["native"]
 visibility = "private"
 depends_on = []
-provides = ["component"]
+provides = ["sigmaintegritymanager2", "sigmaintegrity"]
 
 [[component]]
 name = "SigmaOS-display"
