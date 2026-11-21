@@ -586,17 +586,6 @@ visibility = "public"
 depends_on = ["SigmaOS-desktop", "SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-session-manager2"
-description = "Session save/restore"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-manager2"
-engine = "session_manager"
-category = "System Services"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-calculator"
 description = "Scientific calculator engine"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calculator"
@@ -9661,34 +9650,12 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-arch-pm3"
-description = "Path monitor for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-path-monitor"
-engine = "path_monitor"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-mint-permission-manager"
 description = "Permission manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-permission-manager"
 engine = "permission_manager"
 category = "Utilities"
 language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-pm4"
-description = "Permission manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-permission-manager"
-engine = "permission_manager"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -9964,17 +9931,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-resource-manager"
 engine = "resource_manager"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-rm2"
-description = "Resource manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-manager"
-engine = "resource_manager"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
