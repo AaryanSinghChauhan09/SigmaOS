@@ -1137,3 +1137,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmahttp"]
+
+[[component]]
+name = "SigmaOS-zeromq"
+description = "Message queue: publish/consume/ack, queues, states"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zeromq.git"
+engine = "messaging"
+category = "Network"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmamq"]
