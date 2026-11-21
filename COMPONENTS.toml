@@ -18318,17 +18318,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-libreoffice2"
-description = "LibreOffice compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libreoffice2"
-engine = "Rust"
-category = "Office"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-onlyoffice2"
 description = "OnlyOffice compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice2"
@@ -18497,17 +18486,6 @@ inspirations = "None"
 name = "SigmaOS-blender2"
 description = "Blender 3D software compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blender2"
-engine = "Rust"
-category = "Application"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-vlc2"
-description = "VLC media player compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vlc2"
 engine = "Rust"
 category = "Application"
 languages = ["Rust"]
@@ -18780,17 +18758,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-gimp2"
-description = "GIMP image editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gimp2"
-engine = "Rust"
-category = "Creative"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-inkscape2"
 description = "Inkscape vector editor compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-inkscape2"
@@ -18813,17 +18780,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-audacity2"
-description = "Audacity audio editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-audacity2"
-engine = "Rust"
-category = "Creative"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-obs-studio2"
 description = "OBS Studio screen recorder compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-obs-studio2"
@@ -18838,17 +18794,6 @@ inspirations = "None"
 name = "SigmaOS-handbrake2"
 description = "HandBrake media converter compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-handbrake2"
-engine = "Rust"
-category = "Creative"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-ffmpeg2"
-description = "FFmpeg media converter compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ffmpeg2"
 engine = "Rust"
 category = "Creative"
 languages = ["Rust"]
