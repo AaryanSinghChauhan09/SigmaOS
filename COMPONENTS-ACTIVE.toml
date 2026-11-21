@@ -1197,3 +1197,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaart"]
+
+[[component]]
+name = "SigmaOS-craft-cad"
+description = "CAD: drawings, layers, entities, constraints"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-cad.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmacad"]
