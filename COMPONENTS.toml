@@ -18264,17 +18264,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-crewai"
-description = "CrewAI AI agent framework compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crewai"
-engine = "app_integration"
-category = "AI Framework"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-deepseek-coder"
 description = "DeepSeek Coder AI model compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deepseek-coder"
