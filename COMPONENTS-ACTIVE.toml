@@ -657,3 +657,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmantp"]
+
+[[component]]
+name = "SigmaOS-servicemanager3"
+description = "Service management (start/stop, enable/disable, status, dependencies)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-servicemanager3.git"
+engine = "servicemanager3"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaservicemanager3"]
