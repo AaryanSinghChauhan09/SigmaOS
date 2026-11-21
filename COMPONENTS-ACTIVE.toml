@@ -717,3 +717,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasecurityaudit"]
+
+[[component]]
+name = "SigmaOS-filesystem-manager"
+description = "Filesystem management (create, mount, format, health monitoring)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem-manager.git"
+engine = "filesystem-manager"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmafilesystemmanager"]
