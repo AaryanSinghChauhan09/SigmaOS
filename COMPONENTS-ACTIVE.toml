@@ -1257,3 +1257,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmatimeshift"]
+
+[[component]]
+name = "SigmaOS-systemd"
+description = "systemd unit manager: units, targets, dependencies"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd.git"
+engine = "init"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasystemd"]
