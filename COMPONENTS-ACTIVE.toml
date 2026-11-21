@@ -1041,3 +1041,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmanic"]
+
+[[component]]
+name = "SigmaOS-auditd"
+description = "System audit daemon: events, severity, type/pid filtering"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-auditd.git"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmait"]
