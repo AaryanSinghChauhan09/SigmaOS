@@ -1026,10 +1026,10 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-theme-gtk3"
+name = "SigmaOS-theme-gtk"
 description = "GTK3 theme engine"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-gtk3"
-engine = "theme_engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-gtk"
+engine = "app_integration"
 category = "Desktop/UI"
 language = "shell"
 inspirations = "None"
@@ -1497,17 +1497,6 @@ language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-install2"
-description = "Alternate installer (ubiquity-style)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-install2"
-engine = "installer"
-category = "Utilities"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-website"
@@ -17703,21 +17692,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-bsd-rc2"
-description = "BSD rc.d init system compatibility layer with service management and rc scripts"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bsd-rc2"
-engine = "Rust"
-category = "Init System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-busybox-init2"
+name = "SigmaOS-busybox-init"
 description = "BusyBox init compatibility layer with simple init and service management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-busybox-init2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-busybox-init"
+engine = "app_integration"
 category = "Init System"
 languages = ["Rust"]
 dependencies = []
@@ -17725,43 +17703,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-sixty-six2"
-description = "66 init system compatibility layer with service management and s6-66 compatibility"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sixty-six2"
-engine = "Rust"
-category = "Init System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-finit2"
-description = "Finit init system compatibility layer with fast init and service management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-finit2"
-engine = "Rust"
-category = "Init System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-epoch2"
-description = "Epoch init system compatibility layer with service management and dependency tracking"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-epoch2"
-engine = "Rust"
-category = "Init System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-dumb-init2"
+name = "SigmaOS-dumb-init"
 description = "dumb-init compatibility layer with minimal init and PID 1 reaping"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dumb-init2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dumb-init"
+engine = "app_integration"
 category = "Init System"
 languages = ["Rust"]
 dependencies = []
@@ -17769,10 +17714,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-upstart2"
+name = "SigmaOS-upstart"
 description = "Upstart init system compatibility layer with event-based init and job management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-upstart2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-upstart"
+engine = "app_integration"
 category = "Init System"
 languages = ["Rust"]
 dependencies = []
@@ -17780,10 +17725,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-kde-desktop2"
+name = "SigmaOS-kde-desktop"
 description = "KDE desktop environment compatibility layer with session, windows, settings, and panel"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kde-desktop2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kde-desktop"
+engine = "app_integration"
 category = "Desktop/UI"
 languages = ["Rust"]
 dependencies = []
@@ -17791,33 +17736,11 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-xfce-desktop2"
+name = "SigmaOS-xfce-desktop"
 description = "Xfce desktop environment compatibility layer with session, windows, settings, and panel"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfce-desktop2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfce-desktop"
+engine = "app_integration"
 category = "Desktop/UI"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-dnf-compat3"
-description = "DNF package management compatibility layer with RPM package management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dnf-compat3"
-engine = "Rust"
-category = "Package Management"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-yum-compat3"
-description = "YUM package management compatibility layer with RPM package management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yum-compat3"
-engine = "Rust"
-category = "Package Management"
 languages = ["Rust"]
 dependencies = []
 public = true
@@ -17835,32 +17758,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-gnu-binutils2"
-description = "GNU Binutils compatibility layer with assembler, linker, and binary tools"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnu-binutils2"
-engine = "Rust"
-category = "GNU Tools"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-pthread2"
-description = "Pthread library compatibility layer with thread management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pthread2"
-engine = "Rust"
-category = "GNU Tools"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-libstdc2"
+name = "SigmaOS-libstdcxx"
 description = "Libstdc++ library compatibility layer with C++ standard library"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libstdc2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libstdcxx"
+engine = "app_integration"
 category = "GNU Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18110,17 +18011,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-platform2"
-description = "Platform compatibility layer for SigmaOS with GUI framework and application platform"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-platform2"
-engine = "Rust"
-category = "Platform"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-data-science-tools"
 description = "Data science tools compatibility layer for SigmaOS with data analysis, visualization, and machine learning"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-data-science-tools"
@@ -18176,21 +18066,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-qt3"
-description = "Qt GUI framework compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qt3"
-engine = "Rust"
-category = "GUI Framework"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-wxwidgets2"
+name = "SigmaOS-wxwidgets"
 description = "WxWidgets GUI framework compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wxwidgets2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wxwidgets"
+engine = "app_integration"
 category = "GUI Framework"
 languages = ["Rust"]
 dependencies = []
@@ -19188,10 +19067,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-android-emulator2"
+name = "SigmaOS-android-emulator"
 description = "Android emulator profile manager with device specs and CPU architecture options"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-android-emulator2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-android-emulator"
+engine = "app_integration"
 category = "Virtualization"
 languages = ["Rust"]
 dependencies = []
@@ -19199,10 +19078,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-ios-emulator2"
+name = "SigmaOS-ios-emulator"
 description = "iOS Emulator emulator compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ios-emulator2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ios-emulator"
+engine = "app_integration"
 category = "Virtualization"
 languages = ["Rust"]
 dependencies = []
@@ -19210,10 +19089,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-game-engine2"
+name = "SigmaOS-game-engine"
 description = "Game Engine game engine compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-game-engine2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-game-engine"
+engine = "app_integration"
 category = "Game Development"
 languages = ["Rust"]
 dependencies = []
@@ -19254,10 +19133,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-game-development2"
+name = "SigmaOS-game-development"
 description = "Game Development game development compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-game-development2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-game-development"
+engine = "app_integration"
 category = "Game Development"
 languages = ["Rust"]
 dependencies = []
@@ -19265,10 +19144,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-security-scanner2"
+name = "SigmaOS-security-scanner"
 description = "Security Scanner security scanner compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security-scanner2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security-scanner"
+engine = "app_integration"
 category = "Security"
 languages = ["Rust"]
 dependencies = []
@@ -19815,10 +19694,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-swift2"
+name = "SigmaOS-swift"
 description = "Swift runtime compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-swift2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-swift"
+engine = "app_integration"
 category = "Runtime"
 languages = ["Rust"]
 dependencies = []
@@ -19826,10 +19705,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-dotnet2"
+name = "SigmaOS-dotnet"
 description = ".NET runtime compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dotnet2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dotnet"
+engine = "app_integration"
 category = "Runtime"
 languages = ["Rust"]
 dependencies = []
@@ -19848,10 +19727,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-fsharp2"
+name = "SigmaOS-fsharp"
 description = "F# runtime compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fsharp2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fsharp"
+engine = "app_integration"
 category = "Runtime"
 languages = ["Rust"]
 dependencies = []
@@ -23422,12 +23301,12 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-fuse2"
+name = "SigmaOS-fuse"
 description = "Userspace virtual filesystem namespace and mount table"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fuse2"
-engine = "component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fuse"
+engine = "app_integration"
 category = "Components"
-language = "rust"
+language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = []
@@ -24038,12 +23917,12 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-openjpeg2"
+name = "SigmaOS-openjpeg"
 description = "SigmaOS SigmaOS-openjpeg2 component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openjpeg2"
-engine = "component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openjpeg"
+engine = "app_integration"
 category = "Components"
-language = "rust"
+language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = []
@@ -28627,12 +28506,12 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-buck2"
+name = "SigmaOS-buck"
 description = "Buck2"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-buck2"
-engine = "development"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-buck"
+engine = "app_integration"
 category = "Development"
-language = "rust"
+language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = []
