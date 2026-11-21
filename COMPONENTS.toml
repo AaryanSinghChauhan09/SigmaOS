@@ -8330,17 +8330,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS--Dante"
-description = "SigmaOS component; consult its README for scope and implementation status."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS--Dante"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-visibility = "public"
-canonical_branch = "main"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-ab"
 description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-ab."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ab"
@@ -15053,16 +15042,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-graphicsmagick"
 engine = "image_graphics"
 category = "Graphics"
 language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-GTK-"
-description = "GitHub repository has no published branch; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-GTK-"
-engine = "gui_toolkit"
-category = "GUI Frameworks"
-language = "unknown"
 visibility = "public"
 depends_on = []
 
