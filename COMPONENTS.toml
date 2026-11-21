@@ -33960,3 +33960,13 @@ language = "shell"
 inspirations = "RPCS3 PS3 emulator"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-gtklock-cmd-i3"
+description = "SigmaOS integration for gtklock: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gtklock-cmd-i3"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gtklock"
+visibility = "public"
+depends_on = []
