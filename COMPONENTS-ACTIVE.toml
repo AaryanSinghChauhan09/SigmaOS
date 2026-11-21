@@ -1185,3 +1185,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmafig"]
+
+[[component]]
+name = "SigmaOS-craft-art"
+description = "Digital art: canvases, layers, shapes, colors"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-art.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaart"]
