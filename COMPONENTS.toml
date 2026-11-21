@@ -8319,17 +8319,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-power"
-description = "Power management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-power"
-engine = "power_manager"
-category = "System Services"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-power"
 description = "Power manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power"
@@ -8748,17 +8737,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-disp"
-description = "Display/output manager (DRM connectors, modes, brightness)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disp.git"
-engine = "display_manager"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-disp"
 description = "Display manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disp.git"
@@ -9012,17 +8990,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-av"
-description = "Antivirus/malware scanner with signature DB"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-av.git"
-engine = "antivirus"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-av"
 description = "Antivirus for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-av.git"
@@ -9194,17 +9161,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-sh.git"
 engine = "shell"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-tm"
-description = "Terminal emulator profile manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-tm.git"
-engine = "terminal"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -9579,17 +9535,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-voice-manager"
 engine = "voice_manager"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-vm"
-description = "Voice/speech manager (TTS/STT)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-vm.git"
-engine = "voice_manager"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10134,17 +10079,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-pdf-viewer"
-description = "PDF metadata and text extraction"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-pdf-viewer"
-engine = "pdf_viewer"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-pdf-viewer"
 description = "PDF Viewer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pdf-viewer"
@@ -10530,17 +10464,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-keyring-manager"
-description = "Secret keyring manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-keyring-manager"
-engine = "keyring_manager"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-mint-scheduler"
 description = "Scheduler for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-scheduler"
@@ -10668,17 +10591,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-recovery-tool"
 engine = "recovery"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-recovery-tool"
-description = "Recovery profiles and diagnostics"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-recovery-tool"
-engine = "recovery"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -11212,17 +11124,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-storage-manager"
-description = "Block device and filesystem manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-storage-manager"
-engine = "storage_manager"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-storage-manager"
 description = "Storage Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-storage-manager"
@@ -11383,17 +11284,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-monitor
 engine = "performance_monitor"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-resource-manager"
-description = "cgroup v2 resource limits manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-resource-manager"
-engine = "resource_manager"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
