@@ -633,3 +633,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasound"]
+
+[[component]]
+name = "SigmaOS-file-manager"
+description = "File management (operations, permissions, directory management)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-manager.git"
+engine = "file-manager"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmafilemanager"]
