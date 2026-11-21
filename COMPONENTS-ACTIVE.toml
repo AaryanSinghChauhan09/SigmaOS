@@ -1209,3 +1209,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmacad"]
+
+[[component]]
+name = "SigmaOS-container"
+description = "Container manager: create/start/stop/pause, limits"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-container.git"
+engine = "container"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmacontainer"]
