@@ -33887,3 +33887,76 @@ language = "shell"
 inspirations = "YMuse MPD client"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-adler32"
+description = "This repository is currently a minimal no_std component identity scaffold. Its library exposes a Component named SigmaOS-adler32."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adler32"
+engine = "common_lib"
+category = "Developer Tools"
+language = "rust"
+visibility = "public"
+canonical_branch = "main"
+depends_on = ["SigmaOS-system"]
+
+[[component]]
+name = "SigmaOS-aria2"
+description = "No GitHub description is set; component scope remains unclassified."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-aria2"
+engine = "network_tool"
+category = "Networking"
+language = "rust"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-i3"
+description = "No GitHub description is set; component scope remains unclassified."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-i3"
+engine = "window_manager"
+category = "Window Manager"
+language = "rust"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-v4l2"
+description = "V4L2 video subsystem: capture and output devices"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-v4l2"
+engine = "hardware_driver"
+category = "Device Drivers"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-archlinux-tss2"
+description = "SigmaOS component repository"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archlinux-tss2"
+engine = "component"
+category = "Components"
+language = "rust"
+inspirations = "None"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-pcsx2"
+description = "SigmaOS integration for PCSX2 PS2 emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pcsx2"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PCSX2 PS2 emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rpcs3"
+description = "SigmaOS integration for RPCS3 PS3 emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rpcs3"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "RPCS3 PS3 emulator"
+visibility = "public"
+depends_on = []
