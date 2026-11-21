@@ -1017,3 +1017,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaflatpak"]
+
+[[component]]
+name = "SigmaOS-dhcp-client"
+description = "DHCP client: leases, binding, renewal, interfaces"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dhcp-client.git"
+engine = "network"
+category = "Network"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmadhcp"]
