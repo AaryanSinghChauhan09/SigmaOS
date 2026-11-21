@@ -1077,3 +1077,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmafilm"]
+
+[[component]]
+name = "SigmaOS-craft-ani"
+description = "Animation/graphics: keyframes, tweens, tracks"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-ani.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaani"]
