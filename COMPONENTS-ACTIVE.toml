@@ -561,3 +561,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasearch"]
+
+[[component]]
+name = "SigmaOS-snap"
+description = "Snap package management (sandboxed apps, channels, store)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snap.git"
+engine = "snap"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasnap"]
