@@ -825,3 +825,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmafont"]
+
+[[component]]
+name = "SigmaOS-timer2"
+description = "Timer and alarm management: countdown timers, alarms, scheduling"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timer2.git"
+engine = "timer2"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmatimer"]
