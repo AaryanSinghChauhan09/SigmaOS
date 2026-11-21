@@ -981,3 +981,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmarecovery"]
+
+[[component]]
+name = "SigmaOS-fs"
+description = "System filesystem manager: mounts, fs types, mount states"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fs.git"
+engine = "vfs_core"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmafs"]
