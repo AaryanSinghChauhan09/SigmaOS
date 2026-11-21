@@ -150,7 +150,7 @@ engine = "compress"
 category = "storage"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -174,7 +174,7 @@ engine = "cache"
 category = "storage"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmacachemanager2", "sigmacache"]
 
@@ -210,7 +210,7 @@ engine = "updatemanager2"
 category = "system"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -222,7 +222,7 @@ engine = "stall"
 category = "system"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -258,7 +258,7 @@ engine = "monitoring2"
 category = "monitoring"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -294,7 +294,7 @@ engine = "resource"
 category = "system"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -378,7 +378,7 @@ engine = "kernel-manager"
 category = "kernel"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -390,7 +390,7 @@ engine = "refresh"
 category = "system"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -402,7 +402,7 @@ engine = "integrity"
 category = "security"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaintegritymanager2", "sigmaintegrity"]
 
@@ -414,7 +414,7 @@ engine = "display"
 category = "Display"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmadisplaymanager"]
 
@@ -426,7 +426,7 @@ engine = "package-updates"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmapackageupdates"]
 
@@ -450,7 +450,7 @@ engine = "jails"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmajails"]
 
@@ -462,7 +462,7 @@ engine = "process-monitor"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaprocessmonitor", "sigmaprocess"]
 
@@ -474,7 +474,7 @@ engine = "bsd-ports"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaports"]
 
@@ -486,7 +486,7 @@ engine = "task-automation"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaautomation"]
 
@@ -498,7 +498,7 @@ engine = "clipboard-manager"
 category = "Desktop"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaclipboardmanager"]
 
@@ -522,7 +522,7 @@ engine = "archive-manager"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaarchivemanager"]
 
@@ -534,7 +534,7 @@ engine = "webcam"
 category = "Desktop"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmawebcam"]
 
@@ -546,7 +546,7 @@ engine = "perf-monitor"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaperformancemonitor"]
 
@@ -558,7 +558,7 @@ engine = "search"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmasearch"]
 
@@ -570,7 +570,7 @@ engine = "snap"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmasnap"]
 
@@ -582,7 +582,7 @@ engine = "word-processor"
 category = "Desktop"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaword"]
 
@@ -618,7 +618,7 @@ engine = "pdf"
 category = "Desktop"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmapdf"]
 
@@ -630,7 +630,7 @@ engine = "sound"
 category = "Desktop"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmasound"]
 
@@ -666,7 +666,7 @@ engine = "servicemanager3"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaservicemanager3"]
 
@@ -678,7 +678,7 @@ engine = "microphone"
 category = "Desktop"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmamicrophone"]
 
@@ -690,7 +690,7 @@ engine = "voice"
 category = "Desktop"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmavoice"]
 
@@ -702,7 +702,7 @@ engine = "disk-usage"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmadiskusage"]
 
@@ -714,7 +714,7 @@ engine = "security-audit"
 category = "Security"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmasecurityaudit"]
 
@@ -726,7 +726,7 @@ engine = "filesystem-manager"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmafilesystemmanager"]
 
@@ -738,7 +738,7 @@ engine = "scanner-backend"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmascanner"]
 
@@ -774,7 +774,7 @@ engine = "light"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmalight"]
 
@@ -786,7 +786,7 @@ engine = "security-core"
 category = "Security"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmasecuritymanager"]
 
@@ -858,7 +858,7 @@ engine = "keyboard-manager"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmakeyboardmanager"]
 
@@ -870,7 +870,7 @@ engine = "hibernation"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmahibernation"]
 
@@ -882,7 +882,7 @@ engine = "design"
 category = "Graphics"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmadesign"]
 
@@ -906,7 +906,7 @@ engine = "package-manager2"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmapackagemanager2", "sigmapkg"]
 
@@ -918,7 +918,7 @@ engine = "event"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaevent"]
 
@@ -930,7 +930,7 @@ engine = "samba"
 category = "Network"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmasmb"]
 
@@ -954,7 +954,7 @@ engine = "user-manager"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmausermanager"]
 
@@ -1014,7 +1014,7 @@ engine = "package_manager"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmaflatpak"]
 
@@ -1038,7 +1038,7 @@ engine = "network"
 category = "Network"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["sigmanic"]
 
@@ -1314,7 +1314,7 @@ engine = "trim"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -1326,7 +1326,7 @@ engine = "nfs"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
 
@@ -1338,6 +1338,6 @@ engine = "dns"
 category = "System Services"
 language = "rust"
 inspirations = ["native"]
-visibility = "private"
+visibility = "public"
 depends_on = []
 provides = ["component"]
