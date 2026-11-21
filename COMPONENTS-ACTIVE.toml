@@ -573,3 +573,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasnap"]
+
+[[component]]
+name = "SigmaOS-word-processor"
+description = "Word processing system (documents, paragraphs, text formatting)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-word-processor.git"
+engine = "word-processor"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaword"]
