@@ -609,3 +609,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmapower"]
+
+[[component]]
+name = "SigmaOS-pdf"
+description = "PDF document management (create, render, extract)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pdf.git"
+engine = "pdf"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmapdf"]
