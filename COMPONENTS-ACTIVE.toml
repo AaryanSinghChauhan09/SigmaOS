@@ -1101,3 +1101,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaphoto"]
+
+[[component]]
+name = "SigmaOS-craft-deck"
+description = "Deck/presentation: decks, slides, elements, navigation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-deck.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmadeck"]
