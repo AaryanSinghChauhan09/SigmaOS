@@ -1269,3 +1269,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasystemd"]
+
+[[component]]
+name = "SigmaOS-parted"
+description = "Partition manager: disks, tables, partitions, flags"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-parted.git"
+engine = "storage"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaparted"]
