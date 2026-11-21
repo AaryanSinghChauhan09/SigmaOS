@@ -1065,3 +1065,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["component"]
+
+[[component]]
+name = "SigmaOS-craft-film"
+description = "Film/video editing: projects, clips, timeline tracks"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-film.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmafilm"]
