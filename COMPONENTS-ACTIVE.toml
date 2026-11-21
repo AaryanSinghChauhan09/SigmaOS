@@ -1161,3 +1161,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaprinter"]
+
+[[component]]
+name = "SigmaOS-craft-print"
+description = "Print management: jobs, options, paper sizes"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-print.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaprint2"]
