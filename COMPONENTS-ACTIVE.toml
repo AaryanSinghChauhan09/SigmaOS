@@ -1029,3 +1029,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmadhcp"]
+
+[[component]]
+name = "SigmaOS-network-interface"
+description = "Network interface manager: bring up/down, MTU, states"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-interface.git"
+engine = "network"
+category = "Network"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmanic"]
