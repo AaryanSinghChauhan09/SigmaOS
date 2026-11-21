@@ -801,3 +801,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmanetwork"]
+
+[[component]]
+name = "SigmaOS-craft-vector"
+description = "Vector graphics: paths, shapes, bezier curves, layers, SVG-like elements"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-vector.git"
+engine = "craft-vector"
+category = "Graphics"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmavector"]
