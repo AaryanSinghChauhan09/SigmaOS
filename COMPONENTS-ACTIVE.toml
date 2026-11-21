@@ -464,7 +464,7 @@ language = "rust"
 inspirations = ["native"]
 visibility = "private"
 depends_on = []
-provides = ["sigmaprocessmonitor"]
+provides = ["sigmaprocessmonitor", "sigmaprocess"]
 
 [[component]]
 name = "SigmaOS-bsd-ports"
