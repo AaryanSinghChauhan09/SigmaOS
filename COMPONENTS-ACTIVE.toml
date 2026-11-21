@@ -993,3 +993,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmafs"]
+
+[[component]]
+name = "SigmaOS-craft-grid"
+description = "Grid layout system: areas, rows, columns, items"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-grid.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmagrid"]
