@@ -38752,3 +38752,313 @@ language = "shell"
 inspirations = "Zrythm DAW"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-bigquery"
+description = "SigmaOS integration for BigQuery CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bigquery"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "BigQuery CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-bokeh"
+description = "SigmaOS integration for Bokeh viz: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bokeh"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Bokeh viz"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cassandra"
+description = "SigmaOS integration for Apache Cassandra: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cassandra"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apache Cassandra"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-clickhouse"
+description = "SigmaOS integration for ClickHouse: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clickhouse"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ClickHouse"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-databricks"
+description = "SigmaOS integration for Databricks CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-databricks"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Databricks CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-duckdb"
+description = "SigmaOS integration for DuckDB analytics: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-duckdb"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "DuckDB analytics"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fivetran"
+description = "SigmaOS integration for Fivetran CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fivetran"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Fivetran CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-flink"
+description = "SigmaOS integration for Apache Flink streaming: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flink"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apache Flink streaming"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-google-colab"
+description = "SigmaOS integration for Google Colab local: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-google-colab"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Google Colab local"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-grafana"
+description = "SigmaOS integration for Grafana: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grafana"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Grafana"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-hadoop"
+description = "SigmaOS integration for Apache Hadoop: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hadoop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apache Hadoop"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-julia"
+description = "SigmaOS integration for Julia: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-julia"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Julia"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-jupyter-notebook"
+description = "SigmaOS integration for Jupyter Notebook: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jupyter-notebook"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Jupyter Notebook"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-jupyterlab"
+description = "SigmaOS integration for JupyterLab: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jupyterlab"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "JupyterLab"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kafka"
+description = "SigmaOS integration for Apache Kafka: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kafka"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apache Kafka"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lightdash"
+description = "SigmaOS integration for Lightdash: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lightdash"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Lightdash"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-looker"
+description = "SigmaOS integration for Looker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-looker"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Looker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-matplotlib"
+description = "SigmaOS integration for Matplotlib: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-matplotlib"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Matplotlib"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mongodb"
+description = "SigmaOS integration for MongoDB: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mongodb"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MongoDB"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nifi"
+description = "SigmaOS integration for Apache NiFi: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nifi"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apache NiFi"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pandas"
+description = "SigmaOS integration for Pandas: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pandas"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pandas"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-plotly"
+description = "SigmaOS integration for Plotly: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plotly"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Plotly"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-polars"
+description = "SigmaOS integration for Polars: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-polars"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Polars"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-posthog"
+description = "SigmaOS integration for PostHog: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-posthog"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PostHog"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rabbitmq"
+description = "SigmaOS integration for RabbitMQ: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rabbitmq"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "RabbitMQ"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-redash"
+description = "SigmaOS integration for Redash: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-redash"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Redash"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-scala"
+description = "SigmaOS integration for Scala CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scala"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Scala CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-seaborn"
+description = "SigmaOS integration for Seaborn: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-seaborn"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Seaborn"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-snowflake"
+description = "SigmaOS integration for Snowflake CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snowflake"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Snowflake CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-spark"
+description = "SigmaOS integration for Apache Spark: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-spark"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apache Spark"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-trino"
+description = "SigmaOS integration for Trino query engine: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-trino"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Trino query engine"
+visibility = "public"
+depends_on = []
