@@ -32780,3 +32780,393 @@ language = "shell"
 inspirations = "Yuzu Switch emulator"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-apostrophe"
+description = "SigmaOS integration for Apostrophe editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apostrophe"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apostrophe editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-basket"
+description = "SigmaOS integration for Basket notes: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-basket"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Basket notes"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-byobu"
+description = "SigmaOS integration for Byobu multiplexer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-byobu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Byobu multiplexer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dvtm"
+description = "SigmaOS integration for dvtm multiplexer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dvtm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "dvtm multiplexer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-emacs-vterm"
+description = "SigmaOS integration for Emacs vterm: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-emacs-vterm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Emacs vterm"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-featherpad"
+description = "SigmaOS integration for FeatherPad editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-featherpad"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "FeatherPad editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-geany"
+description = "SigmaOS integration for Geany IDE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-geany"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Geany IDE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-disk-usage-analyzer"
+description = "SigmaOS integration for GNOME Disk Usage Analyzer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-disk-usage-analyzer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Disk Usage Analyzer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-font-viewer"
+description = "SigmaOS integration for GNOME Font Viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-font-viewer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Font Viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-logs"
+description = "SigmaOS integration for GNOME Logs: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-logs"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Logs"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-power-statistics"
+description = "SigmaOS integration for GNOME Power Statistics: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-power-statistics"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Power Statistics"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-goneovim"
+description = "SigmaOS integration for Goneovim: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-goneovim"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Goneovim"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gthumb"
+description = "SigmaOS integration for gThumb image organizer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gthumb"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gThumb image organizer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gwenview"
+description = "SigmaOS integration for Gwenview image viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gwenview"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Gwenview image viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-idea-neovim"
+description = "SigmaOS integration for IDEA Neovim: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-idea-neovim"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "IDEA Neovim"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-joplin"
+description = "SigmaOS integration for Joplin notes: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-joplin"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Joplin notes"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kwrite"
+description = "SigmaOS integration for KWrite editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kwrite"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KWrite editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-logseq"
+description = "SigmaOS integration for Logseq notes: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-logseq"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Logseq notes"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-loupe"
+description = "SigmaOS integration for Loupe image viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-loupe"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Loupe image viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-marktext"
+description = "SigmaOS integration for MarkText markdown editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-marktext"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MarkText markdown editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mousepad"
+description = "SigmaOS integration for Mousepad editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mousepad"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Mousepad editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-neovide"
+description = "SigmaOS integration for Neovide GUI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-neovide"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Neovide GUI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-notepad-next"
+description = "SigmaOS integration for Notepad Next: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notepad-next"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Notepad Next"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-notes-up"
+description = "SigmaOS integration for Notes-up: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notes-up"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Notes-up"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-obsidian"
+description = "SigmaOS integration for Obsidian notes: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-obsidian"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Obsidian notes"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-papers"
+description = "SigmaOS integration for Papers document viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-papers"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Papers document viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-paperwork"
+description = "SigmaOS integration for Paperwork document organizer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-paperwork"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Paperwork document organizer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-photoflare"
+description = "SigmaOS integration for PhotoFlare image editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-photoflare"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PhotoFlare image editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-retext"
+description = "SigmaOS integration for Retext editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-retext"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Retext editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-screen"
+description = "SigmaOS integration for GNU screen: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNU screen"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-skanpage"
+description = "SigmaOS integration for Skanpage scanner: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-skanpage"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Skanpage scanner"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tmux"
+description = "SigmaOS integration for tmux terminal multiplexer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tmux"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tmux terminal multiplexer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tomboy"
+description = "SigmaOS integration for Tomboy notes: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tomboy"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Tomboy notes"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-trilium"
+description = "SigmaOS integration for Trilium notes: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-trilium"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Trilium notes"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-typora"
+description = "SigmaOS integration for Typora markdown editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-typora"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Typora markdown editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-vim-r-plugin"
+description = "SigmaOS integration for Vim R plugin: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vim-r-plugin"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Vim R plugin"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-vs-neovim"
+description = "SigmaOS integration for VSCode Neovim: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vs-neovim"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "VSCode Neovim"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xed"
+description = "SigmaOS integration for xed editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xed"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "xed editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xournal"
+description = "SigmaOS integration for Xournal note-taking: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xournal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Xournal note-taking"
+visibility = "public"
+depends_on = []
