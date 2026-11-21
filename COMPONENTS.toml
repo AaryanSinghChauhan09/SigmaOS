@@ -30270,3 +30270,403 @@ language = "shell"
 inspirations = "Wine staging"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-adw-gtk-theme"
+description = "SigmaOS integration for adw-gtk3 theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adw-gtk-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "adw-gtk3 theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-adwaita-icon-theme"
+description = "SigmaOS integration for Adwaita icon theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-adwaita-icon-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Adwaita icon theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-breeze-gtk-theme"
+description = "SigmaOS integration for Breeze GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-breeze-gtk-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Breeze GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-breeze-icon-theme"
+description = "SigmaOS integration for Breeze icon theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-breeze-icon-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Breeze icon theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-budgie-control-center"
+description = "SigmaOS integration for Budgie Control Center: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-budgie-control-center"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Budgie Control Center"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-catppuccin-theme"
+description = "SigmaOS integration for Catppuccin GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-catppuccin-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Catppuccin GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cinnamon-settings"
+description = "SigmaOS integration for Cinnamon Settings: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon-settings"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cinnamon Settings"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-colloid-gtk-theme"
+description = "SigmaOS integration for Colloid GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-colloid-gtk-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Colloid GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-deepin-control-center"
+description = "SigmaOS integration for Deepin Control Center: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deepin-control-center"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Deepin Control Center"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dotfiles-manager"
+description = "SigmaOS integration for chezmoi dotfiles manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dotfiles-manager"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "chezmoi dotfiles manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-foot"
+description = "SigmaOS integration for foot terminal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-foot"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "foot terminal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-control-center"
+description = "SigmaOS integration for GNOME Settings: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-control-center"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Settings"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-initial-setup"
+description = "SigmaOS integration for GNOME Initial Setup: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-initial-setup"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Initial Setup"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-software"
+description = "SigmaOS integration for GNOME Software: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-software"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Software"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-terminal"
+description = "SigmaOS integration for GNOME Terminal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-terminal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Terminal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gruvbox-theme"
+description = "SigmaOS integration for Gruvbox GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gruvbox-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Gruvbox GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-guake"
+description = "SigmaOS integration for Guake drop-down terminal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guake"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Guake drop-down terminal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-home-manager"
+description = "SigmaOS integration for Nix home-manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-home-manager"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Nix home-manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-hydra-gtk-theme"
+description = "SigmaOS integration for Hydra GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hydra-gtk-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Hydra GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kde-discover"
+description = "SigmaOS integration for KDE Discover: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kde-discover"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KDE Discover"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kde-systemsettings"
+description = "SigmaOS integration for KDE System Settings: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kde-systemsettings"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KDE System Settings"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kgx"
+description = "SigmaOS integration for GNOME Console (kgx): package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kgx"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Console (kgx)"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lxqt-config"
+description = "SigmaOS integration for LXQt Configuration: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lxqt-config"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "LXQt Configuration"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mate-control-center"
+description = "SigmaOS integration for MATE Control Center: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mate-control-center"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MATE Control Center"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-materia-gtk-theme"
+description = "SigmaOS integration for Materia GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-materia-gtk-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Materia GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nix-package-manager"
+description = "SigmaOS integration for Nix package manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nix-package-manager"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Nix package manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nordic-theme"
+description = "SigmaOS integration for Nordic GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nordic-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Nordic GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-numix-icon-theme"
+description = "SigmaOS integration for Numix icon theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-numix-icon-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Numix icon theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-orchis-theme"
+description = "SigmaOS integration for Orchis GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-orchis-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Orchis GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pantheon-system76"
+description = "SigmaOS integration for elementary System Settings: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pantheon-system76"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "elementary System Settings"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-papirus-icon-theme"
+description = "SigmaOS integration for Papirus icon theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-papirus-icon-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Papirus icon theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-stow-dotfiles"
+description = "SigmaOS integration for GNU Stow dotfiles: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stow-dotfiles"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNU Stow dotfiles"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-terminator"
+description = "SigmaOS integration for Terminator terminal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-terminator"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Terminator terminal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tilda"
+description = "SigmaOS integration for Tilda drop-down terminal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tilda"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Tilda drop-down terminal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tilix"
+description = "SigmaOS integration for Tilix terminal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tilix"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Tilix terminal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tokyo-night-theme"
+description = "SigmaOS integration for Tokyo Night GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tokyo-night-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Tokyo Night GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-whitesur-gtk-theme"
+description = "SigmaOS integration for WhiteSur GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-whitesur-gtk-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WhiteSur GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xfce4-settings"
+description = "SigmaOS integration for XFCE Settings: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfce4-settings"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "XFCE Settings"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-yadm-dotfiles"
+description = "SigmaOS integration for yadm dotfiles: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yadm-dotfiles"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "yadm dotfiles"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-yakuake"
+description = "SigmaOS integration for Yakuake drop-down terminal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yakuake"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Yakuake drop-down terminal"
+visibility = "public"
+depends_on = []
