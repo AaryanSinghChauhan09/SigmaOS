@@ -1457,7 +1457,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-GTK+"
 description = "Blueman & Celluloid GTK app wrappers"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gtk-plus"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-GTK+.git"
 engine = "gtk_lib"
 category = "Developer Tools"
 language = "shell"
@@ -1952,7 +1952,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-github-actions"
 description = "GitHub Actions component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-Github-Action"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-github-actions.git"
 engine = "plugin_registry"
 category = "Utilities"
 language = "unknown"
@@ -8816,7 +8816,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-dm"
 description = "Device manager (sysfs device tree, drivers, uaccess)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-device-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dm.git"
 engine = "device_manager"
 category = "Developer Tools"
 language = "rust"
@@ -8827,7 +8827,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-dm"
 description = "Device manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-device-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dm.git"
 engine = "device_manager"
 category = "Developer Tools"
 language = "c"
@@ -8849,7 +8849,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-am"
 description = "Audio manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-audio-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-am.git"
 engine = "audio_manager"
 category = "Utilities"
 language = "c"
@@ -8871,7 +8871,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-vc"
 description = "Volume control for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-volume-control"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-vc.git"
 engine = "volume_control"
 category = "Utilities"
 language = "c"
@@ -8893,7 +8893,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-bt"
 description = "Bluetooth manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bt.git"
 engine = "bluetooth_manager"
 category = "Drivers & Hardware"
 language = "c"
@@ -8915,7 +8915,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-ps"
 description = "Power supplier manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power-supplier"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ps.git"
 engine = "power_supplier"
 category = "Utilities"
 language = "c"
@@ -8937,7 +8937,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-disp"
 description = "Display/output manager (DRM connectors, modes, brightness)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-display-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disp.git"
 engine = "display_manager"
 category = "Utilities"
 language = "rust"
@@ -8948,7 +8948,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-disp"
 description = "Display manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-display-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disp.git"
 engine = "display_manager"
 category = "Utilities"
 language = "c"
@@ -8970,7 +8970,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-gr"
 description = "Graphics renderer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-graphics-renderer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-gr.git"
 engine = "graphics_renderer"
 category = "Drivers & Hardware"
 language = "c"
@@ -8992,7 +8992,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-sc"
 description = "Software center for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software-center"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-sc.git"
 engine = "software_center"
 category = "Package Management"
 language = "c"
@@ -9014,7 +9014,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-pm"
 description = "Package manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pm.git"
 engine = "package_manager"
 category = "Package Management"
 language = "c"
@@ -9036,7 +9036,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-dr"
 description = "Dependency resolver for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dependency-resolver"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dr.git"
 engine = "dependency_resolver"
 category = "Utilities"
 language = "c"
@@ -9058,7 +9058,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-un"
 description = "Uninstaller for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-uninstaller"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-un.git"
 engine = "uninstaller"
 category = "Utilities"
 language = "c"
@@ -9080,7 +9080,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-rm"
 description = "Repository manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repo-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rm.git"
 engine = "repo_manager"
 category = "Utilities"
 language = "c"
@@ -9124,7 +9124,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-fm"
 description = "File manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-flatpak-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-fm.git"
 engine = "flatpak_manager"
 category = "Utilities"
 language = "rust"
@@ -9135,7 +9135,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-fm"
 description = "Flatpak manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-flatpak-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-fm.git"
 engine = "flatpak_manager"
 category = "Utilities"
 language = "c"
@@ -9157,7 +9157,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-as"
 description = "AppStream software metadata catalog"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-appstream"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-as.git"
 engine = "appstream"
 category = "Utilities"
 language = "rust"
@@ -9168,7 +9168,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-as"
 description = "AppStream for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-appstream"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-as.git"
 engine = "appstream"
 category = "Utilities"
 language = "c"
@@ -9212,7 +9212,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-av"
 description = "Antivirus/malware scanner with signature DB"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-antivirus"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-av.git"
 engine = "antivirus"
 category = "Utilities"
 language = "rust"
@@ -9223,7 +9223,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-av"
 description = "Antivirus for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-antivirus"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-av.git"
 engine = "antivirus"
 category = "Utilities"
 language = "c"
@@ -9234,7 +9234,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-fw"
 description = "Firewall for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-firewall"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-fw.git"
 engine = "firewall"
 category = "Utilities"
 language = "c"
@@ -9256,7 +9256,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-cw"
 description = "Watch-only crypto wallet manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-crypto-wallet"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-cw.git"
 engine = "crypto_wallet"
 category = "Utilities"
 language = "rust"
@@ -9267,7 +9267,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-cw"
 description = "Crypto wallet for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-crypto-wallet"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cw.git"
 engine = "crypto_wallet"
 category = "Utilities"
 language = "c"
@@ -9322,7 +9322,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-et"
 description = "Encryption tool (file encrypt/decrypt/sign via openssl/gpg)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-encryption-tool"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-et.git"
 engine = "encryption_tool"
 category = "Developer Tools"
 language = "rust"
@@ -9333,7 +9333,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-et"
 description = "Encryption tool for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-encryption-tool"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-et.git"
 engine = "encryption_tool"
 category = "Developer Tools"
 language = "c"
@@ -9355,7 +9355,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-sa"
 description = "Security auditor"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-security-auditor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-sa.git"
 engine = "security_auditor"
 category = "Security"
 language = "rust"
@@ -9366,7 +9366,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-sa"
 description = "Security auditor for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-security-auditor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-sa.git"
 engine = "security_auditor"
 category = "Security"
 language = "c"
@@ -9388,7 +9388,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-sh"
 description = "Shell for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shell"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-sh.git"
 engine = "shell"
 category = "Utilities"
 language = "c"
@@ -9399,7 +9399,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-tm"
 description = "Terminal emulator profile manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-tm.git"
 engine = "terminal"
 category = "Utilities"
 language = "rust"
@@ -9410,7 +9410,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-tm"
 description = "Terminal for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-tm.git"
 engine = "terminal"
 category = "Utilities"
 language = "c"
@@ -9432,7 +9432,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-cp"
 description = "Command processor for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-command-processor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cp.git"
 engine = "command_processor"
 category = "Utilities"
 language = "c"
@@ -9454,7 +9454,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-js"
 description = "Job scheduler for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-job-scheduler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-js.git"
 engine = "job_scheduler"
 category = "Utilities"
 language = "c"
@@ -9476,7 +9476,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-eh"
 description = "Event handler for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-event-handler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-eh.git"
 engine = "event_handler"
 category = "Utilities"
 language = "c"
@@ -9498,7 +9498,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-sh2"
 description = "POSIX signal handler framework"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-signal-handler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-sh2.git"
 engine = "signal_handler"
 category = "Utilities"
 language = "rust"
@@ -9509,7 +9509,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-sh2"
 description = "Signal handler for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-signal-handler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-sh2.git"
 engine = "signal_handler"
 category = "Utilities"
 language = "c"
@@ -9531,7 +9531,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-mm"
 description = "Memory manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-memory-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mm.git"
 engine = "memory_manager"
 category = "Utilities"
 language = "c"
@@ -9553,7 +9553,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-fb"
 description = "File browser for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file-browser"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-fb.git"
 engine = "file_browser"
 category = "Utilities"
 language = "c"
@@ -9575,7 +9575,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-dm2"
 description = "Directory manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-directory-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dm2.git"
 engine = "directory_manager"
 category = "Utilities"
 language = "c"
@@ -9597,7 +9597,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-pr"
 description = "Path resolver for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-path-resolver"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pr.git"
 engine = "path_resolver"
 category = "Utilities"
 language = "c"
@@ -9619,7 +9619,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-lm"
 description = "Link manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-link-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lm.git"
 engine = "link_manager"
 category = "Utilities"
 language = "c"
@@ -9641,7 +9641,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-pm3"
 description = "Filesystem path monitor"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-path-monitor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-pm3.git"
 engine = "path_monitor"
 category = "Utilities"
 language = "rust"
@@ -9674,7 +9674,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-at"
 description = "Accessibility settings manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-accessibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-at.git"
 engine = "accessibility"
 category = "Utilities"
 language = "rust"
@@ -9685,7 +9685,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-at"
 description = "Accessibility tools for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-accessibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-at.git"
 engine = "accessibility"
 category = "Utilities"
 language = "c"
@@ -9696,7 +9696,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-nm"
 description = "Network manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-nm.git"
 engine = "network_manager"
 category = "Network"
 language = "c"
@@ -9718,7 +9718,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-wm"
 description = "WiFi manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wifi-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wm.git"
 engine = "wifi_manager"
 category = "Utilities"
 language = "c"
@@ -9740,7 +9740,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-bs"
 description = "Bluetooth setup for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth-setup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bs.git"
 engine = "bluetooth_setup"
 category = "Drivers & Hardware"
 language = "c"
@@ -9762,7 +9762,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-mm2"
 description = "Modem manager with AT profiles and SMS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-modem-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-mm2.git"
 engine = "modem_manager"
 category = "Utilities"
 language = "rust"
@@ -9773,7 +9773,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-mm2"
 description = "Modem manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-modem-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mm2.git"
 engine = "modem_manager"
 category = "Utilities"
 language = "c"
@@ -9795,7 +9795,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-vm"
 description = "Voice/speech manager (TTS/STT)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-voice-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-vm.git"
 engine = "voice_manager"
 category = "Utilities"
 language = "rust"
@@ -9806,7 +9806,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-vm"
 description = "Voice manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-voice-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-vm.git"
 engine = "voice_manager"
 category = "Utilities"
 language = "c"
@@ -9828,7 +9828,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-cm"
 description = "Call management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-call-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-cm.git"
 engine = "call_manager"
 category = "Utilities"
 language = "rust"
@@ -9839,7 +9839,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-cm"
 description = "Call manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-call-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cm.git"
 engine = "call_manager"
 category = "Utilities"
 language = "c"
@@ -9861,7 +9861,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-ar"
 description = "Audio recorder for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio-recorder"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-ar.git"
 engine = "audio_recorder"
 category = "Utilities"
 language = "rust"
@@ -9872,7 +9872,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-ar"
 description = "Audio recorder for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-audio-recorder"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ar.git"
 engine = "audio_recorder"
 category = "Utilities"
 language = "c"
@@ -9894,7 +9894,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-st"
 description = "System tracer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-tracer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-st.git"
 engine = "system_tracer"
 category = "System Services"
 language = "c"
@@ -9916,7 +9916,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-pm2"
 description = "Performance monitor for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-monitor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pm2.git"
 engine = "performance_monitor"
 category = "Utilities"
 language = "rust"
@@ -9949,7 +9949,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-ts"
 description = "Task scheduler (cron/at jobs)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-task-scheduler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-ts.git"
 engine = "task_scheduler"
 category = "Utilities"
 language = "rust"
@@ -9960,7 +9960,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-ts"
 description = "Task scheduler for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-task-scheduler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ts.git"
 engine = "task_scheduler"
 category = "Utilities"
 language = "c"
@@ -9982,7 +9982,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-jt"
 description = "Job/task tracker"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-job-tracker"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-jt.git"
 engine = "job_tracker"
 category = "Utilities"
 language = "rust"
@@ -9993,7 +9993,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-jt"
 description = "Job tracker for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-job-tracker"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-jt.git"
 engine = "job_tracker"
 category = "Utilities"
 language = "c"
@@ -10015,7 +10015,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-rm3"
 description = "Resource monitor for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-monitor"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rm3.git"
 engine = "resource_monitor"
 category = "Utilities"
 language = "rust"
@@ -10037,7 +10037,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-pa"
 description = "Performance analyzer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-analyzer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pa.git"
 engine = "performance_analyzer"
 category = "Utilities"
 language = "c"
@@ -10059,7 +10059,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-su"
 description = "System updater for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-updater"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-su.git"
 engine = "system_updater"
 category = "System Services"
 language = "c"
@@ -10081,7 +10081,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-km"
 description = "Kernel manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel-manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-km.git"
 engine = "kernel_manager"
 category = "System Services"
 language = "c"
@@ -10103,7 +10103,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-ml"
 description = "Modules loader for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-modules-loader"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ml.git"
 engine = "modules_loader"
 category = "Utilities"
 language = "c"
@@ -10125,7 +10125,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-sw"
 description = "Service wrapper for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service-wrapper"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-sw.git"
 engine = "service_wrapper"
 category = "Utilities"
 language = "c"
@@ -10147,7 +10147,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-ph"
 description = "Process handler for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-process-handler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ph.git"
 engine = "process_handler"
 category = "Utilities"
 language = "c"
@@ -10169,7 +10169,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-ih"
 description = "Interrupt handler for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-interrupt-handler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ih.git"
 engine = "interrupt_handler"
 category = "Utilities"
 language = "c"
@@ -10191,7 +10191,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-omarchy-cs"
 description = "Window/context switcher"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-context-switcher"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-cs.git"
 engine = "context_switcher"
 category = "Utilities"
 language = "rust"
@@ -10202,7 +10202,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-cs"
 description = "Context switcher for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-context-switcher"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cs.git"
 engine = "context_switcher"
 category = "Utilities"
 language = "c"
@@ -10213,7 +10213,7 @@ depends_on = ["SigmaOS-system"]
 [[component]]
 name = "SigmaOS-arch-calc"
 description = "Calculator for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-calculator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-calc.git"
 engine = "calculator"
 category = "Utilities"
 language = "c"
