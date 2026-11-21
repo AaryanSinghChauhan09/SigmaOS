@@ -813,3 +813,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmavector"]
+
+[[component]]
+name = "SigmaOS-craft-font"
+description = "Font management: loading, glyph management, text rendering, OpenType metrics"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-font.git"
+engine = "craft-font"
+category = "Graphics"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmafont"]
