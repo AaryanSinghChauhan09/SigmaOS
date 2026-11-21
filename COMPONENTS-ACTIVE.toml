@@ -585,3 +585,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaword"]
+
+[[component]]
+name = "SigmaOS-system-monitor"
+description = "System monitoring (CPU, memory, disk, network, temperature)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-monitor.git"
+engine = "system-monitor"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasystemmonitor"]
