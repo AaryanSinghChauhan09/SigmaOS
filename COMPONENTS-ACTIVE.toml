@@ -969,3 +969,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaacpi"]
+
+[[component]]
+name = "SigmaOS-recovery"
+description = "System recovery daemon: modes, snapshots, boot actions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-recovery.git"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmarecovery"]
