@@ -885,3 +885,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmahibernation"]
+
+[[component]]
+name = "SigmaOS-design"
+description = "Design system: tokens, UI components, variants, theming"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-design.git"
+engine = "design"
+category = "Graphics"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmadesign"]
+
+[[component]]
+name = "SigmaOS-design"
+description = "Design system: tokens, UI components, variants, theming"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-design.git"
+engine = "design"
+category = "Graphics"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmadesign"]
