@@ -29990,3 +29990,283 @@ language = "shell"
 inspirations = "LocalSend file transfer"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-dconf-editor"
+description = "SigmaOS integration for dconf Editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dconf-editor"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "dconf Editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dolphin"
+description = "SigmaOS integration for KDE Dolphin file manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dolphin"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KDE Dolphin file manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-epiphany"
+description = "SigmaOS integration for GNOME Web (Epiphany): package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-epiphany"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Web (Epiphany)"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-falkon"
+description = "SigmaOS integration for Falkon browser: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-falkon"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Falkon browser"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-filelight"
+description = "SigmaOS integration for Filelight disk usage map: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-filelight"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Filelight disk usage map"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-boxes"
+description = "SigmaOS integration for GNOME Boxes VM manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-boxes"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Boxes VM manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-calendar"
+description = "SigmaOS integration for GNOME Calendar: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-calendar"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Calendar"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-contacts"
+description = "SigmaOS integration for GNOME Contacts: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-contacts"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Contacts"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-games"
+description = "SigmaOS integration for GNOME Games collection: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-games"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Games collection"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-music"
+description = "SigmaOS integration for GNOME Music: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-music"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Music"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-photos"
+description = "SigmaOS integration for GNOME Photos: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-photos"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Photos"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-tweaks"
+description = "SigmaOS integration for GNOME Tweaks: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-tweaks"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Tweaks"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-heroic"
+description = "SigmaOS integration for Heroic Games Launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-heroic"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Heroic Games Launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kodi"
+description = "SigmaOS integration for Kodi media center: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kodi"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Kodi media center"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nautilus"
+description = "SigmaOS integration for GNOME Files (Nautilus): package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nautilus"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Files (Nautilus)"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nnn"
+description = "SigmaOS integration for nnn terminal file manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nnn"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "nnn terminal file manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-opera"
+description = "SigmaOS integration for Opera browser: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-opera"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Opera browser"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pcmanfm-qt"
+description = "SigmaOS integration for LXQt PCManFM-Qt: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pcmanfm-qt"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "LXQt PCManFM-Qt"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-plex"
+description = "SigmaOS integration for Plex media server: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plex"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Plex media server"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-qutebrowser"
+description = "SigmaOS integration for qutebrowser keyboard browser: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qutebrowser"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "qutebrowser keyboard browser"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ranger"
+description = "SigmaOS integration for ranger terminal file manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ranger"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ranger terminal file manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-retroarch"
+description = "SigmaOS integration for RetroArch emulator frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-retroarch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "RetroArch emulator frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-smplayer"
+description = "SigmaOS integration for SMPlayer media player: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-smplayer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SMPlayer media player"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-snapshot"
+description = "SigmaOS integration for GNOME Snapshot: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-snapshot"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Snapshot"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-steam"
+description = "SigmaOS integration for Steam client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-steam"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Steam client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-totem"
+description = "SigmaOS integration for Totem video player: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-totem"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Totem video player"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-vifm"
+description = "SigmaOS integration for vifm file manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vifm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "vifm file manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wine-staging"
+description = "SigmaOS integration for Wine staging: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wine-staging"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Wine staging"
+visibility = "public"
+depends_on = []
