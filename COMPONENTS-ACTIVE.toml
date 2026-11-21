@@ -96,7 +96,7 @@ category = "Desktop"
 language = "rust"
 visibility = "public"
 depends_on = ["SigmaOS-ISO", "SigmaOS-system"]
-provides = ["installer-engine", "partitioning", "bootloader-install"]
+provides = ["installer-engine", "partitioning", "bootloader-install", "sigmainstaller"]
 
 [[component]]
 name = "SigmaOS-system-tools"
