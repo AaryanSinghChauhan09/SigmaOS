@@ -284,7 +284,7 @@ language = "rust"
 inspirations = ["native"]
 visibility = "private"
 depends_on = []
-provides = ["component"]
+provides = ["sigmaconfigmanager", "sigmaconfig"]
 
 [[component]]
 name = "SigmaOS-resource"
