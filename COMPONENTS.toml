@@ -3127,17 +3127,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-automation"
-description = "Automation component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-automation"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-cron-manager"
 description = "Cron manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cron-manager"
@@ -4722,17 +4711,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-recipe"
-description = "Recipe component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-recipe"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-cookbook"
 description = "Cookbook component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cookbook"
@@ -4777,17 +4755,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-nutrition"
-description = "Nutrition component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nutrition"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-gardening"
 description = "Gardening component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gardening"
@@ -4804,17 +4771,6 @@ description = "Forestry component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-forestry"
 engine = "try_live"
 category = "Utilities"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-shopping"
-description = "Shopping component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shopping"
-engine = "common_lib"
-category = "Developer Tools"
 language = "unknown"
 inspirations = "None"
 visibility = "public"
@@ -4846,17 +4802,6 @@ depends_on = ["SigmaOS-system"]
 name = "SigmaOS-supermarket"
 description = "Supermarket component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-supermarket"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-grocery"
-description = "Grocery component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grocery"
 engine = "common_lib"
 category = "Developer Tools"
 language = "unknown"
@@ -5231,17 +5176,6 @@ depends_on = ["SigmaOS-system"]
 name = "SigmaOS-sports"
 description = "Sports component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sports"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-fitness"
-description = "Fitness component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fitness"
 engine = "common_lib"
 category = "Developer Tools"
 language = "unknown"
@@ -9078,17 +9012,6 @@ canonical_branch = "main"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-dashboard"
-description = "Part of SigmaOS architecture: SigmaOS-dashboard"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dashboard"
-engine = "common_lib"
-category = "Developer Tools"
-language = "rust"
-visibility = "public"
-canonical_branch = "main"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-database"
 description = "Part of SigmaOS architecture: SigmaOS-database"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-database"
@@ -9325,17 +9248,6 @@ description = "SigmaOS application launcher and quick access"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-launcher"
 engine = "common_lib"
 category = "Developer Tools"
-language = "rust"
-visibility = "public"
-canonical_branch = "main"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-legal"
-description = "SigmaOS legal documents, licenses, and compliance"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-legal"
-engine = "docs_site"
-category = "Documentation"
 language = "rust"
 visibility = "public"
 canonical_branch = "main"
@@ -10360,16 +10272,6 @@ description = "GitHub description is a placeholder; component scope remains uncl
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-anacron"
 engine = "service_daemon"
 category = "System Services"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-analytics"
-description = "Event aggregation and analytics with counters, histograms, and persistence"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-analytics"
-engine = "data_engineering"
-category = "Data Engineering"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -34748,5 +34650,1745 @@ engine = "app_integration"
 category = "Applications"
 language = "shell"
 inspirations = "YubiKey manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-clipboard-history"
+description = "SigmaOS integration for Clipboard history: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clipboard-history"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Clipboard history"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cliphist-picker"
+description = "SigmaOS integration for Cliphist picker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cliphist-picker"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cliphist picker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-command-palette"
+description = "SigmaOS integration for Command palette: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-command-palette"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Command palette"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cursor-picker"
+description = "SigmaOS integration for Cursor picker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cursor-picker"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cursor picker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-emoji-picker"
+description = "SigmaOS integration for Emoji picker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-emoji-picker"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Emoji picker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-font-picker"
+description = "SigmaOS integration for Font picker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-font-picker"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Font picker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-guest-session"
+description = "SigmaOS integration for Guest session: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guest-session"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Guest session"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-hibernate"
+description = "SigmaOS integration for System hibernate: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hibernate"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "System hibernate"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-icon-picker"
+description = "SigmaOS integration for Icon picker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-icon-picker"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Icon picker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lock-session"
+description = "SigmaOS integration for Session lock: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lock-session"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Session lock"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-logout"
+description = "SigmaOS integration for Session logout: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-logout"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Session logout"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-quick-settings"
+description = "SigmaOS integration for Quick settings panel: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quick-settings"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Quick settings panel"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-reboot"
+description = "SigmaOS integration for System reboot: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-reboot"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "System reboot"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-run-dialog"
+description = "SigmaOS integration for Run dialog: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-run-dialog"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Run dialog"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-shutdown"
+description = "SigmaOS integration for System shutdown: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shutdown"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "System shutdown"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-accounting"
+description = "SigmaOS integration for Accounting: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-accounting"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Accounting"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-activepieces"
+description = "SigmaOS integration for Activepieces: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-activepieces"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Activepieces"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-adwaita"
+description = "SigmaOS integration for Adwaita icon theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-adwaita"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Adwaita icon theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-analytics"
+description = "SigmaOS integration for Analytics: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-analytics"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Analytics"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-automation"
+description = "SigmaOS integration for Automation: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-automation"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Automation"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-autumn"
+description = "SigmaOS integration for Autumn theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-autumn"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Autumn theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-ayu"
+description = "SigmaOS integration for Ayu theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-ayu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ayu theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-battery"
+description = "SigmaOS integration for SigmaOS battery monitor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-battery"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS battery monitor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-berkeley-mono"
+description = "SigmaOS integration for Berkeley Mono font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-berkeley-mono"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Berkeley Mono font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-bi"
+description = "SigmaOS integration for BI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-bi"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "BI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-blueman"
+description = "SigmaOS integration for SigmaOS bluetooth: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-blueman"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS bluetooth"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-bookkeeping"
+description = "SigmaOS integration for Bookkeeping: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-bookkeeping"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Bookkeeping"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-breeze"
+description = "SigmaOS integration for Breeze icon theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-breeze"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Breeze icon theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-brightness"
+description = "SigmaOS integration for SigmaOS brightness: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-brightness"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS brightness"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-budget"
+description = "SigmaOS integration for Budget: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-budget"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Budget"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-catppuccin"
+description = "SigmaOS integration for Catppuccin theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-catppuccin"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Catppuccin theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-child"
+description = "SigmaOS integration for Child theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-child"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Child theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-clipboard"
+description = "SigmaOS integration for SigmaOS clipboard: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-clipboard"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS clipboard"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-cognitive"
+description = "SigmaOS integration for Cognitive theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-cognitive"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cognitive theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-colorblind"
+description = "SigmaOS integration for Colorblind theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-colorblind"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Colorblind theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-colors"
+description = "SigmaOS integration for SigmaOS color palette: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-colors"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS color palette"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-contract"
+description = "SigmaOS integration for Contract: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-contract"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Contract"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-crm"
+description = "SigmaOS integration for CRM: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-crm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "CRM"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-cursor-theme"
+description = "SigmaOS integration for SigmaOS cursor theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-cursor-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS cursor theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-cyberpunk"
+description = "SigmaOS integration for Cyberpunk theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-cyberpunk"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cyberpunk theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-dark"
+description = "SigmaOS integration for Dark theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-dark"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Dark theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-dashboard"
+description = "SigmaOS integration for Dashboard: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-dashboard"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Dashboard"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-data"
+description = "SigmaOS integration for Data: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-data"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Data"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-dejavu"
+description = "SigmaOS integration for DejaVu font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-dejavu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "DejaVu font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-diary"
+description = "SigmaOS integration for Diary: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-diary"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Diary"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-dpms"
+description = "SigmaOS integration for SigmaOS DPMS: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-dpms"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS DPMS"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-dyslexia"
+description = "SigmaOS integration for Dyslexia font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-dyslexia"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Dyslexia font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-education"
+description = "SigmaOS integration for Education theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-education"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Education theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-emoji"
+description = "SigmaOS integration for SigmaOS emoji font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-emoji"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS emoji font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-erp"
+description = "SigmaOS integration for ERP: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-erp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ERP"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-estimate"
+description = "SigmaOS integration for Estimate: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-estimate"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Estimate"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-etl"
+description = "SigmaOS integration for ETL: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-etl"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ETL"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-everforest"
+description = "SigmaOS integration for Everforest theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-everforest"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Everforest theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-expense"
+description = "SigmaOS integration for Expense: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-expense"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Expense"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-finance"
+description = "SigmaOS integration for Finance: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-finance"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Finance"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-fira-code"
+description = "SigmaOS integration for Fira Code font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-fira-code"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Fira Code font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-fitness"
+description = "SigmaOS integration for Fitness: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-fitness"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Fitness"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-flexoki"
+description = "SigmaOS integration for Flexoki theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-flexoki"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Flexoki theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-focus"
+description = "SigmaOS integration for Focus mode: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-focus"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Focus mode"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-font"
+description = "SigmaOS integration for SigmaOS font manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-font"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS font manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-forest"
+description = "SigmaOS integration for Forest theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-forest"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Forest theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-geist"
+description = "SigmaOS integration for Geist font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-geist"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Geist font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-goal"
+description = "SigmaOS integration for Goal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-goal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Goal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-grocery"
+description = "SigmaOS integration for Grocery: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-grocery"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Grocery"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-gruvbox"
+description = "SigmaOS integration for Gruvbox theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-gruvbox"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Gruvbox theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-gtk-theme"
+description = "SigmaOS integration for SigmaOS GTK theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-gtk-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS GTK theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-habit"
+description = "SigmaOS integration for Habit tracker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-habit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Habit tracker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-hack"
+description = "SigmaOS integration for Hack font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-hack"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Hack font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-health"
+description = "SigmaOS integration for Health: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-health"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Health"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-hearing"
+description = "SigmaOS integration for Hearing theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-hearing"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Hearing theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-high-contrast"
+description = "SigmaOS integration for High Contrast theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-high-contrast"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "High Contrast theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-hr"
+description = "SigmaOS integration for HR: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-hr"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "HR"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-huginn"
+description = "SigmaOS integration for Huginn: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-huginn"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Huginn"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-icon-theme"
+description = "SigmaOS integration for SigmaOS icon theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-icon-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS icon theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-idle"
+description = "SigmaOS integration for SigmaOS idle manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-idle"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS idle manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-ifttt"
+description = "SigmaOS integration for IFTTT: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-ifttt"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "IFTTT"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-insurance"
+description = "SigmaOS integration for Insurance: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-insurance"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Insurance"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-inter"
+description = "SigmaOS integration for Inter font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-inter"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Inter font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-investment"
+description = "SigmaOS integration for Investment: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-investment"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Investment"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-invoice"
+description = "SigmaOS integration for Invoice: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-invoice"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Invoice"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-jetbrains-mono"
+description = "SigmaOS integration for JetBrains Mono font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-jetbrains-mono"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "JetBrains Mono font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-journal"
+description = "SigmaOS integration for Journal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-journal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Journal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-kanagawa"
+description = "SigmaOS integration for Kanagawa theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-kanagawa"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Kanagawa theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-kids"
+description = "SigmaOS integration for Kids theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-kids"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Kids theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-kpi"
+description = "SigmaOS integration for KPI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-kpi"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KPI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-lake"
+description = "SigmaOS integration for Lake: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-lake"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Lake"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-large-text"
+description = "SigmaOS integration for Large Text: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-large-text"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Large Text"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-lato"
+description = "SigmaOS integration for Lato font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-lato"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Lato font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-legal"
+description = "SigmaOS integration for Legal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-legal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Legal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-liberation"
+description = "SigmaOS integration for Liberation font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-liberation"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Liberation font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-light"
+description = "SigmaOS integration for Light theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-light"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Light theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-lock"
+description = "SigmaOS integration for SigmaOS lock screen: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-lock"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS lock screen"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-matrix"
+description = "SigmaOS integration for Matrix theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-matrix"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Matrix theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-matte-black"
+description = "SigmaOS integration for Matte Black theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-matte-black"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Matte Black theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-meal"
+description = "SigmaOS integration for Meal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-meal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Meal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-meditation"
+description = "SigmaOS integration for Meditation: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-meditation"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Meditation"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-menu"
+description = "SigmaOS integration for SigmaOS unified menu: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-menu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS unified menu"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-metric"
+description = "SigmaOS integration for Metric: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-metric"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Metric"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-minimal"
+description = "SigmaOS integration for Minimal theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-minimal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Minimal theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-montserrat"
+description = "SigmaOS integration for Montserrat font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-montserrat"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Montserrat font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-mood"
+description = "SigmaOS integration for Mood tracker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-mood"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Mood tracker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-motor"
+description = "SigmaOS integration for Motor theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-motor"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Motor theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-n8n"
+description = "SigmaOS integration for n8n automation: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-n8n"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "n8n automation"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-neurodivergent"
+description = "SigmaOS integration for Neurodivergent theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-neurodivergent"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Neurodivergent theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-node-red"
+description = "SigmaOS integration for Node-RED: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-node-red"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Node-RED"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-nord"
+description = "SigmaOS integration for Nord theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-nord"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Nord theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-notifications"
+description = "SigmaOS integration for SigmaOS notifications: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-notifications"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS notifications"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-noto"
+description = "SigmaOS integration for Noto fonts: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-noto"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Noto fonts"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-nutrition"
+description = "SigmaOS integration for Nutrition: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-nutrition"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Nutrition"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-ocean"
+description = "SigmaOS integration for Ocean theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-ocean"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ocean theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-offboarding"
+description = "SigmaOS integration for Offboarding: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-offboarding"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Offboarding"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-okr"
+description = "SigmaOS integration for OKR: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-okr"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OKR"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-onboarding"
+description = "SigmaOS integration for Onboarding: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-onboarding"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Onboarding"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-opensans"
+description = "SigmaOS integration for OpenSans font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-opensans"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OpenSans font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-orchestration"
+description = "SigmaOS integration for Orchestration: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-orchestration"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Orchestration"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-palette"
+description = "SigmaOS integration for SigmaOS palette: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-palette"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS palette"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-parental"
+description = "SigmaOS integration for Parental controls: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-parental"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Parental controls"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-pavucontrol"
+description = "SigmaOS integration for SigmaOS audio mixer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-pavucontrol"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS audio mixer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-payroll"
+description = "SigmaOS integration for Payroll: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-payroll"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Payroll"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-performance"
+description = "SigmaOS integration for Performance: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-performance"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Performance"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-pipeline"
+description = "SigmaOS integration for Pipeline: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-pipeline"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pipeline"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-polkit"
+description = "SigmaOS integration for SigmaOS polkit agent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-polkit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS polkit agent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-pomodoro"
+description = "SigmaOS integration for Pomodoro: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-pomodoro"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pomodoro"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-poppins"
+description = "SigmaOS integration for Poppins font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-poppins"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Poppins font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-powermenu"
+description = "SigmaOS integration for SigmaOS power menu: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-powermenu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS power menu"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-productivity"
+description = "SigmaOS integration for Productivity: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-productivity"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Productivity"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-proposal"
+description = "SigmaOS integration for Proposal: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-proposal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Proposal"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-qt-theme"
+description = "SigmaOS integration for SigmaOS Qt theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-qt-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS Qt theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-quote"
+description = "SigmaOS integration for Quote: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-quote"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Quote"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-receipt"
+description = "SigmaOS integration for Receipt: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-receipt"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Receipt"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-recipe"
+description = "SigmaOS integration for Recipe: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-recipe"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Recipe"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-recruitment"
+description = "SigmaOS integration for Recruitment: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-recruitment"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Recruitment"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-reduced-motion"
+description = "SigmaOS integration for Reduced Motion: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-reduced-motion"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Reduced Motion"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-report"
+description = "SigmaOS integration for Report: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-report"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Report"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-retro"
+description = "SigmaOS integration for Retro theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-retro"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Retro theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-review"
+description = "SigmaOS integration for Review: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-review"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Review"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-roboto"
+description = "SigmaOS integration for Roboto font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-roboto"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Roboto font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-rose-pine"
+description = "SigmaOS integration for Rose Pine theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-rose-pine"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Rose Pine theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-screen-time"
+description = "SigmaOS integration for Screen time: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-screen-time"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Screen time"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-screenrecord"
+description = "SigmaOS integration for SigmaOS screen recorder: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-screenrecord"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS screen recorder"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-screensaver"
+description = "SigmaOS integration for SigmaOS screensaver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-screensaver"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS screensaver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-screenshot"
+description = "SigmaOS integration for SigmaOS screenshot: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-screenshot"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS screenshot"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-senior"
+description = "SigmaOS integration for Senior theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-senior"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Senior theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-shopping"
+description = "SigmaOS integration for Shopping: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-shopping"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Shopping"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-sleep"
+description = "SigmaOS integration for Sleep: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-sleep"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Sleep"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-sonokai"
+description = "SigmaOS integration for Sonokai theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-sonokai"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Sonokai theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-source-code-pro"
+description = "SigmaOS integration for Source Code Pro font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-source-code-pro"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Source Code Pro font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-spring"
+description = "SigmaOS integration for Spring theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-spring"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Spring theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-summer"
+description = "SigmaOS integration for Summer theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-summer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Summer theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-sunrise"
+description = "SigmaOS integration for Sunrise theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-sunrise"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Sunrise theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-sunset"
+description = "SigmaOS integration for Sunset theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-sunset"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Sunset theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-synthwave"
+description = "SigmaOS integration for Synthwave theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-synthwave"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Synthwave theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-tax"
+description = "SigmaOS integration for Tax: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-tax"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Tax"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-tela"
+description = "SigmaOS integration for Tela icon theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-tela"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Tela icon theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-theme"
+description = "SigmaOS integration for SigmaOS theme manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-theme"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS theme manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-time-tracking"
+description = "SigmaOS integration for Time tracking: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-time-tracking"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Time tracking"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-tokyo-night"
+description = "SigmaOS integration for Tokyo Night theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-tokyo-night"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Tokyo Night theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-ubuntu"
+description = "SigmaOS integration for Ubuntu font: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-ubuntu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ubuntu font"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-udiskie"
+description = "SigmaOS integration for SigmaOS disk automount: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-udiskie"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS disk automount"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-vaporwave"
+description = "SigmaOS integration for Vaporwave theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-vaporwave"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Vaporwave theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-vision"
+description = "SigmaOS integration for Vision theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-vision"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Vision theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-volume"
+description = "SigmaOS integration for SigmaOS volume control: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-volume"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS volume control"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-wallpaper"
+description = "SigmaOS integration for SigmaOS wallpaper: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-wallpaper"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS wallpaper"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-warehouse"
+description = "SigmaOS integration for Warehouse: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-warehouse"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Warehouse"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-wifi-menu"
+description = "SigmaOS integration for SigmaOS WiFi menu: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-wifi-menu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SigmaOS WiFi menu"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-winter"
+description = "SigmaOS integration for Winter theme: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-winter"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Winter theme"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-workflow"
+description = "SigmaOS integration for Workflow: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-workflow"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Workflow"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-workout"
+description = "SigmaOS integration for Workout: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-workout"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Workout"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-yoga"
+description = "SigmaOS integration for Yoga: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-yoga"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Yoga"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigmaos-zapier"
+description = "SigmaOS integration for Zapier: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigmaos-zapier"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Zapier"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-suspend"
+description = "SigmaOS integration for System suspend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-suspend"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "System suspend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-switch-user"
+description = "SigmaOS integration for User switch: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-switch-user"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "User switch"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-theme-switcher"
+description = "SigmaOS integration for Theme switcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-switcher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Theme switcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wallpaper-switcher"
+description = "SigmaOS integration for Wallpaper switcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper-switcher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Wallpaper switcher"
 visibility = "public"
 depends_on = []
