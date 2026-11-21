@@ -2159,17 +2159,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-translations"
-description = "Mint translations component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-translations"
-engine = "translations"
-category = "Documentation"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-nemo"
 description = "Nemo file manager component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nemo"
@@ -6669,17 +6658,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-arch-packages"
-description = "Arch packages compatibility component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-packages"
-engine = "package_manager"
-category = "Package Management"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-cinnamon"
 description = "Cinnamon desktop component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon"
@@ -6697,28 +6675,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timeshift"
 engine = "snapshot"
 category = "Utilities"
 language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-drivers"
-description = "Driver manager component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers"
-engine = "driver_manager"
-category = "Drivers & Hardware"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-tools"
-description = "Mint tools component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-tools"
-engine = "utilities"
-category = "Utilities"
-language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -6911,17 +6867,6 @@ visibility = "public"
 depends_on = ["SigmaOS-desktop", "SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-arch-keyring"
-description = "Arch Linux keyring integration for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-keyring"
-engine = "keyring"
-category = "Utilities"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-pacman-contrib"
 description = "Pacman contrib tools with ALPM version checks, cache pruning, and SHA-256 PKGBUILD checksums"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman-contrib"
@@ -6953,17 +6898,6 @@ language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-systemd-units"
-description = "Custom systemd units for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-systemd-units"
-engine = "systemd_units"
-category = "System Services"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-mint-auto-mounter"
@@ -7049,17 +6983,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-look"
 engine = "system_config"
 category = "System Services"
 language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-kernel-headers"
-description = "Arch Linux kernel headers for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel-headers"
-engine = "kernel_headers"
-category = "System Services"
-language = "c"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -7241,17 +7164,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-arch-documentation"
-description = "Documentation for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-documentation"
-engine = "doc_generator"
-category = "Documentation"
-language = "markdown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-community-portal"
 description = "Community component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-community-portal"
@@ -7269,17 +7181,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers-extra"
 engine = "driver_manager"
 category = "Drivers & Hardware"
 language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-driver"
-description = "Arch Linux driver for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-driver"
-engine = "driver"
-category = "Drivers & Hardware"
-language = "c"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -7313,17 +7214,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-logger"
 engine = "logger"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-help-center"
-description = "Help center for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-center"
-engine = "support_system"
-category = "System Services"
-language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -7450,17 +7340,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-mint-packages"
-description = "Packages manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-packages"
-engine = "package_manager"
-category = "Package Management"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-packages-full"
 description = "Full packages list for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-packages-full"
@@ -7478,28 +7357,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-cleaner"
 engine = "cleaner"
 category = "Utilities"
 language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-disk-utility"
-description = "Disk utility for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-disk-utility"
-engine = "disk_tool"
-category = "Developer Tools"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-disk"
-description = "Disk manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disk"
-engine = "disk_manager"
-category = "Utilities"
-language = "c"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -7753,17 +7610,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-graphics-renderer"
 engine = "graphics_renderer"
 category = "Drivers & Hardware"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-mint-package-manager"
-description = "Package manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-manager"
-engine = "package_manager"
-category = "Package Management"
-language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8187,39 +8033,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-fedora-system-monitor"
-description = "System Monitor for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-system-monitor"
-engine = "system_monitor"
-category = "System Services"
-language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-package-manager"
-description = "Package Manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-manager"
-engine = "package_manager"
-category = "Package Management"
-language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-fedora-package-manager"
-description = "Package Manager for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-package-manager"
-engine = "package_manager"
-category = "Package Management"
-language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-printer-manager"
 description = "Printer queue and driver manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-printer-manager"
@@ -8383,17 +8196,6 @@ language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-arch-disk-utility"
-description = "Disk Utility for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disk-utility"
-engine = "disk_utility"
-category = "Utilities"
-language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-kernel-builder"
@@ -11511,16 +11313,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-appimage"
-description = "No GitHub description is set; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-appimage"
-engine = "image_graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-ash"
 description = "No GitHub description is set; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ash"
@@ -11556,16 +11348,6 @@ description = "GitHub description is a placeholder; component scope remains uncl
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-binaryen"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-binutils"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-binutils"
-engine = "compiler_toolchain"
-category = "Compilers"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -11671,16 +11453,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-community"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-community"
-engine = "gui_toolkit"
-category = "GUI Frameworks"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-compilation"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-compilation"
@@ -11691,39 +11463,9 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-compiler"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-compiler"
-engine = "compiler_toolchain"
-category = "Compilers"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-config"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-config"
-engine = "cloud_provider"
-category = "Cloud"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-conflicts"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-conflicts"
-engine = "messaging"
-category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-core"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-core"
 engine = "messaging"
 category = "Messaging"
 language = "rust"
@@ -11901,16 +11643,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-gcc"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-gcc"
-engine = "compiler_toolchain"
-category = "Compilers"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-go"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-go"
@@ -11981,16 +11713,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-java"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-java"
-engine = "language_runtime"
-category = "Languages"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-kotlin"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kotlin"
@@ -12016,16 +11738,6 @@ description = "GitHub description is a placeholder; component scope remains uncl
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-list"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-llvm"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-llvm"
-engine = "compiler_toolchain"
-category = "Compilers"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -12064,16 +11776,6 @@ depends_on = []
 name = "SigmaOS-arch-signoff"
 description = "SigmaOS arch-signoff component (Arch Linux inspired)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-signoff"
-engine = "messaging"
-category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-tools"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-tools"
 engine = "messaging"
 category = "Messaging"
 language = "rust"
@@ -22398,52 +22100,9 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-lxc"
-description = "LXC container management interface with lifecycle and configuration"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lxc"
-engine = "container_runtime"
-category = "Containers"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-lxd"
-description = "SigmaOS SigmaOS-arch-lxd component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lxd"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-make"
-description = "SigmaOS SigmaOS-arch-make component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-make"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-meson"
 description = "SigmaOS SigmaOS-arch-meson component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-meson"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-mirror"
-description = "SigmaOS SigmaOS-arch-mirror component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mirror"
 engine = "component"
 category = "Components"
 language = "rust"
@@ -22573,17 +22232,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-podman"
-description = "SigmaOS SigmaOS-arch-podman component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-podman"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-power-shell"
 description = "PowerShell-like command interpreter with cmdlets and pipeline execution"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power-shell"
@@ -22653,39 +22301,6 @@ depends_on = []
 name = "SigmaOS-arch-react-native"
 description = "SigmaOS SigmaOS-arch-react-native component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-react-native"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-reflector"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-reflector"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-refresh"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-refresh"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-release"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-release"
 engine = "component"
 category = "Components"
 language = "rust"
