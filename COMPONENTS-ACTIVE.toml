@@ -705,3 +705,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmadiskusage"]
+
+[[component]]
+name = "SigmaOS-security-audit"
+description = "Security audit & compliance (scanning, vulnerability detection, reporting)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security-audit.git"
+engine = "security-audit"
+category = "Security"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasecurityaudit"]
