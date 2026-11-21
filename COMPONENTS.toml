@@ -916,17 +916,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-draw2"
-description = "Vector drawing app"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-draw2"
-engine = "draw"
-category = "Creative"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-bluetooth"
 description = "Bluetooth adapter & device manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bluetooth"
@@ -1629,17 +1618,6 @@ language = "shell"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-indicator-sound2"
-description = "Sound indicator alt"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-indicator-sound2"
-engine = "indicator_sound"
-category = "Desktop/UI"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-desktop", "SigmaOS-system"]
 
 [[component]]
 name = "SigmaOS-aether.nvim"
@@ -4535,17 +4513,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-image-viewer-2"
-description = "Image viewer 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-image-viewer-2"
-engine = "media_player"
-category = "Creative"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-productivity"
 description = "Productivity component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-productivity"
@@ -4573,83 +4540,6 @@ description = "System utility component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-utility"
 engine = "system_core"
 category = "System Services"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-file-utility-2"
-description = "File utility 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-utility-2"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-network-utility-2"
-description = "Network utility 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-utility-2"
-engine = "net_core"
-category = "Network"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-security-utility-2"
-description = "Security utility 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security-utility-2"
-engine = "security_core"
-category = "Security"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-power-utility-2"
-description = "Power utility 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-utility-2"
-engine = "power_manager"
-category = "System Services"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-display-utility-2"
-description = "Display utility 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-display-utility-2"
-engine = "greeter"
-category = "Desktop/UI"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-input-utility-2"
-description = "Input utility 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-input-utility-2"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-output-utility-2"
-description = "Output utility 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-output-utility-2"
-engine = "common_lib"
-category = "Developer Tools"
 language = "unknown"
 inspirations = "None"
 visibility = "public"
@@ -6020,17 +5910,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-network-manager-2"
-description = "Network manager 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-manager-2"
-engine = "net_core"
-category = "Network"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-network-config"
 description = "Network config component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-config"
@@ -6133,39 +6012,6 @@ depends_on = ["SigmaOS-system"]
 name = "SigmaOS-tool-call"
 description = "Tool call component for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tool-call"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-system-apis-2"
-description = "System APIs 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-apis-2"
-engine = "system_core"
-category = "System Services"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-framework-apis-2"
-description = "Framework APIs 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-framework-apis-2"
-engine = "common_lib"
-category = "Developer Tools"
-language = "unknown"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-application-apis-2"
-description = "Application APIs 2 component for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-application-apis-2"
 engine = "common_lib"
 category = "Developer Tools"
 language = "unknown"
@@ -15341,16 +15187,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-grub2"
-description = "GRand Unified Bootloader model"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grub2"
-engine = "boot"
-category = "Boot"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-GTK-"
 description = "GitHub repository has no published branch; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-GTK-"
@@ -18021,61 +17857,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-libdl2"
-description = "Libdl library compatibility layer with dynamic loading"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libdl2"
-engine = "Rust"
-category = "GNU Tools"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-libm2"
-description = "Libm library compatibility layer with math functions"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libm2"
-engine = "Rust"
-category = "GNU Tools"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-librt2"
-description = "Librt library compatibility layer with real-time extensions"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-librt2"
-engine = "Rust"
-category = "GNU Tools"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-libcrypt2"
-description = "Libcrypt library compatibility layer with cryptographic functions"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libcrypt2"
-engine = "Rust"
-category = "GNU Tools"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-libnss2"
-description = "Libnss library compatibility layer with name service switch"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libnss2"
-engine = "Rust"
-category = "GNU Tools"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-libstdc2"
 description = "Libstdc++ library compatibility layer with C++ standard library"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libstdc2"
@@ -18318,17 +18099,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-onlyoffice2"
-description = "OnlyOffice compatibility layer for SigmaOS with document, spreadsheet, and presentation management"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onlyoffice2"
-engine = "Rust"
-category = "Office"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-rdbms"
 description = "RDBMS compatibility layer for SigmaOS with database management and query execution"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rdbms"
@@ -18406,17 +18176,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-redis2"
-description = "Redis in-memory data store compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-redis2"
-engine = "Rust"
-category = "Database"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-qt3"
 description = "Qt GUI framework compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qt3"
@@ -18439,31 +18198,9 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-electron2"
-description = "Electron application framework compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-electron2"
-engine = "Rust"
-category = "Application Framework"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-tauri"
 description = "Tauri application framework compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tauri"
-engine = "Rust"
-category = "Application Framework"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-react-native2"
-description = "React Native mobile framework compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-react-native2"
 engine = "Rust"
 category = "Application Framework"
 languages = ["Rust"]
@@ -18758,64 +18495,9 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-inkscape2"
-description = "Inkscape vector editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-inkscape2"
-engine = "Rust"
-category = "Creative"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-krita2"
-description = "Krita digital painting compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-krita2"
-engine = "Rust"
-category = "Creative"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-obs-studio2"
-description = "OBS Studio screen recorder compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-obs-studio2"
-engine = "Rust"
-category = "Creative"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-handbrake2"
-description = "HandBrake media converter compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-handbrake2"
-engine = "Rust"
-category = "Creative"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-shotcut2"
 description = "Shotcut video editor compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shotcut2"
-engine = "Rust"
-category = "Creative"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-kdenlive2"
-description = "Kdenlive video editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kdenlive2"
 engine = "Rust"
 category = "Creative"
 languages = ["Rust"]
@@ -19220,17 +18902,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-thunderbird2"
-description = "Thunderbird email client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thunderbird2"
-engine = "Rust"
-category = "Collaboration"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-evolution2"
 description = "Evolution email client compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-evolution2"
@@ -19258,28 +18929,6 @@ description = "Asana project management compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asana2"
 engine = "Rust"
 category = "Collaboration"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-calibre2"
-description = "Calibre e-book manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calibre2"
-engine = "Rust"
-category = "Utilities"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-zotero2"
-description = "Zotero reference manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zotero2"
-engine = "Rust"
-category = "Utilities"
 languages = ["Rust"]
 dependencies = []
 public = true
@@ -19322,17 +18971,6 @@ inspirations = "None"
 name = "SigmaOS-translate2"
 description = "Translate translation compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-translate2"
-engine = "Rust"
-category = "Utilities"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-calculator2"
-description = "Calculator calculator compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calculator2"
 engine = "Rust"
 category = "Utilities"
 languages = ["Rust"]
@@ -19396,119 +19034,9 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-file-manager2"
-description = "File Manager file manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-archive-manager2"
-description = "Archive Manager archive manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archive-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-disk-manager2"
 description = "Disk Manager disk manager compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-disk-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-process-manager2"
-description = "Process Manager process manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-process-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-task-manager2"
-description = "Task Manager task manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-task-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-system-monitor2"
-description = "System Monitor system monitor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-monitor2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-bluetooth-manager2"
-description = "Bluetooth Manager bluetooth manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bluetooth-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-printer-manager2"
-description = "Printer Manager printer manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-printer-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-display-manager2"
-description = "Display Manager display manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-display-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-session-manager3"
-description = "Session Manager session manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-manager3"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-window-manager2"
-description = "Window Manager window manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-window-manager2"
 engine = "Rust"
 category = "System"
 languages = ["Rust"]
@@ -19572,77 +19100,11 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-font-manager2"
-description = "Font Manager font manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-font-manager2"
-engine = "Rust"
-category = "Customization"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-icon-theme2"
-description = "Icon Theme icon theme compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-icon-theme2"
-engine = "Rust"
-category = "Customization"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-cursor-theme2"
-description = "Cursor Theme cursor theme compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cursor-theme2"
-engine = "Rust"
-category = "Customization"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-wallpaper-manager2"
 description = "Wallpaper Manager wallpaper manager compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper-manager2"
 engine = "Rust"
 category = "Customization"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-color-picker2"
-description = "Color Picker color picker compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-color-picker2"
-engine = "Rust"
-category = "Customization"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-screenshot-tool2"
-description = "Screenshot Tool screenshot tool compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screenshot-tool2"
-engine = "Rust"
-category = "Accessibility"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-screen-recorder2"
-description = "Screen Recorder screen recorder compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-recorder2"
-engine = "Rust"
-category = "Accessibility"
 languages = ["Rust"]
 dependencies = []
 public = true
@@ -19682,66 +19144,11 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-module-manager2"
-description = "Module Manager module manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-module-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-kernel-manager2"
-description = "Kernel Manager kernel manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-package-manager2"
-description = "Package Manager package manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-package-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-software-updater2"
 description = "Software Updater software updater compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-updater2"
 engine = "Rust"
 category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-flatpak-manager2"
-description = "Flatpak Manager flatpak manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flatpak-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-virtualbox2"
-description = "VirtualBox virtualization compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virtualbox2"
-engine = "Rust"
-category = "Virtualization"
 languages = ["Rust"]
 dependencies = []
 public = true
@@ -19872,28 +19279,6 @@ inspirations = "None"
 name = "SigmaOS-security-scanner2"
 description = "Security Scanner security scanner compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security-scanner2"
-engine = "Rust"
-category = "Security"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-antivirus2"
-description = "Antivirus antivirus compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-antivirus2"
-engine = "Rust"
-category = "Security"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-firewall2"
-description = "Firewall firewall compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firewall2"
 engine = "Rust"
 category = "Security"
 languages = ["Rust"]
@@ -20430,31 +19815,9 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-ash2"
-description = "Ash Vulkan runtime compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ash2"
-engine = "Rust"
-category = "Runtime"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-java"
 description = "Java runtime compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-java"
-engine = "Rust"
-category = "Runtime"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
-name = "SigmaOS-kotlin2"
-description = "Kotlin runtime compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kotlin2"
 engine = "Rust"
 category = "Runtime"
 languages = ["Rust"]
