@@ -669,3 +669,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaservicemanager3"]
+
+[[component]]
+name = "SigmaOS-microphone"
+description = "Microphone management (ALSA/PulseAudio input devices, capture)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-microphone.git"
+engine = "microphone"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmamicrophone"]
