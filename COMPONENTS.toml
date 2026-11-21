@@ -9155,17 +9155,6 @@ canonical_branch = "main"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-arch-kernel"
-description = "A Rust library collecting kernel and Arch Linux inspired mechanisms, including a KUnit-style expectation runner, package transaction and dependency models, advisory tracking, signing policy models, initramfs hook configuration, rebuild ordering, package signoff, and reproducible-build records."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel"
-engine = "kernel_core"
-category = "System Services"
-language = "rust"
-visibility = "public"
-canonical_branch = "main"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-audio"
 description = "An evolving Rust audio library exposing AudioManager and modules for audio graphs, codec and driver abstractions, ALSA/PipeWire related types, podcast data, editing effects, and audio routing."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-audio"
@@ -11522,66 +11511,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-3d-kernel"
-description = "No GitHub description is set; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-3d-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-ai-kernel"
-description = "No GitHub description is set; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ai-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-ambient-occlusion-kernel"
-description = "No GitHub description is set; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ambient-occlusion-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-anisotropic-filtering-kernel"
-description = "No GitHub description is set; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-anisotropic-filtering-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-anonymity-kernel"
-description = "No GitHub description is set; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-anonymity-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-anti-aliasing-kernel"
-description = "No GitHub description is set; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-anti-aliasing-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-appimage"
 description = "No GitHub description is set; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-appimage"
@@ -11607,16 +11536,6 @@ description = "GitHub description is a placeholder; component scope remains uncl
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-assembly"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-augmented-reality-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-augmented-reality-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -11652,51 +11571,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-bitcoin-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bitcoin-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-blockchain-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-blockchain-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-boxes"
 description = "SigmaOS arch-boxes component (Arch Linux inspired)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-boxes"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-brave-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-brave-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-browser-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-browser-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -11732,16 +11611,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-bump-mapping-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bump-mapping-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-bundler"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bundler"
@@ -11757,16 +11626,6 @@ description = "GitHub description is a placeholder; component scope remains uncl
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-c"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-censorship-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-censorship-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -11792,41 +11651,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-chromium-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-chromium-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-clang"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-clang"
 engine = "compiler_toolchain"
 category = "Compilers"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-cloud-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cloud-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-cluster-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cluster-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -11872,16 +11701,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-compute-shader-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-compute-shader-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-config"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-config"
@@ -11922,16 +11741,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-cryptocurrency-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cryptocurrency-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-csh"
 description = "C shell command interpreter with parsing, history, and basic command execution"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-csh"
@@ -11942,71 +11751,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-cuda-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cuda-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-custom-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-custom-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-dao-kernel"
-description = "DAO kernel with data access abstraction, CRUD operations, and transactions"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dao-kernel"
-engine = "data_layer"
-category = "Data"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-dart"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dart"
 engine = "language_runtime"
 category = "Languages"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-decentralization-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-decentralization-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-default-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-default-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-defi-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-defi-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -12032,81 +11781,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-desktop-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-desktop-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-directx-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-directx-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-directx-shader-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-directx-shader-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-displacement-mapping-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-displacement-mapping-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-distributed-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-distributed-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-distribution"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-distribution"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-dl-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dl-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-edge-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-edge-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -12132,31 +11811,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-embedded-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-embedded-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-emscripten"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-emscripten"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-encryption-kernel"
-description = "Kernel-level encryption framework with key management and cipher operations"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-encryption-kernel"
-engine = "crypto"
-category = "Security"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -12192,16 +11851,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-ethereum-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ethereum-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-experimental"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-experimental"
@@ -12212,31 +11861,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-extended-reality-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-extended-reality-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-extra"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-extra"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-firefox-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-firefox-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -12272,26 +11901,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-fragment-shader-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-fragment-shader-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-freedom-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-freedom-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-gcc"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-gcc"
@@ -12302,51 +11911,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-geometry-shader-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-geometry-shader-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-global-illumination-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-global-illumination-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-glsl-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-glsl-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-go"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-go"
 engine = "compiler_toolchain"
 category = "Compilers"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-graphics-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-graphics-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -12372,41 +11941,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-hardened-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-hardened-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-haskell"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-haskell"
 engine = "language_runtime"
 category = "Languages"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-hlsl-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-hlsl-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-hpc-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-hpc-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -12432,16 +11971,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-iot-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-iot-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-iso"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-iso"
@@ -12462,31 +11991,11 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-javascript-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-javascript-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-kotlin"
 description = "GitHub description is a placeholder; component scope remains unclassified."
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kotlin"
 engine = "language_runtime"
 category = "Languages"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-laptop-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-laptop-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -12547,106 +12056,6 @@ description = "SigmaOS arch-repro-status component (Arch Linux inspired)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repro-status"
 engine = "messaging"
 category = "Messaging"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-funding-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-funding-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-futuristic-inspired-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-futuristic-inspired-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-fuzzer-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-fuzzer-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-gagan-kernel"
-description = "Gagan shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-gagan-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-genealogy-kernel"
-description = "Genealogy shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-genealogy-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-genetic-learning-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-genetic-learning-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-genus-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-genus-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-gnss-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-gnss-kernel"
-engine = "kernel_core"
-category = "Kernel"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-government-kernel"
-description = "Government kernel shader management with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-government-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-gps-kernel"
-description = "GitHub description is a placeholder; component scope remains unclassified."
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-gps-kernel"
-engine = "kernel_core"
-category = "Kernel"
 language = "rust"
 visibility = "public"
 depends_on = []
@@ -22978,31 +22387,9 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-low-latency-kernel"
-description = "SigmaOS SigmaOS-arch-low-latency-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-low-latency-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-lts"
 description = "SigmaOS SigmaOS-arch-lts component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lts"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-lts-kernel"
-description = "SigmaOS SigmaOS-arch-lts-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-lts-kernel"
 engine = "component"
 category = "Components"
 language = "rust"
@@ -23054,64 +22441,9 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-metal-kernel"
-description = "SigmaOS SigmaOS-arch-metal-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-metal-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-metal-shader-kernel"
-description = "SigmaOS SigmaOS-arch-metal-shader-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-metal-shader-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-metaverse-kernel"
-description = "SigmaOS SigmaOS-arch-metaverse-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-metaverse-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-mipmapping-kernel"
-description = "SigmaOS SigmaOS-arch-mipmapping-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mipmapping-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-mirror"
 description = "SigmaOS SigmaOS-arch-mirror component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mirror"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-mixed-reality-kernel"
-description = "SigmaOS SigmaOS-arch-mixed-reality-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mixed-reality-kernel"
 engine = "component"
 category = "Components"
 language = "rust"
@@ -23131,39 +22463,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-ml-kernel"
-description = "SigmaOS SigmaOS-arch-ml-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ml-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-mobile-kernel"
-description = "SigmaOS SigmaOS-arch-mobile-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mobile-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-msl-kernel"
-description = "SigmaOS SigmaOS-arch-msl-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-msl-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-multilib"
 description = "SigmaOS SigmaOS-arch-multilib component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-multilib"
@@ -23175,31 +22474,9 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-nft-kernel"
-description = "SigmaOS SigmaOS-arch-nft-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-nft-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-ninja"
 description = "SigmaOS SigmaOS-arch-ninja component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ninja"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-normal-mapping-kernel"
-description = "SigmaOS SigmaOS-arch-normal-mapping-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-normal-mapping-kernel"
 engine = "component"
 category = "Components"
 language = "rust"
@@ -23230,53 +22507,9 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-opencl-kernel"
-description = "SigmaOS SigmaOS-arch-opencl-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-opencl-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-opengl-kernel"
-description = "SigmaOS SigmaOS-arch-opengl-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-opengl-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-opera-kernel"
-description = "SigmaOS SigmaOS-arch-opera-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-opera-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-optimization"
 description = "SigmaOS SigmaOS-arch-optimization component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-optimization"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-optimized-kernel"
-description = "SigmaOS SigmaOS-arch-optimized-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-optimized-kernel"
 engine = "component"
 category = "Components"
 language = "rust"
@@ -23318,75 +22551,9 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-parallax-mapping-kernel"
-description = "SigmaOS SigmaOS-arch-parallax-mapping-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-parallax-mapping-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-patched-kernel"
-description = "SigmaOS SigmaOS-arch-patched-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-patched-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-path-tracing-kernel"
-description = "SigmaOS SigmaOS-arch-path-tracing-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-path-tracing-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-peer-to-peer-kernel"
-description = "SigmaOS SigmaOS-arch-peer-to-peer-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-peer-to-peer-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-performance-kernel"
-description = "SigmaOS SigmaOS-arch-performance-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-perl"
 description = "SigmaOS SigmaOS-arch-perl component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-perl"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-photon-mapping-kernel"
-description = "SigmaOS SigmaOS-arch-photon-mapping-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-photon-mapping-kernel"
 engine = "component"
 category = "Components"
 language = "rust"
@@ -23428,17 +22595,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-privacy-kernel"
-description = "SigmaOS SigmaOS-arch-privacy-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-privacy-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-profile"
 description = "System profiling tool collecting CPU, memory, disk, OS, and hardware information"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-profile"
@@ -23472,17 +22628,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-quantum-kernel"
-description = "SigmaOS SigmaOS-arch-quantum-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-quantum-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-query"
 description = "Package metadata query engine with name, description, and dependency search"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-query"
@@ -23505,17 +22650,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-ray-tracing-kernel"
-description = "SigmaOS SigmaOS-arch-ray-tracing-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-ray-tracing-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-react-native"
 description = "SigmaOS SigmaOS-arch-react-native component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-react-native"
@@ -23527,42 +22661,9 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-realtime-kernel"
-description = "SigmaOS SigmaOS-arch-realtime-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-realtime-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-reflections-kernel"
-description = "SigmaOS SigmaOS-arch-reflections-kernel component"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-reflections-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-reflector"
 description = "SigmaOS component repository"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-reflector"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-refractions-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-refractions-kernel"
 engine = "component"
 category = "Components"
 language = "rust"
@@ -23593,17 +22694,6 @@ visibility = "public"
 depends_on = []
 
 [[component]]
-name = "SigmaOS-arch-rendering-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rendering-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
 name = "SigmaOS-arch-replaces"
 description = "SigmaOS component repository"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-replaces"
@@ -23618,17 +22708,6 @@ depends_on = []
 name = "SigmaOS-arch-repository"
 description = "Package repository management with sync operations and package queries"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repository"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-rocm-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rocm-kernel"
 engine = "component"
 category = "Components"
 language = "rust"
@@ -23662,351 +22741,6 @@ depends_on = []
 name = "SigmaOS-arch-rust"
 description = "SigmaOS component repository"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rust"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-safari-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-safari-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-security-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-security-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-server-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-server-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-accountability-kernel"
-description = "Accountability shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-accountability-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-accountable-learning-kernel"
-description = "Accountable learning shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-accountable-learning-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-accreditation-kernel"
-description = "Accreditation shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-accreditation-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-accuracy-kernel"
-description = "Accuracy shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-accuracy-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-acquisitions-kernel"
-description = "Acquisitions shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-acquisitions-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-active-learning-kernel"
-description = "Active learning shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-active-learning-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-actuator-kernel"
-description = "Actuator shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-actuator-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-adaptability-kernel"
-description = "Adaptability shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-adaptability-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-adaptation-inspired-kernel"
-description = "Adaptation inspired shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-adaptation-inspired-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-administration-kernel"
-description = "Administration shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-administration-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-adversarial-learning-kernel"
-description = "Adversarial learning shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-adversarial-learning-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-agency-kernel"
-description = "Agency shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-agency-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-ai-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-ai-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-allegory-inspired-kernel"
-description = "Allegory inspired shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-allegory-inspired-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-alliance-kernel"
-description = "Alliance shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-alliance-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-alliances-kernel"
-description = "Alliances shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-alliances-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-allusion-inspired-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-allusion-inspired-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-analysis-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-analysis-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-analytics-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-analytics-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-analyzer-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-analyzer-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-animal-behavior-kernel"
-description = "Animal behavior shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-animal-behavior-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-anonymous-learning-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-anonymous-learning-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-ant-colony-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-ant-colony-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-anti-patterns-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-anti-patterns-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-antithesis-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-antithesis-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-api-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-api-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-apprenticeships-kernel"
-description = "Apprenticeships shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-apprenticeships-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-architecture-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-architecture-kernel"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-audit-kernel"
-description = "Audit shader kernel with compilation and rendering pipeline"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-audit-kernel"
-engine = "graphics"
-category = "Graphics"
-language = "rust"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-arch-shader-auditability-kernel"
-description = "SigmaOS component repository"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shader-auditability-kernel"
 engine = "component"
 category = "Components"
 language = "rust"
