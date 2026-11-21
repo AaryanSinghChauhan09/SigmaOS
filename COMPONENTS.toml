@@ -30670,3 +30670,383 @@ language = "shell"
 inspirations = "Yakuake drop-down terminal"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-apprise"
+description = "SigmaOS integration for Apprise notifications: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apprise"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apprise notifications"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-beeper"
+description = "SigmaOS integration for Beeper unified chat: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-beeper"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Beeper unified chat"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-bulksms"
+description = "SigmaOS integration for BulkSMS CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bulksms"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "BulkSMS CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-centerim"
+description = "SigmaOS integration for CenterIM IM client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-centerim"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "CenterIM IM client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-conduit"
+description = "SigmaOS integration for Conduit Matrix homeserver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-conduit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Conduit Matrix homeserver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dino"
+description = "SigmaOS integration for Dino XMPP client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dino"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Dino XMPP client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-discord-cli"
+description = "SigmaOS integration for Discord CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-discord-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Discord CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ejabberd"
+description = "SigmaOS integration for ejabberd XMPP server: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ejabberd"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ejabberd XMPP server"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-element-desktop"
+description = "SigmaOS integration for Element Matrix client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-element-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Element Matrix client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fractal"
+description = "SigmaOS integration for Fractal Matrix client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fractal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Fractal Matrix client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gajim"
+description = "SigmaOS integration for Gajim XMPP client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gajim"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Gajim XMPP client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gotify"
+description = "SigmaOS integration for Gotify push notifications: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gotify"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Gotify push notifications"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-heisenbridge"
+description = "SigmaOS integration for Heisenbridge Matrix bridge: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-heisenbridge"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Heisenbridge Matrix bridge"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-hexchat"
+description = "SigmaOS integration for HexChat IRC client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hexchat"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "HexChat IRC client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-jitsi-meet-element"
+description = "SigmaOS integration for Jitsi via Element: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jitsi-meet-element"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Jitsi via Element"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-matrix-synapse"
+description = "SigmaOS integration for Matrix Synapse server: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-matrix-synapse"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Matrix Synapse server"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mattermost-desktop"
+description = "SigmaOS integration for Mattermost desktop: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mattermost-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Mattermost desktop"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mautrix-telegram"
+description = "SigmaOS integration for mautrix Telegram bridge: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mautrix-telegram"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "mautrix Telegram bridge"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mautrix-whatsapp"
+description = "SigmaOS integration for mautrix WhatsApp bridge: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mautrix-whatsapp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "mautrix WhatsApp bridge"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-metronome"
+description = "SigmaOS integration for Metronome XMPP server: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-metronome"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Metronome XMPP server"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ntfy"
+description = "SigmaOS integration for ntfy push notifications: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ntfy"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ntfy push notifications"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pidgin"
+description = "SigmaOS integration for Pidgin multi-protocol IM: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pidgin"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pidgin multi-protocol IM"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-prosody"
+description = "SigmaOS integration for Prosody XMPP server: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-prosody"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Prosody XMPP server"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-psi-plus"
+description = "SigmaOS integration for Psi+ XMPP client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-psi-plus"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Psi+ XMPP client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-quassel"
+description = "SigmaOS integration for Quassel IRC client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quassel"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Quassel IRC client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-riot-desktop"
+description = "SigmaOS integration for Element (Riot) client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-riot-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Element (Riot) client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-signal-cli"
+description = "SigmaOS integration for Signal CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-signal-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Signal CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-signal-desktop"
+description = "SigmaOS integration for Signal messenger: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-signal-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Signal messenger"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-slidge"
+description = "SigmaOS integration for Slidge Matrix bridges: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slidge"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Slidge Matrix bridges"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-telegram-bot-api"
+description = "SigmaOS integration for Telegram Bot API: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-telegram-bot-api"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Telegram Bot API"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-telegram-cli"
+description = "SigmaOS integration for Telegram CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-telegram-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Telegram CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-telegram-desktop"
+description = "SigmaOS integration for Telegram Desktop: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-telegram-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Telegram Desktop"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-texts"
+description = "SigmaOS integration for Texts messaging app: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-texts"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Texts messaging app"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-webex"
+description = "SigmaOS integration for Webex client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webex"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Webex client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-weechat"
+description = "SigmaOS integration for WeeChat terminal IRC: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-weechat"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WeeChat terminal IRC"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-whatsapp-cli"
+description = "SigmaOS integration for WhatsApp CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-whatsapp-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WhatsApp CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-whatsapp-desktop"
+description = "SigmaOS integration for WhatsApp Linux app: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-whatsapp-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WhatsApp Linux app"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-zulip-desktop"
+description = "SigmaOS integration for Zulip desktop: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zulip-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Zulip desktop"
+visibility = "public"
+depends_on = []
