@@ -525,3 +525,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaarchivemanager"]
+
+[[component]]
+name = "SigmaOS-webcam"
+description = "Webcam management (V4L2 discovery, capture, camera control)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webcam.git"
+engine = "webcam"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmawebcam"]
