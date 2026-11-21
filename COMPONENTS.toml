@@ -2247,44 +2247,11 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-audio-tuner"
-description = "Audio tuning and equalizer profiles"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio-tuner"
-engine = "audio_tuner"
-category = "System Services"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-lazyvim"
 description = "Neovim/LazyVim config manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-lazyvim"
 engine = "nvim_distro"
 category = "Developer Tools"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-plugin-marketplace"
-description = "Plugin catalog, install, and update"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-plugin-marketplace"
-engine = "theme_marketplace"
-category = "Desktop/UI"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-plugin-registry"
-description = "Plugin metadata and dependency resolver"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-plugin-registry"
-engine = "try_live"
-category = "Utilities"
 language = "rust"
 inspirations = "None"
 visibility = "public"
@@ -6999,17 +6966,6 @@ visibility = "public"
 depends_on = ["SigmaOS-desktop", "SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-module-loader"
-description = "Kernel/user module discovery and loading manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-module-loader"
-engine = "module_loader"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-keyring"
 description = "Arch Linux keyring integration for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-keyring"
@@ -7467,17 +7423,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme-collection"
 engine = "theme_manager"
 category = "Desktop/UI"
 language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-omarchy-theme"
-description = "Theme manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-theme"
-engine = "theme_manager"
-category = "Desktop/UI"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = []
@@ -7956,17 +7901,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-dev-tools"
-description = "Development toolchain manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dev-tools"
-engine = "dev_tools"
-category = "Developer Tools"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-dev-tools"
 description = "Development tools for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dev-tools"
@@ -8066,17 +8000,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-calculator"
-description = "Expression calculator with history"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-calculator"
-engine = " calculator"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-calculator"
 description = "Calculator for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-calculator"
@@ -8171,17 +8094,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-image-viewer"
 engine = " image_viewer"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-viewer"
-description = "Image viewer (formats, gallery, annotations)"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-viewer"
-engine = " image_viewer"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8347,17 +8259,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-log"
 engine = "log_viewer"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-update"
-description = "System update manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update"
-engine = "update_manager"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -9067,17 +8968,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-as"
-description = "AppStream software metadata catalog"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-as.git"
-engine = "appstream"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-as"
 description = "AppStream for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-as.git"
@@ -9584,17 +9474,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-at"
-description = "Accessibility settings manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-at.git"
-engine = "accessibility"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-at"
 description = "Accessibility tools for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-at.git"
@@ -9766,17 +9645,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-audio-recorder"
 engine = "audio_recorder"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-ar"
-description = "Audio recorder for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-ar.git"
-engine = "audio_recorder"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10156,17 +10024,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-terminal-text-effects"
-description = "Terminal ASCII art and text effects"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal-text-effects"
-engine = "text_effects"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-terminal-text-effects"
 description = "Terminal Text Effects for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal-text-effects"
@@ -10184,17 +10041,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drawing"
 engine = "drawing"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-drawing"
-description = "Vector drawing document engine"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-drawing"
-engine = "drawing"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10525,17 +10371,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service-manager"
 engine = "service_manager"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-log-viewer"
-description = "Structured log parser, filter, and viewer"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log-viewer"
-engine = "log_viewer"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10992,34 +10827,12 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-boot-manager"
-description = "Boot entry and bootloader manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-boot-manager"
-engine = "boot_manager"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-boot-manager"
 description = "Boot Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-boot-manager"
 engine = "boot_manager"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-disk-utility"
-description = "Disk usage, mounts, and health inspection"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disk-utility"
-engine = "disk_utility"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
