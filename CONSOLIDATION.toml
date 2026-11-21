@@ -263,7 +263,6 @@ consolidates = [
     "SigmaOS-audio",
     "SigmaOS-audio-tuner",
     "SigmaOS-indicator-sound",
-    "SigmaOS-indicator-sound2",
     "SigmaOS-player-library",
     "SigmaOS-radio-stream",
     "SigmaOS-reel",
@@ -283,7 +282,7 @@ upstream = ["native"]
 consolidates = [
     "SigmaOS-rdbms-apache",
     "SigmaOS-rdbms-dbearer",
-    "SigmaOS-dbeaver2",
+    "SigmaOS-dbeaver",
     "SigmaOS-rdbms-duckdb",
     "SigmaOS-rdbms-metabase",
     "SigmaOS-rdbms-postgresql",
