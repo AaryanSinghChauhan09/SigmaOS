@@ -168,7 +168,7 @@ provides = ["component"]
 
 [[component]]
 name = "SigmaOS-cache"
-description = "Cache manager for SigmaOS filesystem and memory operations"
+description = "Cache manager + system cache daemon: entries, TTL, eviction"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cache.git"
 engine = "cache"
 category = "storage"
@@ -176,7 +176,7 @@ language = "rust"
 inspirations = ["native"]
 visibility = "private"
 depends_on = []
-provides = ["component"]
+provides = ["sigmacachemanager2", "sigmacache"]
 
 [[component]]
 name = "SigmaOS-logrotation"
@@ -1053,3 +1053,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmait"]
+
+[[component]]
+name = "SigmaOS-defrag"
+description = "Disk defragmentation: jobs, extents, free-space consolidation"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-defrag.git"
+engine = "storage"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
