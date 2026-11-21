@@ -1089,3 +1089,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaani"]
+
+[[component]]
+name = "SigmaOS-craft-photo"
+description = "Photo editing/management: photos, albums, filters"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-photo.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaphoto"]
