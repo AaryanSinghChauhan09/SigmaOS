@@ -6,7 +6,47 @@ name = "SigmaOS"
 depends_on = []
 
 [[wire]]
+name = "SigmaOS-3d-renderer"
+depends_on = []
+
+[[wire]]
 name = "SigmaOS-ISO"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-acpi"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-archive-manager"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-auditd"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-backup-tool"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-bsd-ports"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-cache"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-cleaner"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-clipboard-manager"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-command"
 depends_on = []
 
 [[wire]]
@@ -14,12 +54,148 @@ name = "SigmaOS-compress"
 depends_on = []
 
 [[wire]]
+name = "SigmaOS-config"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-container"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-ani"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-art"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-cad"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-craftlibs"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-deck"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-effect"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-fig"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-film"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-font"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-grid"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-photo"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-print"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-craft-vector"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-cron"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-crypto"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-defrag"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-design"
+depends_on = []
+
+[[wire]]
 name = "SigmaOS-desktop"
 depends_on = ["SigmaOS-kernel", "SigmaOS-system"]
 
 [[wire]]
+name = "SigmaOS-device"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-dhcp-client"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-disk-usage"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-display"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-dns"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-driver-manager"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-event"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-file-manager"
+depends_on = []
+
+[[wire]]
 name = "SigmaOS-filesystem"
 depends_on = ["SigmaOS-kernel"]
+
+[[wire]]
+name = "SigmaOS-filesystem-manager"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-firewall"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-flatpak-manager2"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-fs"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-hardware"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-hibernation"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-http"
+depends_on = []
 
 [[wire]]
 name = "SigmaOS-hub"
@@ -30,7 +206,51 @@ name = "SigmaOS-installer"
 depends_on = ["SigmaOS-ISO", "SigmaOS-system"]
 
 [[wire]]
+name = "SigmaOS-integrity"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-jails"
+depends_on = []
+
+[[wire]]
 name = "SigmaOS-kernel"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-kernel-manager"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-keyboard-manager"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-launch"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-light"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-logrotation"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-menu"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-microphone"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-monitor"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-monitoring2"
 depends_on = []
 
 [[wire]]
@@ -38,18 +258,194 @@ name = "SigmaOS-network"
 depends_on = ["SigmaOS-kernel"]
 
 [[wire]]
+name = "SigmaOS-network-interface"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-network-manager2"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-nfs"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-ntp"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-package-manager2"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-package-updates"
+depends_on = []
+
+[[wire]]
 name = "SigmaOS-packages"
 depends_on = ["SigmaOS-system"]
+
+[[wire]]
+name = "SigmaOS-parted"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-pdf"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-perf-monitor"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-printing"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-process-monitor"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-recovery"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-refresh"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-remote"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-resource"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-restart"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-restore"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-samba"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-scanner-backend"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-search"
+depends_on = []
 
 [[wire]]
 name = "SigmaOS-security"
 depends_on = ["SigmaOS-kernel"]
 
 [[wire]]
+name = "SigmaOS-security-audit"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-security-core"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-servicemanager3"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-sigma-power"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-snap"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-sound"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-stall"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-storage"
+depends_on = []
+
+[[wire]]
 name = "SigmaOS-system"
 depends_on = ["SigmaOS-kernel"]
 
 [[wire]]
+name = "SigmaOS-system-info"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-system-monitor"
+depends_on = []
+
+[[wire]]
 name = "SigmaOS-system-tools"
 depends_on = ["SigmaOS-system"]
+
+[[wire]]
+name = "SigmaOS-systemd"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-systemd-fsck"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-task-automation"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-timer2"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-timeshift"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-toggle"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-trim"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-updatemanager2"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-user-manager"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-virtualization"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-voice"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-webcam"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-word-processor"
+depends_on = []
+
+[[wire]]
+name = "SigmaOS-zeromq"
+depends_on = []
 

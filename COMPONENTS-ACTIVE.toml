@@ -1305,3 +1305,39 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasysteminfo"]
+
+[[component]]
+name = "SigmaOS-trim"
+description = "SigmaOS SigmaOS-trim component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-trim.git"
+engine = "trim"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-nfs"
+description = "SigmaOS SigmaOS-nfs component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nfs.git"
+engine = "nfs"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
+
+[[component]]
+name = "SigmaOS-dns"
+description = "SigmaOS SigmaOS-dns component"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dns.git"
+engine = "dns"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["component"]
