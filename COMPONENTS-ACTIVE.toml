@@ -849,3 +849,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmastorage", "sigmadiskmanager"]
+
+[[component]]
+name = "SigmaOS-keyboard-manager"
+description = "Keyboard/input management: layouts, keybindings, input methods, shortcuts"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keyboard-manager.git"
+engine = "keyboard-manager"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmakeyboardmanager"]
+
+[[component]]
+name = "SigmaOS-system-tools"
+description = "System utilities: tool registry, maintenance tasks, cleanup actions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-tools.git"
+engine = "system-tools"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasystemtools"]
