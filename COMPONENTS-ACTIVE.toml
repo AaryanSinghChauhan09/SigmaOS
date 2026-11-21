@@ -909,3 +909,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmadesign"]
+
+[[component]]
+name = "SigmaOS-driver-manager"
+description = "Driver management: installation, updates, detection, hardware compatibility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-driver-manager.git"
+engine = "driver-manager"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmadrivermanager"]
