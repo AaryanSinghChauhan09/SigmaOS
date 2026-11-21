@@ -1173,3 +1173,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaprint2"]
+
+[[component]]
+name = "SigmaOS-craft-fig"
+description = "Diagram/figure: diagrams, layers, nodes, connectors"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-fig.git"
+engine = "creative_suite"
+category = "Office"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmafig"]
