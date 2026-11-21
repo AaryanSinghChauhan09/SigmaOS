@@ -693,3 +693,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmavoice"]
+
+[[component]]
+name = "SigmaOS-disk-usage"
+description = "Disk usage analysis (df/du-style filesystem monitoring, space reporting)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-disk-usage.git"
+engine = "disk-usage"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmadiskusage"]
