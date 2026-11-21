@@ -513,3 +513,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigma3d"]
+
+[[component]]
+name = "SigmaOS-archive-manager"
+description = "Archive management (create, extract, compress; tar/zip formats)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-archive-manager.git"
+engine = "archive-manager"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaarchivemanager"]
