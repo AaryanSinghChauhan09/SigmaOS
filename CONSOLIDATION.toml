@@ -165,8 +165,7 @@ consolidates = [
     "SigmaOS-desktop-session",
     "SigmaOS-display-manager",
     "SigmaOS-greeter",
-    "SigmaOS-session-manager",
-    "SigmaOS-session-manager2"
+    "SigmaOS-session-manager"
 ]
 provides = ["desktop-shell", "window-manager", "display-manager", "settings-daemon", "session-lifecycle"]
 
