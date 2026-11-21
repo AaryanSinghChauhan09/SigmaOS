@@ -31780,3 +31780,113 @@ language = "shell"
 inspirations = "Zed editor"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-ventoy"
+description = "SigmaOS integration for Ventoy USB multiboot: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ventoy"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ventoy USB multiboot"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-vinagre"
+description = "SigmaOS integration for Vinagre VNC viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vinagre"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Vinagre VNC viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-vino"
+description = "SigmaOS integration for Vino VNC server: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vino"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Vino VNC server"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-virt-viewer"
+description = "SigmaOS integration for virt-viewer VM display: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virt-viewer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "virt-viewer VM display"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wavemon"
+description = "SigmaOS integration for wavemon WiFi monitor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wavemon"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "wavemon WiFi monitor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wavemon-ng"
+description = "SigmaOS integration for wavemon WiFi monitor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wavemon-ng"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "wavemon WiFi monitor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wavestamp"
+description = "SigmaOS integration for wavestamp WiFi monitor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wavestamp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "wavestamp WiFi monitor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wayvnc"
+description = "SigmaOS integration for WayVNC Wayland VNC: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wayvnc"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WayVNC Wayland VNC"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xfreerdp"
+description = "SigmaOS integration for FreeRDP client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfreerdp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "FreeRDP client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-zenmap"
+description = "SigmaOS integration for Zenmap GUI scanner: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zenmap"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Zenmap GUI scanner"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-zmap"
+description = "SigmaOS integration for ZMap internet scanner: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zmap"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ZMap internet scanner"
+visibility = "public"
+depends_on = []
