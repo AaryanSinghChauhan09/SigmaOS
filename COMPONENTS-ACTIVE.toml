@@ -753,3 +753,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmacraftlibs"]
+
+[[component]]
+name = "SigmaOS-craft-effect"
+description = "Effects and filters: image filters, visual effects, post-processing chains, presets"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-effect.git"
+engine = "craft-effect"
+category = "Graphics"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaeffect"]
