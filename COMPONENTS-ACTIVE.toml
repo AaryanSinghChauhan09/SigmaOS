@@ -597,3 +597,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasystemmonitor"]
+
+[[component]]
+name = "SigmaOS-sigma-power"
+description = "Power management settings (profiles, brightness, power saving)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigma-power.git"
+engine = "sigma-power"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmapower"]
