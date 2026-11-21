@@ -156,7 +156,7 @@ provides = ["component"]
 
 [[component]]
 name = "SigmaOS-cron"
-description = "Cron daemon and job scheduler for SigmaOS"
+description = "Cron daemon + scheduler: jobs, specs, schedules"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cron.git"
 engine = "cron"
 category = "system"
@@ -164,7 +164,7 @@ language = "rust"
 inspirations = ["native"]
 visibility = "private"
 depends_on = []
-provides = ["component"]
+provides = ["sigmacronmanager2", "sigmacron"]
 
 [[component]]
 name = "SigmaOS-cache"
