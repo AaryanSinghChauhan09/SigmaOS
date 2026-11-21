@@ -38002,3 +38002,753 @@ language = "shell"
 inspirations = "Zenity dialogs"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-amazon-music"
+description = "SigmaOS integration for Amazon Music: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-amazon-music"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Amazon Music"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-apple-music"
+description = "SigmaOS integration for Apple Music: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apple-music"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apple Music"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-aria2c"
+description = "SigmaOS integration for aria2c: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-aria2c"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "aria2c"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-bettercap"
+description = "SigmaOS integration for bettercap: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bettercap"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "bettercap"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-burp-suite"
+description = "SigmaOS integration for Burp Suite: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-burp-suite"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Burp Suite"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-carla"
+description = "SigmaOS integration for Carla plugins host: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-carla"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Carla plugins host"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cinelerra"
+description = "SigmaOS integration for Cinelerra video editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinelerra"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cinelerra video editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cyberduck"
+description = "SigmaOS integration for Cyberduck: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cyberduck"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cyberduck"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dashlane"
+description = "SigmaOS integration for Dashlane: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dashlane"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Dashlane"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-deezer"
+description = "SigmaOS integration for Deezer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deezer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Deezer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-deluge"
+description = "SigmaOS integration for Deluge torrent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deluge"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Deluge torrent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-diagrams-net"
+description = "SigmaOS integration for diagrams.net: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-diagrams-net"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "diagrams.net"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-digikam"
+description = "SigmaOS integration for digiKam photo manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-digikam"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "digiKam photo manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-drawio"
+description = "SigmaOS integration for draw.io diagrams: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-drawio"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "draw.io diagrams"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ettercap"
+description = "SigmaOS integration for Ettercap: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ettercap"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ettercap"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-evernote"
+description = "SigmaOS integration for Evernote: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-evernote"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Evernote"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-excalidraw"
+description = "SigmaOS integration for Excalidraw: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-excalidraw"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Excalidraw"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-feh"
+description = "SigmaOS integration for feh image viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-feh"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "feh image viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-flowblade"
+description = "SigmaOS integration for Flowblade video editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flowblade"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Flowblade video editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-freshRSS"
+description = "SigmaOS integration for FreshRSS: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-freshRSS"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "FreshRSS"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-geary"
+description = "SigmaOS integration for Geary mail: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-geary"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Geary mail"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-guitarix"
+description = "SigmaOS integration for Guitarix: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guitarix"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Guitarix"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-httpie"
+description = "SigmaOS integration for HTTPie: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-httpie"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "HTTPie"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ilovepdf"
+description = "SigmaOS integration for iLovePDF: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ilovepdf"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "iLovePDF"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-imv"
+description = "SigmaOS integration for imv image viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-imv"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "imv image viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-iridium-browser"
+description = "SigmaOS integration for Iridium browser: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-iridium-browser"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Iridium browser"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lastpass"
+description = "SigmaOS integration for LastPass CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lastpass"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "LastPass CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-limbo"
+description = "SigmaOS integration for Limbo emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-limbo"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Limbo emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lmms"
+description = "SigmaOS integration for LMMS DAW: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lmms"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "LMMS DAW"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mailspring"
+description = "SigmaOS integration for Mailspring mail: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mailspring"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Mailspring mail"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-melt"
+description = "SigmaOS integration for MELT video editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-melt"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MELT video editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-metasploit"
+description = "SigmaOS integration for Metasploit: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-metasploit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Metasploit"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-miniflux"
+description = "SigmaOS integration for Miniflux RSS: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-miniflux"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Miniflux RSS"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mirage"
+description = "SigmaOS integration for Mirage image viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mirage"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Mirage image viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mitmproxy"
+description = "SigmaOS integration for mitmproxy: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mitmproxy"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "mitmproxy"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mixxx"
+description = "SigmaOS integration for Mixxx DJ: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mixxx"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Mixxx DJ"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mumble"
+description = "SigmaOS integration for Mumble: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mumble"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Mumble"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-natron"
+description = "SigmaOS integration for Natron compositing: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-natron"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Natron compositing"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nessus"
+description = "SigmaOS integration for Nessus scanner: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nessus"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Nessus scanner"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-newsbeuter"
+description = "SigmaOS integration for newsbeuter RSS: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-newsbeuter"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "newsbeuter RSS"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ngrep"
+description = "SigmaOS integration for ngrep: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ngrep"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ngrep"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nitrogen"
+description = "SigmaOS integration for nitrogen image viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nitrogen"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "nitrogen image viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-openvas"
+description = "SigmaOS integration for OpenVAS scanner: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openvas"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OpenVAS scanner"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pdf24"
+description = "SigmaOS integration for PDF24: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pdf24"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PDF24"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pencil"
+description = "SigmaOS integration for Pencil: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pencil"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pencil"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-penpot"
+description = "SigmaOS integration for Penpot design: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-penpot"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Penpot design"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-photopea"
+description = "SigmaOS integration for Photopea: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-photopea"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Photopea"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pixlr"
+description = "SigmaOS integration for Pixlr: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pixlr"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pixlr"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pqiv"
+description = "SigmaOS integration for pqiv image viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pqiv"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "pqiv image viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-qbittorrent-nox"
+description = "SigmaOS integration for qBittorrent-nox: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qbittorrent-nox"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "qBittorrent-nox"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-qobuz"
+description = "SigmaOS integration for Qobuz: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qobuz"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Qobuz"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rtorrent"
+description = "SigmaOS integration for rTorrent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rtorrent"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "rTorrent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-shotwell"
+description = "SigmaOS integration for Shotwell: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shotwell"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Shotwell"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-simplenote"
+description = "SigmaOS integration for Simplenote: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-simplenote"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Simplenote"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-smallpdf"
+description = "SigmaOS integration for SmallPDF: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-smallpdf"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SmallPDF"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-stirling-pdf"
+description = "SigmaOS integration for Stirling PDF: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stirling-pdf"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Stirling PDF"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sxiv"
+description = "SigmaOS integration for sxiv image viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sxiv"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "sxiv image viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tcpdump"
+description = "SigmaOS integration for tcpdump: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tcpdump"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tcpdump"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-texmaker"
+description = "SigmaOS integration for Texmaker: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-texmaker"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Texmaker"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-texworks"
+description = "SigmaOS integration for TeXworks: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-texworks"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "TeXworks"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-thorium"
+description = "SigmaOS integration for Thorium browser: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thorium"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Thorium browser"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tidal"
+description = "SigmaOS integration for Tidal HiFi: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tidal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Tidal HiFi"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tldraw"
+description = "SigmaOS integration for tldraw: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tldraw"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tldraw"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-transmission-gtk"
+description = "SigmaOS integration for Transmission GTK: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-transmission-gtk"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Transmission GTK"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-trojan-source"
+description = "SigmaOS integration for Trojan Source: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-trojan-source"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Trojan Source"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tshark"
+description = "SigmaOS integration for tshark: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tshark"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tshark"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-utm"
+description = "SigmaOS integration for UTM VM: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-utm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "UTM VM"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-vantage"
+description = "SigmaOS integration for Vantage RSS: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vantage"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Vantage RSS"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wallabag"
+description = "SigmaOS integration for wallabag read-later: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallabag"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "wallabag read-later"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-webtorrent"
+description = "SigmaOS integration for WebTorrent Desktop: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webtorrent"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WebTorrent Desktop"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-winscp"
+description = "SigmaOS integration for WinSCP: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-winscp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WinSCP"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xh"
+description = "SigmaOS integration for xh HTTPie alternative: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xh"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "xh HTTPie alternative"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xournalpp-viewer"
+description = "SigmaOS integration for Xournal++: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xournalpp-viewer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Xournal++"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-youtube-music"
+description = "SigmaOS integration for YouTube Music: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-youtube-music"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "YouTube Music"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-zrythm"
+description = "SigmaOS integration for Zrythm DAW: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zrythm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Zrythm DAW"
+visibility = "public"
+depends_on = []
