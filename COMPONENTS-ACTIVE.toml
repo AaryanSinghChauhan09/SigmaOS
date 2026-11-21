@@ -789,3 +789,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasecuritymanager"]
+
+[[component]]
+name = "SigmaOS-network-manager2"
+description = "NetworkManager-style network configuration: interfaces, connections, DNS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-manager2.git"
+engine = "network-manager2"
+category = "Network"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmanetwork"]
