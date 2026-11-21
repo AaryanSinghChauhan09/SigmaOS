@@ -645,3 +645,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmafilemanager"]
+
+[[component]]
+name = "SigmaOS-ntp"
+description = "System NTP client (server pool, sync, offsets)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ntp.git"
+engine = "ntp"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmantp"]
