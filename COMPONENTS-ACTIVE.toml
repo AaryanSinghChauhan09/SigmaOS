@@ -957,3 +957,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmausermanager"]
+
+[[component]]
+name = "SigmaOS-acpi"
+description = "ACPI power management: events, batteries, thermal zones"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-acpi.git"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaacpi"]
