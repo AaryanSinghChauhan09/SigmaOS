@@ -933,3 +933,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmasmb"]
+
+[[component]]
+name = "SigmaOS-systemd-fsck"
+description = "Scheduled filesystem checks: mount-count/interval triggers, check records, policies"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-fsck.git"
+engine = "systemd-fsck"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmascheduledfsck"]
