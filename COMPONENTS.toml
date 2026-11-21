@@ -35576,3 +35576,113 @@ language = "rust"
 inspirations = "Dependency inversion / shared contract (GoF, POSA)"
 visibility = "private"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-runtime-support"
+description = "Shared runtime primitives extracted from SigmaOS-system: config, error, crypto entropy, klib shims, service lifecycle, orchestrator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-runtime-support"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-sovereign"
+description = "Sovereign init (PID 1) and service supervisor suite extracted from SigmaOS-system (v52-v76 design variants)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sovereign"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-duplicates"
+description = "Duplicate file finder with hash comparison extracted from SigmaOS-system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-duplicates"
+engine = "common_lib"
+category = "Developer Tools"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-preload"
+description = "Application preloading manager extracted from SigmaOS-system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-preload"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-cleaner"
+description = "System cleaner + secure file shredder extracted from SigmaOS-system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cleaner"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = ["SigmaOS-runtime-support"]
+
+[[component]]
+name = "SigmaOS-cron"
+description = "Cron daemon and scheduled task engine extracted from SigmaOS-system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cron"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = ["SigmaOS-component-core"]
+
+[[component]]
+name = "SigmaOS-defrag"
+description = "Filesystem defragmentation manager extracted from SigmaOS-system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-defrag"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-user-manager"
+description = "User and group management (accounts, shadow passwords, sudo policies) extracted from SigmaOS-system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-manager"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = ["SigmaOS-runtime-support"]
+
+[[component]]
+name = "SigmaOS-logrotation"
+description = "Log rotation manager extracted from SigmaOS-system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-logrotation"
+engine = "common_lib"
+category = "System Services"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-command"
+description = "Helper command manager extracted from SigmaOS-system"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-command"
+engine = "common_lib"
+category = "Developer Tools"
+language = "rust"
+inspirations = "None"
+visibility = "private"
+depends_on = []
