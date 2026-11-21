@@ -621,3 +621,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmapdf"]
+
+[[component]]
+name = "SigmaOS-sound"
+description = "Audio management (devices, volume, routing; PulseAudio/PipeWire-inspired)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sound.git"
+engine = "sound"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasound"]
