@@ -33970,3 +33970,783 @@ language = "shell"
 inspirations = "gtklock"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-ananicy-cpp"
+description = "SigmaOS integration for ananicy auto-nice: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ananicy-cpp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ananicy auto-nice"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-asusctl"
+description = "SigmaOS integration for ASUS ROG control: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asusctl"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ASUS ROG control"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-authentic"
+description = "SigmaOS integration for AuthentIC driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-authentic"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "AuthentIC driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-auto-cpufreq"
+description = "SigmaOS integration for auto-cpufreq governor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-auto-cpufreq"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "auto-cpufreq governor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-belpic"
+description = "SigmaOS integration for belpic driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-belpic"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "belpic driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-bitwarden-desktop"
+description = "SigmaOS integration for Bitwarden desktop: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bitwarden-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Bitwarden desktop"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cac"
+description = "SigmaOS integration for CAC driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cac"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "CAC driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cage"
+description = "SigmaOS integration for cage kiosk compositor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cage"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "cage kiosk compositor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cardos"
+description = "SigmaOS integration for CardOS driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cardos"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "CardOS driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ccid"
+description = "SigmaOS integration for CCID driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ccid"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "CCID driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cinnamon-polkit"
+description = "SigmaOS integration for Cinnamon polkit agent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon-polkit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cinnamon polkit agent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-coolkey"
+description = "SigmaOS integration for CoolKey driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-coolkey"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "CoolKey driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dellctl"
+description = "SigmaOS integration for Dell power control: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dellctl"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Dell power control"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-earlyoom"
+description = "SigmaOS integration for earlyoom OOM daemon: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-earlyoom"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "earlyoom OOM daemon"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-entersafe"
+description = "SigmaOS integration for entersafe driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-entersafe"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "entersafe driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-epass2003"
+description = "SigmaOS integration for ePass2003 driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-epass2003"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ePass2003 driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-esteid"
+description = "SigmaOS integration for EstEID driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-esteid"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "EstEID driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fprintd-enroll"
+description = "SigmaOS integration for fprintd enroll: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fprintd-enroll"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "fprintd enroll"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fwupd"
+description = "SigmaOS integration for fwupd firmware updater: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fwupd"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "fwupd firmware updater"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gemalto"
+description = "SigmaOS integration for Gemalto driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gemalto"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Gemalto driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gids"
+description = "SigmaOS integration for GIDS driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gids"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GIDS driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-keyring"
+description = "SigmaOS integration for GNOME Keyring: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-keyring"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Keyring"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnupg"
+description = "SigmaOS integration for GnuPG: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnupg"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GnuPG"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-goa-daemon"
+description = "SigmaOS integration for GNOME Online Accounts: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-goa-daemon"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Online Accounts"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-greetd"
+description = "SigmaOS integration for greetd display manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-greetd"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "greetd display manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gvfs"
+description = "SigmaOS integration for gvfs virtual filesystem: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gvfs"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gvfs virtual filesystem"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gvfs-afc"
+description = "SigmaOS integration for gvfs AFC backend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gvfs-afc"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gvfs AFC backend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gvfs-goa"
+description = "SigmaOS integration for gvfs GNOME Online Accounts: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gvfs-goa"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gvfs GNOME Online Accounts"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gvfs-gphoto2"
+description = "SigmaOS integration for gvfs camera backend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gvfs-gphoto2"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gvfs camera backend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gvfs-mtp"
+description = "SigmaOS integration for gvfs MTP backend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gvfs-mtp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gvfs MTP backend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gvfs-nfs"
+description = "SigmaOS integration for gvfs NFS backend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gvfs-nfs"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gvfs NFS backend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gvfs-smb"
+description = "SigmaOS integration for gvfs SMB backend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gvfs-smb"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "gvfs SMB backend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-idprime"
+description = "SigmaOS integration for idPrime driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-idprime"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "idPrime driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ifd-vpcid"
+description = "SigmaOS integration for vpcd driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ifd-vpcid"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "vpcd driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-isoApplet"
+description = "SigmaOS integration for isoApplet driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-isoApplet"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "isoApplet driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-jacarta"
+description = "SigmaOS integration for Jacarta driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jacarta"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Jacarta driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-keepassxc"
+description = "SigmaOS integration for KeePassXC password manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-keepassxc"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KeePassXC password manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kwallet-cli"
+description = "SigmaOS integration for KWallet CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kwallet-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KWallet CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kwalletmanager"
+description = "SigmaOS integration for KWallet manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kwalletmanager"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KWallet manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lenovolegion-linux"
+description = "SigmaOS integration for Lenovo Legion control: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lenovolegion-linux"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Lenovo Legion control"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lxqt-policykit"
+description = "SigmaOS integration for LXQt polkit agent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lxqt-policykit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "LXQt polkit agent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ly-display-manager"
+description = "SigmaOS integration for Ly display manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ly-display-manager"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ly display manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mate-polkit"
+description = "SigmaOS integration for MATE polkit agent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mate-polkit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MATE polkit agent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-muscle"
+description = "SigmaOS integration for MuscleCard driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-muscle"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MuscleCard driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-myeid"
+description = "SigmaOS integration for MyEID driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-myeid"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MyEID driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nohang"
+description = "SigmaOS integration for nohang OOM daemon: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nohang"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "nohang OOM daemon"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nvidia-powerd"
+description = "SigmaOS integration for NVIDIA power daemon: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nvidia-powerd"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "NVIDIA power daemon"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-openct"
+description = "SigmaOS integration for OpenCT smartcard: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openct"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OpenCT smartcard"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-openpgp"
+description = "SigmaOS integration for OpenPGP driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openpgp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OpenPGP driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-openpgp-card"
+description = "SigmaOS integration for OpenPGP card: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openpgp-card"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OpenPGP card"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-opensc"
+description = "SigmaOS integration for OpenSC smartcard: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-opensc"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OpenSC smartcard"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pam-u2f"
+description = "SigmaOS integration for pam-u2f FIDO2: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pam-u2f"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "pam-u2f FIDO2"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-password-store"
+description = "SigmaOS integration for pass password store: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-password-store"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "pass password store"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pcsc-lite"
+description = "SigmaOS integration for PC/SC smartcard: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pcsc-lite"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PC/SC smartcard"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-piv"
+description = "SigmaOS integration for PIV driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-piv"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PIV driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-polkit-gnome"
+description = "SigmaOS integration for polkit GNOME agent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-polkit-gnome"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "polkit GNOME agent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-polkit-kde"
+description = "SigmaOS integration for polkit KDE agent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-polkit-kde"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "polkit KDE agent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-powermenu"
+description = "SigmaOS integration for rofi power menu: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-powermenu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "rofi power menu"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-powertop"
+description = "SigmaOS integration for powertop power analyzer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-powertop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "powertop power analyzer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rutoken"
+description = "SigmaOS integration for Rutoken driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rutoken"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Rutoken driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sc-hsm"
+description = "SigmaOS integration for SC-HSM driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sc-hsm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SC-HSM driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sddm"
+description = "SigmaOS integration for SDDM display manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sddm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SDDM display manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-seahorse"
+description = "SigmaOS integration for Seahorse keyring: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-seahorse"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Seahorse keyring"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-secret-tool"
+description = "SigmaOS integration for libsecret tool: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-secret-tool"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "libsecret tool"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-setcos"
+description = "SigmaOS integration for SetCOS driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-setcos"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SetCOS driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sops"
+description = "SigmaOS integration for SOPS secrets: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sops"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SOPS secrets"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-supergfxctl"
+description = "SigmaOS integration for Supergfx hybrid GPU: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-supergfxctl"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Supergfx hybrid GPU"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-thunderbolt"
+description = "SigmaOS integration for Thunderbolt manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thunderbolt"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Thunderbolt manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tlp"
+description = "SigmaOS integration for TLP power manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tlp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "TLP power manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tomb"
+description = "SigmaOS integration for tomb encrypted folders: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tomb"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tomb encrypted folders"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tuigreet"
+description = "SigmaOS integration for tuigreet greeter: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tuigreet"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tuigreet greeter"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tuned"
+description = "SigmaOS integration for tuned performance profiles: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tuned"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tuned performance profiles"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-udiskie"
+description = "SigmaOS integration for udiskie automount: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-udiskie"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "udiskie automount"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-udisks2"
+description = "SigmaOS integration for udisks2 disk manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-udisks2"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "udisks2 disk manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-westcos"
+description = "SigmaOS integration for WestCOS driver: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-westcos"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WestCOS driver"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xfce-polkit"
+description = "SigmaOS integration for XFCE polkit agent: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfce-polkit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "XFCE polkit agent"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ykman-cli"
+description = "SigmaOS integration for ykman CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ykman-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ykman CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-yubikey-manager"
+description = "SigmaOS integration for YubiKey manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yubikey-manager"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "YubiKey manager"
+visibility = "public"
+depends_on = []
