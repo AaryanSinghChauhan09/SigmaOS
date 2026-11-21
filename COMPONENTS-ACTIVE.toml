@@ -1293,3 +1293,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmavirtualizationmanager", "sigmavirtualization"]
+
+[[component]]
+name = "SigmaOS-system-info"
+description = "System information: OS name/version, kernel, hostname, uptime"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-info.git"
+engine = "system"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasysteminfo"]
