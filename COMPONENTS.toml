@@ -30572,3 +30572,113 @@ language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = []
+
+[[component]]
+name = "SigmaOS-firefox"
+description = "SigmaOS integration for Firefox browser: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firefox"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Firefox browser"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-mpv"
+description = "SigmaOS integration for mpv media player: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mpv"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "mpv media player"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-krita"
+description = "SigmaOS integration for Krita digital painting: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-krita"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Krita digital painting"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-inkscape"
+description = "SigmaOS integration for Inkscape vector graphics: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-inkscape"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Inkscape vector graphics"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-darktable"
+description = "SigmaOS integration for darktable photo workflow: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-darktable"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "darktable photo workflow"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-thunderbird"
+description = "SigmaOS integration for Thunderbird mail client: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thunderbird"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Thunderbird mail client"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-obs-studio"
+description = "SigmaOS integration for OBS Studio screen recording: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-obs-studio"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OBS Studio screen recording"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-handbrake"
+description = "SigmaOS integration for HandBrake video transcoder: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-handbrake"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "HandBrake video transcoder"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-kdenlive"
+description = "SigmaOS integration for Kdenlive video editor: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kdenlive"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Kdenlive video editor"
+visibility = "public"
+depends_on = []
+
+[[component]]
+name = "SigmaOS-jellyfin"
+description = "SigmaOS integration for Jellyfin media server: default configs, MIME associations, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jellyfin"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Jellyfin media server"
+visibility = "public"
+depends_on = []
