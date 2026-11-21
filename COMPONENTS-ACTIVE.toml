@@ -777,3 +777,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmalight"]
+
+[[component]]
+name = "SigmaOS-security-core"
+description = "Security management: firewall rules, security policies, access control entries"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security-core.git"
+engine = "security-core"
+category = "Security"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasecuritymanager"]
