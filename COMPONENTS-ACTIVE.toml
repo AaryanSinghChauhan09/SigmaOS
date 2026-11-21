@@ -549,3 +549,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmaperformancemonitor"]
+
+[[component]]
+name = "SigmaOS-search"
+description = "System search & indexing (file/content search, index management)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-search.git"
+engine = "search"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmasearch"]
