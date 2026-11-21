@@ -1221,3 +1221,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmacontainer"]
+
+[[component]]
+name = "SigmaOS-crypto"
+description = "Cryptography: keys, volumes, lock/unlock, types"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crypto.git"
+engine = "security"
+category = "Security"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmacrypto"]
