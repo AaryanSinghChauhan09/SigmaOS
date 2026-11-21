@@ -35585,7 +35585,7 @@ engine = "common_lib"
 category = "System Services"
 language = "rust"
 inspirations = "None"
-visibility = "private"
+visibility = "public"
 depends_on = []
 
 [[component]]
@@ -35596,7 +35596,7 @@ engine = "common_lib"
 category = "System Services"
 language = "rust"
 inspirations = "None"
-visibility = "private"
+visibility = "public"
 depends_on = []
 
 [[component]]
@@ -35607,7 +35607,7 @@ engine = "common_lib"
 category = "Developer Tools"
 language = "rust"
 inspirations = "None"
-visibility = "private"
+visibility = "public"
 depends_on = []
 
 [[component]]
@@ -35629,7 +35629,7 @@ engine = "common_lib"
 category = "System Services"
 language = "rust"
 inspirations = "None"
-visibility = "private"
+visibility = "public"
 depends_on = ["SigmaOS-runtime-support"]
 
 [[component]]
@@ -35640,7 +35640,7 @@ engine = "common_lib"
 category = "System Services"
 language = "rust"
 inspirations = "None"
-visibility = "private"
+visibility = "public"
 depends_on = ["SigmaOS-component-core"]
 
 [[component]]
@@ -35651,7 +35651,7 @@ engine = "common_lib"
 category = "System Services"
 language = "rust"
 inspirations = "None"
-visibility = "private"
+visibility = "public"
 depends_on = []
 
 [[component]]
@@ -35673,7 +35673,7 @@ engine = "common_lib"
 category = "System Services"
 language = "rust"
 inspirations = "None"
-visibility = "private"
+visibility = "public"
 depends_on = []
 
 [[component]]
@@ -35684,5 +35684,5 @@ engine = "common_lib"
 category = "Developer Tools"
 language = "rust"
 inspirations = "None"
-visibility = "private"
+visibility = "public"
 depends_on = []
