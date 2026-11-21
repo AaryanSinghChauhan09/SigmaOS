@@ -31530,3 +31530,253 @@ language = "shell"
 inspirations = "Zotero reference manager"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-nano-ide"
+description = "SigmaOS integration for GNU nano: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nano-ide"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNU nano"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-neovim-qt"
+description = "SigmaOS integration for Neovim editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-neovim-qt"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Neovim editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-netbeans"
+description = "SigmaOS integration for Apache NetBeans: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-netbeans"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Apache NetBeans"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nvchad"
+description = "SigmaOS integration for NvChad: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nvchad"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "NvChad"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-perforce"
+description = "SigmaOS integration for Perforce Helix: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-perforce"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Perforce Helix"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-phpstorm"
+description = "SigmaOS integration for PhpStorm IDE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-phpstorm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PhpStorm IDE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-plastic-scm"
+description = "SigmaOS integration for Plastic SCM: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plastic-scm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Plastic SCM"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pycharm-ultimate"
+description = "SigmaOS integration for PyCharm Ultimate: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pycharm-ultimate"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PyCharm Ultimate"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-qtcreator"
+description = "SigmaOS integration for Qt Creator IDE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qtcreator"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Qt Creator IDE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rider"
+description = "SigmaOS integration for Rider .NET IDE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rider"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Rider .NET IDE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rubymine"
+description = "SigmaOS integration for RubyMine IDE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rubymine"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "RubyMine IDE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sourcetree"
+description = "SigmaOS integration for Sourcetree: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sourcetree"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Sourcetree"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-spacemacs"
+description = "SigmaOS integration for Spacemacs: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-spacemacs"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Spacemacs"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-spacevim"
+description = "SigmaOS integration for SpaceVim: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-spacevim"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SpaceVim"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sublime-merge"
+description = "SigmaOS integration for Sublime Merge: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sublime-merge"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Sublime Merge"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-svn-cli"
+description = "SigmaOS integration for SVN client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-svn-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SVN client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-svn-gui"
+description = "SigmaOS integration for RabbitVCS SVN/Git: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-svn-gui"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "RabbitVCS SVN/Git"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tea-cli"
+description = "SigmaOS integration for Gitea Tea CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tea-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Gitea Tea CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-theia"
+description = "SigmaOS integration for Eclipse Theia IDE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theia"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Eclipse Theia IDE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tig"
+description = "SigmaOS integration for tig TUI git: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tig"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tig TUI git"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tortoisegit"
+description = "SigmaOS integration for TortoiseGit: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tortoisegit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "TortoiseGit"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-vim-ide"
+description = "SigmaOS integration for Vim IDE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vim-ide"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Vim IDE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-webstorm"
+description = "SigmaOS integration for WebStorm IDE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webstorm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WebStorm IDE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-windsurf"
+description = "SigmaOS integration for Windsurf AI editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-windsurf"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Windsurf AI editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-zed"
+description = "SigmaOS integration for Zed editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zed"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Zed editor"
+visibility = "public"
+depends_on = []
