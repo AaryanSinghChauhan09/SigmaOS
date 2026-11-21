@@ -31050,3 +31050,483 @@ language = "shell"
 inspirations = "Zulip desktop"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-bambu-studio"
+description = "SigmaOS integration for Bambu Studio slicer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bambu-studio"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Bambu Studio slicer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-calligra"
+description = "SigmaOS integration for Calligra office suite: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calligra"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Calligra office suite"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cura"
+description = "SigmaOS integration for Ultimaker Cura slicer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cura"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ultimaker Cura slicer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-docear"
+description = "SigmaOS integration for Docear academic suite: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-docear"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Docear academic suite"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-evince"
+description = "SigmaOS integration for Evince document viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-evince"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Evince document viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fbreader"
+description = "SigmaOS integration for FBReader ebook reader: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fbreader"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "FBReader ebook reader"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-flameshot"
+description = "SigmaOS integration for Flameshot screenshot tool: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flameshot"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Flameshot screenshot tool"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fontforge"
+description = "SigmaOS integration for FontForge font editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fontforge"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "FontForge font editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fontmatrix"
+description = "SigmaOS integration for FontMatrix font manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fontmatrix"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "FontMatrix font manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-freecad"
+description = "SigmaOS integration for FreeCAD parametric CAD: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-freecad"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "FreeCAD parametric CAD"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fritzing"
+description = "SigmaOS integration for Fritzing electronics: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fritzing"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Fritzing electronics"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-geogebra"
+description = "SigmaOS integration for GeoGebra math suite: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-geogebra"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GeoGebra math suite"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-screenshot"
+description = "SigmaOS integration for GNOME Screenshot: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-screenshot"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Screenshot"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-jabref"
+description = "SigmaOS integration for JabRef bibliography manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jabref"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "JabRef bibliography manager"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-joolib"
+description = "SigmaOS integration for JooLib ebook reader: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-joolib"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "JooLib ebook reader"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kazam"
+description = "SigmaOS integration for Kazam screen recorder: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kazam"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Kazam screen recorder"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kicad"
+description = "SigmaOS integration for KiCad PCB design suite: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kicad"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KiCad PCB design suite"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-koreader"
+description = "SigmaOS integration for KOReader ebook reader: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-koreader"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KOReader ebook reader"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ksnip"
+description = "SigmaOS integration for Ksnip screenshot annotation: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ksnip"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ksnip screenshot annotation"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-meshlab"
+description = "SigmaOS integration for MeshLab mesh processing: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-meshlab"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MeshLab mesh processing"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mtpaint"
+description = "SigmaOS integration for mtPaint raster editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mtpaint"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "mtPaint raster editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mupdf"
+description = "SigmaOS integration for MuPDF tools: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mupdf"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MuPDF tools"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mypaint"
+description = "SigmaOS integration for MyPaint painting: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mypaint"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MyPaint painting"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-obs-alt"
+description = "SigmaOS integration for GPU Screen Recorder: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-obs-alt"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GPU Screen Recorder"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-okular"
+description = "SigmaOS integration for Okular document viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-okular"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Okular document viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-openscad"
+description = "SigmaOS integration for OpenSCAD 3D modeling: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openscad"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OpenSCAD 3D modeling"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-orca-slicer"
+description = "SigmaOS integration for OrcaSlicer slicer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-orca-slicer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "OrcaSlicer slicer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pandoc"
+description = "SigmaOS integration for Pandoc document converter: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pandoc"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pandoc document converter"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-paper"
+description = "SigmaOS integration for Paper PDF viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-paper"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Paper PDF viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pdfarranger"
+description = "SigmaOS integration for PDF Arranger: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pdfarranger"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PDF Arranger"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pdfsam"
+description = "SigmaOS integration for PDFsam PDF suite: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pdfsam"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PDFsam PDF suite"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-peek"
+description = "SigmaOS integration for Peek GIF recorder: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-peek"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Peek GIF recorder"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pinta"
+description = "SigmaOS integration for Pinta image editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pinta"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pinta image editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-prusa-slicer"
+description = "SigmaOS integration for PrusaSlicer 3D printing: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-prusa-slicer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PrusaSlicer 3D printing"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pybtex"
+description = "SigmaOS integration for PybTex bibliography: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pybtex"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PybTex bibliography"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-qpdfview"
+description = "SigmaOS integration for qpdfview PDF viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qpdfview"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "qpdfview PDF viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-shutter"
+description = "SigmaOS integration for Shutter screenshot tool: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shutter"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Shutter screenshot tool"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sigil"
+description = "SigmaOS integration for Sigil EPUB editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sigil"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Sigil EPUB editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-simplescreenrecorder"
+description = "SigmaOS integration for SimpleScreenRecorder: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-simplescreenrecorder"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SimpleScreenRecorder"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-sketch"
+description = "SigmaOS integration for Xournal++ note-taking/sketching: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sketch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Xournal++ note-taking/sketching"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-slic3r"
+description = "SigmaOS integration for Slic3r 3D printing slicer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slic3r"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Slic3r 3D printing slicer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-solvespace"
+description = "SigmaOS integration for SolveSpace CAD: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-solvespace"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "SolveSpace CAD"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-texstudio"
+description = "SigmaOS integration for TeXstudio LaTeX editor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-texstudio"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "TeXstudio LaTeX editor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wings3d"
+description = "SigmaOS integration for Wings 3D modeler: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wings3d"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Wings 3D modeler"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xfce4-screenshooter"
+description = "SigmaOS integration for XFCE Screenshot: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfce4-screenshooter"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "XFCE Screenshot"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xournalpp"
+description = "SigmaOS integration for Xournal++ PDF annotation: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xournalpp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Xournal++ PDF annotation"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-zotero-cli"
+description = "SigmaOS integration for Zotero CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zotero-cli"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Zotero CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-zotero7"
+description = "SigmaOS integration for Zotero reference manager: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zotero7"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Zotero reference manager"
+visibility = "public"
+depends_on = []
