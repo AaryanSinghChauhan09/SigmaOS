@@ -1245,3 +1245,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmafirewallmanager2", "sigmafirewall"]
+
+[[component]]
+name = "SigmaOS-timeshift"
+description = "Timeshift: snapshots, schedules, restore, cleanup"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timeshift.git"
+engine = "backup"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmatimeshift"]
