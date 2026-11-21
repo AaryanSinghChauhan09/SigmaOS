@@ -681,3 +681,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmamicrophone"]
+
+[[component]]
+name = "SigmaOS-voice"
+description = "Voice & speech system (recognition, TTS, voice commands)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-voice.git"
+engine = "voice"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmavoice"]
