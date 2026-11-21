@@ -861,3 +861,27 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmakeyboardmanager"]
+
+[[component]]
+name = "SigmaOS-hibernation"
+description = "Hibernation/suspend-to-disk management: power states, hibernation images, resume"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hibernation.git"
+engine = "hibernation"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmahibernation"]
+
+[[component]]
+name = "SigmaOS-hibernation"
+description = "Hibernation/suspend-to-disk management: power states, hibernation images, resume"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hibernation.git"
+engine = "hibernation"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmahibernation"]
