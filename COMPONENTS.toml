@@ -31890,3 +31890,403 @@ language = "shell"
 inspirations = "ZMap internet scanner"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-bemenu"
+description = "SigmaOS integration for bemenu launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bemenu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "bemenu launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-bleachbit"
+description = "SigmaOS integration for BleachBit cleaner: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bleachbit"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "BleachBit cleaner"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-budgie-panel"
+description = "SigmaOS integration for Budgie panel: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-budgie-panel"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Budgie panel"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-caelestia"
+description = "SigmaOS integration for Caelestia shell: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-caelestia"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Caelestia shell"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cerebro"
+description = "SigmaOS integration for Cerebro launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cerebro"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cerebro launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cinnamon-launcher"
+description = "SigmaOS integration for Cinnamon launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cinnamon-launcher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Cinnamon launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-deepin-panel"
+description = "SigmaOS integration for Deepin desktop panel: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-deepin-panel"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Deepin desktop panel"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dmenu"
+description = "SigmaOS integration for dmenu launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dmenu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "dmenu launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-end-4"
+description = "SigmaOS integration for end-4 shell: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-end-4"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "end-4 shell"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-eww"
+description = "SigmaOS integration for eww widget system: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-eww"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "eww widget system"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fastfetch"
+description = "SigmaOS integration for fastfetch system fetch: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fastfetch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "fastfetch system fetch"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-fuzzel"
+description = "SigmaOS integration for fuzzel launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fuzzel"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "fuzzel launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gnome-do"
+description = "SigmaOS integration for GNOME Do launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gnome-do"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Do launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-hwinfo"
+description = "SigmaOS integration for hwinfo hardware info: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hwinfo"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "hwinfo hardware info"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-hyfetch"
+description = "SigmaOS integration for hyfetch: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-hyfetch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "hyfetch"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-krunner"
+description = "SigmaOS integration for KRunner launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-krunner"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "KRunner launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-kupfer"
+description = "SigmaOS integration for Kupfer launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kupfer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Kupfer launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lxqt-panel"
+description = "SigmaOS integration for LXQt panel: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lxqt-panel"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "LXQt panel"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mako"
+description = "SigmaOS integration for mako notifications: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mako"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "mako notifications"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mate-menu"
+description = "SigmaOS integration for MATE menu: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mate-menu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MATE menu"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mission-center"
+description = "SigmaOS integration for Mission Center monitor: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mission-center"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Mission Center monitor"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-neofetch"
+description = "SigmaOS integration for neofetch system fetch: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-neofetch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "neofetch system fetch"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-onefetch"
+description = "SigmaOS integration for onefetch git summary: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-onefetch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "onefetch git summary"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pantheon-panel"
+description = "SigmaOS integration for Pantheon Wingpanel: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pantheon-panel"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pantheon Wingpanel"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-plasma-search"
+description = "SigmaOS integration for Plasma search: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plasma-search"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Plasma search"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-resources"
+description = "SigmaOS integration for GNOME Resources: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-resources"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNOME Resources"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rofi"
+description = "SigmaOS integration for rofi launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rofi"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "rofi launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-screenfetch"
+description = "SigmaOS integration for screenfetch: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screenfetch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "screenfetch"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-stacer"
+description = "SigmaOS integration for Stacer system optimizer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stacer"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Stacer system optimizer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-swayosd"
+description = "SigmaOS integration for swayosd OSD: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-swayosd"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "swayosd OSD"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-synapse"
+description = "SigmaOS integration for Synapse launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-synapse"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Synapse launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tofi"
+description = "SigmaOS integration for tofi launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tofi"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tofi launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tspwm"
+description = "SigmaOS integration for tspwm panel: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tspwm"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "tspwm panel"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ufetch"
+description = "SigmaOS integration for ufetch: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ufetch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ufetch"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ulauncher"
+description = "SigmaOS integration for Ulauncher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ulauncher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ulauncher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-vicinae"
+description = "SigmaOS integration for Vicinae launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vicinae"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Vicinae launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-walker"
+description = "SigmaOS integration for walker app launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-walker"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "walker app launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-waybar"
+description = "SigmaOS integration for waybar status bar: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-waybar"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "waybar status bar"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wofi"
+description = "SigmaOS integration for wofi launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wofi"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "wofi launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xfce-panel"
+description = "SigmaOS integration for XFCE panel: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xfce-panel"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "XFCE panel"
+visibility = "public"
+depends_on = []
