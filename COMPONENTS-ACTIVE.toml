@@ -945,3 +945,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmascheduledfsck"]
+
+[[component]]
+name = "SigmaOS-user-manager"
+description = "User account management: creation, groups, permissions"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-user-manager.git"
+engine = "user-manager"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmausermanager"]
