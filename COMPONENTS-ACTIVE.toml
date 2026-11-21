@@ -741,3 +741,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmascanner"]
+
+[[component]]
+name = "SigmaOS-craft-craftlibs"
+description = "Shared libraries management: loading, versioning, dependencies"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-craft-craftlibs.git"
+engine = "craft-craftlibs"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmacraftlibs"]
