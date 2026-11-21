@@ -19462,17 +19462,6 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-network-manager2"
-description = "Network Manager network manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-manager2"
-engine = "Rust"
-category = "System"
-languages = ["Rust"]
-dependencies = []
-public = true
-inspirations = "None"
-
-[[component]]
 name = "SigmaOS-bluetooth-manager2"
 description = "Bluetooth Manager bluetooth manager compatibility layer for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bluetooth-manager2"
