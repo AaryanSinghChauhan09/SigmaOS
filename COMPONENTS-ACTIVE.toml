@@ -608,7 +608,7 @@ language = "rust"
 inspirations = ["native"]
 visibility = "private"
 depends_on = []
-provides = ["sigmapower"]
+provides = ["sigmapower", "sigmapowermanager"]
 
 [[component]]
 name = "SigmaOS-pdf"
