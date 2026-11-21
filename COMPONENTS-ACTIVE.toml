@@ -729,3 +729,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmafilesystemmanager"]
+
+[[component]]
+name = "SigmaOS-scanner-backend"
+description = "SANE-style scanner management: discovery, scan jobs, image acquisition"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scanner-backend.git"
+engine = "scanner-backend"
+category = "System Services"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmascanner"]
