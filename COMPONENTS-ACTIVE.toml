@@ -1149,3 +1149,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmamq"]
+
+[[component]]
+name = "SigmaOS-printing"
+description = "Printer management: printers, jobs, queues, discovery"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-printing.git"
+engine = "printing"
+category = "Desktop"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmaprinter"]
