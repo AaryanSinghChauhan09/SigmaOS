@@ -1444,17 +1444,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-GTK+"
-description = "Blueman & Celluloid GTK app wrappers"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-GTK+.git"
-engine = "gtk_lib"
-category = "Developer Tools"
-language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-setup"
 description = "Post-install setup (omamac-style)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-setup"
