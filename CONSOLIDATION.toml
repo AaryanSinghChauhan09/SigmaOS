@@ -183,7 +183,7 @@ consolidates = [
     "SigmaOS-theme-cursor",
     "SigmaOS-theme-desktop-environment",
     "SigmaOS-theme-engine",
-    "SigmaOS-theme-gtk3",
+    "SigmaOS-theme-gtk",
     "SigmaOS-theme-icon",
     "SigmaOS-theme-marketplace",
     "SigmaOS-theme-mdm",
