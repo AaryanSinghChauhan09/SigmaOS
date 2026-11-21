@@ -2258,28 +2258,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-chromium"
-description = "Chromium browser integration manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-chromium"
-engine = "common_lib"
-category = "Developer Tools"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-fish"
-description = "Fish shell integration manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-fish"
-engine = "shell_config"
-category = "Developer Tools"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-omarchy-lazyvim"
 description = "Neovim/LazyVim config manager"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-lazyvim"
@@ -7461,17 +7439,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-driver"
-description = "Driver and device registry with modalias matching"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-driver"
-engine = "driver"
-category = "Drivers & Hardware"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-driver"
 description = "Arch Linux driver for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-driver"
@@ -7846,17 +7813,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-bluetooth"
-description = "Bluetooth device manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth"
-engine = "bluetooth_manager"
-category = "Drivers & Hardware"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-bluetooth"
 description = "Bluetooth manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth"
@@ -7874,17 +7830,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-audio"
 engine = "audio_manager"
 category = "Utilities"
 language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-audio"
-description = "Audio device and mixer manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio"
-engine = "audio_manager"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -8264,17 +8209,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-player"
-description = "MPRIS media player controller"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-player"
-engine = " media_player"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-player"
 description = "Media player for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-player"
@@ -8341,17 +8275,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-system-monitor"
-description = "System resource monitor"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-monitor"
-engine = "monitor"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-system-monitor"
 description = "System monitor for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-monitor"
@@ -8369,17 +8292,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-installer"
 engine = "installer"
 category = "Utilities"
 language = "shell"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-installer"
-description = "System installer"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-installer"
-engine = "installer"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-filesystem", "SigmaOS-packages", "SigmaOS-system"]
@@ -10409,17 +10321,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-package-manager"
-description = "Package repository and transaction manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-manager"
-engine = "package_manager"
-category = "Package Management"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-package-manager"
 description = "Package Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-manager"
@@ -10585,17 +10486,6 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-session-manager"
-description = "Login/session manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-session-manager"
-engine = "session_manager"
-category = "System Services"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-session-manager"
 description = "Session Manager for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-session-manager"
@@ -10618,34 +10508,12 @@ visibility = "public"
 depends_on = ["SigmaOS-system"]
 
 [[component]]
-name = "SigmaOS-omarchy-firewall"
-description = "Firewall rule manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-firewall"
-engine = "firewall"
-category = "Utilities"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
 name = "SigmaOS-arch-firewall"
 description = "Firewall Configuration for SigmaOS"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-firewall"
 engine = "firewall"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-service-manager"
-description = "Service lifecycle manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-manager"
-engine = "service_manager"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -10888,17 +10756,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-launcher"
 engine = "launcher"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-launcher"
-description = "Application launcher"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-launcher"
-engine = "launcher"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -11779,17 +11636,6 @@ repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-process-manager"
 engine = "process_manager"
 category = "Utilities"
 language = "c"
-inspirations = "None"
-visibility = "public"
-depends_on = ["SigmaOS-system"]
-
-[[component]]
-name = "SigmaOS-omarchy-process-manager"
-description = "Process manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-process-manager"
-engine = "process_manager"
-category = "Utilities"
-language = "rust"
 inspirations = "None"
 visibility = "public"
 depends_on = ["SigmaOS-system"]
@@ -29737,17 +29583,6 @@ depends_on = []
 name = "SigmaOS-omarchy"
 description = "SigmaOS SigmaOS-omarchy component"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy"
-engine = "component"
-category = "Components"
-language = "rust"
-inspirations = "None"
-visibility = "public"
-depends_on = []
-
-[[component]]
-name = "SigmaOS-omarchy-menu"
-description = "Menu/panel system manager"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-menu"
 engine = "component"
 category = "Components"
 language = "rust"
