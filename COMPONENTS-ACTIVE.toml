@@ -837,3 +837,15 @@ inspirations = ["native"]
 visibility = "private"
 depends_on = []
 provides = ["sigmatimer"]
+
+[[component]]
+name = "SigmaOS-storage"
+description = "Storage model: block devices, volumes, partitions, snapshots, I/O scheduling, disk manager, volume management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-storage.git"
+engine = "storage"
+category = "storage"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+depends_on = []
+provides = ["sigmastorage", "sigmadiskmanager"]
