@@ -39062,3 +39062,193 @@ language = "shell"
 inspirations = "Trino query engine"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-affine"
+description = "SigmaOS integration for AFFiNE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-affine"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "AFFiNE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-anytype"
+description = "SigmaOS integration for Anytype: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-anytype"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Anytype"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-appflowy"
+description = "SigmaOS integration for AppFlowy: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-appflowy"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "AppFlowy"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-discourse"
+description = "SigmaOS integration for Discourse: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-discourse"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Discourse"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dokuwiki"
+description = "SigmaOS integration for DokuWiki: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dokuwiki"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "DokuWiki"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-dropbox"
+description = "SigmaOS integration for Dropbox: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dropbox"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Dropbox"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-drupal"
+description = "SigmaOS integration for Drupal Drush: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-drupal"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Drupal Drush"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-flarum"
+description = "SigmaOS integration for Flarum: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flarum"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Flarum"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ghost"
+description = "SigmaOS integration for Ghost CMS: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ghost"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ghost CMS"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-joomla"
+description = "SigmaOS integration for Joomla CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-joomla"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Joomla CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mediawiki"
+description = "SigmaOS integration for MediaWiki: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mediawiki"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MediaWiki"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mega-cmd"
+description = "SigmaOS integration for MEGA CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mega-cmd"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MEGA CLI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-nextcloud-desktop"
+description = "SigmaOS integration for Nextcloud desktop: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nextcloud-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Nextcloud desktop"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-outline"
+description = "SigmaOS integration for Outline: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-outline"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Outline"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-owncloud-desktop"
+description = "SigmaOS integration for ownCloud desktop: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-owncloud-desktop"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ownCloud desktop"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pcloud"
+description = "SigmaOS integration for pCloud: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pcloud"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "pCloud"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rocket-chat"
+description = "SigmaOS integration for Rocket.Chat: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rocket-chat"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Rocket.Chat"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-seafile-client"
+description = "SigmaOS integration for Seafile client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-seafile-client"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Seafile client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-wordpress"
+description = "SigmaOS integration for WordPress CLI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wordpress"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "WordPress CLI"
+visibility = "public"
+depends_on = []
