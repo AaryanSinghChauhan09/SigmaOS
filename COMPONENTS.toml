@@ -32290,3 +32290,493 @@ language = "shell"
 inspirations = "XFCE panel"
 visibility = "public"
 depends_on = []
+[[component]]
+name = "SigmaOS-arena-chess"
+description = "SigmaOS integration for GNU Chess: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arena-chess"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GNU Chess"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-atlauncher"
+description = "SigmaOS integration for ATLauncher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-atlauncher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "ATLauncher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-attractmode"
+description = "SigmaOS integration for AttractMode frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-attractmode"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "AttractMode frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-batocera"
+description = "SigmaOS integration for Batocera frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-batocera"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Batocera frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-battle-net"
+description = "SigmaOS integration for Battle.net launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-battle-net"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Battle.net launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-bigbox"
+description = "SigmaOS integration for Big Box frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bigbox"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Big Box frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-citra"
+description = "SigmaOS integration for Citra 3DS emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-citra"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Citra 3DS emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-crazyhouse"
+description = "SigmaOS integration for Crazyhouse: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crazyhouse"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Crazyhouse"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-cutechess"
+description = "SigmaOS integration for cutechess engine: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cutechess"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "cutechess engine"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-duckstation"
+description = "SigmaOS integration for DuckStation PS1 emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-duckstation"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "DuckStation PS1 emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-emudeck"
+description = "SigmaOS integration for EmuDeck frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-emudeck"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "EmuDeck frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-epic-games"
+description = "SigmaOS integration for Epic Games launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-epic-games"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Epic Games launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-flycast"
+description = "SigmaOS integration for Flycast Dreamcast emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-flycast"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Flycast Dreamcast emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gdlauncher"
+description = "SigmaOS integration for GDLauncher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gdlauncher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GDLauncher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-gogcom"
+description = "SigmaOS integration for GOG.com launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gogcom"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "GOG.com launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-heroic-linux"
+description = "SigmaOS integration for Heroic Linux launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-heroic-linux"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Heroic Linux launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-humble-bundle"
+description = "SigmaOS integration for Humble Bundle: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-humble-bundle"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Humble Bundle"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-itch-io"
+description = "SigmaOS integration for itch.io client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-itch-io"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "itch.io client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-komodo"
+description = "SigmaOS integration for Komodo engine: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-komodo"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Komodo engine"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-launchbox"
+description = "SigmaOS integration for LaunchBox frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-launchbox"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "LaunchBox frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lc0"
+description = "SigmaOS integration for Leela Chess Zero: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lc0"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Leela Chess Zero"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-league-client"
+description = "SigmaOS integration for League client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-league-client"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "League client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-legendary"
+description = "SigmaOS integration for Legendary Epic launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-legendary"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Legendary Epic launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lime3ds"
+description = "SigmaOS integration for Lime3DS emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lime3ds"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Lime3DS emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-lutris-gui"
+description = "SigmaOS integration for Lutris GUI: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lutris-gui"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Lutris GUI"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-mame"
+description = "SigmaOS integration for MAME arcade emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mame"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "MAME arcade emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-minecraft-launcher"
+description = "SigmaOS integration for Minecraft launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-minecraft-launcher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Minecraft launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-origin-ea"
+description = "SigmaOS integration for EA Origin: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-origin-ea"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "EA Origin"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pcsx2"
+description = "SigmaOS integration for PCSX2 PS2 emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pcsx2"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PCSX2 PS2 emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pegasus"
+description = "SigmaOS integration for Pegasus frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pegasus"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Pegasus frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-pgn"
+description = "SigmaOS integration for PGN chess viewer: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pgn"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PGN chess viewer"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-playnite"
+description = "SigmaOS integration for Playnite frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-playnite"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Playnite frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-playonlinux"
+description = "SigmaOS integration for PlayOnLinux: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-playonlinux"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PlayOnLinux"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ppsspp"
+description = "SigmaOS integration for PPSSPP PSP emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ppsspp"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "PPSSPP PSP emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-prismlauncher"
+description = "SigmaOS integration for Prism Launcher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-prismlauncher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Prism Launcher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-proton-ge"
+description = "SigmaOS integration for Proton-GE: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-proton-ge"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Proton-GE"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-retroarch-hd"
+description = "SigmaOS integration for RetroArch HD shaders: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-retroarch-hd"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "RetroArch HD shaders"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-retrodeck"
+description = "SigmaOS integration for RetroDECK frontend: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-retrodeck"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "RetroDECK frontend"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-riot-client"
+description = "SigmaOS integration for Riot Client: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-riot-client"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Riot Client"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-rpcs3"
+description = "SigmaOS integration for RPCS3 PS3 emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rpcs3"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "RPCS3 PS3 emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ryujinx"
+description = "SigmaOS integration for Ryujinx Switch emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ryujinx"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ryujinx Switch emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-scid"
+description = "SigmaOS integration for Scid chess DB: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-scid"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Scid chess DB"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-stockfish"
+description = "SigmaOS integration for Stockfish engine: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stockfish"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Stockfish engine"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-tlauncher"
+description = "SigmaOS integration for TLauncher: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tlauncher"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "TLauncher"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-torch"
+description = "SigmaOS integration for Torch engine: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-torch"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Torch engine"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-ubisoft-connect"
+description = "SigmaOS integration for Ubisoft Connect: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ubisoft-connect"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Ubisoft Connect"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-valorant"
+description = "SigmaOS integration for Valorant: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-valorant"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Valorant"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-xemu"
+description = "SigmaOS integration for xemu original Xbox emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xemu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "xemu original Xbox emulator"
+visibility = "public"
+depends_on = []
+[[component]]
+name = "SigmaOS-yuzu"
+description = "SigmaOS integration for Yuzu Switch emulator: package management, config deployment, and CLI helpers."
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-yuzu"
+engine = "app_integration"
+category = "Applications"
+language = "shell"
+inspirations = "Yuzu Switch emulator"
+visibility = "public"
+depends_on = []
