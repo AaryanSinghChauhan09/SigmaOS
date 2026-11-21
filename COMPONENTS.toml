@@ -17824,10 +17824,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-bash3"
+name = "SigmaOS-bash"
 description = "BASH shell compatibility layer with shell scripting and command execution"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bash3"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bash"
+engine = "app_integration"
 category = "Shell"
 languages = ["Rust"]
 dependencies = []
@@ -18154,10 +18154,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-postgresql2"
+name = "SigmaOS-postgresql"
 description = "PostgreSQL database compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-postgresql2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-postgresql"
+engine = "app_integration"
 category = "Database"
 languages = ["Rust"]
 dependencies = []
@@ -18165,10 +18165,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-mysql2"
+name = "SigmaOS-mysql"
 description = "MySQL database compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mysql2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mysql"
+engine = "app_integration"
 category = "Database"
 languages = ["Rust"]
 dependencies = []
@@ -18209,10 +18209,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-vscode2"
+name = "SigmaOS-vscode"
 description = "VS Code editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vscode2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vscode"
+engine = "app_integration"
 category = "Application"
 languages = ["Rust"]
 dependencies = []
@@ -18220,10 +18220,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-blender2"
+name = "SigmaOS-blender"
 description = "Blender 3D software compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blender2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-blender"
+engine = "app_integration"
 category = "Application"
 languages = ["Rust"]
 dependencies = []
@@ -18231,10 +18231,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-warp2"
+name = "SigmaOS-warp"
 description = "Warp terminal emulator compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-warp2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-warp"
+engine = "app_integration"
 category = "Terminal"
 languages = ["Rust"]
 dependencies = []
@@ -18242,10 +18242,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-cline2"
+name = "SigmaOS-cline"
 description = "Cline AI coding assistant compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cline2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-cline"
+engine = "app_integration"
 category = "AI Tool"
 languages = ["Rust"]
 dependencies = []
@@ -18253,10 +18253,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-codex-cli2"
+name = "SigmaOS-codex-cli"
 description = "CodexCLI AI coding tool compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-codex-cli2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-codex-cli"
+engine = "app_integration"
 category = "AI Tool"
 languages = ["Rust"]
 dependencies = []
@@ -18264,10 +18264,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-crewai2"
+name = "SigmaOS-crewai"
 description = "CrewAI AI agent framework compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crewai2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crewai"
+engine = "app_integration"
 category = "AI Framework"
 languages = ["Rust"]
 dependencies = []
@@ -18319,10 +18319,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-notepad-plus-plus2"
+name = "SigmaOS-notepad-plus-plus"
 description = "Notepad++ text editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notepad-plus-plus2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notepad-plus-plus"
+engine = "app_integration"
 category = "Text Editor"
 languages = ["Rust"]
 dependencies = []
@@ -18330,10 +18330,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-command-code2"
+name = "SigmaOS-command-code"
 description = "Command Code AI tool compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-command-code2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-command-code"
+engine = "app_integration"
 category = "AI Tool"
 languages = ["Rust"]
 dependencies = []
@@ -18341,10 +18341,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-crew-ai2"
+name = "SigmaOS-crew-ai"
 description = "CrewAI AI framework compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crew-ai2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-crew-ai"
+engine = "app_integration"
 category = "AI Framework"
 languages = ["Rust"]
 dependencies = []
@@ -18363,10 +18363,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-brave-browser2"
+name = "SigmaOS-brave-browser"
 description = "Brave browser compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-brave-browser2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-brave-browser"
+engine = "app_integration"
 category = "Browser"
 languages = ["Rust"]
 dependencies = []
@@ -18374,10 +18374,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-edge-browser2"
+name = "SigmaOS-edge-browser"
 description = "Edge browser compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-edge-browser2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-edge-browser"
+engine = "app_integration"
 category = "Browser"
 languages = ["Rust"]
 dependencies = []
@@ -18495,10 +18495,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-shotcut2"
+name = "SigmaOS-shotcut"
 description = "Shotcut video editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shotcut2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-shotcut"
+engine = "app_integration"
 category = "Creative"
 languages = ["Rust"]
 dependencies = []
@@ -18506,10 +18506,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-lightworks2"
+name = "SigmaOS-lightworks"
 description = "Lightworks video editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lightworks2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-lightworks"
+engine = "app_integration"
 category = "Creative"
 languages = ["Rust"]
 dependencies = []
@@ -18517,10 +18517,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-openshot2"
+name = "SigmaOS-openshot"
 description = "OpenShot video editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openshot2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-openshot"
+engine = "app_integration"
 category = "Creative"
 languages = ["Rust"]
 dependencies = []
@@ -18528,10 +18528,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-pitivi2"
+name = "SigmaOS-pitivi"
 description = "Pitivi video editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pitivi2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pitivi"
+engine = "app_integration"
 category = "Creative"
 languages = ["Rust"]
 dependencies = []
@@ -18539,10 +18539,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-wireshark2"
+name = "SigmaOS-wireshark"
 description = "Wireshark network analyzer compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wireshark2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wireshark"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18550,10 +18550,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-nmap2"
+name = "SigmaOS-nmap"
 description = "Nmap network scanner compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nmap2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nmap"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18561,10 +18561,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-metabase2"
+name = "SigmaOS-metabase"
 description = "Metabase business intelligence compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-metabase2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-metabase"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18572,10 +18572,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-airbyte2"
+name = "SigmaOS-airbyte"
 description = "Airbyte data integration compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-airbyte2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-airbyte"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18583,10 +18583,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-dbt2"
+name = "SigmaOS-dbt"
 description = "dbt data transformation compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dbt2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dbt"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18594,10 +18594,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-tableau2"
+name = "SigmaOS-tableau"
 description = "Tableau data visualization compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tableau2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tableau"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18605,10 +18605,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-powerbi2"
+name = "SigmaOS-powerbi"
 description = "PowerBI business intelligence compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-powerbi2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-powerbi"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18616,10 +18616,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-superset2"
+name = "SigmaOS-superset"
 description = "Superset data visualization compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-superset2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-superset"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18627,10 +18627,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-knime2"
+name = "SigmaOS-knime"
 description = "KNIME data analytics compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-knime2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-knime"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18638,10 +18638,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-jupyter2"
+name = "SigmaOS-jupyter"
 description = "Jupyter notebook compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jupyter2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jupyter"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18649,10 +18649,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-rstudio2"
+name = "SigmaOS-rstudio"
 description = "RStudio IDE compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rstudio2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-rstudio"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18660,10 +18660,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-sas2"
+name = "SigmaOS-sas"
 description = "SAS statistical software compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sas2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sas"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18671,10 +18671,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-ms-access2"
+name = "SigmaOS-ms-access"
 description = "MS Access database compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ms-access2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ms-access"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18682,10 +18682,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-ms-excel2"
+name = "SigmaOS-ms-excel"
 description = "MS Excel spreadsheet compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ms-excel2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ms-excel"
+engine = "app_integration"
 category = "Data Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18693,10 +18693,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-intellij-idea2"
+name = "SigmaOS-intellij-idea"
 description = "IntelliJ IDEA IDE compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-intellij-idea2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-intellij-idea"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18704,10 +18704,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-eclipse2"
+name = "SigmaOS-eclipse"
 description = "Eclipse IDE compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-eclipse2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-eclipse"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18715,10 +18715,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-atom-editor2"
+name = "SigmaOS-atom-editor"
 description = "Atom text editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-atom-editor2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-atom-editor"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18726,10 +18726,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-sublime-text2"
+name = "SigmaOS-sublime-text"
 description = "Sublime Text text editor compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sublime-text2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sublime-text"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18737,10 +18737,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-gitkraken2"
+name = "SigmaOS-gitkraken"
 description = "GitKraken git client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gitkraken2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gitkraken"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18748,10 +18748,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-postman2"
+name = "SigmaOS-postman"
 description = "Postman API client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-postman2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-postman"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18759,10 +18759,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-insomnia2"
+name = "SigmaOS-insomnia"
 description = "Insomnia API client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-insomnia2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-insomnia"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18770,10 +18770,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-dbeaver2"
+name = "SigmaOS-dbeaver"
 description = "DBeaver database client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dbeaver2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dbeaver"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18781,10 +18781,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-datagrip2"
+name = "SigmaOS-datagrip"
 description = "DataGrip database IDE compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-datagrip2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-datagrip"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18792,10 +18792,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-tableplus2"
+name = "SigmaOS-tableplus"
 description = "TablePlus database GUI compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tableplus2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tableplus"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18803,10 +18803,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-redis-commander2"
+name = "SigmaOS-redis-commander"
 description = "Redis Commander redis client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-redis-commander2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-redis-commander"
+engine = "app_integration"
 category = "Dev Tools"
 languages = ["Rust"]
 dependencies = []
@@ -18814,10 +18814,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-jira2"
+name = "SigmaOS-jira"
 description = "Jira project management compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jira2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-jira"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18825,10 +18825,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-trello2"
+name = "SigmaOS-trello"
 description = "Trello project management compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-trello2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-trello"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18836,10 +18836,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-slack2"
+name = "SigmaOS-slack"
 description = "Slack team communication compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slack2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slack"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18847,10 +18847,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-discord2"
+name = "SigmaOS-discord"
 description = "Discord team communication compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-discord2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-discord"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18858,10 +18858,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-zoom2"
+name = "SigmaOS-zoom"
 description = "Zoom video conferencing compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zoom2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zoom"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18869,10 +18869,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-teams2"
+name = "SigmaOS-teams"
 description = "Teams video conferencing compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-teams2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-teams"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18880,10 +18880,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-gmail2"
+name = "SigmaOS-gmail"
 description = "Gmail email client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gmail2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gmail"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18891,10 +18891,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-outlook2"
+name = "SigmaOS-outlook"
 description = "Outlook email client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-outlook2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-outlook"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18902,10 +18902,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-evolution2"
+name = "SigmaOS-evolution"
 description = "Evolution email client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-evolution2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-evolution"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18913,10 +18913,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-notion2"
+name = "SigmaOS-notion"
 description = "Notion note taking compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notion2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notion"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18924,10 +18924,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-asana2"
+name = "SigmaOS-asana"
 description = "Asana project management compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asana2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asana"
+engine = "app_integration"
 category = "Collaboration"
 languages = ["Rust"]
 dependencies = []
@@ -18935,10 +18935,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-mendeley2"
+name = "SigmaOS-mendeley"
 description = "Mendeley reference manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mendeley2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mendeley"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -18946,10 +18946,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-endnote2"
+name = "SigmaOS-endnote"
 description = "EndNote reference manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-endnote2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-endnote"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -18957,10 +18957,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-dictionary2"
+name = "SigmaOS-dictionary"
 description = "Dictionary dictionary compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dictionary2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dictionary"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -18968,10 +18968,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-translate2"
+name = "SigmaOS-translate"
 description = "Translate translation compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-translate2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-translate"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -18979,10 +18979,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-weather2"
+name = "SigmaOS-weather"
 description = "Weather weather compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-weather2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-weather"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -18990,10 +18990,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-clock2"
+name = "SigmaOS-clock"
 description = "Clock clock compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clock2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clock"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -19001,10 +19001,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-timer2"
+name = "SigmaOS-timer"
 description = "Timer timer compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timer2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timer"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -19012,10 +19012,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-stopwatch2"
+name = "SigmaOS-stopwatch"
 description = "Stopwatch stopwatch compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stopwatch2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stopwatch"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -19023,10 +19023,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-pomodoro2"
+name = "SigmaOS-pomodoro"
 description = "Pomodoro pomodoro compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pomodoro2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pomodoro"
+engine = "app_integration"
 category = "Utilities"
 languages = ["Rust"]
 dependencies = []
@@ -19034,10 +19034,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-disk-manager2"
+name = "SigmaOS-disk-manager"
 description = "Disk Manager disk manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-disk-manager2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-disk-manager"
+engine = "app_integration"
 category = "System"
 languages = ["Rust"]
 dependencies = []
@@ -19045,10 +19045,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-screen-reader2"
+name = "SigmaOS-screen-reader"
 description = "Screen Reader screen reader compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-reader2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-reader"
+engine = "app_integration"
 category = "Accessibility"
 languages = ["Rust"]
 dependencies = []
@@ -19056,10 +19056,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-magnifier2"
+name = "SigmaOS-magnifier"
 description = "Magnifier magnifier compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-magnifier2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-magnifier"
+engine = "app_integration"
 category = "Accessibility"
 languages = ["Rust"]
 dependencies = []
@@ -19067,10 +19067,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-voice-control2"
+name = "SigmaOS-voice-control"
 description = "Voice Control voice control compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-voice-control2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-voice-control"
+engine = "app_integration"
 category = "Accessibility"
 languages = ["Rust"]
 dependencies = []
@@ -19078,10 +19078,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-on-screen-keyboard2"
+name = "SigmaOS-on-screen-keyboard"
 description = "On-Screen Keyboard on-screen keyboard compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-on-screen-keyboard2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-on-screen-keyboard"
+engine = "app_integration"
 category = "Accessibility"
 languages = ["Rust"]
 dependencies = []
@@ -19089,10 +19089,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-accessibility-manager2"
+name = "SigmaOS-accessibility-manager"
 description = "Accessibility Manager accessibility manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accessibility-manager2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accessibility-manager"
+engine = "app_integration"
 category = "Accessibility"
 languages = ["Rust"]
 dependencies = []
@@ -19100,10 +19100,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-wallpaper-manager2"
+name = "SigmaOS-wallpaper-manager"
 description = "Wallpaper Manager wallpaper manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper-manager2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper-manager"
+engine = "app_integration"
 category = "Customization"
 languages = ["Rust"]
 dependencies = []
@@ -19111,10 +19111,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-gpu-manager2"
+name = "SigmaOS-gpu-manager"
 description = "GPU Manager gpu manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gpu-manager2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gpu-manager"
+engine = "app_integration"
 category = "System"
 languages = ["Rust"]
 dependencies = []
@@ -19122,10 +19122,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-thermal-manager2"
+name = "SigmaOS-thermal-manager"
 description = "Thermal Manager thermal manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thermal-manager2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thermal-manager"
+engine = "app_integration"
 category = "System"
 languages = ["Rust"]
 dependencies = []
@@ -19133,10 +19133,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-firmware-manager2"
+name = "SigmaOS-firmware-manager"
 description = "Firmware Manager firmware manager compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firmware-manager2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firmware-manager"
+engine = "app_integration"
 category = "System"
 languages = ["Rust"]
 dependencies = []
@@ -19144,10 +19144,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-software-updater2"
+name = "SigmaOS-software-updater"
 description = "Software Updater software updater compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-updater2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-updater"
+engine = "app_integration"
 category = "System"
 languages = ["Rust"]
 dependencies = []
@@ -19155,10 +19155,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-vmware2"
+name = "SigmaOS-vmware"
 description = "VMware virtualization compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vmware2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vmware"
+engine = "app_integration"
 category = "Virtualization"
 languages = ["Rust"]
 dependencies = []
@@ -19166,10 +19166,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-qemu2"
+name = "SigmaOS-qemu"
 description = "QEMU virtualization compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qemu2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-qemu"
+engine = "app_integration"
 category = "Virtualization"
 languages = ["Rust"]
 dependencies = []
@@ -19177,10 +19177,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-virtual-machine-manager2"
+name = "SigmaOS-virtual-machine-manager"
 description = "Virtual Machine Manager virtualization compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virtual-machine-manager2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-virtual-machine-manager"
+engine = "app_integration"
 category = "Virtualization"
 languages = ["Rust"]
 dependencies = []
@@ -19188,10 +19188,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-waydroid2"
+name = "SigmaOS-waydroid"
 description = "Waydroid Android container compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-waydroid2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-waydroid"
+engine = "app_integration"
 category = "Virtualization"
 languages = ["Rust"]
 dependencies = []
@@ -19232,10 +19232,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-unreal-engine2"
+name = "SigmaOS-unreal-engine"
 description = "Unreal Engine game engine compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unreal-engine2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unreal-engine"
+engine = "app_integration"
 category = "Game Development"
 languages = ["Rust"]
 dependencies = []
@@ -19243,10 +19243,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-unity2"
+name = "SigmaOS-unity"
 description = "Unity game engine compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unity2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-unity"
+engine = "app_integration"
 category = "Game Development"
 languages = ["Rust"]
 dependencies = []
@@ -19254,10 +19254,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-godot2"
+name = "SigmaOS-godot"
 description = "Godot game engine compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-godot2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-godot"
+engine = "app_integration"
 category = "Game Development"
 languages = ["Rust"]
 dependencies = []
@@ -19287,10 +19287,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-vpn2"
+name = "SigmaOS-vpn"
 description = "VPN vpn compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vpn2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vpn"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
@@ -19298,10 +19298,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-ssh-server2"
+name = "SigmaOS-ssh-server"
 description = "SSH Server ssh server compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ssh-server2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ssh-server"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
@@ -19309,10 +19309,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-ssh-client2"
+name = "SigmaOS-ssh-client"
 description = "SSH Client ssh client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ssh-client2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ssh-client"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
@@ -19320,10 +19320,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-ftp-server2"
+name = "SigmaOS-ftp-server"
 description = "FTP Server ftp server compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ftp-server2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ftp-server"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
@@ -19331,10 +19331,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-ftp-client2"
+name = "SigmaOS-ftp-client"
 description = "FTP Client ftp client compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ftp-client2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ftp-client"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
@@ -19342,10 +19342,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-web-server2"
+name = "SigmaOS-web-server"
 description = "Web Server web server compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-web-server2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-web-server"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
@@ -19353,10 +19353,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-database-server2"
+name = "SigmaOS-database-server"
 description = "Database Server database server compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-database-server2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-database-server"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
@@ -19364,10 +19364,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-mail-server2"
+name = "SigmaOS-mail-server"
 description = "Mail Server mail server compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mail-server2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mail-server"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
@@ -19375,10 +19375,10 @@ public = true
 inspirations = "None"
 
 [[component]]
-name = "SigmaOS-proxy-server2"
+name = "SigmaOS-proxy-server"
 description = "Proxy Server proxy server compatibility layer for SigmaOS"
-repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-proxy-server2"
-engine = "Rust"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-proxy-server"
+engine = "app_integration"
 category = "Network"
 languages = ["Rust"]
 dependencies = []
